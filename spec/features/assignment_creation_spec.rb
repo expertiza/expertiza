@@ -27,6 +27,30 @@ def get_selected_id(finder_var)
   end
 end
 
+def self.set_assignment_review_deadline(submission_date, review_date, _round=1)
+  it "set the deadline for an assignment review" do
+    fill_in 'assignment_form_assignment_rounds_of_reviews', with: _round
+    fill_in 'datetimepicker_submission_round_1', with: submission_date
+    fill_in 'datetimepicker_review_round_1', with: review_date
+    click_button 'submit_btn'
+
+    submission_type_id = DeadlineType.where(name: 'submission')[0].id
+    review_type_id = DeadlineType.where(name: 'review')[0].id
+
+    submission_due_date = DueDate.find(1)
+    review_due_date = DueDate.find(2)
+    expect(submission_due_date).to have_attributes(
+      deadline_type_id: submission_type_id,
+      type: 'AssignmentDueDate'
+    )
+
+    expect(review_due_date).to have_attributes(
+      deadline_type_id: review_type_id,
+      type: 'AssignmentDueDate'
+    )
+  end
+end
+
 def fill_assignment_form
   fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
   select('Course 2', from: 'assignment_form_assignment_course_id')
@@ -221,6 +245,7 @@ describe "assignment function" do
       )
     end
   end
+
   # instructor can set in which deadline can student reviewers take the quizzes
   describe "deadlines", js: true do
     before(:each) do
@@ -228,28 +253,7 @@ describe "assignment function" do
       login_as("instructor6")
       visit "/assignments/#{@assignment.id}/edit"
       click_link 'Due date'
-    end
-    # instructor can set deadline for review and taking quiz
-    it "set the deadline for an assignment review" do
-      fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
-      fill_in 'datetimepicker_submission_round_1', with: '2017/11/01 12:00'
-      fill_in 'datetimepicker_review_round_1', with: '2017/11/10 12:00'
-      click_button 'submit_btn'
-
-      submission_type_id = DeadlineType.where(name: 'submission')[0].id
-      review_type_id = DeadlineType.where(name: 'review')[0].id
-
-      submission_due_date = DueDate.find(1)
-      review_due_date = DueDate.find(2)
-      expect(submission_due_date).to have_attributes(
-        deadline_type_id: submission_type_id,
-        type: 'AssignmentDueDate'
-      )
-
-      expect(review_due_date).to have_attributes(
-        deadline_type_id: review_type_id,
-        type: 'AssignmentDueDate'
-      )
+      set_assignment_review_deadline('2017/11/01 12:00','2017/11/10 12:00')
     end
   end
   # adding test for general tab
@@ -579,6 +583,7 @@ describe "assignment function" do
       login_as("instructor6")
       visit "/assignments/#{@assignment.id}/edit"
       click_link 'Due date'
+      set_assignment_review_deadline('2017/10/01 12:00','2017/10/10 12:00')
     end
 
     xit "Able to create a new penalty policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.
@@ -587,29 +592,6 @@ describe "assignment function" do
       fill_in 'policy_penalty_per_unit', with: 'testlatepolicypenalty'
       fill_in 'late_policy_max_penalty', with: 2
       click_button 'Create'
-    end
-
-    # able to set deadlines for a single round of reviews
-    it "set the deadline for an assignment review" do
-      fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
-      fill_in 'datetimepicker_submission_round_1', with: '2017/10/01 12:00'
-      fill_in 'datetimepicker_review_round_1', with: '2017/10/10 12:00'
-      click_button 'submit_btn'
-
-      submission_type_id = DeadlineType.where(name: 'submission')[0].id
-      review_type_id = DeadlineType.where(name: 'review')[0].id
-
-      submission_due_date = DueDate.find(1)
-      review_due_date = DueDate.find(2)
-      expect(submission_due_date).to have_attributes(
-        deadline_type_id: submission_type_id,
-        type: 'AssignmentDueDate'
-      )
-
-      expect(review_due_date).to have_attributes(
-        deadline_type_id: review_type_id,
-        type: 'AssignmentDueDate'
-      )
     end
   end
 

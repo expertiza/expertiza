@@ -99,7 +99,7 @@
                   <td align = "center">Declined</td>
                 <% else %>
                   <td align = "center">Waiting for reply
-                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
+                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
                 <% end %>
              </tr>
           <% end %>
@@ -122,7 +122,7 @@
        <% end %>
      <% elsif !@student.team.full?%>
        <b>Invite people</b>
-       <%= form_tag :controller => 'invitation', :action => 'create' do %>
+       <%= form_tag :controller => 'invitations', :action => 'create' do %>
          <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
@@ -186,12 +186,12 @@
                       @team_id = @student.team.id
                     end %>
                   <%= link_to "Accept",
-                              {:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
+                              {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
                               {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}
                   %>
                   |
                   <%= link_to "Decline",
-                              {:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
+                              {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
                   %>
                 </td>
               </tr>

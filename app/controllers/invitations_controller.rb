@@ -62,7 +62,7 @@ class InvitationsController < ApplicationController
 
   def update_join_team_request(user, student)
     # update the status in the join_team_request to A
-    if user && student
+    if !user || !student
       return
     end
     #participant information of invitee and assignment

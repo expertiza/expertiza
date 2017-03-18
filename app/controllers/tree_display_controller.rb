@@ -12,6 +12,11 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  def confirm
+    @id = params[:id]
+    @type = params[:type]
+  end
+
   # direct access to questionnaires
   def goto_questionnaires
     goto_controller('Questionnaires')

@@ -79,7 +79,7 @@ jQuery(document).ready(function() {
           moreContent.push(
             <span>
               <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
-              <a title="Delete" href={"/"+newNodeType+"/delete?id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/delete-icon-24.png" /></a>
+              <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&type="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
               <a title={this.props.private? "Make public" : "Make private"} href={"/"+newNodeType+"/toggle_access?id="+(parseInt(this.props.id)/2).toString()}><img src={"/assets/tree_view/lock-"+(this.props.private? "off-" : "")+"disabled-icon-24.png"} /></a>
             </span>
           )
@@ -637,7 +637,7 @@ jQuery(document).ready(function() {
       var _this = this
       var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
       var colDisplayStyle = {
-        "display": "",
+        "display": ""
       }
       if (this.props) {
           if (this.props.dataType === 'questionnaire') {

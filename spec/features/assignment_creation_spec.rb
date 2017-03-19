@@ -88,10 +88,7 @@ describe "assignment function" do
     it "is able to create a public assignment" do
       login_as("instructor6")
       visit "/assignments/new?private=0"
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("public", "testDirectory")
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_reviews_visible_to_all")
@@ -215,10 +212,7 @@ describe "assignment function" do
     it "is able to create public micro-task assignment" do
       login_as("instructor6")
       visit '/assignments/new?private=0'
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("public", "testDirectory")
       check('assignment_form_assignment_microtask')
       click_button 'Create'
 
@@ -230,10 +224,7 @@ describe "assignment function" do
     it "is able to create calibrated public assignment" do
       login_as("instructor6")
       visit '/assignments/new?private=0'
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("public", "testDirectory")
       check("assignment_form_assignment_is_calibrated")
       click_button 'Create'
 

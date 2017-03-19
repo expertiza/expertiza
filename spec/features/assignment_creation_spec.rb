@@ -29,7 +29,7 @@ end
 
 def set_assignment_review_deadline(submission_date, review_date, round)
   it "set the deadline for an assignment review" do
-    fill_in 'assignment_form_assignment_rounds_of_reviews', with: _round
+    fill_in 'assignment_form_assignment_rounds_of_reviews', with: round
     fill_in 'datetimepicker_submission_round_1', with: submission_date
     fill_in 'datetimepicker_review_round_1', with: review_date
     click_button 'submit_btn'
@@ -51,7 +51,7 @@ def set_assignment_review_deadline(submission_date, review_date, round)
   end
 end
 
-def login_create_assignment_reroute(assignment, assignment_name, login_user, page_to_visit, link_to_click, submission_date, review_date, round)
+def login_create_assignment_reroute(assignment, assignment_name, login_user, page_to_visit, link_to_click)
   @assignment = create(assignment, name: assignment_name)
   login_as(login_user)
   visit page_to_visit
@@ -112,7 +112,7 @@ describe "assignment function" do
     it "is able to create a private assignment" do
       login_as("instructor6")
       visit "/assignments/new?private=1"
-      
+
       fill_assignment_form("private", "testDirectory")
 
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
@@ -184,7 +184,8 @@ describe "assignment function" do
       click_button 'submit_btn'
 
       assignment = Assignment.where(name: 'private assignment for test').first
-      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
+      pending(%(not sure what's broken here but the error is: 
+        #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
         staggered_deadline: true
       )
@@ -593,7 +594,7 @@ describe "assignment function" do
     login_as('instructor6')
     visit "/assignments/associate_assignment_with_course?id=#{assignment_id}"
 
-    choose "course_id_#{course_id}"					
+    choose "course_id_#{course_id}"
     click_button 'Save'
 
     assignment_row = Assignment.where(name: 'Test Assignment')[0]

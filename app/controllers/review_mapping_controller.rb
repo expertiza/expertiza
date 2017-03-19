@@ -366,6 +366,7 @@ class ReviewMappingController < ApplicationController
 
 
   def response_report
+
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
     @assignment = Assignment.find(@id)
@@ -398,12 +399,18 @@ class ReviewMappingController < ApplicationController
       @avg_scores_by_round = sum.avg_scores_by_round
       @avg_scores_by_criterion = sum.avg_scores_by_criterion
     when "ReviewResponseMap"
+      if params[:select_metric]
+        @metric_type = params[:MetricSelector]
+      else
+        # Default metric
+        @metric_type = "AverageScore"
+      end
       @review_user = params[:user]
       # If review response is required call review_response_report method in review_response_map model
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
-      
+
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?

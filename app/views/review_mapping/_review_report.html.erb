@@ -21,7 +21,9 @@
     </tr>
     </thead>
 <tbody>
+      <% if @metric_type == "Sentiment" %>
       <% get_sentiment_list %>
+      <% end %>
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
@@ -69,8 +71,11 @@
                 <% if index == 0 %>
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-                    <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
-                    <!--<%= display_sentiment_metric(r.id) %>-->
+                    <% if @metric_type == "Sentiment" %>
+                        <%= display_sentiment_metric(r.id) %>
+                    <% else %>
+                        <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                    <% end %>
                   </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

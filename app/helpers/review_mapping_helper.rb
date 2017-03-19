@@ -19,7 +19,7 @@ module ReviewMappingHelper
   end
 
 def get_sentiment_list
-  
+
     response_list = []
     @sentiment_list = []
     
@@ -55,7 +55,7 @@ def get_sentiment_list
   def display_sentiment_metric id
     hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s}
     value = hashed_sentiment[0]["sentiment"].to_f.round(2)
-    metric = "Avg. Sentiment: #{value}<br/>"
+    metric = "Overall Sentiment: #{value}<br/>"
     metric.html_safe
   end
 

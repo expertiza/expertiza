@@ -370,6 +370,10 @@ class ReviewMappingController < ApplicationController
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
     @assignment = Assignment.find(@id)
+    
+    # Default metric
+    @metric_type = "AverageScore"
+    
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"

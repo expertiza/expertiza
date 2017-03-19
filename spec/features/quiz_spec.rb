@@ -1,75 +1,87 @@
 require 'rails_helper'
 require 'selenium-webdriver'
 
+def create_default_test_data
+  # Create an instructor
+  @instructor = create(:instructor)
+
+  # Create a student
+  @student = create(:student)
+
+  # Create an assignment with quiz
+  @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+
+  # Create an assignment due date
+  create(:deadline_type, name: "submission")
+  create(:deadline_type, name: "review")
+  create(:deadline_type, name: "metareview")
+  create(:deadline_type, name: "drop_topic")
+  create(:deadline_type, name: "signup")
+  create(:deadline_type, name: "team_formation")
+  create(:deadline_right)
+  create(:deadline_right, name: 'Late')
+  create(:deadline_right, name: 'OK')
+  create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
+
+  @review_deadline_type = create(:deadline_type, name: "review")
+  create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
+
+  # Create a team linked to the calibrated assignment
+  @team = create :assignment_team, assignment: @assignment
+
+  # Create an assignment participant linked to the assignment
+  @participant = create :participant, assignment: @assignment, user: @student
+
+  # Create a mapping between the assignment team and the
+  # participant object's user (the submitter).
+  create :team_user, team: @team, user: @student
+  create :review_response_map, assignment: @assignment, reviewee: @team
+end
+
+def login_and_create_quiz
+  # Create a quiz
+  login_as @student.name
+
+  # Click on the assignment link, and navigate to work view
+  click_link @assignment.name
+  click_link 'Your work'
+
+  # Click on create quiz link
+  click_link 'Create a quiz'
+end
+
+def fill_in_quiz
+  # Fill in the form for Name
+  fill_in 'questionnaire_name', with: 'Quiz for test'
+
+  # Fill in the form for Question 1
+  fill_in 'text_area', with: 'Test Question 1'
+
+  # Choose the quiz to be a single choice question
+  page.choose('question_type_1_type_multiplechoiceradio')
+
+  # Fill in for all 4 choices
+  fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
+  fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
+  fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
+  fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
+
+  # Choose the first one to be the correct answer
+  page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
+
+  # Save quiz
+  click_on 'Create Quiz'
+end
+
 describe 'Student can create quizzes and edit them', js: true do
   before(:each) do
-    # Create an instructor
-    @instructor = create(:instructor)
-
-    # Create a student
-    @student = create(:student)
-
-    # Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
-
-    # Create an assignment due date
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
-
-    @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
-
-    # Create a team linked to the calibrated assignment
-    @team = create :assignment_team, assignment: @assignment
-
-    # Create an assignment participant linked to the assignment
-    @participant = create :participant, assignment: @assignment, user: @student
-
-    # Create a mapping between the assignment team and the
-    # participant object's user (the submitter).
-    create :team_user, team: @team, user: @student
-    create :review_response_map, assignment: @assignment, reviewee: @team
+    create_default_test_data
   end
 
   it 'should be able to create quiz' do
-    # Create a quiz
-    login_as @student.name
+    login_and_create_quiz
 
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Click on create quiz link
-    click_link 'Create a quiz'
-
-    # Fill in the form for Name
-    fill_in 'questionnaire_name', with: 'Quiz for test'
-
-    # Fill in the form for Question 1
-    fill_in 'text_area', with: 'Test Question 1'
-
-    # Choose the quiz to be a single choice question
-    page.choose('question_type_1_type_multiplechoiceradio')
-
-    # Fill in for all 4 choices
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-
-    # Choose the first one to be the correct answer
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-
-    # Save quiz
-    click_on 'Create Quiz'
+    fill_in_quiz
 
     # If the page have link View Quiz and Edit quiz, meaning the quiz has been created.
     expect(page).to have_link('View quiz')
@@ -77,36 +89,9 @@ describe 'Student can create quizzes and edit them', js: true do
   end
 
   it 'should be able to view quiz after create one' do
-    # Create a quiz
-    login_as @student.name
+    login_and_create_quiz
 
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Click on create quiz link
-    click_link 'Create a quiz'
-
-    # Fill in the form for Name
-    fill_in 'questionnaire_name', with: 'Quiz for test'
-
-    # Fill in the form for Question 1
-    fill_in 'text_area', with: 'Test Question 1'
-
-    # Choose the quiz to be a single choice question
-    page.choose('question_type_1_type_multiplechoiceradio')
-
-    # Fill in for all 4 choices
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-
-    # Choose the first one to be the correct answer
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-
-    # Save quiz
-    click_on 'Create Quiz'
+    fill_in_quiz
 
     # Be able to see the quiz
     click_on 'View quiz'
@@ -116,23 +101,9 @@ describe 'Student can create quizzes and edit them', js: true do
   end
 
   it 'should be able to edit quiz after create one' do
-    login_as @student.name
+    login_and_create_quiz
 
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Create a quiz for the assignment
-    click_link 'Create a quiz'
-    fill_in 'questionnaire_name', with: 'Quiz for test'
-    fill_in 'text_area', with: 'Test Question 1'
-    page.choose('question_type_1_type_multiplechoiceradio')
-    fill_in 'new_choices_1_MultipleChoiceRadio_1_txt', with: 'Test Quiz 1'
-    fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
-    fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
-    fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
-    page.choose('new_choices_1_MultipleChoiceRadio_1_iscorrect_1')
-    click_on 'Create Quiz'
+    fill_in_quiz
 
     # Should be able to edit the quiz
     click_on 'Edit quiz'
@@ -153,14 +124,7 @@ describe 'Student can create quizzes and edit them', js: true do
   end
 
   it 'should have error message if the name of the quiz is missing' do
-    login_as @student.name
-
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Create a quiz for the assignment without quiz name
-    click_link 'Create a quiz'
+    login_and_create_quiz
 
     # Without fill in quiz name
     fill_in 'text_area', with: 'Test Question 1'
@@ -177,14 +141,8 @@ describe 'Student can create quizzes and edit them', js: true do
   end
 
   it 'should have error message if The question text is missing for one or more questions' do
-    login_as @student.name
+    login_and_create_quiz
 
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Create a quiz for the assignment without fill in question text
-    click_link 'Create a quiz'
     fill_in 'questionnaire_name', with: 'Quiz for test'
 
     # Withnot fill in the question text
@@ -201,14 +159,8 @@ describe 'Student can create quizzes and edit them', js: true do
   end
 
   it 'should have error message if the choices are missing for one or more questions' do
-    login_as @student.name
+    login_and_create_quiz
 
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Create a quiz for the assignment without fill in every choices
-    click_link 'Create a quiz'
     fill_in 'questionnaire_name', with: 'Quiz for test'
     fill_in 'text_area', with: 'Test Question 1'
     page.choose('question_type_1_type_multiplechoiceradio')
@@ -224,14 +176,8 @@ describe 'Student can create quizzes and edit them', js: true do
   end
 
   it 'should have error message if the correct answer(s) have not been provided' do
-    login_as @student.name
+    login_and_create_quiz
 
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Create a quiz for the assignment without fill in every choices
-    click_link 'Create a quiz'
     fill_in 'questionnaire_name', with: 'Quiz for test'
     fill_in 'text_area', with: 'Test Question 1'
     page.choose('question_type_1_type_multiplechoiceradio')
@@ -252,53 +198,13 @@ end
 
 describe 'multiple quiz question test', js: true do
   before(:each) do
-    # Create an instructor
-    @instructor = create(:instructor)
-
-    # Create a student
-    @student = create(:student)
-
-    # Create an assignment with quiz
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 3
-
-    # Create an assignment due date
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
-
-    @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
-
-    # Create a team linked to the calibrated assignment
-    @team = create :assignment_team, assignment: @assignment
-
-    # Create an assignment participant linked to the assignment
-    @participant = create :participant, assignment: @assignment, user: @student
-
-    # Create a mapping between the assignment team and the
-    # participant object's user (the submitter).
-    create :team_user, team: @team, user: @student
-    create :review_response_map, assignment: @assignment, reviewee: @team
+    create_default_test_data
   end
 
   it 'number of questions set matches number of quiz questions avaliable' do
-    # [S2] - When an assignment has a quiz there is an input field that accepts the number of questions that will be on each quiz. Setting this number appropriately changes the number of quiz questions.
-    # Create a quiz
-    login_as @student.name
-
-    # Click on the assignment link, and navigate to work view
-    click_link @assignment.name
-    click_link 'Your work'
-
-    # Click on create quiz link
-    click_link 'Create a quiz'
+    # [S2] - When an assignment has a quiz there is an input field that accepts the number of questions that will be on
+    # each quiz. Setting this number appropriately changes the number of quiz questions.
+    login_and_create_quiz
 
     # Fill in the form for Name
     fill_in 'questionnaire_name', with: 'Quiz for test'
@@ -383,7 +289,8 @@ describe 'appropriate quiz taking times', js: true do
     # create :answer, question: @question, response_id: @response.id, answer: 1
   end
 
-  # [S3] - Students may not take quizzes on a phase that does not allow them to do so. When on a stage that does allow for quizzes, they may take quizzes on work that they have reviewed.
+  # [S3] - Students may not take quizzes on a phase that does not allow them to do so. When on a stage that does allow
+  # for quizzes, they may take quizzes on work that they have reviewed.
   it 'should not be able to take quiz before doing review' do
     login_as @student2.name
 

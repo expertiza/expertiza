@@ -27,7 +27,7 @@ def get_selected_id(finder_var)
   end
 end
 
-def self.set_assignment_review_deadline(submission_date, review_date, _round=1)
+def set_assignment_review_deadline(submission_date, review_date, round=1)
   it "set the deadline for an assignment review" do
     fill_in 'assignment_form_assignment_rounds_of_reviews', with: _round
     fill_in 'datetimepicker_submission_round_1', with: submission_date
@@ -259,11 +259,6 @@ describe "assignment function" do
   describe "deadlines", js: true do
     before(:each) do
       login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/11/01 12:00','2017/11/10 12:00', 1)
-      #@assignment = create(:assignment, name: 'public assignment for test')
-      #login_as("instructor6")
-      #visit "/assignments/#{@assignment.id}/edit"
-      #click_link 'Due date'
-      #set_assignment_review_deadline('2017/11/01 12:00','2017/11/10 12:00')
     end
   end
   # adding test for general tab
@@ -590,11 +585,6 @@ describe "assignment function" do
   describe "Due dates tab", js: true do
     before(:each) do
       login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/10/01 12:00','2017/10/10 12:00', 1)
-      #@assignment = create(:assignment, name: 'public assignment for test')
-      #login_as("instructor6")
-      #visit "/assignments/#{@assignment.id}/edit"
-      #click_link 'Due date'
-      #set_assignment_review_deadline('2017/10/01 12:00','2017/10/10 12:00')
     end
 
     xit "Able to create a new penalty policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.

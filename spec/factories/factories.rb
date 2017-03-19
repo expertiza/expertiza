@@ -362,7 +362,13 @@ FactoryGirl.define do
     instructor { User.where(role_id: 1).first || association(:instructor) }
     max_penalty 10
     penalty_per_unit 1
-    penalty_unit 'Minute'
+    penalty_unit 'Day'
+  end
+  
+  
+  factory :calculated_penalty, class: CalculatedPenalty do
+    participant { AssignmentParticipant.first || association(:participant) }
+    deadline_type { DeadlineType.first || association(:deadline_type) }
   end
 
 end

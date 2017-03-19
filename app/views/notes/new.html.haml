@@ -1,0 +1,17 @@
+%h1 New note
+
+= render 'form'
+
+= link_to 'Back', notes_path
+
+<form id="contact_form" action="#" method="POST" enctype="multipart/form-data">
+  <div class="row">
+    <label for="subject">Subject:</label><br />
+    <input id="subject" class="input" name="subject" type="text" value="" size="30" /><br />
+  </div>
+  <div class="row">
+    <label for="message">Your message:</label><br />
+    <textarea id="message" class="input" name="message" rows="7" cols="30"></textarea><br />
+  </div>
+  <input id="submit_button" type="submit" value="Send Notification" />
+</form>

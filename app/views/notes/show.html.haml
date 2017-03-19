@@ -1,0 +1,18 @@
+%p#notice= notice
+
+%p
+  %b Title:
+  = @note.title
+%p
+  %b Description:
+  = @note.description
+%p
+  %b Date:
+  = @note.date
+%p
+  %b Flag:
+  = @note.flag
+
+= link_to 'Edit', edit_note_path(@note)
+\|
+= link_to 'Back', notes_path

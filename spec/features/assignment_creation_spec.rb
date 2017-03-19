@@ -56,14 +56,12 @@ def login_create_assignment_reroute(assignment, assignment_name, login_user, pag
   login_as(login_user)
   visit page_to_visit
   click_link link_to_click
-  set_assignment_review_deadline(submission_date, review_date, round)
 end
 
-def fill_assignment_form
-  fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+def fill_assignment_form(assignment_descriptor, directory_identifier)
+  fill_in 'assignment_form_assignment_name', with: assignment_descriptor + ' assignment for test'
   select('Course 2', from: 'assignment_form_assignment_course_id')
-  fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-  fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+  fill_in 'assignment_form_assignment_directory_path', with: directory_identifier
 end
 
 describe "assignment function" do
@@ -117,10 +115,9 @@ describe "assignment function" do
     it "is able to create a private assignment" do
       login_as("instructor6")
       visit "/assignments/new?private=1"
+      
+      fill_assignment_form("private", "testDirectory")
 
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_reviews_visible_to_all")
@@ -142,9 +139,7 @@ describe "assignment function" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
 
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("private", "testDirectory")
       check("team_assignment")
       check("assignment_form_assignment_show_teammate_reviews")
       fill_in 'assignment_form_assignment_max_team_size', with: 3
@@ -162,9 +157,7 @@ describe "assignment function" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
 
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("private", "testDirectory")
       check("assignment_form_assignment_require_quiz")
       click_button 'Create'
       fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
@@ -182,9 +175,7 @@ describe "assignment function" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
 
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("private", "testDirectory")
       begin
         check("assignment_form_assignment_staggered_deadline")
       rescue
@@ -206,9 +197,7 @@ describe "assignment function" do
     it "is able to create with review visible to all reviewers" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("private", "testDirectory")
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check('assignment_form_assignment_reviews_visible_to_all')
       click_button 'Create'
@@ -277,7 +266,8 @@ describe "assignment function" do
     end
 
     it "should edit assignment available to students" do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_is_calibrated")
       click_button 'Save'
@@ -293,7 +283,8 @@ describe "assignment function" do
     end
 
     it "should edit quiz number available to students" do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check("assignment_form_assignment_require_quiz")
       click_button 'Save'
       fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
@@ -310,7 +301,8 @@ describe "assignment function" do
     end
 
     it "should edit number of members per team " do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check("assignment_form_assignment_show_teammate_reviews")
       fill_in 'assignment_form_assignment_max_team_size', with: 5
       click_button 'Save'
@@ -327,7 +319,8 @@ describe "assignment function" do
 
     ##### test reviews visible to all other reviewers ######
     it "should edit review visible to all other reviewers" do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check "assignment_form_assignment_reviews_visible_to_all"
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first

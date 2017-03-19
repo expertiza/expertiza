@@ -85,9 +85,9 @@ class DelayedMailer
           user_id = signed_up_user.team_id
           user = User.find(user_id)
           emails << user.email
-        end
-      end
-    end
+        end # end for signed_up_user
+      end # end else
+    end # end for topic
     return emails
   end
     
@@ -100,18 +100,18 @@ class DelayedMailer
     # If there are sign_up topics for an assignement then send a mail toonly signed_up_teams else send a mail to all participants
     if (sign_up_topics.nil? || sign_up_topics.count == 0)
       if assignment.team_assignment?
-        teamMails = getTeamMembersMail
-        for mail in teamMails
-          emails << mail
-          email_reminder(emails, self.deadline_type)
-        end
+        emails = getTeamMembersMail
       else
+        
+        # mail_assignment_participants sends out email so return
+        # return immediately after so email is not sent twice
         mail_assignment_participants
+        return
       end
     else
       emails = get_emails_signed_up_users(assignement, sign_up_topics)
-      email_reminder(emails, self.deadline_type)
     end
+    email_reminder(emails, self.deadline_type)
   end
 
   def getTeamMembersMail

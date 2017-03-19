@@ -48,13 +48,17 @@ module PenaltyHelper
     if resubmission_times.any?
       last_submission_time = resubmission_times.at(resubmission_times.size - 1).resubmitted_at
       if last_submission_time > submission_due_date
-        if @penalty_unit == 'Minute'
-          penalty_minutes = ((last_submission_time - submission_due_date)) / 60
-        elsif @penalty_unit == 'Hour'
-          penalty_minutes = ((last_submission_time - submission_due_date)) / 3600
-        elsif @penalty_unit == 'Day'
-          penalty_minutes = ((last_submission_time - submission_due_date)) / 86_400
-        end
+        time_difference = last_submission_time - submission_due_date
+        penalty_minutes = calculate_penalty_minutes(time_difference)
+##
+        #if @penalty_unit == 'Minute'
+        #  penalty_minutes = ((last_submission_time - submission_due_date)) / 60
+        #elsif @penalty_unit == 'Hour'
+        #  penalty_minutes = ((last_submission_time - submission_due_date)) / 3600
+        #elsif @penalty_unit == 'Day'
+        #  penalty_minutes = ((last_submission_time - submission_due_date)) / 86_400
+        #end
+##
         penalty_for_submission = penalty_minutes * @penalty_per_unit
         penalty = if penalty_for_submission > @max_penalty_for_no_submission
                     @max_penalty_for_no_submission
@@ -160,14 +164,17 @@ module PenaltyHelper
     for i in 0...num_of_reviews_required
       if review_map_created_at_list.at(i)
         if review_map_created_at_list.at(i) > review_due_date
-
-          if @penalty_unit == 'Minute'
-            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 60
-          elsif @penalty_unit == 'Hour'
-            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 3600
-          elsif @penalty_unit == 'Day'
-            penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 86_400
-          end
+          time_difference = review_map_created_at_list.at(i) - review_due_date
+          penalty_minutes = calculate_penalty_minutes(time_difference)
+##
+          #if @penalty_unit == 'Minute'
+          #  penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 60
+          #elsif @penalty_unit == 'Hour'
+          #  penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 3600
+          #elsif @penalty_unit == 'Day'
+          #  penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 86_400
+          #end
+##
           penalty_for_this_review = penalty_minutes * @penalty_per_unit
           if penalty_for_this_review > @max_penalty_for_no_submission
             penalty = @max_penalty_for_no_submission
@@ -180,6 +187,16 @@ module PenaltyHelper
       end
     end
     penalty
+  end
+
+  def calculate_penalty_minutes(time_difference)
+    if @penalty_unit == 'Minute'
+      penalty_minutes = time_difference / 60
+    elsif @penalty_unit == 'Hour'
+      penalty_minutes = time_difference / 3600
+    elsif @penalty_unit == 'Day'
+      penalty_minutes = time_difference / 86_400
+    end
   end
 
   #checking that penalty_per_unit is not exceeding max_penalty

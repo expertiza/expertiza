@@ -27,9 +27,9 @@ def get_selected_id(finder_var)
   end
 end
 
-def set_assignment_review_deadline(submission_date, review_date, round=1)
+def set_assignment_review_deadline(submission_date, review_date, _round= 1 )
   it "set the deadline for an assignment review" do
-    fill_in 'assignment_form_assignment_rounds_of_reviews', with: round
+    fill_in 'assignment_form_assignment_rounds_of_reviews', with: _round
     fill_in 'datetimepicker_submission_round_1', with: submission_date
     fill_in 'datetimepicker_review_round_1', with: review_date
     click_button 'submit_btn'
@@ -51,12 +51,12 @@ def set_assignment_review_deadline(submission_date, review_date, round=1)
   end
 end
 
-def login_create_assignment_reroute(assignment, assignment_name, login_user, page_to_visit, link_to_click, submission_date, review_date, round)
+def login_create_assignment_reroute(assignment, assignment_name, login_user, page_to_visit, link_to_click, submission_date, review_date)
   @assignment = create(assignment, name: assignment_name)
   login_as(login_user)
   visit page_to_visit
   click_link link_to_click
-  set_assignment_review_deadline(submission_date, review_date, round)
+  set_assignment_review_deadline(submission_date, review_date)
 end
 
 def fill_assignment_form

@@ -27,7 +27,51 @@ def get_selected_id(finder_var)
   end
 end
 
-def set_assignment_review_deadline(submission_date, review_date, round)
+def create_public_assignment(user_id, assignment_option)
+  login_as(user_id)
+  visit '/assignments/new?private=0'
+  fill_assignment_form("public", "testDirectory")
+  check(assignment_option)
+  click_button 'Create'
+  Assignment.where(name: 'public assignment for test').first
+end
+
+#login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date')
+#      set_assignment_review_deadline('2017/11/01 12:00', '2017/11/10 12:00', 1)
+
+#login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date')
+#      set_assignment_review_deadline('2017/10/01 12:00', '2017/10/10 12:00', 1)
+
+#def set_assignment_review_deadline(submission_date, review_date, round)
+#  it "set the deadline for an assignment review" do
+#    fill_in 'assignment_form_assignment_rounds_of_reviews', with: round
+#    fill_in 'datetimepicker_submission_round_1', with: submission_date
+#    fill_in 'datetimepicker_review_round_1', with: review_date
+#    click_button 'submit_btn'
+
+#    submission_type_id = DeadlineType.where(name: 'submission')[0].id
+#    review_type_id = DeadlineType.where(name: 'review')[0].id
+
+#    submission_due_date = DueDate.find(1)
+#    review_due_date = DueDate.find(2)
+#    expect(submission_due_date).to have_attributes(
+#      deadline_type_id: submission_type_id,
+#      type: 'AssignmentDueDate'
+#    )
+
+#    expect(review_due_date).to have_attributes(
+#      deadline_type_id: review_type_id,
+#      type: 'AssignmentDueDate'
+#    )
+#  end
+#end
+
+def admin_set_assignment_dates(assignment, submission_date, review_date, round)
+  @assignment = create(assignment, name: 'public assignment for test')
+  login_as("instructor6")
+  visit "/assignments/#{@assignment.id}/edit"
+  click_link 'Due date'
+
   it "set the deadline for an assignment review" do
     fill_in 'assignment_form_assignment_rounds_of_reviews', with: round
     fill_in 'datetimepicker_submission_round_1', with: submission_date
@@ -51,11 +95,27 @@ def set_assignment_review_deadline(submission_date, review_date, round)
   end
 end
 
-def login_create_assignment_reroute(assignment, assignment_name, login_user, page_to_visit, link_to_click)
-  @assignment = create(assignment, name: assignment_name)
-  login_as(login_user)
-  visit page_to_visit
-  click_link link_to_click
+def fill_in_questionaire(questionaire_css, questionaire_name, test_attributes)
+  within(:css, questionaire_css) do
+    select questionaire_name, from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+    uncheck('dropdown')
+    select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+    fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
+    fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
+  end
+  click_button 'Save'
+  sleep 1
+  if test_attributes
+    questionnaire = get_questionnaire(questionaire_name).first
+    expect(questionnaire).to have_attributes(
+      questionnaire_weight: 50,
+      notification_limit: 50
+    )
+  else
+    questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+    expect(assignment_questionnaire.dropdown).to eq(false)
+  end
 end
 
 def fill_assignment_form(assignment_descriptor, directory_identifier)
@@ -184,7 +244,7 @@ describe "assignment function" do
       click_button 'submit_btn'
 
       assignment = Assignment.where(name: 'private assignment for test').first
-      pending(%(not sure what's broken here but the error is: 
+      pending(%(not sure what's broken here but the error is:
         #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
         staggered_deadline: true
@@ -211,25 +271,13 @@ describe "assignment function" do
     end
 
     it "is able to create public micro-task assignment" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-      fill_assignment_form("public", "testDirectory")
-      check('assignment_form_assignment_microtask')
-      click_button 'Create'
-
-      assignment = Assignment.where(name: 'public assignment for test').first
+      assignment = create_public_assignment("instructor6", 'assignment_form_assignment_microtask')
       expect(assignment).to have_attributes(
         microtask: true
       )
     end
     it "is able to create calibrated public assignment" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-      fill_assignment_form("public", "testDirectory")
-      check("assignment_form_assignment_is_calibrated")
-      click_button 'Create'
-
-      assignment = Assignment.where(name: 'public assignment for test').first
+      assignment = create_public_assignment("instructor6", "assignment_form_assignment_is_calibrated")
       expect(assignment).to have_attributes(
         is_calibrated: true
       )
@@ -239,8 +287,9 @@ describe "assignment function" do
   # instructor can set in which deadline can student reviewers take the quizzes
   describe "deadlines", js: true do
     before(:each) do
-      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date')
-      set_assignment_review_deadline('2017/11/01 12:00', '2017/11/10 12:00', 1)
+      admin_set_assignment_dates(:assignment, '2017/11/01 12:00', '2017/11/10 12:00', 1)
+      #login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date')
+      #set_assignment_review_deadline('2017/11/01 12:00', '2017/11/10 12:00', 1)
     end
   end
   # adding test for general tab
@@ -439,66 +488,22 @@ describe "assignment function" do
     # First row of rubric
     describe "Edit review rubric" do
       it "updates review questionnaire" do
-        within(:css, "tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        sleep 1
-        questionnaire = get_questionnaire("ReviewQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
+        fill_in_questionaire("tr#questionnaire_table_ReviewQuestionnaire", "ReviewQuestionnaire2", true)
       end
 
       it "should update scored question dropdown" do
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
+        fill_in_questionaire("tr#questionnaire_table_ReviewQuestionnaire", "ReviewQuestionnaire2", false)
       end
 
       # Second row of rubric
       it "updates author feedback questionnaire" do
-        within(:css, "tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
-          select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
+        fill_in_questionaire("tr#questionnaire_table_AuthorFeedbackQuestionnaire", "AuthorFeedbackQuestionnaire2", true)
       end
 
       ##
       # Third row of rubric
       it "updates teammate review questionnaire" do
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
-          select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
+        fill_in_questionaire("tr#questionnaire_table_TeammateReviewQuestionnaire", "TeammateReviewQuestionnaire2", true)
       end
     end
   end
@@ -570,8 +575,9 @@ describe "assignment function" do
   # Begin Due Date tab
   describe "Due dates tab", js: true do
     before(:each) do
-      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date')
-      set_assignment_review_deadline('2017/10/01 12:00', '2017/10/10 12:00', 1)
+      admin_set_assignment_dates(:assignment, '2017/10/01 12:00', '2017/10/10 12:00', 1)
+      #login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date')
+      #set_assignment_review_deadline('2017/10/01 12:00', '2017/10/10 12:00', 1)
     end
 
     xit "Able to create a new penalty policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.

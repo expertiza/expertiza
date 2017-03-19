@@ -57,8 +57,41 @@ class DelayedMailer
     end
   end
 
+
+  def get_emails_signed_up_users(assignment, sign_up_topics)
+
+    emails = []
+    for topic in sign_up_topic
+
+      # A signed up team is a single person when it is not a team assignment
+      signed_up_teams = SignedUpTeam.where(['topic_id = ?', topic.id])
+
+      if assignment.team_assignment?
+
+        # Since this is a team assignment, we need to first find each team and then
+        # each user to find all the emails
+        for team in signed_up_team
+          team_members = TeamsUser.where(team_id: team.team_id)
+          for team_member in team_members
+            user = User.find(team_member.user_id)
+            emails << user.email
+          end
+        end
+
+      else
+        for signed_up_user in signed_up_team
+
+          # The team_id field is really a user ID because this is not a team assignment
+          user_id = signed_up_user.team_id
+          user = User.find(user_id)
+          emails << user.email
+        end
+      end
+    end
+    return emails
+  end
+    
   # Find the signed_up_teams of the assignment and send mails to them
-  # Prateek - check if git setup now works correctly!
   def mail_signed_up_users
     emails = []
     assignment = Assignment.find(self.assignment_id)
@@ -76,28 +109,10 @@ class DelayedMailer
         mail_assignment_participants
       end
     else
-      for topic in sign_up_topics
-        signedUpTeams = SignedUpTeam.where(['topic_id = ?', topic.id])
-        unless assignment.team_assignment?
-          for signedUser in signedUpTeams
-            uid  = signedUser.team_id
-            user = User.find(uid)
-            emails << user.email
-          end
-        else
-          for signedUser in signedUpTeams
-            teamid = signedUser.team_id
-            team_members = TeamsUser.where(team_id: teamid)
-            for team_member in team_members
-              user = User.find(team_member.user_id)
-              emails << user.email
-            end
-          end
-        end
-      end
+      emails = get_emails_signed_up_users(assignement, sign_up_topics)
       email_reminder(emails, self.deadline_type)
     end
-    end
+  end
 
   def getTeamMembersMail
     teamMembersMailList = []

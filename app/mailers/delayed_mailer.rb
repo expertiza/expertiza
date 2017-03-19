@@ -103,7 +103,7 @@ class DelayedMailer
         emails = getTeamMembersMail
       else
         
-        # mail_assignment_participants sends out email so return
+        # mail_assignment_participants sends out email so
         # return immediately after so email is not sent twice
         mail_assignment_participants
         return

@@ -89,129 +89,69 @@ describe "Questionnaire tests for instructor interface" do
     click_button "Create"
   end
 
-  describe "Create a review question" do
-    it "is able to create a Criterion question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Criterion', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Scale question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Scale', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Dropdown question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Dropdown', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a Checkbox question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('Checkbox', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TextArea question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TextArea', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TextField question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TextField', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a UploadFile question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('UploadFile', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a SectionHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('SectionHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a TableHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('TableHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
-    it "is able to create a ColumnHeader question" do
-      load_questionnaire
-      fill_in('question_total_num', with: '1')
-      select('ColumnHeader', from: 'question_type')
-      click_button "Add"
-      expect(page).to have_content('Remove')
-
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-  end
-
-  def load_question question_type
+  def load_question (question_type, verify_button)
     load_questionnaire
     fill_in('question_total_num', with: '1')
     select(question_type, from: 'question_type')
     click_button "Add"
+
+    if verify_button
+      expect(page).to have_content('Remove')
+    end
+
     click_button "Save review questionnaire"
+
+    if verify_button
+      expect(page).to have_content('All questions has been successfully saved!')
+    end
+
+  end
+
+  describe "Create a review question" do
+    it "is able to create a Criterion question" do
+      load_question('Criterion', true)
+    end
+
+    it "is able to create a Scale question" do
+      load_question('Scale', true)
+    end
+
+    it "is able to create a Dropdown question" do
+      load_question('Dropdown', true)
+    end
+
+    it "is able to create a Checkbox question" do
+      load_question('Checkbox', true)
+    end
+
+    it "is able to create a TextArea question" do
+      load_question('TextArea', true)
+    end
+
+    it "is able to create a TextField question" do
+      load_question('TextField', true)
+    end
+
+    it "is able to create a UploadFile question" do
+      load_question('UploadFile', true)
+    end
+
+    it "is able to create a SectionHeader question" do
+      load_question('SectionHeader', true)
+    end
+
+    it "is able to create a TableHeader question" do
+      load_question('TableHeader', true)
+    end
+
+    it "is able to create a ColumnHeader question" do
+      load_question('ColumnHeader', true)
+    end
   end
 
   describe "Edit a question" do
     it "is able to edit Criterion question" do
-      load_question 'Criterion'
+      load_question ('Criterion', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -219,7 +159,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit Scale question" do
-      load_question 'Scale'
+      load_question ('Scale', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -227,7 +167,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit Dropdown question" do
-      load_question 'Dropdown'
+      load_question ('Dropdown', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -235,7 +175,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit Checkbox question" do
-      load_question 'Checkbox'
+      load_question ('Checkbox', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -243,7 +183,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit TextArea question" do
-      load_question 'TextArea'
+      load_question ('TextArea', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -251,7 +191,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit TextField question" do
-      load_question 'TextField'
+      load_question ('TextField', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -259,7 +199,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit UploadFile question" do
-      load_question 'UploadFile'
+      load_question ('UploadFile', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -267,7 +207,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit SectionHeader question" do
-      load_question 'SectionHeader'
+      load_question ('SectionHeader', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -275,7 +215,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit TableHeader question" do
-      load_question 'TableHeader'
+      load_question ('TableHeader', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -283,7 +223,7 @@ describe "Questionnaire tests for instructor interface" do
     end
 
     it "is able to edit ColumnHeader question" do
-      load_question 'ColumnHeader'
+      load_question ('ColumnHeader', false)
       first("textarea[placeholder='Edit question content here']").set "Question edit"
       click_button "Save review questionnaire"
       expect(page).to have_content('All questions has been successfully saved!')
@@ -293,70 +233,70 @@ describe "Questionnaire tests for instructor interface" do
 
   describe "Delete a question" do
     it "is able to delete a Criterion question" do
-      load_question 'Criterion'
+      load_question ('Criterion', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a Scale question" do
-      load_question 'Scale'
+      load_question ('Scale', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a Dropdown question" do
-      load_question 'Dropdown'
+      load_question ('Dropdown', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a Checkbox question" do
-      load_question 'Checkbox'
+      load_question ('Checkbox', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a TextArea question" do
-      load_question 'TextArea'
+      load_question ('TextArea', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a TextField question" do
-      load_question 'TextField'
+      load_question ('TextField', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a UploadFile question" do
-      load_question 'UploadFile'
+      load_question ('UploadFile', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a SectionHeader question" do
-      load_question 'SectionHeader'
+      load_question ('SectionHeader', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a TableHeader question" do
-      load_question 'TableHeader'
+      load_question ('TableHeader', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
     end
 
     it "is able to delete a ColumnHeader question" do
-      load_question 'ColumnHeader'
+      load_question ('ColumnHeader', false)
 
       click_on('Remove')
       expect(page).to have_content('You have successfully deleted the question!')
@@ -365,7 +305,7 @@ describe "Questionnaire tests for instructor interface" do
 
   describe "Create a review advice" do
     it "is able to create a public review advice" do
-      load_question 'Criterion'
+      load_question ('Criterion', false)
       click_button "Edit/View advice"
       expect(page).to have_content('Edit an existing questionnaire')
 
@@ -378,7 +318,7 @@ describe "Questionnaire tests for instructor interface" do
 
   describe "Edit a review advice" do
     it "is able to edit a public review advice" do
-      load_question 'Criterion'
+      load_question ('Criterion', false)
       click_button "Edit/View advice"
       expect(page).to have_content('Edit an existing questionnaire')
 

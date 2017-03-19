@@ -436,6 +436,7 @@ class Assignment < ActiveRecord::Base
     #for each anwswer, find the reviewee, question, question id, comment, and score!
     @answers.each do |answer|
       row = []
+      tcsv = []
 
       @response = Response.find_by_id(answer.response_id)
       a = ResponseMap.find_by_id(@response.map_id)
@@ -445,21 +446,32 @@ class Assignment < ActiveRecord::Base
       reviewer = Participant.find_by_id(a.reviewer_id).user
 
       if !reviewee.nil?
-        row.push(reviewee.id)
-        row.push(reviewee.name)
-        row.push(reviewer.name)
-        row.push(answer.question.txt)
-        row.push(answer.question.id)
-        row.push(answer.comments)
-        row.push(answer.answer)
+        # row.push(reviewee.id)
+        # row.push(reviewee.name)
+        # row.push(reviewer.name)
+        # row.push(answer.question.txt)
+        # row.push(answer.question.id)
+        # row.push(answer.comments)
+        # row.push(answer.answer)
+
+        tcsv << reviewee.id
+        tcsv << reviewee.name
+        tcsv << reviewer.name
+        tcsv << answer.question.txt
+        tcsv << answer.question.id
+        tcsv << answer.comments
+        tcsv << answer.answer
+
+
+        csv << tcsv
 
         # puts '---------'
         # puts type
         # puts '----'
         # puts row
         # puts '---------'
-        allRows[idx] = row
-        idx = idx + 1
+        # allRows[idx] = row
+        # idx = idx + 1
       end
       # puts a.reviewee_id
       # puts a.reviewer_id
@@ -530,13 +542,28 @@ class Assignment < ActiveRecord::Base
   #   fields << 'Team Member'
   #   fields << 'Reviewer'
   #   fields << 'Dimension Name' #Questions.txt
-  #   fields << 'Comment ID' #Questions.id
+  #   fields << 'Comment ID' #Answer.id
   #   fields << 'Dimension'  #??
-  #   fields << 'Comment Content' #Answers.txt
+  #   fields << 'Comment Content' #Answers.comments
   #   fields << 'BackEval Comment'
   #   fields << 'BackEval Score'
   #   fields
   # end
+
+    def self.exportDetails_fields
+    fields = []
+    fields << 'reviewee.id'
+    fields << 'reviewee.name' #Also team name
+    fields << 'reviewer.name'
+    fields << 'answer.question.txt'
+    fields << 'answer.question.id' #Questions.txt
+    fields << 'answer.comments' #Answer.id
+    fields << 'answer.answer'  #??
+    # fields << 'Comment Content' #Answers.comments
+    # fields << 'BackEval Comment'
+    # fields << 'BackEval Score'
+    fields
+  end
 
 
   # This method is used for export contents of grade#view.  -Zhewei

@@ -148,7 +148,8 @@ class CourseController < ApplicationController
       @user.role = Role.find_by_name 'Teaching Assistant'
       @user.save
 
-      redirect_to action: 'view_teaching_assistants', id: @course.id
+      #redirect_to action: 'view_teaching_assistants', id: @course.id
+      render :action => 'add_ta_success.js.erb', :layout => false
 
       @course = @ta_mapping
       undo_link("The TA \"#{@user.name}\" has been successfully added.")

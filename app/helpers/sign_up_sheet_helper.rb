@@ -16,4 +16,46 @@ module SignUpSheetHelper
       assignment_due_dates[review_round - 1].due_at.to_s
     end
   end
+
+  # Retrieve topics suggested by signed in user for
+  # the assignment.
+  def get_suggested_topics(assignment_id)
+    team_id = TeamsUser.team_id(assignment_id, session[:user].id)
+    teams_users = TeamsUser.where(team_id: team_id)
+    teams_users_array = Array.new
+    teams_users.each do |teams_user|
+      teams_users_array << teams_user.user_id
+    end
+    @suggested_topics = SignUpTopic.where(assignment_id: assignment_id, private_to: teams_users_array)
+  end
+
+  # Render topic row for intelligent topic selection.
+  def get_intelligent_topic_row(topic, selected_topics)
+    row_html = ''
+    if !selected_topics.nil? && selected_topics.size != 0
+      for selected_topic in @selected_topics
+        if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
+          row_html = '<tr bgcolor="yellow">'
+        elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted
+          row_html = '<tr bgcolor="lightgray">'
+        else
+          row_html = '<tr id="topic_"' + topic.id.to_s + '>'
+        end
+      end
+    else
+      row_html = '<tr id="topic_"' + topic.id.to_s + ' style="background-color:' + get_topic_bg_color(topic) + '">'
+      # row_html = '<tr id="topic_"' + topic.id.to_s + '>'
+    end
+    row_html.html_safe
+  end
+
+
+  # Compute backgroudn colour for a topic with respect to maximum team size.
+  def get_topic_bg_color(topic)
+    rgb = 'rgb(' + (400*(1-(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2))
+        .to_i.to_s + ',' + (400*(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).
+        count,1].min-1)+1)/2).to_i.to_s + ',0)'
+    puts rgb
+    rgb
+  end
 end

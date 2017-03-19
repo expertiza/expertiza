@@ -58,6 +58,7 @@ class DelayedMailer
   end
 
   # Find the signed_up_teams of the assignment and send mails to them
+  # Prateek - check if git setup now works correctly!
   def mail_signed_up_users
     emails = []
     assignment = Assignment.find(self.assignment_id)

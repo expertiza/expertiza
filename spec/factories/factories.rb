@@ -356,4 +356,13 @@ FactoryGirl.define do
     round 1
     is_submitted false
   end
+  
+  factory :late_policy, class: LatePolicy do
+    sequence(:policy_name) { |n| "Late Policy #{n}" }
+    instructor { User.where(role_id: 1).first || association(:instructor) }
+    max_penalty 10
+    penalty_per_unit 1
+    penalty_unit 'Minute'
+  end
+
 end

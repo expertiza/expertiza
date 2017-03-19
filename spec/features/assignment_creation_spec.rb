@@ -56,7 +56,7 @@ def login_create_assignment_reroute(assignment, assignment_name, login_user, pag
   login_as(login_user)
   visit page_to_visit
   click_link link_to_click
-  set_assignment_review_deadline(submission_date,review_date, _round)
+  set_assignment_review_deadline(submission_date, review_date, _round)
 end
 
 def fill_assignment_form
@@ -258,7 +258,7 @@ describe "assignment function" do
   # instructor can set in which deadline can student reviewers take the quizzes
   describe "deadlines", js: true do
     before(:each) do
-      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/11/01 12:00','2017/11/10 12:00', 1)
+      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/11/01 12:00', '2017/11/10 12:00', 1)
     end
   end
   # adding test for general tab
@@ -584,7 +584,7 @@ describe "assignment function" do
   # Begin Due Date tab
   describe "Due dates tab", js: true do
     before(:each) do
-      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/10/01 12:00','2017/10/10 12:00', 1)
+      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/10/01 12:00', '2017/10/10 12:00', 1)
     end
 
     xit "Able to create a new penalty policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.

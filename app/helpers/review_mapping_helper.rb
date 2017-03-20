@@ -51,6 +51,7 @@ module ReviewMappingHelper
 
       response = get_sentiment(review, true)
 
+      # Retry in case of failure by sending only a single sentence for sentiment analysis.
       if response.code == 200
         sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
         sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]

@@ -57,6 +57,7 @@
 
     <div id="MetricsForm">
       <%= form_tag :action => 'response_report', :id => @id do %>
+          <%= label_tag 'Metric' %>
           <select name='MetricSelector' style="width: 15em">
             <option value='AverageVolume' selected>
               Average Score

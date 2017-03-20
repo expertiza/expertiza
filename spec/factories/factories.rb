@@ -359,7 +359,8 @@ FactoryGirl.define do
   
   factory :late_policy, class: LatePolicy do
     sequence(:policy_name) { |n| "Late Policy #{n}" }
-    instructor { User.where(role_id: 1).first || association(:instructor) }
+    #instructor { User.where(role_id: 2).first || association(:instructor) }
+    instructor_id { User.where(role_id: 2).first.id }
     max_penalty 10
     penalty_per_unit 1
     penalty_unit 'Day'

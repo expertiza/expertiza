@@ -2,8 +2,10 @@ require 'rails_helper'
 
 describe "PenaltyHelper" do
   before(:each) do
-    @late_policy = create(:late_policy)
-    @assignment = create(:assignment, is_penalty_calculated: true, late_policy_id: @late_policy.id)
+    @instructor = create(:instructor)
+    login_as(@instructor.name)
+    @late_policy = create(:late_policy, instructor_id: @instructor.id)
+    @assignment = create(:assignment, is_penalty_calculated: true, late_policy_id: @late_policy.id, instructor: @instructor)
     @assignment_due_date = create(:assignment_due_date, assignment: @assignment, due_at: DateTime.now.in_time_zone - 1.day)
     @participant = create(:participant, assignment: @assignment)
     @calculated_penalty = create(:calculated_penalty, participant: @participant)
@@ -55,6 +57,4 @@ describe "PenaltyHelper" do
       expect(penalty_minutes.round).to be == 1
     end
   end 
-  
-  # Add tests to validate calculate_penalty
 end

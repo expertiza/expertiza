@@ -1,3 +1,2 @@
-$('#part-list').html("<%= j render :partial => '/shared_scripts/user_list',
-           :locals => {:controller => 'participants',
-                       :user_list => @participants} %>");
+$("#plist").append("<%= j render :partial => 'participant',
+           :locals => {participant: @participant, :userid => @participant.user_id, :controller => 'participants'} %>");

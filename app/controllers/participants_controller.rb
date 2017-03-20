@@ -54,20 +54,7 @@ class ParticipantsController < ApplicationController
       flash[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
     # redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
-    if Participant::PARTICIPANT_TYPES.include? params[:model]
-      @root_node = Object.const_get(params[:model] + "Node").find_by_node_object_id(params[:id])
-      @parent = Object.const_get(params[:model]).find(params[:id])
-    end
-    begin
-      @participants = @parent.participants
-      @model = params[:model]
-      # E726 Fall2012 Changes Begin
-      @authorization = params[:authorization]
-        # E726 Fall2012 Changes End
-    rescue
-      flash[:error] = $!
-    end
-    render :action => 'add.js.erb', id: curr_object.id, model: params[:model], authorization: params[:authorization], :layout => false
+    render :action => 'add.js.erb', :layout => false
   end
 
   def update_authorizations

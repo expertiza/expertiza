@@ -1,20 +1,19 @@
-user = User.find(participant.user_id) %>
-<% @user_id << participant.user_id %>
+<% userid << participant.user_id %>
 <tr class= "exp">
-  <td ><%= link_to user.name, :controller=> 'users', :action => 'show', :id => user.id %></td>
-  <td ><%= user.fullname %></td>
-  <td ><%= user.email %></td>
-  <td ><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>
-  <td  align="center"><%= (User.find(user.parent_id)).name %></td>
-  <td ><%= User.yesorno(user.email_on_review) %></td>
-  <td ><%= User.yesorno(user.email_on_submission) %></td>
-  <td ><%= User.yesorno(user.email_on_review_of_review) %></td>
-  <td ><%= participant.can_submit == false ? 'no' : 'yes' %></td>
-  <td ><%= participant.can_review == false ? 'no' : 'yes' %></td>
-  <td ><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>
-  <td ><%= participant.handle %></td>
+  <td ><%= link_to User.find(participant.user_id).name, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
+  <td ><%= User.find(participant.user_id).fullname %></td>
+  <td ><%= User.find(participant.user_id).email %></td>
+  <td ><%= link_to User.find(participant.user_id).role.name, :controller => 'roles', :action => 'show', :id => User.find(participant.user_id).role.id %></td>
+  <td  align="center"><%= (User.find(User.find(participant.user_id).parent_id)).name %></td>
+  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_review) %></td>
+  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_submission) %></td>
+  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_review_of_review) %></td>
+  <td align="center" ><%= participant.can_submit == false ? 'no' : 'yes' %></td>
+  <td align="center" ><%= participant.can_review == false ? 'no' : 'yes' %></td>
+  <td align="center" ><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>
+  <td align="center" ><%= participant.handle %></td>
 
-  <td ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
+  <td align="center" ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
 
   <!-- E726 Fall2012 Changes Begin -->
   <% authorization = Participant.get_authorization(participant.can_submit, participant.can_review, participant.can_take_quiz) %>
@@ -56,3 +55,4 @@ user = User.find(participant.user_id) %>
   </td>
 
 </tr>
+

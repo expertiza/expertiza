@@ -1,10 +1,12 @@
 <h1><%= @model %> Participants: <%= @parent.name %></h1>
 
 <br/>
+<div id="part_list" >
 <%= render :partial => '/shared_scripts/user_list',
            :locals => {:controller => 'participants', 
                        :user_list => @participants} %>
 <br/>
+</div>
 <%= 
 	render :partial => '/shared_scripts/add_individual',
 		   :locals => {:form_action => "add",

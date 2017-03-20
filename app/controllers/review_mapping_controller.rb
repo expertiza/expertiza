@@ -372,7 +372,7 @@ class ReviewMappingController < ApplicationController
     @assignment = Assignment.find(@id)
     
     # Default metric
-    @metric_type = "AverageScore"
+    @metric_type = "AverageVolume"
     
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
@@ -407,7 +407,7 @@ class ReviewMappingController < ApplicationController
         @metric_type = params[:MetricSelector]
       else
         # Default metric
-        @metric_type = "AverageScore"
+        @metric_type = "AverageVolume"
       end
       @review_user = params[:user]
       # If review response is required call review_response_report method in review_response_map model

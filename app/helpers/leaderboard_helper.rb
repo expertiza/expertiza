@@ -125,4 +125,20 @@ module LeaderboardHelper
     @expList
   end
 
+  # This method does a destructive sort on the computed scores hash so
+  # that it can be mined for personal achievement information
+  def self.sortHash(qTypeHash)
+    result = Hash.new
+    # Deep-copy of Hash
+    result = Marshal.load(Marshal.dump(qTypeHash))
+
+    result.each { |qType, courseHash|
+      courseHash.each { |courseId, userScoreHash|
+        userScoreSortArray = userScoreHash.sort { |a, b| b[1][0] <=> a[1][0]}
+        result[qType][courseId] = userScoreSortArray
+      }
+    }
+    result
+  end
+
 end

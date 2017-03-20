@@ -3,7 +3,6 @@ require 'rails_helper'
 describe "PenaltyHelper" do
   before(:each) do
     @instructor = create(:instructor)
-    login_as(@instructor.name)
     @late_policy = create(:late_policy, instructor_id: @instructor.id)
     @assignment = create(:assignment, is_penalty_calculated: true, late_policy_id: @late_policy.id, instructor: @instructor)
     @assignment_due_date = create(:assignment_due_date, assignment: @assignment, due_at: DateTime.now.in_time_zone - 1.day)
@@ -13,7 +12,7 @@ describe "PenaltyHelper" do
   
   describe "#check_policy_with_same_name" do
     it "should return true when checking an existing policy name" do
-      policy_exists = PenlatyHelper.check_policy_with_same_name(@late_policy.name)
+      policy_exists = PenaltyHelper.check_policy_with_same_name(@late_policy.name)
       expect(policy_exists).to be true
     end
 
@@ -21,7 +20,7 @@ describe "PenaltyHelper" do
       late_policy_delete = create(:late_policy)
       late_policy_name = late_policy_delete.name
       LatePolicy.destroy(late_policy_delete.id)
-      policy_exists = PenlatyHelper.check_policy_with_same_name(late_policy_name)
+      policy_exists = PenaltyHelper.check_policy_with_same_name(late_policy_name)
       expect(policy_exists).to be false
     end
   end

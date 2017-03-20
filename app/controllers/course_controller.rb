@@ -148,7 +148,8 @@ class CourseController < ApplicationController
       @user.role = Role.find_by_name 'Teaching Assistant'
       @user.save
 
-      redirect_to action: 'view_teaching_assistants', id: @course.id
+      #redirect_to action: 'view_teaching_assistants', id: @course.id
+      render :action => 'add_ta_success.js.erb', :layout => false
 
       @course = @ta_mapping
       undo_link("The TA \"#{@user.name}\" has been successfully added.")
@@ -170,7 +171,8 @@ class CourseController < ApplicationController
     @course = @ta_mapping
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
-    redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
+    #redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
+    render :action => 'remove_ta.js.erb', :layout => false
   end
 
   # generate the undo link

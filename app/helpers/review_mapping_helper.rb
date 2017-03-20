@@ -18,7 +18,26 @@ module ReviewMappingHelper
     table_header.html_safe
   end
 
-def get_sentiment_list
+  def construct_sentiment_query(id, text)
+    review = {}
+    review["id"] = id.to_s
+    review["text"] = text
+    review
+  end
+
+  def get_sentiment(review, first_try)
+    if (first_try)
+       response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[review]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+    else
+      # Send only the first sentence of the review for sentiment analysis
+      text = review["text"].split('.')[0]
+      reconstructed_review = construct_sentiment_query(review["id"], text)
+      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[reconstructed_review]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+    end
+    response
+  end
+
+  def get_sentiment_list
 
     response_list = []
     @sentiment_list = []
@@ -28,31 +47,40 @@ def get_sentiment_list
       review = {}
   
       review_text = Response.concatenate_all_review_comments(@id, r).join(" ")
-      review["id"] = r.id.to_s
-      review["text"] = review_text
-      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[review]}.to_json, :headers => { 'Content-Type' => 'application/json' })
-      response_list<<response
-      case response.code
-        when 200
-          sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
-          sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
-          @sentiment_list<<sentiment
-        when 404
-          # Error in generating sentiment from the server
-          sentiment["id"] = review["id"]
-          sentiment["sentiment"]="-404"
-          @sentiment_list<<sentiment
-        when 500...600
-          # Error in generating sentiment from the server
-          sentiment["id"] = review["id"]
-          sentiment["sentiment"]="-500"
-          @sentiment_list<<sentiment
+      review = construct_sentiment_query(r.id, review_text)
+
+      response = get_sentiment(review, true)
+
+      if response.code == 200
+        sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
+        sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
+        @sentiment_list<<sentiment
+      else
+        # Retry once in case of a failure
+        response = get_sentiment(review, false)
+        response_list<<response
+        case response.code
+          when 200
+            sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
+            sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
+            @sentiment_list<<sentiment
+          when 404
+            # Error in generating sentiment from the server
+            sentiment["id"] = review["id"]
+            sentiment["sentiment"]="-404"
+            @sentiment_list<<sentiment
+          when 500...600
+            # Error in generating sentiment from the server
+            sentiment["id"] = review["id"]
+            sentiment["sentiment"]="-500"
+            @sentiment_list<<sentiment
+        end
       end
     end
     @sentiment_list
   end
 
-  def display_sentiment_metric id
+  def display_sentiment_metric(id)
     hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s}
     value = hashed_sentiment[0]["sentiment"].to_f.round(2)
     metric = "Overall Sentiment: #{value}<br/>"

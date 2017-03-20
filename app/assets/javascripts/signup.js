@@ -1,4 +1,4 @@
-function showHideTeamAndMembers(){
+function showHideTeamAndMembers(numTeams){
     var element = document.getElementById('teamsAndMembers');
     var show = element.innerHTML == 'Hide all teams';
     if (show){
@@ -6,7 +6,7 @@ function showHideTeamAndMembers(){
     }else{
         element.innerHTML='Hide all teams';
     }
-    toggleTeamsAndMembers();
+    toggleTeamsAndMembers(numTeams);
 }
 
 function toggleTeamsAndMembers(numTeams) {

@@ -44,20 +44,44 @@ module SignUpSheetHelper
       end
     else
       row_html = '<tr id="topic_"' + topic.id.to_s + ' style="background-color:' + get_topic_bg_color(topic) + '">'
-      # row_html = '<tr id="topic_"' + topic.id.to_s + '>'
     end
     row_html.html_safe
   end
 
 
-  # Compute backgroudn colour for a topic with respect to maximum team size.
+  # Compute background colour for a topic with respect to maximum team size.
   def get_topic_bg_color(topic)
-    rgb = 'rgb(' + (400*(1-(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2))
+    'rgb(' + (400*(1-(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2))
         .to_i.to_s + ',' + (400*(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).
         count,1].min-1)+1)/2).to_i.to_s + ',0)'
-    puts rgb
-    rgb
   end
+
+
+  # Render the participant info for a topic and assignment.
+  def render_participant_info(topic, assignment, participants)
+    name_html = ''
+    if !participants.nil? && participants.size > 0
+      chooser_present = false
+      for participant in @participants
+        if topic.id == participant.topic_id
+          chooser_present = true
+          if assignment.max_team_size > 1
+            name_html += '<br/><b>' + participant.team_name_placeholder + '</b><br/>'
+          end
+          name_html += 'participant.user_name_placeholder'
+          if participant.is_waitlisted
+            name_html += '<font color="red">(waitlisted)</font>'
+          end
+          name_html += '<br/>'
+        end
+      end
+      unless chooser_present
+        name_html += 'No choosers.'
+      end
+    end
+    name_html.html_safe
+  end
+
 end
 
 

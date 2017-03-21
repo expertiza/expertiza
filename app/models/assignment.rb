@@ -448,9 +448,9 @@ class Assignment < ActiveRecord::Base
       @uniq_response_type.each do |res_type|
         
         if round_num.nil?
-          round_type = "Nil " + res_type
+          round_type = "Round Nil " + res_type
         else 
-          round_type = round_num.to_s + " " + res_type.to_s
+          round_type = "Round " + round_num.to_s + " " + res_type.to_s
         end
         
         csv << [round_type, '---', '---', '---', '---', '---', '---']

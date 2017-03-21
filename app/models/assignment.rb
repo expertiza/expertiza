@@ -465,17 +465,17 @@ class Assignment < ActiveRecord::Base
     # end
 
     #loop through all rounds and resp types, then access the array of answers for that round/resp type
-    csv << ['---', '---', '---', '---', '---', '---', '---']
+    # csv << ['---', '---', '---', '---', '---', '---', '---']
     @uniq_rounds.each do |round_num|
-      csv << ['---', '---', '---', '---', '---', '---', '---']
+      # csv << ['---', '---', '---', '---', '---', '---', '---']
       
-      if round_num.nil?
-        csv << ["Round Nill", '---', '---', '---', '---', '---', '---']
-      else
-        csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
-      end
+      # if round_num.nil?
+      #   csv << ["Round Nill", '---', '---', '---', '---', '---', '---']
+      # else
+      #   csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
+      # end
       
-      csv << ['---', '---', '---', '---', '---', '---', '---']
+      # csv << ['---', '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
         
         if round_num.nil?

@@ -409,9 +409,8 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
-  def self.exportDetailsTest(csv, parent_id)
-    #will contain all the anwswer objecets for this assignment
-    @answers = []
+  def self.exportDetails(csv, parent_id)
+    @answers = [] # Contails all answer objects for this assignment
     @assignment = Assignment.find(parent_id)
 
     puts @assignment.name
@@ -419,14 +418,10 @@ class Assignment < ActiveRecord::Base
     puts @questionnaires.size
 
     @questionnaires.each do |questionnaire|
-      # puts 'Questionnaire ID : ' + questionnaire.id.to_s
-      # puts 'Questionnaire Name : ' + questionnaire.name
       questionnaire.questions.each do |q|
-        # puts '  -> Question Text: ' + q.txt
         @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
         @list.each do |a|
           @answers.push(a)
-          #puts a.response_id
         end
       end
     end
@@ -436,33 +431,29 @@ class Assignment < ActiveRecord::Base
     allRows = []
     idx = 0
 
-    # @response_type = ResponseMap.type
+    @answer.sort
+
+    #Find all unique response types
     @uniq_response_type =  ResponseMap.uniq.pluck(:type)
 
     @uniq_response_type.each do |res_type|
-    #for each anwswer, find the reviewee, question, question id, comment, and score!
+
       csv << [res_type, '---', '---', '---', '---', '---', '---']
-      puts res_type
+      # For each answer find
+      # [reviewee.id,reviewee.name, reviewer.name, answer.question.txt, \
+      #  answer.question.id, answer.comments, answer.answer]
 
       @answers.each do |answer|
         row = []
         tcsv = []
 
         @response = Response.find_by_id(answer.response_id)
-        a = ResponseMap.find_by_id(@response.map_id)
+        ans = ResponseMap.find_by_id(@response.map_id)
 
-        # type a.type
-        reviewee = Team.find_by_id(a.reviewee_id)
-        reviewer = Participant.find_by_id(a.reviewer_id).user
+        reviewee = Team.find_by_id(ans.reviewee_id)
+        reviewer = Participant.find_by_id(ans.reviewer_id).user 
 
-        if !reviewee.nil?
-          # row.push(reviewee.id)
-          # row.push(reviewee.name)
-          # row.push(reviewer.name)
-          # row.push(answer.question.txt)
-          # row.push(answer.question.id)
-          # row.push(answer.comments)
-          # row.push(answer.answer)
+        if res_type = ans.type and !reviewee.nil?
 
           tcsv << reviewee.id
           tcsv << reviewee.name
@@ -472,81 +463,12 @@ class Assignment < ActiveRecord::Base
           tcsv << answer.comments
           tcsv << answer.answer
 
-
           csv << tcsv
 
-          # puts '---------'
-          # puts type
-          # puts '----'
-          # puts row
-          # puts '---------'
-          # allRows[idx] = row
-          # idx = idx + 1
         end
-        # puts a.reviewee_id
-        # puts a.reviewer_id
       end
-
     end
-
-
-
   end
-
-  # def self.exportDetails(csv, parent_id)
-  #   #We have the assignment, we want to get organize all the scores
-  #   @assignment = Assignment.find(parent_id)
-
-  #   #a hash of all the questions, where each key is questionnaire symbol and the value is the list of questions
-  #   @ALLquestions = {}
-
-  #   #gets all the questionnaires associated w/ this assignment
-  #   questionnaires = @assignment.questionnaires
-
-  #   #for all questionnaires, get all questions
-  #   questionnaires.each do |questionnaire|
-  #     @ALLquestions[questionnaire_symbol] = questionnaire.questions
-  #   end
-
-  #   @ALLquestions.each do |questionnaire_symbol, questions|
-
-  #   end
-  #   @ALLScoresByTeam = {}
-
-
-  #   #list of all the teams
-  #   @teams = self.teams
-  #   @teams.each do |team|
-
-  #   end
-
-  #   #for each team, will record score for each users
-  #   @teams.each do |team|
-  #     teamName = team.name
-  #     #for each user on the team
-  #     team.users.each do |user|
-  #       userName = user.name
-  #       #gets all reviewresponsemaps with this user as the reviewee
-  #       @reviewMapByReviewee = ReviewResponseMap.find_by_reviewee_id(user.id)
-
-
-  #       @reviewMapByReviewee.each do |responseMap|
-  #         #all the response objects with this map's id
-  #         @responsesByMap = Responses.find_by_map_id(responseMap.id)
-
-  #         @responsesByMap.each do |resp|
-  #           #all the answer objects with this responseID
-  #           @answersByResponseID = Answers.find_by_response_id(resp.id)
-
-
-  #         end
-          
-  #       end
-
-  #     end
-  #   end
-
-  # end
 
   # def self.exportDetails_fields
   #   fields = []
@@ -561,19 +483,16 @@ class Assignment < ActiveRecord::Base
   #   fields << 'BackEval Score'
   #   fields
   # end
-
-    def self.exportDetails_fields
+  # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
+  def self.exportDetails_fields
     fields = []
-    fields << 'reviewee.id'
-    fields << 'reviewee.name' #Also team name
-    fields << 'reviewer.name'
-    fields << 'answer.question.txt'
-    fields << 'answer.question.id' #Questions.txt
-    fields << 'answer.comments' #Answer.id
-    fields << 'answer.answer'  #??
-    # fields << 'Comment Content' #Answers.comments
-    # fields << 'BackEval Comment'
-    # fields << 'BackEval Score'
+    fields << 'Team ID'        # reviewee.id
+    fields << 'Team Name'      # reviewee.name
+    fields << 'Reviewer'       # reviewer.name
+    fields << 'Question'       # answer.question.txt
+    fields << 'Question ID'    # answer.question.id
+    fields << 'Comments'       # answer.comments # Answer.id
+    fields << 'Score'          # answer.answer # Score
     fields
   end
 

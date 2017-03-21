@@ -186,7 +186,7 @@ describe "assignment function" do
     end
 
     it "is able to create with teams" do
-      new_assignment_settings(["team_assignment", "assignment_form_assignment_show_teammate_reviews"])
+      new_assignment_settings(%w(team_assignment assignment_form_assignment_show_teammate_reviews))
       fill_in 'assignment_form_assignment_max_team_size', with: 3
 
       click_button 'Create'

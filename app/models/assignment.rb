@@ -420,7 +420,7 @@ class Assignment < ActiveRecord::Base
     @uniq_rounds = Response.uniq.pluck(:round)
 
     #create the nested hash that holds all the answers organized by round # and response type
-    @uniq_rouns.each do |round_num|
+    @uniq_rounds.each do |round_num|
       @answers[round_num] = {}
       @uniq_response_type.each do |res_type|
         @answers[round_num][res_type] = []
@@ -442,7 +442,7 @@ class Assignment < ActiveRecord::Base
     end
 
     #loop through all rounds and resp types, then access the array of answers for that round/resp type
-    @uniq_rouns.each do |round_num|
+    @uniq_rounds.each do |round_num|
       csv << [round_num, '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
         csv << [round_num + ' ' + res_type, '---', '---', '---', '---', '---', '---']

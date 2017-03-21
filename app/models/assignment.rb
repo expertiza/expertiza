@@ -478,8 +478,9 @@ class Assignment < ActiveRecord::Base
       # csv << ['---', '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
         
-        if @answers[round_num][res_type].size > 1
+        if @answers[round_num][res_type].size > 0
           if round_num.nil?
+            puts  @answers[round_num][res_type].size
             round_type = "Round Nill - " + res_type
           else 
             round_type = "Round " + round_num.to_s + " - " + res_type.to_s

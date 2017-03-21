@@ -1,13 +1,13 @@
 
 <% @assignment = Assignment.find(params[:id]) %>
-<h1>Scheduled tasks for <%= @assignment.name %> assignment</h1>
+<h1>Delayed mailer for <%= @assignment.name %> assignment</h1>
 
 
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
 
-<% @scheduled_jobs = DelayedJob.all.sort{|a, b| a.run_at <=> b.run_at} %>
+<% @delayed_mailer = DelayedJob.all.sort{|a, b| a.run_at <=> b.run_at} %>
 
 <table class="general">
   <th width="25%">Deadline type</th>
@@ -16,7 +16,7 @@
   <th width="25 %">Action</th>
   <th width="25 %">Delete</th>
   <% i=1 %>
-  <% for delayed_job in @scheduled_jobs %>
+  <% for delayed_job in @delayed_mailer %>
       <tr>
         <% if delayed_job.handler.include? "assignment_id: #{@assignment.id}"%>
             <% handler = delayed_job.handler.split()%>
@@ -42,7 +42,7 @@
                 <td><%= "Drop one member team topics"%></td>
             <%end%>
             <td><%= link_to image_tag('delete_icon.png', :title => 'Delete'),
-                            {:controller => 'assignments', :action => 'delete_scheduled_task',
+                            {:controller => 'assignments', :action => 'delete_delayed_mailer',
                              :id => @assignment.id, :delayed_job_id => delayed_job.id}%></td>
         <% end %>
       </tr>

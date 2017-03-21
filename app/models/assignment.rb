@@ -436,13 +436,13 @@ class Assignment < ActiveRecord::Base
     allRows = []
     idx = 0
 
-    @response_type = ResponseMap.type
-    @uniq_response_type.uniq_response_type
+    # @response_type = ResponseMap.type
+    @uniq_response_type =  ResponseMap.uniq.pluck(:type)
 
     @uniq_response_type.each do |res_type|
     #for each anwswer, find the reviewee, question, question id, comment, and score!
       csv << [res_type, '---', '---', '---', '---', '---', '---',]
-      
+
       @answers.each do |answer|
         row = []
         tcsv = []

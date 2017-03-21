@@ -496,26 +496,26 @@ class Assignment < ActiveRecord::Base
           @response = Response.find_by_id(answer.response_id)
           ans = ResponseMap.find_by_id(@response.map_id)
 
-          reviewee = Team.find_by_id(ans.reviewee_id)
+          @reviewee = Team.find_by_id(ans.reviewee_id)
           if reviewee.nil?
-            reviewee = User.find_by_id(ans.reviewee_id)
-            puts reviewee.nil?
+            @reviewee = Participant.find_by_id(ans.reviewee_id).user
+
           end
 
           reviewer = Participant.find_by_id(ans.reviewer_id).user
 
           # if !reviewee.nil?
 
-            if reviewee.nil?
+            if @reviewee.nil?
               tcsv << ' '
             else
-              tcsv << reviewee.id
+              tcsv << @reviewee.id
             end
 
-            if reviewee.nil?
+            if @reviewee.nil?
               tcsv << ' '
             else
-              tcsv << reviewee.name
+              tcsv << @reviewee.name
             end
 
             if reviewer.nil?

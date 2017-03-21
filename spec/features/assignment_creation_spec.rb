@@ -39,11 +39,11 @@ def set_assignment_review_deadline(submission_date, review_date, round)
   fill_in 'datetimepicker_submission_round_1', with: submission_date
   fill_in 'datetimepicker_review_round_1', with: review_date
   click_button 'submit_btn'
-  submission_type_id = DeadlineType.where(name: 'submission')[0].id
-  review_type_id = DeadlineType.where(name: 'review')[0].id
 end
 
-def validate_assignment_review_deadline(submission_date, review_date)
+def validate_assignment_review_deadline
+  submission_type_id = DeadlineType.where(name: 'submission')[0].id
+  review_type_id = DeadlineType.where(name: 'review')[0].id
   submission_due_date = DueDate.find(1)
   review_due_date = DueDate.find(2)
   expect(submission_due_date).to have_attributes(
@@ -83,7 +83,7 @@ def validate_attributes(questionaire_name)
 end
 
 def validate_dropdown
-questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+  questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
   assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
   expect(assignment_questionnaire.dropdown).to eq(false)
 end
@@ -113,9 +113,8 @@ def new_assignment_settings(selected_options)
   login_as("instructor6")
   visit '/assignments/new?private=1'
   fill_assignment_form("private", "testDirectory")
-  selected_options.each { |a| check(a) }
+  selected_options.each {|a| check(a) }
 end
-
 
 def fill_assignment_form(assignment_descriptor, directory_identifier)
   fill_in 'assignment_form_assignment_name', with: assignment_descriptor + ' assignment for test'
@@ -184,16 +183,10 @@ describe "assignment function" do
       click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       validate_assignment_attributes_by_course(assignment, 'private', 'testDirectory', 'testLocation')
-      #expect(assignment).to have_attributes(
-      #  name: 'private assignment for test',
-      #  course_id: Course.find_by(name: 'Course 2')[:id],
-      #  directory_path: 'testDirectory',
-      #  spec_location: 'testLocation'
-      #)
     end
 
     it "is able to create with teams" do
-      new_assignment_settings(["team_assignment","assignment_form_assignment_show_teammate_reviews"])
+      new_assignment_settings(["team_assignment", "assignment_form_assignment_show_teammate_reviews"])
       fill_in 'assignment_form_assignment_max_team_size', with: 3
 
       click_button 'Create'
@@ -350,12 +343,6 @@ describe "assignment function" do
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       validate_assignment_attributes_by_course(assignment, 'edit', 'testDirectory1', 'testLocation1')
-      #expect(assignment).to have_attributes(
-      #  name: 'edit assignment for test',
-      #  course_id: Course.find_by(name: 'Course 2')[:id],
-      #  directory_path: 'testDirectory1',
-      #  spec_location: 'testLocation1'
-      #)
     end
 
     it "check if checking calibration shows the tab" do

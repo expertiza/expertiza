@@ -508,31 +508,31 @@ class Assignment < ActiveRecord::Base
             end
 
             if reviewee.nil?
-              tsv << ' '
+              tcsv << ' '
             else
               tcsv << reviewee.name
             end
 
             if answer.question.txt.nil?
-              tsv << ' '
+              tcsv << ' '
             else
               tcsv << answer.question.txt
             end
 
             if answer.question.id.nil?
-              tsv << ' '
+              tcsv << ' '
             else
               tcsv << answer.question.id
             end
 
             if answer.comments.nil?
-              tsv << ' '
+              tcsv << ' '
             else
               tcsv << answer.comments
             end
 
             if answer.answer.nil?
-              tsv << ' '
+              tcsv << ' '
             else
               tcsv << answer.answer
             end

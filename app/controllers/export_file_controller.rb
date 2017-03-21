@@ -25,16 +25,16 @@ class ExportFileController < ApplicationController
   def exportdetails
      @delim_type = params[:delim_type2]
      if @delim_type == "comma"
-       filename = params[:model] + params[:id] + ".csv"
+       filename = params[:model] + params[:id] + "_Details.csv"
        delimiter = ","
      elsif @delim_type == "space"
-       filename = params[:model] + params[:id] + ".csv"
+       filename = params[:model] + params[:id] + "_Details.csv"
        delimiter = " "
      elsif @delim_type == "tab"
-       filename = params[:model] + params[:id] + ".csv"
+       filename = params[:model] + params[:id] + "_Details.csv"
        delimiter = "\t"
      elsif @delim_type == "other"
-       filename = params[:model] + params[:id] + ".csv"
+       filename = params[:model] + params[:id] + "_Details.csv"
        delimiter = other_char
      end
 
@@ -42,7 +42,7 @@ class ExportFileController < ApplicationController
          csv << Object.const_get(params[:model]).exportDetails_fields()
          Object.const_get(params[:model]).exportDetails(csv, params[:id])
      end
- 
+    
      send_data csv_data,
                type: 'text/csv; charset=iso-8859-1; header=present',
          disposition: "attachment; filename=#{filename}"

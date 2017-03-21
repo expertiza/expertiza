@@ -501,7 +501,7 @@ class Assignment < ActiveRecord::Base
 
           # if !reviewee.nil?
 
-            if reviewee.id.nil?
+            if reviewee.nil?
               tsv << ' '
             else
               tcsv << reviewee.id

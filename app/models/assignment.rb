@@ -450,7 +450,7 @@ class Assignment < ActiveRecord::Base
         @response = Response.find_by_id(answer.response_id)
         a = ResponseMap.find_by_id(@response.map_id)
 
-        type a.type
+        # type a.type
         reviewee = Team.find_by_id(a.reviewee_id)
         reviewer = Participant.find_by_id(a.reviewer_id).user
 

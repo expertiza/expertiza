@@ -446,7 +446,13 @@ class Assignment < ActiveRecord::Base
     @uniq_rounds.each do |round_num|
       csv << [round_num, '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
-        round_type = round_num + " " + res_type
+        
+        if round_num.nil?
+          round_type = "Nil " + res_type
+        else 
+          round_type = round_num + " " + res_type
+        end
+        
         csv << [round_type, '---', '---', '---', '---', '---', '---']
 
         @answers[round_num][res_type].each do |answer|

@@ -450,7 +450,7 @@ class Assignment < ActiveRecord::Base
         if round_num.nil?
           round_type = "Nil " + res_type
         else 
-          round_type = round_num + " " + res_type
+          round_type = round_num.to_s + " " + res_type.to_s
         end
         
         csv << [round_type, '---', '---', '---', '---', '---', '---']

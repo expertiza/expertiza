@@ -443,14 +443,17 @@ class Assignment < ActiveRecord::Base
     end
 
     #loop through all rounds and resp types, then access the array of answers for that round/resp type
+    csv << ["Assignment Name: " + @assignment.name.to_s, '---', '---', '---', '---', '---', '---']
     @uniq_rounds.each do |round_num|
-      csv << [round_num, '---', '---', '---', '---', '---', '---']
+      csv << ['---', '---', '---', '---', '---', '---', '---']
+      csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
+      csv << ['---', '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
         
         if round_num.nil?
-          round_type = "Round Nil " + res_type
+          round_type = "Round Nil - " + res_type
         else 
-          round_type = "Round " + round_num.to_s + " " + res_type.to_s
+          round_type = "Round " + round_num.to_s + " - " + res_type.to_s
         end
         
         csv << [round_type, '---', '---', '---', '---', '---', '---']
@@ -496,6 +499,13 @@ class Assignment < ActiveRecord::Base
     fields
   end
 
+  def self.export_Headers(parent_id))
+    @assignment = Assignment.find(parent_id)
+    fields = []
+    fields << "Assignment Name: " + @assignment.name.to_s
+    fields << "Assignment Instructor: " + User.find(@assignment.instructor_id).name.to_s
+    fields
+  end
 
   # This method is used for export contents of grade#view.  -Zhewei
   def self.export(csv, parent_id, options)

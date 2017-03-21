@@ -460,6 +460,20 @@ class Assignment < ActiveRecord::Base
 
           reviewee = Team.find_by_id(ans.reviewee_id)
           reviewer = Participant.find_by_id(ans.reviewer_id).user
+
+          if !reviewee.nil?
+
+            tcsv << reviewee.id
+            tcsv << reviewee.name
+            tcsv << reviewer.name
+            tcsv << answer.question.txt
+            tcsv << answer.question.id
+            tcsv << answer.comments
+            tcsv << answer.answer
+
+            csv << tcsv
+
+          end
         end
       end
     end

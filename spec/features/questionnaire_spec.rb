@@ -34,43 +34,33 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
+  def make_questionnaire private
+    login_as("instructor6")
+
+    visit '/questionnaires/new?model=ReviewQuestionnaire&private=' + private ? '1' : '0'
+
+    fill_in('questionnaire_name', with: 'Review 1')
+
+    fill_in('questionnaire_min_question_score', with: '0')
+
+    fill_in('questionnaire_max_question_score', with: '5')
+
+    select(private ? 'yes' : 'no' , from: 'questionnaire_private')
+
+    click_button "Create"
+
+    expect(Questionnaire.where(name: "Review 1")).to exist
+  end
+
   describe "Create a public review questionnaire" do
     it "is able to create a public review questionnaire" do
-      login_as("instructor6")
-
-      visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'
-
-      fill_in('questionnaire_name', with: 'Review 1')
-
-      fill_in('questionnaire_min_question_score', with: '0')
-
-      fill_in('questionnaire_max_question_score', with: '5')
-
-      select('no', from: 'questionnaire_private')
-
-      click_button "Create"
-
-      expect(Questionnaire.where(name: "Review 1")).to exist
+      make_questionnaire false
     end
   end
 
   describe "Create a private review questionnaire" do
     it "is able to create a private review questionnaire" do
-      login_as("instructor6")
-
-      visit '/questionnaires/new?model=ReviewQuestionnaire&private=1'
-
-      fill_in('questionnaire_name', with: 'Review 1')
-
-      fill_in('questionnaire_min_question_score', with: '0')
-
-      fill_in('questionnaire_max_question_score', with: '5')
-
-      select('yes', from: 'questionnaire_private')
-
-      click_button "Create"
-
-      expect(Questionnaire.where(name: "Review 1")).to exist
+      make_questionnaire true
     end
   end
 
@@ -89,22 +79,17 @@ describe "Questionnaire tests for instructor interface" do
     click_button "Create"
   end
 
-  def load_question (question_type, verify_button)
+  def load_question question_type, verify_button
     load_questionnaire
     fill_in('question_total_num', with: '1')
     select(question_type, from: 'question_type')
     click_button "Add"
 
-    if verify_button
-      expect(page).to have_content('Remove')
-    end
+    expect(page).to have_content('Remove') if verify_button
 
     click_button "Save review questionnaire"
 
-    if verify_button
-      expect(page).to have_content('All questions has been successfully saved!')
-    end
-
+    expect(page).to have_content('All questions has been successfully saved!') if verify_button
   end
 
   describe "Create a review question" do
@@ -149,183 +134,142 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
+  def edit_created_question
+    first("textarea[placeholder='Edit question content here']").set "Question edit"
+    click_button "Save review questionnaire"
+    expect(page).to have_content('All questions has been successfully saved!')
+    expect(page).to have_content('Question edit')
+  end
+
   describe "Edit a question" do
     it "is able to edit Criterion question" do
       load_question 'Criterion', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit Scale question" do
       load_question 'Scale', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit Dropdown question" do
       load_question 'Dropdown', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit Checkbox question" do
       load_question 'Checkbox', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit TextArea question" do
       load_question 'TextArea', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit TextField question" do
       load_question 'TextField', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit UploadFile question" do
       load_question 'UploadFile', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit SectionHeader question" do
       load_question 'SectionHeader', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit TableHeader question" do
       load_question 'TableHeader', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
 
     it "is able to edit ColumnHeader question" do
       load_question 'ColumnHeader', false
-      first("textarea[placeholder='Edit question content here']").set "Question edit"
-      click_button "Save review questionnaire"
-      expect(page).to have_content('All questions has been successfully saved!')
-      expect(page).to have_content('Question edit')
+      edit_created_question
     end
+  end
+
+  def check_deleted_question
+    click_on('Remove')
+    expect(page).to have_content('You have successfully deleted the question!')
   end
 
   describe "Delete a question" do
     it "is able to delete a Criterion question" do
       load_question 'Criterion', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a Scale question" do
       load_question 'Scale', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a Dropdown question" do
       load_question 'Dropdown', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a Checkbox question" do
       load_question 'Checkbox', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a TextArea question" do
       load_question 'TextArea', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a TextField question" do
       load_question 'TextField', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a UploadFile question" do
       load_question 'UploadFile', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a SectionHeader question" do
       load_question 'SectionHeader', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a TableHeader question" do
       load_question 'TableHeader', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
 
     it "is able to delete a ColumnHeader question" do
       load_question 'ColumnHeader', false
-
-      click_on('Remove')
-      expect(page).to have_content('You have successfully deleted the question!')
+      check_deleted_question
     end
+  end
+
+  def create_review_advice
+    load_question 'Criterion', false
+    click_button "Edit/View advice"
+    expect(page).to have_content('Edit an existing questionnaire')
+
+    first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Advice 1")
+    click_button "Save and redisplay advice"
+    expect(page).to have_content('advice was successfully saved')
+    expect(page).to have_content('Advice 1')
   end
 
   describe "Create a review advice" do
     it "is able to create a public review advice" do
-      load_question 'Criterion', false
-      click_button "Edit/View advice"
-      expect(page).to have_content('Edit an existing questionnaire')
-
-      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Advice 1")
-      click_button "Save and redisplay advice"
-      expect(page).to have_content('advice was successfully saved')
-      expect(page).to have_content('Advice 1')
+      create_review_advice
     end
   end
 
   describe "Edit a review advice" do
     it "is able to edit a public review advice" do
-      load_question 'Criterion', false
-      click_button "Edit/View advice"
-      expect(page).to have_content('Edit an existing questionnaire')
-
-      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Advice 1")
-      click_button "Save and redisplay advice"
-      expect(page).to have_content('advice was successfully saved')
-      expect(page).to have_content('Advice 1')
+      create_review_advice
 
       first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Advice edit")
       click_button "Save and redisplay advice"

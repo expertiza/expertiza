@@ -1,14 +1,17 @@
 require 'rails_helper'
 require 'selenium-webdriver'
 
-
-def create_assignment_due_date
+def create_deadline_type
   create(:deadline_type, name: "submission")
   create(:deadline_type, name: "review")
   create(:deadline_type, name: "metareview")
   create(:deadline_type, name: "drop_topic")
   create(:deadline_type, name: "signup")
   create(:deadline_type, name: "team_formation")
+end
+
+def create_assignment_due_date
+  create_deadline_type
   create(:deadline_right)
   create(:deadline_right, name: 'Late')
   create(:deadline_right, name: 'OK')
@@ -64,11 +67,11 @@ def fill_in_choices
 end
 
 def create_choices
-  return [
-      create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+  [
+    create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+    create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+    create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+    create(:quiz_question_choice, question: @question, txt: 'Answer 4')
   ]
 end
 
@@ -319,7 +322,6 @@ describe 'appropriate quiz taking times', js: true do
     expect(page).to have_content("Quiz Questionnaire")
   end
 end
-
 
 def init_instructor_tests
   # Create an instructor

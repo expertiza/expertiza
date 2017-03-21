@@ -513,6 +513,12 @@ class Assignment < ActiveRecord::Base
               tcsv << reviewee.name
             end
 
+            if reviewer.nil?
+              tcsv << ' '
+            else
+              tcsv << reviewer.name
+            end
+
             if answer.question.txt.nil?
               tcsv << ' '
             else

@@ -497,6 +497,10 @@ class Assignment < ActiveRecord::Base
           ans = ResponseMap.find_by_id(@response.map_id)
 
           reviewee = Team.find_by_id(ans.reviewee_id)
+          if reviewee.nil?
+            reviewee = Participant.find_by_id(ans.reviewee_id).user
+          end
+
           reviewer = Participant.find_by_id(ans.reviewer_id).user
 
           # if !reviewee.nil?

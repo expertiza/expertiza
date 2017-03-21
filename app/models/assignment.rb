@@ -478,20 +478,7 @@ class Assignment < ActiveRecord::Base
       end
     end
   end
-
-  # def self.exportDetails_fields
-  #   fields = []
-  #   fields << 'Paper Author' #Also team name
-  #   fields << 'Team Member'
-  #   fields << 'Reviewer'
-  #   fields << 'Dimension Name' #Questions.txt
-  #   fields << 'Comment ID' #Answer.id
-  #   fields << 'Dimension'  #??
-  #   fields << 'Comment Content' #Answers.comments
-  #   fields << 'BackEval Comment'
-  #   fields << 'BackEval Score'
-  #   fields
-  # end
+  
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.exportDetails_fields
     fields = []

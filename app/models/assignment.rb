@@ -421,6 +421,7 @@ class Assignment < ActiveRecord::Base
 
     #create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
+      puts round_num
       @answers[round_num] = {}
       @uniq_response_type.each do |res_type|
         @answers[round_num][res_type] = []

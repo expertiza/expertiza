@@ -433,7 +433,10 @@ class Assignment < ActiveRecord::Base
       questionnaire.questions.each do |q|
         @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
         @list.each do |a|
-          @answers.push(a)
+          #get response object then response map object for this answer
+          @response = Response.find_by_id(a.response_id)
+          ans = ResponseMap.find_by_id(@response.map_id)
+          @answers[@response.round][ans.type].push(a)
         end
       end
     end

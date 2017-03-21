@@ -441,9 +441,6 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    #Find all unique response types
-    @uniq_response_type =  ResponseMap.uniq.pluck(:type)
-
     #loop through all rounds and resp types, then access the array of answers for that round/resp type
     @uniq_rouns.each do |round_num|
       csv << [round_num, '---', '---', '---', '---', '---', '---']
@@ -478,7 +475,7 @@ class Assignment < ActiveRecord::Base
       end
     end
   end
-  
+
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.exportDetails_fields
     fields = []

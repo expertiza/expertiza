@@ -6,7 +6,7 @@ describe "peer review testing", type: :feature do
     # create assignment and topic
     create(:assignment, name: "TestAssignment", directory_path: "TestAssignment")
     create_list(:participant, 3)
-    create(:topic, topic_name: "Topic")
+    create(:topic, topic_name: "TestTopic")
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")
@@ -44,13 +44,53 @@ describe "peer review testing", type: :feature do
   end
   
   it "submit and try to review own topic" do
-	submit_to_topic
-	visit '/student_task/list'
-	click_link "TestAssignment"
-	click_link "Others' work"
-        find(:css, "#i_dont_care").set(true)
-	click_button "Request a new submission to review"
-        expect(page).to have_content "No topics are available to review at this time. Please try later."
+    submit_to_topic
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Others' work"
+    find(:css, "#i_dont_care").set(true)
+    click_button "Request a new submission to review"
+    expect(page).to have_content "No topics are available to review at this time. Please try later."
+  end
+
+  it "submit only submission and manually choose review" do
+    submit_to_topic
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Others' work"
+    expect(page).to have_content 'Reviews for "TestAssignment"'
+    #expect(page).to have_button()
+    #choose :match => :first
+    #click_button "Request a new submission to review"
+    #expect(page).to have_content "There are no more submissions to review on this"
+  end
+
+  it "assign review manually with valid option" do
+    submit_to_topic
+    user = User.find_by_name("student2065")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Others' work"
+    choose "topic_id_#{SignUpTopic.find_by_topic_name("TestTopic").id}"
+    click_button "Request a new submission to review"
+    expect(page).to have_content "No previous versions available"
+  end
+
+  it "assign review dynamically" do
+    submit_to_topic
+    user = User.find_by_name("student2065")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Others' work"
+    find(:css, "#i_dont_care").set(true)
+    click_button "Request a new submission to review"
+    expect(page).to have_content "No previous versions available"
   end
   
 end

@@ -499,7 +499,7 @@ class Assignment < ActiveRecord::Base
     fields
   end
 
-  def self.export_Headers(parent_id))
+  def self.export_Headers(parent_id)
     @assignment = Assignment.find(parent_id)
     fields = []
     fields << "Assignment Name: " + @assignment.name.to_s

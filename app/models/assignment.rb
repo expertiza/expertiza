@@ -437,10 +437,12 @@ class Assignment < ActiveRecord::Base
     @responseMapsForAssignment.each do |map|
       @responseForThisMap = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       #for this response, get the answer associated with it
-      @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{@responseForThisMap.id}"])
-      @answer.each do |ans|
-        @answers[@responseForThisMap.round][map.type].push(ans)
+      @responseForThisMap.each do |res_map|
+        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
       end
+      # @answer.each do |ans|
+      @answers[@responseForThisMap.round][map.type].push(@answer)
+      # end
     end
 
 

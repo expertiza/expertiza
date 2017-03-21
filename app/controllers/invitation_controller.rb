@@ -9,8 +9,10 @@ class InvitationController < ApplicationController
 
   def create
     user = User.find_by_name(params[:user][:name].strip)
+
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
+    student_email = AssignmentParticipant.find(params[:student_id][:email])
     return unless current_user_id?(student.user_id)
 
     # check if the invited user is valid
@@ -37,8 +39,7 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
-            accept_invitation
-            #Call the mailing function
+            accept_invitation(student_email)  #Call the mailing function
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end
@@ -50,9 +51,9 @@ class InvitationController < ApplicationController
 
     redirect_to view_student_teams_path student_id: student.id
   end
-  def accept_invitation
+  def accept_invitation(student_email)
     Mailer.accept_invitation(
-        to: @participant,
+        to: student_email,
         #cc: cc_mail_list,
         subject: "You have a new team invitaion",
         body: {
@@ -77,9 +78,9 @@ class InvitationController < ApplicationController
     @users = User.where("LOWER(name) LIKE ?", "%#{search}%") unless search.blank?
   end
 
-  def accepted_invitation
+  def accepted_invitation(user_email)
     Mailer.accepted_invitation(
-        to: @team,  #I'm not sure about this, but lets see
+        to: user_email,
         #cc: cc_mail_list,
         subject: "The invitation for the teammate has been accepted",
         body: {
@@ -90,6 +91,7 @@ class InvitationController < ApplicationController
 
   def accept
     @inv = Invitation.find(params[:inv_id])
+    user_email = User.find(params[:user][:email])
 
     student = Participant.find(params[:student_id])
 
@@ -113,7 +115,7 @@ class InvitationController < ApplicationController
     if ready_to_join
       @inv.reply_status = 'A'
       @inv.save
-      accepted_invitation
+      accepted_invitation(user_email)
       #add the acceptance mailer call here
 
       # Remove the users previous team since they are accepting an invite for possibly a new team.

@@ -63,7 +63,7 @@ class DelayedMailer
     assignment = Assignment.find(self.assignment_id)
     sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
 
-    # If there are sign_up topics for an assignement then send a mail toonly signed_up_teams else send a mail to all participants
+    # If there are sign_up topics for an assignement then send a mail to only signed_up_teams else send a mail to all participants
     if (sign_up_topics.nil? || sign_up_topics.count == 0)
       if assignment.team_assignment?
         teamMails = getTeamMembersMail

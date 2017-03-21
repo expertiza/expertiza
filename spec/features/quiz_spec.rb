@@ -1,17 +1,8 @@
 require 'rails_helper'
 require 'selenium-webdriver'
 
-def create_default_test_data
-  # Create an instructor
-  @instructor = create(:instructor)
 
-  # Create a student
-  @student = create(:student)
-
-  # Create an assignment with quiz
-  @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
-
-  # Create an assignment due date
+def create_assignment_due_date
   create(:deadline_type, name: "submission")
   create(:deadline_type, name: "review")
   create(:deadline_type, name: "metareview")
@@ -25,6 +16,20 @@ def create_default_test_data
 
   @review_deadline_type = create(:deadline_type, name: "review")
   create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
+end
+
+def create_default_test_data
+  # Create an instructor
+  @instructor = create(:instructor)
+
+  # Create a student
+  @student = create(:student)
+
+  # Create an assignment with quiz
+  @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+
+  # Create an assignment due date
+  create_assignment_due_date
 
   # Create a team linked to the calibrated assignment
   @team = create :assignment_team, assignment: @assignment
@@ -56,6 +61,15 @@ def fill_in_choices
   fill_in 'new_choices_1_MultipleChoiceRadio_2_txt', with: 'Test Quiz 2'
   fill_in 'new_choices_1_MultipleChoiceRadio_3_txt', with: 'Test Quiz 3'
   fill_in 'new_choices_1_MultipleChoiceRadio_4_txt', with: 'Test Quiz 4'
+end
+
+def create_choices
+  return [
+      create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
+      create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
+      create(:quiz_question_choice, question: @question, txt: 'Answer 4')
+  ]
 end
 
 def fill_in_quiz
@@ -226,19 +240,7 @@ describe 'appropriate quiz taking times', js: true do
     @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1, review_topic_threshold: 1
 
     # Create an assignment due date
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
-
-    @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
+    create_assignment_due_date
 
     # Setup Student 1
 
@@ -260,12 +262,8 @@ describe 'appropriate quiz taking times', js: true do
     @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
 
     # Create the quiz question and answers
-    choices = [
-      create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 4')
-    ]
+    choices = create_choices
+
     @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
 
     # Setup Student 2
@@ -322,21 +320,6 @@ describe 'appropriate quiz taking times', js: true do
   end
 end
 
-def create_assignment_due_date
-  create(:deadline_type, name: "submission")
-  create(:deadline_type, name: "review")
-  create(:deadline_type, name: "metareview")
-  create(:deadline_type, name: "drop_topic")
-  create(:deadline_type, name: "signup")
-  create(:deadline_type, name: "team_formation")
-  create(:deadline_right)
-  create(:deadline_right, name: 'Late')
-  create(:deadline_right, name: 'OK')
-  create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
-
-  @review_deadline_type = create(:deadline_type, name: "review")
-  create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
-end
 
 def init_instructor_tests
   # Create an instructor
@@ -368,12 +351,8 @@ def init_instructor_tests
   @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
 
   # Create the quiz question and answers
-  choices = [
-      create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 4')
-  ]
+  choices = create_choices
+
   @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
 
   # Setup Student 2
@@ -448,19 +427,7 @@ describe 'Student reviewers can not take the quizzes before request artifact', j
     @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
 
     # Create an assignment due date
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
-
-    @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
+    create_assignment_due_date
 
     # Setup Student 1
 
@@ -482,12 +449,8 @@ describe 'Student reviewers can not take the quizzes before request artifact', j
     @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
 
     # Create the quiz question and answers
-    choices = [
-      create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 4')
-    ]
+    choices = create_choices
+
     @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
 
     # Setup Student 2
@@ -522,19 +485,7 @@ describe 'Student reviewers can take the quizzes', js: true do
     @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
 
     # Create an assignment due date
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
-
-    @review_deadline_type = create(:deadline_type, name: "review")
-    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
+    create_assignment_due_date
 
     # Setup Student 1
 
@@ -556,12 +507,8 @@ describe 'Student reviewers can take the quizzes', js: true do
     @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
 
     # Create the quiz question and answers
-    choices = [
-      create(:quiz_question_choice, question: @question, txt: 'Answer 1', iscorrect: 1),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 2'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
-      create(:quiz_question_choice, question: @question, txt: 'Answer 4')
-    ]
+    choices = create_choices
+
     @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
 
     # Setup Student 2

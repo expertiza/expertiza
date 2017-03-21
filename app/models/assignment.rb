@@ -440,9 +440,9 @@ class Assignment < ActiveRecord::Base
       @responseForThisMap.each do |res_map|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
       end
-      # @answer.each do |ans|
-      @answers[@responseForThisMap.round][map.type].push(@answer)
-      # end
+      @answer.each do |ans|
+        @answers[@responseForThisMap.round][map.type].push(ans)
+      end
     end
 
 

@@ -410,8 +410,22 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.exportDetails(csv, parent_id)
-    @answers = [] # Contails all answer objects for this assignment
     @assignment = Assignment.find(parent_id)
+
+    @answers = {} # Contails all answer objects for this assignment
+
+    #Find all unique response types
+    @uniq_response_type =  ResponseMap.uniq.pluck(:type)
+    #Find all unique round numbers
+    @uniq_rounds = Response.uniq.pluck(:round)
+
+    #create the nested hash that holds all the answers organized by round # and response type
+    @uniq_rouns.each do |round_num|
+      @answers[round_num] = {}
+      @uniq_response_type.each do |res_type|
+        @answers[round_num][res_type] = []
+      end
+    end
 
     puts @assignment.name
     @questionnaires = @assignment.questionnaires

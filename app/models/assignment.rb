@@ -421,7 +421,7 @@ class Assignment < ActiveRecord::Base
 
     #create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
-      puts round_num
+      #puts round_num
       @answers[round_num] = {}
       @uniq_response_type.each do |res_type|
         @answers[round_num][res_type] = []
@@ -443,15 +443,21 @@ class Assignment < ActiveRecord::Base
     end
 
     #loop through all rounds and resp types, then access the array of answers for that round/resp type
-    #csv << ["Assignment Name: " + @assignment.name.to_s, '---', '---', '---', '---', '---', '---']
+    csv << ['---', '---', '---', '---', '---', '---', '---']
     @uniq_rounds.each do |round_num|
       csv << ['---', '---', '---', '---', '---', '---', '---']
-      csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
+      
+      if round_num.nil?
+        csv << ["Round Nill," '---', '---', '---', '---', '---', '---']
+      else
+        csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
+      end
+      
       csv << ['---', '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
         
         if round_num.nil?
-          round_type = "Round Nil - " + res_type
+          round_type = "Round Nill - " + res_type
         else 
           round_type = "Round " + round_num.to_s + " - " + res_type.to_s
         end

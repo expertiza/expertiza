@@ -19,7 +19,7 @@ class DelayedMailer
       if (self.deadline_type == "metareview")
         mail_metareviewers
         if assignment.team_assignment?
-          team_mails = get_team_members_mail
+          team_mails = find_team_members_email
           email_reminder(team_mails, "teammate review")
         end
       end
@@ -65,88 +65,50 @@ class DelayedMailer
     end
   end
 
-  # Added by Prateek as part of Spring 2017 E1711
-  def get_emails_signed_up_users(assignment, sign_up_topics)
-
-    emails = []
-    for topic in sign_up_topics
-
-      # A signed up team is a single person when it is not a team assignment
-      signed_up_teams = SignedUpTeam.where(['topic_id = ?', topic.id])
-
-      if assignment.team_assignment?
-
-        # Since this is a team assignment, we need to first find each team and then
-        # each user to find all the emails
-        for team in signed_up_teams
-          team_members = TeamsUser.where(team_id: team.team_id)
-          for team_member in team_members
-            user = User.find(team_member.user_id)
-            emails << user.email
-          end
-        end
-
-      else
-        for signed_up_user in signed_up_teams
-
-          # The team_id field is really a user ID because this is not a team assignment
-          user_id = signed_up_user.team_id
-          user = User.find(user_id)
-          emails << user.email
-        end # end for signed_up_user
-      end # end else
-    end # end for topic
-    emails
-  end
-
-  # Last refactored by Prateek as part of Spring 2017 E1711
-
+  # Last modified by Prateek as part of Spring 2017 E1711
   def mail_signed_up_users
     emails = []
-    assignment = Assignment.find(self.assignment_id)
     sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
 
-    # If there are sign_up topics for an assignement then send a mail to only signed_up_teams else send a mail to all participants
     if sign_up_topics.nil? || sign_up_topics.count.zero?
-      if assignment.team_assignment?
-        emails = get_team_members_mail
-      else
-        # mail_assignment_participants sends out email so
-        # return immediately after so email is not sent twice
-        mail_assignment_participants
-      end
+      emails = find_team_members_email
     else
-      emails = get_emails_signed_up_users(assignement, sign_up_topics)
+      emails = find_team_members_email_for_all_topics(sign_up_topics)
     end
     email_reminder(emails, self.deadline_type)
   end
 
-  # Function name changed by Prateek as part of Spring 2017 E1711
-  def get_team_members_mail
+  # Last modified by Prateek as part of Spring 2017 E1711
+  def find_team_members_email
     emails = []
     teams = Team.where(['parent_id = ?', self.assignment_id])
     for team in teams
-      team_participants = TeamsUser.where(['team_id = ?', team.id])
-      for team_participant in team_participants
-        user = User.find(team_participant.user_id)
+      team_members = TeamsUser.where(['team_id = ?', team.id])
+      for team_member in team_members
+        user = User.find(team_member.user_id)
         emails << user.email
       end
     end
     emails
   end
 
-  def getTeamMembersMail
-    teamMembersMailList = []
-    assignment = Assignment.find(self.assignment_id)
-    teams = Team.where(['parent_id = ?', self.assignment_id])
-    for team in teams
-      team_participants = TeamsUser.where(['team_id = ?', team.id])
-      for team_participant in team_participants
-        user = User.find(team_participant.user_id)
-        teamMembersMailList << user.email
+  # Added by Prateek as part of Spring 2017 E1711
+  def find_team_members_email_for_all_topics(sign_up_topics)
+    emails = []
+    unless sign_up_topics.respond_to?(:each)
+      sign_up_topics = [sign_up_topics]
+    end
+    for topic in sign_up_topics
+      teams = SignedUpTeam.where(['topic_id=?', topic.id])
+      for team in teams
+        team_members = TeamsUser.where(['team_id = ?', team.id])
+        for team_member in team_members
+          user = User.find(team_member.user_id)
+          emails << user.email
+        end
       end
     end
-    teamMembersMailList
+    emails
   end
 
   def get_one_member_team

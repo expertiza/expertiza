@@ -127,3 +127,35 @@ describe 'Team formation deadline reminder email' do
     expect(Delayed::Job.last.handler).to include("deadline_type: team_formation")
   end
 end
+
+describe DelayedMailer do
+  describe ".find_team_members_email_for_all_topics" do
+    it "gets user emails" do
+      assignment = Assignment.create()
+      sign_up_topic = create(:topic)
+      user = create(:student)
+      signed_up_team = create(:signed_up_team)
+      team_user = create(:team_user)
+      # deadline type and due_date are not important for this test
+      dm = DelayedMailer.new(1, nil, nil)
+      expect(dm.find_team_members_email_for_all_topics(sign_up_topic)).to eq(["expertiza@mailinator.com"])
+    end
+  end
+
+  describe ".mail_signed_up_users" do
+    it "sends emails to signed up users" do
+    end
+  end
+
+  describe ".find_team_members_email" do
+    it "gets emails of team members" do
+      # deadline_type and due_date are not important for this test
+      dm = DelayedMailer.new(1, nil, nil)
+      user = create(:student)
+      team = Team.create(parent_id: 1)
+      team_user = create(:team_user, team_id: team.id, user_id: user.id)
+      expect(dm.find_team_members_email).to eq(["expertiza@mailinator.com"])
+    end
+  end
+
+end

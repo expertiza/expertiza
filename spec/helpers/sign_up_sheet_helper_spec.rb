@@ -4,7 +4,10 @@ describe "SignUpSheetHelper" do
 
   describe "#check_topic_due_date_value" do
     it "The check_topic_due_date_value method should return the assignment due date" do
-
+      @assignment = create(:assignment)
+      @assignment_due_date = create(:assignment_due_date)
+      due_date = helper.get_topic_deadline(@assignment_due_date, @assignment.topic_id, deadline_type_id = 1, review_round = 1)
+      expect(due_date).to be_empty
     end
   end
 
@@ -14,6 +17,7 @@ describe "SignUpSheetHelper" do
     end
   end
 
+  #######THIS TEST CASE WORKS
   describe "#get_suggested_topics" do
     it "The get_suggested_topics method should return the suggested topics" do
       @assignment = create(:assignment)

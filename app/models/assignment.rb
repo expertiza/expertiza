@@ -427,9 +427,7 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    puts @assignment.name
     @questionnaires = @assignment.questionnaires
-    puts @questionnaires.size
 
     @questionnaires.each do |questionnaire|
       questionnaire.questions.each do |q|

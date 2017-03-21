@@ -421,26 +421,41 @@ class Assignment < ActiveRecord::Base
 
     #create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
-      #puts round_num
       @answers[round_num] = {}
       @uniq_response_type.each do |res_type|
         @answers[round_num][res_type] = []
       end
     end
 
-    @questionnaires = @assignment.questionnaires
 
-    @questionnaires.each do |questionnaire|
-      questionnaire.questions.each do |q|
-        @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
-        @list.each do |a|
-          #get response object then response map object for this answer
-          @response = Response.find_by_id(a.response_id)
-          ans = ResponseMap.find_by_id(@response.map_id)
-          @answers[@response.round][ans.type].push(a)
-        end
-      end
+
+
+    #get all response maps for this assignment
+    @responseMapsForAssignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
+    
+    #for each map, get the response & answer associated with it
+    @responseMapsForAssignment.each do |map|
+      @responseForThisMap = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
+      #for this response, get the answer associated with it
+      @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{@responseForThisMap.id}"])
+      @answers[@responseForThisMap.round][map.type].push(a)
     end
+
+
+
+    # @questionnaires = @assignment.questionnaires
+
+    # @questionnaires.each do |questionnaire|
+    #   questionnaire.questions.each do |q|
+    #     @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
+    #     @list.each do |a|
+    #       #get response object then response map object for this answer
+    #       @response = Response.find_by_id(a.response_id)
+    #       ans = ResponseMap.find_by_id(@response.map_id)
+    #       @answers[@response.round][ans.type].push(a)
+    #     end
+    #   end
+    # end
 
     #loop through all rounds and resp types, then access the array of answers for that round/resp type
     csv << ['---', '---', '---', '---', '---', '---', '---']

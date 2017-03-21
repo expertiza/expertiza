@@ -20,7 +20,7 @@ describe 'Submission deadline reminder email' do
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)
 
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "submission", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "submission", due_at), priority: 1, run_at: time_in_min)
 
     expect(Delayed::Job.count).to eq(1)
 
@@ -41,10 +41,10 @@ describe 'Review deadline reminder email' do
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)
 
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "review", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "review", due_at), priority: 1, run_at: time_in_min)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: review")
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "drop_outstanding_reviews", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "drop_outstanding_reviews", due_at), priority: 1, run_at: time_in_min)
     expect(Delayed::Job.count).to eq(2)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_outstanding_reviews")
   end
@@ -63,7 +63,7 @@ describe 'Metareview deadline reminder email' do
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)
 
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "metareview", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "metareview", due_at), priority: 1, run_at: time_in_min)
 
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: metareview")
@@ -83,7 +83,7 @@ describe 'Drop Topic deadline reminder email' do
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)
 
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "drop_topic", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "drop_topic", due_at), priority: 1, run_at: time_in_min)
 
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_topic")
@@ -103,7 +103,7 @@ describe 'Signup deadline reminder email' do
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)
 
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "signup", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "signup", due_at), priority: 1, run_at: time_in_min)
 
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: signup")
@@ -123,10 +123,10 @@ describe 'Team formation deadline reminder email' do
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)
 
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "team_formation", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "team_formation", due_at), priority: 1, run_at: time_in_min)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: team_formation")
-    Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, "drop_one_member_topics", due_at), priority: 1, run_at: time_in_min)
+    Delayed::Job.enqueue(payload_object: DelayedMailer.new(id, "drop_one_member_topics", due_at), priority: 1, run_at: time_in_min)
     expect(Delayed::Job.count).to eq(2)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_one_member_topics")
   end

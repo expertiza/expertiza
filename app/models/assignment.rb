@@ -426,13 +426,6 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-
-
-    allRows = []
-    idx = 0
-
-    @answer.sort
-
     #Find all unique response types
     @uniq_response_type =  ResponseMap.uniq.pluck(:type)
 

@@ -441,7 +441,8 @@ class Assignment < ActiveRecord::Base
 
     @uniq_response_type.each do |res_type|
     #for each anwswer, find the reviewee, question, question id, comment, and score!
-      csv << [res_type, '---', '---', '---', '---', '---', '---',]
+      csv << [res_type, '---', '---', '---', '---', '---', '---']
+      puts res_type
 
       @answers.each do |answer|
         row = []

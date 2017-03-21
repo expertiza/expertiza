@@ -94,7 +94,7 @@ class SuggestionController < ApplicationController
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
-      instructor_email = User.find(:role_id =>2).email
+      instructor_email = User.where(["role_id = ?", 2]).select("email").first
       send_email_to_instructor(instructor_email) #an email is sent to the instructor regarding the suggestion
     end
     redirect_to action: 'new', id: @suggestion.assignment_id

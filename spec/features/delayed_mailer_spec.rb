@@ -108,6 +108,7 @@ describe 'Signup deadline reminder email' do
   end
 end
 
+# Added by Prateek during Spring 2017 E1711
 describe 'Team formation deadline reminder email' do
   it 'is able to send reminder email for team formation deadline to reviewers ' do
     id = 2
@@ -131,19 +132,43 @@ end
 describe DelayedMailer do
   describe ".find_team_members_email_for_all_topics" do
     it "gets user emails" do
-      assignment = Assignment.create()
+      assignment = create(:assignment)
       sign_up_topic = create(:topic)
       user = create(:student)
       signed_up_team = create(:signed_up_team)
       team_user = create(:team_user)
       # deadline type and due_date are not important for this test
-      dm = DelayedMailer.new(1, nil, nil)
+      dm = DelayedMailer.new(assignment.id, nil, nil)
       expect(dm.find_team_members_email_for_all_topics(sign_up_topic)).to eq(["expertiza@mailinator.com"])
     end
   end
 
   describe ".mail_signed_up_users" do
-    it "sends emails to signed up users" do
+    it "sends emails to signed up users when no topics" do
+      assignment = create(:assignment)
+      dm = DelayedMailer.new(assignment.id,nil, nil)
+
+      # Do not let these functions do anything, like sending out emails
+      allow(DelayedMailer).to receive(:find_team_members_email).and_return(true)
+      allow(DelayedMailer).to receive(:email_reminder).and_return(true)
+      expect(dm).to receive(:find_team_members_email)
+      expect(dm).to receive(:email_reminder)
+      dm.mail_signed_up_users
+    end
+  end
+
+  describe ".mail_signed_up_users" do
+    it "sends emails to singed up users when there are topics" do
+      assignment = create(:assignment)
+      sign_up_topic = create(:topic)
+      dm = DelayedMailer.new(assignment.id,nil, nil)
+
+      # Do not let these functions do anything
+      allow(DelayedMailer).to receive(:find_team_members_email_for_all_topics).and_return(true)
+      allow(DelayedMailer).to receive(:email_reminder).and_return(true)
+      expect(dm).to receive(:find_team_members_email_for_all_topics).with([sign_up_topic])
+      expect(dm).to receive(:email_reminder)
+      dm.mail_signed_up_users
     end
   end
 

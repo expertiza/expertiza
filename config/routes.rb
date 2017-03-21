@@ -358,6 +358,7 @@ Expertiza::Application.routes.draw do
       get :team_details
       get :intelligent_sign_up
       get :intelligent_save
+      get :signup_as_instructor
       post :set_priority
       post :save_topic_deadlines
     end

@@ -250,6 +250,18 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
+  def signup_as_instructor
+    user = User.find_by(name: params[:username])
+    puts(params[:username])
+    puts(params[:assignment_id])
+    puts(params[:topic_id])
+    participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: params[:assignment_id])
+    unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+      flash[:error] = "You've already signed up for a topic!"
+    end
+    redirect_to action: 'list', id: params[:id]
+  end
+
   def sign_up(optional=true)
     # find the assignment to which user is signing up
     @assignment = AssignmentParticipant.find(params[:id]).assignment

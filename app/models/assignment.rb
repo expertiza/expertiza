@@ -448,7 +448,7 @@ class Assignment < ActiveRecord::Base
       csv << ['---', '---', '---', '---', '---', '---', '---']
       
       if round_num.nil?
-        csv << ["Round Nill," '---', '---', '---', '---', '---', '---']
+        csv << ["Round Nill", '---', '---', '---', '---', '---', '---']
       else
         csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
       end

@@ -642,10 +642,10 @@ ActiveRecord::Schema.define(version: 20170222161826) do
     t.boolean "is_new_user",                             default: true,  null: false
     t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 65535
+    t.text    "digital_certificate",       limit: 16777215
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 65535
+    t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                          default: false
     t.integer "institution_id",            limit: 4
   end

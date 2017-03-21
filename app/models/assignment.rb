@@ -444,35 +444,22 @@ class Assignment < ActiveRecord::Base
     #Find all unique response types
     @uniq_response_type =  ResponseMap.uniq.pluck(:type)
 
-    @uniq_response_type.each do |res_type|
+    #loop through all rounds and resp types, then access the array of answers for that round/resp type
+    @uniq_rouns.each do |round_num|
+      csv << [round_num, '---', '---', '---', '---', '---', '---']
+      @uniq_response_type.each do |res_type|
+        csv << [round_num + ' ' + res_type, '---', '---', '---', '---', '---', '---']
 
-      csv << [res_type, '---', '---', '---', '---', '---', '---']
-      # For each answer find
-      # [reviewee.id,reviewee.name, reviewer.name, answer.question.txt, \
-      #  answer.question.id, answer.comments, answer.answer]
 
-      @answers.each do |answer|
-        row = []
-        tcsv = []
+        @answers[round_num][res_type].each do |answer|
+          row = []
+          tcsv = []
 
-        @response = Response.find_by_id(answer.response_id)
-        ans = ResponseMap.find_by_id(@response.map_id)
+          @response = Response.find_by_id(answer.response_id)
+          ans = ResponseMap.find_by_id(@response.map_id)
 
-        reviewee = Team.find_by_id(ans.reviewee_id)
-        reviewer = Participant.find_by_id(ans.reviewer_id).user 
-
-        if res_type = ans.type and !reviewee.nil?
-
-          tcsv << reviewee.id
-          tcsv << reviewee.name
-          tcsv << reviewer.name
-          tcsv << answer.question.txt
-          tcsv << answer.question.id
-          tcsv << answer.comments
-          tcsv << answer.answer
-
-          csv << tcsv
-
+          reviewee = Team.find_by_id(ans.reviewee_id)
+          reviewer = Participant.find_by_id(ans.reviewer_id).user
         end
       end
     end

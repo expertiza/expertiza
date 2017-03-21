@@ -445,8 +445,8 @@ class Assignment < ActiveRecord::Base
     @uniq_rounds.each do |round_num|
       csv << [round_num, '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
-        csv << [round_num + ' ' + res_type, '---', '---', '---', '---', '---', '---']
-
+        round_type = round_num + " " + res_type
+        csv << [round_type, '---', '---', '---', '---', '---', '---']
 
         @answers[round_num][res_type].each do |answer|
           row = []

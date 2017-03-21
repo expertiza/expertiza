@@ -12,10 +12,6 @@ module GradesHelper
     end
   end
 
-  def render_ui(param1, param2)
-    render partial: param1, locals: param2
-  end
-
   def has_team_and_metareview?
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])

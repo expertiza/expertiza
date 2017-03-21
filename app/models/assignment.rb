@@ -499,6 +499,7 @@ class Assignment < ActiveRecord::Base
           reviewee = Team.find_by_id(ans.reviewee_id)
           if reviewee.nil?
             reviewee = Participant.find_by_id(ans.reviewee_id).user
+            puts reviewee.nil?
           end
 
           reviewer = Participant.find_by_id(ans.reviewer_id).user

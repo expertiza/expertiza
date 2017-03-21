@@ -443,7 +443,7 @@ class Assignment < ActiveRecord::Base
     end
 
     #loop through all rounds and resp types, then access the array of answers for that round/resp type
-    csv << ["Assignment Name: " + @assignment.name.to_s, '---', '---', '---', '---', '---', '---']
+    #csv << ["Assignment Name: " + @assignment.name.to_s, '---', '---', '---', '---', '---', '---']
     @uniq_rounds.each do |round_num|
       csv << ['---', '---', '---', '---', '---', '---', '---']
       csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']

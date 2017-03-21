@@ -23,6 +23,10 @@
               <td><label for="copy_of_emails">Send me copies of emails sent for assigments</label></td>
               <td><%= check_box 'user', 'copy_of_emails', {}, true, false %></td>
             </tr>
+             <tr>
+               <td><label for="copy_of_all_emails">Send me copies of all emails sent for students</label></td>
+               <td><%= check_box 'user', 'copy_of_all_emails', {}, true, false %></td>
+            </tr>
           <% end %>
   </table>
 </div>

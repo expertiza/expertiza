@@ -501,13 +501,13 @@ class Assignment < ActiveRecord::Base
 
           # if !reviewee.nil?
 
-            tcsv << reviewee.id
-            tcsv << reviewee.name
-            tcsv << reviewer.name
-            tcsv << answer.question.txt
-            tcsv << answer.question.id
-            tcsv << answer.comments
-            tcsv << answer.answer
+            tcsv << reviewee.id.to_s
+            tcsv << reviewee.name.to_s
+            tcsv << reviewer.name.to_s
+            tcsv << answer.question.txt.to_s
+            tcsv << answer.question.id.to_s
+            tcsv << answer.comments.to_s
+            tcsv << answer.answer.to_s
 
             csv << tcsv
 

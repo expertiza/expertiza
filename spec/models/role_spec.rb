@@ -37,4 +37,20 @@ describe Role do
   it "cache value of admin role does not match with admin YAML" do
     expect(@admin_role.cache.to_json).not_to eq(expected_instructor_cache.to_json)
   end
+
+  it "role instance to be invalid scenario" do
+    expect(@invalid_role).to be_invalid
+  end
+
+  it "role instance to be valid scenario for student" do
+    expect(@student_role).to be_valid
+  end
+
+  it "role instance to be valid scenario for instructor" do
+    expect(@instructor_role).to be_valid
+  end
+
+  it "role instance to be valid scenario for admin" do
+    expect(@admin_role).to be_valid
+  end
 end

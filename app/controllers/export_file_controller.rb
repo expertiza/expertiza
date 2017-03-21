@@ -37,13 +37,12 @@ class ExportFileController < ApplicationController
        filename = params[:model] + params[:id] + ".csv"
        delimiter = other_char
      end
-     puts 'TEST'
-     puts @delim_type
+     # puts 'TEST'
+     # puts @delim_type
 
      #Just a test to print all the Quesionairres and its questions
      # Object.const_get(params[:model]).exportDetailsTest(params[:id])
- 
-      #this will have to be updated to call a new methods in assignment.rb to choose the detailed csvs columns AND export
+
      csv_data = CSV.generate(col_sep: delimiter) do |csv|
          csv << Object.const_get(params[:model]).exportDetails_fields()
          Object.const_get(params[:model]).exportDetailsTest(csv, params[:id])

@@ -431,50 +431,61 @@ class Assignment < ActiveRecord::Base
       end
     end
 
+
+
     allRows = []
     idx = 0
+
+    @response_type = ResponseMap.type
+    @uniq_response_type.uniq_response_type
+
+    @uniq_response_type.each do |res_type|
     #for each anwswer, find the reviewee, question, question id, comment, and score!
-    @answers.each do |answer|
-      row = []
-      tcsv = []
+      csv << [res_type, '---', '---', '---', '---', '---', '---',]
+      
+      @answers.each do |answer|
+        row = []
+        tcsv = []
 
-      @response = Response.find_by_id(answer.response_id)
-      a = ResponseMap.find_by_id(@response.map_id)
+        @response = Response.find_by_id(answer.response_id)
+        a = ResponseMap.find_by_id(@response.map_id)
 
-      type = a.type
-      reviewee = Team.find_by_id(a.reviewee_id)
-      reviewer = Participant.find_by_id(a.reviewer_id).user
+        type a.type
+        reviewee = Team.find_by_id(a.reviewee_id)
+        reviewer = Participant.find_by_id(a.reviewer_id).user
 
-      if !reviewee.nil?
-        # row.push(reviewee.id)
-        # row.push(reviewee.name)
-        # row.push(reviewer.name)
-        # row.push(answer.question.txt)
-        # row.push(answer.question.id)
-        # row.push(answer.comments)
-        # row.push(answer.answer)
+        if !reviewee.nil?
+          # row.push(reviewee.id)
+          # row.push(reviewee.name)
+          # row.push(reviewer.name)
+          # row.push(answer.question.txt)
+          # row.push(answer.question.id)
+          # row.push(answer.comments)
+          # row.push(answer.answer)
 
-        tcsv << reviewee.id
-        tcsv << reviewee.name
-        tcsv << reviewer.name
-        tcsv << answer.question.txt
-        tcsv << answer.question.id
-        tcsv << answer.comments
-        tcsv << answer.answer
+          tcsv << reviewee.id
+          tcsv << reviewee.name
+          tcsv << reviewer.name
+          tcsv << answer.question.txt
+          tcsv << answer.question.id
+          tcsv << answer.comments
+          tcsv << answer.answer
 
 
-        csv << tcsv
+          csv << tcsv
 
-        # puts '---------'
-        # puts type
-        # puts '----'
-        # puts row
-        # puts '---------'
-        # allRows[idx] = row
-        # idx = idx + 1
+          # puts '---------'
+          # puts type
+          # puts '----'
+          # puts row
+          # puts '---------'
+          # allRows[idx] = row
+          # idx = idx + 1
+        end
+        # puts a.reviewee_id
+        # puts a.reviewer_id
       end
-      # puts a.reviewee_id
-      # puts a.reviewer_id
+
     end
 
 

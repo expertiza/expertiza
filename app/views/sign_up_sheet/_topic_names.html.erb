@@ -41,7 +41,7 @@
       <% end %>
     <% end %>
     <% if chooser_present == false %>
-      No choosers.<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id=>31708,:topic_id => topic.id, :assignment_id => params[:assignment_id] %>
+      No choosers.<%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), signup_as_instructor_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
     <% end %>
     <br/>
   <% end %>

@@ -218,6 +218,12 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: mapping.assignment.id
   end
 
+  def unsubmit_review
+    @response = Response.where(map_id: params[:id]).last
+    @response.update_attribute('is_submitted', false)
+    redirect_to :back
+  end
+
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
     if review_response_map and !Response.exists?(map_id: review_response_map.id)

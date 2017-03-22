@@ -28,3 +28,16 @@ function toggleSingleTeamAndMember(i) {
         elem.style.display = 'none';
     }
 }
+
+jQuery("input[id^='due_date_']").datetimepicker({
+    dateFormat: 'yy/mm/dd',
+    timeFormat: 'HH:mm:ss',
+    controlType: 'select',
+    timezoneList: [
+        { value: -000, label: 'GMT'},
+        { value: -300, label: 'Eastern'},
+        { value: -360, label: 'Central' },
+        { value: -420, label: 'Mountain' },
+        { value: -480, label: 'Pacific' }
+    ]
+});

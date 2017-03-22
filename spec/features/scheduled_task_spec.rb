@@ -33,7 +33,7 @@ describe 'Review deadline reminder email' do
     # id = 2
     # @name = "user"
     enqueue_scheduled_tasks("drop_outstanding_reviews")
-    expect(Delayed::Job.count).to eq(2)
+    expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_outstanding_reviews")
   end
 end

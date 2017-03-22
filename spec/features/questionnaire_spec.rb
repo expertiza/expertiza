@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+question_type = ['Criterion', 'Scale', 'Dropdown', 'Checkbox', 'TextArea', 'TextField', 'UploadFile', 'SectionHeader', 'TableHeader', 'ColumnHeader']
+
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
     create(:assignment)
@@ -93,44 +95,10 @@ describe "Questionnaire tests for instructor interface" do
   end
 
   describe "Create a review question" do
-    it "is able to create a Criterion question" do
-      load_question 'Criterion', true
-    end
-
-    it "is able to create a Scale question" do
-      load_question 'Scale', true
-    end
-
-    it "is able to create a Dropdown question" do
-      load_question 'Dropdown', true
-    end
-
-    it "is able to create a Checkbox question" do
-      load_question 'Checkbox', true
-    end
-
-    it "is able to create a TextArea question" do
-      load_question 'TextArea', true
-    end
-
-    it "is able to create a TextField question" do
-      load_question 'TextField', true
-    end
-
-    it "is able to create a UploadFile question" do
-      load_question 'UploadFile', true
-    end
-
-    it "is able to create a SectionHeader question" do
-      load_question 'SectionHeader', true
-    end
-
-    it "is able to create a TableHeader question" do
-      load_question 'TableHeader', true
-    end
-
-    it "is able to create a ColumnHeader question" do
-      load_question 'ColumnHeader', true
+    question_type.each do |q_type|
+      it "is able to create "+q_type+" question" do
+          load_question q_type, true
+      end
     end
   end
 
@@ -154,109 +122,19 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  describe "Edit a question" do
-    it "is able to edit Criterion question" do
-      load_question 'Criterion', false
-      choose_check_type 'edit'
-    end
+  question_type = ['Criterion', 'Scale', 'Dropdown', 'Checkbox', 'TextArea', 'TextField', 'UploadFile', 'SectionHeader', 'TableHeader', 'ColumnHeader']
 
-    it "is able to edit Scale question" do
-      load_question 'Scale', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit Dropdown question" do
-      load_question 'Dropdown', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit Checkbox question" do
-      load_question 'Checkbox', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit TextArea question" do
-      load_question 'TextArea', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit TextField question" do
-      load_question 'TextField', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit UploadFile question" do
-      load_question 'UploadFile', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit SectionHeader question" do
-      load_question 'SectionHeader', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit TableHeader question" do
-      load_question 'TableHeader', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit ColumnHeader question" do
-      load_question 'ColumnHeader', false
-      choose_check_type 'edit'
+  describe "Edit and delete a question" do
+    question_type.each do |q_type|
+      ['edit', 'delete'].each do |q_command|
+        it "is able to "+q_command+" "+q_type+" question" do
+          load_question q_type, false
+          choose_check_type q_command
+        end
+      end
     end
   end
 
-  describe "Delete a question" do
-    it "is able to delete Criterion question" do
-      load_question 'Criterion', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete Scale question" do
-      load_question 'Scale', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete Dropdown question" do
-      load_question 'Dropdown', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete Checkbox question" do
-      load_question 'Checkbox', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete TextArea question" do
-      load_question 'TextArea', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete TextField question" do
-      load_question 'TextField', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete UploadFile question" do
-      load_question 'UploadFile', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete SectionHeader question" do
-      load_question 'SectionHeader', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete TableHeader question" do
-      load_question 'TableHeader', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete ColumnHeader question" do
-      load_question 'ColumnHeader', false
-      choose_check_type 'delete'
-    end
-  end
 
   def load_and_edit_check
     load_question 'Criterion', false

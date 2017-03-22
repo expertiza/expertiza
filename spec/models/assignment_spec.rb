@@ -121,7 +121,6 @@ describe "has correct csv values?" do
     assignment = create(:assignment)
     create(:assignment_team, name: "team1")
     create(:student, name: "student1")
-    create(:participant)
     create(:questionnaire)
     create(:question)
     create(:review_response_map)

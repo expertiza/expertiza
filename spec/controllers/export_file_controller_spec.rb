@@ -25,7 +25,8 @@ describe ExportFileController do
           model: 'Assignment',
           details: options
       }
-      expect { controller.send(:exportddetails, controller.params) }.to eq(expected_csv)
+      generated_csv = controller.send(:exportdetails, controller.params)
+      expect (generated_csv).to eq(expected_csv)
     end
   end
 end

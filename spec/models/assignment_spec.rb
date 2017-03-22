@@ -130,6 +130,7 @@ describe "has correct csv values?" do
       csv << Assignment.export_Headers(assignment.id)
       csv << Assignment.exportDetails_fields()
       generated_csv = Assignment.exportDetails(csv, assignment.id)
+      puts generated_csv
     end
     generated_csv.should == expected_csv
   end

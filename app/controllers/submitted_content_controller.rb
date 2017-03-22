@@ -4,7 +4,7 @@ class SubmittedContentController < ApplicationController
      'Teaching Assistant',
      'Administrator',
      'Super-Administrator',
-     'Student'].include? current_role_name and 
+     'Student'].include? current_role_name and
     ((%w(edit).include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
     one_team_can_submit_work?
   end
@@ -138,6 +138,7 @@ class SubmittedContentController < ApplicationController
 
    # params = ActionController::Parameters.new(a: "123", b: "456")
     # send message to reviewers when submission has been updated
+    #this message should only be sent if the review round is not the last one and if the current date is not past the review_deadline
     participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
     if params[:origin] == 'review'
       redirect_to :back

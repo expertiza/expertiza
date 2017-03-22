@@ -22,7 +22,7 @@ describe "Questionnaire tests for instructor interface" do
   def make_questionnaire private
     login_as("instructor6")
 
-    visit '/questionnaires/new?model=ReviewQuestionnaire&private=' + private ? '1' : '0'
+    visit '/questionnaires/new?model=ReviewQuestionnaire&private=' + (private ? '1' : '0')
 
     fill_in('questionnaire_name', with: 'Review 1')
 

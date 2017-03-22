@@ -21,7 +21,7 @@ def create_assignment_due_date
   create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 end
 
-def create_default_test_data
+def create_default_test_data num_qs
   # Create an instructor
   @instructor = create(:instructor)
 
@@ -29,7 +29,7 @@ def create_default_test_data
   @student = create(:student)
 
   # Create an assignment with quiz
-  @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 1
+  @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: num_qs
 
   # Create an assignment due date
   create_assignment_due_date
@@ -96,7 +96,7 @@ end
 
 describe 'Student can create quizzes and edit them', js: true do
   before(:each) do
-    create_default_test_data
+    create_default_test_data 1
   end
 
   it 'should be able to create quiz' do
@@ -214,7 +214,7 @@ end
 
 describe 'multiple quiz question test', js: true do
   before(:each) do
-    create_default_test_data
+    create_default_test_data 3
   end
 
   it 'number of questions set matches number of quiz questions avaliable' do

@@ -1,36 +1,31 @@
 require 'rails_helper'
+require 'spec_helper'
+require 'helpers/instructor_interface_helper_spec'
+
+def validate_pages(filepath)
+  login_as("instructor6")
+  visit '/assignments/1/edit'
+  click_link "Topics"
+  click_link "Import topics"
+  file_path = filepath
+  attach_file('file', file_path)
+  click_button "Import"
+  click_link "Topics"
+end
 
 describe "Integration tests for instructor interface" do
+  include InstructorInterfaceHelperSpec
   before(:each) do
-    create(:assignment)
-    create_list(:participant, 3)
-    create(:assignment_node)
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create(:assignment_due_date)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
+    assignment_setup
   end
 
   describe "Instructor login" do
     it "with valid username and password" do
-      login_as("instructor6")
-      visit '/tree_display/list'
-      expect(page).to have_content("Manage content")
+      instructor_login
     end
 
     it "with invalid username and password" do
-      visit root_path
-      fill_in 'login_name', with: 'instructor6'
-      fill_in 'login_password', with: 'something'
-      click_button 'SIGN IN'
-      expect(page).to have_text('Incorrect password')
+      invalid_user
     end
   end
 
@@ -61,53 +56,25 @@ describe "Integration tests for instructor interface" do
 
   describe "Import tests for assignment topics" do
     it 'should be valid file with 3 columns' do
-      login_as("instructor6")
-      visit '/assignments/1/edit'
-      click_link "Topics"
-      click_link "Import topics"
-      file_path = Rails.root + "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv"
-      attach_file('file', file_path)
-      click_button "Import"
-      click_link "Topics"
+      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv")
       expect(page).to have_content('expertiza')
       expect(page).to have_content('mozilla')
     end
 
     it 'should be a valid file with 3 or more columns' do
-      login_as("instructor6")
-      visit '/assignments/1/edit'
-      click_link "Topics"
-      click_link "Import topics"
-      file_path = Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv"
-      attach_file('file', file_path)
-      click_button "Import"
-      click_link "Topics"
+      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv")
       expect(page).to have_content('capybara')
       expect(page).to have_content('cucumber')
     end
 
     it 'should be a invalid csv file' do
-      login_as("instructor6")
-      visit '/assignments/1/edit'
-      click_link "Topics"
-      click_link "Import topics"
-      file_path = Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv"
-      attach_file('file', file_path)
-      click_button "Import"
-      click_link "Topics"
+      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv")
       expect(page).not_to have_content('airtable')
       expect(page).not_to have_content('devise')
     end
 
     it 'should be an random text file' do
-      login_as("instructor6")
-      visit '/assignments/1/edit'
-      click_link "Topics"
-      click_link "Import topics"
-      file_path = Rails.root + "spec/features/assignment_topic_csvs/random.txt"
-      attach_file('file', file_path)
-      click_button "Import"
-      click_link "Topics"
+      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/random.txt")
       expect(page).not_to have_content('this is a random file which should fail')
     end
   end

@@ -132,6 +132,6 @@ describe "has correct csv values?" do
       generated_csv = Assignment.exportDetails(csv, assignment.id)
       puts generated_csv
     end
-    generated_csv.should == expected_csv
+    expect(generated_csv).to equal(expected_csv)
   end
 end

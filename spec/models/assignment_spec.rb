@@ -124,13 +124,12 @@ describe "has correct csv values?" do
     create(:review_response_map)
     create(:response)
     delimiter = ","
-    expected_csv = File.read('expected_details.csv')
+    expected_csv = CSV.read('expected_details.csv')
     generated_csv = nil
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_Headers(assignment.id)
       csv << Assignment.exportDetails_fields()
       generated_csv = Assignment.exportDetails(csv, assignment.id)
-      puts generated_csv
     end
     expect(generated_csv).to equal(expected_csv)
   end

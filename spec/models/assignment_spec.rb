@@ -118,14 +118,13 @@ end
 
 describe "has correct csv values?" do
   it "checks_if_csv has the correct data" do
-    assignment = build(:assignment)
     delimiter = ","
     expected_csv = File.read('expected_details.csv')
     generated_csv = nil
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      csv << assignment.export_Headers(765)
-      csv << assignment.exportDetails_fields()
-      generated_csv = assignment.exportDetails(csv, 765)
+      csv << Assignment.export_Headers(765)
+      csv << Assignment.exportDetails_fields()
+      generated_csv = Assignment.exportDetails(csv, 765)
     end
 
   end

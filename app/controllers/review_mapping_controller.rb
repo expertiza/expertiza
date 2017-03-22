@@ -220,8 +220,13 @@ class ReviewMappingController < ApplicationController
 
   def unsubmit_review
     @response = Response.where(map_id: params[:id]).last
-    @response.update_attribute('is_submitted', false)
-    redirect_to :back
+    review_response_map = ReviewResponseMap.find_by(id: params[:id])
+    if @response.update_attribute('is_submitted', false)
+      flash.now[:success] = "The review submitted by \"" + review_response_map.reviewer.name + "\" for \"" + review_response_map.reviewee.name + "\" has been unsubmitted."
+    else
+      flash.now[:error] = "The review submitted by \"" + review_response_map.reviewer.name + "\" for \"" + review_response_map.reviewee.name + "\" could not be unsubmitted."
+    end
+    render :action => 'unsubmit_review.js.erb', :layout => false
   end
 
   def delete_reviewer

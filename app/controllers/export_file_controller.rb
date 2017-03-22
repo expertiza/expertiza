@@ -39,6 +39,7 @@ class ExportFileController < ApplicationController
      end
      
      puts "TEST DETAILS ARRAY"
+     puts params[:options]
      puts params[:details]
 
      csv_data = CSV.generate(col_sep: delimiter) do |csv|

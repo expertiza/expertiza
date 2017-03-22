@@ -40,7 +40,6 @@ class ExportFileController < ApplicationController
      
      puts "TEST DETAILS ARRAY"
      puts params[:options]
-     puts params[:details]
 
      csv_data = CSV.generate(col_sep: delimiter) do |csv|
          csv << Object.const_get(params[:model]).export_Headers(params[:id])

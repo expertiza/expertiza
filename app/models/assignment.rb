@@ -480,19 +480,25 @@ class Assignment < ActiveRecord::Base
             if @reviewee.nil?
               tcsv << ' '
             else
-              tcsv << @reviewee.id if options['team_id']
+              if options['team_id']
+                tcsv << @reviewee.id 
+              end
             end
 
             if @reviewee.nil? 
               tcsv << ' '
             else
-              tcsv << @reviewee.name if options['team_name']
+              if options['team_name']
+                tcsv << @reviewee.name
+              end
             end
 
             if reviewer.nil?
               tcsv << ' '
             else
-              tcsv << reviewer.name if options['reviewer']
+              if options['reviewer']
+                tcsv << reviewer.name
+              end
             end
 
             if answer.question.txt.nil?
@@ -504,19 +510,25 @@ class Assignment < ActiveRecord::Base
             if answer.question.id.nil?
               tcsv << ' '
             else
-              tcsv << answer.question.id if options['question_id']
+              if options['question_id']
+                tcsv << answer.question.id
+              end
             end
 
             if answer.comments.nil?
               tcsv << ' '
             else
-              tcsv << answer.comments if options['comments']
+              if options['comments']
+                tcsv << answer.comments
+              end
             end
 
             if answer.answer.nil?
               tcsv << ' '
             else
-              tcsv << answer.answer if options['score']
+              if options['score']
+                tcsv << answer.answer
+              end
             end
 
             csv << tcsv

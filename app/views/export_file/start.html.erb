@@ -35,7 +35,7 @@
 <% end %>
 
 <h2>Export Details</h2>
- <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_form'}) do %>
+ <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
      <table>
        <tr>
          <td valign='Top'>Delimiter:</td>
@@ -48,11 +48,11 @@
          </td>
        </tr>
      </table>
-     
+     <%= render :partial => 'export_details' %>
      <br/>
      <%= hidden_field_tag('id', @id) %>
      <%= hidden_field_tag('model', @model) %>
-     <input type='submit' value='ExportDetails' onclick='{export_form.submit();}'/>
+     <input type='submit' value='ExportDetails' onclick='{export_details_form.submit();}'/>
      <br/><br/>
  <% end %>
 <a href="<%= session[:return_to] %>">Back</a>

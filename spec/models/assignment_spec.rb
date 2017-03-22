@@ -128,10 +128,10 @@ describe "has correct csv values?" do
     create(:response)
     create(:answer, comments: "Test comment")
     delimiter = ","
-    options = {team_id: true, team_name: true,
-               reviewer: true, question: true,
-               question_id: true, comments: true,
-               score: true}
+    options = {'team_id': true, 'team_name': true,
+               'reviewer': true, 'question': true,
+               'question_id': true, 'comments': true,
+               'score': true}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_Headers(assignment.id)

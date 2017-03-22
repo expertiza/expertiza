@@ -1,14 +1,5 @@
 require 'rails_helper'
 
-def questionnaire_options(assignment, type, _round = 0)
-  questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
-  options = []
-  questionnaires.select {|x| x.type == type }.each do |questionnaire|
-    options << [questionnaire.name, questionnaire.id]
-  end
-  options
-end
-
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
     AssignmentQuestionnaire.find_by(assignment_id: @assignment[:id])
@@ -27,43 +18,108 @@ def get_selected_id(finder_var)
   end
 end
 
-def set_assignment_review_deadline(submission_date, review_date, _round= 1 )
+def create_public_assignment(user_id, assignment_option)
+  login_as(user_id)
+  visit '/assignments/new?private=0'
+  fill_assignment_form("public", "testDirectory")
+  check(assignment_option)
+  click_button 'Create'
+  Assignment.where(name: 'public assignment for test').first
+end
+
+def admin_edit_assignment_due_date(assignment)
+  @assignment = create(assignment, name: 'public assignment for test')
+  login_as("instructor6")
+  visit "/assignments/#{@assignment.id}/edit"
+  click_link 'Due date'
+end
+
+def set_assignment_review_deadline(submission_date, review_date, round)
+  fill_in 'assignment_form_assignment_rounds_of_reviews', with: round
+  fill_in 'datetimepicker_submission_round_1', with: submission_date
+  fill_in 'datetimepicker_review_round_1', with: review_date
+  click_button 'submit_btn'
+end
+
+def validate_assignment_review_deadline
+  submission_type_id = DeadlineType.where(name: 'submission')[0].id
+  review_type_id = DeadlineType.where(name: 'review')[0].id
+  submission_due_date = DueDate.find(1)
+  review_due_date = DueDate.find(2)
+  expect(submission_due_date).to have_attributes(
+    deadline_type_id: submission_type_id,
+    type: 'AssignmentDueDate'
+  )
+
+  expect(review_due_date).to have_attributes(
+    deadline_type_id: review_type_id,
+    type: 'AssignmentDueDate'
+  )
+end
+
+def admin_set_assignment_dates(assignment, submission_date, review_date, round)
+  admin_edit_assignment_due_date(assignment)
   it "set the deadline for an assignment review" do
-    fill_in 'assignment_form_assignment_rounds_of_reviews', with: _round
-    fill_in 'datetimepicker_submission_round_1', with: submission_date
-    fill_in 'datetimepicker_review_round_1', with: review_date
-    click_button 'submit_btn'
-
-    submission_type_id = DeadlineType.where(name: 'submission')[0].id
-    review_type_id = DeadlineType.where(name: 'review')[0].id
-
-    submission_due_date = DueDate.find(1)
-    review_due_date = DueDate.find(2)
-    expect(submission_due_date).to have_attributes(
-      deadline_type_id: submission_type_id,
-      type: 'AssignmentDueDate'
-    )
-
-    expect(review_due_date).to have_attributes(
-      deadline_type_id: review_type_id,
-      type: 'AssignmentDueDate'
-    )
+    set_assignment_review_deadline(submission_date, review_date, round)
+    validate_assignment_review_deadline(submission_date, review_date)
   end
 end
 
-def login_create_assignment_reroute(assignment, assignment_name, login_user, page_to_visit, link_to_click, submission_date, review_date)
-  @assignment = create(assignment, name: assignment_name)
-  login_as(login_user)
-  visit page_to_visit
-  click_link link_to_click
-  set_assignment_review_deadline(submission_date, review_date)
+def validate_assignment_attributes_by_course(assignment, assignment_descriptor, directory_path, spec_location)
+  expect(assignment).to have_attributes(
+    name: assignment_descriptor + ' assignment for test',
+    course_id: Course.find_by(name: 'Course 2')[:id],
+    directory_path: directory_path,
+    spec_location: spec_location
+  )
 end
 
-def fill_assignment_form
-  fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
+def validate_attributes(questionaire_name)
+  questionnaire = get_questionnaire(questionaire_name).first
+  expect(questionnaire).to have_attributes(
+    questionnaire_weight: 50,
+    notification_limit: 50
+  )
+end
+
+def validate_dropdown
+  questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
+  assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
+  expect(assignment_questionnaire.dropdown).to eq(false)
+end
+
+def fill_in_questionaire(questionaire_css, questionaire_name)
+  within(:css, questionaire_css) do
+    select questionaire_name, from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+    uncheck('dropdown')
+    select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
+    fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
+    fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
+  end
+  click_button 'Save'
+  sleep 1
+end
+
+def handle_questionaire(questionaire_css, questionaire_name, test_attributes)
+  fill_in_questionaire(questionaire_css, questionaire_name)
+  if test_attributes
+    validate_attributes(questionaire_name)
+  else
+    validate_dropdown
+  end
+end
+
+def new_assignment_settings(selected_options)
+  login_as("instructor6")
+  visit '/assignments/new?private=1'
+  fill_assignment_form("private", "testDirectory")
+  selected_options.each {|a| check(a) }
+end
+
+def fill_assignment_form(assignment_descriptor, directory_identifier)
+  fill_in 'assignment_form_assignment_name', with: assignment_descriptor + ' assignment for test'
   select('Course 2', from: 'assignment_form_assignment_course_id')
-  fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-  fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
+  fill_in 'assignment_form_assignment_directory_path', with: directory_identifier
 end
 
 describe "assignment function" do
@@ -90,10 +146,7 @@ describe "assignment function" do
     it "is able to create a public assignment" do
       login_as("instructor6")
       visit "/assignments/new?private=0"
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("public", "testDirectory")
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_reviews_visible_to_all")
@@ -118,9 +171,8 @@ describe "assignment function" do
       login_as("instructor6")
       visit "/assignments/new?private=1"
 
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("private", "testDirectory")
+
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_reviews_visible_to_all")
@@ -130,23 +182,11 @@ describe "assignment function" do
 
       click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        name: 'private assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
-        directory_path: 'testDirectory',
-        spec_location: 'testLocation'
-      )
+      validate_assignment_attributes_by_course(assignment, 'private', 'testDirectory', 'testLocation')
     end
 
     it "is able to create with teams" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("team_assignment")
-      check("assignment_form_assignment_show_teammate_reviews")
+      new_assignment_settings(%w(team_assignment assignment_form_assignment_show_teammate_reviews))
       fill_in 'assignment_form_assignment_max_team_size', with: 3
 
       click_button 'Create'
@@ -159,13 +199,7 @@ describe "assignment function" do
     end
     # instructor can check "has quiz" box and set the number of quiz questions
     it "is able to create with quiz" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("assignment_form_assignment_require_quiz")
+      new_assignment_settings(["assignment_form_assignment_require_quiz"])
       click_button 'Create'
       fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
       click_button 'submit_btn'
@@ -182,9 +216,7 @@ describe "assignment function" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
 
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("private", "testDirectory")
       begin
         check("assignment_form_assignment_staggered_deadline")
       rescue
@@ -196,59 +228,35 @@ describe "assignment function" do
       click_button 'submit_btn'
 
       assignment = Assignment.where(name: 'private assignment for test').first
-      pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
+      pending(%(not sure what's broken here but the error is:
+        #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
         staggered_deadline: true
       )
     end
 
-    ## should be able to create with review visible to all reviewres
+    ## should be able to create with review visible to all reviewers
     it "is able to create with review visible to all reviewers" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_assignment_form("private", "testDirectory")
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check('assignment_form_assignment_reviews_visible_to_all')
       click_button 'Create'
       expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
       # click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
-      expect(assignment).to have_attributes(
-        name: 'private assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
-        directory_path: 'testDirectory',
-        spec_location: 'testLocation'
-      )
+      validate_assignment_attributes_by_course(assignment, 'private', 'testDirectory', 'testLocation')
     end
 
     it "is able to create public micro-task assignment" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check('assignment_form_assignment_microtask')
-      click_button 'Create'
-
-      assignment = Assignment.where(name: 'public assignment for test').first
+      assignment = create_public_assignment("instructor6", 'assignment_form_assignment_microtask')
       expect(assignment).to have_attributes(
         microtask: true
       )
     end
     it "is able to create calibrated public assignment" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("assignment_form_assignment_is_calibrated")
-      click_button 'Create'
-
-      assignment = Assignment.where(name: 'public assignment for test').first
+      assignment = create_public_assignment("instructor6", "assignment_form_assignment_is_calibrated")
       expect(assignment).to have_attributes(
         is_calibrated: true
       )
@@ -258,7 +266,7 @@ describe "assignment function" do
   # instructor can set in which deadline can student reviewers take the quizzes
   describe "deadlines", js: true do
     before(:each) do
-      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/11/01 12:00', '2017/11/10 12:00', 1)
+      admin_set_assignment_dates(:assignment, '2017/11/01 12:00', '2017/11/10 12:00', 1)
     end
   end
   # adding test for general tab
@@ -276,7 +284,8 @@ describe "assignment function" do
     end
 
     it "should edit assignment available to students" do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_is_calibrated")
       click_button 'Save'
@@ -292,7 +301,8 @@ describe "assignment function" do
     end
 
     it "should edit quiz number available to students" do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check("assignment_form_assignment_require_quiz")
       click_button 'Save'
       fill_in 'assignment_form_assignment_num_quiz_questions', with: 5
@@ -309,7 +319,8 @@ describe "assignment function" do
     end
 
     it "should edit number of members per team " do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check("assignment_form_assignment_show_teammate_reviews")
       fill_in 'assignment_form_assignment_max_team_size', with: 5
       click_button 'Save'
@@ -326,16 +337,12 @@ describe "assignment function" do
 
     ##### test reviews visible to all other reviewers ######
     it "should edit review visible to all other reviewers" do
-      fill_assignment_form
+      fill_assignment_form("edit", "testDirectory1")
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
       check "assignment_form_assignment_reviews_visible_to_all"
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
-      expect(assignment).to have_attributes(
-        name: 'edit assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
-        directory_path: 'testDirectory1',
-        spec_location: 'testLocation1'
-      )
+      validate_assignment_attributes_by_course(assignment, 'edit', 'testDirectory1', 'testLocation1')
     end
 
     it "check if checking calibration shows the tab" do
@@ -453,66 +460,22 @@ describe "assignment function" do
     # First row of rubric
     describe "Edit review rubric" do
       it "updates review questionnaire" do
-        within(:css, "tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        sleep 1
-        questionnaire = get_questionnaire("ReviewQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
+        handle_questionaire("tr#questionnaire_table_ReviewQuestionnaire", "ReviewQuestionnaire2", true)
       end
 
       it "should update scored question dropdown" do
-        within("tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-        end
-        click_button 'Save'
-        questionnaire = Questionnaire.where(name: "ReviewQuestionnaire2").first
-        assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first
-        expect(assignment_questionnaire.dropdown).to eq(false)
+        handle_questionaire("tr#questionnaire_table_ReviewQuestionnaire", "ReviewQuestionnaire2", false)
       end
 
       # Second row of rubric
       it "updates author feedback questionnaire" do
-        within(:css, "tr#questionnaire_table_AuthorFeedbackQuestionnaire") do
-          select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
+        handle_questionaire("tr#questionnaire_table_AuthorFeedbackQuestionnaire", "AuthorFeedbackQuestionnaire2", true)
       end
 
       ##
       # Third row of rubric
       it "updates teammate review questionnaire" do
-        within("tr#questionnaire_table_TeammateReviewQuestionnaire") do
-          select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
-          uncheck('dropdown')
-          select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
-          fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
-        end
-        click_button 'Save'
-        questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first
-        expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
-          notification_limit: 50
-        )
+        handle_questionaire("tr#questionnaire_table_TeammateReviewQuestionnaire", "TeammateReviewQuestionnaire2", true)
       end
     end
   end
@@ -584,7 +547,7 @@ describe "assignment function" do
   # Begin Due Date tab
   describe "Due dates tab", js: true do
     before(:each) do
-      login_create_assignment_reroute(:assignment, 'public assignment for test', "instructor6", "/assignments/#{@assignment.id}/edit", 'Due date', '2017/10/01 12:00', '2017/10/10 12:00', 1)
+      admin_set_assignment_dates(:assignment, '2017/10/01 12:00', '2017/10/10 12:00', 1)
     end
 
     xit "Able to create a new penalty policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.
@@ -607,7 +570,7 @@ describe "assignment function" do
     login_as('instructor6')
     visit "/assignments/associate_assignment_with_course?id=#{assignment_id}"
 
-    choose "course_id_#{course_id}"					
+    choose "course_id_#{course_id}"
     click_button 'Save'
 
     assignment_row = Assignment.where(name: 'Test Assignment')[0]

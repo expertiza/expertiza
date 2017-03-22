@@ -118,6 +118,11 @@ end
 
 describe "has correct csv values?" do
   it "checks_if_csv has the correct data" do
+    create(:assignment)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
     delimiter = ","
     expected_csv = File.read('expected_details.csv')
     generated_csv = nil

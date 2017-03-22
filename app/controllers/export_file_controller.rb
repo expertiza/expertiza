@@ -37,9 +37,6 @@ class ExportFileController < ApplicationController
        filename = params[:model] + params[:id] + "_Details.csv"
        delimiter = other_char2
      end
-     
-     puts "TEST DETAILS ARRAY"
-     puts params[:details]
 
      csv_data = CSV.generate(col_sep: delimiter) do |csv|
          csv << Object.const_get(params[:model]).export_Headers(params[:id])

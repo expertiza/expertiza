@@ -519,6 +519,14 @@ class Assignment < ActiveRecord::Base
               end
             end
 
+            if answer.id.nil?
+              tcsv << ' '
+            else
+              if detail_options['comment_id'] == 'true'
+                tcsv << answer.id
+              end
+            end
+
             if answer.comments.nil?
               tcsv << ' '
             else
@@ -544,11 +552,12 @@ class Assignment < ActiveRecord::Base
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.export_details_fields(detail_options)
     fields = []
-    fields << 'Team ID' if detail_options['team_id'] == 'true'       # reviewee.id
-    fields << 'Team Name' if detail_options['team_name'] == 'true' # reviewee.name
+    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       # reviewee.id
+    fields << 'Team Name / Author Name' if detail_options['team_name'] == 'true' # reviewee.name
     fields << 'Reviewer' if detail_options['reviewer'] == 'true'    # reviewer.name
-    fields << 'Question' if detail_options['question'] == 'true'    # answer.question.txt
-    fields << 'Question ID' if detail_options['question_id'] == 'true'   # answer.question.id
+    fields << 'Question / Dimension Name' if detail_options['question'] == 'true'
+    fields << 'Question ID / Dimension' if detail_options['question_id'] == 'true'
+    fields << 'Comment ID' if detail_options['comment_id'] == 'true'   # answer.question.id
     fields << 'Comments' if detail_options['comments'] == 'true'      # answer.comments # Answer.id
     fields << 'Score' if detail_options['score'] == 'true'        # answer.answer # Score
     fields

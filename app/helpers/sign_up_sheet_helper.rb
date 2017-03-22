@@ -32,16 +32,16 @@ module SignUpSheetHelper
   # Render topic row for intelligent topic selection.
   def get_intelligent_topic_row(topic, selected_topics, max_team_size)
     row_html = ''
-    if !selected_topics.nil? && selected_topics.size != 0
-      selected_topics.each { |selected_topic|
+    if !selected_topics.nil? && !selected_topics.empty?
+      selected_topics.each do |selected_topic|
         row_html = if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
                      '<tr bgcolor="yellow">'
                    elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted
                      '<tr bgcolor="lightgray">'
                    else
                      '<tr id="topic_' + topic.id.to_s + '">'
-        end
-      }
+                   end
+      end
     else
       row_html = '<tr id="topic_' + topic.id.to_s + '" style="background-color:' + get_topic_bg_color(topic, max_team_size) + '">'
     end
@@ -59,7 +59,7 @@ module SignUpSheetHelper
     name_html = ''
     if !participants.nil? && !participants.empty?
       chooser_present = false
-      participants.each { |participant|
+      participants.each do |participant|
         next unless topic.id == participant.topic_id
         chooser_present = true
         if assignment.max_team_size > 1
@@ -70,12 +70,11 @@ module SignUpSheetHelper
           name_html += '<font color="red">(waitlisted)</font>'
         end
         name_html += '<br/>'
-      }
+      end
       unless chooser_present
         name_html += 'No choosers.'
       end
     end
     name_html.html_safe
   end
-
 end

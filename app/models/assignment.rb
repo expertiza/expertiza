@@ -472,8 +472,6 @@ class Assignment < ActiveRecord::Base
           @reviewee = Team.find_by_id(ans.reviewee_id)
           if @reviewee.nil?
             @reviewee = Participant.find_by_id(ans.reviewee_id).user
-            puts @reviewee.name
-            puts @reviewee.id
           end
 
           reviewer = Participant.find_by_id(ans.reviewer_id).user
@@ -485,7 +483,7 @@ class Assignment < ActiveRecord::Base
               tcsv << @reviewee.id if options['team_id']
             end
 
-            if @reviewee.nil? or 
+            if @reviewee.nil? 
               tcsv << ' '
             else
               tcsv << @reviewee.name if options['team_name']

@@ -27,9 +27,9 @@
 
         <% if(@assignment.max_team_size > 1)%>
           <br/>
-          <b><%= participant.team_name_placeholder%></b>
+          <b><%= participant.team_name_placeholder%><%= link_to image_tag('signup.png', :border => 0, :title => 'Waitlist Student', :align => 'middle'), signup_as_instructor_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %></b>
           <br/>
-          <%= participant.user_name_placeholder%>
+          <%= participant.user_name_placeholder%><%= link_to image_tag('leave_topic.png', :border => 0, :title => 'Drop Student', :align => 'middle'), :controller => "sign_up_sheet", :action => "delete_signup_as_instructor", :id => participant.team_id, :topic_id => topic.id %>
         <% else %>
           <%= participant.user_name_placeholder%>
         <% end %>
@@ -40,7 +40,7 @@
       <% end %>
     <% end %>
     <% if chooser_present == false %>
-      No choosers.
+      No choosers.<%= link_to image_tag('signup.png', :border => 0, :title => 'Sign Up Student', :align => 'middle'), signup_as_instructor_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
     <% end %>
     <br/>
   <% end %>

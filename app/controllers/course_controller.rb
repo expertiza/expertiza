@@ -141,8 +141,9 @@ class CourseController < ApplicationController
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
     if @user.nil?
-      flash[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
-      redirect_to action: 'view_teaching_assistants', id: @course.id
+      flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
+      #redirect_to action: 'view_teaching_assistants', id: @course.id
+      render :action => 'add_ta_failed.js.erb', :layout => false
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
       @user.role = Role.find_by_name 'Teaching Assistant'

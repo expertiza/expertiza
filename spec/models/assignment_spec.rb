@@ -124,8 +124,8 @@ describe "has correct csv values?" do
     create(:questionnaire)
     create(:question)
     create(:review_response_map)
-    create(:response, additional_comment: "The writeup clearly explains the work")
-    create(:answer, comments: "")
+    create(:response)
+    create(:answer, comments: "Test comment")
     delimiter = ","
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
     # expected_csv = "";

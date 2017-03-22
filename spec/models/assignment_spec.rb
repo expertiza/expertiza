@@ -124,7 +124,11 @@ describe "has correct csv values?" do
     create(:review_response_map)
     create(:response)
     delimiter = ","
-    expected_csv = CSV.read('expected_details.csv')
+    # expected_csv = CSV.read('expected_details.csv')
+    expected_csv = "";
+    CSV.foreach('expected_details.csv') do |row|
+      expected_csv << row + "\n"
+    end
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_Headers(assignment.id)
       csv << Assignment.exportDetails_fields()

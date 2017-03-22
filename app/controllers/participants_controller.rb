@@ -51,7 +51,7 @@ class ParticipantsController < ApplicationController
       undo_link("The user <b>#{params[:user][:name]}</b> has successfully been added.")
     rescue
       url_new_user = url_for controller: 'users', action: 'new'
-      flash[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
+      flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
     # redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
     render :action => 'add.js.erb', :layout => false

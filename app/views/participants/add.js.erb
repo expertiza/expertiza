@@ -1,2 +1,5 @@
+<% if !flash[:error] %>
 $("#plist").append("<%= j render :partial => 'participant',
            :locals => {participant: @participant, :userid => @participant.user_id, :controller => 'participants'} %>");
+<% end %>
++$("#flash_message").html("<%= j render partial: "shared/flash_messages" %>");

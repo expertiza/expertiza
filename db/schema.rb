@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170222161826) do
+ActiveRecord::Schema.define(version: 20170322035252) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -285,6 +285,15 @@ ActiveRecord::Schema.define(version: 20170222161826) do
     t.integer "parent_id",      limit: 4
     t.integer "node_object_id", limit: 4
     t.string  "type",           limit: 255
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string   "subject",         limit: 255
+    t.text     "description",     limit: 65535
+    t.date     "expiration_date"
+    t.boolean  "active_flag"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "participants", force: :cascade do |t|

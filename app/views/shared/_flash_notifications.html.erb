@@ -1,0 +1,21 @@
+<%# this page will display the notifications as a flash message Randal Myers, 22 March 2017 %>
+<% if  (flash_message :notification) != nil %>
+
+  <% @notifications = Notification.where(:active_flag => true) %>
+
+  <% if !@notifications.nil? %>
+
+    <% @notifications.each do |notification| %>
+
+      <% if notification.expiration_date >= Time.now %>
+
+        <table style="background-color: #faebcc">
+          <tbody style="background-color: #faebcc"><br>
+            <tr><p style="color:black; font-width:bold; background-color: #faebcc"><%= notification.subject.upcase %></p></tr>
+            <tr><%= notification.description %></tr>
+          </tbody>
+        </table>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

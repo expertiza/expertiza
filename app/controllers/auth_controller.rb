@@ -63,6 +63,8 @@ class AuthController < ApplicationController
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
 
+    flash[:notification] = 'This will display notifications on login' # added by Randal Myers, 22 March 2017
+
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
   end

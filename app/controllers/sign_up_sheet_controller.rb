@@ -221,12 +221,13 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
+  # routes to new page to specficy student
   def signup_as_instructor
   end
 
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
-    unless user.nil?
+    unless user.nil? # validate invalid user
       unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
         flash[:error] = "The student has already signed up for a topic!"
       end
@@ -258,6 +259,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def delete_signup_as_instructor
+    # find participant using assignment using team and topic ids
     team = Team.find(params[:id])
     assignment = Assignment.find(team.parent_id)
     teamUsr = TeamsUser.find_by(team_id: team.id)

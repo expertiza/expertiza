@@ -3,6 +3,7 @@ def enqueue_scheduled_tasks(stage)
   # due_at = DateTime.now.in_time_zone + 120
   # seconds_until_due = due_at - Time.now
   # minutes_until_due = seconds_until_due / 60
+  id = 2
   @name = "user"
   due_at = DateTime.now.in_time_zone + 1.day
   # puts DateTime.now.in_time_zone
@@ -32,7 +33,7 @@ describe 'Review deadline reminder email' do
     # id = 2
     # @name = "user"
     enqueue_scheduled_tasks("drop_outstanding_reviews")
-    expect(Delayed::Job.count).to eq(2)
+    expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_outstanding_reviews")
   end
 end
@@ -74,6 +75,7 @@ describe 'Team formation deadline reminder email' do
     enqueue_scheduled_tasks("team_formation")
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: team_formation")
+    due_at = DateTime.now.in_time_zone + 1.day
     Delayed::Job.enqueue(payload_object: ScheduledTask.new(2, "drop_one_member_topics", due_at), priority: 1, run_at: time_in_min)
     expect(Delayed::Job.count).to eq(2)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_one_member_topics")

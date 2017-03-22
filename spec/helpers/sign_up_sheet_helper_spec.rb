@@ -1,24 +1,26 @@
 require 'rails_helper'
 
 describe "SignUpSheetHelper" do
-
   describe "#check_topic_due_date_value" do
     before(:each) do
       @assignment = create(:assignment)
       @topic = create(:topic, assignment: @assignment)
       @deadline_type = create(:deadline_type)
       @deadline_right = create(:deadline_right)
-      @assignment_due_date = create(:assignment_due_date, deadline_type: @deadline_type, assignment: @assignment,
-                                    submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+      @assignment_due_date = create(:assignment_due_date,
+                                    deadline_type: @deadline_type,
+                                    assignment: @assignment,
+                                    submission_allowed_id: @deadline_right.id,
+                                    review_allowed_id: @deadline_right.id,
                                     review_of_review_allowed_id: @deadline_right.id)
     end
     it "The check_topic_due_date_value method should fail" do
-      expect { helper.get_topic_deadline(@assignment_due_date, @topic.id, deadline_type_id = 1, review_round = 1)}.
-          to raise_exception(NoMethodError)
+      expect { helper.get_topic_deadline(@assignment_due_date, @topic.id, 1, 1) }.
+        to raise_exception(NoMethodError)
     end
 
     it "The check_topic_due_date_value method should return the assignment due date" do
-      due_date = helper.get_topic_deadline([@assignment_due_date], @topic.id, deadline_type_id = 1, review_round = 1)
+      due_date = helper.get_topic_deadline([@assignment_due_date], @topic.id, 1, 1)
       expect(due_date).not_to be_empty
     end
   end
@@ -29,7 +31,7 @@ describe "SignUpSheetHelper" do
     end
 
     it "The get_suggested_topics method should fail" do
-      expect {helper.get_suggested_topics(@assignment.id)}.to raise_exception(NoMethodError)
+      expect { helper.get_suggested_topics(@assignment.id) }.to raise_exception(NoMethodError)
     end
 
     it "The get_suggested_topics method should return the suggested topics" do
@@ -73,7 +75,6 @@ describe "SignUpSheetHelper" do
   end
 
   describe "#render_participant_info" do
-
     before(:each) do
       @assignment1 = create(:assignment, name: "final 1")
       @topic1 = create(:topic, assignment: @assignment1)
@@ -88,8 +89,7 @@ describe "SignUpSheetHelper" do
     end
 
     it "The render_participant_info method should throw an exception" do
-      expect {helper.render_participant_info(@topic1, @assignment1, [@participant1])}.to raise_exception(NoMethodError)
+      expect { helper.render_participant_info(@topic1, @assignment1, [@participant1]) }.to raise_exception(NoMethodError)
     end
   end
-
 end

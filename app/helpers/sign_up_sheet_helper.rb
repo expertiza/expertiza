@@ -22,7 +22,7 @@ module SignUpSheetHelper
   def get_suggested_topics(assignment_id)
     team_id = TeamsUser.team_id(assignment_id, session[:user].id)
     teams_users = TeamsUser.where(team_id: team_id)
-    teams_users_array = Array.new
+    teams_users_array = []
     teams_users.each do |teams_user|
       teams_users_array << teams_user.user_id
     end
@@ -33,48 +33,44 @@ module SignUpSheetHelper
   def get_intelligent_topic_row(topic, selected_topics, max_team_size)
     row_html = ''
     if !selected_topics.nil? && selected_topics.size != 0
-      for selected_topic in selected_topics
-        if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
-          row_html = '<tr bgcolor="yellow">'
-        elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted
-          row_html = '<tr bgcolor="lightgray">'
-        else
-          row_html = '<tr id="topic_' + topic.id.to_s + '">'
+      selected_topics.each { |selected_topic|
+        row_html = if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
+                     '<tr bgcolor="yellow">'
+                   elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted
+                     '<tr bgcolor="lightgray">'
+                   else
+                     '<tr id="topic_' + topic.id.to_s + '">'
         end
-      end
+      }
     else
       row_html = '<tr id="topic_' + topic.id.to_s + '" style="background-color:' + get_topic_bg_color(topic, max_team_size) + '">'
     end
     row_html.html_safe
   end
 
-
   # Compute background colour for a topic with respect to maximum team size.
   def get_topic_bg_color(topic, max_team_size)
-    'rgb(' + (400*(1-(Math.tanh(2*[max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2))
-        .to_i.to_s + ',' + (400*(Math.tanh(2*[max_team_size.to_f/Bid.where(topic_id:topic.id).
-        count,1].min-1)+1)/2).to_i.to_s + ',0)'
+    calculation = (400 * (1 - (Math.tanh(2 * [max_team_size.to_f / Bid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2)).to_i.to_s
+    'rgb(' + calculation + ',' + calculation + ',0)'
   end
-
 
   # Render the participant info for a topic and assignment.
   def render_participant_info(topic, assignment, participants)
     name_html = ''
-    if !participants.nil? && participants.size > 0
+    if !participants.nil? && !participants.empty?
       chooser_present = false
-      for participant in participants
-        if topic.id == participant.topic_id
-          chooser_present = true
-          if assignment.max_team_size > 1
-            name_html += '<br/><b>' + participant.team_name_placeholder + '</b><br/>'
-          end
-          name_html += 'participant.user_name_placeholder'
-          if participant.is_waitlisted
-            name_html += '<font color="red">(waitlisted)</font>'
-          end
-          name_html += '<br/>'
+      participants.each { |participant|
+        next unless topic.id == participant.topic_id
+        chooser_present = true
+        if assignment.max_team_size > 1
+          name_html += '<br/><b>' + participant.team_name_placeholder + '</b><br/>'
         end
-      end
+        name_html += 'participant.user_name_placeholder'
+        if participant.is_waitlisted
+          name_html += '<font color="red">(waitlisted)</font>'
+        end
+        name_html += '<br/>'
+      }
       unless chooser_present
         name_html += 'No choosers.'
       end
@@ -83,5 +79,3 @@ module SignUpSheetHelper
   end
 
 end
-
-

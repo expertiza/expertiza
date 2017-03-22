@@ -1,12 +1,11 @@
 require 'rails_helper'
 require 'selenium-webdriver'
 
-describe GradesHelper, :type => :helper do
+describe GradesHelper, type: :helper do
   before(:each) do
     @assignment = create(:assignment, max_team_size: 1)
     @deadline_type = create(:deadline_type, id: 5, name: 'metareview')
     @deadline_right = create(:deadline_right)
-
   end
 
   describe 'get_accordion_title' do
@@ -54,8 +53,8 @@ describe GradesHelper, :type => :helper do
       @assignment.max_team_size = 1
       @assignment.save
       @assignment_due_date = create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-        review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
+                                                          submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+                                                          review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
 
       params[:action] = 'view'
       params[:id] = @assignment.id
@@ -66,8 +65,8 @@ describe GradesHelper, :type => :helper do
       @assignment.max_team_size = 3
       @assignment.save
       @assignment_due_date = create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-        review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
+                                                          submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+                                                          review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
 
       params[:action] = 'view'
       params[:id] = @assignment.id
@@ -80,7 +79,7 @@ describe GradesHelper, :type => :helper do
     it 'should return the correct particpant' do
       new_participant = create(:participant)
       params[:id] = new_participant.id
-      result = participant()
+      result = participant
       expect(result).to eq(new_participant)
     end
   end
@@ -93,7 +92,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_review()
+      result = rscore_review
       expect(result).to_not be_nil
     end
     it 'should return nil if no record of type :review is available' do
@@ -103,7 +102,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_review()
+      result = rscore_review
       expect(result).to be_nil
     end
   end
@@ -116,7 +115,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_metareview()
+      result = rscore_metareview
       expect(result).to_not be_nil
     end
     it 'should return nil if no record of type :metareview is available' do
@@ -126,7 +125,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_metareview()
+      result = rscore_metareview
       expect(result).to be_nil
     end
   end
@@ -139,7 +138,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_feedback()
+      result = rscore_feedback
       expect(result).to_not be_nil
     end
     it 'should return nil if no record of type :feedback is available' do
@@ -149,7 +148,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_feedback()
+      result = rscore_feedback
       expect(result).to be_nil
     end
   end
@@ -162,7 +161,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_teammate()
+      result = rscore_teammate
       expect(result).to_not be_nil
     end
     it 'should return nil if no record of type :teammate is available' do
@@ -172,7 +171,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = rscore_teammate()
+      result = rscore_teammate
       expect(result).to be_nil
     end
   end
@@ -185,7 +184,7 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = p_total_score()
+      result = p_total_score
       expect(result).to eq(90)
     end
     it 'should return :total_score if no grade is available' do
@@ -195,11 +194,10 @@ describe GradesHelper, :type => :helper do
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
-      result = p_total_score()
+      result = p_total_score
       expect(result).to eq(0)
     end
   end
-
 
   describe 'p_title' do
     it 'should return a title when the participant has a grade' do
@@ -207,13 +205,13 @@ describe GradesHelper, :type => :helper do
       params[:id] = new_participant.id
       new_participant.grade = 90
       new_participant.save
-      result = p_title()
+      result = p_title
       expect(result).to eq('A score in blue indicates that the value was overwritten by the instructor or teaching assistant.')
     end
     it 'should return nil when the participant has no grade' do
       new_participant = create(:participant)
       params[:id] = new_participant.id
-      result = p_title()
+      result = p_title
       expect(result).to eq(nil)
     end
   end
@@ -280,10 +278,10 @@ describe GradesHelper, :type => :helper do
     end
   end
 end
-  ##########################
-  #Functional Cases
-  ##########################
-describe GradesHelper, :type => :feature do
+##########################
+# Functional Cases
+##########################
+describe GradesHelper, type: :feature do
   describe 'case 1' do
     it "Javascript should work on grades Alternate View", js: true do
       assignment = create(:assignment)
@@ -315,12 +313,6 @@ describe GradesHelper, :type => :feature do
       click_link('Your scores')
 
       expect(page).to have_content '0.00%'
-
     end
   end
-
-
 end
-
-
-

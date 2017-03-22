@@ -123,7 +123,7 @@ describe "has correct csv values?" do
     create(:question)
     create(:review_response_map)
     create(:response, additional_comment: "The writeup clearly explains the work")
-    # create(:answer)
+    create(:answer, comments: "")
     delimiter = ","
     expected_csv = File.read('expected_details_csv.txt')
     # expected_csv = "";

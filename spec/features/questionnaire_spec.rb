@@ -1,4 +1,5 @@
 require 'rails_helper'
+require 'helpers/instructor_interface_helper_spec'
 
 question_type = %w(Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader)
 

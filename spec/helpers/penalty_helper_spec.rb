@@ -10,13 +10,13 @@ describe "PenaltyHelper" do
   
   describe "#check_policy_with_same_name" do
     it "should return true when checking an existing policy name" do
-      policy_exists = PenaltyHelper.check_policy_with_same_name(@late_policy.name)
+      policy_exists = PenaltyHelper.check_policy_with_same_name(@late_policy.policy_name)
       expect(policy_exists).to be true
     end
 
     it "should return false when checking a non-existant policy name" do
       late_policy_delete = create(:late_policy)
-      late_policy_name = late_policy_delete.name
+      late_policy_name = late_policy_delete.policy_name
       LatePolicy.destroy(late_policy_delete.id)
       policy_exists = PenaltyHelper.check_policy_with_same_name(late_policy_name)
       expect(policy_exists).to be false

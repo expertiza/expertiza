@@ -26,7 +26,7 @@ describe ExportFileController do
           details: options
       }
       # generated_csv = controller.send(:exportdetails)
-      generated_csv = get :exportdetails, {:params => params}
+      generated_csv = post :exportdetails, {:params => params}
       expect(generated_csv).to eq(expected_csv)
     end
   end

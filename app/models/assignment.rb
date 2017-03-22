@@ -409,7 +409,7 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
-  def self.exportDetails(csv, parent_id)
+  def self.exportDetails(csv, parent_id, options)
     @assignment = Assignment.find(parent_id)
 
     @answers = {} # Contails all answer objects for this assignment
@@ -448,34 +448,8 @@ class Assignment < ActiveRecord::Base
       
     end
 
-
-
-    # @questionnaires = @assignment.questionnaires
-
-    # @questionnaires.each do |questionnaire|
-    #   questionnaire.questions.each do |q|
-    #     @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
-    #     @list.each do |a|
-    #       #get response object then response map object for this answer
-    #       @response = Response.find_by_id(a.response_id)
-    #       ans = ResponseMap.find_by_id(@response.map_id)
-    #       @answers[@response.round][ans.type].push(a)
-    #     end
-    #   end
-    # end
-
-    #loop through all rounds and resp types, then access the array of answers for that round/resp type
-    # csv << ['---', '---', '---', '---', '---', '---', '---']
     @uniq_rounds.each do |round_num|
-      # csv << ['---', '---', '---', '---', '---', '---', '---']
       
-      # if round_num.nil?
-      #   csv << ["Round Nill", '---', '---', '---', '---', '---', '---']
-      # else
-      #   csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
-      # end
-      
-      # csv << ['---', '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
         
         if @answers[round_num][res_type].size > 0
@@ -504,68 +478,65 @@ class Assignment < ActiveRecord::Base
 
           reviewer = Participant.find_by_id(ans.reviewer_id).user
 
-          # if !reviewee.nil?
 
             if @reviewee.nil?
               tcsv << ' '
             else
-              tcsv << @reviewee.id
+              tcsv << @reviewee.id if options['team_id']
             end
 
-            if @reviewee.nil?
+            if @reviewee.nil? or 
               tcsv << ' '
             else
-              tcsv << @reviewee.name
+              tcsv << @reviewee.name if options['team_name']
             end
 
             if reviewer.nil?
               tcsv << ' '
             else
-              tcsv << reviewer.name
+              tcsv << reviewer.name if options['reviewer']
             end
 
             if answer.question.txt.nil?
               tcsv << ' '
             else
-              tcsv << answer.question.txt
+              tcsv << answer.question.txt if options['question']
             end
 
             if answer.question.id.nil?
               tcsv << ' '
             else
-              tcsv << answer.question.id
+              tcsv << answer.question.id if options['question_id']
             end
 
             if answer.comments.nil?
               tcsv << ' '
             else
-              tcsv << answer.comments
+              tcsv << answer.comments if options['comments']
             end
 
             if answer.answer.nil?
               tcsv << ' '
             else
-              tcsv << answer.answer
+              tcsv << answer.answer if options['score']
             end
 
             csv << tcsv
-
-          # end
         end
       end
     end
   end
 
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
-  def self.exportDetails_fields
+  def self.exportDetails_fields(options)
     fields = []
-    fields << 'Team ID'        # reviewee.id
-    fields << 'Team Name'      # reviewee.name
-    fields << 'Reviewer'       # reviewer.name
-    fields << 'Question'       # answer.question.txt
-    fields << 'Question ID'    # answer.question.id
-    fields << 'Comments'       # answer.comments # Answer.id
-    fields << 'Score'          # answer.answer # Score
+    fields << 'Team ID' if options['team_id']         # reviewee.id
+    fields << 'Team Name' if options['team_name']     # reviewee.name
+    fields << 'Reviewer' if options['reviewer']      # reviewer.name
+    fields << 'Question' if options['question']      # answer.question.txt
+    fields << 'Question ID' if options['question_id']   # answer.question.id
+    fields << 'Comments' if options['comments']      # answer.comments # Answer.id
+    fields << 'Score' if options['score']         # answer.answer # Score
     fields
   end
 

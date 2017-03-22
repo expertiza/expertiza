@@ -48,6 +48,9 @@
          </td>
        </tr>
      </table>
+     <% if @model == 'Assignment' %>
+     <%= render :partial => 'export_details' %>
+     <% end %>
      <br/>
      <%= hidden_field_tag('id', @id) %>
      <%= hidden_field_tag('model', @model) %>

@@ -129,10 +129,6 @@ describe "has correct csv values?" do
     create(:answer, comments: "Test comment")
     delimiter = ","
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
-    # expected_csv = "";
-    # CSV.foreach('expected_details.csv') do |row|
-    #   expected_csv << row.to_s + "\n"
-    # end
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_Headers(assignment.id)
       csv << Assignment.exportDetails_fields()

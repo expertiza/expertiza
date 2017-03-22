@@ -482,7 +482,7 @@ class Assignment < ActiveRecord::Base
             if @reviewee.nil?
               tcsv << ' '
             else
-              if options['team_id']
+              if options['team_id'] == 'true'
                 tcsv << @reviewee.id 
               end
             end
@@ -490,7 +490,7 @@ class Assignment < ActiveRecord::Base
             if @reviewee.nil? 
               tcsv << ' '
             else
-              if options['team_name']
+              if options['team_name'] == 'true'
                 tcsv << @reviewee.name
               end
             end
@@ -498,7 +498,7 @@ class Assignment < ActiveRecord::Base
             if reviewer.nil?
               tcsv << ' '
             else
-              if options['reviewer']
+              if options['reviewer'] == 'true'
                 tcsv << reviewer.name
               end
             end
@@ -506,13 +506,15 @@ class Assignment < ActiveRecord::Base
             if answer.question.txt.nil?
               tcsv << ' '
             else
-              tcsv << answer.question.txt if options['question']
+              if options['question'] == 'true'
+                tcsv << answer.question.txt
+              end
             end
 
             if answer.question.id.nil?
               tcsv << ' '
             else
-              if options['question_id']
+              if options['question_id'] == 'true'
                 tcsv << answer.question.id
               end
             end
@@ -520,7 +522,7 @@ class Assignment < ActiveRecord::Base
             if answer.comments.nil?
               tcsv << ' '
             else
-              if options['comments']
+              if options['comments'] == 'true'
                 tcsv << answer.comments
               end
             end
@@ -528,7 +530,7 @@ class Assignment < ActiveRecord::Base
             if answer.answer.nil?
               tcsv << ' '
             else
-              if options['score']
+              if options['score'] == 'true'
                 tcsv << answer.answer
               end
             end
@@ -542,13 +544,13 @@ class Assignment < ActiveRecord::Base
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.exportDetails_fields(options)
     fields = []
-    fields << 'Team ID' if options['team_id']         # reviewee.id
-    fields << 'Team Name' if options['team_name']     # reviewee.name
-    fields << 'Reviewer' if options['reviewer']      # reviewer.name
-    fields << 'Question' if options['question']      # answer.question.txt
-    fields << 'Question ID' if options['question_id']   # answer.question.id
-    fields << 'Comments' if options['comments']      # answer.comments # Answer.id
-    fields << 'Score' if options['score']         # answer.answer # Score
+    fields << 'Team ID' if options['team_id'] == 'true'       # reviewee.id
+    fields << 'Team Name' if options['team_name'] == 'true' # reviewee.name
+    fields << 'Reviewer' if options['reviewer'] == 'true'    # reviewer.name
+    fields << 'Question' if options['question'] == 'true'    # answer.question.txt
+    fields << 'Question ID' if options['question_id'] == 'true'   # answer.question.id
+    fields << 'Comments' if options['comments'] == 'true'      # answer.comments # Answer.id
+    fields << 'Score' if options['score'] == 'true'        # answer.answer # Score
     fields
   end
 

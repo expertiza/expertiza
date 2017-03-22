@@ -51,7 +51,7 @@ class ExportFileController < ApplicationController
                type: 'text/csv; charset=iso-8859-1; header=present',
          disposition: "attachment; filename=#{filename}"
 
-     return csv_data
+     return csv_data.to_s
    end
  
   def export

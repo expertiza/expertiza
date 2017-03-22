@@ -2,13 +2,11 @@ require 'rails_helper'
 
 describe "PenaltyHelper" do
   before(:each) do
+    @course_participant = create(:course_participant)
     @instructor = create(:instructor)
-    @late_policy = create(:late_policy, instructor_id: @instructor.id)
-    @assignment = create(:assignment, is_penalty_calculated: true, late_policy_id: @late_policy.id, instructor: @instructor)
-    @assignment_due_date = create(:assignment_due_date, assignment: @assignment, due_at: DateTime.now.in_time_zone - 1.day)
-    @participant = create(:participant, assignment: @assignment)
-    @calculated_penalty = create(:calculated_penalty, participant: @participant)
+    @late_policy = create(:late_policy)
   end
+
   
   describe "#check_policy_with_same_name" do
     it "should return true when checking an existing policy name" do
@@ -56,4 +54,9 @@ describe "PenaltyHelper" do
       expect(penalty_minutes.round).to be == 1
     end
   end 
+
+  it "has a valid factory" do
+    factory = FactoryGirl.build(:late_policy)
+    expect(factory).to be_valid
+  end
 end

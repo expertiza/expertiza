@@ -356,4 +356,11 @@ FactoryGirl.define do
     round 1
     is_submitted false
   end
+
+  factory :answer, class: Answer do
+    question_id { Question.first || association(:question) }
+    answer 1
+    comments ""
+    response_id { Response.first || association(:response) }
+  end
 end

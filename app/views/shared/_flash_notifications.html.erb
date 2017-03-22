@@ -7,7 +7,7 @@
 
     <% @notifications.each do |notification| %>
 
-      <% if notification.expiration_date >= Time.now %>
+      <% if notification.expiration_date >= Date.today %>
 
         <table style="background-color: #faebcc">
           <tbody style="background-color: #faebcc"><br>

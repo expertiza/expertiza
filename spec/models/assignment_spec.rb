@@ -120,7 +120,8 @@ describe "has correct csv values?" do
   it "checks_if_csv has the correct data" do
     assignment = create(:assignment)
     create(:assignment_team, name: "team1")
-    create(:student, name: "student1")
+    student = create(:student, name: "student1")
+    create(:participant, student: student)
     create(:questionnaire)
     create(:question)
     create(:review_response_map)

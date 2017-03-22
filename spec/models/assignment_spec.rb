@@ -114,6 +114,7 @@ describe "#check if the assignment belongs to a course" do
     assignment_node.node_object_id = assignment.id
     expect(assignment_node.belongs_to_course?).to be true
   end
+end
 
 describe "has correct csv values?" do
   it "checks_if_csv has the correct data" do
@@ -121,6 +122,4 @@ describe "has correct csv values?" do
     expected_csv = File.read('expected_details.csv')
     generated_csv = assignment.exportDetails("", 765)
   end
-end
-
 end

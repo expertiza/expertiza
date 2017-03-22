@@ -17,8 +17,15 @@ describe ExportFileController do
                  "question_id"=>"true", "comment_id"=>"true",
                  "comments"=>"true", "score"=>"true"}
       expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
-      generated_csv = post :exportdetails, id: assignment.id, delim_type2: ",", model: "Assignment", details: options
-      expect(generated_csv).to eq(expected_csv)
+      # generated_csv = post :exportdetails, id: assignment.id, delim_type2: ",", model: "Assignment", details: options
+      # expect(generated_csv).to eq(expected_csv)
+      controller.params = {
+          id: assignment.id,
+          delim_type2: ",",
+          model: 'Assignment',
+          details: options
+      }
+      expect { controller.send(:exportddetails, controller.params) }.to eq(expected_csv)
     end
   end
 end

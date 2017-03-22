@@ -37,8 +37,8 @@ class AssignmentForm
       attributes[:assignment][:late_policy_id] = nil
     end
     update_assignment(attributes[:assignment])
-    update_assignment_questionnaires(attributes[:assignment_questionnaire])
-    update_due_dates(attributes[:due_date], user)
+    update_assignment_questionnaires(attributes[:assignment_questionnaire]) if !@has_errors
+    update_due_dates(attributes[:due_date], user) if !@has_errors
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
@@ -52,7 +52,7 @@ class AssignmentForm
   # Code to update values of assignment
   def update_assignment(attributes)
     unless @assignment.update_attributes(attributes)
-      @errors += @assignment.errors
+      @errors = @assignment.errors
       @has_errors = true
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
@@ -67,13 +67,13 @@ class AssignmentForm
       if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
         aq = AssignmentQuestionnaire.new(assignment_questionnaire)
         unless aq.save
-          @errors += @assignment.errors
+          @errors = @assignment.errors
           @has_errors = true
         end
       else
         aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
         unless aq.update_attributes(assignment_questionnaire)
-          @errors += @assignment.errors
+          @errors = @assignment.errors
           @has_errors = true
         end
       end

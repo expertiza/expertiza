@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-question_type = ['Criterion', 'Scale', 'Dropdown', 'Checkbox', 'TextArea', 'TextField', 'UploadFile', 'SectionHeader', 'TableHeader', 'ColumnHeader']
+question_type = %w(Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader)
 
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
@@ -96,7 +96,7 @@ describe "Questionnaire tests for instructor interface" do
 
   describe "Create a review question" do
     question_type.each do |q_type|
-      it "is able to create "+q_type+" question" do
+      it "is able to create " + q_type + " question" do
           load_question q_type, true
       end
     end
@@ -122,19 +122,16 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  question_type = ['Criterion', 'Scale', 'Dropdown', 'Checkbox', 'TextArea', 'TextField', 'UploadFile', 'SectionHeader', 'TableHeader', 'ColumnHeader']
-
   describe "Edit and delete a question" do
     question_type.each do |q_type|
-      ['edit', 'delete'].each do |q_command|
-        it "is able to "+q_command+" "+q_type+" question" do
+      %w(edit delete).each do |q_command|
+        it "is able to " + q_command + " " + q_type + " question" do
           load_question q_type, false
           choose_check_type q_command
         end
       end
     end
   end
-
 
   def load_and_edit_check
     load_question 'Criterion', false

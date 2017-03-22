@@ -136,6 +136,6 @@ describe "has correct csv values?" do
     end
     # puts "Generated CSV - " + generated_csv
     # puts "Expected CSV - " + expected_csv.to_s
-    expect(generated_csv).to equal(expected_csv)
+    expect(generated_csv).to eq(expected_csv)
   end
 end

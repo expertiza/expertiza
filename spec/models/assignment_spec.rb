@@ -135,8 +135,8 @@ describe "has correct csv values?" do
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_Headers(assignment.id)
-      csv << Assignment.exportDetails_fields(options)
-      Assignment.exportDetails(csv, assignment.id, options)
+      csv << Assignment.export_details_fields(options)
+      Assignment.export_details(csv, assignment.id, options)
     end
     # puts "Generated CSV - " + generated_csv
     # puts "Expected CSV - " + expected_csv.to_s

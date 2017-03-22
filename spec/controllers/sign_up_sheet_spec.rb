@@ -148,3 +148,50 @@ describe SignUpSheetController do
     end
   end
 end
+
+describe SignUpSheetController do
+  before(:each) do
+    instructor.save
+    @user = User.find_by_name("instructor")
+
+    @assignment = Assignment.where(name: 'My assignment').first || Assignment.new("name" => "My assignment",
+                                                                                  "instructor_id" => @user.id)
+    @assignment.save
+
+    @topic1 = SignUpTopic.new(topic_name: "Topic1",
+                              topic_identifier: "Ch10",
+                              assignment_id: @assignment.id,
+                              max_choosers: 2)
+    @topic1.save
+
+    @topic2 = SignUpTopic.new(topic_name: "Topic2",
+                              topic_identifier: "Ch10",
+                              assignment_id: @assignment.id,
+                              max_choosers: 2)
+    @topic2.save
+
+    student.save
+    @user = User.find_by_name("student")
+
+    # simulate authorized session
+    allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return('Instructor')
+    allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(TRUE)
+  end
+
+  describe "Instructor singup user" do
+    it "denies adding a user already signed up" do
+      post :signup_as_instructor_action, username: @user.name, assignment_id: @assignment.id, topic_id: @topic1.id
+      post :signup_as_instructor_action, username: @user.name, assignment_id: @assignment.id, topic_id: @topic2.id
+      expect(flash[:error]).to eq('The student already signed up for a topic!')
+    end
+    it "checks to make sure the user exists" do
+      post :signup_as_instructor_action, username: "asifljasdlf", assignment_id: @assignment.id, topic_id: @topic1.id
+      expect(flash[:error]).to eq('That student does not exist!')
+    end
+    it "redirects back to topics page" do
+      post :signup_as_instructor_action, username: @user.name, assignment_id: @assignment.id, topic_id: @topic1.id
+      expect(response).to redirect_to edit_assignment_url(id: @assignment.id)
+    end
+  end
+
+end

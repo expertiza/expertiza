@@ -130,8 +130,8 @@ describe "has correct csv values?" do
       csv << Assignment.exportDetails_fields()
       Assignment.exportDetails(csv, assignment.id)
     end
-    puts "Generated CSV - " + generated_csv
-    puts "Expected CSV - " + expected_csv.to_s
-    # expect(generated_csv).to equal(expected_csv)
+    # puts "Generated CSV - " + generated_csv
+    # puts "Expected CSV - " + expected_csv.to_s
+    expect(generated_csv).to equal(expected_csv)
   end
 end

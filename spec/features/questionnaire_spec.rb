@@ -45,7 +45,7 @@ describe "Questionnaire tests for instructor interface" do
 
     fill_in('questionnaire_max_question_score', with: '5')
 
-    select(private ? 'yes' : 'no', from: 'questionnaire_private')
+    select(private ? 'yes' : 'no' , from: 'questionnaire_private')
 
     click_button "Create"
 
@@ -141,139 +141,124 @@ describe "Questionnaire tests for instructor interface" do
     expect(page).to have_content('Question edit')
   end
 
+  describe "Edit a question" do
+    it "is able to edit Criterion question" do
+      load_question 'Criterion', false
+      edit_created_question
+    end
+
+    it "is able to edit Scale question" do
+      load_question 'Scale', false
+      edit_created_question
+    end
+
+    it "is able to edit Dropdown question" do
+      load_question 'Dropdown', false
+      edit_created_question
+    end
+
+    it "is able to edit Checkbox question" do
+      load_question 'Checkbox', false
+      edit_created_question
+    end
+
+    it "is able to edit TextArea question" do
+      load_question 'TextArea', false
+      edit_created_question
+    end
+
+    it "is able to edit TextField question" do
+      load_question 'TextField', false
+      edit_created_question
+    end
+
+    it "is able to edit UploadFile question" do
+      load_question 'UploadFile', false
+      edit_created_question
+    end
+
+    it "is able to edit SectionHeader question" do
+      load_question 'SectionHeader', false
+      edit_created_question
+    end
+
+    it "is able to edit TableHeader question" do
+      load_question 'TableHeader', false
+      edit_created_question
+    end
+
+    it "is able to edit ColumnHeader question" do
+      load_question 'ColumnHeader', false
+      edit_created_question
+    end
+  end
+
   def check_deleted_question
     click_on('Remove')
     expect(page).to have_content('You have successfully deleted the question!')
   end
 
-  def choose_check_type command_type
-    if command_type == 'edit'
-      edit_created_question
-    else
+  describe "Delete a question" do
+    it "is able to delete a Criterion question" do
+      load_question 'Criterion', false
+      check_deleted_question
+    end
+
+    it "is able to delete a Scale question" do
+      load_question 'Scale', false
+      check_deleted_question
+    end
+
+    it "is able to delete a Dropdown question" do
+      load_question 'Dropdown', false
+      check_deleted_question
+    end
+
+    it "is able to delete a Checkbox question" do
+      load_question 'Checkbox', false
+      check_deleted_question
+    end
+
+    it "is able to delete a TextArea question" do
+      load_question 'TextArea', false
+      check_deleted_question
+    end
+
+    it "is able to delete a TextField question" do
+      load_question 'TextField', false
+      check_deleted_question
+    end
+
+    it "is able to delete a UploadFile question" do
+      load_question 'UploadFile', false
+      check_deleted_question
+    end
+
+    it "is able to delete a SectionHeader question" do
+      load_question 'SectionHeader', false
+      check_deleted_question
+    end
+
+    it "is able to delete a TableHeader question" do
+      load_question 'TableHeader', false
+      check_deleted_question
+    end
+
+    it "is able to delete a ColumnHeader question" do
+      load_question 'ColumnHeader', false
       check_deleted_question
     end
   end
 
-  describe "Edit a question" do
-    it "is able to edit Criterion question" do
-      load_question 'Criterion', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit Scale question" do
-      load_question 'Scale', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit Dropdown question" do
-      load_question 'Dropdown', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit Checkbox question" do
-      load_question 'Checkbox', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit TextArea question" do
-      load_question 'TextArea', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit TextField question" do
-      load_question 'TextField', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit UploadFile question" do
-      load_question 'UploadFile', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit SectionHeader question" do
-      load_question 'SectionHeader', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit TableHeader question" do
-      load_question 'TableHeader', false
-      choose_check_type 'edit'
-    end
-
-    it "is able to edit ColumnHeader question" do
-      load_question 'ColumnHeader', false
-      choose_check_type 'edit'
-    end
-  end
-
-  describe "Delete a question" do
-    it "is able to delete Criterion question" do
-      load_question 'Criterion', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete Scale question" do
-      load_question 'Scale', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete Dropdown question" do
-      load_question 'Dropdown', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete Checkbox question" do
-      load_question 'Checkbox', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete TextArea question" do
-      load_question 'TextArea', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete TextField question" do
-      load_question 'TextField', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete UploadFile question" do
-      load_question 'UploadFile', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete SectionHeader question" do
-      load_question 'SectionHeader', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete TableHeader question" do
-      load_question 'TableHeader', false
-      choose_check_type 'delete'
-    end
-
-    it "is able to delete ColumnHeader question" do
-      load_question 'ColumnHeader', false
-      choose_check_type 'delete'
-    end
-  end
-
-  def load_and_edit_check
+  def create_review_advice
     load_question 'Criterion', false
     click_button "Edit/View advice"
     expect(page).to have_content('Edit an existing questionnaire')
-  end
 
-  def edit_and_save_check
     first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Advice 1")
     click_button "Save and redisplay advice"
     expect(page).to have_content('advice was successfully saved')
     expect(page).to have_content('Advice 1')
-  end
-
-  def create_review_advice
-    load_and_edit_check
-    edit_and_save_check
   end
 
   describe "Create a review advice" do

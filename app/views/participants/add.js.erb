@@ -1,3 +1,4 @@
+// E1721: Adding AJAX for adding participants to assignment
 <% if !flash[:error] %>
 $("#plist").append("<%= j render :partial => 'participant',
            :locals => {participant: @participant, :userid => @participant.user_id, :controller => 'participants'} %>");

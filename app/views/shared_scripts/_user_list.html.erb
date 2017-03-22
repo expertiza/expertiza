@@ -1,5 +1,5 @@
 <div class = "exp">
-<%if user_list.length > 0%>
+
 <table id="plist">
   <tr>
     <th colspan=5></th>
@@ -21,10 +21,12 @@
     <th class="head">Handle</th>
     <th class="head">Action</th>
   </tr>
+  <!--E1721 changes begin-->
   <% @user_id = [] %>
   <%= render partial: 'participant', collection: user_list, :locals => {:userid => @user_id, :controller => 'participants'}%>
+  <!--E1721 changes End-->
 </table>
-<% end -%>
+
 
 </div>
 

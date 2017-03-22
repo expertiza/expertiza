@@ -208,6 +208,30 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+  def sign_up()
+    # find the assignment to which user is signing up
+    @assignment = AssignmentParticipant.find(params[:id]).assignment
+    @user_id = session[:user].id
+    # Always use team_id ACS
+    # s = Signupsheet.new
+    # Team lazy initialization: check whether the user already has a team for this assignment
+    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
+      flash[:error] = "You've already signed up for a topic!"
+    end
+    redirect_to action: 'list', id: params[:id]
+  end
+
+  def signup_as_instructor
+  end
+
+  def signup_as_instructor_action
+    user = User.find_by(name: params[:username])
+    unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+      flash[:error] = "You've already signed up for a topic!"
+    end
+    redirect_to action: 'list', id: params[:assignment_id]
+  end
+
   # this function is used to delete a previous signup
   def delete_signup
     participant = AssignmentParticipant.find(params[:id])
@@ -228,17 +252,13 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  def delete_signup_instructor
+  def delete_signup_as_instructor
     team = Team.find(params[:id])
     assignment = Assignment.find(team.parent_id)
     teamUsr = TeamsUser.find_by(team_id: team.id)
     user = User.find(teamUsr.user_id)
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
-    # A student who has already submitted work should not be allowed to drop his/her topic!
-    # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
-    # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
-    # If there is a drop topic deadline, student cannot drop topic after this deadline.
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
@@ -250,37 +270,7 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  def signup_as_instructor
-
-  end
-
-  def signup_as_instructor_action
-    user = User.find_by(name: params[:username])
-    participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: params[:assignment_id])
-    unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-      flash[:error] = "You've already signed up for a topic!"
-    end
-    redirect_to action: 'list', id: params[:assignment_id]
-  end
-
-  def sign_up(optional=true)
-    # find the assignment to which user is signing up
-    @assignment = AssignmentParticipant.find(params[:id]).assignment
-    if (optional)
-      @user_id = 6623
-    else
-      @user_id = session[:user].id
-    end
-    # Always use team_id ACS
-    # s = Signupsheet.new
-    # Team lazy initialization: check whether the user already has a team for this assignment
-    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
-      flash[:error] = "You've already signed up for a topic!"
-    end
-    redirect_to action: 'list', id: params[:id]
-  end
-
-def set_priority
+  def set_priority
     @user_id = session[:user].id
     unless params[:topic].nil?
       team_ids = AssignmentTeam.where(parent_id: params[:assignment_id]).map(&:id)

@@ -50,7 +50,8 @@ class ExportFileController < ApplicationController
      send_data csv_data,
                type: 'text/csv; charset=iso-8859-1; header=present',
          disposition: "attachment; filename=#{filename}"
- 
+
+     return csv_data
    end
  
   def export

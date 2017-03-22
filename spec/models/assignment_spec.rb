@@ -118,8 +118,16 @@ end
 
 describe "has correct csv values?" do
   it "checks_if_csv has the correct data" do
-    assignment = build(:assignment)
+    assignment = create(:assignment)
+    assignment[:parent_id] = 765
+    delimiter = ","
     expected_csv = File.read('expected_details.csv')
-    generated_csv = assignment.exportDetails("", 765)
+    generated_csv = nil
+    csv_data = CSV.generate(col_sep: delimiter) do |csv|
+      csv << assignment.export_Headers(params[:id])
+      csv << assignment.exportDetails_fields()
+      generated_csv = assignment.exportDetails(csv, 765)
+    end
+    
   end
 end

@@ -4,7 +4,8 @@ describe "PenaltyHelper" do
   before(:each) do
     @course_participant = create(:course_participant)
     @instructor = create(:instructor)
-    @late_policy = create(:late_policy)
+    @late_policy = create(:late_policy, instructor_id: @instructor.id)
+    @assignment = create(:assignment, is_penalty_calculated: true, late_policy_id: @late_policy.id, instructor: @instructor)
   end
 
   

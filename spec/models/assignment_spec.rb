@@ -118,7 +118,7 @@ end
 
 describe "has correct csv values?" do
   it "checks_if_csv has the correct data" do
-    create(:assignment)
+    assignment = create(:assignment)
     create(:questionnaire)
     create(:question)
     create(:review_response_map)
@@ -127,9 +127,9 @@ describe "has correct csv values?" do
     expected_csv = File.read('expected_details.csv')
     generated_csv = nil
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_Headers(:assignment.id)
+      csv << Assignment.export_Headers(assignment.id)
       csv << Assignment.exportDetails_fields()
-      generated_csv = Assignment.exportDetails(csv, :assignment.id)
+      generated_csv = Assignment.exportDetails(csv, assignment.id)
     end
 
   end

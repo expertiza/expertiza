@@ -127,9 +127,9 @@ describe "has correct csv values?" do
     expected_csv = File.read('expected_details.csv')
     generated_csv = nil
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_Headers(765)
+      csv << Assignment.export_Headers(:assignment.id)
       csv << Assignment.exportDetails_fields()
-      generated_csv = Assignment.exportDetails(csv, 765)
+      generated_csv = Assignment.exportDetails(csv, :assignment.id)
     end
 
   end

@@ -115,4 +115,12 @@ describe "#check if the assignment belongs to a course" do
     expect(assignment_node.belongs_to_course?).to be true
   end
 
+describe "has correct csv values?" do
+  it "checks_if_csv has the correct data" do
+    assignment = build(:assignment)
+    expected_csv = File.read('expected_details.csv')
+    generated_csv = assignment.exportDetails("", 765)
+  end
+end
+
 end

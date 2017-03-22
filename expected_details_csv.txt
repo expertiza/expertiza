@@ -1,2 +1,2 @@
-Assignment Name: final2,Assignment Instructor: Instructor
+Assignment Name: final2,Assignment Instructor: instructor6
 Team ID,Team Name,Reviewer,Question,Question ID,Comments,Score

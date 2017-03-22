@@ -448,8 +448,6 @@ class Assignment < ActiveRecord::Base
       
     end
 
-    puts detail_options
-
     @uniq_rounds.each do |round_num|
       
       @uniq_response_type.each do |res_type|
@@ -552,17 +550,18 @@ class Assignment < ActiveRecord::Base
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.export_details_fields(detail_options)
     fields = []
-    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       # reviewee.id
-    fields << 'Team Name / Author Name' if detail_options['team_name'] == 'true' # reviewee.name
-    fields << 'Reviewer' if detail_options['reviewer'] == 'true'    # reviewer.name
+    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
+    fields << 'Team Name / Author Name' if detail_options['team_name'] == 'true' 
+    fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
     fields << 'Question / Dimension Name' if detail_options['question'] == 'true'
     fields << 'Question ID / Dimension' if detail_options['question_id'] == 'true'
-    fields << 'Comment ID' if detail_options['comment_id'] == 'true'   # answer.question.id
-    fields << 'Comments' if detail_options['comments'] == 'true'      # answer.comments # Answer.id
-    fields << 'Score' if detail_options['score'] == 'true'        # answer.answer # Score
+    fields << 'Comment ID' if detail_options['comment_id'] == 'true'   
+    fields << 'Comments' if detail_options['comments'] == 'true'      
+    fields << 'Score' if detail_options['score'] == 'true'  
     fields
   end
 
+  # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor
   def self.export_Headers(parent_id)
     @assignment = Assignment.find(parent_id)
     fields = []

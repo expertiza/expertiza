@@ -388,6 +388,15 @@ class Assignment < ActiveRecord::Base
 
   def review_questionnaire_id(round = nil)
     rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id).where(used_in_round: round)
+    # for program 1 like assignment, if same rubric is used in both rounds, 
+    # the 'used_in_round' field in 'assignment_questionnaires' will be null, 
+    # since one field can only store one integer
+    # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+    if rev_q_ids.empty?
+      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
+        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+      end
+    end
     review_questionnaire_id = nil
     rev_q_ids.each do |rqid|
       next if rqid.questionnaire_id.nil?

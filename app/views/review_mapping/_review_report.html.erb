@@ -37,7 +37,7 @@
                 <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
-              <%= link_to "summary", :controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id %>
+              <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
             </td>
 
           <% @response_maps.each_with_index do |ri, index| %>
@@ -90,7 +90,7 @@
       <%end %>
 </table>
 
-  <p> **Text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:gray">gray</i> indicates that the review is done in previous round(s); text in <i style = "color:blue">blue</i> indicates that the review is updated after the review grade is assigned.</p>
+  <p> **Text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:blue">blue</i> indicates that the review grade is not assigned or updated.</p>
 </div>
 
 <style>

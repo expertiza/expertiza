@@ -166,18 +166,13 @@ class ReviewResponseMap < ResponseMap
 
   def self.prepare_final_review_versions(assignment, maps)
     review_final_versions = {}
-
-    if !assignment.varying_rubrics_by_round?
-      prepare_review_response(assignment, maps, review_final_versions, nil)
-
-    else
-      # vary rubric by round
-      rounds_num = assignment.rounds_of_reviews
-
+    rounds_num = assignment.rounds_of_reviews
+    if !rounds_num.nil? && rounds_num > 1
       (1..rounds_num).each do |round|
         prepare_review_response(assignment, maps, review_final_versions, round)
       end
-
+    else
+      prepare_review_response(assignment, maps, review_final_versions, nil)
     end
     review_final_versions
   end
@@ -191,7 +186,6 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol] = {}
     review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
     response_ids = []
-
     maps.each do |map|
       where_map={map_id: map.id}
       if !round.nil?
@@ -201,6 +195,5 @@ class ReviewResponseMap < ResponseMap
       response_ids << responses.last.id unless responses.empty?
     end
     review_final_versions[symbol][:response_ids] = response_ids
-
   end
 end

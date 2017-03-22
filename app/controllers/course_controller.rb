@@ -158,8 +158,13 @@ class CourseController < ApplicationController
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta = User.find(@ta_mapping.ta_id)
-    @ta.role = Role.find_by_name 'Student'
-    @ta.save
+
+    # if the user does not have any other TA mappings, then the role should be changed to student
+    other_ta_mappings_num = TaMapping.where(ta_id: @ta_mapping.ta_id).size - 1
+    if other_ta_mappings_num == 0
+      @ta.role = Role.find_by_name 'Student'
+      @ta.save
+    end
     @ta_mapping.destroy
 
     @course = @ta_mapping

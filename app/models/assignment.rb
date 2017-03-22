@@ -448,6 +448,10 @@ class Assignment < ActiveRecord::Base
       
     end
 
+    @options.each do |opt|
+      puts opt
+    end
+
     @uniq_rounds.each do |round_num|
       
       @uniq_response_type.each do |res_type|

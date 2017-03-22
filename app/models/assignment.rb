@@ -409,7 +409,7 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
-  def self.exportDetails(csv, parent_id, detail_options)
+  def self.export_details(csv, parent_id, detail_options)
     @assignment = Assignment.find(parent_id)
 
     @answers = {} # Contails all answer objects for this assignment

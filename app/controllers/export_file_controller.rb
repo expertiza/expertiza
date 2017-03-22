@@ -35,13 +35,13 @@ class ExportFileController < ApplicationController
        delimiter = "\t"
      elsif @delim_type == "other"
        filename = params[:model] + params[:id] + "_Details.csv"
-       delimiter = other_char
+       delimiter = other_char2
      end
 
      csv_data = CSV.generate(col_sep: delimiter) do |csv|
          csv << Object.const_get(params[:model]).export_Headers(params[:id])
          csv << Object.const_get(params[:model]).export_details_fields(params[:detail_options])
-         Object.const_get(params[:model]).exportDetails(csv, params[:id], params[:detail_options])
+         Object.const_get(params[:model]).export_details(csv, params[:id], params[:detail_options])
      end
     
      send_data csv_data,

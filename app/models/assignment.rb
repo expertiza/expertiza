@@ -448,9 +448,7 @@ class Assignment < ActiveRecord::Base
       
     end
 
-    @options.each do |opt|
-      puts opt
-    end
+    puts options
 
     @uniq_rounds.each do |round_num|
       

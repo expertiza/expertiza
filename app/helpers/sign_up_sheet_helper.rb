@@ -71,9 +71,7 @@ module SignUpSheetHelper
         end
         name_html += '<br/>'
       end
-      unless chooser_present
-        name_html += 'No choosers.'
-      end
+      name_html += 'No choosers.' unless chooser_present
     end
     name_html.html_safe
   end

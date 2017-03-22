@@ -542,7 +542,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
-  def self.exportDetails_fields(options)
+  def self.exportDetails_fields(detail_options)
     fields = []
     fields << 'Team ID' if detail_options['team_id'] == 'true'       # reviewee.id
     fields << 'Team Name' if detail_options['team_name'] == 'true' # reviewee.name

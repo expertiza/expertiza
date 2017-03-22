@@ -226,10 +226,14 @@ class SignUpSheetController < ApplicationController
 
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
-    unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-      flash[:error] = "The student has already signed up for a topic!"
+    unless user.nil?
+      unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+        flash[:error] = "The student has already signed up for a topic!"
+      end
+      flash[:success] = "You have successfully signed up the student for the topic!"
+    else
+      flash[:error] = "That student does not exist!"
     end
-    flash[:success] = "You have successfully signed up the student for the topic!"
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 

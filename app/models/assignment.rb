@@ -409,7 +409,7 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
-  def self.exportDetails(csv, parent_id, options)
+  def self.exportDetails(csv, parent_id, detail_options)
     @assignment = Assignment.find(parent_id)
 
     @answers = {} # Contails all answer objects for this assignment
@@ -448,7 +448,7 @@ class Assignment < ActiveRecord::Base
       
     end
 
-    puts options
+    puts detail_options
 
     @uniq_rounds.each do |round_num|
       
@@ -482,7 +482,7 @@ class Assignment < ActiveRecord::Base
             if @reviewee.nil?
               tcsv << ' '
             else
-              if options['team_id'] == 'true'
+              if detail_options['team_id'] == 'true'
                 tcsv << @reviewee.id 
               end
             end
@@ -490,7 +490,7 @@ class Assignment < ActiveRecord::Base
             if @reviewee.nil? 
               tcsv << ' '
             else
-              if options['team_name'] == 'true'
+              if detail_options['team_name'] == 'true'
                 tcsv << @reviewee.name
               end
             end
@@ -498,7 +498,7 @@ class Assignment < ActiveRecord::Base
             if reviewer.nil?
               tcsv << ' '
             else
-              if options['reviewer'] == 'true'
+              if detail_options['reviewer'] == 'true'
                 tcsv << reviewer.name
               end
             end
@@ -506,7 +506,7 @@ class Assignment < ActiveRecord::Base
             if answer.question.txt.nil?
               tcsv << ' '
             else
-              if options['question'] == 'true'
+              if detail_options['question'] == 'true'
                 tcsv << answer.question.txt
               end
             end
@@ -514,7 +514,7 @@ class Assignment < ActiveRecord::Base
             if answer.question.id.nil?
               tcsv << ' '
             else
-              if options['question_id'] == 'true'
+              if detail_options['question_id'] == 'true'
                 tcsv << answer.question.id
               end
             end
@@ -522,7 +522,7 @@ class Assignment < ActiveRecord::Base
             if answer.comments.nil?
               tcsv << ' '
             else
-              if options['comments'] == 'true'
+              if detail_options['comments'] == 'true'
                 tcsv << answer.comments
               end
             end
@@ -530,7 +530,7 @@ class Assignment < ActiveRecord::Base
             if answer.answer.nil?
               tcsv << ' '
             else
-              if options['score'] == 'true'
+              if detail_options['score'] == 'true'
                 tcsv << answer.answer
               end
             end
@@ -544,13 +544,13 @@ class Assignment < ActiveRecord::Base
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.exportDetails_fields(options)
     fields = []
-    fields << 'Team ID' if options['team_id'] == 'true'       # reviewee.id
-    fields << 'Team Name' if options['team_name'] == 'true' # reviewee.name
-    fields << 'Reviewer' if options['reviewer'] == 'true'    # reviewer.name
-    fields << 'Question' if options['question'] == 'true'    # answer.question.txt
-    fields << 'Question ID' if options['question_id'] == 'true'   # answer.question.id
-    fields << 'Comments' if options['comments'] == 'true'      # answer.comments # Answer.id
-    fields << 'Score' if options['score'] == 'true'        # answer.answer # Score
+    fields << 'Team ID' if detail_options['team_id'] == 'true'       # reviewee.id
+    fields << 'Team Name' if detail_options['team_name'] == 'true' # reviewee.name
+    fields << 'Reviewer' if detail_options['reviewer'] == 'true'    # reviewer.name
+    fields << 'Question' if detail_options['question'] == 'true'    # answer.question.txt
+    fields << 'Question ID' if detail_options['question_id'] == 'true'   # answer.question.id
+    fields << 'Comments' if detail_options['comments'] == 'true'      # answer.comments # Answer.id
+    fields << 'Score' if detail_options['score'] == 'true'        # answer.answer # Score
     fields
   end
 

@@ -119,7 +119,7 @@ end
 describe "has correct csv values?" do
   it "checks_if_csv has the correct data" do
     assignment = create(:assignment)
-    create(:assignment_team)
+    create(:assignment_tea, name: "team1")
     create(:participant)
     create(:questionnaire)
     create(:question)

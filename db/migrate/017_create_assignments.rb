@@ -9,8 +9,8 @@ class CreateAssignments < ActiveRecord::Migration
     t.column "course_id", :integer, :default => 0, :null => false
     t.column "instructor_id", :integer, :default => 0, :null => false
     t.column "private", :boolean, :default => false, :null => false
-    t.column "num_reviews", :integer, :default => 0, :null => false
-    t.column "num_review_of_reviews", :integer, :default => 0, :null => false
+    t.column "num_reviews", :integer, :default => 3, :null => false
+    t.column "num_review_of_reviews", :integer, :default => 3, :null => false
     t.column "num_review_of_reviewers", :integer, :default => 0, :null => false
     t.column "review_strategy_id", :integer, :default => 0, :null => false
     t.column "mapping_strategy_id", :integer, :default => 0, :null => false
@@ -23,8 +23,6 @@ class CreateAssignments < ActiveRecord::Migration
     t.column "require_signup", :boolean
     t.column "num_reviewers", :integer, limit: 8, :default => 0, :null => false
     t.column "spec_location", :text
-    t.column "num_reviews_allowed", :integer
-    t.column "num_reviews_required", :integer
   end
 
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"

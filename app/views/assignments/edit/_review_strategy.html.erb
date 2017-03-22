@@ -27,6 +27,9 @@
     <br/>
       <%= label_tag('assignment_form[assignment][num_reviews]', 'Set max number of reviews done by each student') %>
       <%= text_field_tag('assignment_form[assignment][num_reviews]', @assignment_form.assignment.num_reviews ||= 3, size: 1) %>
+    <br/>
+      <%= label_tag('assignment_form[assignment][num_reviews_required]', 'Set required number of reviews') %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_required]', @assignment_form.assignment.num_reviews_required ||= 3, size: 1) %>
     </td>
   </tr>
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>

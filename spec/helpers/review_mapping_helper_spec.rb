@@ -31,7 +31,15 @@ describe 'ReviewMappingHelper', :type => :helper do
       # Test a retry to get sentiment from the sentiment analysis web service
       expect(helper.get_sentiment(review, true).code).not_to eq(500)
     end
-
+ 
+    it "should return json response" do
+      review = helper.construct_sentiment_query(1,"Test Review")
+      # Test first try to get sentiment from the sentiment analysis web service
+      expect(helper.get_sentiment(review, true).header['Content-Type']).to include 'application/json'
+      # Test a retry to get sentiment from the sentiment analysis web service
+      expect(helper.get_sentiment(review, false).header['Content-Type']).to include 'application/json'
+    end
+    
   end
 
   describe "#get_sentiment_list" do

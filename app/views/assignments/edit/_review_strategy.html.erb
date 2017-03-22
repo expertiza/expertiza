@@ -30,6 +30,12 @@
     <br/>
       <%= label_tag('assignment_form[assignment][num_reviews_required]', 'Set Required Number of Reviews per reviewer') %>
       <%= text_field_tag('assignment_form[assignment][num_reviews_required]', @assignment_form.assignment.num_reviews_required ||= @assignment_form.assignment.num_reviews, size: 1) %>
+    <br/>
+      <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', 'Set Allowed Number of MetaReviews per reviewer') %>
+      <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]', @assignment_form.assignment.num_metareviews_allowed ||= 3, size: 1) %>
+    <br/>
+      <%= label_tag('assignment_form[assignment][num_metareviews_required]', 'Set Required Number of MetaReviews per reviewer') %>
+      <%= text_field_tag('assignment_form[assignment][num_metareviews_required]', @assignment_form.assignment.num_metareviews_required ||= @assignment_form.assignment.num_metareviews_allowed, size: 1) %>
     </td>
   </tr>
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>

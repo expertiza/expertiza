@@ -227,9 +227,10 @@ class SignUpSheetController < ApplicationController
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-      flash[:error] = "You've already signed up for a topic!"
+      flash[:error] = "The student has already signed up for a topic!"
     end
-    redirect_to action: 'list', id: params[:assignment_id]
+    flash[:success] = "You have successfully signed up the student for the topic!"
+    redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
   # this function is used to delete a previous signup
@@ -244,7 +245,7 @@ class SignUpSheetController < ApplicationController
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
-      flash[:error] = "You cannot drop your topic after drop topic deadline!"
+      flash[:error] = "You cannot drop your topic after the drop topic deadline!"
     else
       delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
       flash[:success] = "You have successfully dropped your topic!"
@@ -260,14 +261,14 @@ class SignUpSheetController < ApplicationController
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
-      flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
+      flash[:error] = "The student has already submitted their work, so you are not allowed to remove them."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
-      flash[:error] = "You cannot drop your topic after drop topic deadline!"
+      flash[:error] = "You cannot drop a student after the drop topic deadline!"
     else
       delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
-      flash[:success] = "You have successfully dropped your topic!"
+      flash[:success] = "You have successfully dropped the student from the topic!"
     end
-    redirect_to action: 'list', id: params[:id]
+    redirect_to controller: 'assignments', action: 'edit', id: assignment.id
   end
 
   def set_priority

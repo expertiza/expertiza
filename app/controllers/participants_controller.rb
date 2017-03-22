@@ -53,7 +53,6 @@ class ParticipantsController < ApplicationController
       url_new_user = url_for controller: 'users', action: 'new'
       flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
-    # redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
     render :action => 'add.js.erb', :layout => false
   end
 

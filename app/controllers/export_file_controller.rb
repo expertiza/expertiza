@@ -43,8 +43,8 @@ class ExportFileController < ApplicationController
 
      csv_data = CSV.generate(col_sep: delimiter) do |csv|
          csv << Object.const_get(params[:model]).export_Headers(params[:id])
-         csv << Object.const_get(params[:model]).export_details_fields(params[:details])
-         Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
+         csv << Object.const_get(params[:model]).export_details_fields(params[:options])
+         Object.const_get(params[:model]).export_details(csv, params[:id], params[:options])
      end
     
      send_data csv_data,

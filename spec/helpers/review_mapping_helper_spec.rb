@@ -16,4 +16,13 @@ describe 'ReviewMappingHelper', :type => :helper do
       expect(helper.get_sentiment(review, false)).not_to eq(nil)
     end
   end
+
+  describe "#get_sentiment_list" do
+    it "should not return nil" do
+      @id=1
+      @assignment = Assignment.where(id: @id)
+      @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, "ReviewResponseMap", nil)
+      expect(helper.get_sentiment_list).not_to eq(nil)
+    end
+  end
 end

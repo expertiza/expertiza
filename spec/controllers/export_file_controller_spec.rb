@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe ExportFileController do
-  describe "check export to detailed csv" do
+  describe "check export to detailed csv", type: :controller do
     it "checks if returned csv is same as expected" do
       assignment = create(:assignment)
       create(:assignment_team, name: "team1")

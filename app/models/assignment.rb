@@ -448,34 +448,8 @@ class Assignment < ActiveRecord::Base
       
     end
 
-
-
-    # @questionnaires = @assignment.questionnaires
-
-    # @questionnaires.each do |questionnaire|
-    #   questionnaire.questions.each do |q|
-    #     @list = Answer.find_by_sql(["SELECT * FROM answers WHERE question_id = #{q.id}"])
-    #     @list.each do |a|
-    #       #get response object then response map object for this answer
-    #       @response = Response.find_by_id(a.response_id)
-    #       ans = ResponseMap.find_by_id(@response.map_id)
-    #       @answers[@response.round][ans.type].push(a)
-    #     end
-    #   end
-    # end
-
-    #loop through all rounds and resp types, then access the array of answers for that round/resp type
-    # csv << ['---', '---', '---', '---', '---', '---', '---']
     @uniq_rounds.each do |round_num|
-      # csv << ['---', '---', '---', '---', '---', '---', '---']
       
-      # if round_num.nil?
-      #   csv << ["Round Nill", '---', '---', '---', '---', '---', '---']
-      # else
-      #   csv << ["Round " + round_num.to_s, '---', '---', '---', '---', '---', '---']
-      # end
-      
-      # csv << ['---', '---', '---', '---', '---', '---', '---']
       @uniq_response_type.each do |res_type|
         
         if @answers[round_num][res_type].size > 0

@@ -554,7 +554,6 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
-    return csv
   end
 
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav

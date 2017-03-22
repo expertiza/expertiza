@@ -125,11 +125,10 @@ describe "has correct csv values?" do
     create(:response)
     delimiter = ","
     expected_csv = CSV.read('expected_details.csv')
-    generated_csv = nil
-    csv_data = CSV.generate(col_sep: delimiter) do |csv|
+    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_Headers(assignment.id)
       csv << Assignment.exportDetails_fields()
-      generated_csv = Assignment.exportDetails(csv, assignment.id)
+      Assignment.exportDetails(csv, assignment.id)
     end
     puts "Generated CSV - " + generated_csv
     puts "Expected CSV - " + expected_csv.to_s

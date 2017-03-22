@@ -30,29 +30,29 @@ module SignUpSheetHelper
   end
 
   # Render topic row for intelligent topic selection.
-  def get_intelligent_topic_row(topic, selected_topics)
+  def get_intelligent_topic_row(topic, selected_topics, max_team_size)
     row_html = ''
     if !selected_topics.nil? && selected_topics.size != 0
-      for selected_topic in @selected_topics
+      for selected_topic in selected_topics
         if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
           row_html = '<tr bgcolor="yellow">'
         elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted
           row_html = '<tr bgcolor="lightgray">'
         else
-          row_html = '<tr id="topic_"' + topic.id.to_s + '>'
+          row_html = '<tr id="topic_' + topic.id.to_s + '">'
         end
       end
     else
-      row_html = '<tr id="topic_"' + topic.id.to_s + ' style="background-color:' + get_topic_bg_color(topic) + '">'
+      row_html = '<tr id="topic_' + topic.id.to_s + '" style="background-color:' + get_topic_bg_color(topic, max_team_size) + '">'
     end
     row_html.html_safe
   end
 
 
   # Compute background colour for a topic with respect to maximum team size.
-  def get_topic_bg_color(topic)
-    'rgb(' + (400*(1-(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2))
-        .to_i.to_s + ',' + (400*(Math.tanh(2*[@max_team_size.to_f/Bid.where(topic_id:topic.id).
+  def get_topic_bg_color(topic, max_team_size)
+    'rgb(' + (400*(1-(Math.tanh(2*[max_team_size.to_f/Bid.where(topic_id:topic.id).count,1].min-1)+1)/2))
+        .to_i.to_s + ',' + (400*(Math.tanh(2*[max_team_size.to_f/Bid.where(topic_id:topic.id).
         count,1].min-1)+1)/2).to_i.to_s + ',0)'
   end
 
@@ -62,7 +62,7 @@ module SignUpSheetHelper
     name_html = ''
     if !participants.nil? && participants.size > 0
       chooser_present = false
-      for participant in @participants
+      for participant in participants
         if topic.id == participant.topic_id
           chooser_present = true
           if assignment.max_team_size > 1

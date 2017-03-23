@@ -20,7 +20,7 @@ describe "peer review testing", type: :feature do
   end
   
   def signup_topic
-    user = User.find_by_name("student2064")
+    user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
@@ -44,7 +44,7 @@ describe "peer review testing", type: :feature do
   end
 
   it "is not able to select review with no submissions" do
-    user = User.find_by_name("student2065")
+    user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     click_link "TestAssignment"
@@ -70,26 +70,26 @@ describe "peer review testing", type: :feature do
     click_link "TestAssignment"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "TestAssignment"'
-    expect(page).not_to have_button("topic_id_#{SignUpTopic.find_by_topic_name("TestTopic").id}")
+    expect(page).not_to have_button("topic_id_#{SignUpTopic.find_by(topic_name: "TestTopic").id}")
   end
 
   it "is able to select topic for review with valid submissions" do
     submit_to_topic
-    user = User.find_by_name("student2065")
+    user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    choose "topic_id_#{SignUpTopic.find_by_topic_name("TestTopic").id}"
+    choose "topic_id_#{SignUpTopic.find_by(topic_name: "TestTopic").id}"
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end
 
   it "is able to be assigned random topic for review" do
     submit_to_topic
-    user = User.find_by_name("student2065")
+    user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1'

@@ -15,7 +15,6 @@ def enqueue_scheduled_tasks(stage)
   Delayed::Job.delete_all
   expect(Delayed::Job.count).to eq(0)
   Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, stage, due_at), priority: 1, run_at: time_in_min)
-  time_in_min
 end
 
 describe 'Submission deadline reminder email' do
@@ -77,6 +76,10 @@ describe 'Team formation deadline reminder email' do
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: team_formation")
     due_at = DateTime.now.in_time_zone + 1.day
+    due_at1 = Time.zone.parse(due_at.to_s(:db))
+    curr_time = DateTime.now.in_time_zone.to_s(:db)
+    curr_time = Time.zone.parse(curr_time)
+    time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
     Delayed::Job.enqueue(payload_object: ScheduledTask.new(2, "drop_one_member_topics", due_at), priority: 1, run_at: time_in_min)
     expect(Delayed::Job.count).to eq(2)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_one_member_topics")

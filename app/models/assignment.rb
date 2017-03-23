@@ -436,7 +436,7 @@ class Assignment < ActiveRecord::Base
         
         round_type = check_empty_rounds(@answers, round_num, res_type)
 
-        unless round_type.nil?
+        unless round_type.nil? and row_selected(detail_options) > 0
           csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
         end
 
@@ -540,6 +540,16 @@ class Assignment < ActiveRecord::Base
       end
     end
     return answers
+  end
+
+  def self.row_selected(detail_options)
+    num_row_selected = 0
+    detail_options.each do |option, check|
+      if check == 'true'
+        num_row_selected = row_selected + 1
+      end
+    end
+    return num_row_selected
   end
 
   def self.check_empty_rounds(answers, round_num, res_type)

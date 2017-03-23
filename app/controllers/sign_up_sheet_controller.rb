@@ -228,10 +228,14 @@ class SignUpSheetController < ApplicationController
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     unless user.nil? # validate invalid user
-      unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-        flash[:error] = "The student has already signed up for a topic!"
+      if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
+        unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+          flash[:error] = "The student has already signed up for a topic!"
+        else
+          flash[:success] = "You have successfully signed up the student for the topic!"
+        end
       else
-        flash[:success] = "You have successfully signed up the student for the topic!"
+        flash[:error] = "The student is not registered for the assignment!"
       end
     else
       flash[:error] = "That student does not exist!"

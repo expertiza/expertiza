@@ -415,7 +415,7 @@ class Assignment < ActiveRecord::Base
     @answers = {} # Contains all answer objects for this assignment
 
     # Find all unique response types
-    @uniq_response_type =  ResponseMap.uniq.pluck(:type)
+    @uniq_response_type = ResponseMap.uniq.pluck(:type)
     # Find all unique round numbers
     @uniq_rounds = Response.uniq.pluck(:round)
 
@@ -428,13 +428,13 @@ class Assignment < ActiveRecord::Base
     end
 
     # get all response maps for this assignment
-    @responseMapsForAssignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
+    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
     
     # for each map, get the response & answer associated with it
-    @responseMapsForAssignment.each do |map|
-      @responseForThisMap = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
+    @response_maps_for_assignment.each do |map|
+      @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
-      @responseForThisMap.each do |res_map|
+      @response_for_this_map.each do |res_map|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
         
         @answer.each do |ans|
@@ -461,7 +461,6 @@ class Assignment < ActiveRecord::Base
         end
 
         @answers[round_num][res_type].each do |answer|
-          row = []
           tcsv = []
 
           @response = Response.find_by_id(answer.response_id)

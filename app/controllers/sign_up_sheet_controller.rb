@@ -230,8 +230,9 @@ class SignUpSheetController < ApplicationController
     unless user.nil? # validate invalid user
       unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
         flash[:error] = "The student has already signed up for a topic!"
+      else
+        flash[:success] = "You have successfully signed up the student for the topic!"
       end
-      flash[:success] = "You have successfully signed up the student for the topic!"
     else
       flash[:error] = "That student does not exist!"
     end

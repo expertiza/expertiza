@@ -117,18 +117,15 @@ describe "#check if the assignment belongs to a course" do
 end
 
 describe "has correct csv values?" do
-
-  before(:each) do
-    assignment = create(:assignment)
-    create(:assignment_team, name: "team1")
-    student = create(:student, name: "student1")
-    create(:participant, user: student)
-    create(:questionnaire)
-    create(:question)
-    create(:review_response_map)
-    create(:response)
-  end
-
+  
+  assignment = create(:assignment)
+  create(:assignment_team, name: "team1")
+  student = create(:student, name: "student1")
+  create(:participant, user: student)
+  create(:questionnaire)
+  create(:question)
+  create(:review_response_map)
+  create(:response)
   delimiter = ","
 
   it "checks_if_csv has the correct data" do

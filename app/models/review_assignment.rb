@@ -28,7 +28,7 @@ module ReviewAssignment
 
     # Filter the contributors with the least number of reviews
     # (using the fact that each contributor is associated with a topic)
-    contributor_set = reject_by_least_reviewed(contributor_set)
+    contributor_set = filter_least_reviewed(contributor_set)
 
     contributor_set = reject_by_max_reviews_per_submission(contributor_set)
 
@@ -92,7 +92,7 @@ module ReviewAssignment
     contributor_set = reject_own_submission(contributor_set, reviewer)
 
     # Filter the contributors with the least number of reviews
-    contributor_set = reject_by_least_reviewed(contributor_set)
+    contributor_set = filter_least_reviewed(contributor_set)
 
     contributor_set = reject_by_max_reviews_per_submission(contributor_set)
 
@@ -111,14 +111,6 @@ module ReviewAssignment
   end
 
   private
-
-  def reject_by_least_reviewed(contributor_set)
-    contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
-    min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
-    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
-
-    contributor_set
-  end
 
   def reject_by_max_reviews_per_submission(contributor_set)
     contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count >= max_reviews_per_submission }
@@ -159,6 +151,15 @@ module ReviewAssignment
 
   def reject_by_no_topic_selection_or_no_submission(contributor_set)
     contributor_set.reject! {|contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
+    contributor_set
+  end
+  
+  def filter_least_reviewed(contributor_set)
+    contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
+    minimum_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
+	allowed_reviews = minimum_reviews + review_topic_threshold
+    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > allowed_reviews }
+
     contributor_set
   end
 

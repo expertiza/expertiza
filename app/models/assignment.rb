@@ -543,7 +543,7 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
-    return answers
+    answers
   end
 
   def self.check_empty_rounds(answers, round_num, res_type)
@@ -555,7 +555,7 @@ class Assignment < ActiveRecord::Base
       end
       return round_type
     end
-    return nil
+    nil
   end
 
   # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor

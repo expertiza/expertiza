@@ -26,7 +26,7 @@ describe ExportFileController do
           details: options
       }
       # generated_csv = controller.exportdetails
-      allow(controller).to receive(:redirect_to)
+      controller.should_receive(:render).with(:new).and_return(true)
       expect(controller.send(:exportdetails)).to have_http_status(:ok)
       # expect(generated_csv).to eq(expected_csv)
     end

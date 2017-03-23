@@ -1,6 +1,11 @@
 <!--[form:course]-->
+<p><label for="institution_name">Institution Name</label><br/>
+<%= collection_select('user', :institution_id, Institution.all, :id, :name) %></p>
+
+
 <p><label for="course_name">Course Name</label><br/>
 <%= text_field 'course', 'name'  %></p>
+
 <p><label for="course_directory_path">Course Directory</label> (Mandatory field. No space or special chars.)
   <img src="/assets/info.png" title='- DO NOT change this filed for an on-going course. This may cause lost of student submitted file.'>
 <br/>

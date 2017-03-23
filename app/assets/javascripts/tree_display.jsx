@@ -285,6 +285,7 @@ jQuery(document).ready(function() {
             <td width={colWidthArray[0]}>{this.props.name}</td>
             <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
             <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
+            <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.institution}</td>
             <td width={colWidthArray[3]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
             <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
             <td width={colWidthArray[5]}>
@@ -331,6 +332,7 @@ jQuery(document).ready(function() {
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
                       name={entry.name}
                       instructor={entry.instructor}
+                      institution={entry.institution}
                       directory={entry.directory}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
@@ -359,6 +361,9 @@ jQuery(document).ready(function() {
               </th>
               <th style={colDisplayStyle} width={colWidthArray[2]}>
                 Instructor
+              </th>
+              <th style={colDisplayStyle} width={colWidthArray[2]}>
+                Institution
               </th>
               <th width={colWidthArray[3]}>
                 Creation Date
@@ -422,6 +427,7 @@ jQuery(document).ready(function() {
             <td width={colWidthArray[0]}>{this.props.name}</td>
             <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
             <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
+            <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.institution}</td>
             <td style={colDisplayStyle} width={colWidthArray[3]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
             <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
             <td width={colWidthArray[5]}>
@@ -661,6 +667,7 @@ jQuery(document).ready(function() {
                   (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
                   (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
                   (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                   (entry.private == true || entry.type == 'FolderNode')) {
                   _rows.push(<ContentTableRow
@@ -669,6 +676,7 @@ jQuery(document).ready(function() {
                       name={entry.name}
                       directory={entry.directory}
                       instructor={entry.instructor}
+                      institution={entry.institution}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       actions={entry.actions}
@@ -712,6 +720,7 @@ jQuery(document).ready(function() {
                   (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
                   (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
                   (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                   (entry.private == false)) {
                   _rows.push(<ContentTableRow
@@ -720,6 +729,7 @@ jQuery(document).ready(function() {
                       name={entry.name}
                       directory={entry.directory}
                       instructor={entry.instructor}
+                      institution={entry.institution}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       actions={entry.actions}
@@ -768,6 +778,12 @@ jQuery(document).ready(function() {
               <th style={colDisplayStyle} width={colWidthArray[2]}>
                 Instructor <SortToggle
                         colName="instructor"
+                        order="normal"
+                        handleUserClick={this.handleSortingClick} />
+              </th>
+              <th style={colDisplayStyle} width={colWidthArray[2]}>
+                 Institution <SortToggle
+                        colName="institution"
                         order="normal"
                         handleUserClick={this.handleSortingClick} />
               </th>

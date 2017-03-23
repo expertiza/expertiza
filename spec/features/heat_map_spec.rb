@@ -14,11 +14,21 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     # Create an assignment
     @assignment = create :assignment, instructor: @instructor, course: nil, num_quiz_questions: 1
 
-    # Create reviewers
+    # This setup is from calibration_spec, 'Add Expert Review' better to use existing code to test with
+    @questionnaire = create(:questionnaire)
+    @assignment_questionnaire = create :assignment_questionnaire, assignment: @assignment
 
-    # Create reviews for the assignment from reviewers
-    # I'm not quite sure what the best way is to set these up. Do I need to make actual reviewers? Which factory type
-    # makes the reviews I need to display in the heat map?
+    # Create a team linked to the calibrated assignment
+    @team = create :assignment_team, assignment: @assignment
+
+    # Create an assignment participant linked to the assignment.
+    # The factory for this implicitly loads or creates a student
+    # (user) object that the participant is linked to.
+    @submitter = create :participant, assignment: @assignment
+    # Create a mapping between the assignment team and the
+    # participant object's user (the student).
+    create :team_user, team: @team, user: @submitter.user
+    create :review_response_map, assignment: @assignment, reviewee: @team
 
   end
 

@@ -11,7 +11,8 @@ class Role < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
-  attr_accessible :cache
+  attr_reader :cache
+  attr_writer :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
   def cache=(value)
@@ -20,7 +21,7 @@ class Role < ActiveRecord::Base
 
   def cache
     @cache = Hash.new
-    if !self.nil?
+    unless self.nil?
       @cache[:credentials] = get_cache_roles(self.id)[:credentials]
       @cache[:menu] = get_cache_roles(self.id)[:menu]
     end

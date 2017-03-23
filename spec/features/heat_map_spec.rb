@@ -12,7 +12,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     @instructor = create(:instructor)
 
     # Create an assignment
-    @assignment = create :assignment, instructor: @instructor, course: nil  # Does this need to be tweaked?
+    @assignment = create :assignment, instructor: @instructor, course: nil, num_quiz_questions: 1
 
     # Create reviewers
 
@@ -20,6 +20,10 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     # I'm not quite sure what the best way is to set these up. Do I need to make actual reviewers? Which factory type
     # makes the reviews I need to display in the heat map?
 
+  end
+
+  it 'should be able to sort by total review score' do
+    # This would require us to create several reviews 
   end
 
   it 'should be able to view a heat map of review scores' do
@@ -30,7 +34,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     click_link @assignment.name
     click_link 'Alternate View'
 
-    expect(page).to have_content('Summary Report for Assignment')
+    expect(page).to have_content('Summary Report for assignment')
   end
 
   it 'should be able to follow the link to a specific review' do
@@ -50,7 +54,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
 
     # Select the assignment and follow the link to the heat map
     click_link @assignment.name
-    click_link 'toggle question list' #Is this a link or a button or what? Make sure this works.
+    click_link 'toggle question list' # This is a link
 
     expect(page).to have_content('Question')
   end

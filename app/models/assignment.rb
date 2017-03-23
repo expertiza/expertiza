@@ -526,7 +526,7 @@ class Assignment < ActiveRecord::Base
 
   end
 
-  def generate_answer(answers, assignment)
+  def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
     

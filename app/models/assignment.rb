@@ -427,17 +427,16 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    assign = @assignment
-    nanswer = @answers
-
-    @answers = generate_answer(nanswer, assign)
+    @answers = generate_answer(@answersr, @assignment)
 
     # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
       
       @uniq_response_type.each do |res_type|
         
-        check_empty_rounds(@answers, round_num, res_type)
+        round_type = check_empty_rounds(@answers, round_num, res_type)
+
+        csv << [round_type, '---', '---', '---', '---', '---', '---']
 
         @answers[round_num][res_type].each do |answer|
 
@@ -548,14 +547,13 @@ class Assignment < ActiveRecord::Base
   def self.check_empty_rounds(answers, round_num, res_type)
 
     if !@answers[round_num][res_type].empty?
-          if round_num.nil?
-            round_type = "Round Nill - " + res_type
-          else 
-            round_type = "Round " + round_num.to_s + " - " + res_type.to_s
-          end
-          
-          csv << [round_type, '---', '---', '---', '---', '---', '---']
-        end
+      if round_num.nil?
+        round_type = "Round Nill - " + res_type
+      else 
+        round_type = "Round " + round_num.to_s + " - " + res_type.to_s
+      end
+    end
+    return round_type
   end
 
   # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor

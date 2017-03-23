@@ -1,5 +1,5 @@
 module PenaltyHelper
-  def self.calculate_penalty(participant_id)
+  def calculate_penalty(participant_id)
     @submission_deadline_type_id = 1
     @review_deadline_type_id = 2
     @meta_review_deadline_type_id = 5
@@ -22,8 +22,6 @@ module PenaltyHelper
         penalties[:submission] = calculate_submission_penalty
         penalties[:review] = calculate_review_penalty
         penalties[:meta_review] = calculate_meta_review_penalty
-        # penalties[:author_feedback] = calculate_author_feedback_penalty()
-        # penalties[:team_mate_feedback] = calculate_team_feedback_penalty()
       end
     else
       penalties[:submission] = 0
@@ -34,14 +32,9 @@ module PenaltyHelper
     penalties
   end
 
-  #def set_penalty_policy
-  #  @late_policy = Assignment.find(@assignment_id).late_policy
-  #  @late_policy.max_penalty
-  #end
 
-  def self.calculate_submission_penalty
+  def calculate_submission_penalty
     penalty = 0
-    # penalty_unit = @late_policy.penalty_unit
     submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id, parent_id:  @assignment.id).first.due_at
 
     resubmission_times = @participant.resubmission_times
@@ -50,15 +43,6 @@ module PenaltyHelper
       if last_submission_time > submission_due_date
         time_difference = last_submission_time - submission_due_date
         penalty_minutes = calculate_penalty_minutes(time_difference)
-##
-        #if @penalty_unit == 'Minute'
-        #  penalty_minutes = ((last_submission_time - submission_due_date)) / 60
-        #elsif @penalty_unit == 'Hour'
-        #  penalty_minutes = ((last_submission_time - submission_due_date)) / 3600
-        #elsif @penalty_unit == 'Day'
-        #  penalty_minutes = ((last_submission_time - submission_due_date)) / 86_400
-        #end
-##
         penalty_for_submission = penalty_minutes * @penalty_per_unit
         penalty = if penalty_for_submission > @max_penalty_for_no_submission
                     @max_penalty_for_no_submission
@@ -71,7 +55,7 @@ module PenaltyHelper
     end
   end
 
-  def self.calculate_review_penalty
+  def calculate_review_penalty
     penalty = 0
     num_of_reviews_required = @assignment.num_reviews
     if num_of_reviews_required > 0
@@ -88,7 +72,7 @@ module PenaltyHelper
     penalty
   end
 
-  def self.calculate_meta_review_penalty
+  def calculate_meta_review_penalty
     penalty = 0
     num_of_meta_reviews_required = @assignment.num_review_of_reviews
     if num_of_meta_reviews_required > 0
@@ -104,50 +88,8 @@ module PenaltyHelper
     penalty
   end
 
-  #def calculate_author_feedback_penalty
-  #  penalty = 0
-  #  penalty
-  #end
-
-  #def calculate_team_feedback_penalty
-  #  penalty = 0
-  #  penalty
-  #end
-
-  def self.compute_penalty_on_reviews(review_mappings, review_due_date, num_of_reviews_required)
+  def compute_penalty_on_reviews(review_mappings, review_due_date, num_of_reviews_required)
     review_map_created_at_list = []
-
-    ## Calculate the number of reviews that the user has completed so far.
-    # num_of_reviews_completed_before_deadline = 0
-    # num_of_reviews_completed = 0
-    # review_mappings.each do |map|
-    #  created_at = Response.find_by_map_id(map.id).created_at
-    #  num_of_reviews_completed += 1 if map.response
-    #  if(created_at < review_due_date)
-    #    num_of_reviews_completed_before_deadline += 1
-    #  else
-    #    review_map_created_at_after_due_date_list <<  created_at
-    #  end
-    # end
-    #
-    # review_map_created_at_after_due_date_list.sort!
-    #
-    # penalty = 0
-    ## assign max penalty for all the reviews which are not completed
-    # if(num_of_reviews_completed_before_deadline >= num_of_reviews_required)
-    #  # no need to calculate the penalty
-    # else
-    #  # assign maximum penalty for uncompleted reviews
-    #  if(num_of_reviews_required > num_of_reviews_completed)
-    #    penalty += (num_of_reviews_required - num_of_reviews_completed) * @max_penalty_per_missed_review
-    #  else
-    #    # calculate the penalty for reviews completed after deadline
-    #    for i in 0..(num_of_reviews_required - num_of_reviews_completed_before_deadline)
-    #      penalty += (review_map_created_at_after_due_date_list[i] - review_due_date) * @penalty_per_unit
-    #    end
-    #  end
-    # end
-    # penalty
 
     penalty = 0
 
@@ -166,15 +108,7 @@ module PenaltyHelper
         if review_map_created_at_list.at(i) > review_due_date
           time_difference = review_map_created_at_list.at(i) - review_due_date
           penalty_minutes = calculate_penalty_minutes(time_difference)
-##
-          #if @penalty_unit == 'Minute'
-          #  penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 60
-          #elsif @penalty_unit == 'Hour'
-          #  penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 3600
-          #elsif @penalty_unit == 'Day'
-          #  penalty_minutes = ((review_map_created_at_list.at(i) - review_due_date)) / 86_400
-          #end
-##
+          
           penalty_for_this_review = penalty_minutes * @penalty_per_unit
           if penalty_for_this_review > @max_penalty_for_no_submission
             penalty = @max_penalty_for_no_submission
@@ -189,7 +123,7 @@ module PenaltyHelper
     penalty
   end
 
-  def self.calculate_penalty_minutes(time_difference)
+  def calculate_penalty_minutes(time_difference)
     if @penalty_unit == 'Minute'
       penalty_minutes = time_difference / 60
     elsif @penalty_unit == 'Hour'
@@ -200,7 +134,7 @@ module PenaltyHelper
   end
 
   #checking that penalty_per_unit is not exceeding max_penalty
-  def self.check_penalty_points_validity(max_penalty, penalty_per_unit)
+  def check_penalty_points_validity(max_penalty, penalty_per_unit)
     if max_penalty < penalty_per_unit
       flash[:error] = "The maximum penalty cannot be less than penalty per unit."
       invalid_penalty_per_unit = true
@@ -211,7 +145,7 @@ module PenaltyHelper
 
   #method to check whether the policy name given as a parameter already exists under the current instructor id
   #it return true if there's another policy with the same name under current instructor else false
-  def self.check_policy_with_same_name(late_policy_name)
+  def check_policy_with_same_name(late_policy_name)
     @policy = LatePolicy.where(policy_name: late_policy_name)
     if !@policy.nil? && !@policy.empty?
       @policy.each do |p|
@@ -224,7 +158,7 @@ module PenaltyHelper
 
   #this method updates all the penalty objects which uses the penalty policy which is passed as a parameter
   #whenever a policy is updated, all the existing penalty objects needs to be updated according to new policy
-  def self.update_calculated_penalty_objects(penalty_policy)
+  def update_calculated_penalty_objects(penalty_policy)
     @penaltyObjs = CalculatedPenalty.all
     @penaltyObjs.each do |pen|
       @participant = AssignmentParticipant.find(pen.participant_id)

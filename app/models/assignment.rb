@@ -474,56 +474,55 @@ class Assignment < ActiveRecord::Base
 
           reviewer = Participant.find_by_id(ans.reviewer_id).user
 
+          if @reviewee.nil?
+            tcsv << ' '
+          elsif detail_options['team_id'] == 'true'
+            tcsv << @reviewee.id
+          end
 
-            if @reviewee.nil?
-              tcsv << ' '
-            elsif detail_options['team_id'] == 'true'
-              tcsv << @reviewee.id
-            end
+          if @reviewee.nil?
+            tcsv << ' '
+          elsif detail_options['team_name'] == 'true'
+            tcsv << @reviewee.name
+          end
 
-            if @reviewee.nil? 
-              tcsv << ' '
-            elsif detail_options['team_name'] == 'true'
-              tcsv << @reviewee.name
-            end
+          if reviewer.nil?
+            tcsv << ' '
+          elsif detail_options['reviewer'] == 'true'
+            tcsv << reviewer.name
+          end
 
-            if reviewer.nil?
-              tcsv << ' '
-            elsif detail_options['reviewer'] == 'true'
-              tcsv << reviewer.name
-            end
+          if answer.question.txt.nil?
+            tcsv << ' '
+          elsif detail_options['question'] == 'true'
+            tcsv << answer.question.txt
+          end
 
-            if answer.question.txt.nil?
-              tcsv << ' '
-            elsif detail_options['question'] == 'true'
-              tcsv << answer.question.txt
-            end
+          if answer.question.id.nil?
+            tcsv << ' '
+          elsif detail_options['question_id'] == 'true'
+            tcsv << answer.question.id
+          end
 
-            if answer.question.id.nil?
-              tcsv << ' '
-            elsif detail_options['question_id'] == 'true'
-              tcsv << answer.question.id
-            end
+          if answer.id.nil?
+            tcsv << ' '
+          elsif detail_options['comment_id'] == 'true'
+            tcsv << answer.id
+          end
 
-            if answer.id.nil?
-              tcsv << ' '
-            elsif detail_options['comment_id'] == 'true'
-              tcsv << answer.id
-            end
+          if answer.comments.nil?
+            tcsv << ' '
+          elsif detail_options['comments'] == 'true'
+            tcsv << answer.comments
+          end
 
-            if answer.comments.nil?
-              tcsv << ' '
-            elsif detail_options['comments'] == 'true'
-              tcsv << answer.comments
-            end
+          if answer.answer.nil?
+            tcsv << ' '
+          elsif detail_options['score'] == 'true'
+            tcsv << answer.answer
+          end
 
-            if answer.answer.nil?
-              tcsv << ' '
-            elsif detail_options['score'] == 'true'
-              tcsv << answer.answer
-            end
-
-            csv << tcsv
+          csv << tcsv
         end
       end
     end
@@ -544,7 +543,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor
-  def self.export_Headers(parent_id)
+  def self.export_headers(parent_id)
     @assignment = Assignment.find(parent_id)
     fields = []
     fields << "Assignment Name: " + @assignment.name.to_s

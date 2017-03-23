@@ -22,7 +22,7 @@ before_install:
     - npm install -g bower
     - bower install
 before_script:
-    - mysql -u root < db/grant_expertiza_copy.sql
+    - mysql -u root < db/grant_expertiza.sql
     - cp config/database.yml.example config/database.yml
     - cp config/secrets.yml.example config/secrets.yml
     - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64

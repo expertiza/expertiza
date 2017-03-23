@@ -427,9 +427,6 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-
-
-
     #get all response maps for this assignment
     @responseMapsForAssignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
     
@@ -448,6 +445,7 @@ class Assignment < ActiveRecord::Base
       
     end
 
+    #Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
       
       @uniq_response_type.each do |res_type|

@@ -436,14 +436,12 @@ class Assignment < ActiveRecord::Base
         
         round_type = check_empty_rounds(@answers, round_num, res_type)
 
-        if !round_type.nil?
+        unless round_type.nil?
           csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
         end
 
         @answers[round_num][res_type].each do |answer|
-
           csv << csv_row(detail_options, answer)
-
         end
       end
     end
@@ -522,9 +520,7 @@ class Assignment < ActiveRecord::Base
     elsif detail_options['score'] == 'true'
       tcsv << answer.answer
     end
-
-    return tcsv
-
+    tcsv
   end
 
   def self.generate_answer(answers, assignment)
@@ -547,8 +543,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.check_empty_rounds(answers, round_num, res_type)
-
-    if !answers[round_num][res_type].empty?
+    unless answers[round_num][res_type].empty?
       if round_num.nil?
         round_type = "Round Nill - " + res_type
       else 

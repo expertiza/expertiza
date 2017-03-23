@@ -118,17 +118,17 @@ end
 
 describe "has correct csv values?" do
 
-  @assignment = create(:assignment)
-  create(:assignment_team, name: "team1")
-  @student = create(:student, name: "student1")
-  create(:participant, user: @student)
-  create(:questionnaire)
-  create(:question)
-  create(:review_response_map)
-  create(:response)
   delimiter = ","
 
   it "checks_if_csv has the correct data" do
+    @assignment = create(:assignment)
+    create(:assignment_team, name: "team1")
+    @student = create(:student, name: "student1")
+    create(:participant, user: @student)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
     create(:answer, comments: "Test comment")
     options = {"team_id" => "true", "team_name" => "true",
                "reviewer" => "true", "question" => "true",
@@ -144,6 +144,14 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with some options" do
+    @assignment = create(:assignment)
+    create(:assignment_team, name: "team1")
+    @student = create(:student, name: "student1")
+    create(:participant, user: @student)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
     create(:answer, comments: "Test comment")
     options = {"team_id" => "false", "team_name" => "true",
                "reviewer" => "true", "question" => "true",
@@ -159,6 +167,14 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with no data" do
+    @assignment = create(:assignment)
+    create(:assignment_team, name: "team1")
+    @student = create(:student, name: "student1")
+    create(:participant, user: @student)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
     options = {"team_id" => "true", "team_name" => "true",
                "reviewer" => "true", "question" => "true",
                "question_id" => "true", "comment_id" => "true",
@@ -173,6 +189,14 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with data and no options" do
+    @assignment = create(:assignment)
+    create(:assignment_team, name: "team1")
+    @student = create(:student, name: "student1")
+    create(:participant, user: @student)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
     options = {"team_id" => "false", "team_name" => "false",
                "reviewer" => "false", "question" => "false",
                "question_id" => "false", "comment_id" => "false",

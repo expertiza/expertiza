@@ -409,6 +409,102 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
+  def csv_row(answer)
+    tcsv = []
+    @response = Response.find_by_id(answer.response_id)
+    ans = ResponseMap.find_by_id(@response.map_id)
+
+    @reviewee = Team.find_by_id(ans.reviewee_id)
+    if @reviewee.nil?
+      @reviewee = Participant.find_by_id(ans.reviewee_id).user
+    end
+
+    reviewer = Participant.find_by_id(ans.reviewer_id).user
+
+    if @reviewee.nil?
+      tcsv << ' '
+    elsif detail_options['team_id'] == 'true'
+      tcsv << @reviewee.id
+    end
+
+    if @reviewee.nil?
+      tcsv << ' '
+    elsif detail_options['team_name'] == 'true'
+      tcsv << @reviewee.name
+    end
+
+    if reviewer.nil?
+      tcsv << ' '
+    elsif detail_options['reviewer'] == 'true'
+      tcsv << reviewer.name
+    end
+
+    if answer.question.txt.nil?
+      tcsv << ' '
+    elsif detail_options['question'] == 'true'
+      tcsv << answer.question.txt
+    end
+
+    if answer.question.id.nil?
+      tcsv << ' '
+    elsif detail_options['question_id'] == 'true'
+      tcsv << answer.question.id
+    end
+
+    if answer.id.nil?
+      tcsv << ' '
+    elsif detail_options['comment_id'] == 'true'
+      tcsv << answer.id
+    end
+
+    if answer.comments.nil?
+      tcsv << ' '
+    elsif detail_options['comments'] == 'true'
+      tcsv << answer.comments
+    end
+
+    if answer.answer.nil?
+      tcsv << ' '
+    elsif detail_options['score'] == 'true'
+      tcsv << answer.answer
+    end
+
+    return tcsv
+
+  end
+
+  def generate_answer(@answers, @assignment)
+    # get all response maps for this assignment
+    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
+    
+    # for each map, get the response & answer associated with it
+    @response_maps_for_assignment.each do |map|
+      @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
+      # for this response, get the answer associated with it
+      @response_for_this_map.each do |res_map|
+        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
+        
+        @answer.each do |ans|
+          @answers[res_map.round][map.type].push(ans)
+        end
+      end
+    end
+    return @answers
+  end
+
+  def check_empty_rounds(@answers, round_num, res_type)
+
+    if !@answers[round_num][res_type].empty?
+          if round_num.nil?
+            round_type = "Round Nill - " + res_type
+          else 
+            round_type = "Round " + round_num.to_s + " - " + res_type.to_s
+          end
+          
+          csv << [round_type, '---', '---', '---', '---', '---', '---']
+        end
+  end
+
   def self.export_details(csv, parent_id, detail_options)
     @assignment = Assignment.find(parent_id)
 
@@ -427,101 +523,19 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    # get all response maps for this assignment
-    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
-    
-    # for each map, get the response & answer associated with it
-    @response_maps_for_assignment.each do |map|
-      @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
-      # for this response, get the answer associated with it
-      @response_for_this_map.each do |res_map|
-        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
-        
-        @answer.each do |ans|
-          @answers[res_map.round][map.type].push(ans)
-        end
-      
-      end
-      
-    end
+    @answers = generate_answer(@answers, @assignment)
 
     # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
       
       @uniq_response_type.each do |res_type|
         
-        if !@answers[round_num][res_type].empty?
-          if round_num.nil?
-            round_type = "Round Nill - " + res_type
-          else 
-            round_type = "Round " + round_num.to_s + " - " + res_type.to_s
-          end
-          
-          csv << [round_type, '---', '---', '---', '---', '---', '---']
-        end
+        check_empty_rounds(@answers, round_num, res_type)
 
         @answers[round_num][res_type].each do |answer|
-          tcsv = []
 
-          @response = Response.find_by_id(answer.response_id)
-          ans = ResponseMap.find_by_id(@response.map_id)
+          csv << csv_row(answer)
 
-          @reviewee = Team.find_by_id(ans.reviewee_id)
-          if @reviewee.nil?
-            @reviewee = Participant.find_by_id(ans.reviewee_id).user
-          end
-
-          reviewer = Participant.find_by_id(ans.reviewer_id).user
-
-          if @reviewee.nil?
-            tcsv << ' '
-          elsif detail_options['team_id'] == 'true'
-            tcsv << @reviewee.id
-          end
-
-          if @reviewee.nil?
-            tcsv << ' '
-          elsif detail_options['team_name'] == 'true'
-            tcsv << @reviewee.name
-          end
-
-          if reviewer.nil?
-            tcsv << ' '
-          elsif detail_options['reviewer'] == 'true'
-            tcsv << reviewer.name
-          end
-
-          if answer.question.txt.nil?
-            tcsv << ' '
-          elsif detail_options['question'] == 'true'
-            tcsv << answer.question.txt
-          end
-
-          if answer.question.id.nil?
-            tcsv << ' '
-          elsif detail_options['question_id'] == 'true'
-            tcsv << answer.question.id
-          end
-
-          if answer.id.nil?
-            tcsv << ' '
-          elsif detail_options['comment_id'] == 'true'
-            tcsv << answer.id
-          end
-
-          if answer.comments.nil?
-            tcsv << ' '
-          elsif detail_options['comments'] == 'true'
-            tcsv << answer.comments
-          end
-
-          if answer.answer.nil?
-            tcsv << ' '
-          elsif detail_options['score'] == 'true'
-            tcsv << answer.answer
-          end
-
-          csv << tcsv
         end
       end
     end

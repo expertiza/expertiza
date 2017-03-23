@@ -546,7 +546,7 @@ class Assignment < ActiveRecord::Base
     num_row_selected = 0
     detail_options.each do |option, check|
       if check == 'true'
-        num_row_selected = row_selected + 1
+        num_row_selected = num_row_selected + 1
       end
     end
     return num_row_selected

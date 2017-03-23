@@ -410,7 +410,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.export_details(csv, parent_id, detail_options)
-    unless !no_options(detail_options)
+    unless detail_options.has_value?('true')
       return csv
     end
 
@@ -544,15 +544,6 @@ class Assignment < ActiveRecord::Base
       end
     end
     return answers
-  end
-
-  def self.no_options(detail_options)
-    detail_options.each do |option, check|
-      if check == 'true'
-        return false
-      end
-    end
-    return true
   end
 
   def self.check_empty_rounds(answers, round_num, res_type)

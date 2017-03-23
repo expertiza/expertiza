@@ -15,6 +15,21 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     # Create an assignment
     @assignment = create :assignment, instructor: @instructor, course: nil, num_quiz_questions: 1
 
+    # Create an assignment due date
+    create(:deadline_type, name: "submission")
+    create(:deadline_type, name: "review")
+    create(:deadline_type, name: "metareview")
+    create(:deadline_type, name: "drop_topic")
+    create(:deadline_type, name: "signup")
+    create(:deadline_type, name: "team_formation")
+    create(:deadline_right)
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
+
+    @review_deadline_type = create(:deadline_type, name: "review")
+    create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
+
     # This setup is from calibration_spec, 'Add Expert Review' better to use existing code to test with
     @questionnaire = create(:questionnaire)
     @assignment_questionnaire = create :assignment_questionnaire, assignment: @assignment
@@ -22,13 +37,12 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     # Create a team linked to the calibrated assignment
     @team = create :assignment_team, assignment: @assignment
 
-    # Create an assignment participant linked to the assignment.
-    # The factory for this implicitly loads or creates a student
-    # (user) object that the participant is linked to.
-    @submitter = create :participant, assignment: @assignment
+    # Create an assignment participant linked to the assignment
+    @participant = create :participant, assignment: @assignment, user: @student
+
     # Create a mapping between the assignment team and the
-    # participant object's user (the student).
-    create :team_user, team: @team, user: @submitter.user
+    # participant object's user (the submitter).
+    create :team_user, team: @team, user: @student
     create :review_response_map, assignment: @assignment, reviewee: @team
 
   end

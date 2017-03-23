@@ -100,6 +100,7 @@ class UsersController < ApplicationController
     @rolename = Role.find_by_name(params[:role])
     ##here add a mailer to - created account
     foreign
+    #write a mailer call here
   end
 
   def request_new

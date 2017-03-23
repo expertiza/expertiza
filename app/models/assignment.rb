@@ -410,6 +410,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.export_details(csv, parent_id, detail_options)
+    unless row_selected(detail_options) > 0
+      return csv
+    end
+
     @assignment = Assignment.find(parent_id)
 
     @answers = {} # Contains all answer objects for this assignment
@@ -436,7 +440,7 @@ class Assignment < ActiveRecord::Base
         
         round_type = check_empty_rounds(@answers, round_num, res_type)
 
-        unless round_type.nil? and row_selected(detail_options) > 0
+        unless round_type.nil?
           csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
         end
 

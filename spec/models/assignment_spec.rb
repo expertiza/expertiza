@@ -117,7 +117,6 @@ describe "#check if the assignment belongs to a course" do
 end
 
 describe "has correct csv values?" do
-
   before(:each) do
     @assignment = create(:assignment)
     create(:assignment_team, name: "team1")

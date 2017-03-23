@@ -23,36 +23,37 @@ class ExportFileController < ApplicationController
   end
 
   def exportdetails
-     @delim_type = params[:delim_type2]
-     if @delim_type == "comma"
-       filename = params[:model] + params[:id] + "_Details.csv"
-       delimiter = ","
-     elsif @delim_type == "space"
-       filename = params[:model] + params[:id] + "_Details.csv"
-       delimiter = " "
-     elsif @delim_type == "tab"
-       filename = params[:model] + params[:id] + "_Details.csv"
-       delimiter = "\t"
-     elsif @delim_type == "other"
-       filename = params[:model] + params[:id] + "_Details.csv"
-       delimiter = other_char2
-     end
-     allowed_models = ['Assignment']
-
-     csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      if allowed_models.include? params[:model]
-         csv << Object.const_get(params[:model]).export_Headers(params[:id])
-         csv << Object.const_get(params[:model]).export_details_fields(params[:details])
-         Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
-      end
-     end
+    @delim_type = params[:delim_type2]
+    if @delim_type == "comma"
+      filename = params[:model] + params[:id] + "_Details.csv"
+      delimiter = ","
+    elsif @delim_type == "space"
+      filename = params[:model] + params[:id] + "_Details.csv"
+      delimiter = " "
+    elsif @delim_type == "tab"
+      filename = params[:model] + params[:id] + "_Details.csv"
+      delimiter = "\t"
+    elsif @delim_type == "other"
+      filename = params[:model] + params[:id] + "_Details.csv"
+      delimiter = other_char2
+    end
     
-     send_data csv_data,
-               type: 'text/csv; charset=iso-8859-1; header=present',
-         disposition: "attachment; filename=#{filename}"
+    allowed_models = ['Assignment']
 
-     return csv_data.to_s
-   end
+    csv_data = CSV.generate(col_sep: delimiter) do |csv|
+      if allowed_models.include? params[:model]
+        csv << Object.const_get(params[:model]).export_Headers(params[:id])
+        csv << Object.const_get(params[:model]).export_details_fields(params[:details])
+        Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
+      end
+    end
+  
+    send_data csv_data,
+              type: 'text/csv; charset=iso-8859-1; header=present',
+        disposition: "attachment; filename=#{filename}"
+
+    return csv_data.to_s
+  end
  
   def export
     @delim_type = params[:delim_type]

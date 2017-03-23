@@ -118,15 +118,17 @@ end
 
 describe "has correct csv values?" do
   
-  assignment = create(:assignment)
-  create(:assignment_team, name: "team1")
-  student = create(:student, name: "student1")
-  create(:participant, user: student)
-  create(:questionnaire)
-  create(:question)
-  create(:review_response_map)
-  create(:response)
-  delimiter = ","
+  before(:each) do
+    assignment = create(:assignment)
+    create(:assignment_team, name: "team1")
+    student = create(:student, name: "student1")
+    create(:participant, user: student)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
+    delimiter = ","
+  end
 
   it "checks_if_csv has the correct data" do
     create(:answer, comments: "Test comment")

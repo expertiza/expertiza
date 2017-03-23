@@ -139,7 +139,12 @@ class SubmittedContentController < ApplicationController
    # params = ActionController::Parameters.new(a: "123", b: "456")
     # send message to reviewers when submission has been updated
     #send this only for the review rounds 1 and 2 and before the review_deadline has passed
-    participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+    last = DueDate.where(["assignment_id = ?",assignment.id]).select("round").last
+    date = DueDate.where(["assignment_id =? and deadline_type_id",assignment.id,2]).select("due_date")
+
+    if (last<3 and date > DateTime.now)
+      participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+    end
     if params[:origin] == 'review'
       redirect_to :back
     else

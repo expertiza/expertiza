@@ -45,6 +45,12 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create :team_user, team: @team, user: @student
     create :review_response_map, assignment: @assignment, reviewee: @team
 
+    # Log in as the student with an assignment and reviews
+    login_as @student.name
+
+    # Select the assignment and follow the link to the heat map
+    click_link @assignment.name
+    click_link 'Alternate View'
   end
 
   it 'should be able to sort by total review score' do
@@ -52,37 +58,16 @@ describe 'Student can view review scores in a heat map distribution', js: true d
   end
 
   it 'should be able to view a heat map of review scores' do
-    # Log in as the student with an assignment and reviews
-    login_as @student.name
-
-    # Select the assignment and follow the link to the heat map
-    click_link @assignment.name
-    click_link 'Alternate View'
-
     expect(page).to have_content('Summary Report for assignment')
   end
 
   it 'should be able to follow the link to a specific review' do
-    # Log in as the student with an assignment and reviews
-    login_as @student.name
-
-    # Select the assignment and follow the link to the heat map
-    click_link @assignment.name
-    click_link 'Alternate View'
     click_link 'Review 1'
-
     expect(page).to have_content('Review for')
   end
 
   it 'should be able to toggle the question list' do
-    # Log in as the student with an assignment and reviews
-    login_as @student.name
-    click_link 'Alternate View'
-
-    # Select the assignment and follow the link to the heat map
-    click_link @assignment.name
-    click_link 'toggle question list' # This is a link
-
+    click_link 'toggle question list'
     expect(page).to have_content('Question')
   end
 
@@ -97,7 +82,6 @@ describe 'Student does not have scores to show in a heat map distribution', js: 
   it 'should show an empty table with no reviews' do
     # Log in as the student with an assignment and reviews
     login_as @student.name
-    click_link 'Alternate View'
     expect(page).to_not have_content('Review 1')
   end
 end

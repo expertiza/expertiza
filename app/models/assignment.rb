@@ -440,7 +440,7 @@ class Assignment < ActiveRecord::Base
 
         @answers[round_num][res_type].each do |answer|
 
-          csv << csv_row(answer)
+          csv << csv_row(detail_options, answer)
 
         end
       end
@@ -461,7 +461,7 @@ class Assignment < ActiveRecord::Base
     fields
   end
 
-  def self.csv_row(answer)
+  def self.csv_row(detail_options, answer)
     tcsv = []
     @response = Response.find_by_id(answer.response_id)
     ans = ResponseMap.find_by_id(@response.map_id)

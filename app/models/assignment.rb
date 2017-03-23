@@ -409,7 +409,59 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
-  def csv_row(answer)
+  def self.export_details(csv, parent_id, detail_options)
+    @assignment = Assignment.find(parent_id)
+
+    @answers = {} # Contains all answer objects for this assignment
+
+    # Find all unique response types
+    @uniq_response_type = ResponseMap.uniq.pluck(:type)
+    # Find all unique round numbers
+    @uniq_rounds = Response.uniq.pluck(:round)
+
+    # create the nested hash that holds all the answers organized by round # and response type
+    @uniq_rounds.each do |round_num|
+      @answers[round_num] = {}
+      @uniq_response_type.each do |res_type|
+        @answers[round_num][res_type] = []
+      end
+    end
+
+    @answers = generate_answer(@answers, @assignment)
+
+    # Loop through each round and response type and construct a new row to be pushed in CSV
+    @uniq_rounds.each do |round_num|
+      
+      @uniq_response_type.each do |res_type|
+        
+        round_type = check_empty_rounds(@answers, round_num, res_type)
+
+        unless round_type.nil?
+          csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
+        end
+
+        @answers[round_num][res_type].each do |answer|
+          csv << csv_row(detail_options, answer)
+        end
+      end
+    end
+  end
+
+  # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
+  def self.export_details_fields(detail_options)
+    fields = []
+    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
+    fields << 'Team Name / Author Name' if detail_options['team_name'] == 'true' 
+    fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
+    fields << 'Question / Dimension Name' if detail_options['question'] == 'true'
+    fields << 'Question ID / Dimension' if detail_options['question_id'] == 'true'
+    fields << 'Comment ID' if detail_options['comment_id'] == 'true'   
+    fields << 'Comments' if detail_options['comments'] == 'true'      
+    fields << 'Score' if detail_options['score'] == 'true'  
+    fields
+  end
+
+  def self.csv_row(detail_options, answer)
     tcsv = []
     @response = Response.find_by_id(answer.response_id)
     ans = ResponseMap.find_by_id(@response.map_id)
@@ -468,12 +520,10 @@ class Assignment < ActiveRecord::Base
     elsif detail_options['score'] == 'true'
       tcsv << answer.answer
     end
-
-    return tcsv
-
+    tcsv
   end
 
-  def generate_answer(answers, assignment)
+  def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
     
@@ -485,77 +535,23 @@ class Assignment < ActiveRecord::Base
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
         
         @answer.each do |ans|
-          @answers[res_map.round][map.type].push(ans)
+          answers[res_map.round][map.type].push(ans)
         end
       end
     end
     return answers
   end
 
-  def check_empty_rounds(answers, round_num, res_type)
-
-    if !@answers[round_num][res_type].empty?
-          if round_num.nil?
-            round_type = "Round Nill - " + res_type
-          else 
-            round_type = "Round " + round_num.to_s + " - " + res_type.to_s
-          end
-          
-          csv << [round_type, '---', '---', '---', '---', '---', '---']
-        end
-  end
-
-  def self.export_details(csv, parent_id, detail_options)
-    @assignment = Assignment.find(parent_id)
-
-    @answers = {} # Contains all answer objects for this assignment
-
-    # Find all unique response types
-    @uniq_response_type = ResponseMap.uniq.pluck(:type)
-    # Find all unique round numbers
-    @uniq_rounds = Response.uniq.pluck(:round)
-
-    # create the nested hash that holds all the answers organized by round # and response type
-    @uniq_rounds.each do |round_num|
-      @answers[round_num] = {}
-      @uniq_response_type.each do |res_type|
-        @answers[round_num][res_type] = []
+  def self.check_empty_rounds(answers, round_num, res_type)
+    unless answers[round_num][res_type].empty?
+      if round_num.nil?
+        round_type = "Round Nill - " + res_type
+      else 
+        round_type = "Round " + round_num.to_s + " - " + res_type.to_s
       end
+      return round_type
     end
-
-    assign = @assignment
-    nanswer = @answers
-
-    @answers = generate_answer(nanswer, assign)
-
-    # Loop through each round and response type and construct a new row to be pushed in CSV
-    @uniq_rounds.each do |round_num|
-      
-      @uniq_response_type.each do |res_type|
-        
-        check_empty_rounds(@answers, round_num, res_type)
-
-        @answers[round_num][res_type].each do |answer|
-
-          csv << csv_row(answer)
-
-        end
-      end
-    end
-  end
-
-  # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
-  def self.export_details_fields(detail_options)
-    fields = []
-    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
-    fields << 'Team Name / Author Name' if detail_options['team_name'] == 'true' 
-    fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
-    fields << 'Question / Dimension Name' if detail_options['question'] == 'true'
-    fields << 'Question ID / Dimension' if detail_options['question_id'] == 'true'
-    fields << 'Comment ID' if detail_options['comment_id'] == 'true'   
-    fields << 'Comments' if detail_options['comments'] == 'true'      
-    fields << 'Score' if detail_options['score'] == 'true'  
-    fields
+    return nil
   end
 
   # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor

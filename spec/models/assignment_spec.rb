@@ -187,4 +187,27 @@ describe "has correct csv values?" do
     end
     expect(generated_csv).to eq(expected_csv)
   end
+
+  it "checks csv with data and no options" do
+    assignment = create(:assignment)
+    create(:assignment_team, name: "team1")
+    student = create(:student, name: "student1")
+    create(:participant, user: student)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
+    delimiter = ","
+    options = {"team_id"=>"false", "team_name"=>"false",
+               "reviewer"=>"false", "question"=>"false",
+               "question_id"=>"false", "comment_id"=>"false",
+               "comments"=>"false", "score"=>"false"}
+    expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
+    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
+      csv << Assignment.export_Headers(assignment.id)
+      csv << Assignment.export_details_fields(options)
+      Assignment.export_details(csv, assignment.id, options)
+    end
+    expect(generated_csv).to eq(expected_csv)
+  end
 end

@@ -436,7 +436,9 @@ class Assignment < ActiveRecord::Base
         
         round_type = check_empty_rounds(@answers, round_num, res_type)
 
-        csv << [round_type, '---', '---', '---', '---', '---', '---']
+        if !round_type.empty?
+          csv << [round_type, '---', '---', '---', '---', '---', '---']
+        end
 
         @answers[round_num][res_type].each do |answer|
 

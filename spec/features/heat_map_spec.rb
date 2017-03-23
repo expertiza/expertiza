@@ -1,4 +1,5 @@
-require 'rspec'
+require 'rails_helper'
+require 'selenium-webdriver'
 
 describe 'Student can view review scores in a heat map distribution', js: true do
 

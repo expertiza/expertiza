@@ -9,8 +9,8 @@ class CreateAssignments < ActiveRecord::Migration
     t.column "course_id", :integer, :default => 0, :null => false
     t.column "instructor_id", :integer, :default => 0, :null => false
     t.column "private", :boolean, :default => false, :null => false
-    t.column "num_reviews", :integer, :default => 0, :null => false
-    t.column "num_review_of_reviews", :integer, :default => 0, :null => false
+    t.column "num_reviews", :integer, :default => 3, :null => false
+    t.column "num_review_of_reviews", :integer, :default => 3, :null => false
     t.column "num_review_of_reviewers", :integer, :default => 0, :null => false
     t.column "review_strategy_id", :integer, :default => 0, :null => false
     t.column "mapping_strategy_id", :integer, :default => 0, :null => false

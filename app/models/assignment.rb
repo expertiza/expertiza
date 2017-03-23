@@ -462,7 +462,7 @@ class Assignment < ActiveRecord::Base
     fields
   end
 
-  def csv_row(answer)
+  def self.csv_row(answer)
     tcsv = []
     @response = Response.find_by_id(answer.response_id)
     ans = ResponseMap.find_by_id(@response.map_id)
@@ -545,7 +545,7 @@ class Assignment < ActiveRecord::Base
     return answers
   end
 
-  def check_empty_rounds(answers, round_num, res_type)
+  def self.check_empty_rounds(answers, round_num, res_type)
 
     if !@answers[round_num][res_type].empty?
           if round_num.nil?

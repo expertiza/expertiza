@@ -410,7 +410,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.export_details(csv, parent_id, detail_options)
-    unless row_selected(detail_options) > 0
+    unless !(row_selected(detail_options) == 0)
       return csv
     end
 

@@ -118,11 +118,11 @@ end
 
 describe "has correct csv values?" do
   
-  before(:each) do
-    assignment = create(:assignment)
+  before(:all) do
+    @assignment = create(:assignment)
     create(:assignment_team, name: "team1")
-    student = create(:student, name: "student1")
-    create(:participant, user: student)
+    @student = create(:student, name: "student1")
+    create(:participant, user: @student)
     create(:questionnaire)
     create(:question)
     create(:review_response_map)
@@ -139,9 +139,9 @@ describe "has correct csv values?" do
                "comments" => "true", "score" => "true"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_Headers(assignment.id)
+      csv << Assignment.export_Headers(@assignment.id)
       csv << Assignment.export_details_fields(options)
-      Assignment.export_details(csv, assignment.id, options)
+      Assignment.export_details(csv, @assignment.id, options)
     end
     expect(generated_csv).to eq(expected_csv)
   end
@@ -154,9 +154,9 @@ describe "has correct csv values?" do
                "comments" => "true", "score" => "true"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_some_options_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_Headers(assignment.id)
+      csv << Assignment.export_Headers(@assignment.id)
       csv << Assignment.export_details_fields(options)
-      Assignment.export_details(csv, assignment.id, options)
+      Assignment.export_details(csv, @assignment.id, options)
     end
     expect(generated_csv).to eq(expected_csv)
   end
@@ -168,9 +168,9 @@ describe "has correct csv values?" do
                "comments" => "true", "score" => "true"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_data_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_Headers(assignment.id)
+      csv << Assignment.export_Headers(@assignment.id)
       csv << Assignment.export_details_fields(options)
-      Assignment.export_details(csv, assignment.id, options)
+      Assignment.export_details(csv, @assignment.id, options)
     end
     expect(generated_csv).to eq(expected_csv)
   end
@@ -182,9 +182,9 @@ describe "has correct csv values?" do
                "comments" => "false", "score" => "false"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_Headers(assignment.id)
+      csv << Assignment.export_Headers(@assignment.id)
       csv << Assignment.export_details_fields(options)
-      Assignment.export_details(csv, assignment.id, options)
+      Assignment.export_details(csv, @assignment.id, options)
     end
     expect(generated_csv).to eq(expected_csv)
   end

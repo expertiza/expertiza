@@ -127,8 +127,9 @@ describe "has correct csv values?" do
     create(:question)
     create(:review_response_map)
     create(:response)
-    delimiter = ","
   end
+
+  delimiter = ","
 
   it "checks_if_csv has the correct data" do
     create(:answer, comments: "Test comment")

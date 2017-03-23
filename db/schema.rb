@@ -626,7 +626,7 @@ ActiveRecord::Schema.define(version: 20170322232119) do
     t.text    "public_key",                limit: 65535
     t.boolean "copy_of_emails",                          default: false
     t.integer "institution_id",            limit: 4
-    t.boolean "copy_of_all_emails"
+    t.boolean "copy_of_all_emails",                      default: false
     t.boolean "copy_emails"
   end
 

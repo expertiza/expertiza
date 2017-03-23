@@ -118,7 +118,7 @@ end
 
 describe "has correct csv values?" do
   
-  before(:all) do
+  before(:each) do
     @assignment = create(:assignment)
     create(:assignment_team, name: "team1")
     @student = create(:student, name: "student1")

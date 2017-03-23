@@ -23,8 +23,8 @@ before_install:
     - bower install
 before_script:
     - mysql -u root < db/grant_expertiza.sql
-    - cp config/database.yml.example config/database.yml
-    - cp config/secrets.yml.example config/secrets.yml
+    - cp config/database.yml config/database.yml
+    - cp config/secrets.yml config/secrets.yml
     - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
     - bundle install
     - bundle exec rake db:setup

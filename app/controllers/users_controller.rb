@@ -95,10 +95,10 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     ##add the next two lines~~~~~
-    prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
-    prepared_mail.deliver
     @rolename = Role.find_by_name(params[:role])
     ##here add a mailer to - created account
+    password = @user.reset_password
+    MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password).deliver
     foreign
     #write a mailer call here
   end
@@ -305,6 +305,7 @@ class UsersController < ApplicationController
                                      :timezonepref, 
                                      :public_key, 
                                      :copy_of_emails,
+                                     :copy_of_all_emails,
                                      :institution_id)
   end
 

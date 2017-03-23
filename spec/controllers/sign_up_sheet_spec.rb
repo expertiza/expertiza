@@ -179,10 +179,10 @@ describe SignUpSheetController do
   end
 
   describe "Instructor singup user" do
-    it "denies adding a user already signed up" do
+    it "adds user to topic with no signed up team" do
       post :signup_as_instructor_action, username: @user.name, assignment_id: @assignment.id, topic_id: @topic1.id
-      post :signup_as_instructor_action, username: @user.name, assignment_id: @assignment.id, topic_id: @topic2.id
-      expect(flash[:error]).to eq('The student already signed up for a topic!')
+      numTeams = @topic1.signed_up_teams.length
+      expect(numTeams).to eq(1)
     end
     it "checks to make sure the user exists" do
       post :signup_as_instructor_action, username: "asifljasdlf", assignment_id: @assignment.id, topic_id: @topic1.id

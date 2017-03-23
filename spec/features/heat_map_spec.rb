@@ -22,6 +22,12 @@ describe 'Student can view review scores in a heat map distribution', js: true d
 
   end
 
+  it 'should show an empty table with no reviews' do
+    # Log in as the student with an assignment and reviews
+    login_as @student.name
+    expect(page).to_not have_content('Review 1')
+  end
+
   it 'should be able to sort by total review score' do
     # This would require us to create several reviews 
   end

@@ -175,6 +175,7 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with data and no options" do
+    create(:answer, comments: "Test comment")
     options = {"team_id" => "false", "team_name" => "false",
                "reviewer" => "false", "question" => "false",
                "question_id" => "false", "comment_id" => "false",

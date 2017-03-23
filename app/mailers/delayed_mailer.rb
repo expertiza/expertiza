@@ -186,7 +186,7 @@ class DelayedMailer
         bcc: emails,
         subject: subject,
         body: body
-    ).deliver
+    ).deliver_now
   end
 
   def drop_one_member_topics

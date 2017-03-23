@@ -473,7 +473,7 @@ class Assignment < ActiveRecord::Base
 
   end
 
-  def generate_answer(@answers, @assignment)
+  def generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
     
@@ -489,10 +489,10 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
-    return @answers
+    return answers
   end
 
-  def check_empty_rounds(@answers, round_num, res_type)
+  def check_empty_rounds(answers, round_num, res_type)
 
     if !@answers[round_num][res_type].empty?
           if round_num.nil?

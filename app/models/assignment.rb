@@ -537,7 +537,7 @@ class Assignment < ActiveRecord::Base
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
         
         @answer.each do |ans|
-          @answers[res_map.round][map.type].push(ans)
+          answers[res_map.round][map.type].push(ans)
         end
       end
     end
@@ -546,7 +546,7 @@ class Assignment < ActiveRecord::Base
 
   def self.check_empty_rounds(answers, round_num, res_type)
 
-    if !@answers[round_num][res_type].empty?
+    if !answers[round_num][res_type].empty?
       if round_num.nil?
         round_type = "Round Nill - " + res_type
       else 

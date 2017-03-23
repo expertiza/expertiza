@@ -436,7 +436,7 @@ class Assignment < ActiveRecord::Base
         
         round_type = check_empty_rounds(@answers, round_num, res_type)
 
-        if !round_type.empty?
+        if !round_type.nil?
           csv << [round_type, '---', '---', '---', '---', '---', '---']
         end
 
@@ -554,8 +554,9 @@ class Assignment < ActiveRecord::Base
       else 
         round_type = "Round " + round_num.to_s + " - " + res_type.to_s
       end
+      return round_type
     end
-    return round_type
+    return nil
   end
 
   # This method is used to set the headers for the csv like Assignment Name and Assignment Instructor

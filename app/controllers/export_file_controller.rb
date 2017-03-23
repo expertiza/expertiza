@@ -37,7 +37,7 @@ class ExportFileController < ApplicationController
       filename = params[:model] + params[:id] + "_Details.csv"
       delimiter = other_char2
     end
-    
+
     allowed_models = ['Assignment']
 
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
@@ -47,12 +47,12 @@ class ExportFileController < ApplicationController
         Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
       end
     end
-  
+
     send_data csv_data,
               type: 'text/csv; charset=iso-8859-1; header=present',
-        disposition: "attachment; filename=#{filename}"
+              disposition: "attachment; filename=#{filename}"
   end
- 
+
   def export
     @delim_type = params[:delim_type]
     if @delim_type == "comma"

@@ -412,14 +412,14 @@ class Assignment < ActiveRecord::Base
   def self.export_details(csv, parent_id, detail_options)
     @assignment = Assignment.find(parent_id)
 
-    @answers = {} # Contails all answer objects for this assignment
+    @answers = {} # Contains all answer objects for this assignment
 
-    #Find all unique response types
+    # Find all unique response types
     @uniq_response_type =  ResponseMap.uniq.pluck(:type)
-    #Find all unique round numbers
+    # Find all unique round numbers
     @uniq_rounds = Response.uniq.pluck(:round)
 
-    #create the nested hash that holds all the answers organized by round # and response type
+    # create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
       @answers[round_num] = {}
       @uniq_response_type.each do |res_type|
@@ -427,13 +427,13 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    #get all response maps for this assignment
+    # get all response maps for this assignment
     @responseMapsForAssignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
     
-    #for each map, get the response & answer associated with it
+    # for each map, get the response & answer associated with it
     @responseMapsForAssignment.each do |map|
       @responseForThisMap = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
-      #for this response, get the answer associated with it
+      # for this response, get the answer associated with it
       @responseForThisMap.each do |res_map|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
         
@@ -445,12 +445,12 @@ class Assignment < ActiveRecord::Base
       
     end
 
-    #Loop through each round and response type and construct a new row to be pushed in CSV
+    # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
       
       @uniq_response_type.each do |res_type|
         
-        if @answers[round_num][res_type].size > 0
+        if !@answers[round_num][res_type].empty?
           if round_num.nil?
             round_type = "Round Nill - " + res_type
           else 
@@ -477,66 +477,50 @@ class Assignment < ActiveRecord::Base
 
             if @reviewee.nil?
               tcsv << ' '
-            else
-              if detail_options['team_id'] == 'true'
-                tcsv << @reviewee.id 
-              end
+            elsif detail_options['team_id'] == 'true'
+              tcsv << @reviewee.id
             end
 
             if @reviewee.nil? 
               tcsv << ' '
-            else
-              if detail_options['team_name'] == 'true'
-                tcsv << @reviewee.name
-              end
+            elsif detail_options['team_name'] == 'true'
+              tcsv << @reviewee.name
             end
 
             if reviewer.nil?
               tcsv << ' '
-            else
-              if detail_options['reviewer'] == 'true'
-                tcsv << reviewer.name
-              end
+            elsif detail_options['reviewer'] == 'true'
+              tcsv << reviewer.name
             end
 
             if answer.question.txt.nil?
               tcsv << ' '
-            else
-              if detail_options['question'] == 'true'
-                tcsv << answer.question.txt
-              end
+            elsif detail_options['question'] == 'true'
+              tcsv << answer.question.txt
             end
 
             if answer.question.id.nil?
               tcsv << ' '
-            else
-              if detail_options['question_id'] == 'true'
-                tcsv << answer.question.id
-              end
+            elsif detail_options['question_id'] == 'true'
+              tcsv << answer.question.id
             end
 
             if answer.id.nil?
               tcsv << ' '
-            else
-              if detail_options['comment_id'] == 'true'
-                tcsv << answer.id
-              end
+            elsif detail_options['comment_id'] == 'true'
+              tcsv << answer.id
             end
 
             if answer.comments.nil?
               tcsv << ' '
-            else
-              if detail_options['comments'] == 'true'
-                tcsv << answer.comments
-              end
+            elsif detail_options['comments'] == 'true'
+              tcsv << answer.comments
             end
 
             if answer.answer.nil?
               tcsv << ' '
-            else
-              if detail_options['score'] == 'true'
-                tcsv << answer.answer
-              end
+            elsif detail_options['score'] == 'true'
+              tcsv << answer.answer
             end
 
             csv << tcsv

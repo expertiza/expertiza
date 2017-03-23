@@ -523,7 +523,10 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    @answers = generate_answer(@answers, @assignment)
+    assign = @assignment
+    nanswer = @answers
+
+    @answers = generate_answer(nanswer, assign)
 
     # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|

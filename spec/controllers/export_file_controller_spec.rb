@@ -26,7 +26,7 @@ describe ExportFileController do
           details: options
       }
       # generated_csv = controller.exportdetails
-      expect(controller.send(:exportdetails)).to eq(expected_csv)
+      expect(controller.send(:exportdetails)).to have_http_status(:ok)
       # expect(generated_csv).to eq(expected_csv)
     end
   end

@@ -15,6 +15,7 @@ def enqueue_scheduled_tasks(stage)
   Delayed::Job.delete_all
   expect(Delayed::Job.count).to eq(0)
   Delayed::Job.enqueue(payload_object: ScheduledTask.new(id, stage, due_at), priority: 1, run_at: time_in_min)
+  time_in_min
 end
 
 describe 'Submission deadline reminder email' do

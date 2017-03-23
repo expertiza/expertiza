@@ -68,6 +68,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
 
     # Select the assignment and follow the link to the heat map
     click_link @assignment.name
+    click_link 'Alternate View'
     click_link 'Review 1'
 
     expect(page).to have_content('Review for')
@@ -76,6 +77,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
   it 'should be able to toggle the question list' do
     # Log in as the student with an assignment and reviews
     login_as @student.name
+    click_link 'Alternate View'
 
     # Select the assignment and follow the link to the heat map
     click_link @assignment.name
@@ -95,6 +97,7 @@ describe 'Student does not have scores to show in a heat map distribution', js: 
   it 'should show an empty table with no reviews' do
     # Log in as the student with an assignment and reviews
     login_as @student.name
+    click_link 'Alternate View'
     expect(page).to_not have_content('Review 1')
   end
 end

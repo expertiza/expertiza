@@ -172,6 +172,7 @@ describe SignUpSheetController do
 
     student.save
     @user = User.find_by_name("student")
+    @participant = @assignment.add_participant(@user.name, true, true, true)
 
     # simulate authorized session
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return('Instructor')
@@ -193,5 +194,4 @@ describe SignUpSheetController do
       expect(response).to redirect_to edit_assignment_url(id: @assignment.id)
     end
   end
-
 end

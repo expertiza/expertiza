@@ -478,9 +478,9 @@ class Assignment < ActiveRecord::Base
 
     reviewer = Participant.find_by_id(ans.reviewer_id).user
 
-    tcsv << handle_nil(@reviewee) if detail_options['team_id'] == 'true'
-    tcsv << handle_nil(@reviewee) if detail_options['team_name'] == 'true'
-    tcsv << handle_nil(reviewer) if detail_options['reviewer'] == 'true'
+    tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
+    tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
+    tcsv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
     tcsv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
     tcsv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
     tcsv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'

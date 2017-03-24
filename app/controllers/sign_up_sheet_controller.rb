@@ -208,7 +208,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  def sign_up()
+  def sign_up
     # find the assignment to which user is signing up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
@@ -222,23 +222,22 @@ class SignUpSheetController < ApplicationController
   end
 
   # routes to new page to specficy student
-  def signup_as_instructor
-  end
+  def signup_as_instructor; end
 
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
-    unless user.nil? # validate invalid user
+    if user.nil? # validate invalid user
+      flash[:error] = "That student does not exist!"
+    else
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-        unless SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-          flash[:error] = "The student has already signed up for a topic!"
-        else
+        if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
           flash[:success] = "You have successfully signed up the student for the topic!"
+        else
+          flash[:error] = "The student has already signed up for a topic!"
         end
       else
         flash[:error] = "The student is not registered for the assignment!"
       end
-    else
-      flash[:error] = "That student does not exist!"
     end
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
@@ -267,8 +266,8 @@ class SignUpSheetController < ApplicationController
     # find participant using assignment using team and topic ids
     team = Team.find(params[:id])
     assignment = Assignment.find(team.parent_id)
-    teamUsr = TeamsUser.find_by(team_id: team.id)
-    user = User.find(teamUsr.user_id)
+    team_user = TeamsUser.find_by(team_id: team.id)
+    user = User.find(team_user.user_id)
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?

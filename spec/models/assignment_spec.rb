@@ -132,10 +132,10 @@ describe "has correct csv values?" do
   delimiter = ","
 
   def set_option(t_id, t_name, r, q, q_id, c_id, c, s)
-    return {"team_id" => t_id, "team_name" => t_name,
-            "reviewer" => r, "question" => q,
-            "question_id" => q_id, "comment_id" => c_id,
-            "comments" => c, "score" => s}
+    {"team_id" => t_id, "team_name" => t_name,
+     "reviewer" => r, "question" => q,
+     "question_id" => q_id, "comment_id" => c_id,
+     "comments" => c, "score" => s}
   end
 
   it "checks_if_csv has the correct data" do

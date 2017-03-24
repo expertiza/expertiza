@@ -33,17 +33,15 @@ describe 'Student can view review scores in a heat map distribution', js: true d
   end
 
   def create_review
-    #Capybara.using_session("Review Setup") do
-    login_as('student2064')
-    #expect(page).to have_content "User: student2064"
-    #expect(page).to have_content "TestAssignment"
+    # NOTE: this function does not work since it stubs: login_as('student2064')
+    user = User.find_by_name('student2064')
+    visit root_path
+    fill_in 'login_name', with: 'student2064'
+    fill_in 'login_password', with: 'password'
+    click_button 'SIGN IN'
 
     click_link "TestAssignment"
-    #expect(page).to have_content "Submit or Review work for TestAssignment"
-    #expect(page).to have_content "Others' work"
-
     click_link "Others' work"
-    #expect(page).to have_content 'Reviews for "TestAssignment"'
 
     choose "topic_id"
     click_button "Request a new submission to review"
@@ -53,18 +51,14 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     fill_in 'responses[0][comment]', with: 'HelloWorld'
     select 5, from: "responses[0][score]"
     click_button 'Submit Review'
-    #expect(page).to have_content "Your response was successfully saved."
 
     # click ok on the pop-up box that warns you that responses can not be edited
     page.driver.browser.switch_to.alert.accept
 
+    visit root_path
     click_link "Logout"
-    click_on('logout-button')
-    find("login_name")
-    # visit (root_path + '/auth/logout')
-    #end
-
-
+    Capybara.default_max_wait_time = 10
+    expect(page).to have_content('Password')
   end
 
   #it 'should be able to sort by total review score' do

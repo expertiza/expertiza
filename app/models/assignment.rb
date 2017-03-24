@@ -510,10 +510,10 @@ class Assignment < ActiveRecord::Base
 
   def self.check_empty_rounds(answers, round_num, res_type)
     unless answers[round_num][res_type].empty?
-      if round_num.nil?
-        round_type = "Round Nill - " + res_type
+      round_type = if round_num.nil?
+        "Round Nill - " + res_type
       else 
-        round_type = "Round " + round_num.to_s + " - " + res_type.to_s
+        "Round " + round_num.to_s + " - " + res_type.to_s
       end
       return round_type
     end

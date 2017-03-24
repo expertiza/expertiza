@@ -171,7 +171,7 @@ describe SignUpSheetController do
     @topic2.save
 
     student.save
-    @user = User.find_by_name("student")
+    @user = User.find_by(name: "student")
     @participant = @assignment.add_participant(@user.name, true, true, true)
 
     # simulate authorized session
@@ -182,8 +182,8 @@ describe SignUpSheetController do
   describe "Instructor singup user" do
     it "adds user to topic with no signed up team" do
       post :signup_as_instructor_action, username: @user.name, assignment_id: @assignment.id, topic_id: @topic1.id
-      numTeams = @topic1.signed_up_teams.length
-      expect(numTeams).to eq(1)
+      num_teams = @topic1.signed_up_teams.length
+      expect(num_teams).to eq(1)
     end
     it "checks to make sure the user exists" do
       post :signup_as_instructor_action, username: "asifljasdlf", assignment_id: @assignment.id, topic_id: @topic1.id

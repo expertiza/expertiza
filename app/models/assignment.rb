@@ -410,9 +410,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.export_details(csv, parent_id, detail_options)
-    unless detail_options.has_value?('true')
-      return csv
-    end
+    return csv unless detail_options.value?('true')
 
     @assignment = Assignment.find(parent_id)
 
@@ -471,9 +469,7 @@ class Assignment < ActiveRecord::Base
     ans = ResponseMap.find_by_id(@response.map_id)
 
     @reviewee = Team.find_by_id(ans.reviewee_id)
-    if @reviewee.nil?
-      @reviewee = Participant.find_by_id(ans.reviewee_id).user
-    end
+    @reviewee = Participant.find_by_id(ans.reviewee_id).user if @reviewee.nil?
 
     reviewer = Participant.find_by_id(ans.reviewer_id).user
 
@@ -529,7 +525,7 @@ class Assignment < ActiveRecord::Base
 
   def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
-    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{@assignment.id}"])
+    @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
     
     # for each map, get the response & answer associated with it
     @response_maps_for_assignment.each do |map|

@@ -1,13 +1,13 @@
-Team Members:
--Andrew Haskett
--Bardia Zamanian
--Prateek Pramanik
+Team Members:  
+-Andrew Haskett  
+-Bardia Zamanian  
+-Prateek Pramanik  
 
 Deployed Environment: http://152.46.18.218:3000/
 
-Preconfigured Admin:
--username = instructor6
--password = password
+Preconfigured Admin:  
+-username = instructor6  
+-password = password  
 
 
 

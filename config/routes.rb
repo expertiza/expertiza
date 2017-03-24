@@ -1,8 +1,7 @@
 Expertiza::Application.routes.draw do
 
-
-  resources :lti_assignment_users
   #lti start
+  resources :lti_assignment_users
   resources :tenants
   mount Lti2Tp::Engine, :at => '/lti2_tp'
 
@@ -10,6 +9,15 @@ Expertiza::Application.routes.draw do
   get 'complete_reregistration' => 'lti_registration_wips#complete_reregistration'
 
   get 'tool_profile' => 'tool_profiles#get_first'
+
+  get 'lti_assignment_users_controller/back_to_lms', to: 'lti_assignment_users#back_to_lms'
+
+  resources :impersonate do
+    collection do
+      get :start
+      post :impersonate
+    end
+  end
 
   post 'lti_registrations' => 'lti_registrations#create', as: 'lti_registration'
   resources :lti_assignments

@@ -117,15 +117,9 @@ class ApplicationController < ActionController::Base
   #lti start
 
   def pre_process_tenant
+    error_code, message = nil;
     oauth_params = OAuth::OAuthProxy::OAuthRequest.parse_authorization_header request.authorization
     oauth_consumer_key = oauth_params[:oauth_consumer_key] || params['oauth_consumer_key']
-
-    # no way home
-    if params['lti_message_type']  == 'basic-lti-launch-request'
-      # unless params.has_key?('launch_presentation_return_url')
-      #   render :inline => "<br><br><h2>LTI launch parameters are incomplete and no return URL has been provided</h2>" and return
-      # end
-    end
 
     # OAuth check here
     tool_provider_registry = Rails.application.config.tool_provider_registry
@@ -136,13 +130,17 @@ class ApplicationController < ActionController::Base
         # no oauth_consumer_key but but flash has been saved from *last* request
         return
       else
-        (redirect_to redirect_url("Improper LTI context")) and return
+        error_code = "LTI_INVALID_REQUEST"
+        message = "Improper LTI context: LTI Consumer key is missing or not valid!"
+        return [error_code, message];
       end
     end
     @tenant = Tenant.where(:tenant_key => key).first
     @registration = Lti2Tp::Registration.where(:tenant_id => @tenant.id).first
     unless @registration
-      (redirect_to redirect_url("No existing tools for this partner")) and return
+      error_code = "LTI_INVALID_CONSUMER"
+      message = "Tool registration not found. Please register Expertiza in your LMS before invoking the request."
+      return [error_code, message];
     end
 
     request.parameters['_tenant_id'] = @tenant.id

@@ -69,7 +69,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create_review
 
     # Log in as the student with an assignment and reviews
-    login_as('student2065')
+    login_as('student2066')
 
     # Select the assignment and follow the link to the heat map
     click_link 'TestAssignment'
@@ -82,21 +82,23 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create_review
 
     # Log in as the student with an assignment and reviews
-    login_as('student2065')
+    login_as('student2066')
 
     # Select the assignment and follow the link to the heat map
     click_link 'TestAssignment'
     click_link 'Alternate View'
 
-    click_link 'Review 1'
-    expect(page).to have_content('Review for')
+    new_window = window_opened_by { click_link 'Review 1' }
+    within_window new_window do
+      expect(page).to have_content('Review for')
+    end
   end
 
   it 'should be able to toggle the question list' do
     create_review
 
     # Log in as the student with an assignment and reviews
-    login_as('student2065')
+    login_as('student2066')
 
     # Select the assignment and follow the link to the heat map
     click_link 'TestAssignment'

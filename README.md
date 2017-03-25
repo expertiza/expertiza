@@ -9,6 +9,16 @@ Preconfigured Admin:
 -username = instructor6  
 -password = password  
 
+Functionality to test:  
+-metareview  
+-review  
+-submission  
+-drop topic  
+-signup  
+-team formation  
+-drop one member topics  
+-drop outstanding reviews  
+
 
 
 Expertiza

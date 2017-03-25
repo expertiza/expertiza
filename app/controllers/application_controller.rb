@@ -7,6 +7,13 @@ include OAuth::OAuthProxy
 class ApplicationController < ActionController::Base
   include AccessHelper
 
+  # You want to get exceptions in development, but not in production.
+  unless Rails.application.config.consider_all_requests_local
+    rescue_from ActionView::MissingTemplate do |exception|
+      redirect_to root_path
+    end
+  end
+
   if Rails.env.production?
     # forcing SSL only in the production mode
     force_ssl
@@ -46,6 +53,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def are_needed_authorizations_present?(id, *authorizations)
+    @participant = Participant.find_by(id: id)
+    return false if @participant.nil?
+    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
+    if authorizations.include? authorization
+      return false
+    else
+      return true
+    end
+  end
+
   private
 
   def current_user
@@ -70,8 +88,6 @@ class ApplicationController < ActionController::Base
     Time.zone = current_user.timezonepref if current_user
   end
 
-  private
-
   def require_user
     invalid_login_status('in') unless current_user
   end
@@ -91,27 +107,8 @@ class ApplicationController < ActionController::Base
       user.super_admin?
   end
 
-  protected
-
-  def set_up_display_options(object_type)
-    # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
-    # Get the Instructor::QUESTIONNAIRE constant
-    @display_options ||= eval "#{current_user_role.class}::#{object_type}"
-    end
-
-  # Use this method to validate the current user in order to avoid allowing users
-  # to see unauthorized data.
-  # Ex: return unless current_user_id?(params[:user_id])
-  def current_user_id?(user_id)
-    current_user.try(:id) == user_id
-  end
-
-  def denied(reason = nil)
-    if reason
-      redirect_to "/denied?reason=#{reason}"
-    else
-      redirect_to "/denied"
-    end
+  def record_not_found
+    redirect_to controller: :tree_display, action: :list
   end
 
   #lti start
@@ -191,7 +188,32 @@ class ApplicationController < ActionController::Base
     return [200, nil, nil]
   end
 
+  #lti end
+
   protected
+
+  def set_up_display_options(object_type)
+    # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
+    # Get the Instructor::QUESTIONNAIRE constant
+    @display_options ||= eval "#{current_user_role.class}::#{object_type}"
+    end
+
+  # Use this method to validate the current user in order to avoid allowing users
+  # to see unauthorized data.
+  # Ex: return unless current_user_id?(params[:user_id])
+  def current_user_id?(user_id)
+    current_user.try(:id) == user_id
+  end
+
+  def denied(reason = nil)
+    if reason
+      redirect_to "/denied?reason=#{reason}"
+    else
+      redirect_to "/denied"
+    end
+  end
+
+  #lti start
 
   def normalize_role(roles_string)
     roles_string ||= 'learner'
@@ -240,9 +262,4 @@ class ApplicationController < ActionController::Base
 
   #lti end
 
-  private
-
-  def record_not_found
-    redirect_to controller: :tree_display, action: :list
-  end
 end

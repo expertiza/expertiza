@@ -4,15 +4,15 @@ module ReviewMappingHelper
                     <table width='100% cellspacing='0' cellpadding='2' border='0'>\
                     <tr bgcolor='#CCCCCC'>"
     headers.each do |header, percentage|
-      if percentage
-        table_header += "<th width = #{percentage}>\
-                        #{header.humanize}\
-                        </th>"
-      else
-        table_header += "<th>\
-                        #{header.humanize}\
-                        </th>"
-      end
+      table_header += if percentage
+                        "<th width = #{percentage}>\
+                                        #{header.humanize}\
+                                        </th>"
+                      else
+                        "<th>\
+                                        #{header.humanize}\
+                                        </th>"
+                      end
     end
     table_header += "</tr>"
     table_header.html_safe
@@ -39,11 +39,18 @@ module ReviewMappingHelper
   end
 
   def get_team_name_color(response_map)
-    team_name_color = Response.exists?(map_id: response_map.id) ? "green" : "red"
-    review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
-    response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
-    team_name_color = "blue" if review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at
-    team_name_color
+    if Response.exists?(map_id: response_map.id)
+      review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
+      response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
+      if review_graded_at.nil? ||
+        (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
+        "blue"
+      else
+        "green"
+      end
+    else
+      "red"
+    end
   end
 
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
@@ -84,7 +91,7 @@ module ReviewMappingHelper
   end
 
   def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r| 
+    @reviewers.each do |r|
       r.overall_avg_vol,
       r.avg_vol_in_round_1,
       r.avg_vol_in_round_2,
@@ -94,7 +101,7 @@ module ReviewMappingHelper
   end
 
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-    metric = "Avg. Volume: #{overall_avg_vol.to_s} <br/> ("
+    metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
     metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
     metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
@@ -109,11 +116,25 @@ module ReviewMappingHelper
     if !team.nil? and !participant.nil?
       review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
-      if files and files.length > 0 
-        html += display_review_files_directory_tree(participant, files) 
-      end 
-    end 
+      if files and !files.empty?
+        html += display_review_files_directory_tree(participant, files)
+      end
+    end
     html.html_safe
+  end
+
+  # Zhewei - 2017-02-27
+  # This is for all Dr.Kidd's courses
+  def calcutate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
+    review_response = ResponseMap.where(id: response_map_id).try(:first).try(:response).try(:last)
+    author_feedback_avg_score = "-- / --"
+    unless review_response.nil?
+      user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
+      author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
+      feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
+      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.get_total_score} / #{feedback_response.get_maximum_score}"
+    end
+    author_feedback_avg_score
   end
 
   # Zhewei - 2016-10-20
@@ -121,7 +142,7 @@ module ReviewMappingHelper
   # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
   # Since we do not have hyperlink question type, we hacked this requirement
   # Maybe later we can create a hyperlink question type to deal with this situation.
-  def list_hyperlink_submission(participant_id, response_map_id, question_id)
+  def list_hyperlink_submission(response_map_id, question_id)
     assignment = Assignment.find(@id)
     curr_round = assignment.try(:num_review_rounds)
     curr_response = Response.where(map_id: response_map_id, round: curr_round).first
@@ -129,10 +150,11 @@ module ReviewMappingHelper
     comments = answer_with_link.try(:comments)
     html = ''
     if comments and !comments.empty? and comments.start_with?('http')
-      html += display_hyperlink_in_peer_review_question(comments) 
+      html += display_hyperlink_in_peer_review_question(comments)
     end
     html.html_safe
   end
+
   #
   # for author feedback report
   #

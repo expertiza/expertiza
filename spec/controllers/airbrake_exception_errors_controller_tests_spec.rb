@@ -58,40 +58,6 @@ describe ImportFileController do
   end
 end
 
-describe SubmittedContentController do 
-  # Airbrake-1775143306379398644
-  describe '#are_needed_authorizations_present?', type: :controller do
-    it 'return false when the participant cannot find by id' do
-        controller.params[:id] = 1
-        allow(Participant).to receive(:find).with(any_args).and_return(nil)
-        allow(Participant).to receive(:find_by).with(any_args).and_return(nil)
-        expect(controller.send(:are_needed_authorizations_present?)).to eq(false)
-    end
-
-    it 'return false when the participant is reader or reviewer' do
-        controller.params[:id] = 1
-        participant = double('Participant',
-                             can_submit: false,
-                             can_review: true,
-                             can_take_quiz: false)
-        allow(Participant).to receive(:find).with(any_args).and_return(participant)
-        allow(Participant).to receive(:find_by).with(any_args).and_return(participant)
-        expect(controller.send(:are_needed_authorizations_present?)).to eq(false)
-    end
-
-    it 'return true when the participant is other role (participant or submitter)' do
-        controller.params[:id] = 1
-        participant = double('Participant',
-                             can_submit: true,
-                             can_review: true,
-                             can_take_quiz: true)
-        allow(Participant).to receive(:find).with(any_args).and_return(participant)
-        allow(Participant).to receive(:find_by).with(any_args).and_return(participant)
-        expect(controller.send(:are_needed_authorizations_present?)).to eq(true)
-    end
-  end
-end
-
 describe MenuItemsController do
   # Airbrake-1766139777878852159
   describe '#link', type: :controller do

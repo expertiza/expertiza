@@ -38,3 +38,4 @@ notifications:
         - expertiza-support@lists.ncsu.edu
       on_success: change
       on_failure: change
+    slack: expertiza-support:sbS46L9sFGW9vrRDszFaD9C2

@@ -470,7 +470,7 @@ class Assignment < ActiveRecord::Base
 
   def self.csv_row(detail_options, answer)
     tcsv = []
-    @response = Response.find_by(answer.response_id)
+    @response = Response.find_by_id(answer.response_id)
     ans = ResponseMap.find_by_id(@response.map_id)
 
     @reviewee = Team.find_by_id(ans.reviewee_id)

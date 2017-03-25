@@ -470,13 +470,13 @@ class Assignment < ActiveRecord::Base
 
   def self.csv_row(detail_options, answer)
     tcsv = []
-    @response = Response.find_by(answer.response_id)
-    ans = ResponseMap.find_by(@response.map_id)
+    @response = Response.find_by_id(answer.response_id)
+    ans = ResponseMap.find_by_id(@response.map_id)
 
-    @reviewee = Team.find_by(ans.reviewee_id)
-    @reviewee = Participant.find_by(ans.reviewee_id).user if @reviewee.nil?
+    @reviewee = Team.find_by_id(ans.reviewee_id)
+    @reviewee = Participant.find_by_id(ans.reviewee_id).user if @reviewee.nil?
 
-    reviewer = Participant.find_by(ans.reviewer_id).user
+    reviewer = Participant.find_by_id(ans.reviewer_id).user
 
     tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
     tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'

@@ -131,16 +131,11 @@ describe "has correct csv values?" do
 
   delimiter = ","
 
-  def set_option(t_id, t_name, r, q, q_id, c_id, c, s)
-    {"team_id" => t_id, "team_name" => t_name,
-     "reviewer" => r, "question" => q,
-     "question_id" => q_id, "comment_id" => c_id,
-     "comments" => c, "score" => s}
-  end
-
   it "checks_if_csv has the correct data" do
-    options = set_option("true", "true", "true", "true",
-                         "true", "true", "true", "true")
+    options = {"team_id" => "true", "team_name" => "true",
+               "reviewer" => "true", "question" => "true",
+               "question_id" => "true", "comment_id" => "true",
+               "comments" => "true", "score" => "true"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_headers(@assignment.id)
@@ -151,8 +146,10 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with some options" do
-    options = set_option("false", "true", "true", "true",
-                         "false", "false", "true", "true")
+    options = {"team_id" => "false", "team_name" => "true",
+              "reviewer" => "true", "question" => "true",
+              "question_id" => "false", "comment_id" => "false",
+              "comments" => "true", "score" => "true"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_some_options_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_headers(@assignment.id)
@@ -163,8 +160,10 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with no data" do
-    options = set_option("true", "true", "true", "true",
-                         "true", "true", "true", "true")
+    options = {"team_id" => "true", "team_name" => "true",
+               "reviewer" => "true", "question" => "true",
+               "question_id" => "true", "comment_id" => "true",
+               "comments" => "true", "score" => "true"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_data_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_headers(@assignment.id)
@@ -175,8 +174,10 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with data and no options" do
-    options = set_option("false", "false", "false", "false",
-                         "false", "false", "false", "false")
+    options = {"team_id" => "false", "team_name" => "false",
+               "reviewer" => "false", "question" => "false",
+               "question_id" => "false", "comment_id" => "false",
+               "comments" => "false", "score" => "false"}
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_headers(@assignment.id)

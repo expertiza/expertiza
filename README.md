@@ -1,15 +1,26 @@
-Team Members:  
+### Team Members:  
 -Andrew Haskett  
 -Bardia Zamanian  
 -Prateek Pramanik  
 
-Deployed Environment: http://152.46.18.218:3000/
+### Deployed Environment: http://152.46.18.218:3000/
 
 Preconfigured Admin:  
 -username = instructor6  
 -password = password  
 
+### How to Run Tests
+-go to the project directory
+-run "rspec spec/features/delayed_mailer_spec.rb"
 
+Latest Changes
+-----
+
+### Test Cases
+Reformed the whole delayed_mailer_spec.rb test case file, with better and more end-to-end test cases:
+-Now in this file all the objects of assignment, topic, team, reviwer, and etc are created with their expected relationship.
+-In each step of DelayedMailer test description, a specific mail with a specific deadline type gets created and the final action of sending that mail to expected recipents (funcitonality of DelayedMailer class) is being tested. (checking action_mailer.deliveries.count in test environment)
+-These test cases are expected to provide a good degree of confidence about the functionality of DelayedMailer class, if the relations between different objects in the rest of the project are set as expected.
 
 Expertiza
 =========

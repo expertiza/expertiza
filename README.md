@@ -27,6 +27,12 @@ Reformed the whole delayed_mailer_spec.rb test case file, with better and more e
 -In each step of DelayedMailer test description, a specific mail with a specific deadline type gets created and the final action of sending that mail to expected recipents (funcitonality of DelayedMailer class) is being tested. (checking action_mailer.deliveries.count in test environment)  
 -These test cases are expected to provide a good degree of confidence about the functionality of DelayedMailer class, if the relations between different objects in the rest of the project are set as expected.  
 
+### Code Cleaning (DRYed out)
+-Our team applied an effort on cleaning the old style code related with a "mailing funcitonality", which were duplicated in two files "scheduled_task.rb" and "delayed_mailer.rb".   
+-We have removed the scheduled_task.rb, and imported all the difference to delayed_mailer.rb (as the original file)
+-We have cleaned the actual code with removing lots of redundant query lines within different functions, and replaced them with rails association wihch were already setup in the structure of models and also a cleaner approach.
+
+
 Expertiza
 =========
 

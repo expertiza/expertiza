@@ -10,8 +10,8 @@ Preconfigured Admin:
 -password = password  
 
 ### How to Run Tests
--go to the project directory
--run "rspec spec/features/delayed_mailer_spec.rb"
+-go to the project directory  
+-run "rspec spec/features/delayed_mailer_spec.rb"  
 
 Latest Changes
 -----

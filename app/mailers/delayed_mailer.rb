@@ -5,6 +5,7 @@ class DelayedMailer
   attr_accessor :assignment_id
   attr_accessor :deadline_type
   attr_accessor :due_at
+  attr_accessor :mail
   @@count = 0
 
   def initialize(assignment_id, deadline_type, due_at)
@@ -30,7 +31,7 @@ class DelayedMailer
         mail_metareviewers
         if assignment.team_assignment?
           team_mails = find_team_members_email
-          email_reminder(team_mails, "teammate review")
+          email_reminder(team_mails, "teammate review") if team_mails.size > 0
         end
       end
 
@@ -80,7 +81,7 @@ class DelayedMailer
     else
       emails = find_team_members_email_for_all_topics(sign_up_topics)
     end
-    email_reminder(emails, self.deadline_type)
+    email_reminder(emails, self.deadline_type) if emails and emails.size > 0
   end
 
   # Last modified by bzamani as part of Spring 2017 E1711
@@ -140,9 +141,9 @@ class DelayedMailer
   # Last modified by bzamani as part of Spring 2017 E1711
   def mail_reviewers
     emails = []
-    reviewer_tuples = ResponseMap.where(['reviewed_object_id = ? AND type = "ReviewResponseMap"', self.assignment_id])
-    for reviewer in reviewer_tuples
-      participant = Participant.where(['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
+    reviews = ResponseMap.where(['reviewed_object_id = ? AND type = "ReviewResponseMap"', self.assignment_id])
+    for review in reviews
+      participant = Participant.where(['parent_id = ? AND id = ?', self.assignment_id, review.reviewer_id]).first
       emails << participant.user.email
     end
     email_reminder(emails, self.deadline_type) if emails.size > 0
@@ -182,11 +183,12 @@ class DelayedMailer
       Rails.logger.info mail
     end
 
-    Mailer.delayed_message(
+    @mail = Mailer.delayed_message(
         bcc: emails,
         subject: subject,
         body: body
-    ).deliver_now
+    )
+    @mail.deliver_now
   end
 
   def drop_one_member_topics

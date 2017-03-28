@@ -67,21 +67,13 @@ module GradesHelper
   def p_total_score
     @participant = Participant.find(params[:id])
     @pscore = @participant.scores(@questions)
-    if @participant.grade
-      @total_score = participant.grade
-    else
-      @total_score = @pscore[:total_score]
-    end
+    @total_score = @participant.grade ? participant.grade : @pscore[:total_score]
     @total_score
   end
 
   def p_title
     @participant = Participant.find(params[:id])
-    if @participant.grade
-      @title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
-    else
-      @title = nil
-    end
+    @title = @participant.grade ? 'A score in blue indicates that the value was overwritten by the instructor or teaching assistant.' : nil
     @title
   end
 

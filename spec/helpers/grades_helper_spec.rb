@@ -88,7 +88,7 @@ describe GradesHelper, type: :helper do
     it 'should return a record of type :review if available' do
       new_participant = create(:participant)
       questionnaire = create(:questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -98,7 +98,7 @@ describe GradesHelper, type: :helper do
     it 'should return nil if no record of type :review is available' do
       new_participant = create(:participant)
       questionnaire = create(:metareview_questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -111,7 +111,7 @@ describe GradesHelper, type: :helper do
     it 'should return a record of type :metareview if available' do
       new_participant = create(:participant)
       questionnaire = create(:metareview_questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -121,7 +121,7 @@ describe GradesHelper, type: :helper do
     it 'should return nil if no record of type :metareview is available' do
       new_participant = create(:participant)
       questionnaire = create(:questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -144,7 +144,7 @@ describe GradesHelper, type: :helper do
     it 'should return nil if no record of type :feedback is available' do
       new_participant = create(:participant)
       questionnaire = create(:questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -157,7 +157,7 @@ describe GradesHelper, type: :helper do
     it 'should return a record of type :teammate if available' do
       new_participant = create(:participant)
       questionnaire = create(:teammate_review_questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -167,7 +167,7 @@ describe GradesHelper, type: :helper do
     it 'should return nil if no record of type :teammate is available' do
       new_participant = create(:participant)
       questionnaire = create(:questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -180,7 +180,7 @@ describe GradesHelper, type: :helper do
     it 'should return the grade if available' do
       new_participant = create(:participant, grade: 90)
       questionnaire = create(:questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -190,7 +190,7 @@ describe GradesHelper, type: :helper do
     it 'should return :total_score if no grade is available' do
       new_participant = create(:participant)
       questionnaire = create(:questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id
@@ -287,7 +287,7 @@ describe GradesHelper, type: :feature do
       assignment = create(:assignment)
       assignment_team = create(:assignment_team, assignment: assignment)
       participant = create(:participant, assignment: assignment)
-      team_user = create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
 
       login_as(participant.name)
       visit '/student_task/list'
@@ -303,7 +303,7 @@ describe GradesHelper, type: :feature do
       assignment = create(:assignment)
       assignment_team = create(:assignment_team, assignment: assignment)
       participant = create(:participant, assignment: assignment)
-      team_user = create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
 
       login_as(participant.name)
       visit '/student_task/list'

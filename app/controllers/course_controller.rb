@@ -80,7 +80,7 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    @course = Course.new(name: params[:course][:name], directory_path: params[:course][:directory_path], info: params[:course][:info], private: params[:course][:private])
+    @course = Course.new(name: params[:course][:name], directory_path: params[:course][:directory_path], info: params[:course][:info], institutions_id: params[:institutions_id], private: params[:course][:private])
 
     @course.instructor_id = session[:user].id
     begin

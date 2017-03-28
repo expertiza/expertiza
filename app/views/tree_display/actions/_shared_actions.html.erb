@@ -3,7 +3,7 @@
     <%= link_to image_tag('/assets/tree_view/edit-icon-24.png', :title => 'Edit ' + model.downcase),
       controller: controller, action: :edit, id: node.node_object.id %>
     <%= link_to image_tag('/assets/tree_view/delete-icon-24.png', :title => 'Delete ' + model.downcase),
-      { :controller => controller, :action=>'delete', :id => node.node_object_id },
+      { :controller => controller, :action=>'delete', :id => node.node_object_id , :data => {:confirm => 'Are you sure you want to delete?'}},
       { :title => 'Delete ' + model.downcase } %>
     <% if Object.const_get(model).find(node.node_object_id).private %>
       <%= link_to image_tag('/assets/tree_view/lock-off-disabled-icon-24.png', :title => 'Make public'),

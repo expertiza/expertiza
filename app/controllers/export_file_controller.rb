@@ -22,21 +22,26 @@ class ExportFileController < ApplicationController
     @id = params[:id]
   end
 
+  def find_delim_filename(delim_type, other_char, suffix = "")
+    if delim_type == "comma"
+      filename = params[:model] + params[:id] + suffix + ".csv"
+      delimiter = ","
+    elsif delim_type == "space"
+      filename = params[:model] + params[:id] + suffix + ".csv"
+      delimiter = " "
+    elsif delim_type == "tab"
+      filename = params[:model] + params[:id] + suffix + ".csv"
+      delimiter = "\t"
+    elsif delim_type == "other"
+      filename = params[:model] + params[:id] + suffix + ".csv"
+      delimiter = other_char
+    end
+    return filename, delimiter
+  end
+
   def exportdetails
     @delim_type = params[:delim_type2]
-    if @delim_type == "comma"
-      filename = params[:model] + params[:id] + "_Details.csv"
-      delimiter = ","
-    elsif @delim_type == "space"
-      filename = params[:model] + params[:id] + "_Details.csv"
-      delimiter = " "
-    elsif @delim_type == "tab"
-      filename = params[:model] + params[:id] + "_Details.csv"
-      delimiter = "\t"
-    elsif @delim_type == "other"
-      filename = params[:model] + params[:id] + "_Details.csv"
-      delimiter = other_char2
-    end
+    filename, delimiter = find_delim_filename(@delim_type, other_char2,"_Details")
 
     allowed_models = ['Assignment']
 
@@ -55,19 +60,8 @@ class ExportFileController < ApplicationController
 
   def export
     @delim_type = params[:delim_type]
-    if @delim_type == "comma"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = ","
-    elsif @delim_type == "space"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = " "
-    elsif @delim_type == "tab"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = "\t"
-    elsif @delim_type == "other"
-      filename = params[:model] + params[:id] + ".csv"
-      delimiter = other_char
-    end
+    filename, delimiter = find_delim_filename(@delim_type, other_char)
+
     allowed_models = ['Assignment',
                       'AssignmentParticipant',
                       'AssignmentTeam',

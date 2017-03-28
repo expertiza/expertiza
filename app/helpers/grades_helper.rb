@@ -37,60 +37,52 @@ module GradesHelper
   end
 
   def rscore_review
-     @participant = Participant.find(params[:id])
-     @pscore = @participant.scores(@questions)
-     if @pscore[:review]
-         @rscore_review=Rscore.new(@pscore,:review)
-         end
-     @rscore_review
+    @participant = Participant.find(params[:id])
+    @pscore = @participant.scores(@questions)
+    @rscore_review = Rscore.new(@pscore, :review) if @pscore[:review]
+    @rscore_review
   end
 
   def rscore_metareview
-     @participant = Participant.find(params[:id])
-     @pscore = @participant.scores(@questions)
-     if @pscore[:metareview]
-         @rscore_metareview=Rscore.new(@pscore,:metareview)
-         end
-     @rscore_metareview
+    @participant = Participant.find(params[:id])
+    @pscore = @participant.scores(@questions)
+    @rscore_metareview = Rscore.new(@pscore, :metareview) if @pscore[:metareview]
+    @rscore_metareview
   end
 
   def rscore_feedback
-     @participant = Participant.find(params[:id])
-     @pscore = @participant.scores(@questions)
-     if @pscore[:feedback]
-         @rscore_feedback=Rscore.new(@pscore,:feedback)
-         end
-     @rscore_feedback
+    @participant = Participant.find(params[:id])
+    @pscore = @participant.scores(@questions)
+    @rscore_feedback = Rscore.new(@pscore, :feedback) if @pscore[:feedback]
+    @rscore_feedback
   end
 
   def rscore_teammate
-     @participant = Participant.find(params[:id])
-     @pscore = @participant.scores(@questions)
-     if @pscore[:teammate]
-         @rscore_teammate=Rscore.new(@pscore,:teammate)
-         end
-     @rscore_teammate
+    @participant = Participant.find(params[:id])
+    @pscore = @participant.scores(@questions)
+    @rscore_teammate = Rscore.new(@pscore, :teammate) if @pscore[:teammate]
+    @rscore_teammate
   end
 
   def p_total_score
-     @participant = Participant.find(params[:id])
-     @pscore = @participant.scores(@questions)
-     if @participant.grade
-         @total_score = participant.grade
-         else
-             @total_score = @pscore[:total_score]
-             end
-     @total_score
+    @participant = Participant.find(params[:id])
+    @pscore = @participant.scores(@questions)
+    if @participant.grade
+      @total_score = participant.grade
+    else
+      @total_score = @pscore[:total_score]
+    end
+    @total_score
   end
 
   def p_title
-     @participant = Participant.find(params[:id])
-     if @participant.grade
-         @title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
-         else
-             @title = nil
-             end
-     @title
+    @participant = Participant.find(params[:id])
+    if @participant.grade
+      @title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+    else
+      @title = nil
+    end
+    @title
   end
 
   def get_css_style_for_hamer_reputation(reputation_value)
@@ -98,9 +90,9 @@ module GradesHelper
                   'c1'
                 elsif reputation_value >= 0.5 and reputation_value <= 1
                   'c2'
-                elsif  reputation_value > 1 and reputation_value <= 1.5
+                elsif reputation_value > 1 and reputation_value <= 1.5
                   'c3'
-                elsif  reputation_value > 1.5 and reputation_value <= 2
+                elsif reputation_value > 1.5 and reputation_value <= 2
                   'c4'
                 else
                   'c5'
@@ -113,9 +105,9 @@ module GradesHelper
                   'c1'
                 elsif reputation_value >= 0.2 and reputation_value <= 0.4
                   'c2'
-                elsif  reputation_value > 0.4 and reputation_value <= 0.6
+                elsif reputation_value > 0.4 and reputation_value <= 0.6
                   'c3'
-                elsif  reputation_value > 0.6 and reputation_value <= 0.8
+                elsif reputation_value > 0.6 and reputation_value <= 0.8
                   'c4'
                 else
                   'c5'

@@ -160,7 +160,7 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with no data" do
-    delete(:answer)
+    @answer.destroy
     options = {"team_id" => "true", "team_name" => "true",
                "reviewer" => "true", "question" => "true",
                "question_id" => "true", "comment_id" => "true",

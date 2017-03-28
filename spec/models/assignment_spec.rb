@@ -145,46 +145,51 @@ describe "has correct csv values?" do
               "question_id" => "false", "comment_id" => "false",
               "comments" => "false", "score" => "false"}
 
-  it "checks_if_csv has the correct data" do
-    create(:answer, comments: "Test comment")
-    expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(options1)
-      Assignment.export_details(csv, @assignment.id, options1)
+  describe "has answers" do
+    before(:each) do
+      create(:answer, comments: "Test comment")
     end
-    expect(generated_csv).to eq(expected_csv)
+
+    it "checks_if_csv has the correct data" do
+      expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
+      generated_csv = CSV.generate(col_sep: delimiter) do |csv|
+        csv << Assignment.export_headers(@assignment.id)
+        csv << Assignment.export_details_fields(options1)
+        Assignment.export_details(csv, @assignment.id, options1)
+      end
+      expect(generated_csv).to eq(expected_csv)
+    end
+
+    it "checks csv with some options" do
+      expected_csv = File.read('spec/features/assignment_export_details/expected_details_some_options_csv.txt')
+      generated_csv = CSV.generate(col_sep: delimiter) do |csv|
+        csv << Assignment.export_headers(@assignment.id)
+        csv << Assignment.export_details_fields(options2)
+        Assignment.export_details(csv, @assignment.id, options2)
+      end
+      expect(generated_csv).to eq(expected_csv)
+    end
+
+    it "checks csv with data and no options" do
+      expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
+      generated_csv = CSV.generate(col_sep: delimiter) do |csv|
+        csv << Assignment.export_headers(@assignment.id)
+        csv << Assignment.export_details_fields(options3)
+        Assignment.export_details(csv, @assignment.id, options3)
+      end
+      expect(generated_csv).to eq(expected_csv)
+    end
   end
 
-  it "checks csv with some options" do
-    create(:answer, comments: "Test comment")
-    expected_csv = File.read('spec/features/assignment_export_details/expected_details_some_options_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(options2)
-      Assignment.export_details(csv, @assignment.id, options2)
+  describe "has no answers" do
+    it "checks csv with no data" do
+      expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_data_csv.txt')
+      generated_csv = CSV.generate(col_sep: delimiter) do |csv|
+        csv << Assignment.export_headers(@assignment.id)
+        csv << Assignment.export_details_fields(options1)
+        Assignment.export_details(csv, @assignment.id, options1)
+      end
+      expect(generated_csv).to eq(expected_csv)
     end
-    expect(generated_csv).to eq(expected_csv)
-  end
-
-  it "checks csv with no data" do
-    expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_data_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(options1)
-      Assignment.export_details(csv, @assignment.id, options1)
-    end
-    expect(generated_csv).to eq(expected_csv)
-  end
-
-  it "checks csv with data and no options" do
-    create(:answer, comments: "Test comment")
-    expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(options3)
-      Assignment.export_details(csv, @assignment.id, options3)
-    end
-    expect(generated_csv).to eq(expected_csv)
   end
 end

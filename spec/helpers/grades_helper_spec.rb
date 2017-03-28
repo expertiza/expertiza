@@ -134,7 +134,7 @@ describe GradesHelper, type: :helper do
     it 'should return a record of type :feedback if available' do
       new_participant = create(:participant)
       questionnaire = create(:author_feedback_questionnaire)
-      assignment_questionnaire = create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
+      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
       @questions = {}
       @questions[questionnaire.symbol] = questionnaire.questions
       params[:id] = new_participant.id

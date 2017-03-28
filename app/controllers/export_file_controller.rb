@@ -36,12 +36,12 @@ class ExportFileController < ApplicationController
       filename = params[:model] + params[:id] + suffix + ".csv"
       delimiter = other_char
     end
-    return filename, delimiter
+    filename, delimiter
   end
 
   def exportdetails
     @delim_type = params[:delim_type2]
-    filename, delimiter = find_delim_filename(@delim_type, other_char2,"_Details")
+    filename, delimiter = find_delim_filename(@delim_type, other_char2, "_Details")
 
     allowed_models = ['Assignment']
 

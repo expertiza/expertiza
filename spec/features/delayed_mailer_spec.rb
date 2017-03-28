@@ -3,8 +3,8 @@ def enqueue_delayed_job(stage)
   # due_at = DateTime.now.in_time_zone + 120
   # seconds_until_due = due_at - Time.now
   # minutes_until_due = seconds_until_due / 60
-  @name = "user"
-  id = 2
+  # @name = "user"
+  # id = 2
   due_at = DateTime.now.in_time_zone + 2.minutes
   # puts DateTime.now.in_time_zone
   # puts due_at

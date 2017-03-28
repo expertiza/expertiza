@@ -126,12 +126,12 @@ describe "has correct csv values?" do
     create(:question)
     create(:review_response_map)
     create(:response)
+    create(:answer, comments: "Test comment")
   end
 
   delimiter = ","
 
   it "checks_if_csv has the correct data" do
-    create(:answer, comments: "Test comment")
     options = {"team_id" => "true", "team_name" => "true",
                "reviewer" => "true", "question" => "true",
                "question_id" => "true", "comment_id" => "true",
@@ -146,7 +146,6 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with some options" do
-    create(:answer, comments: "Test comment")
     options = {"team_id" => "false", "team_name" => "true",
                "reviewer" => "true", "question" => "true",
                "question_id" => "false", "comment_id" => "false",
@@ -161,6 +160,7 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with no data" do
+    delete(:answer)
     options = {"team_id" => "true", "team_name" => "true",
                "reviewer" => "true", "question" => "true",
                "question_id" => "true", "comment_id" => "true",
@@ -175,7 +175,6 @@ describe "has correct csv values?" do
   end
 
   it "checks csv with data and no options" do
-    create(:answer, comments: "Test comment")
     options = {"team_id" => "false", "team_name" => "false",
                "reviewer" => "false", "question" => "false",
                "question_id" => "false", "comment_id" => "false",

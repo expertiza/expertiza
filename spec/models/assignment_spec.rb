@@ -134,15 +134,18 @@ describe "has correct csv values?" do
 
   delimiter = ","
 
+  def generated_csv(t_assignment, t_options)
+    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
+      csv << Assignment.export_headers(t_assignment.id)
+      csv << Assignment.export_details_fields(t_options)
+      Assignment.export_details(csv, t_assignment.id, t_options)
+    end
+  end
+
   it "checks_if_csv has the correct data" do
     create(:answer, comments: "Test comment")
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(@options)
-      Assignment.export_details(csv, @assignment.id, @options)
-    end
-    expect(generated_csv).to eq(expected_csv)
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
   end
 
   it "checks csv with some options" do
@@ -151,36 +154,25 @@ describe "has correct csv values?" do
     @options["question_id"] = "false"
     @options["comment_id"] = "false"
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_some_options_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(@options)
-      Assignment.export_details(csv, @assignment.id, @options)
-    end
-    expect(generated_csv).to eq(expected_csv)
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
   end
 
   it "checks csv with no data" do
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_data_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(@options)
-      Assignment.export_details(csv, @assignment.id, @options)
-    end
-    expect(generated_csv).to eq(expected_csv)
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
   end
 
   it "checks csv with data and no options" do
     create(:answer, comments: "Test comment")
-    @options = {"team_id" => "false", "team_name" => "false",
-                "reviewer" => "false", "question" => "false",
-                "question_id" => "false", "comment_id" => "false",
-                "comments" => "false", "score" => "false"}
+    @options["team_id"] = "false"
+    @options["team_name"] = "false"
+    @options["reviewer"] = "false"
+    @options["question"] = "false"
+    @options["question_id"] = "false"
+    @options["comment_id"] = "false"
+    @options["comments"] = "false"
+    @options["score"] = "false"
     expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Assignment.export_headers(@assignment.id)
-      csv << Assignment.export_details_fields(@options)
-      Assignment.export_details(csv, @assignment.id, @options)
-    end
-    expect(generated_csv).to eq(expected_csv)
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
   end
 end

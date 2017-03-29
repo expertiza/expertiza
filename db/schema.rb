@@ -79,8 +79,8 @@ ActiveRecord::Schema.define(version: 20170322074238) do
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true
-    t.integer  "num_reviews_required",       limit: 4,     default: 0
-    t.integer  "num_metareviews_required",   limit: 4,     default: 0
+    t.integer  "num_reviews_required",       limit: 4,     default: 3
+    t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
   end
 

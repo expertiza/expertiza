@@ -102,9 +102,9 @@ class Mailer < ActionMailer::Base
     @topic_name = defn[:body][:suggested_topic]
     @user = defn[:body]
 
-    emails = User.where(["role_id = ?",2], ["copy_of_all_emails = ?", true]).select("email")
-    ins_email = []
-    ins_email << emails
+    #emails = User.where(["role_id = ?",2], ["copy_of_all_emails = ?", true]).select("email")
+    #ins_email = []
+    #ins_email << emails
 
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
@@ -112,7 +112,7 @@ class Mailer < ActionMailer::Base
 
     mail(subject: defn[:subject],
          to: defn[:to],
-         cc: ins_email,
+         #cc: ins_email,
          bcc: defn[:cc])
   end
 
@@ -121,16 +121,16 @@ class Mailer < ActionMailer::Base
     @topic_name = defn[:body][:suggested_topic]
     @user = defn[:body]
 
-    emails = User.where(["role_id = ?",2], ["copy_of_all_emails = ?", true]).select("email")
-    ins_email = []
-    ins_email << emails
+    #emails = User.where(["role_id = ?",2], ["copy_of_all_emails = ?", true]).select("email")
+    #ins_email = []
+    #ins_email << emails
 
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end
     mail(subject: defn[:subject],
          to: defn[:to],
-         cc: ins_email,
+         #cc: ins_email,
          bcc: defn[:cc])
   end
 

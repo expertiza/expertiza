@@ -12,7 +12,8 @@ class InvitationController < ApplicationController
 
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
-    student_email = AssignmentParticipant.find(params[:student_id][:email])
+    student_email = student.user_id
+
     return unless current_user_id?(student.user_id)
 
     # check if the invited user is valid
@@ -91,7 +92,7 @@ class InvitationController < ApplicationController
 
   def accept
     @inv = Invitation.find(params[:inv_id])
-    user_email = User.find(params[:user][:email])
+    user_email = @inv.to_id
 
     student = Participant.find(params[:student_id])
 

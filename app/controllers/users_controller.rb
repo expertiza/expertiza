@@ -100,6 +100,7 @@ class UsersController < ApplicationController
     password = @user.reset_password
     MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password).deliver
     foreign
+
     #write a mailer call here
   end
 

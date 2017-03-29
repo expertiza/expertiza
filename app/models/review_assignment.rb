@@ -153,7 +153,7 @@ module ReviewAssignment
     contributor_set.reject! {|contributor| signed_up_topic(contributor).nil? or !contributor.has_submissions? }
     contributor_set
   end
-  
+
   def filter_least_reviewed(contributor_set)
     contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
     minimum_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0

@@ -27,8 +27,7 @@ describe "validations" do
     @assignment.num_reviews_required = 2
     @assignment.num_reviews_allowed = 5
     expect(@assignment).to be_valid
-    # indicated infinite upperbouned
-    @assignment.num_reviews_allowed = -1
+    @assignment.num_reviews = -1 # indicated infinite upperbouned
     expect(@assignment).to be_valid
   end
 
@@ -36,8 +35,7 @@ describe "validations" do
     @assignment.num_metareviews_allowed = 3
     @assignment.num_metareviews_required = 1
     expect(@assignment).to be_valid
-    #indicated infinite upperbouned
-    @assignment.num_metareviews_allowed = -1
+    @assignment.num_metareviews_allowed = -1 # indicated infinite upperbouned
     expect(@assignment).to be_valid
   end
 

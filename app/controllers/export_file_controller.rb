@@ -42,7 +42,7 @@ class ExportFileController < ApplicationController
 
   def exportdetails
     @delim_type = params[:delim_type2]
-    filename, delimiter = find_delim_filename(@delim_type, other_char2, "_Details")
+    filename, delimiter = find_delim_filename(@delim_type, params[:other_char2], "_Details")
 
     allowed_models = ['Assignment']
 
@@ -61,7 +61,7 @@ class ExportFileController < ApplicationController
 
   def export
     @delim_type = params[:delim_type]
-    filename, delimiter = find_delim_filename(@delim_type, other_char)
+    filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
 
     allowed_models = ['Assignment',
                       'AssignmentParticipant',

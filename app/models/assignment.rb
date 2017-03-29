@@ -468,6 +468,7 @@ class Assignment < ActiveRecord::Base
     csv_field
   end
 
+  # Generates a single row based on the detail_options selected
   def self.csv_row(detail_options, answer)
     tcsv = []
     @response = Response.find_by(answer.response_id)
@@ -489,6 +490,7 @@ class Assignment < ActiveRecord::Base
     tcsv
   end
 
+  # Populate answers will review information
   def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
@@ -508,6 +510,7 @@ class Assignment < ActiveRecord::Base
     answers
   end
 
+  # Checks if there are rounds with no reviews
   def self.check_empty_rounds(answers, round_num, res_type)
     unless answers[round_num][res_type].empty?
       round_type =

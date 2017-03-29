@@ -22,6 +22,7 @@ class ExportFileController < ApplicationController
     @id = params[:id]
   end
 
+  # Find the filename and delimiter
   def find_delim_filename(delim_type, other_char, suffix = "")
     if delim_type == "comma"
       filename = params[:model] + params[:id] + suffix + ".csv"

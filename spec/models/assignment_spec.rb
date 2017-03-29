@@ -134,7 +134,7 @@ describe "has correct csv values?" do
 
   def generated_csv(t_assignment, t_options)
     delimiter = ","
-    generated_csv = CSV.generate(col_sep: delimiter) do |csv|
+    CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_headers(t_assignment.id)
       csv << Assignment.export_details_fields(t_options)
       Assignment.export_details(csv, t_assignment.id, t_options)

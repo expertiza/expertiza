@@ -37,7 +37,7 @@ class ExportFileController < ApplicationController
       filename = params[:model] + params[:id] + suffix + ".csv"
       delimiter = other_char
     end
-    filename, delimiter
+    return filename, delimiter
   end
 
   def exportdetails

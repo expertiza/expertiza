@@ -69,7 +69,7 @@ describe "peer review testing", type: :feature do
     click_link "TestAssignment"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "TestAssignment"'
-    expect(page).not_to have_button("topic_id_#{SignUpTopic.find_by(topic_name: "TestTopic").id}")
+    expect(page).not_to have_button("topic_id_#{SignUpTopic.find_by(topic_name: 'TestTopic').id}")
   end
 
   it "is able to select topic for review with valid submissions" do
@@ -81,7 +81,7 @@ describe "peer review testing", type: :feature do
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    choose "topic_id_#{SignUpTopic.find_by(topic_name: "TestTopic").id}"
+    choose "topic_id_#{SignUpTopic.find_by(topic_name: 'TestTopic').id}"
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end
@@ -99,5 +99,4 @@ describe "peer review testing", type: :feature do
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end
-
 end

@@ -27,12 +27,12 @@
     <br/>
       <%= check_box_tag('review', 'true', true, {:onChange => 'hasReviewChanged()'}) %>
       <%= label_tag('review', 'Has Max Review Limit?') %>&emsp;&emsp;
-      <span id="reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_reviews.nil?%>>
-      <%= label_tag('assignment_form[assignment][num_reviews]', ' Set Allowed Number of Reviews per reviewer') %>
-        <%if @assignment_form.assignment.num_reviews && @assignment_form.assignment.num_reviews >= 0 %>
-      <%= text_field_tag('assignment_form[assignment][num_reviews]', @assignment_form.assignment.num_reviews, size: 1) %>
+      <span id="reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_reviews_allowed.nil?%>>
+      <%= label_tag('assignment_form[assignment][num_reviews_allowed]', ' Set Allowed Number of Reviews per reviewer') %>
+        <%if @assignment_form.assignment.num_reviews_allowed && @assignment_form.assignment.num_reviews_allowed >= 0 %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]', @assignment_form.assignment.num_reviews_allowed, size: 1) %>
         <%else%>
-      <%= text_field_tag('assignment_form[assignment][num_reviews]',  3, size: 1) %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]',  3, size: 1) %>
         <%end%>
       </span>
     <br/>
@@ -110,12 +110,12 @@
         var reviews_allowed_field = jQuery('#reviews_allowed');
         if (checkbox.is(':checked')) {
             reviews_allowed_field.removeAttr('hidden');
-            jQuery('#assignment_form_assignment_num_reviews').val('<%=@assignment_form.assignment.num_reviews ||= 3%>');
+            jQuery('#assignment_form_assignment_num_reviews_allowed').val('<%=@assignment_form.assignment.num_reviews_allowed ||= 3%>');
 
 
         } else {
                 reviews_allowed_field.attr('hidden', true);
-                jQuery('#assignment_form_assignment_num_reviews').val('-1');
+                jQuery('#assignment_form_assignment_num_reviews_allowed').val('-1');
 
 
         }

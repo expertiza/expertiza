@@ -132,9 +132,8 @@ describe "has correct csv values?" do
                 "comments" => "true", "score" => "true"}
   end
 
-  delimiter = ","
-
   def generated_csv(t_assignment, t_options)
+    delimiter = ","
     generated_csv = CSV.generate(col_sep: delimiter) do |csv|
       csv << Assignment.export_headers(t_assignment.id)
       csv << Assignment.export_details_fields(t_options)

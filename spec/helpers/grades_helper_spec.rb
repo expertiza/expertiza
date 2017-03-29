@@ -216,103 +216,65 @@ describe GradesHelper, type: :helper do
     end
   end
 
-  describe 'get_css_style_for_hamer_reputation' do
-    it 'should return correct css for a reputation of -0.1' do
-      result = get_css_style_for_hamer_reputation(-0.1)
-      expect(result).to be == 'c1'
-    end
-    it 'should return correct css for a reputation of 0' do
-      result = get_css_style_for_hamer_reputation(0)
-      expect(result).to be == 'c1'
-    end
-    it 'should return correct css for a reputation of 0.5' do
-      result = get_css_style_for_hamer_reputation(0.5)
-      expect(result).to be == 'c2'
-    end
-    it 'should return correct css for a reputation of 1' do
-      result = get_css_style_for_hamer_reputation(1)
-      expect(result).to be == 'c2'
-    end
-    it 'should return correct css for a reputation of 1.5' do
-      result = get_css_style_for_hamer_reputation(1.5)
-      expect(result).to be == 'c3'
-    end
-    it 'should return correct css for a reputation of 2' do
-      result = get_css_style_for_hamer_reputation(2)
-      expect(result).to be == 'c4'
-    end
-    it 'should return correct css for a reputation of 2.1' do
-      result = get_css_style_for_hamer_reputation(2.1)
-      expect(result).to be == 'c5'
-    end
-  end
+  describe 'css_for_reputation' do
+    hamer_input = [-0.1, 0, 0.5, 1, 1.5, 2, 2.1]
+    lauw_input = [-0.1, 0, 0.2, 0.4, 0.6, 0.8, 0.9]
+    output = %w[c1 c1 c2 c2 c3 c4 c5]
 
-  describe 'get_css_style_for_lauw_reputation' do
-    it 'should return correct css for a reputation of -0.1' do
-      result = get_css_style_for_lauw_reputation(-0.1)
-      expect(result).to be == 'c1'
+    describe 'get_css_style_for_hamer_reputation' do
+      it 'should return correct css for a range of input reputations' do
+        hamer_input.each_with_index do |e, i|
+          result = get_css_style_for_hamer_reputation(e)
+          expect(result).to eq(output[i])
+        end
+      end
     end
-    it 'should return correct css for a reputation of 0' do
-      result = get_css_style_for_lauw_reputation(0)
-      expect(result).to be == 'c1'
-    end
-    it 'should return correct css for a reputation of 0.2' do
-      result = get_css_style_for_lauw_reputation(0.2)
-      expect(result).to be == 'c2'
-    end
-    it 'should return correct css for a reputation of 0.4' do
-      result = get_css_style_for_lauw_reputation(0.4)
-      expect(result).to be == 'c2'
-    end
-    it 'should return correct css for a reputation of 0.6' do
-      result = get_css_style_for_lauw_reputation(0.6)
-      expect(result).to be == 'c3'
-    end
-    it 'should return correct css for a reputation of 0.8' do
-      result = get_css_style_for_lauw_reputation(0.8)
-      expect(result).to be == 'c4'
-    end
-    it 'should return correct css for a reputation of 0.9' do
-      result = get_css_style_for_lauw_reputation(0.9)
-      expect(result).to be == 'c5'
+
+    describe 'get_css_style_for_lauw_reputation' do
+      it 'should return correct css for a range of input reputations' do
+        lauw_input.each_with_index do |e, i|
+          result = get_css_style_for_lauw_reputation(e)
+          expect(result).to eq(output[i])
+        end
+      end
     end
   end
 end
 ##########################
 # Functional Cases
 ##########################
-describe GradesHelper, type: :feature do
-  describe 'case 1' do
-    it "Javascript should work on grades Alternate View", js: true do
-      assignment = create(:assignment)
-      assignment_team = create(:assignment_team, assignment: assignment)
-      participant = create(:participant, assignment: assignment)
-      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+# describe GradesHelper, type: :feature do
+#   describe 'case 1' do
+#     it "Javascript should work on grades Alternate View", js: true do
+#       assignment = create(:assignment)
+#       assignment_team = create(:assignment_team, assignment: assignment)
+#       participant = create(:participant, assignment: assignment)
+#       create(:team_user, team: assignment_team, user: User.find(participant.user_id))
 
-      login_as(participant.name)
-      visit '/student_task/list'
-      expect(page).to have_content 'final2'
-      click_link('final2')
-      expect(page).to have_content 'Alternate View'
-      click_link('Alternate View')
-      expect(page).to have_content 'Grade for submission'
-    end
-  end
-  describe 'case 2' do
-    it "Student should be able to view scores", js: true do
-      assignment = create(:assignment)
-      assignment_team = create(:assignment_team, assignment: assignment)
-      participant = create(:participant, assignment: assignment)
-      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+#       login_as(participant.name)
+#       visit '/student_task/list'
+#       expect(page).to have_content 'final2'
+#       click_link('final2')
+#       expect(page).to have_content 'Alternate View'
+#       click_link('Alternate View')
+#       expect(page).to have_content 'Grade for submission'
+#     end
+#   end
+#   describe 'case 2' do
+#     it "Student should be able to view scores", js: true do
+#       assignment = create(:assignment)
+#       assignment_team = create(:assignment_team, assignment: assignment)
+#       participant = create(:participant, assignment: assignment)
+#       create(:team_user, team: assignment_team, user: User.find(participant.user_id))
 
-      login_as(participant.name)
-      visit '/student_task/list'
-      expect(page).to have_content 'final2'
-      click_link('final2')
-      expect(page).to have_content 'Your scores'
-      click_link('Your scores')
+#       login_as(participant.name)
+#       visit '/student_task/list'
+#       expect(page).to have_content 'final2'
+#       click_link('final2')
+#       expect(page).to have_content 'Your scores'
+#       click_link('Your scores')
 
-      expect(page).to have_content '0.00%'
-    end
-  end
-end
+#       expect(page).to have_content '0.00%'
+#     end
+#   end
+# end

@@ -283,15 +283,16 @@ class SignUpSheetController < ApplicationController
 
   def set_priority
     @user_id = session[:user].id
+    assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
     unless params[:topic].nil?
-      team_ids = AssignmentTeam.where(parent_id: params[:assignment_id]).map(&:id)
+      team_ids = AssignmentTeam.where(parent_id: assignment_id).map(&:id)
       team_user = TeamsUser.where("user_id = ? AND team_id IN (?)", @user_id, team_ids)
       user_ids = []
       user_ids << @user_id
       unless team_user.empty?
         user_ids << TeamsUser.where(team_id: team_user.first.try(:team_id)).map(&:user_id)
       end
-      user_ids = user_ids.uniq
+      user_ids = user_ids.flatten!.uniq
       user_ids.each do |user_id|
         @bids = Bid.where("user_id = ?", user_id )
         signed_up_topics = @bids.map {|bid| bid.topic_id}

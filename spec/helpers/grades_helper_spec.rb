@@ -6,6 +6,22 @@ describe GradesHelper, type: :helper do
     @assignment = create(:assignment, max_team_size: 1)
     @deadline_type = create(:deadline_type, id: 5, name: 'metareview')
     @deadline_right = create(:deadline_right)
+
+    @new_participant = create(:participant)
+
+    @questionnaire = create(:questionnaire)
+    @metareview_questionnaire = create(:metareview_questionnaire)
+    @author_feedback_questionnaire = create(:author_feedback_questionnaire)
+    @teammate_review_questionnaire = create(:teammate_review_questionnaire)
+
+
+    @questions = {}
+    # @assignment_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @questionnaire)
+    # @assignment_metareview_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @metareview_questionnaire)
+    # @assignment_author_feedback_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @author_feedback_questionnaire)
+    # @assignment_teammate_review_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @teammate_review_questionnaire)
+    # @questions = {}
+
   end
 
   describe 'get_accordion_title' do
@@ -86,140 +102,92 @@ describe GradesHelper, type: :helper do
 
   describe 'rscore_review' do
     it 'should return a record of type :review if available' do
-      new_participant = create(:participant)
-      questionnaire = create(:questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_review
-      expect(result).to_not be_nil
+      params[:id] = @new_participant.id
+      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @questionnaire)
+      @questions[@questionnaire.symbol] = @questionnaire.questions
+      expect(rscore_review).to_not be_nil
     end
     it 'should return nil if no record of type :review is available' do
-      new_participant = create(:participant)
-      questionnaire = create(:metareview_questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_review
-      expect(result).to be_nil
+      params[:id] = @new_participant.id
+      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @metareview_questionnaire)
+      @questions[@metareview_questionnaire.symbol] = @metareview_questionnaire.questions
+      expect(rscore_review).to be_nil
     end
   end
 
   describe 'rscore_metareview' do
     it 'should return a record of type :metareview if available' do
-      new_participant = create(:participant)
-      questionnaire = create(:metareview_questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_metareview
-      expect(result).to_not be_nil
+      params[:id] = @new_participant.id
+      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @metareview_questionnaire)
+      @questions[@metareview_questionnaire.symbol] = @metareview_questionnaire.questions
+      expect(rscore_metareview).to_not be_nil
     end
     it 'should return nil if no record of type :metareview is available' do
-      new_participant = create(:participant)
-      questionnaire = create(:questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_metareview
-      expect(result).to be_nil
+      params[:id] = @new_participant.id
+      expect(rscore_metareview).to be_nil
     end
   end
 
   describe 'rscore_feedback' do
     it 'should return a record of type :feedback if available' do
-      new_participant = create(:participant)
-      questionnaire = create(:author_feedback_questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_feedback
-      expect(result).to_not be_nil
+      params[:id] = @new_participant.id
+      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @author_feedback_questionnaire)
+      @questions[@author_feedback_questionnaire.symbol] = @author_feedback_questionnaire.questions
+      expect(rscore_feedback).to_not be_nil
     end
     it 'should return nil if no record of type :feedback is available' do
-      new_participant = create(:participant)
-      questionnaire = create(:questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_feedback
-      expect(result).to be_nil
+      params[:id] = @new_participant.id
+      expect(rscore_feedback).to be_nil
     end
   end
 
   describe 'rscore_teammate' do
     it 'should return a record of type :teammate if available' do
-      new_participant = create(:participant)
-      questionnaire = create(:teammate_review_questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_teammate
-      expect(result).to_not be_nil
+      params[:id] = @new_participant.id
+      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @teammate_review_questionnaire)
+      @questions[@teammate_review_questionnaire.symbol] = @teammate_review_questionnaire.questions
+      expect(rscore_teammate).to_not be_nil
     end
     it 'should return nil if no record of type :teammate is available' do
-      new_participant = create(:participant)
-      questionnaire = create(:questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = rscore_teammate
-      expect(result).to be_nil
+      params[:id] = @new_participant.id
+      expect(rscore_teammate).to be_nil
     end
   end
 
+
   describe 'p_total_score' do
     it 'should return the grade if available' do
-      new_participant = create(:participant, grade: 90)
-      questionnaire = create(:questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = p_total_score
-      expect(result).to eq(90)
+      graded_participant = create(:participant, grade: 90)
+      create(:assignment_questionnaire, user_id: graded_participant.id, questionnaire: @questionnaire)
+      @questions[@questionnaire.symbol] = @questionnaire.questions
+      params[:id] = graded_participant.id
+      expect(p_total_score).to eq(90)
     end
     it 'should return :total_score if no grade is available' do
-      new_participant = create(:participant)
-      questionnaire = create(:questionnaire)
-      create(:assignment_questionnaire, user_id: new_participant.id, questionnaire: questionnaire)
-      @questions = {}
-      @questions[questionnaire.symbol] = questionnaire.questions
-      params[:id] = new_participant.id
-      result = p_total_score
-      expect(result).to eq(0)
+      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @questionnaire)
+      @questions[@questionnaire.symbol] = @questionnaire.questions
+      params[:id] = @new_participant.id
+      expect(p_total_score).to eq(0)
     end
   end
 
   describe 'p_title' do
     it 'should return a title when the participant has a grade' do
-      new_participant = create(:participant)
-      params[:id] = new_participant.id
-      new_participant.grade = 90
-      new_participant.save
-      result = p_title
-      expect(result).to eq('A score in blue indicates that the value was overwritten by the instructor or teaching assistant.')
+      params[:id] = @new_participant.id
+      @new_participant.grade = 90
+      @new_participant.save
+      expect(p_title).to eq('A score in blue indicates that the value was overwritten by the instructor or teaching assistant.')
     end
     it 'should return nil when the participant has no grade' do
-      new_participant = create(:participant)
-      params[:id] = new_participant.id
-      result = p_title
-      expect(result).to eq(nil)
+      params[:id] = @new_participant.id
+      expect(p_title).to eq(nil)
     end
   end
 
   describe 'css_for_reputation' do
     hamer_input = [-0.1, 0, 0.5, 1, 1.5, 2, 2.1]
     lauw_input = [-0.1, 0, 0.2, 0.4, 0.6, 0.8, 0.9]
-    output = %w[c1 c1 c2 c2 c3 c4 c5]
+    output = %w(c1 c1 c2 c2 c3 c4 c5)
 
     describe 'get_css_style_for_hamer_reputation' do
       it 'should return correct css for a range of input reputations' do
@@ -238,43 +206,44 @@ describe GradesHelper, type: :helper do
         end
       end
     end
+
   end
 end
-##########################
-# Functional Cases
-##########################
-# describe GradesHelper, type: :feature do
-#   describe 'case 1' do
-#     it "Javascript should work on grades Alternate View", js: true do
-#       assignment = create(:assignment)
-#       assignment_team = create(:assignment_team, assignment: assignment)
-#       participant = create(:participant, assignment: assignment)
-#       create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+#########################
+Functional Cases
+#########################
+describe GradesHelper, type: :feature do
+  describe 'case 1' do
+    it "Javascript should work on grades Alternate View", js: true do
+      assignment = create(:assignment)
+      assignment_team = create(:assignment_team, assignment: assignment)
+      participant = create(:participant, assignment: assignment)
+      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
 
-#       login_as(participant.name)
-#       visit '/student_task/list'
-#       expect(page).to have_content 'final2'
-#       click_link('final2')
-#       expect(page).to have_content 'Alternate View'
-#       click_link('Alternate View')
-#       expect(page).to have_content 'Grade for submission'
-#     end
-#   end
-#   describe 'case 2' do
-#     it "Student should be able to view scores", js: true do
-#       assignment = create(:assignment)
-#       assignment_team = create(:assignment_team, assignment: assignment)
-#       participant = create(:participant, assignment: assignment)
-#       create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+      login_as(participant.name)
+      visit '/student_task/list'
+      expect(page).to have_content 'final2'
+      click_link('final2')
+      expect(page).to have_content 'Alternate View'
+      click_link('Alternate View')
+      expect(page).to have_content 'Grade for submission'
+    end
+  end
+  describe 'case 2' do
+    it "Student should be able to view scores", js: true do
+      assignment = create(:assignment)
+      assignment_team = create(:assignment_team, assignment: assignment)
+      participant = create(:participant, assignment: assignment)
+      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
 
-#       login_as(participant.name)
-#       visit '/student_task/list'
-#       expect(page).to have_content 'final2'
-#       click_link('final2')
-#       expect(page).to have_content 'Your scores'
-#       click_link('Your scores')
+      login_as(participant.name)
+      visit '/student_task/list'
+      expect(page).to have_content 'final2'
+      click_link('final2')
+      expect(page).to have_content 'Your scores'
+      click_link('Your scores')
 
-#       expect(page).to have_content '0.00%'
-#     end
-#   end
-# end
+      expect(page).to have_content '0.00%'
+    end
+  end
+end

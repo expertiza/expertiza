@@ -150,7 +150,7 @@ class CourseController < ApplicationController
       @course = @ta_mapping
       undo_link("The TA \"#{@user.name}\" has been successfully added.")
     end
-    render :action => 'add_ta.js.erb', :layout => false
+    render action: 'add_ta.js.erb', layout: false
   end
 
   def remove_ta
@@ -168,8 +168,7 @@ class CourseController < ApplicationController
     @course = @ta_mapping
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
-    #redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
-    render :action => 'remove_ta.js.erb', :layout => false
+    render action: 'remove_ta.js.erb', layout: false
   end
 
   # generate the undo link

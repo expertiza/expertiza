@@ -1,7 +1,6 @@
 <!--[form:course]-->
 <p><label for="institution_name">Institution Name</label><br/>
-<%= collection_select('user', :institution_id, Institution.all, :id, :name) %></p>
-
+<%= select("course", "institutions_id", Institution.all.collect{ |c| [ c.name, c.id] }) %></p>
 
 <p><label for="course_name">Course Name</label><br/>
 <%= text_field 'course', 'name'  %></p>

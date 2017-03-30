@@ -263,12 +263,12 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
+      var colWidthArray = ["17%", "17%", "6%", "6%", "17%", "17%", "20%"]
       var colDisplayStyle = {
         "display": ""
       }
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = ["30%", "0%", "0%", "20%", "20%", "30%"]
+        colWidthArray = ["30%", "0%", "0%", "0%", "20%", "20%", "30%"]
         colDisplayStyle = {
           "display": "none"
         }
@@ -285,10 +285,10 @@ jQuery(document).ready(function() {
             <td width={colWidthArray[0]}>{this.props.name}</td>
             <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
             <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
-            <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.institution}</td>
-            <td width={colWidthArray[3]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
-            <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
-            <td width={colWidthArray[5]}>
+            <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+            <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+            <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+            <td width={colWidthArray[6]}>
               <RowAction
                   actions={this.props.actions}
                   key={"simpleTable_"+this.props.id}
@@ -314,13 +314,13 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": ""
       }
       var firstColText = (this.props.dataType === 'questionnaire' ? 'Item' : 'Assignment') + " name"
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = ["30%", "0%", "0%", "20%", "20%", "30%"]
+        colWidthArray = ["30%", "0%", "0%", "0%", "20%", "20%", "30%"]
         colDisplayStyle = {
           "display": "none"
         }
@@ -362,16 +362,16 @@ jQuery(document).ready(function() {
               <th style={colDisplayStyle} width={colWidthArray[2]}>
                 Instructor
               </th>
-              <th style={colDisplayStyle} width={colWidthArray[2]}>
+              <th style={colDisplayStyle} width={colWidthArray[3]}>
                 Institution
               </th>
-              <th width={colWidthArray[3]}>
+              <th width={colWidthArray[4]}>
                 Creation Date
               </th>
-              <th width={colWidthArray[4]}>
+              <th width={colWidthArray[5]}>
                 Updated Date
               </th>
-              <th width={colWidthArray[5]}>Actions</th>
+              <th width={colWidthArray[6]}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -404,13 +404,13 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": "",
         "word-wrap":"break-word"
       }
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
+        colWidthArray = ["70%", "0%", "0%", "0%", "0%", "0%", "30%"]
         colDisplayStyle = {
           "display": "none"
         }
@@ -427,10 +427,10 @@ jQuery(document).ready(function() {
             <td width={colWidthArray[0]}>{this.props.name}</td>
             <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
             <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
-            <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.institution}</td>
-            <td style={colDisplayStyle} width={colWidthArray[3]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
-            <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
-            <td width={colWidthArray[5]}>
+            <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+            <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+            <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+            <td width={colWidthArray[6]}>
               <RowAction
                 actions={this.props.actions}
                 key={this.props.id}
@@ -641,13 +641,13 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": ""
       }
       if (this.props) {
           if (this.props.dataType === 'questionnaire') {
-              colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
+              colWidthArray = ["70%", "0%", "0%", "0%", "0%", "0%", "30%"]
               colDisplayStyle = {
                   "display": "none"
               }
@@ -676,7 +676,7 @@ jQuery(document).ready(function() {
                       name={entry.name}
                       directory={entry.directory}
                       instructor={entry.instructor}
-                      institution={entry.institution}
+                      institution={entry.institution}           //here's the issue
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       actions={entry.actions}
@@ -781,25 +781,25 @@ jQuery(document).ready(function() {
                         order="normal"
                         handleUserClick={this.handleSortingClick} />
               </th>
-              <th style={colDisplayStyle} width={colWidthArray[2]}>
-                 Institution <SortToggle
+              <th style={colDisplayStyle} width={colWidthArray[3]}>
+                Institution <SortToggle
                         colName="institution"
                         order="normal"
                         handleUserClick={this.handleSortingClick} />
               </th>
-              <th style={colDisplayStyle} width={colWidthArray[3]}>
+              <th style={colDisplayStyle} width={colWidthArray[4]}>
                 Creation Date <SortToggle
                         colName="creation_date"
                         order="normal"
                         handleUserClick={this.handleSortingClick} />
               </th>
-              <th style={colDisplayStyle} width={colWidthArray[4]}>
+              <th style={colDisplayStyle} width={colWidthArray[5]}>
                 Updated Date <SortToggle
                         colName="updated_date"
                         order="normal"
                         handleUserClick={this.handleSortingClick} />
               </th>
-              <th width={colWidthArray[5]}>Actions</th>
+              <th width={colWidthArray[6]}>Actions</th>
             </tr>
           </thead>
           <tbody>

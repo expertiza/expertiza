@@ -47,6 +47,7 @@ class CourseController < ApplicationController
       end
     end
     @course.name = params[:course][:name]
+    @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
     @course.save

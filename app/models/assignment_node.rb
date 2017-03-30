@@ -102,6 +102,13 @@ class AssignmentNode < Node
     @assign_node.instructor_id
   end
 
+  # Gets the institution_id from the associated object
+  def get_institution_id
+    # Course.find(self.node_object_id).course_id
+    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+    @assign_node.instructor_id
+  end
+
   # Gets the private attribute from the associated object
   def get_private
     # Assignment.find(self.node_object_id).private

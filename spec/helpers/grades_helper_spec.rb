@@ -6,22 +6,13 @@ describe GradesHelper, type: :helper do
     @assignment = create(:assignment, max_team_size: 1)
     @deadline_type = create(:deadline_type, id: 5, name: 'metareview')
     @deadline_right = create(:deadline_right)
-
-    @new_participant = create(:participant)
-
+    @new_participant = create(:participant, assignment: @assignment)
+    @assignment_team = create(:assignment_team, assignment: @assignment)
     @questionnaire = create(:questionnaire)
     @metareview_questionnaire = create(:metareview_questionnaire)
     @author_feedback_questionnaire = create(:author_feedback_questionnaire)
     @teammate_review_questionnaire = create(:teammate_review_questionnaire)
-
-
     @questions = {}
-    # @assignment_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @questionnaire)
-    # @assignment_metareview_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @metareview_questionnaire)
-    # @assignment_author_feedback_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @author_feedback_questionnaire)
-    # @assignment_teammate_review_questionnaire = create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @teammate_review_questionnaire)
-    # @questions = {}
-
   end
 
   describe 'get_accordion_title' do
@@ -46,8 +37,7 @@ describe GradesHelper, type: :helper do
       expect(result).to eq(@assignment)
     end
     it 'should correctly identify the assignment from a participant id' do
-      participant = create(:participant, assignment: @assignment)
-      params[:id] = participant.id
+      params[:id] = @new_participant.id
       result = Participant.find(params[:id]).parent_id
       expect(result).to eq(@assignment.id)
     end
@@ -154,7 +144,6 @@ describe GradesHelper, type: :helper do
     end
   end
 
-
   describe 'p_total_score' do
     it 'should return the grade if available' do
       graded_participant = create(:participant, grade: 90)
@@ -206,19 +195,15 @@ describe GradesHelper, type: :helper do
         end
       end
     end
-
   end
 end
 #########################
-Functional Cases
+#Functional Cases
 #########################
 describe GradesHelper, type: :feature do
   describe 'case 1' do
     it "Javascript should work on grades Alternate View", js: true do
-      assignment = create(:assignment)
-      assignment_team = create(:assignment_team, assignment: assignment)
-      participant = create(:participant, assignment: assignment)
-      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+      create(:team_user, team: @assignment_team, user: User.find(@new_participant.id))
 
       login_as(participant.name)
       visit '/student_task/list'
@@ -231,10 +216,7 @@ describe GradesHelper, type: :feature do
   end
   describe 'case 2' do
     it "Student should be able to view scores", js: true do
-      assignment = create(:assignment)
-      assignment_team = create(:assignment_team, assignment: assignment)
-      participant = create(:participant, assignment: assignment)
-      create(:team_user, team: assignment_team, user: User.find(participant.user_id))
+      create(:team_user, team: assignment_team, user: User.find(@new_participant.id))
 
       login_as(participant.name)
       visit '/student_task/list'

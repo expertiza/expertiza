@@ -58,9 +58,15 @@ describe GradesHelper, type: :helper do
     it 'should return 1 for an assignment without a team but with a metareview deadline after a view action' do
       @assignment.max_team_size = 1
       @assignment.save
-      create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
-                                                          submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-                                                          review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
+      create(
+        :assignment_due_date,
+        assignment: @assignment,
+        deadline_type: @deadline_type,
+        submission_allowed_id: @deadline_right.id,
+        review_allowed_id: @deadline_right.id,
+        review_of_review_allowed_id: @deadline_right.id,
+        due_at: '2015-12-30 23:30:12'
+      )
 
       params[:action] = 'view'
       params[:id] = @assignment.id
@@ -70,9 +76,15 @@ describe GradesHelper, type: :helper do
     it 'should return 2 for an assignment without a team but with a metareview after a view action' do
       @assignment.max_team_size = 3
       @assignment.save
-      create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
-                                                          submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-                                                          review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
+      create(
+        :assignment_due_date,
+        assignment: @assignment,
+        deadline_type: @deadline_type,
+        submission_allowed_id: @deadline_right.id,
+        review_allowed_id: @deadline_right.id,
+        review_of_review_allowed_id: @deadline_right.id, due_at:
+        '2015-12-30 23:30:12'
+      )
 
       params[:action] = 'view'
       params[:id] = @assignment.id

@@ -54,8 +54,8 @@ class ParticipantsController < ApplicationController
       flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
     # E1721 : AJAX for adding participants to assignment changes begin
-    render :action => 'add.js.erb', :layout => false
-  # E1721 changes End.
+    render action: 'add.js.erb', layout: false
+    # E1721 changes End.
   end
 
   def update_authorizations

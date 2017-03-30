@@ -26,31 +26,27 @@ module ReviewMappingHelper
   end
 
   def get_sentiment(review, first_try)
-    if (first_try)
-       response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[review]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+    if first_try
+      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
+        body: {"reviews" => [review]}.to_json, headers: { 'Content-Type' => 'application/json'})
     else
       # Send only the first sentence of the review for sentiment analysis
       text = review["text"].split('.')[0]
       reconstructed_review = construct_sentiment_query(review["id"], text)
-      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',:body => {"reviews"=>[reconstructed_review]}.to_json, :headers => { 'Content-Type' => 'application/json' })
+      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
+        body: {"reviews" => [reconstructed_review]}.to_json, headers: { 'Content-Type' => 'application/json'})
     end
     response
   end
 
   def get_sentiment_list
-
     response_list = []
     @sentiment_list = []
-    
     @reviewers.each do |r|
       sentiment = {}
-      review = {}
-  
       review_text = Response.concatenate_all_review_comments(@id, r).join(" ")
       review = construct_sentiment_query(r.id, review_text)
-
       response = get_sentiment(review, true)
-
       # Retry in case of failure by sending only a single sentence for sentiment analysis.
       if response.code == 200
         sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
@@ -64,17 +60,17 @@ module ReviewMappingHelper
           when 200
             sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
             sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
-            @sentiment_list<<sentiment
+            @sentiment_list << sentiment
           when 404
             # Error in generating sentiment from the server
             sentiment["id"] = review["id"]
-            sentiment["sentiment"]="-404"
-            @sentiment_list<<sentiment
+            sentiment["sentiment"] = "-404"
+            @sentiment_list << sentiment
           when 500...600
             # Error in generating sentiment from the server
             sentiment["id"] = review["id"]
-            sentiment["sentiment"]="-500"
-            @sentiment_list<<sentiment
+            sentiment["sentiment"] = "-500"
+            @sentiment_list << sentiment
         end
       end
     end

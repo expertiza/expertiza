@@ -217,7 +217,6 @@ describe GradesHelper, type: :feature do
       expect(page).to have_content 'Alternate View'
       click_link('Alternate View')
       expect(page).to have_content 'Grade for submission'
-
     end
   end
   describe 'case 2' do
@@ -230,7 +229,6 @@ describe GradesHelper, type: :feature do
       expect(page).to have_content 'Your scores'
       click_link('Your scores')
       expect(page).to have_content '0.00%'
-
     end
   end
 end

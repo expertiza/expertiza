@@ -198,34 +198,39 @@ describe GradesHelper, type: :helper do
   end
 end
 #########################
-#Functional Cases
+# Functional Cases
 #########################
 describe GradesHelper, type: :feature do
+  before(:each) do
+    @assignment = create(:assignment)
+    @assignment_team = create(:assignment_team, assignment: @assignment)
+    @participant = create(:participant, assignment: @assignment)
+    create(:team_user, team: @assignment_team, user: User.find(@participant.user_id))
+  end
   describe 'case 1' do
     it "Javascript should work on grades Alternate View", js: true do
-      create(:team_user, team: @assignment_team, user: User.find(@new_participant.id))
-
-      login_as(participant.name)
+      login_as(@participant.name)
       visit '/student_task/list'
       expect(page).to have_content 'final2'
       click_link('final2')
+      sleep(10)
       expect(page).to have_content 'Alternate View'
       click_link('Alternate View')
       expect(page).to have_content 'Grade for submission'
+
     end
   end
   describe 'case 2' do
     it "Student should be able to view scores", js: true do
-      create(:team_user, team: assignment_team, user: User.find(@new_participant.id))
-
-      login_as(participant.name)
+      login_as(@participant.name)
       visit '/student_task/list'
       expect(page).to have_content 'final2'
       click_link('final2')
+      sleep(10)
       expect(page).to have_content 'Your scores'
       click_link('Your scores')
-
       expect(page).to have_content '0.00%'
+
     end
   end
 end

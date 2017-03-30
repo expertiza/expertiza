@@ -178,8 +178,8 @@ describe SignUpSheetController do
     create(:team_user, user: User.where(role_id: 2).second, team: AssignmentTeam.second)
     create(:team_user, user: User.where(role_id: 2).third, team: AssignmentTeam.third)
 
-    create(:signed_up_team, team_id: 2 , topic: SignUpTopic.second)
-    create(:signed_up_team, team_id: 3 , topic: SignUpTopic.third)
+    create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
+    create(:signed_up_team, team_id: 3, topic: SignUpTopic.third)
 
     # Simulate Authorized Session
     instructor.save
@@ -222,3 +222,4 @@ describe SignUpSheetController do
     end
   end
 end
+

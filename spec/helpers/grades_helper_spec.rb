@@ -58,7 +58,7 @@ describe GradesHelper, type: :helper do
     it 'should return 1 for an assignment without a team but with a metareview deadline after a view action' do
       @assignment.max_team_size = 1
       @assignment.save
-      @assignment_due_date = create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
+      create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
                                                           submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
                                                           review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
 
@@ -70,7 +70,7 @@ describe GradesHelper, type: :helper do
     it 'should return 2 for an assignment without a team but with a metareview after a view action' do
       @assignment.max_team_size = 3
       @assignment.save
-      @assignment_due_date = create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
+      create(:assignment_due_date, assignment: @assignment, deadline_type: @deadline_type,
                                                           submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
                                                           review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
 
@@ -213,7 +213,6 @@ describe GradesHelper, type: :feature do
       visit '/student_task/list'
       expect(page).to have_content 'final2'
       click_link('final2')
-      sleep(10)
       expect(page).to have_content 'Alternate View'
       click_link('Alternate View')
       expect(page).to have_content 'Grade for submission'
@@ -225,7 +224,6 @@ describe GradesHelper, type: :feature do
       visit '/student_task/list'
       expect(page).to have_content 'final2'
       click_link('final2')
-      sleep(10)
       expect(page).to have_content 'Your scores'
       click_link('Your scores')
       expect(page).to have_content '0.00%'

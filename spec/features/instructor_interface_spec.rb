@@ -70,15 +70,15 @@ describe "Integration tests for instructor interface" do
 
   describe "Import tests for assignment topics" do
     it 'should be valid file with 3 columns' do
-      validate_login_and_page_content("spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv", ['expertiza', 'mozilla'], true)
+      validate_login_and_page_content("spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv", %w(expertiza mozilla), true)
     end
 
     it 'should be a valid file with 3 or more columns' do
-      validate_login_and_page_content("spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv", ['capybara', 'cucumber'], true)
+      validate_login_and_page_content("spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv", %w(capybara cucumber), true)
     end
 
     it 'should be a invalid csv file' do
-      validate_login_and_page_content("spec/features/assignment_topic_csvs/invalid_topics_import.csv", ['airtable', 'devise'], false)
+      validate_login_and_page_content("spec/features/assignment_topic_csvs/invalid_topics_import.csv", %w(airtable devise), false)
     end
 
     it 'should be an random text file' do

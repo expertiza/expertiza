@@ -15,8 +15,7 @@ class InvitationsController < ApplicationController
     team = AssignmentTeam.find(params[:team_id])
     #student has information about the participant
     student = AssignmentParticipant.find(params[:student_id])
-
-
+    
     #participant information about student you are trying to invite to the team
     team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
     # check if invited user is already in the team
@@ -52,7 +51,6 @@ class InvitationsController < ApplicationController
           end
         end
       end
-
     end
 
     update_join_team_request user, student
@@ -99,7 +97,6 @@ class InvitationsController < ApplicationController
     else
       ready_to_join = true
     end
-
 
     if ready_to_join
       #Status code A for accepted
@@ -163,6 +160,5 @@ class InvitationsController < ApplicationController
       redirect_to view_student_teams_path student_id: student.id
       return
     end
-
   end
 end

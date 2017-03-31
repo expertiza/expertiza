@@ -4,15 +4,36 @@ require 'selenium-webdriver'
 describe GradesHelper, type: :helper do
   before(:each) do
     @assignment = create(:assignment, max_team_size: 1)
+    @assignment2 = create(:assignment, name: 'whatever', max_team_size: 3)
     @deadline_type = create(:deadline_type, id: 5, name: 'metareview')
     @deadline_right = create(:deadline_right)
     @new_participant = create(:participant, assignment: @assignment)
+    @participant = create(:participant, assignment: @assignment2)
     @assignment_team = create(:assignment_team, assignment: @assignment)
     @questionnaire = create(:questionnaire)
     @metareview_questionnaire = create(:metareview_questionnaire)
     @author_feedback_questionnaire = create(:author_feedback_questionnaire)
     @teammate_review_questionnaire = create(:teammate_review_questionnaire)
+    create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @questionnaire)
+    create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @metareview_questionnaire)
+    create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @author_feedback_questionnaire)
+    create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @teammate_review_questionnaire)
+
     @questions = {}
+    @questions[@questionnaire.symbol] = @questionnaire.questions
+    @questions[@metareview_questionnaire.symbol] = @metareview_questionnaire.questions
+    @questions[@author_feedback_questionnaire.symbol] = @author_feedback_questionnaire.questions
+    @questions[@teammate_review_questionnaire.symbol] = @teammate_review_questionnaire.questions
+
+    create(
+      :assignment_due_date,
+      assignment: @assignment2,
+      deadline_type: @deadline_type,
+      submission_allowed_id: @deadline_right.id,
+      review_allowed_id: @deadline_right.id,
+      review_of_review_allowed_id: @deadline_right.id,
+      due_at: '2015-12-30 23:30:12'
+    )
   end
 
   describe 'get_accordion_title' do
@@ -41,13 +62,13 @@ describe GradesHelper, type: :helper do
       result = Participant.find(params[:id]).parent_id
       expect(result).to eq(@assignment.id)
     end
-    it 'should return 0 for an assignment without a team or a metareview deadline after a view action' do
+    it 'should return 0 for an assignment without a team or a metareview after a view action' do
       params[:action] = 'view'
       params[:id] = @assignment.id
       result = has_team_and_metareview?
       expect(result).to be == {has_team: false, has_metareview: false, true_num: 0}
     end
-    it 'should return 1 for an assignment with a team but no metareview deadline after a view action' do
+    it 'should return 1 for an assignment with a team but no metareview after a view action' do
       @assignment.max_team_size = 2
       @assignment.save
       params[:action] = 'view'
@@ -55,39 +76,17 @@ describe GradesHelper, type: :helper do
       result = has_team_and_metareview?
       expect(result).to be == {has_team: true, has_metareview: false, true_num: 1}
     end
-    it 'should return 1 for an assignment without a team but with a metareview deadline after a view action' do
-      @assignment.max_team_size = 1
-      @assignment.save
-      create(
-        :assignment_due_date,
-        assignment: @assignment,
-        deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right.id,
-        review_allowed_id: @deadline_right.id,
-        review_of_review_allowed_id: @deadline_right.id,
-        due_at: '2015-12-30 23:30:12'
-      )
-
+    it 'should return 1 for an assignment without a team but with a metareview after a view action' do
+      @assignment2.max_team_size = 1
+      @assignment2.save
       params[:action] = 'view'
-      params[:id] = @assignment.id
+      params[:id] = @assignment2.id
       result = has_team_and_metareview?
       expect(result).to be == {has_team: false, has_metareview: true, true_num: 1}
     end
-    it 'should return 2 for an assignment without a team but with a metareview after a view action' do
-      @assignment.max_team_size = 3
-      @assignment.save
-      create(
-        :assignment_due_date,
-        assignment: @assignment,
-        deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right.id,
-        review_allowed_id: @deadline_right.id,
-        review_of_review_allowed_id: @deadline_right.id, due_at:
-        '2015-12-30 23:30:12'
-      )
-
+    it 'should return 2 for an assignment with a team and with a metareview after a view action' do
       params[:action] = 'view'
-      params[:id] = @assignment.id
+      params[:id] = @assignment2.id
       result = has_team_and_metareview?
       expect(result).to be == {has_team: true, has_metareview: true, true_num: 2}
     end
@@ -102,56 +101,19 @@ describe GradesHelper, type: :helper do
     end
   end
 
-  describe 'rscore_review' do
-    it 'should return a record of type :review if available' do
+  describe 'rscore_X' do
+    it 'should return records of each review type if available' do
       params[:id] = @new_participant.id
-      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @questionnaire)
-      @questions[@questionnaire.symbol] = @questionnaire.questions
       expect(rscore_review).to_not be_nil
-    end
-    it 'should return nil if no record of type :review is available' do
-      params[:id] = @new_participant.id
-      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @metareview_questionnaire)
-      @questions[@metareview_questionnaire.symbol] = @metareview_questionnaire.questions
-      expect(rscore_review).to be_nil
-    end
-  end
-
-  describe 'rscore_metareview' do
-    it 'should return a record of type :metareview if available' do
-      params[:id] = @new_participant.id
-      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @metareview_questionnaire)
-      @questions[@metareview_questionnaire.symbol] = @metareview_questionnaire.questions
       expect(rscore_metareview).to_not be_nil
+      expect(rscore_feedback).to_not eq(nil)
+      expect(rscore_teammate).to_not eq(nil)
     end
-    it 'should return nil if no record of type :metareview is available' do
-      params[:id] = @new_participant.id
+    it 'should return nil if review types are not available' do
+      params[:id] = @participant.id
+      expect(rscore_review).to be_nil
       expect(rscore_metareview).to be_nil
-    end
-  end
-
-  describe 'rscore_feedback' do
-    it 'should return a record of type :feedback if available' do
-      params[:id] = @new_participant.id
-      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @author_feedback_questionnaire)
-      @questions[@author_feedback_questionnaire.symbol] = @author_feedback_questionnaire.questions
-      expect(rscore_feedback).to_not be_nil
-    end
-    it 'should return nil if no record of type :feedback is available' do
-      params[:id] = @new_participant.id
       expect(rscore_feedback).to be_nil
-    end
-  end
-
-  describe 'rscore_teammate' do
-    it 'should return a record of type :teammate if available' do
-      params[:id] = @new_participant.id
-      create(:assignment_questionnaire, user_id: @new_participant.id, questionnaire: @teammate_review_questionnaire)
-      @questions[@teammate_review_questionnaire.symbol] = @teammate_review_questionnaire.questions
-      expect(rscore_teammate).to_not be_nil
-    end
-    it 'should return nil if no record of type :teammate is available' do
-      params[:id] = @new_participant.id
       expect(rscore_teammate).to be_nil
     end
   end
@@ -185,30 +147,23 @@ describe GradesHelper, type: :helper do
     end
   end
 
-  describe 'css_for_reputation' do
+  describe 'get_css_style_for_X_reputation' do
     hamer_input = [-0.1, 0, 0.5, 1, 1.5, 2, 2.1]
     lauw_input = [-0.1, 0, 0.2, 0.4, 0.6, 0.8, 0.9]
     output = %w(c1 c1 c2 c2 c3 c4 c5)
-
-    describe 'get_css_style_for_hamer_reputation' do
-      it 'should return correct css for a range of input reputations' do
-        hamer_input.each_with_index do |e, i|
-          result = get_css_style_for_hamer_reputation(e)
-          expect(result).to eq(output[i])
-        end
+    it 'should return correct css for hamer reputations' do
+      hamer_input.each_with_index do |e, i|
+        expect(get_css_style_for_hamer_reputation(e)).to eq(output[i])
       end
     end
-
-    describe 'get_css_style_for_lauw_reputation' do
-      it 'should return correct css for a range of input reputations' do
-        lauw_input.each_with_index do |e, i|
-          result = get_css_style_for_lauw_reputation(e)
-          expect(result).to eq(output[i])
-        end
+    it 'should return correct css for luaw reputations' do
+      lauw_input.each_with_index do |e, i|
+        expect(get_css_style_for_lauw_reputation(e)).to eq(output[i])
       end
     end
   end
 end
+
 #########################
 # Functional Cases
 #########################

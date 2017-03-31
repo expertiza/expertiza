@@ -14,7 +14,7 @@ RSpec.describe InvitationsController, type: :controller do
 
 
 
-  describe "GET /decline" do
+  describe "GET #decline" do
     it "must decline invitation with invitation_id" do
       @inv = Invitation.new
       @inv.assignment_id = @assignment.id
@@ -30,6 +30,8 @@ RSpec.describe InvitationsController, type: :controller do
       expect(Invitation).to receive(:decline)
     end
   end
+
+
 
 
 

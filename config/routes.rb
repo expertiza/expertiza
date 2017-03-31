@@ -170,7 +170,7 @@ Expertiza::Application.routes.draw do
 
   resources :join_team_requests do
     collection do
-      get :decline
+      post :decline
       get :edit
     end
   end

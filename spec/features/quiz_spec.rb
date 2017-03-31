@@ -1,24 +1,11 @@
 require 'rails_helper'
 require 'selenium-webdriver'
-
-def create_deadline_type
-  create(:deadline_type, name: "submission")
-  create(:deadline_type, name: "review")
-  create(:deadline_type, name: "metareview")
-  create(:deadline_type, name: "drop_topic")
-  create(:deadline_type, name: "signup")
-  create(:deadline_type, name: "team_formation")
-end
-
-def create_deadline_right
-  create(:deadline_right)
-  create(:deadline_right, name: 'Late')
-  create(:deadline_right, name: 'OK')
-end
+require 'helpers/instructor_interface_helper_spec'
+include InstructorInterfaceHelperSpec
 
 def create_assignment_due_date
-  create_deadline_type
-  create_deadline_right
+  set_deadline_type
+  set_deadline_right
   create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
   @review_deadline_type = create(:deadline_type, name: "review")

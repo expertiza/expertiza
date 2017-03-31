@@ -196,5 +196,4 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
-
 end

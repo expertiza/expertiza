@@ -51,11 +51,11 @@ module ReviewMappingHelper
       if response.code == 200
         sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
         sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
-        @sentiment_list<<sentiment
+        @sentiment_list << sentiment
       else
         # Retry once in case of a failure
         response = get_sentiment(review, false)
-        response_list<<response
+        response_list << response
         case response.code
           when 200
             sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
@@ -78,7 +78,7 @@ module ReviewMappingHelper
   end
 
   def display_sentiment_metric(id)
-    hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s}
+    hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s }
     value = hashed_sentiment[0]["sentiment"].to_f.round(2)
     metric = "Overall Sentiment: #{value}<br/>"
     metric.html_safe

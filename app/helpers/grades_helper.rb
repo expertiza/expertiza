@@ -13,7 +13,7 @@ module GradesHelper
   end
 
   def has_team_and_metareview?
-    #returns whether a team and metareveiws exist for a given assignment
+    # returns whether a team and metareveiws exist for a given assignment
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])
       @assignment_id = @assignment.id
@@ -34,44 +34,44 @@ module GradesHelper
   end
 
   def participant
-    #returns a participant given an id
+    # returns a participant given an id
     @participant = Participant.find(params[:id])
     @participant
   end
 
   def pscore
-    #returns participant scores
+    # returns participant scores
     @participant = Participant.find(params[:id])
     @pscore = @participant.scores(@questions)
     @pscore
   end
 
   def rscore_review
-    #returns all reviews for given participant
+    # returns all reviews for given participant
     @rscore_review = Rscore.new(pscore, :review) if pscore[:review]
     @rscore_review
   end
 
   def rscore_metareview
-    #returns all metareviews for given participant
+    # returns all metareviews for given participant
     @rscore_metareview = Rscore.new(pscore, :metareview) if pscore[:metareview]
     @rscore_metareview
   end
 
   def rscore_feedback
-    #returns all author feedbacks for given participant
+    # returns all author feedbacks for given participant
     @rscore_feedback = Rscore.new(pscore, :feedback) if pscore[:feedback]
     @rscore_feedback
   end
 
   def rscore_teammate
-    #returns all teammate reviews for given participant
+    # returns all teammate reviews for given participant
     @rscore_teammate = Rscore.new(pscore, :teammate) if pscore[:teammate]
     @rscore_teammate
   end
 
   def p_total_score
-    #returns grade for given participant
+    # returns grade for given participant
     @participant = Participant.find(params[:id])
     @pscore = @participant.scores(@questions)
     @total_score = @participant.grade ? participant.grade : @pscore[:total_score]
@@ -79,14 +79,14 @@ module GradesHelper
   end
 
   def p_title
-    #returns pertinent title for grades view for given participant
+    # returns pertinent title for grades view for given participant
     @participant = Participant.find(params[:id])
     @title = @participant.grade ? 'A score in blue indicates that the value was overwritten by the instructor or teaching assistant.' : nil
     @title
   end
 
   def get_css_style_for_hamer_reputation(reputation_value)
-    #returns a CSS value for formatting
+    # returns a CSS value for formatting
 
     css_class = if reputation_value < 0.5
                   'c1'

@@ -88,7 +88,8 @@ module ReviewMappingHelper
       review = construct_sentiment_query(r.id, Response.concatenate_all_review_comments(@id, r).join(" "))
       response = retrieve_sentiment_response(review, true)
       # Retry in case of failure by sending only a single sentence for sentiment analysis.
-      if response.code == 200
+      case response.code
+      when 200
         @sentiment_list << create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
       else
         # Retry once in case of a failure

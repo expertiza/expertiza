@@ -64,9 +64,8 @@ module ReviewMappingHelper
   #
   # Handles error scenarios while retrieving sentiment value from sentiment server
   #
-  def handle_sentiment_generation_error(review)
+  def handle_sentiment_generation_retry(response, review)
     sentiment = {}
-    response = retrieve_sentiment_response(review, false)
     case response.code
     when 200
       sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
@@ -94,7 +93,8 @@ module ReviewMappingHelper
         @sentiment_list << create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
       else
         # Retry once in case of a failure
-        @sentiment_list << handle_sentiment_generation_error(review)
+        response = retrieve_sentiment_response(review, false)
+        @sentiment_list << handle_sentiment_generation_retry(response, review)
       end
     end
     @sentiment_list

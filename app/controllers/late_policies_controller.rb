@@ -53,7 +53,7 @@ class LatePoliciesController < ApplicationController
 
   # GET /late_policies/new
   # GET /late_policies/new.xml
-  def new
+def new
     @late_policy = LatePolicy.new
 
     respond_to do |format|
@@ -98,7 +98,7 @@ class LatePoliciesController < ApplicationController
       end
     end
     if is_number
-      @late_policy = LatePolicy.new(late_policy)
+      @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
 
       begin
@@ -185,7 +185,7 @@ end
     obj.to_s.match(/\A[+-]?\d*?(\.\d+)?\Z/).nil? ? false : true
   end
 
-  def late_policy
+  def late_policy_params
     params.require(:late_policy).permit(:policy_name, :penalty_per_unit, :penalty_unit, :max_penalty)
   end
 end

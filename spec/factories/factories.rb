@@ -23,7 +23,7 @@ FactoryGirl.define do
   end
 
   sequence :student_name do |n|
-    "student#{5000+n}"
+    "student#{5000 + n}"
   end
 
   factory :admin, class: User do
@@ -45,12 +45,12 @@ FactoryGirl.define do
     digital_certificate nil
     timezonepref nil
     public_key nil
-    copy_of_emails  false
+    copy_of_emails false
   end
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2064, 2065, 2066) before each example.
-    name {generate(:student_name)}
+    name { generate(:student_name) }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password "password"
     password_confirmation "password"
@@ -181,7 +181,6 @@ FactoryGirl.define do
     topic_identifier "1"
     micropayment 0
     private_to nil
-
   end
 
   factory :signed_up_team do

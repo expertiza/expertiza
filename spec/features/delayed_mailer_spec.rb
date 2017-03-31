@@ -7,7 +7,7 @@ describe 'Delayed Mailer' do
   before(:each) do
     # Delayed::Worker.delay_jobs = false
     @name = "user"
-    @due_at = DateTime.now.in_time_zone + 1.minutes
+    @due_at = DateTime.now.in_time_zone + 1.minute
 
     @assignment = FactoryGirl.create(:oss_project)
     @team = FactoryGirl.create(:assignment_team)
@@ -50,10 +50,6 @@ describe 'Delayed Mailer' do
     @meta_review_response_map.reviewed_object_id = @assignment.id
     @meta_review_response_map.save
 
-    due_at1 = Time.parse(@due_at.to_s(:db))
-    curr_time = DateTime.now.in_time_zone.to_s(:db)
-    curr_time = Time.parse(curr_time)
-
     @time_in_min = Time.zone.now
     Delayed::Job.delete_all
     ActionMailer::Base.delivery_method = :test
@@ -69,7 +65,7 @@ describe 'Delayed Mailer' do
     Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: submission")
-    expect {mail.perform} .to change {Mailer.deliveries.count} .by(1)
+    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
   end
 
   it 'is able to send reminder email for review deadline to reviewers ' do
@@ -77,7 +73,7 @@ describe 'Delayed Mailer' do
     Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: review")
-    expect {mail.perform} .to change {Mailer.deliveries.count} .by(1)
+    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
   end
 
   it 'is able to send reminder email for Metareview deadline to meta-reviewers and team members of the assignment' do
@@ -85,9 +81,8 @@ describe 'Delayed Mailer' do
     Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: metareview")
-    expect {mail.perform} .to change {Mailer.deliveries.count} .by(2)
+    expect { mail.perform } .to change { Mailer.deliveries.count } .by(2)
   end
-
 
   it 'is able to send reminder email for drop topic deadline to reviewers ' do
     mail = DelayedMailer.new(@assignment.id, "drop_topic", @due_at)
@@ -102,7 +97,7 @@ describe 'Delayed Mailer' do
     Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: signup")
-    expect {mail.perform} .to change {Mailer.deliveries.count} .by(1)
+    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
   end
 end
 
@@ -131,9 +126,9 @@ describe DelayedMailer do
     it "gets user emails" do
       assignment = create(:assignment)
       sign_up_topic = create(:topic)
-      user = create(:student)
-      signed_up_team = create(:signed_up_team)
-      team_user = create(:team_user)
+      create(:student)
+      create(:signed_up_team)
+      create(:team_user)
       # deadline type and due_date are not important for this test
       dm = DelayedMailer.new(assignment.id, nil, nil)
       expect(dm.find_team_members_email_for_all_topics(sign_up_topic)).to eq(["expertiza@mailinator.com"])
@@ -143,7 +138,7 @@ describe DelayedMailer do
   describe ".mail_signed_up_users" do
     it "sends emails to signed up users when no topics" do
       assignment = create(:assignment)
-      dm = DelayedMailer.new(assignment.id,nil, nil)
+      dm = DelayedMailer.new(assignment.id, nil, nil)
 
       # Do not let these functions do anything, like sending out emails
       allow(DelayedMailer).to receive(:find_team_members_email).and_return(true)
@@ -157,7 +152,7 @@ describe DelayedMailer do
     it "sends emails to singed up users when there are topics" do
       assignment = create(:assignment)
       sign_up_topic = create(:topic)
-      dm = DelayedMailer.new(assignment.id,nil, nil)
+      dm = DelayedMailer.new(assignment.id, nil, nil)
 
       # Do not let these functions do anything
       allow(DelayedMailer).to receive(:find_team_members_email_for_all_topics).and_return(true)
@@ -177,5 +172,4 @@ describe DelayedMailer do
       expect(dm.find_team_members_email).to eq(["expertiza@mailinator.com"])
     end
   end
-
-  end
+end

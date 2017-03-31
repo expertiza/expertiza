@@ -14,58 +14,58 @@ class DelayedMailer
     self.due_at = due_at
   end
 
-  def get_assignment
+  def find_assignment
     Assignment.find(self.assignment_id)
   end
 
-  def has_sign_up_topics?
+  def sign_up_topics?
     sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
     (!sign_up_topics.nil? && sign_up_topics.count != 0)
   end
 
   def perform
-    assignment = get_assignment
+    assignment = find_assignment
     if !assignment.nil? && !assignment.id.nil?
-      if (self.deadline_type == "metareview")
+      if self.deadline_type == "metareview"
         mail_metareviewers
         if assignment.team_assignment?
           team_mails = find_team_members_email
-          email_reminder(team_mails, "teammate review") if team_mails.size > 0
+          email_reminder(team_mails, "teammate review") if !team_mails.empty?
         end
       end
 
-      if (self.deadline_type == "review")
+      if self.deadline_type == "review"
         mail_reviewers # to all reviewers
       end
 
-      if (self.deadline_type == "submission")
+      if self.deadline_type == "submission"
         mail_signed_up_users # to all signed up users
       end
 
-      if (self.deadline_type == "drop_topic")
-        if has_sign_up_topics?
+      if self.deadline_type == "drop_topic"
+        if sign_up_topics?
           mail_signed_up_users # reminder to signed_up users of the assignment
         end
       end
 
-      if (self.deadline_type == "signup")
-        if has_sign_up_topics?
+      if self.deadline_type == "signup"
+        if sign_up_topics?
           mail_assignment_participants # reminder to all participants
         end
       end
 
-      if (self.deadline_type == "team_formation")
-        if (assignment.team_assignment?)
+      if self.deadline_type == "team_formation"
+        if assignment.team_assignment?
           emails = get_one_member_team
           email_reminder(emails, self.deadline_type)
         end
       end
 
-      if (self.deadline_type == "drop_one_member_topics")
-        drop_one_member_topics if (assignment.team_assignment?)
+      if self.deadline_type == "drop_one_member_topics"
+        drop_one_member_topics if assignment.team_assignment?
       end
 
-      if (self.deadline_type == "drop_outstanding_reviews")
+      if self.deadline_type == "drop_outstanding_reviews"
         drop_outstanding_reviews
       end
     end
@@ -79,7 +79,7 @@ class DelayedMailer
     else
       emails = find_team_members_email_for_all_topics(sign_up_topics)
     end
-    email_reminder(emails, self.deadline_type) if emails and emails.size > 0
+    email_reminder(emails, self.deadline_type) if emails and !emails.empty?
   end
 
   def find_team_members_email
@@ -131,7 +131,7 @@ class DelayedMailer
         emails << metareviewer.reviewer.user.email
       end
     end
-    email_reminder(emails, self.deadline_type) if emails.size > 0
+    email_reminder(emails, self.deadline_type) if !emails.empty?
   end
 
   def mail_reviewers
@@ -141,19 +141,19 @@ class DelayedMailer
       participant = Participant.where(['parent_id = ? AND id = ?', self.assignment_id, review.reviewer_id]).first
       emails << participant.user.email
     end
-    email_reminder(emails, self.deadline_type) if emails.size > 0
+    email_reminder(emails, self.deadline_type) if !emails.empty?
   end
 
   def mail_assignment_participants
     emails = []
-    for user in get_assignment.users
+    for user in find_assignment.users
       emails << user.email
     end
     email_reminder(emails, self.deadline_type)
   end
 
   def email_reminder(emails, deadlineType)
-    assignment = get_assignment
+    assignment = find_assignment
     subject = "Message regarding #{deadlineType} for assignment #{assignment.name}"
     body = "This is a reminder to complete #{deadlineType} for assignment #{assignment.name}. Deadline is #{self.due_at}.If you have already done the  #{deadlineType}, Please ignore this mail."
 
@@ -174,11 +174,7 @@ class DelayedMailer
       Rails.logger.info mail
     end
 
-    @mail = Mailer.delayed_message(
-        bcc: emails,
-        subject: subject,
-        body: body
-    )
+    @mail = Mailer.delayed_message(bcc: emails, subject: subject, body: body)
     @mail.deliver_now
   end
 

@@ -53,12 +53,11 @@ class InvitationsController < ApplicationController
     # Remove the users previous team since they are accepting an invite for possibly a new team.
     TeamsUser.remove_team(student.user_id, params[:team_id])
 
-    # Accept the invite and return boolean on whether the add was successful
-    add_successful = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
-
-    unless add_successful
-    flash[:error] = "The system failed to add you to the team that invited you."
+    # Accept the invite and check whether the add was successful
+    unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
+      flash[:error] = 'The system failed to add you to the team that invited you.'
     end
+
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -78,53 +77,49 @@ class InvitationsController < ApplicationController
 
   private
 
-  def check_user
-    # user is the student you are inviting to your team
-    @user = User.find_by(name: params[:user][:name].strip)
-    # team has information about the team
-    @team = AssignmentTeam.find(params[:team_id])
-    # student has information about the participant
-    @student = AssignmentParticipant.find(params[:student_id])
+    def check_user
+      # user is the student you are inviting to your team
+      @user = User.find_by(name: params[:user][:name].strip)
+      # team has information about the team
+      @team = AssignmentTeam.find(params[:team_id])
+      # student has information about the participant
+      @student = AssignmentParticipant.find(params[:student_id])
 
-    return unless current_user_id?(@student.user_id)
+      return unless current_user_id?(@student.user_id)
 
-    # check if the invited user is valid
-    unless @user
-      flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+      # check if the invited user is valid
+      unless @user
+        flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+        redirect_to view_student_teams_path student_id: @student.id
+        return
+      end
+      @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
+      # check if the user is a participant of the assignment
+      unless @participant
+        flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+        redirect_to view_student_teams_path student_id: @student.id
+        return
+      end
+
+      return unless @team.full?
+      flash[:error] = 'Your team already has the maximum number members.'
       redirect_to view_student_teams_path student_id: @student.id
-      return
-    end
-    @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
-    # check if the user is a participant of the assignment
-    unless @participant
-      flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-      redirect_to view_student_teams_path student_id: @student.id
-      return
     end
 
-    return unless @team.full?
-    flash[:error] = 'Your team already has the maximum number members.'
-    redirect_to view_student_teams_path student_id: @student.id
-  end
-
-  def check_team
-    @inv = Invitation.find(params[:inv_id])
-    assignment_id = @inv.assignment_id
-    inviter_user_id = @inv.from_id
-    inviter_participant = AssignmentParticipant.find_by(user_id: inviter_user_id, parent_id: assignment_id)
-    # check if the inviter's team is still existing, and have available slot to add the invitee
-    inviter_assignment_team = AssignmentTeam.team(inviter_participant)
-    if inviter_assignment_team.nil?
-      flash[:error] = 'The team that invited you does not exist anymore.'
-      redirect_to view_student_teams_path student_id: params[:student_id]
-    elsif inviter_assignment_team.full?
-      flash[:error] = 'The team that invited you is full now.'
-      redirect_to view_student_teams_path student_id: params[:student_id]
-    else
-      # Status code A for accepted
-      @inv.reply_status = 'A'
-      @inv.save
+    def check_team
+      @inv = Invitation.find(params[:inv_id])
+      # check if the inviter's team is still existing, and have available slot to add the invitee
+      inviter_assignment_team = AssignmentTeam.team(AssignmentParticipant.find_by(user_id: @inv.from_id, parent_id: @inv.assignment_id))
+      if inviter_assignment_team.nil?
+        flash[:error] = 'The team that invited you does not exist anymore.'
+        redirect_to view_student_teams_path student_id: params[:student_id]
+      elsif inviter_assignment_team.full?
+        flash[:error] = 'The team that invited you is full now.'
+        redirect_to view_student_teams_path student_id: params[:student_id]
+      else
+        # Status code A for accepted
+        @inv.reply_status = 'A'
+        @inv.save
+      end
     end
-
-  end
 end

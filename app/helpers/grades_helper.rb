@@ -34,33 +34,32 @@ module GradesHelper
 
   def participant
     @participant = Participant.find(params[:id])
+    @participant
+  end
+
+  def pscore
+    @participant = Participant.find(params[:id])
+    @pscore = @participant.scores(@questions)
+    @pscore
   end
 
   def rscore_review
-    @participant = Participant.find(params[:id])
-    @pscore = @participant.scores(@questions)
-    @rscore_review = Rscore.new(@pscore, :review) if @pscore[:review]
+    @rscore_review = Rscore.new(pscore, :review) if pscore[:review]
     @rscore_review
   end
 
   def rscore_metareview
-    @participant = Participant.find(params[:id])
-    @pscore = @participant.scores(@questions)
-    @rscore_metareview = Rscore.new(@pscore, :metareview) if @pscore[:metareview]
+    @rscore_metareview = Rscore.new(pscore, :metareview) if pscore[:metareview]
     @rscore_metareview
   end
 
   def rscore_feedback
-    @participant = Participant.find(params[:id])
-    @pscore = @participant.scores(@questions)
-    @rscore_feedback = Rscore.new(@pscore, :feedback) if @pscore[:feedback]
+    @rscore_feedback = Rscore.new(pscore, :feedback) if pscore[:feedback]
     @rscore_feedback
   end
 
   def rscore_teammate
-    @participant = Participant.find(params[:id])
-    @pscore = @participant.scores(@questions)
-    @rscore_teammate = Rscore.new(@pscore, :teammate) if @pscore[:teammate]
+    @rscore_teammate = Rscore.new(pscore, :teammate) if pscore[:teammate]
     @rscore_teammate
   end
 

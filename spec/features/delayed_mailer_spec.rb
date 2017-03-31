@@ -89,7 +89,7 @@ describe 'Delayed Mailer' do
     Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_topic")
-    expect {mail.perform} .to change {Mailer.deliveries.count} .by(1)
+    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
   end
 
   it 'is able to send reminder email for signup deadline to assignment participants ' do
@@ -168,7 +168,7 @@ describe DelayedMailer do
       dm = DelayedMailer.new(1, nil, nil)
       user = create(:student)
       team = Team.create(parent_id: 1)
-      team_user = create(:team_user, team_id: team.id, user_id: user.id)
+      create(:team_user, team_id: team.id, user_id: user.id)
       expect(dm.find_team_members_email).to eq(["expertiza@mailinator.com"])
     end
   end

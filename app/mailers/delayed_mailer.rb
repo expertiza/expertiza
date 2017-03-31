@@ -30,7 +30,7 @@ class DelayedMailer
         mail_metareviewers
         if assignment.team_assignment?
           team_mails = find_team_members_email
-          email_reminder(team_mails, "teammate review") if !team_mails.empty?
+          email_reminder(team_mails, "teammate review") unless team_mails.empty?
         end
       end
 
@@ -131,7 +131,7 @@ class DelayedMailer
         emails << metareviewer.reviewer.user.email
       end
     end
-    email_reminder(emails, self.deadline_type) if !emails.empty?
+    email_reminder(emails, self.deadline_type) unless emails.empty?
   end
 
   def mail_reviewers
@@ -141,7 +141,7 @@ class DelayedMailer
       participant = Participant.where(['parent_id = ? AND id = ?', self.assignment_id, review.reviewer_id]).first
       emails << participant.user.email
     end
-    email_reminder(emails, self.deadline_type) if !emails.empty?
+    email_reminder(emails, self.deadline_type) unless emails.empty?
   end
 
   def mail_assignment_participants

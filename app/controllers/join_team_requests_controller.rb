@@ -1,6 +1,5 @@
 class JoinTeamRequestsController < ApplicationController
   before_action :check_team, only: [:create]
-  before_action :get_request, only: [:show, :edit, :update, :destroy, :decline]
   def action_allowed?
     current_role_name.eql?("Student")
   end
@@ -11,6 +10,7 @@ class JoinTeamRequestsController < ApplicationController
   end
 
   def show
+    @join_team_request = JoinTeamRequest.find(params[:id])
     respond_after @join_team_request
   end
 
@@ -20,6 +20,7 @@ class JoinTeamRequestsController < ApplicationController
   end
 
   def edit
+    @join_team_request = JoinTeamRequest.find(params[:id])
   end
 
   # create a new join team request entry for join_team_request table and add it to the table
@@ -46,6 +47,7 @@ class JoinTeamRequestsController < ApplicationController
 
   # update join team request entry for join_team_request table and add it to the table
   def update
+    @join_team_request = JoinTeamRequest.find(params[:id])
     respond_to do |format|
       if @join_team_request.update_attribute(:comments, params[:join_team_request][:comments])
         format.html { redirect_to(@join_team_request, notice: 'JoinTeamRequest was successfully updated.') }
@@ -58,7 +60,9 @@ class JoinTeamRequestsController < ApplicationController
   end
 
   def destroy
+    @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.destroy
+
     respond_to do |format|
       format.html { redirect_to(join_team_requests_url) }
       format.xml  { head :ok }
@@ -67,6 +71,7 @@ class JoinTeamRequestsController < ApplicationController
 
   # decline request to join the team...
   def decline
+    @join_team_request = JoinTeamRequest.find(params[:id])
     @join_team_request.status = 'D'
     @join_team_request.save
     redirect_to view_student_teams_path student_id: params[:teams_user_id]
@@ -95,9 +100,5 @@ class JoinTeamRequestsController < ApplicationController
         format.html
         format.xml  { render xml: request }
       end
-    end
-
-    def get_request
-      @join_team_request = JoinTeamRequest.find(params[:id])
     end
 end

@@ -22,6 +22,8 @@ class ImportFileController < ApplicationController
     err_msg += "</ul>"
     flash[:error] = err_msg unless errors.empty?
     undo_link("The file has been successfully imported.")
+    ###add a mailer here
+    ####get the value of email id
     redirect_to session[:return_to]
   end
 

@@ -68,7 +68,6 @@ class DelayedMailer
   end
 
   def mail_signed_up_users
-    emails = []
     sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
     emails = if sign_up_topics.nil? || sign_up_topics.count.zero?
                find_team_members_email

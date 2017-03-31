@@ -1,5 +1,6 @@
 class InvitationsController < ApplicationController
   before_action :check_user, only: [:create]
+  before_action :check_team, only: [:accept]
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
@@ -9,33 +10,26 @@ class InvitationsController < ApplicationController
   end
 
   def create
-    # user is the student you are inviting to your team
-    user = User.find_by(name: params[:user][:name].strip)
-    # team has information about the team
-    team = AssignmentTeam.find(params[:team_id])
-    # student has information about the participant
-    student = AssignmentParticipant.find(params[:student_id])
-
     # participant information about student you are trying to invite to the team
-    team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
+    team_member = TeamsUser.where(['team_id =? and user_id =?', @team.id, @user.id])
     # check if invited user is already in the team
     if !team_member.empty?
-      flash[:note] = "The user \"#{user.name}\" is already a member of the team."
+      flash[:note] = "The user \"#{@user.name}\" is already a member of the team."
     # check if the invited user is already invited (i.e. awaiting reply)
-    elsif Invitation.is_invited?(student.user_id, user.id, student.parent_id)
+    elsif Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       @invitation = Invitation.new
-      @invitation.to_id = user.id
-      @invitation.from_id = student.user_id
-      @invitation.assignment_id = student.parent_id
+      @invitation.to_id = @user.id
+      @invitation.from_id = @student.user_id
+      @invitation.assignment_id = @student.parent_id
       @invitation.reply_status = 'W'
       @invitation.save
     else
-      flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
+      flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end
 
-    update_join_team_request user, student
+    update_join_team_request @user, @student
 
-    redirect_to view_student_teams_path student_id: student.id
+    redirect_to view_student_teams_path student_id: @student.id
   end
 
   def update_join_team_request(user, student)
@@ -56,25 +50,9 @@ class InvitationsController < ApplicationController
 
   def accept
     @inv = Invitation.find(params[:inv_id])
-
     student = Participant.find(params[:student_id])
 
-    assignment_id = @inv.assignment_id
-    inviter_user_id = @inv.from_id
-    inviter_participant = AssignmentParticipant.find_by(user_id: inviter_user_id, parent_id: assignment_id)
-
-    ready_to_join = false
-    # check if the inviter's team is still existing, and have available slot to add the invitee
-    inviter_assignment_team = AssignmentTeam.team(inviter_participant)
-    if inviter_assignment_team.nil?
-      flash[:error] = "The team that invited you does not exist anymore."
-    elsif inviter_assignment_team.full?
-      flash[:error] = "The team that invited you is full now."
-    else
-      ready_to_join = true
-    end
-
-    if ready_to_join
+    if @ready_to_join
       # Status code A for accepted
       @inv.reply_status = 'A'
       @inv.save
@@ -89,7 +67,6 @@ class InvitationsController < ApplicationController
         flash[:error] = "The system failed to add you to the team that invited you."
       end
     end
-
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -111,30 +88,47 @@ class InvitationsController < ApplicationController
 
   def check_user
     # user is the student you are inviting to your team
-    user = User.find_by(name: params[:user][:name].strip)
+    @user = User.find_by(name: params[:user][:name].strip)
     # team has information about the team
-    team = AssignmentTeam.find(params[:team_id])
+    @team = AssignmentTeam.find(params[:team_id])
     # student has information about the participant
-    student = AssignmentParticipant.find(params[:student_id])
+    @student = AssignmentParticipant.find(params[:student_id])
 
-    return unless current_user_id?(student.user_id)
+    return unless current_user_id?(@student.user_id)
 
     # check if the invited user is valid
-    unless user
+    unless @user
       flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
-      redirect_to view_student_teams_path student_id: student.id
+      redirect_to view_student_teams_path student_id: @student.id
       return
     end
-    participant = AssignmentParticipant.where('user_id =? and parent_id =?', user.id, student.parent_id).first
+    @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
-    unless participant
+    unless @participant
       flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-      redirect_to view_student_teams_path student_id: student.id
+      redirect_to view_student_teams_path student_id: @student.id
       return
     end
 
-    return unless team.full?
+    return unless @team.full?
     flash[:error] = "Your team already has the maximum number members."
-    redirect_to view_student_teams_path student_id: student.id
+    redirect_to view_student_teams_path student_id: @student.id
+  end
+
+  def check_team
+    @inv = Invitation.find(params[:inv_id])
+    assignment_id = @inv.assignment_id
+    inviter_user_id = @inv.from_id
+    inviter_participant = AssignmentParticipant.find_by(user_id: inviter_user_id, parent_id: assignment_id)
+    @ready_to_join = false
+    # check if the inviter's team is still existing, and have available slot to add the invitee
+    inviter_assignment_team = AssignmentTeam.team(inviter_participant)
+    if inviter_assignment_team.nil?
+      flash[:error] = "The team that invited you does not exist anymore."
+    elsif inviter_assignment_team.full?
+      flash[:error] = "The team that invited you is full now."
+    else
+      @ready_to_join = true
+    end
   end
 end

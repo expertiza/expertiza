@@ -152,14 +152,8 @@ end
 describe SignUpSheetController do
   before(:each) do
     @assignment = create(:assignment)
-    create_list(:participant, 3)
-    @student1 = User.where(role_id: 2).first
-    @student2 = User.where(role_id: 2).second
-    @student3 = User.where(role_id: 2).third
-
-    @topic1 = create(:topic, topic_name: "Parallel Architecture")
+    @topic1 = create(:topic, topic_name: "Design Patterns")
     @topic2 = create(:topic, topic_name: "MVC Framework")
-    @topic3 = create(:topic, topic_name: "Design Patterns")
     create(:deadline_type, name: "signup")
     create(:deadline_type, name: "team_formation")
     create(:deadline_type, name: "submission")
@@ -171,15 +165,14 @@ describe SignUpSheetController do
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "drop_topic").first, due_at: DateTime.now.in_time_zone - 1.day)
 
-    create(:assignment_team, name: "Team1")
-    create(:assignment_team, name: "Team2")
-    create(:assignment_team, name: "Team3", submitted_hyperlinks: nil)
-    create(:team_user, user: User.where(role_id: 2).first, team: AssignmentTeam.first)
-    create(:team_user, user: User.where(role_id: 2).second, team: AssignmentTeam.second)
-    create(:team_user, user: User.where(role_id: 2).third, team: AssignmentTeam.third)
+    create_list(:participant, 2)
+    @student1 = User.where(role_id: 2).first
+    @student2 = User.where(role_id: 2).second
 
-    create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-    create(:signed_up_team, team_id: 3, topic: SignUpTopic.third)
+    @team1 = create(:assignment_team, name: "Team1", submitted_hyperlinks: nil)
+    @team2 = create(:assignment_team, name: "Team2")
+    create(:team_user, user: @student2, team: @team2)
+    create(:signed_up_team, team_id: 2, topic: @topic2)
 
     # Simulate Authorized Session
     instructor.save
@@ -194,7 +187,9 @@ describe SignUpSheetController do
       expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
     end
     it "checks that a user already has a topic" do
-      post :signup_as_instructor_action, username: @student2.name, assignment_id: @assignment.id, topic_id: @topic1.id
+      create(:team_user, user: @student1, team: @team1)
+      create(:signed_up_team, team_id: 1, topic: @topic1)
+      post :signup_as_instructor_action, username: @student1.name, assignment_id: @assignment.id, topic_id: @topic2.id
       expect(flash[:error]).to eq('The student has already signed up for a topic!')
     end
     it "checks to make sure the user exists" do
@@ -213,13 +208,14 @@ describe SignUpSheetController do
       expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
     end
     it "checks to see if the deadline has passed" do
-      post :delete_signup_as_instructor, id: 3, topic_id: @topic3.id
+      create(:team_user, user: @student1, team: @team1)
+      create(:signed_up_team, team_id: 1, topic: @topic1)
+      post :delete_signup_as_instructor, id: 1, topic_id: @topic1.id
       expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
     end
     it "redirects back to topics page" do
-      post :delete_signup_as_instructor, id: 3, topic_id: @topic3.id
+      post :delete_signup_as_instructor, id: 2, topic_id: @topic2.id
       expect(response).to redirect_to edit_assignment_url(id: @assignment.id)
     end
   end
 end
-

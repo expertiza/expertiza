@@ -23,7 +23,6 @@ class DelayedMailer
     (!sign_up_topics.nil? && sign_up_topics.count != 0)
   end
 
-  # Last modified by bzamani as part of Spring 2017 E1711
   def perform
     assignment = get_assignment
     if !assignment.nil? && !assignment.id.nil?
@@ -72,7 +71,6 @@ class DelayedMailer
     end
   end
 
-  # Last modified by Prateek as part of Spring 2017 E1711
   def mail_signed_up_users
     emails = []
     sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
@@ -84,7 +82,6 @@ class DelayedMailer
     email_reminder(emails, self.deadline_type) if emails and emails.size > 0
   end
 
-  # Last modified by bzamani as part of Spring 2017 E1711
   def find_team_members_email
     emails = []
     teams = Team.where(['parent_id = ?', self.assignment_id])
@@ -96,7 +93,6 @@ class DelayedMailer
     emails
   end
 
-  # Last modify by bzamani as part of Spring 2017 E1711
   def find_team_members_email_for_all_topics(sign_up_topics)
     emails = []
     unless sign_up_topics.respond_to?(:each)
@@ -138,7 +134,6 @@ class DelayedMailer
     email_reminder(emails, self.deadline_type) if emails.size > 0
   end
 
-  # Last modified by bzamani as part of Spring 2017 E1711
   def mail_reviewers
     emails = []
     reviews = ResponseMap.where(['reviewed_object_id = ? AND type = "ReviewResponseMap"', self.assignment_id])
@@ -149,7 +144,6 @@ class DelayedMailer
     email_reminder(emails, self.deadline_type) if emails.size > 0
   end
 
-  # Last modified by bzamani as part of Spring 2017 E1711
   def mail_assignment_participants
     emails = []
     for user in get_assignment.users
@@ -158,14 +152,11 @@ class DelayedMailer
     email_reminder(emails, self.deadline_type)
   end
 
-  # Last modified by bzamani as part of Spring 2017 E1711
   def email_reminder(emails, deadlineType)
     assignment = get_assignment
     subject = "Message regarding #{deadlineType} for assignment #{assignment.name}"
     body = "This is a reminder to complete #{deadlineType} for assignment #{assignment.name}. Deadline is #{self.due_at}.If you have already done the  #{deadlineType}, Please ignore this mail."
 
-    # emails<<"vikas.023@gmail.com"
-    # emails<<"vsharma4@ncsu.edu"
     @@count += 1
     Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     Rails.logger.info deadlineType

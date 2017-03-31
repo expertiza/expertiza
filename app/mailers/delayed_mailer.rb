@@ -28,10 +28,8 @@ class DelayedMailer
     if !assignment.nil? && !assignment.id.nil?
       if self.deadline_type == "metareview"
         mail_metareviewers
-        if assignment.team_assignment?
-          team_mails = find_team_members_email
-          email_reminder(team_mails, "teammate review") unless team_mails.empty?
-        end
+        team_mails = find_team_members_email
+        email_reminder(team_mails, "teammate review") unless team_mails.empty?
       end
 
       if self.deadline_type == "review"
@@ -55,10 +53,8 @@ class DelayedMailer
       end
 
       if self.deadline_type == "team_formation"
-        if assignment.team_assignment?
-          emails = get_one_member_team
-          email_reminder(emails, self.deadline_type)
-        end
+        emails = get_one_member_team
+        email_reminder(emails, self.deadline_type)
       end
 
       if self.deadline_type == "drop_one_member_topics"

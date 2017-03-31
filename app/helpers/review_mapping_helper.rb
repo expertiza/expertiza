@@ -85,16 +85,14 @@ module ReviewMappingHelper
   def generate_sentiment_list
     @sentiment_list = []
     @reviewers.each do |r|
-      review_text = Response.concatenate_all_review_comments(@id, r).join(" ")
-      review = construct_sentiment_query(r.id, review_text)
+      review = construct_sentiment_query(r.id, Response.concatenate_all_review_comments(@id, r).join(" "))
       response = retrieve_sentiment_response(review, true)
       # Retry in case of failure by sending only a single sentence for sentiment analysis.
       if response.code == 200
         @sentiment_list << create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
       else
         # Retry once in case of a failure
-        response = retrieve_sentiment_response(review, false)
-        @sentiment_list << handle_sentiment_generation_retry(response, review)
+        @sentiment_list << handle_sentiment_generation_retry(retrieve_sentiment_response(review, false), review)
       end
     end
     @sentiment_list

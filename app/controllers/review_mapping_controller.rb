@@ -475,8 +475,6 @@ class ReviewMappingController < ApplicationController
 
 private
 
-  
-
   def assign_reviewers_for_team(assignment_id,student_review_num,participants_hash,
                                 exact_num_of_review_needed)
     if ReviewResponseMap.where(reviewed_object_id:assignment_id,calibrate_to:0)

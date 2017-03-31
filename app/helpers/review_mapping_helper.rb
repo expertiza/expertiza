@@ -57,20 +57,20 @@ module ReviewMappingHelper
         response = get_sentiment(review, false)
         response_list << response
         case response.code
-          when 200
-            sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
-            sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
-            @sentiment_list << sentiment
-          when 404
-            # Error in generating sentiment from the server
-            sentiment["id"] = review["id"]
-            sentiment["sentiment"] = "-404"
-            @sentiment_list << sentiment
-          when 500...600
-            # Error in generating sentiment from the server
-            sentiment["id"] = review["id"]
-            sentiment["sentiment"] = "-500"
-            @sentiment_list << sentiment
+        when 200
+          sentiment["id"] = response.parsed_response["sentiments"][0]["id"]
+          sentiment["sentiment"] = response.parsed_response["sentiments"][0]["sentiment"]
+          @sentiment_list << sentiment
+        when 404
+          # Error in generating sentiment from the server
+          sentiment["id"] = review["id"]
+          sentiment["sentiment"] = "-404"
+          @sentiment_list << sentiment
+        when 500...600
+          # Error in generating sentiment from the server
+          sentiment["id"] = review["id"]
+          sentiment["sentiment"] = "-500"
+          @sentiment_list << sentiment
         end
       end
     end
@@ -78,7 +78,7 @@ module ReviewMappingHelper
   end
 
   def display_sentiment_metric(id)
-    hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s }
+    hashed_sentiment = @sentiment_list.select { |sentiment| sentiment["id"] == id.to_s }
     value = hashed_sentiment[0]["sentiment"].to_f.round(2)
     metric = "Overall Sentiment: #{value}<br/>"
     metric.html_safe

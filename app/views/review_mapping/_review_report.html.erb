@@ -22,7 +22,7 @@
     </thead>
 <tbody>
       <% if @metric_type == "Sentiment" %>
-      <% get_sentiment_list %>
+      <% generate_sentiment_list %>
       <% end %>
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>

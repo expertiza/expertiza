@@ -280,63 +280,63 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-      if(this.props.dataType=='course') {
-          return (
-              <tr id={this.props.id}>
-                  <td width={colWidthArray[0]}>{this.props.name}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
-                  <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
-                  <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
-                  <td width={colWidthArray[6]}>
-                      <RowAction
-                          actions={this.props.actions}
-                          key={"simpleTable_" + this.props.id}
-                          nodeType={nodeType}
-                          parent_name={this.props.name}
-                          private={this.props.private}
-                          is_available={this.props.is_available}
-                          course_id={this.props.course_id}
-                          max_team_size={this.props.max_team_size}
-                          is_intelligent={this.props.is_intelligent}
-                          require_quiz={this.props.require_quiz}
-                          allow_suggestions={this.props.allow_suggestions}
-                          has_topic={this.props.has_topic}
-                          id={id}
-                      />
-                  </td>
-              </tr>
-          )
-      }
-      else{
-          return (
-              <tr id={this.props.id}>
-                  <td width={colWidthArray[0]}>{this.props.name}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
-                  <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
-                  <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
-                  <td width={colWidthArray[6]}>
-                      <RowAction
-                          actions={this.props.actions}
-                          key={"simpleTable_" + this.props.id}
-                          nodeType={nodeType}
-                          parent_name={this.props.name}
-                          private={this.props.private}
-                          is_available={this.props.is_available}
-                          course_id={this.props.course_id}
-                          max_team_size={this.props.max_team_size}
-                          is_intelligent={this.props.is_intelligent}
-                          require_quiz={this.props.require_quiz}
-                          allow_suggestions={this.props.allow_suggestions}
-                          has_topic={this.props.has_topic}
-                          id={id}
-                      />
-                  </td>
-              </tr>
-          )
-      }
+        if (this.props.dataType == 'course') {
+            return (
+                <tr id={this.props.id}>
+                    <td width={colWidthArray[0]}>{this.props.name}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+                    <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+                    <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+                    <td width={colWidthArray[6]}>
+                        <RowAction
+                            actions={this.props.actions}
+                            key={"simpleTable_"+this.props.id}
+                            nodeType={nodeType}
+                            parent_name={this.props.name}
+                            private={this.props.private}
+                            is_available={this.props.is_available}
+                            course_id={this.props.course_id}
+                            max_team_size={this.props.max_team_size}
+                            is_intelligent={this.props.is_intelligent}
+                            require_quiz={this.props.require_quiz}
+                            allow_suggestions={this.props.allow_suggestions}
+                            has_topic={this.props.has_topic}
+                            id={id}
+                        />
+                    </td>
+                </tr>
+            )
+        }
+        else{
+            return (
+                <tr id={this.props.id}>
+                    <td width={colWidthArray[0]}>{this.props.name}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
+                    <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+                    <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+                    <td width={colWidthArray[6]}>
+                        <RowAction
+                            actions={this.props.actions}
+                            key={"simpleTable_"+this.props.id}
+                            nodeType={nodeType}
+                            parent_name={this.props.name}
+                            private={this.props.private}
+                            is_available={this.props.is_available}
+                            course_id={this.props.course_id}
+                            max_team_size={this.props.max_team_size}
+                            is_intelligent={this.props.is_intelligent}
+                            require_quiz={this.props.require_quiz}
+                            allow_suggestions={this.props.allow_suggestions}
+                            has_topic={this.props.has_topic}
+                            id={id}
+                        />
+                    </td>
+                </tr>
+            )
+        }
     }
   })
 
@@ -356,11 +356,10 @@ jQuery(document).ready(function() {
         }
       }
       if (this.props.data) {
-          if(this.props.dataType=='course') {
-              this.props.data.forEach(function (entry, i) {
-                  _rows.push(<SimpleTableRow
-                      key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
-                      id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
+        this.props.data.forEach(function(entry, i){
+          _rows.push(<SimpleTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
                       name={entry.name}
                       instructor={entry.instructor}
                       institution={entry.institution}
@@ -377,94 +376,70 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
-                  />)
-              })
-          }
-          else{
-              this.props.data.forEach(function (entry, i) {
-                  _rows.push(<SimpleTableRow
-                      key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
-                      id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
-                      name={entry.name}
-                      instructor={entry.instructor}
-                      directory={entry.directory}
-                      creation_date={entry.creation_date}
-                      updated_date={entry.updated_date}
-                      private={entry.private}
-                      actions={entry.actions}
-                      is_available={entry.is_available}
-                      course_id={entry.course_id}
-                      max_team_size={entry.max_team_size}
-                      is_intelligent={entry.is_intelligent}
-                      allow_suggestions={entry.allow_suggestions}
-                      require_quiz={entry.require_quiz}
-                      has_topic={entry.has_topic}
-                      dataType={_this.props.dataType}
-                  />)
-              })
-          }
+                      />)
+        })
       }
-        if(this.props.dataType=='course') {
-            return (
-                <table className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th width={colWidthArray[0]}>
-                                {firstColText}
-                            </th>
-                            <th style={colDisplayStyle} width={colWidthArray[1]}>
-                                Directory
-                            </th>
-                            <th style={colDisplayStyle} width={colWidthArray[2]}>
-                                Instructor
-                            </th>
-                            <th style={colDisplayStyle} width={colWidthArray[3]}>
-                                Institution
-                            </th>
-                            <th width={colWidthArray[4]}>
-                                Creation Date
-                            </th>
-                            <th width={colWidthArray[5]}>
-                                Updated Date
-                            </th>
-                            <th width={colWidthArray[6]}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+      if (this.props.dataType == 'course') {
+          return (
+              <table className="table table-hover">
+                  <thead>
+                      <tr>
+                          <th width={colWidthArray[0]}>
+                {firstColText}
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[1]}>
+                              Directory
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[2]}>
+                              Instructor
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[3]}>
+                              Institution
+                          </th>
+                          <th width={colWidthArray[4]}>
+                              Creation Date
+                          </th>
+                          <th width={colWidthArray[5]}>
+                              Updated Date
+                          </th>
+                          <th width={colWidthArray[6]}>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
             {_rows}
-                    </tbody>
-                </table>
-            )
-        }
-        else{
-            return (
-                <table className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th width={colWidthArray[0]}>
-                                {firstColText}
-                            </th>
-                            <th style={colDisplayStyle} width={colWidthArray[1]}>
-                                Directory
-                            </th>
-                            <th style={colDisplayStyle} width={colWidthArray[2]}>
-                                Instructor
-                            </th>
-                            <th width={colWidthArray[4]}>
-                                Creation Date
-                            </th>
-                            <th width={colWidthArray[5]}>
-                                Updated Date
-                            </th>
-                            <th width={colWidthArray[6]}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                  </tbody>
+              </table>
+          )
+      }
+      else{
+          return (
+              <table className="table table-hover">
+                  <thead>
+                      <tr>
+                          <th width={colWidthArray[0]}>
+                {firstColText}
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[1]}>
+                              Directory
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[2]}>
+                              Instructor
+                          </th>
+                          <th width={colWidthArray[4]}>
+                              Creation Date
+                          </th>
+                          <th width={colWidthArray[5]}>
+                              Updated Date
+                          </th>
+                          <th width={colWidthArray[6]}>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
             {_rows}
-                    </tbody>
-                </table>
-            )
-        }
+                  </tbody>
+              </table>
+          )
+      }
     }
   })
 
@@ -508,7 +483,7 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-      if(this.props.dataType=='course') {
+      if (this.props.dataType == 'course') {
           return (
               <tr onClick={this.handleClick} id={this.props.id}>
                   <td width={colWidthArray[0]}>{this.props.name}</td>

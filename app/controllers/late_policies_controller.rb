@@ -142,10 +142,4 @@ class LatePoliciesController < ApplicationController
   def late_policy_params
     params.require(:late_policy).permit(:policy_name, :penalty_per_unit, :penalty_unit, :max_penalty)
   end
-
-
-  #private
-  #def is_numeric?(obj)
-  #  obj.to_s.match(/\A[+-]?\d*?(\.\d+)?\Z/).nil? ? false : true
-  #end
 end

@@ -196,6 +196,11 @@ describe SignUpSheetController do
       post :signup_as_instructor_action, username: "asifljasdlf", assignment_id: @assignment.id, topic_id: @topic1.id
       expect(flash[:error]).to eq('That student does not exist!')
     end
+    it "checks to make sure the user is registered for the assignment" do
+      student = create(:student)
+      post :signup_as_instructor_action, username: student.name, assignment_id: @assignment.id, topic_id: @topic1.id
+      expect(flash[:error]).to eq('The student is not registered for the assignment!')
+    end
     it "redirects back to topics page" do
       post :signup_as_instructor_action, username: @student1.name, assignment_id: @assignment.id, topic_id: @topic1.id
       expect(response).to redirect_to edit_assignment_url(id: @assignment.id)

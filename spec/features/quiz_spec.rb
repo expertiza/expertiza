@@ -10,11 +10,15 @@ def create_deadline_type
   create(:deadline_type, name: "team_formation")
 end
 
-def create_assignment_due_date
-  create_deadline_type
+def create_deadline_right
   create(:deadline_right)
   create(:deadline_right, name: 'Late')
   create(:deadline_right, name: 'OK')
+end
+
+def create_assignment_due_date
+  create_deadline_type
+  create_deadline_right
   create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day)
 
   @review_deadline_type = create(:deadline_type, name: "review")
@@ -323,6 +327,50 @@ describe 'appropriate quiz taking times', js: true do
   end
 end
 
+def create_student1
+  @student1 = create(:student)
+  @participant1 = create :participant, assignment: @assignment, user: @student1
+end
+
+def create_student2
+  # Create student
+  @student2 = create(:student)
+
+  # Create participant mapping
+  @participant2 = create :participant, assignment: @assignment, user: @student2
+end
+
+def make_team
+  # Create a team linked to the calibrated assignment
+  @team1 = create :assignment_team, assignment: @assignment
+
+  # Create a mapping between the assignment team and the
+  # participant object's user (the submitter).
+  create :team_user, team: @team1, user: @student1
+  create :review_response_map, assignment: @assignment, reviewee: @team1
+end
+
+def setup_questionnaire
+  # Create a team quiz questionnaire
+  @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
+
+  # Create the quiz question and answers
+  choices = create_choices
+
+  @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+end
+
+def setup_responses
+  # Create a response mapping
+  @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+
+  # Create a question response
+  @response = create :quiz_response, response_map: @response_map
+
+  # Create an answer for the question
+  create :answer, question: @question, response_id: @response.id, answer: 1
+end
+
 def init_instructor_tests
   # Create an instructor
   @instructor = create(:instructor)
@@ -336,43 +384,16 @@ def init_instructor_tests
   # Setup Student 1
 
   # Create student
-  @student1 = create(:student)
+  create_student1
 
-  # Create an assignment participant linked to the assignment
-  @participant1 = create :participant, assignment: @assignment, user: @student1
+  make_team
 
-  # Create a team linked to the calibrated assignment
-  @team1 = create :assignment_team, assignment: @assignment
-
-  # Create a mapping between the assignment team and the
-  # participant object's user (the submitter).
-  create :team_user, team: @team1, user: @student1
-  create :review_response_map, assignment: @assignment, reviewee: @team1
-
-  # Create a team quiz questionnaire
-  @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
-
-  # Create the quiz question and answers
-  choices = create_choices
-
-  @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+  setup_questionnaire
 
   # Setup Student 2
+  create_student2
 
-  # Create student
-  @student2 = create(:student)
-
-  # Create participant mapping
-  @participant2 = create :participant, assignment: @assignment, user: @student2
-
-  # Create a response mapping
-  @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
-
-  # Create a question response
-  @response = create :quiz_response, response_map: @response_map
-
-  # Create an answer for the question
-  create :answer, question: @question, response_id: @response.id, answer: 1
+  setup_responses
 end
 
 # Tests regarding the instructor's ability to interact with quizzes.
@@ -433,35 +454,17 @@ describe 'Student reviewers can not take the quizzes before request artifact', j
 
     # Setup Student 1
 
-    # Create student
-    @student1 = create(:student)
+    create_student1
 
-    # Create an assignment participant linked to the assignment
-    @participant1 = create :participant, assignment: @assignment, user: @student1
-
-    # Create a team linked to the calibrated assignment
-    @team1 = create :assignment_team, assignment: @assignment
-
-    # Create a mapping between the assignment team and the
-    # participant object's user (the submitter).
-    create :team_user, team: @team1, user: @student1
-    create :review_response_map, assignment: @assignment, reviewee: @team1
+    make_team
 
     # Create a team quiz questionnaire
-    @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
-
-    # Create the quiz question and answers
-    choices = create_choices
-
-    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+    setup_questionnaire
 
     # Setup Student 2
 
     # Create student
-    @student2 = create(:student)
-
-    # Create participant mapping
-    @participant2 = create :participant, assignment: @assignment, user: @student2
+    create_student2
   end
 
   it 'can not take quiz' do
@@ -491,35 +494,16 @@ describe 'Student reviewers can take the quizzes', js: true do
 
     # Setup Student 1
 
-    # Create student
-    @student1 = create(:student)
+    create_student1
 
-    # Create an assignment participant linked to the assignment
-    @participant1 = create :participant, assignment: @assignment, user: @student1
+    make_team
 
-    # Create a team linked to the calibrated assignment
-    @team1 = create :assignment_team, assignment: @assignment
-
-    # Create a mapping between the assignment team and the
-    # participant object's user (the submitter).
-    create :team_user, team: @team1, user: @student1
-    create :review_response_map, assignment: @assignment, reviewee: @team1
-
-    # Create a team quiz questionnaire
-    @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
-
-    # Create the quiz question and answers
-    choices = create_choices
-
-    @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
+    setup_questionnaire
 
     # Setup Student 2
 
     # Create student
-    @student2 = create(:student)
-
-    # Create participant mapping
-    @participant2 = create :participant, assignment: @assignment, user: @student2
+    create_student2
 
     # Create a response mapping
     @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id

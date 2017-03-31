@@ -40,7 +40,7 @@ module ReviewMappingHelper
         'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
         body: {"reviews" => [reconstructed_review]}.to_json,
         headers: {'Content-Type' => 'application/json'}
-                              ) 
+                              )
     end
     response
   end

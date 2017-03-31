@@ -398,12 +398,12 @@ class ReviewMappingController < ApplicationController
       @avg_scores_by_round = sum.avg_scores_by_round
       @avg_scores_by_criterion = sum.avg_scores_by_criterion
     when "ReviewResponseMap"
-      if params[:select_metric]
-        @metric_type = params[:MetricSelector]
-      else
-        # Default metric
-        @metric_type = "AverageVolume"
-      end
+      @metric_type = if params[:select_metric]
+                       params[:MetricSelector]
+                     else
+                       # Default metric
+                       "AverageVolume"
+                     end
       @review_user = params[:user]
       # If review response is required call review_response_report method in review_response_map model
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)

@@ -20,10 +20,6 @@ module ImportFileHelper
     user.save!
     user
     instructor_email = User.where(["role_id = ?", 2]).select("email").first
-    send_email_to_instructor(instructor_email)
-  end
-
-  def send_email_to_instructor(instructor_email)
     Mailer.suggested_topic(
         to: instructor_email,
         #cc: cc_mail_list,
@@ -33,5 +29,7 @@ module ImportFileHelper
             proposer: @user_id
         }
     ).deliver_now!
-    end
+
+  end
+
 end

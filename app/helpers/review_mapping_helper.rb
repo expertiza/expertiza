@@ -62,6 +62,25 @@ module ReviewMappingHelper
   end
 
   #
+  # Handles error scenarios while retrieving sentiment value from sentiment server
+  #
+  def handle_sentiment_generation_error(review)
+    sentiment = {}
+    response = retrieve_sentiment_response(review, false)
+    case response.code
+      when 200
+        sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
+      when 404
+        # Error in generating sentiment from the server
+        sentiment = create_sentiment(review["id"], "-404")
+      when 500...600
+        # Error in generating sentiment from the server
+        sentiment = create_sentiment(review["id"], "-500")
+    end
+    sentiment
+  end
+
+  #
   # Generates sentiment list for all the reviews
   #
   def generate_sentiment_list
@@ -76,17 +95,7 @@ module ReviewMappingHelper
         sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
       else
         # Retry once in case of a failure
-        response = retrieve_sentiment_response(review, false)
-        case response.code
-        when 200
-          sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
-        when 404
-          # Error in generating sentiment from the server
-          sentiment = create_sentiment(review["id"], "-404")
-        when 500...600
-          # Error in generating sentiment from the server
-          sentiment = create_sentiment(review["id"], "-500")
-        end
+        sentiment = handle_sentiment_generation_error(review)
       end
       @sentiment_list << sentiment
     end

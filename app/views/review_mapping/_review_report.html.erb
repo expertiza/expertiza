@@ -16,7 +16,11 @@
         <th width = "24%" class="sorter-false">Team reviewed <span></span></th>
       <% end %>
       <th width = "13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width = "13%" class="sorter-true">Metrics <span></span></th>
+      <% if @metric_type == "Sentiment" %>
+          <th width = "13%" class="sorter-true">Metric: Sentiment <span></span></th>
+      <% else %>
+          <th width = "13%" class="sorter-true">Metric: Avg. Volume <span></span></th>
+      <% end %>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>

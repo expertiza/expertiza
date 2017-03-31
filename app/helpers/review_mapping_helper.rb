@@ -65,14 +65,13 @@ module ReviewMappingHelper
   # Handles error scenarios while retrieving sentiment value from sentiment server
   #
   def handle_sentiment_generation_retry(response, review)
-    sentiment = {}
     sentiment = case response.code
                 when 200
                   create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
                 else
                   # Instead of checking for individual error response codes, have a generic code set for any server related error
                   # For now the value representing any server error will be -500
-                  sentiment = create_sentiment(review["id"], "-500")
+                  create_sentiment(review["id"], "-500")
                 end
     sentiment
   end

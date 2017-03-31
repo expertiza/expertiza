@@ -30,7 +30,8 @@ module ReviewMappingHelper
       response = HTTParty.post(
         'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
         body: {"reviews" => [review]}.to_json,
-        headers: { 'Content-Type' => 'application/json'})
+        headers: {'Content-Type' => 'application/json'}
+        )
     else
       # Send only the first sentence of the review for sentiment analysis
       text = review["text"].split('.')[0]
@@ -38,7 +39,8 @@ module ReviewMappingHelper
       response = HTTParty.post(
         'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
         body: {"reviews" => [reconstructed_review]}.to_json,
-        headers: { 'Content-Type' => 'application/json'})
+        headers: {'Content-Type' => 'application/json'}
+        )
     end
     response
   end

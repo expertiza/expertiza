@@ -1,6 +1,5 @@
 require 'rails_helper'
-require 'byebug'
-# Last modified by bzamani during Spring 2017 E1711
+
 describe 'Delayed Mailer' do
   before(:all) do
   end
@@ -51,14 +50,6 @@ describe 'Delayed Mailer' do
     @meta_review_response_map.reviewed_object_id = @assignment.id
     @meta_review_response_map.save
 
-    # FactoryGirl.create(:team, parent_id: @assignment.id)
-    # FactoryGirl.create(:team_user)
-    # FactoryGirl.create(:team_user, :second_user)
-    # FactoryGirl.create(:assignment, id:2)
-
-    # due_at = DateTime.now.in_time_zone + 120
-    # seconds_until_due = due_at - Time.now
-    # minutes_until_due = seconds_until_due / 60
     due_at1 = Time.parse(@due_at.to_s(:db))
     curr_time = DateTime.now.in_time_zone.to_s(:db)
     curr_time = Time.parse(curr_time)
@@ -115,7 +106,6 @@ describe 'Delayed Mailer' do
   end
 end
 
-# Added by Prateek during Spring 2017 E1711
 describe 'Team formation deadline reminder email' do
   it 'is able to send reminder email for team formation deadline to reviewers ' do
     id = 2

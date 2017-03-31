@@ -42,8 +42,8 @@ module PenaltyHelper
       last_submission_time = resubmission_times.at(resubmission_times.size - 1).resubmitted_at
       if last_submission_time > submission_due_date
         time_difference = last_submission_time - submission_due_date
-        penalty_minutes = calculate_penalty_minutes(time_difference)
-        penalty_for_submission = penalty_minutes * @penalty_per_unit
+        penalty_units = calculate_penalty_units(time_difference)
+        penalty_for_submission = penalty_units * @penalty_per_unit
         penalty = if penalty_for_submission > @max_penalty_for_no_submission
                     @max_penalty_for_no_submission
                   else
@@ -107,9 +107,9 @@ module PenaltyHelper
       if review_map_created_at_list.at(i)
         if review_map_created_at_list.at(i) > review_due_date
           time_difference = review_map_created_at_list.at(i) - review_due_date
-          penalty_minutes = calculate_penalty_minutes(time_difference)
+          penalty_units = calculate_penalty_units(time_difference)
           
-          penalty_for_this_review = penalty_minutes * @penalty_per_unit
+          penalty_for_this_review = penalty_units * @penalty_per_unit
           if penalty_for_this_review > @max_penalty_for_no_submission
             penalty = @max_penalty_for_no_submission
           else
@@ -123,13 +123,13 @@ module PenaltyHelper
     penalty
   end
 
-  def calculate_penalty_minutes(time_difference)
+  def calculate_penalty_units(time_difference)
     if @penalty_unit == 'Minute'
-      penalty_minutes = time_difference / 60
+      penalty_units = time_difference / 60
     elsif @penalty_unit == 'Hour'
-      penalty_minutes = time_difference / 3600
+      penalty_units = time_difference / 3600
     elsif @penalty_unit == 'Day'
-      penalty_minutes = time_difference / 86_400
+      penalty_units = time_difference / 86_400
     end
   end
 

@@ -1,8 +1,11 @@
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
-  @@cache_roles = { 1 => CACHED_STUDENT_MENU, 2 => CACHED_INSTRUCTOR_MENU,
-                    3 => CACHED_ADMIN_MENU, 4 => CACHED_SUPER_ADMIN_MENU,
-                    5 => CACHED_UNREG_USER_MENU, 6 => CACHED_TA_MENU }
+  @@cache_roles = {1 => CACHED_STUDENT_MENU,
+                   2 => CACHED_INSTRUCTOR_MENU,
+                   3 => CACHED_ADMIN_MENU,
+                   4 => CACHED_SUPER_ADMIN_MENU,
+                   5 => CACHED_UNREG_USER_MENU,
+                   6 => CACHED_TA_MENU}
 
   def is_available(user, owner_id)
     user.id == owner_id ||

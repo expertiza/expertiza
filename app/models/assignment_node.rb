@@ -106,7 +106,7 @@ class AssignmentNode < Node
   def get_institution_id
     # Course.find(self.node_object_id).course_id
     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.instructor_id
+    @assign_node.instructor_id # This is just so that assignment_node has a matching def... it's not used
   end
 
   # Gets the private attribute from the associated object

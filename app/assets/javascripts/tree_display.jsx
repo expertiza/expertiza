@@ -263,7 +263,7 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["17%", "17%", "6%", "6%", "17%", "17%", "20%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": ""
       }
@@ -356,10 +356,11 @@ jQuery(document).ready(function() {
         }
       }
       if (this.props.data) {
-        this.props.data.forEach(function(entry, i){
-          _rows.push(<SimpleTableRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+          if (this.props.dataType == 'course') {
+              this.props.data.forEach(function (entry, i) {
+                  _rows.push(<SimpleTableRow
+                      key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                      id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                       name={entry.name}
                       instructor={entry.instructor}
                       institution={entry.institution}
@@ -376,8 +377,32 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
-                      />)
-        })
+                  />)
+              })
+          }
+          else{
+              this.props.data.forEach(function (entry, i) {
+                  _rows.push(<SimpleTableRow
+                      key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                      id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
+                      name={entry.name}
+                      instructor={entry.instructor}
+                      directory={entry.directory}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      private={entry.private}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      allow_suggestions={entry.allow_suggestions}
+                      require_quiz={entry.require_quiz}
+                      has_topic={entry.has_topic}
+                      dataType={_this.props.dataType}
+                  />)
+              })
+          }
       }
       if (this.props.dataType == 'course') {
           return (
@@ -768,7 +793,7 @@ jQuery(document).ready(function() {
                       name={entry.name}
                       directory={entry.directory}
                       instructor={entry.instructor}
-                      institution={entry.institution}           //here's the issue
+                      institution={entry.institution}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       actions={entry.actions}

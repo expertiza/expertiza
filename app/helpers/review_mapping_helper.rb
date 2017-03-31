@@ -33,16 +33,20 @@ module ReviewMappingHelper
   #
   def retrieve_sentiment_response(review, first_try)
     if first_try
-      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
-        body: {"reviews" => [review]}.to_json, 
-        headers: { 'Content-Type' => 'application/json'})
+      response = HTTParty.post(
+        'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
+        body: {"reviews" => [review]}.to_json,
+        headers: {'Content-Type' => 'application/json'}
+                              )
     else
       # Send only the first sentence of the review for sentiment analysis
       text = review["text"].split('.')[0]
       reconstructed_review = construct_sentiment_query(review["id"], text)
-      response = HTTParty.post('http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
-        body: {"reviews" => [reconstructed_review]}.to_json, 
-        headers: { 'Content-Type' => 'application/json'})
+      response = HTTParty.post(
+        'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
+        body: {"reviews" => [reconstructed_review]}.to_json,
+        headers: {'Content-Type' => 'application/json'}
+                              )
     end
     response
   end
@@ -95,7 +99,7 @@ module ReviewMappingHelper
   # Displays the value of sentiment
   #
   def display_sentiment_metric(id)
-    hashed_sentiment = @sentiment_list.select { |sentiment| sentiment["id"] == id.to_s }
+    hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s }
     value = hashed_sentiment[0]["sentiment"].to_f.round(2)
     metric = "Overall Sentiment: #{value}<br/>"
     metric.html_safe

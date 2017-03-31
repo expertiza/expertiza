@@ -112,17 +112,14 @@ class InvitationsController < ApplicationController
     assignment_id = @inv.assignment_id
     inviter_user_id = @inv.from_id
     inviter_participant = AssignmentParticipant.find_by(user_id: inviter_user_id, parent_id: assignment_id)
-    @ready_to_join = false
     # check if the inviter's team is still existing, and have available slot to add the invitee
     inviter_assignment_team = AssignmentTeam.team(inviter_participant)
     if inviter_assignment_team.nil?
       flash[:error] = 'The team that invited you does not exist anymore.'
       redirect_to view_student_teams_path student_id: params[:student_id]
-      return
     elsif inviter_assignment_team.full?
       flash[:error] = 'The team that invited you is full now.'
       redirect_to view_student_teams_path student_id: params[:student_id]
-      return
     else
       # Status code A for accepted
       @inv.reply_status = 'A'

@@ -70,11 +70,11 @@ class DelayedMailer
   def mail_signed_up_users
     emails = []
     sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
-    if sign_up_topics.nil? || sign_up_topics.count.zero?
-      emails = find_team_members_email
-    else
-      emails = find_team_members_email_for_all_topics(sign_up_topics)
-    end
+    emails = if sign_up_topics.nil? || sign_up_topics.count.zero?
+               find_team_members_email
+             else
+               find_team_members_email_for_all_topics(sign_up_topics)
+             end
     email_reminder(emails, self.deadline_type) if emails and !emails.empty?
   end
 
@@ -91,9 +91,7 @@ class DelayedMailer
 
   def find_team_members_email_for_all_topics(sign_up_topics)
     emails = []
-    unless sign_up_topics.respond_to?(:each)
-      sign_up_topics = [sign_up_topics]
-    end
+    sign_up_topics = [sign_up_topics] unless sign_up_topics.respond_to?(:each)
     for sign_up_topic in sign_up_topics
       for signed_up_team in sign_up_topic.signed_up_teams
         for user in signed_up_team.team.users

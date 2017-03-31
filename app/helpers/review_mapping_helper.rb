@@ -62,7 +62,7 @@ module ReviewMappingHelper
   end
 
   #
-  # Handles error scenarios while retrieving sentiment value from sentiment server
+  # Handles error scenarios on getting response from sentiment server
   #
   def handle_sentiment_generation_retry(response, review)
     sentiment = case response.code

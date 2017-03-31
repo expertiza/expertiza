@@ -66,14 +66,14 @@ module ReviewMappingHelper
   #
   def handle_sentiment_generation_retry(response, review)
     sentiment = {}
-    case response.code
-    when 200
-      sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
-    else
-      # Instead of checking for individual error response codes, have a generic code set for any server related error
-      # For now the value representing any server error will be -500
-      sentiment = create_sentiment(review["id"], "-500")
-    end
+    sentiment = case response.code
+                when 200
+                  create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
+                else
+                  # Instead of checking for individual error response codes, have a generic code set for any server related error
+                  # For now the value representing any server error will be -500
+                  sentiment = create_sentiment(review["id"], "-500")
+                end
     sentiment
   end
 
@@ -86,13 +86,13 @@ module ReviewMappingHelper
       review = construct_sentiment_query(r.id, Response.concatenate_all_review_comments(@id, r).join(" "))
       response = retrieve_sentiment_response(review, true)
       # Retry in case of failure by sending only a single sentence for sentiment analysis.
-      case response.code
-      when 200
-        @sentiment_list << create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
-      else
-        # Retry once in case of a failure
-        @sentiment_list << handle_sentiment_generation_retry(retrieve_sentiment_response(review, false), review)
-      end
+      @sentiment_list << case response.code
+                         when 200
+                           create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
+                         else
+                           # Retry once in case of a failure
+                           handle_sentiment_generation_retry(retrieve_sentiment_response(review, false), review)
+                         end
     end
     @sentiment_list
   end
@@ -102,8 +102,8 @@ module ReviewMappingHelper
   #
   def display_sentiment_metric(id)
     hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s }
-    value = hashed_sentiment[0]["sentiment"].to_f.round(2)
-    metric = "Overall Sentiment: #{value}<br/>"
+    sentiment_value = hashed_sentiment[0]["sentiment"].to_f.round(2)
+    metric = "Overall Sentiment: #{sentiment_value}<br/>"
     metric.html_safe
   end
 

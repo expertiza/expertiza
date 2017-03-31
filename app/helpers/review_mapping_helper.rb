@@ -69,11 +69,8 @@ module ReviewMappingHelper
     case response.code
     when 200
       sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
-    when 404
-      # Error in generating sentiment from the server
-      sentiment = create_sentiment(review["id"], "-404")
-    when 500...600
-      # Error in generating sentiment from the server
+    else
+      # Instead of checking for individual error response codes, have a generic code set for any server related error/ For now the value representing server error is -500
       sentiment = create_sentiment(review["id"], "-500")
     end
     sentiment

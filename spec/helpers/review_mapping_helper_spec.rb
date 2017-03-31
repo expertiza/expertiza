@@ -17,10 +17,10 @@ describe 'ReviewMappingHelper', type: :helper do
 
     it "should not get web response with 404 error or 500 error" do
       review = helper.construct_sentiment_query(1, "Test Reviews to check if our Rest Client is able to reach the sentiment analysis service.")
-      # Test a first try to get sentiment from the sentiment analysis web service does not return a 404
+      # Test a first try to get sentiment from the sentiment analysis web service does not return a 404 or 500
       expect(helper.retrieve_sentiment_response(review, true).code).not_to eq(404) and
           expect(helper.retrieve_sentiment_response(review, true).code).not_to eq(500)
-      # Test a retry to get sentiment from the sentiment analysis web service does not return a 404
+      # Test a retry to get sentiment from the sentiment analysis web service does not return a 404 or 500
       expect(helper.retrieve_sentiment_response(review, false).code).not_to eq(404) and
           expect(helper.retrieve_sentiment_response(review, false).code).not_to eq(500)
     end

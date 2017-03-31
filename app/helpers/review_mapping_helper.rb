@@ -65,7 +65,6 @@ module ReviewMappingHelper
   # Generates sentiment list for all the reviews
   #
   def generate_sentiment_list
-    response_list = []
     @sentiment_list = []
     @reviewers.each do |r|
       sentiment = {}
@@ -78,7 +77,6 @@ module ReviewMappingHelper
       else
         # Retry once in case of a failure
         response = retrieve_sentiment_response(review, false)
-        response_list << response
         case response.code
         when 200
           sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])

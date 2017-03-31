@@ -39,6 +39,7 @@ describe 'ReviewMappingHelper', type: :helper do
       expect(helper.retrieve_sentiment_response(review, false).header['Content-Type']).to include 'application/json'
     end
   end
+
   describe "#generate_sentiment_list" do
     it "should not return nil" do
       @id = 1

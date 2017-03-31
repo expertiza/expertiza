@@ -37,7 +37,7 @@ module ReviewMappingHelper
         'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
         body: {"reviews" => [review]}.to_json,
         headers: {'Content-Type' => 'application/json'}
-                              )
+      )
     else
       # Send only the first sentence of the review for sentiment analysis
       text = review["text"].split('.')[0]
@@ -46,7 +46,7 @@ module ReviewMappingHelper
         'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
         body: {"reviews" => [reconstructed_review]}.to_json,
         headers: {'Content-Type' => 'application/json'}
-                              )
+      )
     end
     response
   end
@@ -68,14 +68,14 @@ module ReviewMappingHelper
     sentiment = {}
     response = retrieve_sentiment_response(review, false)
     case response.code
-      when 200
-        sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
-      when 404
-        # Error in generating sentiment from the server
-        sentiment = create_sentiment(review["id"], "-404")
-      when 500...600
-        # Error in generating sentiment from the server
-        sentiment = create_sentiment(review["id"], "-500")
+    when 200
+      sentiment = create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
+    when 404
+      # Error in generating sentiment from the server
+      sentiment = create_sentiment(review["id"], "-404")
+    when 500...600
+      # Error in generating sentiment from the server
+      sentiment = create_sentiment(review["id"], "-500")
     end
     sentiment
   end
@@ -91,10 +91,10 @@ module ReviewMappingHelper
       response = retrieve_sentiment_response(review, true)
       # Retry in case of failure by sending only a single sentence for sentiment analysis.
       if response.code == 200
-        @sentiment_list<<create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
+        @sentiment_list << create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
       else
         # Retry once in case of a failure
-        @sentiment_list<<handle_sentiment_generation_error(review)
+        @sentiment_list << handle_sentiment_generation_error(review)
       end
     end
     @sentiment_list

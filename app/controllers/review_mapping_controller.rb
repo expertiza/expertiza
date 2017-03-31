@@ -218,11 +218,20 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: mapping.assignment.id
   end
 
+  # E1721: Unsubmit reviews using AJAX
   def unsubmit_review
     @response = Response.where(map_id: params[:id]).last
-    @response.update_attribute('is_submitted', false)
-    redirect_to :back
+    review_response_map = ReviewResponseMap.find_by(id: params[:id])
+    reviewer = review_response_map.reviewer.name
+    reviewee = review_response_map.reviewee.name
+    if @response.update_attribute('is_submitted', false)
+      flash.now[:success] = "The review by \"" + reviewer + "\" for \"" + reviewee + "\" has been unsubmitted."
+    else
+      flash.now[:error] = "The review by \"" + reviewer + "\" for \"" + reviewee + "\" could not be unsubmitted."
+    end
+    render action: 'unsubmit_review.js.erb', layout: false
   end
+  # E1721 changes End
 
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])

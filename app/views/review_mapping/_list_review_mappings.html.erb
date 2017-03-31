@@ -98,14 +98,14 @@
         <tr style="background-color:<%=bgcolor2%>">
           <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
             <div style="text-align:right">
-              <div id="review_status">
+              <div id="review_status<%=map.map_id%>">
                 <% if(Response.where(map_id: map.map_id).last.nil?) %>
-                    Status: Assigned
+                    Review Status: Assigned
                 <% elsif Response.where(map_id: map.map_id).last.is_submitted == true%>
-                    Status: Submitted
-                    (<%= link_to 'unsubmit', :action => 'unsubmit_review', :id => map.map_id %>)
+                    Review Status: Submitted
+                    (<%= link_to 'unsubmit', :action => 'unsubmit_review', :id => map.map_id, :remote => :true %>)
                 <% else%>
-                    Status: Saved
+                    Review Status: Saved
                 <% end %><br/>
               </div>
               <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id %><br/>

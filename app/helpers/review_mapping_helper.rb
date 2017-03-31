@@ -21,10 +21,10 @@ module ReviewMappingHelper
   #
   # This constructs the query to be sent to the sentiment generation server
   #
-  def construct_sentiment_query(id, text)
+  def construct_sentiment_query(id, review_text)
     review = {}
     review["id"] = id.to_s
-    review["text"] = text
+    review["text"] = review_text
     review
   end
 
@@ -39,9 +39,9 @@ module ReviewMappingHelper
         headers: {'Content-Type' => 'application/json'}
       )
     else
-      # Send only the first sentence of the review for sentiment analysis
-      text = review["text"].split('.')[0]
-      reconstructed_review = construct_sentiment_query(review["id"], text)
+      # Send only the first sentence of the review for sentiment analysis in case of a failure
+      first_sentence = review["text"].split('.')[0]
+      reconstructed_review = construct_sentiment_query(review["id"], first_sentence)
       response = HTTParty.post(
         'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
         body: {"reviews" => [reconstructed_review]}.to_json,
@@ -84,12 +84,13 @@ module ReviewMappingHelper
     @reviewers.each do |r|
       review = construct_sentiment_query(r.id, Response.concatenate_all_review_comments(@id, r).join(" "))
       response = retrieve_sentiment_response(review, true)
-      # Retry in case of failure by sending only a single sentence for sentiment analysis.
+      # Insert the extracted sentiment into the sentiment list
       @sentiment_list << case response.code
                          when 200
+                           # Extract the sentiment from the response in case of a successful response
                            create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
                          else
-                           # Retry once in case of a failure
+                           # Retry to get a sentiment response once again in case of a failure
                            handle_sentiment_generation_retry(retrieve_sentiment_response(review, false), review)
                          end
     end

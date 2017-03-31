@@ -25,7 +25,6 @@ class JoinTeamRequestsController < ApplicationController
 
   # create a new join team request entry for join_team_request table and add it to the table
   def create
-
     @join_team_request = JoinTeamRequest.new
     @join_team_request.comments = params[:comments]
     @join_team_request.status = 'P'
@@ -42,7 +41,6 @@ class JoinTeamRequestsController < ApplicationController
         format.xml  { render xml: @join_team_request.errors, status: :unprocessable_entity }
       end
     end
-
   end
 
   # update join team request entry for join_team_request table and add it to the table
@@ -75,21 +73,15 @@ class JoinTeamRequestsController < ApplicationController
   end
 
   private
+
     def check_team
       # check if the advertisement is from a team member and if so disallow requesting invitations
       team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
       team = Team.find(params[:team_id])
 
-      if team.full?
-        flash[:note] = "This team is full."
-        return
-      end
+      return flash[:note] = "This team is full." if team.full?
 
-      if !team_member.empty?
-        flash[:note] = "You are already a member of this team."
-        return
-      end
-
+      return flash[:note] = "You are already a member of this team." unless team_member.empty?
     end
 
     def find_request
@@ -99,7 +91,7 @@ class JoinTeamRequestsController < ApplicationController
     def respond_after(request)
       respond_to do |format|
         format.html
-        format.xml  { render xml: request }
+        format.xml { render xml: request }
       end
     end
 end

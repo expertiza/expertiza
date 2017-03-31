@@ -167,12 +167,11 @@ describe "Invitations Check" do
       visit '/student_task/list'
       click_link 'final2'
       click_link 'Your team'
-
     end
     it 'should remove entry from database' do
       before_count = Invitation.count
       click_link 'Retract'
-      expect(Invitation.count).to eq(before_count-1)
+      expect(Invitation.count).to eq(before_count - 1)
     end
   end
 end

@@ -15,7 +15,7 @@ class InvitationsController < ApplicationController
     team = AssignmentTeam.find(params[:team_id])
     #student has information about the participant
     student = AssignmentParticipant.find(params[:student_id])
-    
+
     #participant information about student you are trying to invite to the team
     team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
     # check if invited user is already in the team
@@ -32,24 +32,6 @@ class InvitationsController < ApplicationController
         @invitation.save
       else
         flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
-        team_member = TeamsUser.where(['team_id =? and user_id =?', team.id, user.id])
-        # check if invited user is already in the team
-        if !team_member.empty?
-          flash[:note] = "The user \"#{user.name}\" is already a member of the team."
-        else
-          # check if the invited user is already invited (i.e. awaiting reply)
-          if Invitation.is_invited?(student.user_id, user.id, student.parent_id)
-            @invitation = Invitation.new
-            @invitation.to_id = user.id
-            @invitation.from_id = student.user_id
-            @invitation.assignment_id = student.parent_id
-            #Status code W for waiting for reply
-            @invitation.reply_status = 'W'
-            @invitation.save
-          else
-            flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
-          end
-        end
       end
     end
 

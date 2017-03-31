@@ -51,7 +51,6 @@ describe "Invitations Check" do
 
   describe 'one student who signup for a topic should send an invitation to the other student who has no topic' do
     before(:each) do
-
       user = User.find_by(name: "student2065")
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
@@ -76,7 +75,6 @@ describe "Invitations Check" do
 
   describe 'one student who has a topic sends an invitation to other student who also has a topic' do
     before(:each) do
-
       user = User.find_by(name: "student2065")
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
@@ -89,7 +87,7 @@ describe "Invitations Check" do
       expect(page).to have_content('Signup sheet for final2 assignment')
 
       visit '/sign_up_sheet/sign_up?assignment_id=1&id=2'
-      
+
       visit '/student_task/list'
       click_link 'final2'
       click_link 'Your team'
@@ -110,7 +108,6 @@ describe "Invitations Check" do
 
   describe 'one student sends an invitation and retracts it' do
     before(:each) do
-
       visit '/student_task/list'
       click_link 'final2'
       click_link 'Your team'

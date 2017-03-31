@@ -87,7 +87,6 @@ describe "Invitations Check" do
       expect(page).to have_content('Signup sheet for final2 assignment')
 
       visit '/sign_up_sheet/sign_up?assignment_id=1&id=2'
-
       visit '/student_task/list'
       click_link 'final2'
       click_link 'Your team'

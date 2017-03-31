@@ -49,12 +49,8 @@ class InvitationsController < ApplicationController
   end
 
   def accept
-    student = Participant.find(params[:student_id])
-    # Remove the users previous team since they are accepting an invite for possibly a new team.
-    TeamsUser.remove_team(student.user_id, params[:team_id])
-
     # Accept the invite and check whether the add was successful
-    unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, student.parent_id)
+    unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
       flash[:error] = 'The system failed to add you to the team that invited you.'
     end
 
@@ -116,10 +112,16 @@ class InvitationsController < ApplicationController
       elsif inviter_assignment_team.full?
         flash[:error] = 'The team that invited you is full now.'
         redirect_to view_student_teams_path student_id: params[:student_id]
-      else
-        # Status code A for accepted
-        @inv.reply_status = 'A'
-        @inv.save
       end
+      invitation_accept
+    end
+    def invitation_accept
+      # Status code A for accepted
+      @inv.reply_status = 'A'
+      @inv.save
+
+      @student = Participant.find(params[:student_id])
+      # Remove the users previous team since they are accepting an invite for possibly a new team.
+      TeamsUser.remove_team(@student.user_id, params[:team_id])
     end
 end

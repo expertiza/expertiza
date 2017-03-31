@@ -15,7 +15,7 @@ class Role < ActiveRecord::Base
   attr_writer :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
-   def cache
+  def cache
     @cache = Hash.new
     unless self.nil?
       @cache[:credentials] = get_cache_roles(self.id)[:credentials]

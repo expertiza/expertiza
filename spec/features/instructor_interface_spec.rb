@@ -7,10 +7,25 @@ def validate_pages(filepath)
   visit '/assignments/1/edit'
   click_link "Topics"
   click_link "Import topics"
-  file_path = filepath
+  file_path = Rails.root + filepath
   attach_file('file', file_path)
   click_button "Import"
   click_link "Topics"
+end
+
+def expect_page_content_to_have(content, has_content)
+  content.each do |content_element|
+    if has_content
+      expect(page).to have_content(content_element)
+    else
+      expect(page).not_to have_content(content_element)
+    end
+  end
+end
+
+def validate_login_and_page_content(filepath, content, has_content)
+  validate_pages(filepath)
+  expect_page_content_to_have(content, has_content)
 end
 
 describe "Integration tests for instructor interface" do
@@ -48,34 +63,26 @@ describe "Integration tests for instructor interface" do
     it 'should display teams for assignment without topic' do
       login_as("instructor6")
       visit '/participants/view_publishing_rights?id=1'
-      expect(page).to have_content('Team name')
-      expect(page).not_to have_content('Topic name(s)')
-      expect(page).not_to have_content('Topic #')
+      expect_page_content_to_have(['Team name'], true)
+      expect_page_content_to_have(['Topic name(s)', 'Topic #'], false)
     end
   end
 
   describe "Import tests for assignment topics" do
     it 'should be valid file with 3 columns' do
-      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv")
-      expect(page).to have_content('expertiza')
-      expect(page).to have_content('mozilla')
+      validate_login_and_page_content("spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv", ['expertiza', 'mozilla'], true)
     end
 
     it 'should be a valid file with 3 or more columns' do
-      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv")
-      expect(page).to have_content('capybara')
-      expect(page).to have_content('cucumber')
+      validate_login_and_page_content("spec/features/assignment_topic_csvs/3or4-col-valid_topics_import.csv", ['capybara', 'cucumber'], true)
     end
 
     it 'should be a invalid csv file' do
-      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/invalid_topics_import.csv")
-      expect(page).not_to have_content('airtable')
-      expect(page).not_to have_content('devise')
+      validate_login_and_page_content("spec/features/assignment_topic_csvs/invalid_topics_import.csv", ['airtable', 'devise'], false)
     end
 
     it 'should be an random text file' do
-      validate_pages(Rails.root + "spec/features/assignment_topic_csvs/random.txt")
-      expect(page).not_to have_content('this is a random file which should fail')
+      validate_login_and_page_content("spec/features/assignment_topic_csvs/random.txt", ['this is a random file which should fail'], false)
     end
   end
 

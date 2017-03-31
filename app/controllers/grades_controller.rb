@@ -243,7 +243,7 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(assignment_id)
     calculate_for_participants = true unless @assignment.is_penalty_calculated
     Participant.where(parent_id: assignment_id).each do |participant|
-      penalties = calculate_penalty(participant.id)
+      penalties = PenaltyHelper.calculate_penalty(participant.id)
       @total_penalty = 0
 
       unless (penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?)

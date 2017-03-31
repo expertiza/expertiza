@@ -1,5 +1,5 @@
 module PenaltyHelper
-  def calculate_penalty(participant_id)
+  def self.calculate_penalty(participant_id)
     @submission_deadline_type_id = 1
     @review_deadline_type_id = 2
     @meta_review_deadline_type_id = 5
@@ -33,7 +33,7 @@ module PenaltyHelper
   end
 
 
-  def calculate_submission_penalty
+  def self.calculate_submission_penalty
     penalty = 0
     submission_due_date = AssignmentDueDate.where(deadline_type_id: @submission_deadline_type_id, parent_id:  @assignment.id).first.due_at
 
@@ -55,7 +55,7 @@ module PenaltyHelper
     end
   end
 
-  def calculate_review_penalty
+  def self.calculate_review_penalty
     penalty = 0
     num_of_reviews_required = @assignment.num_reviews
     if num_of_reviews_required > 0
@@ -72,7 +72,7 @@ module PenaltyHelper
     penalty
   end
 
-  def calculate_meta_review_penalty
+  def self.calculate_meta_review_penalty
     penalty = 0
     num_of_meta_reviews_required = @assignment.num_review_of_reviews
     if num_of_meta_reviews_required > 0
@@ -88,7 +88,7 @@ module PenaltyHelper
     penalty
   end
 
-  def compute_penalty_on_reviews(review_mappings, review_due_date, num_of_reviews_required)
+  def self.compute_penalty_on_reviews(review_mappings, review_due_date, num_of_reviews_required)
     review_map_created_at_list = []
 
     penalty = 0
@@ -123,7 +123,7 @@ module PenaltyHelper
     penalty
   end
 
-  def calculate_penalty_units(time_difference)
+  def self.calculate_penalty_units(time_difference)
     if @penalty_unit == 'Minute'
       penalty_units = time_difference / 60
     elsif @penalty_unit == 'Hour'
@@ -134,7 +134,7 @@ module PenaltyHelper
   end
 
   #checking that penalty_per_unit is not exceeding max_penalty
-  def check_penalty_points_validity(max_penalty, penalty_per_unit)
+  def self.check_penalty_points_validity(max_penalty, penalty_per_unit)
     if max_penalty < penalty_per_unit
       flash[:error] = "The maximum penalty cannot be less than penalty per unit."
       invalid_penalty_per_unit = true
@@ -145,7 +145,7 @@ module PenaltyHelper
 
   #method to check whether the policy name given as a parameter already exists under the current instructor id
   #it return true if there's another policy with the same name under current instructor else false
-  def check_policy_with_same_name(late_policy_name)
+  def self.check_policy_with_same_name(late_policy_name)
     @policy = LatePolicy.where(policy_name: late_policy_name)
     if !@policy.nil? && !@policy.empty?
       @policy.each do |p|
@@ -158,7 +158,7 @@ module PenaltyHelper
 
   #this method updates all the penalty objects which uses the penalty policy which is passed as a parameter
   #whenever a policy is updated, all the existing penalty objects needs to be updated according to new policy
-  def update_calculated_penalty_objects(penalty_policy)
+  def self.update_calculated_penalty_objects(penalty_policy)
     @penaltyObjs = CalculatedPenalty.all
     @penaltyObjs.each do |pen|
       @participant = AssignmentParticipant.find(pen.participant_id)

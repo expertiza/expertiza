@@ -70,9 +70,9 @@ class LatePoliciesController < ApplicationController
   # POST /late_policies
   # POST /late_policies.xml
   def create
-    invalid_penalty_per_unit = check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
+    invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
 
-    if same_policy_name = check_policy_with_same_name(params[:late_policy][:policy_name])
+    if same_policy_name = PenaltyHelper.check_policy_with_same_name(params[:late_policy][:policy_name])
       flash[:error] = "A policy with the same name already exists."
     end
 
@@ -97,11 +97,11 @@ class LatePoliciesController < ApplicationController
   def update
     @penalty_policy = LatePolicy.find(params[:id])
     
-    invalid_penalty_per_unit = check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
+    invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
     same_policy_name = false
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-      if same_policy_name = check_policy_with_same_name(params[:late_policy][:policy_name])
+      if same_policy_name = PenaltyHelper.check_policy_with_same_name(params[:late_policy][:policy_name])
         flash[:error] = "The policy could not be updated because a policy with the same name already exists."
       end
     end
@@ -110,7 +110,7 @@ class LatePoliciesController < ApplicationController
       begin
         @penalty_policy.update_attributes(late_policy_params)
         @penalty_policy.save!      
-        update_calculated_penalty_objects(@penalty_policy)
+        PenaltyHelper.update_calculated_penalty_objects(@penalty_policy)
         flash[:notice] = "The late policy was successfully updated."
         redirect_to action: 'index'
       rescue

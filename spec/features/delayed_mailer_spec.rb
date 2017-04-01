@@ -7,7 +7,7 @@ def create_delayed_mailer(assignment_id, deadline_type, due_at)
 end
 
 describe 'Delayed Mailer' do
-  def create_mail_and_enqueue_job(assignment_id, deadline_type, duedate=DateTime.now.in_time_zone + 1.minute)
+  def create_mail_and_enqueue_job(assignment_id, deadline_type, duedate = DateTime.now.in_time_zone + 1.minute)
     mail = DelayedMailer.new(assignment_id, deadline_type, duedate)
     Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
   end
@@ -83,15 +83,9 @@ describe 'Delayed Mailer' do
       ActionMailer::Base.deliveries = []
     end
     after(:each) do
-      if @mail.deadline_type=='metareview'
-        expected_number_of_new_emails = 2
-      else
-        expected_number_of_new_emails = 1
-      end
-
+      expected_number_of_new_emails = @mail.deadline_type == 'metareview' ? 2 : 1
       expect { @mail.perform } .to change { Mailer.deliveries.count }.by(expected_number_of_new_emails)
       ActionMailer::Base.deliveries.clear
-
     end
 
     it 'is able to send reminder email for submission deadline to signed-up users ' do
@@ -121,10 +115,9 @@ describe 'Team formation deadline reminder email' do
     id = 2
     @name = "user"
     due_at = DateTime.now.in_time_zone + 2.minutes
-
-    due_at1 = Time.parse(due_at.to_s(:db))
+    due_at1 = Time.zone.parse(due_at.to_s(:db))
     curr_time = DateTime.now.in_time_zone.to_s(:db)
-    curr_time = Time.parse(curr_time)
+    curr_time = Time.zone.parse(curr_time)
     time_in_min = ((due_at1 - curr_time).to_i / 60) * 60
     Delayed::Job.delete_all
     expect(Delayed::Job.count).to eq(0)

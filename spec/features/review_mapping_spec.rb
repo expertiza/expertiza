@@ -117,7 +117,7 @@ describe "review mapping", js: true do
     add_reviewer(@student_reviewer.name)
     expect(page).to have_content @student_reviewer.name
 
-    #create new submitted review
+    # create new submitted review
     team = AssignmentTeam.find(1)
     map_id = team.review_mappings[0].map_id
     create(:response, map_id: map_id, is_submitted: true)
@@ -128,7 +128,7 @@ describe "review mapping", js: true do
     expect do
       click_link "unsubmit"
       wait_for_ajax
-    end.to change { Response.where(is_submitted: true).count }.by 1
+    end.to change { Response.where(is_submitted: true).count }.by -1
   end
   # E1721 changes end
 end

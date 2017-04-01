@@ -1,3 +1,4 @@
+require 'csv'
 class ImportFileController < ApplicationController
   def action_allowed?
     ['Instructor',
@@ -22,8 +23,24 @@ class ImportFileController < ApplicationController
     err_msg += "</ul>"
     flash[:error] = err_msg unless errors.empty?
     undo_link("The file has been successfully imported.")
-    ###add a mailer here
+    #####################################
+    file = params['file'].try(:tempfile)
     ####get the value of email id
+    col_data = []
+    CSV.foreach(file) {|row| col_data << row[2]}
+    email_addr=col_data
+    ###add a mailer here
+    Mailer.added_new_user(
+        to: email_addr,
+        subject: "Your Expertiza account and password have been created.",
+        body: {
+            "welcome!"
+        }
+    ).deliver_now!
+    ######################################
+
+
+
     redirect_to session[:return_to]
   end
 

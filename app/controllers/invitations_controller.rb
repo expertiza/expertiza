@@ -1,6 +1,6 @@
 class InvitationsController < ApplicationController
-  before_action :check_user, only: [:create]
-  before_action :check_team, only: [:accept]
+  before_action :check_user_before_invitation, only: [:create]
+  before_action :check_team_before_accept, only: [:accept]
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
@@ -10,13 +10,8 @@ class InvitationsController < ApplicationController
   end
 
   def create
-    # participant information about student you are trying to invite to the team
-    team_member = TeamsUser.where(['team_id =? and user_id =?', @team.id, @user.id])
-    # check if invited user is already in the team
-    if !team_member.empty?
-      flash[:note] = "The user \"#{@user.name}\" is already a member of the team."
     # check if the invited user is already invited (i.e. awaiting reply)
-    elsif Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
+    if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       @invitation = Invitation.new
       @invitation.to_id = @user.id
       @invitation.from_id = @student.user_id
@@ -73,56 +68,71 @@ class InvitationsController < ApplicationController
 
   private
 
-    def check_user
-      # user is the student you are inviting to your team
-      @user = User.find_by(name: params[:user][:name].strip)
-      # team has information about the team
-      @team = AssignmentTeam.find(params[:team_id])
-      # student has information about the participant
-      @student = AssignmentParticipant.find(params[:student_id])
+  def check_user_before_invitation
+    # user is the student you are inviting to your team
+    @user = User.find_by(name: params[:user][:name].strip)
+    # student has information about the participant
+    @student = AssignmentParticipant.find(params[:student_id])
 
-      return unless current_user_id?(@student.user_id)
+    return unless current_user_id?(@student.user_id)
 
-      # check if the invited user is valid
-      unless @user
-        flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
-        redirect_to view_student_teams_path student_id: @student.id
-        return
-      end
-      @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
-      # check if the user is a participant of the assignment
-      unless @participant
-        flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-        redirect_to view_student_teams_path student_id: @student.id
-        return
-      end
+    # check if the invited user is valid
+    unless @user
+      flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+      redirect_to view_student_teams_path student_id: @student.id
+      return
+    end
+    @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
+    # check if the user is a participant of the assignment
+    unless @participant
+      flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+      redirect_to view_student_teams_path student_id: @student.id
+      return
+    end
+    check_team_before_invitation
+  end
 
-      return unless @team.full?
+  def check_team_before_invitation
+    # team has information about the team
+    @team = AssignmentTeam.find(params[:team_id])
+
+    if @team.full?
       flash[:error] = 'Your team already has the maximum number members.'
       redirect_to view_student_teams_path student_id: @student.id
+      return
     end
 
-    def check_team
-      @inv = Invitation.find(params[:inv_id])
-      # check if the inviter's team is still existing, and have available slot to add the invitee
-      inviter_assignment_team = AssignmentTeam.team(AssignmentParticipant.find_by(user_id: @inv.from_id, parent_id: @inv.assignment_id))
-      if inviter_assignment_team.nil?
-        flash[:error] = 'The team that invited you does not exist anymore.'
-        redirect_to view_student_teams_path student_id: params[:student_id]
-      elsif inviter_assignment_team.full?
-        flash[:error] = 'The team that invited you is full now.'
-        redirect_to view_student_teams_path student_id: params[:student_id]
-      end
-      invitation_accept
-    end
+    # participant information about student you are trying to invite to the team
+    team_member = TeamsUser.where(['team_id =? and user_id =?', @team.id, @user.id])
+    # check if invited user is already in the team
 
-    def invitation_accept
-      # Status code A for accepted
-      @inv.reply_status = 'A'
-      @inv.save
-
-      @student = Participant.find(params[:student_id])
-      # Remove the users previous team since they are accepting an invite for possibly a new team.
-      TeamsUser.remove_team(@student.user_id, params[:team_id])
+    unless team_member.empty?
+      flash[:note] = "The user \"#{@user.name}\" is already a member of the team."
+      redirect_to view_student_teams_path student_id: @student.id
     end
+  end
+
+  def check_team_before_accept
+    @inv = Invitation.find(params[:inv_id])
+    # check if the inviter's team is still existing, and have available slot to add the invitee
+    inviter_assignment_team = AssignmentTeam.team(AssignmentParticipant.find_by(user_id: @inv.from_id, parent_id: @inv.assignment_id))
+    if inviter_assignment_team.nil?
+      flash[:error] = 'The team that invited you does not exist anymore.'
+      redirect_to view_student_teams_path student_id: params[:student_id]
+    elsif inviter_assignment_team.full?
+      flash[:error] = 'The team that invited you is full now.'
+      redirect_to view_student_teams_path student_id: params[:student_id]
+    end
+    invitation_accept
+  end
+
+  def invitation_accept
+    # Status code A for accepted
+    @inv.reply_status = 'A'
+    @inv.save
+
+    @student = Participant.find(params[:student_id])
+    # Remove the users previous team since they are accepting an invite for possibly a new team.
+    TeamsUser.remove_team(@student.user_id, params[:team_id])
+  end
 end

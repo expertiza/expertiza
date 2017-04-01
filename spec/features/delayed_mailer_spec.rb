@@ -1,5 +1,13 @@
 require 'rails_helper'
 
+
+
+def create_delayed_mailer(assignment_id, deadline_type, due_at)
+  mail = DelayedMailer.new(assignment_id, deadline_type, due_at)
+  Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at:1.second.from_now)
+  return mail
+end
+
 describe 'Delayed Mailer' do
   before(:all) do
   end
@@ -61,40 +69,35 @@ describe 'Delayed Mailer' do
   end
 
   it 'is able to send reminder email for submission deadline to signed-up users ' do
-    mail = DelayedMailer.new(@assignment.id, "submission", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+    mail = create_delayed_mailer(@assignment.id, "submission", @due_at)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: submission")
     expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
   end
 
   it 'is able to send reminder email for review deadline to reviewers ' do
-    mail = DelayedMailer.new(@assignment.id, "review", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+    mail = create_delayed_mailer(@assignment.id, "review", @due_at)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: review")
     expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
   end
 
   it 'is able to send reminder email for Metareview deadline to meta-reviewers and team members of the assignment' do
-    mail = DelayedMailer.new(@assignment.id, "metareview", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+    mail = create_delayed_mailer(@assignment.id, "metareview", @due_at)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: metareview")
     expect { mail.perform } .to change { Mailer.deliveries.count } .by(2)
   end
 
   it 'is able to send reminder email for drop topic deadline to reviewers ' do
-    mail = DelayedMailer.new(@assignment.id, "drop_topic", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+    mail = create_delayed_mailer(@assignment.id, "drop_topic", @due_at)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: drop_topic")
     expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
   end
 
   it 'is able to send reminder email for signup deadline to assignment participants ' do
-    mail = DelayedMailer.new(@assignment.id, "signup", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+    mail = create_delayed_mailer(@assignment.id, "signup", @due_at)
     expect(Delayed::Job.count).to eq(1)
     expect(Delayed::Job.last.handler).to include("deadline_type: signup")
     expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)

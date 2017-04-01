@@ -1,103 +1,124 @@
 require 'rails_helper'
 
 describe 'Delayed Mailer' do
-  before(:all) do
-  end
-
-  before(:each) do
-    # Delayed::Worker.delay_jobs = false
-    @name = "user"
-    @due_at = DateTime.now.in_time_zone + 1.minute
-
-    @assignment = FactoryGirl.create(:oss_project)
-    @team = FactoryGirl.create(:assignment_team)
-    @team.users = FactoryGirl.create_list(:student, 5)
-    @topic = FactoryGirl.create(:topic)
-    @review_response_map = FactoryGirl.create(:response_map, :review_response)
-    @meta_review_response_map = FactoryGirl.create(:response_map, :meta_review_response)
-    @reviewer = FactoryGirl.create(:review_participant)
-    @meta_reviewer = FactoryGirl.create(:review_participant)
-    @assignment.sign_up_topics = [@topic]
-
-    @assignment.participants = FactoryGirl.create_list(:participant, 2)
-    @assignment.response_maps = [@review_response_map, @meta_review_response_map]
-    @assignment.save
-
-    @review_response_map.reviewer = @reviewer
-    @review_response_map.save
-
-    @meta_review_response_map.reviewer = @meta_reviewer
-    @meta_review_response_map.save
-
-    @reviewer.id = @review_response_map.reviewer_id
-    @reviewer.parent_id = @assignment.id
-    @reviewer.save
-
-    @meta_reviewer.id = @meta_review_response_map.reviewer_id
-    @meta_reviewer.parent_id = @assignment.id
-    @meta_reviewer.save
-
-    @team.parent_id = @assignment.id
-    @team.save
-
-    @topic.assignment = @assignment
-    @topic.signed_up_teams = [FactoryGirl.create(:signed_up_team)]
-    @topic.save
-
-    @review_response_map.reviewed_object_id = @assignment.id
-    @review_response_map.save
-
-    @meta_review_response_map.reviewed_object_id = @assignment.id
-    @meta_review_response_map.save
-
-    @time_in_min = Time.zone.now
-    Delayed::Job.delete_all
-    ActionMailer::Base.delivery_method = :test
-    ActionMailer::Base.perform_deliveries = true
-    ActionMailer::Base.deliveries = []
-  end
-  after(:each) do
-    ActionMailer::Base.deliveries.clear
-  end
-
-  it 'is able to send reminder email for submission deadline to signed-up users ' do
-    mail = DelayedMailer.new(@assignment.id, "submission", @due_at)
+  def create_mail_and_enqueue_job(assignment_id, deadline_type, duedate=DateTime.now.in_time_zone + 1.minute)
+    mail = DelayedMailer.new(assignment_id, deadline_type, duedate)
     Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
-    expect(Delayed::Job.count).to eq(1)
-    expect(Delayed::Job.last.handler).to include("deadline_type: submission")
-    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+  end
+  context 'in the context of enqueuing jobs correctly' do
+    before(:all) do
+      @assignment_id = 1
+    end
+    it 'when creates and enqueues a mail job, it should be enqueued with a correct deadline type name on the job handler' do
+      create_mail_and_enqueue_job(@assignment_id, "submission")
+      expect(Delayed::Job.last.handler).to include("deadline_type: submission")
+      create_mail_and_enqueue_job(@assignment_id, "metareviewer")
+      expect(Delayed::Job.last.handler).to include("deadline_type: metareview")
+      create_mail_and_enqueue_job(@assignment_id, "review")
+      expect(Delayed::Job.last.handler).to include("deadline_type: review")
+      create_mail_and_enqueue_job(@assignment_id, "drop_topic")
+      expect(Delayed::Job.last.handler).to include("deadline_type: drop_topic")
+      create_mail_and_enqueue_job(@assignment_id, "signup")
+      expect(Delayed::Job.last.handler).to include("deadline_type: signup")
+    end
   end
 
-  it 'is able to send reminder email for review deadline to reviewers ' do
-    mail = DelayedMailer.new(@assignment.id, "review", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
-    expect(Delayed::Job.count).to eq(1)
-    expect(Delayed::Job.last.handler).to include("deadline_type: review")
-    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
-  end
+  context 'in the context of "sending emails" functionality' do
+    before(:each) do
+      # Delayed::Worker.delay_jobs = false
+      @name = "user"
+      @due_at = DateTime.now.in_time_zone + 1.minute
 
-  it 'is able to send reminder email for Metareview deadline to meta-reviewers and team members of the assignment' do
-    mail = DelayedMailer.new(@assignment.id, "metareview", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
-    expect(Delayed::Job.count).to eq(1)
-    expect(Delayed::Job.last.handler).to include("deadline_type: metareview")
-    expect { mail.perform } .to change { Mailer.deliveries.count } .by(2)
-  end
+      @assignment = FactoryGirl.create(:oss_project)
+      @team = FactoryGirl.create(:assignment_team)
+      @team.users = FactoryGirl.create_list(:student, 5)
+      @topic = FactoryGirl.create(:topic)
+      @review_response_map = FactoryGirl.create(:response_map, :review_response)
+      @meta_review_response_map = FactoryGirl.create(:response_map, :meta_review_response)
+      @reviewer = FactoryGirl.create(:review_participant)
+      @meta_reviewer = FactoryGirl.create(:review_participant)
+      @assignment.sign_up_topics = [@topic]
 
-  it 'is able to send reminder email for drop topic deadline to reviewers ' do
-    mail = DelayedMailer.new(@assignment.id, "drop_topic", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
-    expect(Delayed::Job.count).to eq(1)
-    expect(Delayed::Job.last.handler).to include("deadline_type: drop_topic")
-    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
-  end
+      @assignment.participants = FactoryGirl.create_list(:participant, 2)
+      @assignment.response_maps = [@review_response_map, @meta_review_response_map]
+      @assignment.save
 
-  it 'is able to send reminder email for signup deadline to assignment participants ' do
-    mail = DelayedMailer.new(@assignment.id, "signup", @due_at)
-    Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
-    expect(Delayed::Job.count).to eq(1)
-    expect(Delayed::Job.last.handler).to include("deadline_type: signup")
-    expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+      @review_response_map.reviewer = @reviewer
+      @review_response_map.save
+
+      @meta_review_response_map.reviewer = @meta_reviewer
+      @meta_review_response_map.save
+
+      @reviewer.id = @review_response_map.reviewer_id
+      @reviewer.parent_id = @assignment.id
+      @reviewer.save
+
+      @meta_reviewer.id = @meta_review_response_map.reviewer_id
+      @meta_reviewer.parent_id = @assignment.id
+      @meta_reviewer.save
+
+      @team.parent_id = @assignment.id
+      @team.save
+
+      @topic.assignment = @assignment
+      @topic.signed_up_teams = [FactoryGirl.create(:signed_up_team)]
+      @topic.save
+
+      @review_response_map.reviewed_object_id = @assignment.id
+      @review_response_map.save
+
+      @meta_review_response_map.reviewed_object_id = @assignment.id
+      @meta_review_response_map.save
+
+      @time_in_min = Time.zone.now
+      Delayed::Job.delete_all
+      ActionMailer::Base.delivery_method = :test
+      ActionMailer::Base.perform_deliveries = true
+      ActionMailer::Base.deliveries = []
+    end
+    after(:each) do
+      ActionMailer::Base.deliveries.clear
+    end
+
+    it 'is able to send reminder email for submission deadline to signed-up users ' do
+      mail = DelayedMailer.new(@assignment.id, "submission", @due_at)
+      Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+      expect(Delayed::Job.count).to eq(1)
+      expect(Delayed::Job.last.handler).to include("deadline_type: submission")
+      expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+    end
+
+    it 'is able to send reminder email for review deadline to reviewers ' do
+      mail = DelayedMailer.new(@assignment.id, "review", @due_at)
+      Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+      expect(Delayed::Job.count).to eq(1)
+      expect(Delayed::Job.last.handler).to include("deadline_type: review")
+      expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+    end
+
+    it 'is able to send reminder email for Metareview deadline to meta-reviewers and team members of the assignment' do
+      mail = DelayedMailer.new(@assignment.id, "metareview", @due_at)
+      Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+      expect(Delayed::Job.count).to eq(1)
+      expect(Delayed::Job.last.handler).to include("deadline_type: metareview")
+      expect { mail.perform } .to change { Mailer.deliveries.count } .by(2)
+    end
+
+    it 'is able to send reminder email for drop topic deadline to reviewers ' do
+      mail = DelayedMailer.new(@assignment.id, "drop_topic", @due_at)
+      Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+      expect(Delayed::Job.count).to eq(1)
+      expect(Delayed::Job.last.handler).to include("deadline_type: drop_topic")
+      expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+    end
+
+    it 'is able to send reminder email for signup deadline to assignment participants ' do
+      mail = DelayedMailer.new(@assignment.id, "signup", @due_at)
+      Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+      expect(Delayed::Job.count).to eq(1)
+      expect(Delayed::Job.last.handler).to include("deadline_type: signup")
+      expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+    end
   end
 end
 

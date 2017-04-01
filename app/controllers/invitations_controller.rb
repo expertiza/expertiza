@@ -115,6 +115,7 @@ class InvitationsController < ApplicationController
       end
       invitation_accept
     end
+
     def invitation_accept
       # Status code A for accepted
       @inv.reply_status = 'A'

@@ -3,6 +3,9 @@ require 'selenium-webdriver'
 
 describe 'Student can view review scores in a heat map distribution', js: true do
   before(:each) do
+    
+    Capybara.default_max_wait_time = 5
+
     create(:assignment, name: "NewAssignment", directory_path: 'new_assignment')
     create_list(:participant, 3)
     create(:assignment_node)
@@ -16,6 +19,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
+
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
     create(:topic)
     create(:topic, topic_name: "NewReview")

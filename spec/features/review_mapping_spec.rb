@@ -105,4 +105,30 @@ describe "review mapping", js: true do
     num = ReviewResponseMap.where(reviewer_id: 1, reviewed_object_id: 1).count
     expect(num).to eq(2)
   end
+
+  # E1721 changes: test for unsubmitting a review
+  it "can unsubmit a review" do
+    @student_reviewer = create :student, name: 'student_reviewer'
+    @participant_reviewer = create :participant, assignment: @assignment, user: @student_reviewer
+    login_and_assign_reviewer("instructor6", @assignment.id, 0, 1)
+
+    # add_reviewer
+    first(:link, 'add reviewer').click
+    add_reviewer(@student_reviewer.name)
+    expect(page).to have_content @student_reviewer.name
+
+    #create new submitted review
+    team = AssignmentTeam.find(1)
+    map_id = team.review_mappings[0].map_id
+    create(:response, map_id: map_id, is_submitted: true)
+
+    visit "/review_mapping/list_mappings?id=#{@assignment.id}"
+    expect(page).to have_content 'unsubmit'
+
+    expect do
+      click_link "unsubmit"
+      wait_for_ajax
+    end.to change { Response.where(is_submitted: true).count }.by 1
+  end
+  # E1721 changes end
 end

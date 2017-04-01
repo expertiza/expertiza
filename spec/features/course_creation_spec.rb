@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe 'add TA', js: true do
-
   before(:each) do
     @course = create(:course, name: 'TA course')
     ta_role = Role.create(name: "Teaching Assistant")

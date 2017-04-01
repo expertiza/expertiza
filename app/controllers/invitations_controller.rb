@@ -106,10 +106,9 @@ class InvitationsController < ApplicationController
     team_member = TeamsUser.where(['team_id =? and user_id =?', @team.id, @user.id])
     # check if invited user is already in the team
 
-    unless team_member.empty?
-      flash[:note] = "The user \"#{@user.name}\" is already a member of the team."
-      redirect_to view_student_teams_path student_id: @student.id
-    end
+    return if team_member.empty?
+    flash[:note] = "The user \"#{@user.name}\" is already a member of the team."
+    redirect_to view_student_teams_path student_id: @student.id
   end
 
   def check_team_before_accept

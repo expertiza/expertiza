@@ -20,8 +20,7 @@ class JoinTeamRequestsController < ApplicationController
     respond_after @join_team_request
   end
 
-  def edit
-  end
+  def edit ;end
 
   # create a new join team request entry for join_team_request table and add it to the table
   def create
@@ -74,24 +73,24 @@ class JoinTeamRequestsController < ApplicationController
 
   private
 
-    def check_team
-      # check if the advertisement is from a team member and if so disallow requesting invitations
-      team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
-      team = Team.find(params[:team_id])
+  def check_team
+    # check if the advertisement is from a team member and if so disallow requesting invitations
+    team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
+    team = Team.find(params[:team_id])
 
-      return flash[:note] = "This team is full." if team.full?
+    return flash[:note] = "This team is full." if team.full?
 
-      return flash[:note] = "You are already a member of this team." unless team_member.empty?
+    return flash[:note] = "You are already a member of this team." unless team_member.empty?
+  end
+
+  def find_request
+    @join_team_request = JoinTeamRequest.find(params[:id])
+  end
+
+  def respond_after(request)
+    respond_to do |format|
+      format.html
+      format.xml { render xml: request }
     end
-
-    def find_request
-      @join_team_request = JoinTeamRequest.find(params[:id])
-    end
-
-    def respond_after(request)
-      respond_to do |format|
-        format.html
-        format.xml { render xml: request }
-      end
-    end
+  end
 end

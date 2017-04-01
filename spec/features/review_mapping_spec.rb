@@ -110,7 +110,7 @@ describe "review mapping", js: true do
   it "can unsubmit a review" do
     @student_reviewer = create :student, name: 'student_reviewer'
     @participant_reviewer = create :participant, assignment: @assignment, user: @student_reviewer
-    login_and_assign_reviewer("instructor6", @assignment.id, 0, 1)
+    login_and_assign_reviewer("instructor6", @assignment.id, 0, 2)
 
     # add_reviewer
     first(:link, 'add reviewer').click
@@ -125,10 +125,11 @@ describe "review mapping", js: true do
     visit "/review_mapping/list_mappings?id=#{@assignment.id}"
     expect(page).to have_content 'unsubmit'
 
+    # unsubmit the review
     expect do
       click_link "unsubmit"
       wait_for_ajax
-    end.to change { Response.where(is_submitted: true).count }.by -1
+    end.to change { Response.where(is_submitted: true).count }.by(-1)
   end
   # E1721 changes end
 end

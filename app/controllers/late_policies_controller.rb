@@ -71,8 +71,11 @@ class LatePoliciesController < ApplicationController
   # POST /late_policies.xml
   def create
     invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
+    if invalid_penalty_per_unit
+      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
+    end
 
-    if same_policy_name = PenaltyHelper.check_policy_with_same_name(params[:late_policy][:policy_name])
+    if same_policy_name = PenaltyHelper.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = "A policy with the same name already exists."
     end
 
@@ -98,10 +101,14 @@ class LatePoliciesController < ApplicationController
     @penalty_policy = LatePolicy.find(params[:id])
     
     invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, params[:late_policy][:penalty_per_unit].to_i)
+    if invalid_penalty_per_unit
+      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
+    end
+
     same_policy_name = false
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-      if same_policy_name = PenaltyHelper.check_policy_with_same_name(params[:late_policy][:policy_name])
+      if same_policy_name = PenaltyHelper.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
         flash[:error] = "The policy could not be updated because a policy with the same name already exists."
       end
     end

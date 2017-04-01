@@ -20,7 +20,7 @@ class JoinTeamRequestsController < ApplicationController
     respond_after @join_team_request
   end
 
-  def edit ;end
+  def edit; end
 
   # create a new join team request entry for join_team_request table and add it to the table
   def create

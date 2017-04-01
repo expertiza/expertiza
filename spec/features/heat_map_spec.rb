@@ -3,9 +3,10 @@ require 'selenium-webdriver'
 
 describe 'Student can view review scores in a heat map distribution', js: true do
   before(:each) do
-    create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
+    create(:assignment, name: "NewAssignment", directory_path: 'new_assignment')
     create_list(:participant, 3)
     create(:assignment_node)
+
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")
@@ -17,7 +18,8 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
     create(:topic)
-    create(:topic, topic_name: "TestReview")
+    create(:topic, topic_name: "NewReview")
+
     create(:team_user, user: User.where(role_id: 2).first)
     create(:team_user, user: User.where(role_id: 2).second)
     create(:assignment_team)
@@ -35,7 +37,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     fill_in 'login_password', with: 'password'
     click_button 'SIGN IN'
 
-    click_link "TestAssignment"
+    click_link "NewAssignment"
     click_link "Others' work"
 
     choose "topic_id"
@@ -62,7 +64,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
   it 'should be able to view a heat map of review scores' do
     create_review
 
-    click_link "TestAssignment"
+    click_link "NewAssignment"
     click_link 'Alternate View'
 
     expect(page).to have_content('Summary Report for assignment')
@@ -72,7 +74,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create_review
 
     # Select the assignment and follow the link to the heat map
-    click_link "TestAssignment"
+    click_link "NewAssignment"
     click_link 'Alternate View'
 
     new_window = window_opened_by { click_link 'Review 1' }
@@ -85,7 +87,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create_review
 
     # Select the assignment and follow the link to the heat map
-    click_link "TestAssignment"
+    click_link "NewAssignment"
     click_link 'Alternate View'
 
     # Figure out how to add question text so this box works
@@ -99,7 +101,7 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     # Log in as the student with an assignment and reviews
     login_as('student2064')
 
-    click_link "TestAssignment"
+    click_link "NewAssignment"
     click_link 'Alternate View'
 
     expect(page).to_not have_content('Review 1')

@@ -83,32 +83,35 @@ describe 'Delayed Mailer' do
       ActionMailer::Base.deliveries = []
     end
     after(:each) do
+      if @mail.deadline_type=='metareview'
+        expected_number_of_new_emails = 2
+      else
+        expected_number_of_new_emails = 1
+      end
+
+      expect { @mail.perform } .to change { Mailer.deliveries.count }.by(expected_number_of_new_emails)
       ActionMailer::Base.deliveries.clear
+
     end
 
     it 'is able to send reminder email for submission deadline to signed-up users ' do
-      mail = DelayedMailer.new(@assignment.id, "submission", @due_at)
-      expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+      @mail = DelayedMailer.new(@assignment.id, "submission", @due_at)
     end
 
     it 'is able to send reminder email for review deadline to reviewers ' do
-      mail = DelayedMailer.new(@assignment.id, "review", @due_at)
-      expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+      @mail = DelayedMailer.new(@assignment.id, "review", @due_at)
     end
 
     it 'is able to send reminder email for Metareview deadline to meta-reviewers and team members of the assignment' do
-      mail = DelayedMailer.new(@assignment.id, "metareview", @due_at)
-      expect { mail.perform } .to change { Mailer.deliveries.count } .by(2)
+      @mail = DelayedMailer.new(@assignment.id, "metareview", @due_at)
     end
 
     it 'is able to send reminder email for drop topic deadline to reviewers ' do
-      mail = DelayedMailer.new(@assignment.id, "drop_topic", @due_at)
-      expect { mail.perform } .to change { Mailer.deliveries.count } .by(1)
+      @mail = DelayedMailer.new(@assignment.id, "drop_topic", @due_at)
     end
 
     it 'is able to send reminder email for signup deadline to assignment participants ' do
-      mail = DelayedMailer.new(@assignment.id, "signup", @due_at)
-      expect { mail.perform } .to change { Mailer.deliveries.count }.by(1)
+      @mail = DelayedMailer.new(@assignment.id, "signup", @due_at)
     end
   end
 end

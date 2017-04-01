@@ -49,6 +49,10 @@ describe 'Student can view review scores in a heat map distribution', js: true d
 
     # click ok on the pop-up box that warns you that responses can not be edited
     page.driver.browser.switch_to.alert.accept
+
+    user = User.find_by name: 'student2066'
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
   end
 
   # it 'should be able to sort by total review score' do
@@ -58,12 +62,6 @@ describe 'Student can view review scores in a heat map distribution', js: true d
   it 'should be able to view a heat map of review scores' do
     create_review
 
-    # user = User.find_by_name('student2066')
-    user = User.find_by name: 'student2066'
-    stub_current_user(user, user.role.name, user.role)
-    visit '/student_task/list'
-
-    # Select the assignment and follow the link to the heat map
     click_link "TestAssignment"
     click_link 'Alternate View'
 
@@ -72,11 +70,6 @@ describe 'Student can view review scores in a heat map distribution', js: true d
 
   it 'should be able to follow the link to a specific review' do
     create_review
-
-    # user = User.find_by_name('student2066')
-    user = User.find_by name: 'student2066'
-    stub_current_user(user, user.role.name, user.role)
-    visit '/student_task/list'
 
     # Select the assignment and follow the link to the heat map
     click_link "TestAssignment"
@@ -90,11 +83,6 @@ describe 'Student can view review scores in a heat map distribution', js: true d
 
   it 'should be able to toggle the question list' do
     create_review
-
-    # user = User.find_by_name('student2066')
-    user = User.find_by name: 'student2066'
-    stub_current_user(user, user.role.name, user.role)
-    visit '/student_task/list'
 
     # Select the assignment and follow the link to the heat map
     click_link "TestAssignment"

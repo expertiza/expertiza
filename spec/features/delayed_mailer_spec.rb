@@ -1,11 +1,9 @@
 require 'rails_helper'
 
-
-
 def create_delayed_mailer(assignment_id, deadline_type, due_at)
   mail = DelayedMailer.new(assignment_id, deadline_type, due_at)
-  Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at:1.second.from_now)
-  return mail
+  Delayed::Job.enqueue(payload_object: mail, priority: 1, run_at: 1.second.from_now)
+  mail
 end
 
 describe 'Delayed Mailer' do

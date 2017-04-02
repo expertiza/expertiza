@@ -81,8 +81,12 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    @course = Course.new(name: params[:course][:name], institutions_id: params[:course][:institutions_id], directory_path: params[:course][:directory_path], info: params[:course][:info], private: params[:course][:private])
-
+    @course = Course.new(course_params)
+    @course.name = params[:course][:name]
+    @course.institutions_id = params[:course][:institutions_id]
+    @course.directory_path = params[:course][:directory_path]
+    @course.info = params[:course][:info]
+    @course.private = params[:course][:private]
     @course.instructor_id = session[:user].id
     begin
       @course.save!
@@ -173,4 +177,15 @@ class CourseController < ApplicationController
   # def undo_link
   #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
   # end
+
+  private
+  # Use callbacks to share common setup or constraints between actions.
+  def set_course
+    @course = Course.find(params[:id])
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def course_params
+    params.require(:course).permit(:id, :name, :instructor_id, :directory_path, :info, :created_at, :updated_at, :private, :institution_id)
+  end
 end

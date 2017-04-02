@@ -21,6 +21,7 @@ gem 'fastercsv'
 gem 'ffi-aspell'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
+
 gem "googlecharts", require: "gchart"
 gem 'gdata', require: false
 gem 'haml-rails'
@@ -66,7 +67,6 @@ group :development do
   gem 'pry'
   gem 'pry-remote'
   gem 'pry-nav'
-  gem 'rubocop'
   gem 'selenium-webdriver'
   gem 'quiet_assets'
 end

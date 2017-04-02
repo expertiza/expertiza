@@ -103,7 +103,7 @@ class AssignmentNode < Node
   end
 
   # Gets the institution_id from the associated object
-  def get_institution_id
+  def retrieve_institution_id
     # Course.find(self.node_object_id).course_id
     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
     @assign_node.instructor_id # This is just so that assignment_node has a matching def... it's not used

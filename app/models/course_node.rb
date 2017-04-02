@@ -120,7 +120,7 @@ class CourseNode < Node
   end
 
   # Gets the institution_id from the associated object
-  def get_institution_id
+  def retrieve_institution_id
     # Course.find(self.node_object_id).course_id
     @course = Course.find(self.node_object_id) unless @course
     @course.institutions_id

@@ -81,7 +81,7 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    @course = Course.new(course_params)
+    @course = Course.new
     @course.name = params[:course][:name]
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]

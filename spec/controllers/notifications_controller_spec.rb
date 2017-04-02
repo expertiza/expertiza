@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-class ArticlesControllerTest < ActionDispatch::IntegrationTest
+class NotificationsControllerTest < ActionDispatch::IntegrationTest
   describe NotificationsController do
     test "should get index" do
       get notification_url

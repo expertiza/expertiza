@@ -40,7 +40,7 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
-            accept_invitation(student_email)  #Call the mailing function
+            accept_invitation(student_email)  # Call the mailing function
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end
@@ -117,7 +117,7 @@ class InvitationController < ApplicationController
       @inv.reply_status = 'A'
       @inv.save
       accepted_invitation(user_email)
-      #add the acceptance mailer call here
+      # add the acceptance mailer call here
 
       # Remove the users previous team since they are accepting an invite for possibly a new team.
       TeamsUser.remove_team(student.user_id, params[:team_id])

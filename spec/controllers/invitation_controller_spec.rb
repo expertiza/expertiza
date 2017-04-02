@@ -27,7 +27,7 @@ describe InvitationController do
     it "should deliver an reponse to invitation email to the requested user" do
       invitation_attributes = FactoryGirl.attributes_for(:to, :subject, :body)
       mailer = mock(Mailer)
-      mailer.should_receive(:deliver).with(accept_invitation(invitation_attributes))
+      mailer.should_receive(:deliver).with(accepted_invitation(invitation_attributes))
     end
   end
 end

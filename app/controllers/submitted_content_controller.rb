@@ -90,7 +90,7 @@ class SubmittedContentController < ApplicationController
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
 
-    #create a submission record
+    # create a submission record
     @submission_record = SubmissionRecord.new(team_id: team.id, content: hyperlink_to_delete, user:@participant.name , assignment_id: assignment.id, operation: "Remove Hyperlink")
     @submission_record.save
 
@@ -130,7 +130,7 @@ class SubmittedContentController < ApplicationController
       SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
 
-    #create a submission record
+    # create a submission record
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
     @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
@@ -139,14 +139,14 @@ class SubmittedContentController < ApplicationController
    # params = ActionController::Parameters.new(a: "123", b: "456")
     # send message to reviewers when submission has been updated
 
-    #send this only if the last review round has not been completed and before the review_deadline has passed
-    last = DueDate.where(["assignment_id =? and deadline_type_id =?",assignment.id, 2]).select("round").last
-    date = DueDate.where(["assignment_id =? and deadline_type_id =? and round =?",assignment.id,2, last]).select("due_at")
+    # send this only if the last review round has not been completed and before the review_deadline has passed
+    last = DueDate.where(["assignment_id =? and deadline_type_id =?", assignment.id, 2]).select("round").last
+    date = DueDate.where(["assignment_id =? and deadline_type_id =? and round =?", assignment.id, 2, last]).select("due_at")
     #get the current round number
 
-    #current_round=DueDate.where(["assignment_id =? and deadline_type_id =?",assignment.id, 2]).select("round").last
-    #email should go to all reviewers
-    if date > DateTime.now
+    # current_round=DueDate.where(["assignment_id =? and deadline_type_id =?",assignment.id, 2]).select("round").last
+    # email should go to all reviewers
+    if date > DateTime.current
       participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
     end
 
@@ -245,7 +245,7 @@ class SubmittedContentController < ApplicationController
     filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
     FileUtils.rm_r(filename)
 
-    #create a submission record
+    # create a submission record
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
     @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Remove File")

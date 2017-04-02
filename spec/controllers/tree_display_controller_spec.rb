@@ -136,4 +136,3 @@ describe TreeDisplayController do
       expect(response.body).to match /csc517\/test/
     end
   end
-end

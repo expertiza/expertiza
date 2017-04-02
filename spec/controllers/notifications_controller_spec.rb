@@ -11,7 +11,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create notification" do
     assert_difference('Notification.count') do
-      post notification_url, params: { :notification }
+      post notification_url
     end
  
     assert_redirected_to notification_path(Article.last)

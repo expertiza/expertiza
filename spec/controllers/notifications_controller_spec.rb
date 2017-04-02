@@ -1,7 +1,6 @@
 require 'rails_helper'
-
 describe NotificationsController do
-  test "should get index" do
+  test "should get notifications index" do
     get notification_url
     assert_response :success
   end
@@ -31,4 +30,3 @@ describe NotificationsController do
     assert_redirected_to notification_path
   end
 end
-

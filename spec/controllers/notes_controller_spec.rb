@@ -1,7 +1,6 @@
 require 'rails_helper'
-
 describe NotesController do
-  it "should get index" do
+  it "should get notes index" do
     get note_url
     assert_response :success
   end

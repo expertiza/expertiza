@@ -11,7 +11,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       assert_difference('note.count') do
         post note_url, params: {note: @note}
       end
- 
+
       assert_redirected_to note_path(Article.last)
       assert_equal 'note was successfully created.', flash[:notice]
     end
@@ -28,9 +28,8 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       assert_difference 'note.count', -1 do
         delete note_url(@note)
       end
- 
+
       assert_redirected_to note_path
     end
   end
-
 end

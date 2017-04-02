@@ -22,11 +22,11 @@ describe TreeDisplayController do
       expect(response).to redirect_to('/auth/failure')
     end
   end
-  
+
   decribe "#confirm" do
-	  it "should confirm user type"
-		  post :confirm, id: {nodeType:  'instructor'}
-	end
+    it "should confirm user type"
+    post :confirm, id: {nodeType: 'instructor'}
+  end
 end
 describe "#ta_for_current_mappings?" do
   it "should return true if current user is a TA for current course" do

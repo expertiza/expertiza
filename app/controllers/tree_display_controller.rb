@@ -129,7 +129,7 @@ class TreeDisplayController < ApplicationController
       "directory" => node.get_directory,
       "creation_date" => node.get_creation_date,
       "updated_date" => node.get_modified_date,
-      "institution" => Institution.where(:id => node.get_institution_id),
+      "institution" => Institution.where(id: node.get_institution_id),
       "private" => node.get_instructor_id == session[:user].id ? true : false
        }
    tmp_object.merge!(tmp)

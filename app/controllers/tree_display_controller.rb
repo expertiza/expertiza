@@ -79,7 +79,6 @@ class TreeDisplayController < ApplicationController
   end
 
   def confirm_notifications_access
-    redirect_to controller: :content_pages, action: :view if current_user.nil?
     redirect_to controller: :notifications, action: :list if current_user.try(:student?)
   end
 

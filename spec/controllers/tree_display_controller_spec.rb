@@ -24,13 +24,13 @@ describe TreeDisplayController do
   end
 
   describe "#confirm_notifications_access" do
-	  it "should confirm usertype" do
+    it "should verify usertype" do
       user = build(:student)
       stub_current_user(user, user.role.name, user.role)
       get "confirm_notifications_access"
       expect(response).to redirect_to('/notifications/list')
-    end
-	end
+      end
+  end
 
   describe "#ta_for_current_mappings?" do
     it "should return true if current user is a TA for current course" do

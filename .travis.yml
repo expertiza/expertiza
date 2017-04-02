@@ -32,8 +32,6 @@ before_script:
     - "sh -e /etc/init.d/xvfb start"
 script:
     - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake 2> /dev/null"
-    /home/travis/.rvm/rubies/ruby-2.2.5/bin/ruby -I/home/travis/build/expertiza/expertiza/vendor/bundle/ruby/2.2.0/gems/rspec-core-3.3.2/lib:/home/travis/build/expertiza/expertiza/vendor/bundle/ruby/2.2.0/gems/rspec-support-3.3.0/lib /home/travis/build/expertiza/expertiza/vendor/bundle/ruby/2.2.0/gems/rspec-core-3.3.2/exe/rspec --pattern spec/\*\*\{,/\*/\*\*\}/\*_spec.rb
-
 notifications:
     email:
       recipients:

@@ -1,6 +1,6 @@
 class Notification < ActiveRecord::Base
-
-  validates :subject, :presence => true
-  validates :description, :presence => true
-  validates :expiration_date, :presence => true
+  attr_accessible
+  validates_presence_of :subject
+  validates_presence_of :description
+  validates_presence_of :expiration_date
 end

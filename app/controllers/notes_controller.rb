@@ -7,7 +7,8 @@ class NotesController < ApplicationController
   end
 
   # GET /notes/1
-  def show; end
+  def show
+  end
 
   # GET /notes/new
   def new
@@ -15,7 +16,8 @@ class NotesController < ApplicationController
   end
 
   # GET /notes/1/edit
-  def edit; end
+  def edit
+  end
 
   # POST /notes
   def create

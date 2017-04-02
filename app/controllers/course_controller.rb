@@ -92,10 +92,14 @@ class CourseController < ApplicationController
       @course.save!
       parent_id = CourseNode.get_parent_id
       if parent_id
-        CourseNode.create(node_object_id: @course.id, parent_id: parent_id)
+        @course_node = CourseNode.new
+        @course_node.node_object_id = @course.id
+        @course_node.parent_id = parent_id
       else
-        CourseNode.create(node_object_id: @course.id)
+        @course_node = CourseNode.new
+        @course_node.node_object_id = @course.id
       end
+      @course_node.save
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'
@@ -177,15 +181,4 @@ class CourseController < ApplicationController
   # def undo_link
   #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
   # end
-
-  private
-  # Use callbacks to share common setup or constraints between actions.
-  def set_course
-    @course = Course.find(params[:id])
-  end
-
-  # Never trust parameters from the scary internet, only allow the white list through.
-  def course_params
-    params.require(:course).permit(:id, :name, :instructor_id, :directory_path, :info, :created_at, :updated_at, :private, :institution_id)
-  end
 end

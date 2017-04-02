@@ -78,6 +78,11 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
 
+  def confirm_notifications_access
+    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    redirect_to controller: :notifications, action: :list if current_user.try(:student?)
+  end
+
   #renders FolderNode json
   def folder_node_ng_getter
     respond_to do |format|

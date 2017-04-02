@@ -1,5 +1,6 @@
 class NotificationsController < ApplicationController
   before_action :set_notification, only: [:show, :edit, :update, :destroy]
+  helper :application
 
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
@@ -9,19 +10,28 @@ class NotificationsController < ApplicationController
   end
 
   def run_get_notification
-    # here
+    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    redirect_to controller: :notifications, action: :view if current_user.try(:student?)
   end
 
   def run_create_notification
-    # here
+    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    redirect_to controller: :notifications, action: :create if current_user.try(:student?)
   end
 
   def run_update_notification
-    # here
+    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    redirect_to controller: :notifications, action: :update if current_user.try(:student?)
   end
 
   def run_destroy_notification
-    # here
+    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    redirect_to controller: :notifications, action: :destroy if current_user.try(:student?)
+  end
+
+  # GET /notifications
+  def list
+    @notifications = Notification.all
   end
 
   # GET /notifications

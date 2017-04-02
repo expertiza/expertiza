@@ -1,16 +1,11 @@
-require 'rspec'
+require 'rails_helper'
 
-describe 'notification' do
-  it 'should do something' do
-    true.should == true
-  end
-
-  it "should get notifications index" do
-    get notification_url
+describe NotificationsController do
+  it "#run_get_notification" do
+    get :notification_url
     assert_response :success
   end
-
-  it "should create notification" do
+  it "#run_create_notification" do
     assert_difference('Notification.count') do
       post notification_url, params: {notification: @notification}
     end
@@ -19,7 +14,7 @@ describe 'notification' do
     assert_equal 'Notification was successfully created.', flash[:notice]
   end
 
-  it "should update notification" do
+  it "#run_update_notification" do
     notification = notification(:one)
     patch notification_url(notification), params: {article: {title: "updated"}}
     assert_redirected_to notification_path(notification)
@@ -27,7 +22,7 @@ describe 'notification' do
     assert_equal 'Notification was successfully created.', flash[:notice]
   end
 
-  it "should destroy notification" do
+  it "#run_destroy_notification" do
     assert_difference('notification.count', -1) do
       delete notification_url(@notification)
     end

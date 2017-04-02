@@ -8,6 +8,22 @@ class NotificationsController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
+  def run_get_notification
+    # here
+  end
+
+  def run_create_notification
+    # here
+  end
+
+  def run_update_notification
+    # here
+  end
+
+  def run_destroy_notification
+    # here
+  end
+
   # GET /notifications
   def index
     @notifications = Notification.all

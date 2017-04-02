@@ -1,6 +1,3 @@
-require 'rails_helper'
-# include NotificationsHelper
-
 describe NotificationsController do
   test "should get notifications index" do
     get notification_url

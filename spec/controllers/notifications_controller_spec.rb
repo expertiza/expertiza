@@ -20,7 +20,7 @@ class ArticlesControllerTest < ActionDispatch::IntegrationTest
       notification = notification(:one)
 
       patch notification_url(notification), params: {article: {title: "updated"}}
- 
+
       assert_redirected_to notification_path(notification)
       notification.reload
       assert_equal 'Notification was successfully created.', flash[:notice]

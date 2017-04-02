@@ -10,7 +10,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
     it "should create note" do
       assert_difference('note.count') do
-        post note_url, params: { :note }
+        post note_url, params: {:note => @note}
       end
  
       assert_redirected_to note_path(Article.last)
@@ -30,7 +30,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
   
     it "should destroy note" do
-      assert_difference('note.count', -1) do
+      assert_difference 'note.count', -1 do
         delete note_url(@note)
       end
  

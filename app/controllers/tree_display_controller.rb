@@ -14,7 +14,7 @@ class TreeDisplayController < ApplicationController
 
   def confirm
     @id = params[:id]
-    @nodeType = params[:nodeType]
+    @node_type = params[:nodeType]
   end
 
   # direct access to questionnaires

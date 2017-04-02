@@ -29,7 +29,7 @@ describe TreeDisplayController do
       stub_current_user(user, user.role.name, user.role)
       get "confirm_notifications_access"
       expect(response).to redirect_to('/notifications/list')
-      end
+    end
   end
 
   describe "#ta_for_current_mappings?" do

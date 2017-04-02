@@ -14,8 +14,7 @@ class NotificationsController < ApplicationController
   end
 
   # GET /notifications/1
-  def show
-  end
+  def show; end
 
   # GET /notifications/new
   def new
@@ -23,12 +22,11 @@ class NotificationsController < ApplicationController
   end
 
   # GET /notifications/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /notifications
   def create
-    @notification = Notification.new(notification_params)
+    @notification = Notification.new(notification_params, :without_protection => true)
 
     if @notification.save
       redirect_to @notification, notice: 'Notification was successfully created.'
@@ -53,13 +51,14 @@ class NotificationsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_notification
-      @notification = Notification.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def notification_params
-      params.require(:notification).permit(:subject, :description, :expiration_date, :active_flag)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_notification
+    @notification = Notification.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def notification_params
+    params.require(:notification).permit(:subject, :description, :expiration_date, :active_flag)
+  end
 end

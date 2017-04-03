@@ -143,6 +143,7 @@ class SubmittedContentController < ApplicationController
     last = DueDate.where(["assignment_id =? and deadline_type_id =?",assignment.id, 2]).select("round").last
     date = DueDate.where(["assignment_id =? and deadline_type_id =? and round =?",assignment.id,2, last]).select("due_at")
     #get the current round number
+
     #current_round=DueDate.where(["assignment_id =? and deadline_type_id =?",assignment.id, 2]).select("round").last
     #email should go to all reviewers
     if date > DateTime.now

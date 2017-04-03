@@ -21,5 +21,6 @@ describe InvitationController do
       mailer = mock(Mailer)
       mailer.should_receive(:deliver).with(accept_invitation(invitation_attributes))
     end
-  end #made changes
+
+  end # made changes
 end

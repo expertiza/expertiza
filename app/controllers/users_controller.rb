@@ -94,14 +94,14 @@ class UsersController < ApplicationController
 
   def new
     @user = User.new
-    ##add the next two lines~~~~~
+    # add the next two lines~~~~~
     @rolename = Role.find_by_name(params[:role])
-    ##here add a mailer to - created account
+    # here add a mailer to - created account
     password = @user.reset_password
     MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password).deliver
     foreign
 
-    #write a mailer call here
+    # write a mailer call here
   end
 
   def request_new
@@ -183,7 +183,7 @@ class UsersController < ApplicationController
       end
     else 
       if @user.status=="Rejected"    
-        #If the user request has been rejected, a flash message is shown and redirected to review page
+        # If the user request has been rejected, a flash message is shown and redirected to review page
         if @user.update_columns(reason: params[:reason], status: params[:status])
           flash[:success] = "The user \"#{@user.name}\" has been Rejected."
           redirect_to action: 'list_pending_requested'

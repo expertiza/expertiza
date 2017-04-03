@@ -56,7 +56,7 @@ class InvitationController < ApplicationController
   def accept_invitation(student_email)
     Mailer.accept_invitation(
           to: student_email,
-        #cc: cc_mail_list,
+        # cc: cc_mail_list,
         subject: "You have a new team invitaion",
         body: {
 
@@ -83,7 +83,7 @@ class InvitationController < ApplicationController
   def accepted_invitation(user_email)
     Mailer.accepted_invitation(
           to: user_email,
-        #cc: cc_mail_list,
+        # cc: cc_mail_list,
         subject: "The invitation for the teammate has been accepted",
         body: {
 

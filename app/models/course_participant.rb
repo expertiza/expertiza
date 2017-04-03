@@ -31,12 +31,12 @@ class CourseParticipant < Participant
       CourseParticipant.create(user_id: user.id, parent_id: course.id)
       instructor_email = User.where(["role_id = ?", 2]).select("email").first
       Mailer.suggested_topic(
-          to: instructor_email,
-          #cc: cc_mail_list,
+            to: instructor_email,
+          # cc: cc_mail_list,
           subject: "A new topic named '#{@suggestion.title}' has been suggested",
           body: {
-              suggested_topic_name: @suggestion.title,
-              proposer: @user_id
+                suggested_topic_name: @suggestion.title,
+                proposer: @user_id
           }
       ).deliver_now!
     end

@@ -83,6 +83,10 @@ class InvitationsController < ApplicationController
       redirect_to view_student_teams_path student_id: @student.id
       return
     end
+    check_participant_before_invitation
+  end
+
+  def check_participant_before_invitation
     @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant

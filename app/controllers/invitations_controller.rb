@@ -62,7 +62,7 @@ class InvitationsController < ApplicationController
   end
 
   private
-
+  
   def create_utility
     @invitation = Invitation.new(to_id: @user.id, from_id: @student.user_id)
     @invitation.assignment_id = @student.parent_id
@@ -79,23 +79,23 @@ class InvitationsController < ApplicationController
     return unless current_user_id?(@student.user_id)
 
     # check if the invited user is valid
-    if @user
-      check_participant_before_invitation
-    else
+    unless @user
       flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
       redirect_to view_student_teams_path student_id: @student.id
+      return
     end
+    check_participant_before_invitation
   end
 
   def check_participant_before_invitation
     @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
-    if @participant
-      check_team_before_invitation
-    else
+    unless @participant
       flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
       redirect_to view_student_teams_path student_id: @student.id
+      return
     end
+    check_team_before_invitation
   end
 
   def check_team_before_invitation

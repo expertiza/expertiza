@@ -69,7 +69,8 @@ class ParticipantsController < ApplicationController
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
-  #participant_email = Participant.find(params[:student_id
+  # participant_email = Participant.find(params[:student_id
+
   # duties: manager, designer, programmer, tester
 
   def update_duties

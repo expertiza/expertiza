@@ -1,0 +1,16 @@
+E1716. Improve e-mail notifications
+
+What is done: Students and instructors are notified of various events by e-mail, e.g., creation of a new account, submission of a review on their work, or updating of work that they have reviewed.  There are some holes, though, and this project deals with plugging several of them.
+
+What’s wrong:
+When students' accounts are created by importing a CSV file on the Users page, they receive e-mails with their user-ID and password. But if an account is created by adding them as participants to an assignment when they don't already have an account, e-mail is not sent. Students should receive e-mails upon account creation, regardless of how their account is created.  So this involves adding a call to the e-mailer … or, perhaps, moving an email call from the Users controller to the point where an account is actually created.
+Second, evidently if a submission is revised after review, the system e-mails the reviewer saying to revise the review. This is just fine ... except if the last round of review has been completed.
+The message telling reviewers to revise their reviews should not be sent after the last review deadline has passed.  It would also be nice to fix the message so it tells which review (Review 1, Review 2, etc.) has been revised, and gives the reviewer a link directly to it.
+There are also other circumstances when it would be helpful to send mail.
+Send out an email to the invitee when a participant sends out an invitation to another participant to join a team.
+The student who issued the invitation should also be e-mailed when the invitee joins the team. And also when a student responds to a teammate advertisement. In general, all activity on ad responses and invitations should be reported to the other party by e-mail (unless these e-mails are turned off in a (new) profile field).
+Notify an instructor by e-mail when a student suggests a topic.
+Create an option (in the instructor’s profile) to get a copy of ‘e-mails being sent to students (this is so the instructor can verify correct functioning of the system).
+
+Classes involved: …
+Note that when you are testing mailers,  you should not send mail to nonexistent e-mail addresses, or they will bounce and count against us as spam originating at NCSU.  This can make it more likely that ncsu.edu would be deemed a spammer and mail from us would be rejected by other sites.  Instead, send to <arbitrary username>@mailinator.com, which is a special domain that doesn’t deliver any mail sent to it.

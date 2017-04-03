@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "Invitations Check" do
+xdescribe "Invitations Check" do
   before(:each) do
     create(:assignment)
     create_list(:participant, 3)

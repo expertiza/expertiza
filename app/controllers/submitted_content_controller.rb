@@ -147,11 +147,9 @@ class SubmittedContentController < ApplicationController
     #current_round=DueDate.where(["assignment_id =? and deadline_type_id =?",assignment.id, 2]).select("round").last
     #email should go to all reviewers
     if date > DateTime.now
-      participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+      participant.assignment.email(participant.id) rescue nil
+      # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
     end
-
-
-
 
     if params[:origin] == 'review'
       redirect_to :back

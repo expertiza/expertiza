@@ -89,3 +89,4 @@ Style/Documentation:
 # Style preference
 Style/MethodDefParentheses:
   Enabled: false
+

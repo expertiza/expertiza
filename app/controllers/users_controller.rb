@@ -133,7 +133,7 @@ class UsersController < ApplicationController
       # Instructor and Administrator users need to have a default set for their notifications
       # the creation of an AssignmentQuestionnaire object with only the User ID field populated
       # ensures that these users have a default value of 15% for notifications.
-      # TAs and Students do not need a default. TAs inherit the default from the instructor,
+      # TAs and Students do not need a default. TAs inherit default from the instructor,
       # Students do not have any checks for this information.
       if @user.role.name == "Instructor" or @user.role.name == "Administrator"
         AssignmentQuestionnaire.create(user_id: @user.id)

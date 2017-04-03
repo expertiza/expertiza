@@ -1,6 +1,7 @@
 class Mailer < ActionMailer::Base
   if Rails.env.development? || Rails.env.test?
     default from: 'expertiza.development@gmail.com'
+    helper ApplicationHelper
   else
     default from: 'expertiza-support@lists.ncsu.edu'
   end
@@ -14,12 +15,23 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    
+    #emails = User.where(["role_id = ?",2], ["copy_of_all_emails = ?", true]).select("email")
+    #ins_email = []
+    #ins_email << emails
+
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end
+    condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
+    if condition == true
+      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2,true]).select("email")
+    end
+    else
+      defn[:cc] = 'expertiza.development@gmail.com'
+
     mail(subject: defn[:subject],
          to: defn[:to],
+         cc: defn[:cc],
          bcc: defn[:bcc])
   end
 
@@ -35,8 +47,10 @@ class Mailer < ActionMailer::Base
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end
+
     mail(subject: defn[:subject],
          to: defn[:to],
+         cc: defn[:cc],
          bcc: defn[:bcc])
   end
 
@@ -56,9 +70,16 @@ class Mailer < ActionMailer::Base
   end
 
   def delayed_message(defn)
+    condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
+    if condition == true
+      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2,true]).select("email")
+    end
+    else
+      defn[:cc] = 'expertiza.development@gmail.com'
     ret = mail(subject: defn[:subject],
                body: defn[:body],
                content_type: "text/html",
+               cc: defn[:cc],
                bcc: defn[:bcc])
     CUSTOM_LOGGER.info(ret.encoded.to_s)
   end
@@ -67,6 +88,46 @@ class Mailer < ActionMailer::Base
     @body = defn[:body]
     @topic_name = defn[:body][:approved_topic_name]
     @proposer = defn[:body][:proposer]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:cc])
+  end
+
+  def suggested_topic(defn)
+    @body = defn[:body]
+    @topic_name = defn[:body][:suggested_topic]
+    @proposer = defn[:body][:proposer]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:cc])
+  end
+
+  def accept_invitation(defn)
+    @body = defn[:body]
+    @topic_name = defn[:body][:suggested_topic]
+    @user = defn[:body]
+
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+    end
+
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:cc])
+  end
+
+  def accepted_invitation(defn)
+    @body = defn[:body]
+    @topic_name = defn[:body][:suggested_topic]
+    @user = defn[:body]
 
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'

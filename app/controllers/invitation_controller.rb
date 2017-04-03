@@ -9,8 +9,11 @@ class InvitationController < ApplicationController
 
   def create
     user = User.find_by_name(params[:user][:name].strip)
+
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
+    student_email = student.user_id
+
     return unless current_user_id?(student.user_id)
 
     # check if the invited user is valid
@@ -37,6 +40,9 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
+
+            accept_invitation(student_email)  # Call the mailing function
+
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end
@@ -47,6 +53,17 @@ class InvitationController < ApplicationController
     update_join_team_request user, student
 
     redirect_to view_student_teams_path student_id: student.id
+  end
+
+  def accept_invitation(student_email)
+    Mailer.accept_invitation(
+          to: student_email,
+        # cc: cc_mail_list,
+        subject: "You have a new team invitaion",
+        body: {
+
+        }
+    ).deliver_now!
   end
 
   def update_join_team_request(user, student)
@@ -65,8 +82,20 @@ class InvitationController < ApplicationController
     @users = User.where("LOWER(name) LIKE ?", "%#{search}%") unless search.blank?
   end
 
+  def accepted_invitation(user_email)
+    Mailer.accepted_invitation(
+          to: user_email,
+        # cc: cc_mail_list,
+        subject: "The invitation for the teammate has been accepted",
+        body: {
+
+        }
+    ).deliver_now!
+  end
+
   def accept
     @inv = Invitation.find(params[:inv_id])
+    user_email = @inv.to_id
 
     student = Participant.find(params[:student_id])
 
@@ -90,6 +119,8 @@ class InvitationController < ApplicationController
     if ready_to_join
       @inv.reply_status = 'A'
       @inv.save
+      accepted_invitation(user_email)
+      # add the acceptance mailer call here
 
       # Remove the users previous team since they are accepting an invite for possibly a new team.
       TeamsUser.remove_team(student.user_id, params[:team_id])

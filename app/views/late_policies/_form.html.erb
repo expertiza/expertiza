@@ -18,6 +18,8 @@
 <option value='Day' < if @penalty_policy[:penalty_unit] == 'Day'%>selected< end %>>Day</option>
 </select-->
 <% @units=["Minute","Hour","Day"]%>
+
+
 <%= f.select("penalty_unit",@units,:selected=>@penalty_policy[:penalty_unit]) %>
 </p>
 <p>

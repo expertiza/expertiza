@@ -18,6 +18,22 @@ module ImportFileHelper
     user.parent_id = (session[:user]).id
     user.timezonepref = User.find(user.parent_id).timezonepref
     user.save!
+    password = 'qwerty' # the password is reset
+    prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+    prepared_mail.deliver
     user
+  end
+  ##added a mailer to fetch email ids of all students from the imported .csv file and send al email to each on eof them
+  def self.send_email_to_new_users(row)
+    foreach |row| do
+        email_addr=row[2]
+        Mailer.added_new_user(
+        to: email_addr,
+        subject: "Your Expertiza account and password have been created.",
+        body: {
+            "welcome!"
+        }
+    ).deliver_now!
+    end
   end
 end

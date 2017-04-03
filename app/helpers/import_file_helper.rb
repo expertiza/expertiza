@@ -22,9 +22,7 @@ module ImportFileHelper
     prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
     prepared_mail.deliver
     user
-
   end
-
   ##added a mailer to fetch email ids of all students from the imported .csv file and send al email to each on eof them
   def self.send_email_to_new_users(row)
     foreach |row| do
@@ -36,9 +34,6 @@ module ImportFileHelper
             "welcome!"
         }
     ).deliver_now!
-
     end
-    end
-
   end
 end

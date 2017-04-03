@@ -62,7 +62,6 @@ class InvitationsController < ApplicationController
   end
 
   private
-  
   def create_utility
     @invitation = Invitation.new(to_id: @user.id, from_id: @student.user_id)
     @invitation.assignment_id = @student.parent_id

@@ -17,3 +17,4 @@ describe SuggestionController do
     end
   end
 end
+puts

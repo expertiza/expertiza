@@ -12,8 +12,7 @@ class InvitationsController < ApplicationController
   def create
     # check if the invited user is already invited (i.e. awaiting reply)
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
-      @invitation = Invitation.new(to_id: @user.id, from_id: @student.user_id, assignment_id: @student.parent_id, reply_status: 'W')
-      @invitation.save
+      create_utility
     else
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end
@@ -63,6 +62,13 @@ class InvitationsController < ApplicationController
   end
 
   private
+  
+  def create_utility
+    @invitation = Invitation.new(to_id: @user.id, from_id: @student.user_id)
+    @invitation.assignment_id = @student.parent_id
+    @invitation.reply_status = 'W'
+    @invitation.save
+  end
 
   def check_user_before_invitation
     # user is the student you are inviting to your team

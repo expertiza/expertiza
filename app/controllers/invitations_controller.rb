@@ -12,11 +12,7 @@ class InvitationsController < ApplicationController
   def create
     # check if the invited user is already invited (i.e. awaiting reply)
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
-      @invitation = Invitation.new
-      @invitation.to_id = @user.id
-      @invitation.from_id = @student.user_id
-      @invitation.assignment_id = @student.parent_id
-      @invitation.reply_status = 'W'
+      @invitation = Invitation.new(to_id: @user.id, from_id: @student.user_id, assignment_id: @student.parent_id, reply_status: 'W')
       @invitation.save
     else
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
@@ -121,8 +117,9 @@ class InvitationsController < ApplicationController
     elsif inviter_assignment_team.full?
       flash[:error] = 'The team that invited you is full now.'
       redirect_to view_student_teams_path student_id: params[:student_id]
+    else
+      invitation_accept
     end
-    invitation_accept
   end
 
   def invitation_accept

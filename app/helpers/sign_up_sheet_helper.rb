@@ -56,23 +56,24 @@ module SignUpSheetHelper
 
   # Render the participant info for a topic and assignment.
   def render_participant_info(topic, assignment, participants)
-    name_html = ''
+    html = ''
     if !participants.nil? && !participants.empty?
       chooser_present = false
       participants.each do |participant|
         next unless topic.id == participant.topic_id
         chooser_present = true
+        html += participant.user_name_placeholder
         if assignment.max_team_size > 1
-          name_html += '<br/><b>' + participant.team_name_placeholder + '</b><br/>'
+          html += '<a href="/sign_up_sheet/delete_signup_as_instructor/' + participant.team_id.to_s + '?topic_id=' + topic.id.to_s + '"">'
+          html += '<img border="0" align="middle" src="/assets/delete_icon.png" title="Drop Student"></a>'
         end
-        name_html += 'participant.user_name_placeholder'
         if participant.is_waitlisted
-          name_html += '<font color="red">(waitlisted)</font>'
+          html += '<font color="red">(waitlisted)</font>'
         end
-        name_html += '<br/>'
+        html += '<br/>'
       end
-      name_html += 'No choosers.' unless chooser_present
+      html += 'No choosers.' unless chooser_present
     end
-    name_html.html_safe
+    html.html_safe
   end
 end

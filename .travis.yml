@@ -14,8 +14,6 @@ before_install:
     - sudo apt-get update
     - unset RAILS_ENV
     - rvm rubygems current
-    - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-2.1.5-head/
-    - bundle config build.raspell --with-opt-dir=
 before_script:
     - mysql -u root < db/grant_expertiza.sql
     - cp config/database.yml.example config/database.yml

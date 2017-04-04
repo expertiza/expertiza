@@ -18,7 +18,6 @@ gem 'edavis10-ruby-web-search'
 gem 'engtagger'
 gem 'expertiza-authlogic', github: 'expertiza/authlogic', require: 'authlogic'
 gem 'fastercsv'
-gem 'ffi-aspell'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
 gem "googlecharts", require: "gchart"

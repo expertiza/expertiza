@@ -78,9 +78,9 @@ class JoinTeamRequestsController < ApplicationController
     team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
     team = Team.find(params[:team_id])
 
-    return flash[:note] = "This team is full." if team.full?
+    return flash[:error] = "This team is full." if team.full?
 
-    return flash[:note] = "You are already a member of this team." unless team_member.empty?
+    return flash[:error] = "You are already a member of this team." unless team_member.empty?
   end
 
   def find_request

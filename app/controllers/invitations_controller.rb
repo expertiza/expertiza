@@ -80,7 +80,7 @@ class InvitationsController < ApplicationController
 
     # check if the invited user is valid
     unless @user
-      flash[:note] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+      flash[:error] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
       redirect_to view_student_teams_path student_id: @student.id
       return
     end
@@ -91,7 +91,7 @@ class InvitationsController < ApplicationController
     @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant
-      flash[:note] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+      flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
       redirect_to view_student_teams_path student_id: @student.id
       return
     end
@@ -113,7 +113,7 @@ class InvitationsController < ApplicationController
     # check if invited user is already in the team
 
     return if team_member.empty?
-    flash[:note] = "The user \"#{@user.name}\" is already a member of the team."
+    flash[:error] = "The user \"#{@user.name}\" is already a member of the team."
     redirect_to view_student_teams_path student_id: @student.id
   end
 

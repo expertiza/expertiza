@@ -128,11 +128,18 @@ module ReviewMappingHelper
   end
 
   def get_team_name_color(response_map)
-    team_name_color = Response.exists?(map_id: response_map.id) ? "green" : "red"
-    review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
-    response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
-    team_name_color = "blue" if review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at
-    team_name_color
+    if Response.exists?(map_id: response_map.id)
+      review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
+      response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
+      if review_graded_at.nil? ||
+        (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
+        "blue"
+      else
+        "green"
+      end
+    else
+      "red"
+    end
   end
 
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)

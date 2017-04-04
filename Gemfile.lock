@@ -247,7 +247,6 @@ GEM
       request_store (~> 1.1)
     parser (2.3.1.2)
       ast (~> 2.2)
-    pg (0.18.2)
     pkg-config (1.1.7)
     power_assert (0.2.4)
     powerpack (0.1.1)
@@ -472,7 +471,6 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail
-  pg
   protected_attributes
   pry
   pry-nav

@@ -34,7 +34,6 @@ gem 'nokogiri', '~> 1.6.8'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
-gem 'pg', group: :production
 gem 'protected_attributes'
 gem 'rails4-autocomplete'
 gem 'rake'

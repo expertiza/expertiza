@@ -150,6 +150,10 @@ FactoryGirl.define do
     user { User.where(role_id: 2).first || association(:student) }
   end
 
+  factory :invitation, class: Invitation do
+    reply_status 'W'
+  end
+
 
   factory :course_team, class: CourseTeam do
     sequence(:name) {|n| "team#{n}" }

@@ -1,7 +1,6 @@
 language: ruby
 cache:
     bundler: true
-    bower: true
     timeout: 1000
 rvm:
     - 2.2.5
@@ -14,6 +13,8 @@ before_install:
     - sudo apt-get update
     - unset RAILS_ENV
     - rvm rubygems current
+    - npm install -g bower
+    - bower install
 before_script:
     - mysql -u root < db/grant_expertiza.sql
     - cp config/database.yml.example config/database.yml

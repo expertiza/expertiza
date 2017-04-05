@@ -1,5 +1,4 @@
 class TrackNotificationsController < ApplicationController
-
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
     ['Instructor',

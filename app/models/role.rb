@@ -15,8 +15,8 @@ class Role < ActiveRecord::Base
   def cache
     @cache = {}
     unless self.nil?
-      @cache[:credentials] = CACHED_ROLES(self.id)[:credentials]
-      @cache[:menu] = CACHED_ROLES(self.id)[:menu]
+      @cache[:credentials] = CACHED_ROLES[self.id][:credentials]
+      @cache[:menu] = CACHED_ROLES[self.id][:menu]
     end
     @cache
   end
@@ -86,11 +86,11 @@ class Role < ActiveRecord::Base
   end
 
   def rebuild_credentials
-    self.cache[:credentials] = CACHED_ROLES(self.id)[:credentials]
+    self.cache[:credentials] = CACHED_ROLES[self.id][:credentials]
   end
 
   def rebuild_menu
-    self.cache[:menu] = CACHED_ROLES(self.id)[:menu]
+    self.cache[:menu] = CACHED_ROLES[self.id][:menu]
   end
 
   # return ids of roles that are below this role

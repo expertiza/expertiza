@@ -1,4 +1,4 @@
-class CreateTrackNotifications < ActiveRecord::Migration
+class CreateTrackNotificationsTable < ActiveRecord::Migration
   def change
     create_table :track_notifications do |t|
       t.integer :notification

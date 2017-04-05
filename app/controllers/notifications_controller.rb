@@ -62,7 +62,6 @@ class NotificationsController < ApplicationController
     @individual_notification.each do |notification|
       if notification.notification == @notification.id
         notification.destroy
-      else
       end
     end
     @notification.destroy

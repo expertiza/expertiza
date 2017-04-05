@@ -21,8 +21,8 @@ class TrackNotificationsController < ApplicationController
 
   private
 
-    # Only allow a trusted parameter "white list" through.
-    def track_notification_params
-      params.permit(:notification, :user_id)
-    end
+  # Only allow a trusted parameter "white list" through.
+  def track_notification_params
+    params.permit(:notification, :user_id)
+  end
 end

@@ -162,6 +162,7 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment_id)
     @show_actions = true
     @priority = 0
+    @topic_id = params[:id]
 
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
     @max_team_size = assignment.max_team_size

@@ -12,6 +12,11 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  def confirm
+    @id = params[:id]
+    @node_type = params[:nodeType]
+  end
+
   # direct access to questionnaires
   def goto_questionnaires
     goto_controller('Questionnaires')
@@ -73,6 +78,10 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
 
+  def confirm_notifications_access
+    redirect_to controller: :notifications, action: :list if current_user.try(:student?)
+  end
+
   #renders FolderNode json
   def folder_node_ng_getter
     respond_to do |format|
@@ -124,6 +133,7 @@ class TreeDisplayController < ApplicationController
       "directory" => node.get_directory,
       "creation_date" => node.get_creation_date,
       "updated_date" => node.get_modified_date,
+      "institution" => Institution.where(id: node.retrieve_institution_id),
       "private" => node.get_instructor_id == session[:user].id ? true : false
        }
    tmp_object.merge!(tmp)

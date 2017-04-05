@@ -47,6 +47,7 @@ class CourseController < ApplicationController
       end
     end
     @course.name = params[:course][:name]
+    @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
     @course.save
@@ -80,17 +81,25 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    @course = Course.new(name: params[:course][:name], directory_path: params[:course][:directory_path], info: params[:course][:info], private: params[:course][:private])
-
+    @course = Course.new
+    @course.name = params[:course][:name]
+    @course.institutions_id = params[:course][:institutions_id]
+    @course.directory_path = params[:course][:directory_path]
+    @course.info = params[:course][:info]
+    @course.private = params[:course][:private]
     @course.instructor_id = session[:user].id
     begin
       @course.save!
       parent_id = CourseNode.get_parent_id
       if parent_id
-        CourseNode.create(node_object_id: @course.id, parent_id: parent_id)
+        @course_node = CourseNode.new
+        @course_node.node_object_id = @course.id
+        @course_node.parent_id = parent_id
       else
-        CourseNode.create(node_object_id: @course.id)
+        @course_node = CourseNode.new
+        @course_node.node_object_id = @course.id
       end
+      @course_node.save
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'

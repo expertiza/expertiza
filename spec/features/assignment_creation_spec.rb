@@ -405,17 +405,6 @@ describe "assignment function" do
         category: 'Test Category'
       )
     end
-
-    it "Delete existing topic" do
-      create(:topic, assignment_id: @assignment[:id])
-      visit "/assignments/#{@assignment[:id]}/edit"
-      click_link 'Topics'
-      all(:xpath, '//img[@title="Delete Topic"]')[0].click
-      click_button 'OK'
-
-      topics_exist = SignUpTopic.count(:all, assignment_id: @assignment[:id])
-      expect(topics_exist).to be_eql 0
-    end
   end
 
   # Begin rubric tab

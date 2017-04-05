@@ -2,24 +2,21 @@ require "credentials"
 require "menu"
 
 class Role < ActiveRecord::Base
-  include ApplicationHelper
-
   belongs_to :parent, class_name: 'Role'
   has_many :users
 
   serialize :cache
-  validates_presence_of :name
-  validates_uniqueness_of :name
+  validates :name, presence: true
+  validates :name, uniqueness: true
 
-  attr_reader :cache
-  attr_writer :cache
+  attr_accessor :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
   def cache
-    @cache = Hash.new
+    @cache = {}
     unless self.nil?
-      @cache[:credentials] = get_cache_roles(self.id)[:credentials]
-      @cache[:menu] = get_cache_roles(self.id)[:menu]
+      @cache[:credentials] = CACHED_ROLES(self.id)[:credentials]
+      @cache[:menu] = CACHED_ROLES(self.id)[:menu]
     end
     @cache
   end
@@ -78,7 +75,7 @@ class Role < ActiveRecord::Base
 
   def self.rebuild_cache
     Role.find_each do |role|
-      role.cache = Hash.new
+      role.cache = {}
       role.rebuild_credentials
       role.rebuild_menu
     end
@@ -89,11 +86,11 @@ class Role < ActiveRecord::Base
   end
 
   def rebuild_credentials
-    self.cache[:credentials] = get_cache_roles(self.id)[:credentials]
+    self.cache[:credentials] = CACHED_ROLES(self.id)[:credentials]
   end
 
   def rebuild_menu
-    self.cache[:menu] = get_cache_roles(self.id)[:menu]
+    self.cache[:menu] = CACHED_ROLES(self.id)[:menu]
   end
 
   # return ids of roles that are below this role

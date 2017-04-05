@@ -8,9 +8,9 @@ gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
-# gem 'capistrano'
+gem 'capistrano'
 gem "capistrano-db-tasks", require: false
-# gem 'capistrano-rails'
+gem 'capistrano-rails'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'

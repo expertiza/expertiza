@@ -1,0 +1,58 @@
+<% userid << participant.user_id %>
+<tr class= "exp">
+  <td ><%= link_to User.find(participant.user_id).name, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
+  <td ><%= User.find(participant.user_id).fullname %></td>
+  <td ><%= User.find(participant.user_id).email %></td>
+  <td ><%= link_to User.find(participant.user_id).role.name, :controller => 'roles', :action => 'show', :id => User.find(participant.user_id).role.id %></td>
+  <td  align="center"><%= (User.find(User.find(participant.user_id).parent_id)).name %></td>
+  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_review) %></td>
+  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_submission) %></td>
+  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_review_of_review) %></td>
+  <td align="center" ><%= participant.can_submit == false ? 'no' : 'yes' %></td>
+  <td align="center" ><%= participant.can_review == false ? 'no' : 'yes' %></td>
+  <td align="center" ><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>
+  <td align="center" ><%= participant.handle %></td>
+
+  <td align="center" ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
+
+  <!-- E726 Fall2012 Changes Begin -->
+  <% authorization = Participant.get_authorization(participant.can_submit, participant.can_review, participant.can_take_quiz) %>
+  <% if authorization =='reader' %>
+      <td><%= fa_icon 'book', title: 'reader' %></td>
+  <% else %>
+      <td></td>
+  <% end %>
+  <!-- E726 Fall2012 Changes End -->
+
+  <td>
+    <%= form_tag :controller=>'participants', :action=>'update_authorizations', :id => participant.id do %>
+        <% params[:authorization] = authorization %>
+        <select id=<%=participant.user_id%> name="authorization" style="font-size:12px">
+
+          <option value="participant"
+                  <% if params[:authorization] == "participant" -%>
+                  selected
+                  <% end -%>
+                  >participant</option>
+          <option value="reader"
+                  <% if params[:authorization] == "reader" -%>
+                  selected
+                  <% end -%>
+                  >reader</option>
+          <option value="reviewer"
+                  <% if params[:authorization] == "reviewer" -%>
+                  selected
+                  <% end -%>
+                  >reviewer</option>
+          <option value="submitter"
+                  <% if params[:authorization] == "submitter" -%>
+                  selected
+                  <% end -%>
+                  >submitter</option>
+        </select>
+        <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:12px; display:none;"} %>
+    <% end %>
+  </td>
+
+</tr>
+

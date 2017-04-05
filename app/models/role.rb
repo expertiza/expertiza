@@ -2,6 +2,8 @@ require "credentials"
 require "menu"
 
 class Role < ActiveRecord::Base
+  include ApplicationHelper
+
   belongs_to :parent, class_name: 'Role'
   has_many :users
 
@@ -9,7 +11,18 @@ class Role < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  attr_reader :cache
+  attr_writer :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+
+  def cache
+    @cache = Hash.new
+    unless self.nil?
+      @cache[:credentials] = get_cache_roles(self.id)[:credentials]
+      @cache[:menu] = get_cache_roles(self.id)[:menu]
+    end
+    @cache
+  end
 
   def self.find_or_create_by_name(params)
     Role.find_or_create_by(name: params)
@@ -65,13 +78,9 @@ class Role < ActiveRecord::Base
 
   def self.rebuild_cache
     Role.find_each do |role|
-      role.cache = nil
-      role.save # we have to do this to clear it
-
       role.cache = Hash.new
       role.rebuild_credentials
       role.rebuild_menu
-      role.save
     end
   end
 
@@ -80,12 +89,11 @@ class Role < ActiveRecord::Base
   end
 
   def rebuild_credentials
-    self.cache[:credentials] = Credentials.new(self.id)
+    self.cache[:credentials] = get_cache_roles(self.id)[:credentials]
   end
 
   def rebuild_menu
-    menu = Menu.new(self)
-    self.cache[:menu] = menu
+    self.cache[:menu] = get_cache_roles(self.id)[:menu]
   end
 
   # return ids of roles that are below this role

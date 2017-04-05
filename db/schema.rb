@@ -433,7 +433,6 @@ ActiveRecord::Schema.define(version: 20170222161826) do
     t.integer  "parent_id",       limit: 4
     t.string   "description",     limit: 255,   default: "", null: false
     t.integer  "default_page_id", limit: 4
-    t.text     "cache",           limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end

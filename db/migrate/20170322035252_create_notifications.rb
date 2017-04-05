@@ -5,7 +5,6 @@ class CreateNotifications < ActiveRecord::Migration
       t.text :description
       t.date :expiration_date
       t.boolean :active_flag
-
       t.timestamps null: false
     end
   end

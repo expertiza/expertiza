@@ -288,7 +288,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.string  "type",           limit: 255
   end
 
-  creatications", force: :cascade do |t|
+  create_table "creatications", force: :cascade do |t|
     t.string   "subject",         limit: 255
     t.text     "description",     limit: 65535
     t.date     "expiration_date"

@@ -162,7 +162,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :invitation do
+  resources :invitations do
     collection do
       get :cancel
       get :accept
@@ -172,7 +172,7 @@ Expertiza::Application.routes.draw do
 
   resources :join_team_requests do
     collection do
-      get :decline
+      post :decline
       get :edit
     end
   end
@@ -360,6 +360,8 @@ Expertiza::Application.routes.draw do
       get :team_details
       get :intelligent_sign_up
       get :intelligent_save
+      get :signup_as_instructor
+      post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
     end

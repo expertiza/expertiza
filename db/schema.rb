@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20170404122028) do
 
   create_table "answers", force: :cascade do |t|
@@ -287,7 +288,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.string  "type",           limit: 255
   end
 
-  create_table "notifications", force: :cascade do |t|
+  creatications", force: :cascade do |t|
     t.string   "subject",         limit: 255
     t.text     "description",     limit: 65535
     t.date     "expiration_date"
@@ -438,11 +439,10 @@ ActiveRecord::Schema.define(version: 20170404122028) do
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
   create_table "roles", force: :cascade do |t|
-    t.string   "name",            limit: 255,   default: "", null: false
+    t.string   "name",            limit: 255, default: "", null: false
     t.integer  "parent_id",       limit: 4
-    t.string   "description",     limit: 255,   default: "", null: false
+    t.string   "description",     limit: 255, default: "", null: false
     t.integer  "default_page_id", limit: 4
-    t.text     "cache",           limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -3,7 +3,7 @@
   <a href="#<%= i %>" onClick="toggleSingleTeamAndMember(<%= i %>)">
     <span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span>
     <span class="inline" id="<%= i %>_hide" style="display: none"><%= topic.topic_name %></span>
-  </a>
+  </a><%= link_to image_tag('signup.png', :border => 0, :title => 'Sign Up Student', :align => 'middle'), signup_as_instructor_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
 <% else %>
     <span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span>
 <% end %>
@@ -19,30 +19,6 @@
 
 <div id="<%= i %>_myDiv">
 <!--Though called participants, @participants are actually records in signed_up_teams table-->
-  <% if !@participants.nil? && @participants.size > 0 %>
-    <% chooser_present = false %>
-    <% for participant in @participants %>
-      <% if topic.id == participant.topic_id %>
-        <% chooser_present = true %>
-
-        <% if(@assignment.max_team_size > 1)%>
-          <br/>
-          <b><%= participant.team_name_placeholder%></b>
-          <br/>
-          <%= participant.user_name_placeholder%>
-        <% else %>
-          <%= participant.user_name_placeholder%>
-        <% end %>
-        <% if participant.is_waitlisted == true %>
-          <font color='red'>(waitlisted)</font>
-        <% end %>
-        <br/>
-      <% end %>
-    <% end %>
-    <% if chooser_present == false %>
-      No choosers.
-    <% end %>
-    <br/>
-  <% end %>
+  <%= render_participant_info(topic, @assignment, @participants) %>
   <div id="dialog-message" style="word-wrap: normal"></div>
 </div>

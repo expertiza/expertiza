@@ -60,7 +60,6 @@ gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'timecop', '0.8.1'
-gem 'awesomplete'
 
 group :development do
   gem 'daemons'

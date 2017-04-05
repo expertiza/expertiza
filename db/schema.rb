@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170322035252) do
+ActiveRecord::Schema.define(version: 20170404122028) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -628,6 +628,13 @@ ActiveRecord::Schema.define(version: 20170322035252) do
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
+
+  create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification", limit: 4
+    t.integer  "user_id",      limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255

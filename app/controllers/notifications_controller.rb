@@ -1,6 +1,5 @@
 class NotificationsController < ApplicationController
   before_action :set_notification, only: [:show, :edit, :update, :destroy]
-  helper :application
 
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
@@ -47,15 +46,25 @@ class NotificationsController < ApplicationController
 
   # PATCH/PUT /notifications/1
   def update
-    if @notification.update(notification_params)
-      redirect_to @notification, notice: 'Notification was successfully updated.'
-    else
-      render :edit
+
+    respond_to do |format|
+      if @notification.update(notification_params)
+        format.html { redirect_to @notification, notice: 'Notification was successfully updated.' }
+      else
+        format.html { render :edit }
+      end
     end
   end
 
   # DELETE /notifications/1
   def destroy
+    # Remove any hidden notifications
+    @individual_notification = TrackNotification.all
+    @individual_notification.each do |notification|
+      if notification.notification == @notification.id
+        notification.destroy
+      end
+    end
     @notification.destroy
     redirect_to notifications_url, notice: 'Notification was successfully destroyed.'
   end

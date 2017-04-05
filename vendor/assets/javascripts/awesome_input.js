@@ -2,44 +2,42 @@ var ready = function() {
 
     // javascript
     var elements = document.getElementsByClassName("awesome_input");
-    if(elements.length > 0){
+    if (elements.length > 0) {
         var list = "";
         //Fetching pastebins from database
         $.ajax({
             type: "GET",
             url: "/user_pastebins", // should be mapped in routes.rb
-            datatype:"json", // check more option
-            success: function(data) {
+            datatype: "json", // check more option
+            success: function (data) {
                 // handle response data
-                alert("Here");
                 list = data;
                 //Calling awesome function
-                if(list.length> 0){
-                    for(var i=0; i<elements.length; i++) {
-                        awesome(elements[i],list);
+                if (list.length > 0) {
+                    for (var i = 0; i < elements.length; i++) {
+                        awesome(elements[i], list);
                     }
                 }
             }
         });
 
 
-
     }
 
 
-    function awesome(element,list){
+    function awesome(element, list) {
 // Show label but insert value into the input:
         new Awesomplete(element, {
             list: list,
 
-            filter: function(text, input) {
+            filter: function (text, input) {
                 var currentInput = input.match(/[^\s]*$/)[0];
-                if(currentInput)
+                if (currentInput)
                     return Awesomplete.FILTER_STARTSWITH(text, currentInput);
                 else return false;
             },
 
-            replace: function(text) {
+            replace: function (text) {
                 var before = this.input.value.match(/^.+\s\s*|/)[0];
                 this.input.value = before + text.value + " ";
             }
@@ -47,6 +45,46 @@ var ready = function() {
         });
     }
 };
+
+function addUserPastebin() {
+    var short_form = $('#short_form').val();
+    var long_form = $('#long_form').val();
+    $( "#user-pastebin-table tbody" ).append( "<tr>" +
+        "<td>" + short_form + "</td>" +
+        "<td>" + long_form + "</td>" +
+        "</tr>" );
+    //Posting pastebins to database
+    $.ajax({
+        type: "POST",
+        url: "/user_pastebins", // should be mapped in routes.rb
+        data: { short_form: short_form, long_form: long_form },
+        async: true
+    });
+    dialog.dialog("close");
+}
+
+var dialog;
+
+
+function show_pastebin(){
+    // dialog.dialog("open");
+    // $("#user-pastebin-form").html('Hello There');
+    dialog = $("#user-pastebin-form").dialog({
+        modal: true,
+        draggable: true,
+        resizable: true,
+        position: ['center', 'center'],
+        show: 'blind',
+        hide: 'blind',
+        width: 400,
+        buttons: {
+            "Add User Pastebin": addUserPastebin,
+            Close: function () {
+                dialog.dialog("close");
+            }
+        }
+    });
+}
 
 $(document).ready(ready);
 $(document).on('page:change', ready);

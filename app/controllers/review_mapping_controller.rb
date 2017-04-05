@@ -424,8 +424,9 @@ class ReviewMappingController < ApplicationController
       @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id:params[:id], calibrate_to:1)
       @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id:params[:id], calibrate_to:0)
       @responses = Response.where(:map_id => @review_response_map_ids)
-      end
     end
+    @user_pastebins = UserPastebin.get_current_user_pastebin (current_user)
+  end
 
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])

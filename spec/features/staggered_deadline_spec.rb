@@ -42,6 +42,10 @@ describe "Staggered deadline test" do
     topic_due('review', DateTime.now.in_time_zone + 20, 2, 1)
     topic_due('submission', DateTime.now.in_time_zone + 30, 2, 2, 1)
     topic_due('review', DateTime.now.in_time_zone + 40, 2, 2)
+
+    @student_name_1 = User.first.name
+    @student_name_2 = User.second.name
+    @student_name_3 = User.third.name
   end
 
   # create assignment deadline
@@ -85,24 +89,24 @@ describe "Staggered deadline test" do
     topic_due.save
   end
 
-  it "test1: in round 1, student2064 in review stage could do review" do
+  it "test1: in round 1, first student in review stage could do review" do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
-    # change deadline to make student2064 in review stage in round 1
+    submit_topic(@student_name_1, '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    submit_topic(@student_name_2, '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    # change deadline to make first student in review stage in round 1
     change_due(1, 1, 1, DateTime.now.in_time_zone - 10)
 
     # impersonate each participant and check their topic's current stage
 
     # ####student 1:
-    user = User.find_by_name('student2064')
+    user = User.find_by_name(@student_name_1)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "review"
 
-    # student2064 in review stage could review others' work
-    # however, student2065 is still in submission stage.
-    # So actually, student2064 cannot review anything.
+    # first student in review stage could review others' work
+    # however, second student is still in submission stage.
+    # So actually, first student cannot review anything.
     # the reason is that the review_allowed_id of default submission deadline is OK, should be NO.
     click_link 'Assignment1665'
     expect(page).to have_content "Others' work"
@@ -111,8 +115,8 @@ describe "Staggered deadline test" do
     click_button 'Request a new submission to review'
     expect(page).to have_content 'No topic is selected. Please go back and select a topic.'
 
-    # Although student2065 is in submission stage, he or she can still review other's work.
-    user = User.find_by_name('student2065')
+    # Although second student is in submission stage, he or she can still review other's work.
+    user = User.find_by_name(@student_name_2)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "submission"
@@ -134,8 +138,8 @@ describe "Staggered deadline test" do
 
   it "test2: in round 2, both students should be in review stage to review each other" do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    submit_topic(@student_name_1, '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    submit_topic(@student_name_2, '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
     # change deadline to make both in review stage in round 2
     change_due(1, 1, 1, DateTime.now.in_time_zone - 30)
     change_due(1, 2, 1, DateTime.now.in_time_zone - 20)
@@ -147,7 +151,7 @@ describe "Staggered deadline test" do
     # impersonate each participant and check their topic's current stage
 
     # ##first student:
-    user = User.find_by_name('student2064')
+    user = User.find_by_name(@student_name_1)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "review"
@@ -173,7 +177,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content "View"
 
     # ##second student
-    user = User.find_by_name('student2065')
+    user = User.find_by_name(@student_name_2)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "review"
@@ -201,8 +205,8 @@ describe "Staggered deadline test" do
 
   it "test3: in round 2, both students after review deadline should not do review" do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    submit_topic(@student_name_1, '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    submit_topic(@student_name_2, '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
 
     # change deadline to make both after review deadline in round 2
     change_due(1, 1, 1, DateTime.now.in_time_zone - 40)
@@ -215,7 +219,7 @@ describe "Staggered deadline test" do
     change_due(2, 2, 2, DateTime.now.in_time_zone - 10)
 
     # impersonate each participant and check their topic's current stage
-    user = User.find_by_name('student2064')
+    user = User.find_by_name(@student_name_1)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "Finished"
@@ -228,7 +232,7 @@ describe "Staggered deadline test" do
     # it should not able to choose topic for review
     expect { choose "topic_id_2" }.to raise_error('Unable to find radio button "topic_id_2"')
 
-    user = User.find_by_name('student2065')
+    user = User.find_by_name(@student_name_2)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "Finished"

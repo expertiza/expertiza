@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170222161826) do
+ActiveRecord::Schema.define(version: 20170404122028) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -287,6 +287,15 @@ ActiveRecord::Schema.define(version: 20170222161826) do
     t.string  "type",           limit: 255
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.string   "subject",         limit: 255
+    t.text     "description",     limit: 65535
+    t.date     "expiration_date"
+    t.boolean  "active_flag"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
   create_table "participants", force: :cascade do |t|
     t.boolean  "can_submit",                        default: true
     t.boolean  "can_review",                        default: true
@@ -429,11 +438,10 @@ ActiveRecord::Schema.define(version: 20170222161826) do
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
   create_table "roles", force: :cascade do |t|
-    t.string   "name",            limit: 255,   default: "", null: false
+    t.string   "name",            limit: 255, default: "", null: false
     t.integer  "parent_id",       limit: 4
-    t.string   "description",     limit: 255,   default: "", null: false
+    t.string   "description",     limit: 255, default: "", null: false
     t.integer  "default_page_id", limit: 4
-    t.text     "cache",           limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -620,6 +628,13 @@ ActiveRecord::Schema.define(version: 20170222161826) do
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
+  create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification", limit: 4
+    t.integer  "user_id",      limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
     t.string  "child_type", limit: 255
@@ -627,26 +642,26 @@ ActiveRecord::Schema.define(version: 20170222161826) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,      default: "",    null: false
-    t.string  "crypted_password",          limit: 40,       default: "",    null: false
-    t.integer "role_id",                   limit: 4,        default: 0,     null: false
+    t.string  "name",                      limit: 255,   default: "",    null: false
+    t.string  "crypted_password",          limit: 40,    default: "",    null: false
+    t.integer "role_id",                   limit: 4,     default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                         default: false
+    t.boolean "private_by_default",                      default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                                default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,        default: 0
+    t.boolean "is_new_user",                             default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 16777215
+    t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 16777215
-    t.boolean "copy_of_emails",                             default: false
+    t.text    "public_key",                limit: 65535
+    t.boolean "copy_of_emails",                          default: false
     t.integer "institution_id",            limit: 4
   end
 

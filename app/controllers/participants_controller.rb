@@ -35,7 +35,7 @@ class ParticipantsController < ApplicationController
   # OSS_808 change 28th oct
   # required for sending emails
   def email_sent
-    DelayedMailer.deliver_mail("recipient.address@example.com")
+    # DelayedMailer.deliver_mail("recipient.address@example.com")
   end
 
   def add
@@ -45,15 +45,21 @@ class ParticipantsController < ApplicationController
       can_submit = permissions[:can_submit]
       can_review = permissions[:can_review]
       can_take_quiz = permissions[:can_take_quiz]
-      curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
+      if curr_object.is_a?(Assignment)
+        curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz)
+      elsif curr_object.is_a?(Course)
+        curr_object.add_participant(params[:user][:name])
+      end
       user = User.find_by_name(params[:user][:name])
       @participant = curr_object.participants.find_by_user_id(user.id)
       undo_link("The user <b>#{params[:user][:name]}</b> has successfully been added.")
-    rescue
+    rescue Exception => e
       url_new_user = url_for controller: 'users', action: 'new'
-      flash[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
+      flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
-    redirect_to action: 'list', id: curr_object.id, model: params[:model], authorization: params[:authorization]
+    # E1721 : AJAX for adding participants to assignment changes begin
+    render action: 'add.js.erb', layout: false
+    # E1721 changes End.
   end
 
   def update_authorizations

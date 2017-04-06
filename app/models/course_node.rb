@@ -119,6 +119,13 @@ class CourseNode < Node
     @course.instructor_id
   end
 
+  # Gets the institution_id from the associated object
+  def retrieve_institution_id
+    # Course.find(self.node_object_id).course_id
+    @course = Course.find(self.node_object_id) unless @course
+    @course.institutions_id
+  end
+
   # Gets any TeamNodes associated with this object
   def get_teams
     TeamNode.get(self.node_object_id)

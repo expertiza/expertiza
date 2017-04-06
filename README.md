@@ -1,5 +1,37 @@
-Please Check the "oss-project" branch for reviewing our work,
-Thank you :D
+### Team Members:  
+-Andrew Haskett  
+-Bardia Zamanian  
+-Prateek Pramanik  
+
+### Deployed Environment: http://152.46.18.218:3000/
+
+Preconfigured Admin:  
+-username = instructor6  
+-password = password  
+
+### How to Run Tests
+-go to the project directory  
+-run "rspec spec/features/delayed_mailer_spec.rb"  
+
+### How to Actually Test the Program
+-Please visit this video: https://www.youtube.com/watch?v=okm0PWxDAEk&feature=youtu.be   
+-Follow the instructions about how to play with the functionality of DelayedMailer class  
+NOTE: You initial setup about the assignments, students, topic, reviews, and etc impacts the condition of sending emails trigger. In other words be aware that DelayedMailer send various types of emails and this functionality depends on certain conditions per type of email (type of deadline actually). Some conditions may not be the default condition of expertiza web page.
+
+Latest Changes
+-----
+
+### Test Cases
+Reformed the whole delayed_mailer_spec.rb test case file, with better and more end-to-end test cases:  
+-Now in this file all the objects of assignment, topic, team, reviwer, and etc are created with their expected relationship.  
+-In each step of DelayedMailer test description, a specific mail with a specific deadline type gets created and the final action of sending that mail to expected recipents (funcitonality of DelayedMailer class) is being tested. (checking action_mailer.deliveries.count in test environment)  
+-These test cases are expected to provide a good degree of confidence about the functionality of DelayedMailer class, if the relations between different objects in the rest of the project are set as expected.  
+
+### Code Cleaning (DRYed out)
+-Our team applied an effort on cleaning the old style code related with a "mailing funcitonality", which were duplicated in two files "scheduled_task.rb" and "delayed_mailer.rb".   
+-We have removed the scheduled_task.rb, and imported all the difference to delayed_mailer.rb (as the original file)
+-We have cleaned the actual code with removing lots of redundant query lines within different functions, and replaced them with rails association wihch were already setup in the structure of models and also a cleaner approach.
+
 
 Expertiza
 =========

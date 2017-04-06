@@ -26,11 +26,15 @@ describe "Airbrake expection errors" do
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
     create(:assignment_questionnaire)
     create(:question)
+
+    @student_name_1 = User.first.name
+    @student_name_2 = User.second.name
+    @student_name_3 = User.third.name
   end
 
   # Airbrake-1806782678925052472
   it "can list sign_up_topics by using 'id' (participant_id) as parameter" do
-    login_as 'student2066'
+    login_as @student_name_1
     visit '/sign_up_sheet/list?id=1'
     expect(page).to have_content('Signup sheet for')
     expect(page).to have_content('Hello world!')
@@ -41,8 +45,8 @@ describe "Airbrake expection errors" do
   it "will redirect to submitted_content#view page if trying to save quiz but w/o questions" do
     assignment = Assignment.first
     assignment.update_attributes(require_quiz: true)
-    login_as 'student2064'
-    user_id = User.find_by(name: 'student2064').id
+    login_as @student_name_2
+    user_id = User.find_by(name: @student_name_2).id
     participant_id = Participant.where(user_id: user_id).first.id
     visit '/student_task/list'
     click_link 'TestAssignment'
@@ -123,7 +127,7 @@ describe "airbrake-1517247902792549741" do
     expect(page).to have_content('Password')
   end
 
-  it "can access to '/tree_display/list' after login as an admin/instructor/TA" do
+  it "can access to '/tree_display/list' after login as an admin/instructor/TA", js: true do
     create(:instructor)
     login_as 'instructor6'
     visit '/tree_display/list'

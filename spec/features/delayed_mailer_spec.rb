@@ -1,4 +1,5 @@
 require 'rails_helper'
+include DelayedTaskHelper
 
 def create_delayed_mailer(assignment_id, deadline_type, due_at)
   mail = DelayedMailer.new(assignment_id, deadline_type, due_at)

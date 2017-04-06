@@ -47,6 +47,7 @@ class CourseController < ApplicationController
       end
     end
     @course.name = params[:course][:name]
+    @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
     @course.save
@@ -80,17 +81,25 @@ class CourseController < ApplicationController
 
   # create a course
   def create
-    @course = Course.new(name: params[:course][:name], directory_path: params[:course][:directory_path], info: params[:course][:info], private: params[:course][:private])
-
+    @course = Course.new
+    @course.name = params[:course][:name]
+    @course.institutions_id = params[:course][:institutions_id]
+    @course.directory_path = params[:course][:directory_path]
+    @course.info = params[:course][:info]
+    @course.private = params[:course][:private]
     @course.instructor_id = session[:user].id
     begin
       @course.save!
       parent_id = CourseNode.get_parent_id
       if parent_id
-        CourseNode.create(node_object_id: @course.id, parent_id: parent_id)
+        @course_node = CourseNode.new
+        @course_node.node_object_id = @course.id
+        @course_node.parent_id = parent_id
       else
-        CourseNode.create(node_object_id: @course.id)
+        @course_node = CourseNode.new
+        @course_node.node_object_id = @course.id
       end
+      @course_node.save
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'
@@ -141,31 +150,36 @@ class CourseController < ApplicationController
     @course = Course.find(params[:course_id])
     @user = User.find_by_name(params[:user][:name])
     if @user.nil?
-      flash[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
-      redirect_to action: 'view_teaching_assistants', id: @course.id
+      flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
+    elsif TaMapping.where(ta_id: @user.id, course_id: @course.id).size > 0
+      flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" is already a TA for this course."
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
       @user.role = Role.find_by_name 'Teaching Assistant'
       @user.save
 
-      redirect_to action: 'view_teaching_assistants', id: @course.id
-
       @course = @ta_mapping
       undo_link("The TA \"#{@user.name}\" has been successfully added.")
     end
+    render action: 'add_ta.js.erb', layout: false
   end
 
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta = User.find(@ta_mapping.ta_id)
-    @ta.role = Role.find_by_name 'Student'
-    @ta.save
+
+    # if the user does not have any other TA mappings, then the role should be changed to student
+    other_ta_mappings_num = TaMapping.where(ta_id: @ta_mapping.ta_id).size - 1
+    if other_ta_mappings_num == 0
+      @ta.role = Role.find_by_name 'Student'
+      @ta.save
+    end
     @ta_mapping.destroy
 
     @course = @ta_mapping
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
-    redirect_to action: 'view_teaching_assistants', id: @ta_mapping.course
+    render action: 'remove_ta.js.erb', layout: false
   end
 
   # generate the undo link

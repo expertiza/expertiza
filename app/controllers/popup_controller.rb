@@ -108,9 +108,9 @@ class PopupController < ApplicationController
   end
 
   def view_review_scores_popup
-    @reviewerid = params[:reviewer_id]
+    @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
-    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewerid)
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

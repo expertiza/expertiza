@@ -559,16 +559,13 @@ describe "assignment function" do
     it "check to see if participants can be added" do
       student = create(:student)
       login_as('instructor6')
-
-      assignment_id = Assignment.where(name: 'participants Assignment')[0].id
+      assignment_id = Assignment.where(name: 'participants Assignment').first.id
       visit "/participants/list?id=#{assignment_id}&model=Assignment"
 
       fill_in 'user_name', with: student.name
       choose 'user_role_participant'
 
-      expect do
-        click_button 'Add'
-      end.to change { Participant.count }.by 1
+      expect{click_button 'Add'; sleep(1)}.to change { Participant.count }.by 1
     end
 
     it "should display newly created assignment" do

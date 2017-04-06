@@ -1,0 +1,4 @@
+<% if flash[:success] %>
+  $("#review_status<%=@response.map_id%>").html("Review Status: Saved");
+<% end %>
+$("#flash_message").html("<%= j render partial: "shared/flash_messages" %>");

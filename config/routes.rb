@@ -120,6 +120,7 @@ Expertiza::Application.routes.draw do
       get :start
       get :export
       post :export
+      post :exportdetails
     end
   end
 
@@ -328,7 +329,8 @@ Expertiza::Application.routes.draw do
       post :automatic_review_mapping_staggered
       #E1600
       post :start_self_review
-      post :save_grade_and_comment_for_reviewer 
+      post :save_grade_and_comment_for_reviewer
+      get :unsubmit_review
     end
   end
 

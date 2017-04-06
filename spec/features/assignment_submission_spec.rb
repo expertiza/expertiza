@@ -16,10 +16,14 @@ describe "assignment submisstion test" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
+
+    @student_name_1 = User.first.name
+    @student_name_2 = User.second.name
+    @student_name_3 = User.third.name
   end
 
   def signup_topic
-    user = User.find_by_name("student2064")
+    user = User.find_by_name(@student_name_1)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic

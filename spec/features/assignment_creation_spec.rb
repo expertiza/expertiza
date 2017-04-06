@@ -11,19 +11,19 @@ end
 
 def get_questionnaire(finder_var = nil)
   if finder_var.nil?
-    AssignmentQuestionnaire.find_by(assignment_id: @assignment[:id])
+    AssignmentQuestionnaire.find_by(assignment_id: @assignment.id)
   else
-    AssignmentQuestionnaire.where(assignment_id: @assignment[:id]).where(questionnaire_id: get_selected_id(finder_var))
+    AssignmentQuestionnaire.where(assignment_id: @assignment.id).where(questionnaire_id: get_selected_id(finder_var))
   end
 end
 
 def get_selected_id(finder_var)
   if finder_var == "ReviewQuestionnaire2"
-    ReviewQuestionnaire.find_by(name: finder_var)[:id]
+    ReviewQuestionnaire.find_by(name: finder_var).id
   elsif finder_var == "AuthorFeedbackQuestionnaire2"
-    AuthorFeedbackQuestionnaire.find_by(name: finder_var)[:id]
+    AuthorFeedbackQuestionnaire.find_by(name: finder_var).id
   elsif finder_var == "TeammateReviewQuestionnaire2"
-    TeammateReviewQuestionnaire.find_by(name: finder_var)[:id]
+    TeammateReviewQuestionnaire.find_by(name: finder_var).id
   end
 end
 
@@ -33,6 +33,7 @@ def fill_assignment_form
   fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
   fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
 end
+
 describe "assignment function" do
   before(:each) do
     create(:deadline_type, name: "submission")
@@ -72,7 +73,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
         name: 'public assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory',
         spec_location: 'testLocation',
         microtask: true,
@@ -99,7 +100,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
         name: 'private assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory',
         spec_location: 'testLocation'
       )
@@ -184,7 +185,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
         name: 'private assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory',
         spec_location: 'testLocation'
       )
@@ -232,8 +233,8 @@ describe "assignment function" do
     # instructor can set deadline for review and taking quiz
     it "set the deadline for an assignment review" do
       fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
-      fill_in 'datetimepicker_submission_round_1', with: '2017/11/01 12:00'
-      fill_in 'datetimepicker_review_round_1', with: '2017/11/10 12:00'
+      fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
+      fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
       click_button 'submit_btn'
 
       submission_type_id = DeadlineType.where(name: 'submission')[0].id
@@ -262,7 +263,7 @@ describe "assignment function" do
 
       assignment = Assignment.where(name: 'edit assignment for test').first
       login_as("instructor6")
-      visit "/assignments/#{assignment[:id]}/edit"
+      visit "/assignments/#{assignment.id}/edit"
       click_link 'General'
     end
 
@@ -274,7 +275,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
         name: 'edit assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory1',
         spec_location: 'testLocation1',
         microtask: true,
@@ -291,7 +292,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
         name: 'edit assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory1',
         spec_location: 'testLocation1',
         num_quiz_questions: 5,
@@ -307,7 +308,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
         name: 'edit assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory1',
         spec_location: 'testLocation1',
         max_team_size: 5,
@@ -323,7 +324,7 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
         name: 'edit assignment for test',
-        course_id: Course.find_by(name: 'Course 2')[:id],
+        course_id: Course.find_by(name: 'Course 2').id,
         directory_path: 'testDirectory1',
         spec_location: 'testLocation1'
       )
@@ -345,11 +346,9 @@ describe "assignment function" do
       (1..3).each do |i|
         create(:course, name: "Course #{i}")
       end
-      create(:assignment, name: 'public assignment for test')
-
-      @assignment = Assignment.where(name: 'public assignment for test').first
+      assignment = create(:assignment, name: 'public assignment for test')
       login_as("instructor6")
-      visit "/assignments/#{@assignment[:id]}/edit"
+      visit "/assignments/#{assignment.id}/edit"
       click_link 'Topics'
     end
 
@@ -405,17 +404,23 @@ describe "assignment function" do
         category: 'Test Category'
       )
     end
-  end
 
-  it "Delete existing topic" do
-     create(:topic, assignment_id: @assignment[:id])
-     visit "/assignments/#{@assignment[:id]}/edit"
-     click_link 'Topics'
-     all(:xpath, '//img[@title="Delete Topic"]')[0].click
-     click_button 'OK'
+    it "Delete existing topic", js: true do
+      click_link 'Due date'
+      fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
+      fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
+      fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
+      click_button 'submit_btn'
+      assignment = Assignment.where(name: 'public assignment for test').first
+      create(:topic, assignment_id: assignment.id)
+      visit "/assignments/#{assignment.id}/edit"
+      click_link 'Topics'
+      all(:xpath, '//img[@title="Delete Topic"]')[0].click
+      click_button 'OK'
 
-     topics_exist = SignUpTopic.count(:all, assignment_id: @assignment[:id])
-     expect(topics_exist).to be_eql 0
+      topics_exist = SignUpTopic.count(:all, assignment_id: assignment.id)
+      expect(topics_exist).to be_eql 0
+    end
   end
 
   # Begin rubric tab
@@ -593,8 +598,8 @@ describe "assignment function" do
     # able to set deadlines for a single round of reviews
     it "set the deadline for an assignment review" do
       fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
-      fill_in 'datetimepicker_submission_round_1', with: '2017/10/01 12:00'
-      fill_in 'datetimepicker_review_round_1', with: '2017/10/10 12:00'
+      fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
+      fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
       click_button 'submit_btn'
 
       submission_type_id = DeadlineType.where(name: 'submission')[0].id

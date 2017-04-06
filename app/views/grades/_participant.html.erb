@@ -5,6 +5,14 @@
 <script type="text/javascript" src="/assets/summary.js" ></script>
 <!-- end required by auto summarization -->
 
+<% 
+    participant = pscore[:participant]
+    rscore_review = Rscore.new(pscore,:review) if pscore[:review]
+    rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview]
+    rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback]
+    rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate]
+%>
+
 <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
     <TD><%= participant.fullname %><BR/>
         <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
@@ -109,7 +117,15 @@
       <TD ALIGN="CENTER">
       <% if stage == "Finished" %>
 
-        <div <% if p_title %>title="<%=p_title%>" style="color:#0033FF"<% end %>><%= p_total_score==(-1)? "N/A": sprintf("%.2f",p_total_score) %><%= score_postfix %></div>
+        <% if participant.grade %>
+          <% total_score = participant.grade %>
+          <% title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant." %>
+        <% else %>
+          <% total_score = pscore[:total_score] %>
+          <% title = nil %>
+        <% end %>
+
+        <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= total_score==(-1)? "N/A": sprintf("%.2f",total_score) %><%= score_postfix %></div>
 
         <% if controller.action_name != "view_my_scores" %>
             <FONT SIZE="-1"><a href="../grades/view_team?id=<%= participant.id%>"  >view heatgrid</a></FONT>
@@ -161,4 +177,3 @@
     <TD COLSPAN="10"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
     <!-- END PARTICIPANT -->
-

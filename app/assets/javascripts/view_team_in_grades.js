@@ -87,4 +87,3 @@ function compare(a, b, less) {
         return a > b
     }
 }
-

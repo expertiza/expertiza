@@ -568,7 +568,6 @@ describe "assignment function" do
 
       expect do
         click_button 'Add'
-        wait_for_ajax # E1721 changes test
       end.to change { Participant.count }.by 1
     end
 

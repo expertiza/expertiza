@@ -75,7 +75,7 @@ class SuggestionController < ApplicationController
       body: {
         suggested_topic_name: @suggestion.title,
         proposer: @user_id
-        }
+      }
     ).deliver_now!
   end
 

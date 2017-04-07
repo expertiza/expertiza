@@ -68,10 +68,10 @@ class Mailer < ActionMailer::Base
   def delayed_message(defn)
     condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
     defn[:cc] = if condition == true
-                   User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
-                 else
-                   defn[:cc] = 'expertiza.development@gmail.com'
-                 end
+                  User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
+                else
+                  defn[:cc] = 'expertiza.development@gmail.com'
+                end
 
     ret = mail(subject: defn[:subject],
                body: defn[:body],

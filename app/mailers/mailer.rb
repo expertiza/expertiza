@@ -19,11 +19,11 @@ class Mailer < ActionMailer::Base
       defn[:to] = 'expertiza.development@gmail.com'
     end
     condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
-    if condition == true
-      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
-    else
-      defn[:cc] = 'expertiza.development@gmail.com'
-    end
+    defn[:cc] = if condition == true
+                  User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
+                else
+                  defn[:cc] = 'expertiza.development@gmail.com'
+                end
 
     mail(subject: defn[:subject],
          to: defn[:to],
@@ -67,18 +67,18 @@ class Mailer < ActionMailer::Base
 
   def delayed_message(defn)
     condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
-    if condition == true
-      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
-    else
-      defn[:cc] = 'expertiza.development@gmail.com'
-    end
+    defn[:cc] =  if condition == true
+                   User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
+                 else
+                   defn[:cc] = 'expertiza.development@gmail.com'
+                 end
 
     ret = mail(subject: defn[:subject],
                body: defn[:body],
                content_type: "text/html",
                cc: defn[:cc],
                bcc: defn[:bcc])
-               CUSTOM_LOGGER.info(ret.encoded.to_s)
+    CUSTOM_LOGGER.info(ret.encoded.to_s)
   end
 
   def suggested_topic_approved_message(defn)

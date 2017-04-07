@@ -69,14 +69,14 @@ class SuggestionController < ApplicationController
   end
 
   def send_email_to_instructor(instructor_email)
-      Mailer.suggested_topic(
-        to: instructor_email,
+    Mailer.suggested_topic(
+      to:instructor_email,
         subject: "A new topic named '#{@suggestion.title}' has been suggested",
         body: {
-            suggested_topic_name: @suggestion.title,
+          suggested_topic_name: @suggestion.title,
             proposer: @user_id
         }
-      ).deliver_now!
+    ).deliver_now!
   end
 
   def create

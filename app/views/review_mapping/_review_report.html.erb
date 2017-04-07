@@ -16,12 +16,18 @@
         <th width = "24%" class="sorter-false">Team reviewed <span></span></th>
       <% end %>
       <th width = "13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width = "13%" class="sorter-true">Metrics <span></span></th>
+      <% if @metric_type == "Sentiment" %>
+          <th width = "13%" class="sorter-true">Metric: Sentiment <span></span></th>
+      <% else %>
+          <th width = "13%" class="sorter-true">Metric: Avg. Volume <span></span></th>
+      <% end %>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
 <tbody>
-
+      <% if @metric_type == "Sentiment" %>
+      <% generate_sentiment_list %>
+      <% end %>
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
@@ -69,7 +75,11 @@
                 <% if index == 0 %>
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-                    <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                    <% if @metric_type == "Sentiment" %>
+                        <%= display_sentiment_metric(r.id) %>
+                    <% else %>
+                        <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                    <% end %>
                   </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
@@ -145,10 +155,11 @@ $.tablesorter.addParser({
   },
   format: function (stringValue) {
     var stringNumericPart = stringValue.split(" ");         //split the data by spaces
-    var numericValue = parseInt(stringNumericPart[2],10);   //extract the numeric data
+    var numericValue = parseFloat(stringNumericPart[2]);   //extract the numeric data
     return numericValue ;
   },
   type: 'numeric'
 });
+
 
 </script>

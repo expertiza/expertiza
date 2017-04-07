@@ -19,6 +19,95 @@ module ReviewMappingHelper
   end
 
   #
+  # This constructs the query to be sent to the sentiment generation server
+  #
+  def construct_sentiment_query(id, review_text)
+    review = {}
+    review["id"] = id.to_s
+    review["text"] = review_text
+    review
+  end
+
+  #
+  # This retrieves the response from the sentiment generation server
+  #
+  def retrieve_sentiment_response(review, first_try)
+    if first_try
+      response = HTTParty.post(
+        'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
+        body: {"reviews" => [review]}.to_json,
+        headers: {'Content-Type' => 'application/json'}
+      )
+    else
+      # Send only the first sentence of the review for sentiment analysis in case of a failure
+      first_sentence = review["text"].split('.')[0]
+      reconstructed_review = construct_sentiment_query(review["id"], first_sentence)
+      response = HTTParty.post(
+        'http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk',
+        body: {"reviews" => [reconstructed_review]}.to_json,
+        headers: {'Content-Type' => 'application/json'}
+      )
+    end
+    response
+  end
+
+  #
+  # Creates sentiment hash with id of review and the results from sentiment generation server
+  #
+  def create_sentiment(id, sentiment_value)
+    sentiment = {}
+    sentiment["id"] = id
+    sentiment["sentiment"] = sentiment_value
+    sentiment
+  end
+
+  #
+  # Handles error scenarios on getting response from sentiment server
+  #
+  def handle_sentiment_generation_retry(response, review)
+    sentiment = case response.code
+                when 200
+                  create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
+                else
+                  # Instead of checking for individual error response codes, have a generic code set for any server related error
+                  # For now the value representing any server error will be -500
+                  create_sentiment(review["id"], "-500")
+                end
+    sentiment
+  end
+
+  #
+  # Generates sentiment list for all the reviews
+  #
+  def generate_sentiment_list
+    @sentiment_list = []
+    @reviewers.each do |r|
+      review = construct_sentiment_query(r.id, Response.concatenate_all_review_comments(@id, r).join(" "))
+      response = retrieve_sentiment_response(review, true)
+      # Insert the extracted sentiment into the sentiment list
+      @sentiment_list << case response.code
+                         when 200
+                           # Extract the sentiment from the response in case of a successful response
+                           create_sentiment(response.parsed_response["sentiments"][0]["id"], response.parsed_response["sentiments"][0]["sentiment"])
+                         else
+                           # Retry to get a sentiment response once again in case of a failure
+                           handle_sentiment_generation_retry(retrieve_sentiment_response(review, false), review)
+                         end
+    end
+    @sentiment_list
+  end
+
+  #
+  # Displays the value of sentiment
+  #
+  def display_sentiment_metric(id)
+    hashed_sentiment = @sentiment_list.select {|sentiment| sentiment["id"] == id.to_s }
+    sentiment_value = hashed_sentiment[0]["sentiment"].to_f.round(2)
+    metric = "Overall Sentiment: #{sentiment_value}<br/>"
+    metric.html_safe
+  end
+
+  #
   # for review report
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type, line_num)

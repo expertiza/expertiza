@@ -23,6 +23,7 @@ gem 'gchartrb', require: 'google_chart'
 gem "googlecharts", require: "gchart"
 gem 'gdata', require: false
 gem 'haml-rails'
+gem 'httparty'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'

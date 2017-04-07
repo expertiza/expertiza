@@ -62,7 +62,6 @@ class ReviewMappingController < ApplicationController
                          id: assignment.id,
                          user_id: user.id,
                          contributor_id: params[:contributor_id]
-
         # Get the assignment's participant corresponding to the user
         reviewer = get_reviewer(user, assignment, regurl)
         # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
@@ -379,15 +378,17 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+
   def response_report
     # Get the assignment id and set it in an instance variable which will be used in view
     @id = params[:id]
     @assignment = Assignment.find(@id)
+    # Default metric
+    @metric_type = "AverageVolume"
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-
     case @type
       # this summarizes the reviews of each reviewee by each rubric criterion
     when "SummaryByRevieweeAndCriteria"
@@ -412,11 +413,18 @@ class ReviewMappingController < ApplicationController
       @avg_scores_by_round = sum.avg_scores_by_round
       @avg_scores_by_criterion = sum.avg_scores_by_criterion
     when "ReviewResponseMap"
+      @metric_type = if params[:select_metric]
+                       params[:MetricSelector]
+                     else
+                       # Default metric
+                       "AverageVolume"
+                     end
       @review_user = params[:user]
       # If review response is required call review_response_report method in review_response_map model
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?

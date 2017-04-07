@@ -107,7 +107,7 @@ class Mailer < ActionMailer::Base
          bcc: defn[:cc])
   end
 
-  def accept_invitation(defn)
+  def invitation(defn)
     @body = defn[:body]
     @topic_name = defn[:body][:suggested_topic]
     @user = defn[:body]
@@ -116,19 +116,6 @@ class Mailer < ActionMailer::Base
       defn[:to] = 'expertiza.development@gmail.com'
     end
 
-    mail(subject: defn[:subject],
-         to: defn[:to],
-         bcc: defn[:cc])
-  end
-
-  def accepted_invitation(defn)
-    @body = defn[:body]
-    @topic_name = defn[:body][:suggested_topic]
-    @user = defn[:body]
-
-    if Rails.env.development? || Rails.env.test?
-      defn[:to] = 'expertiza.development@gmail.com'
-    end
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])

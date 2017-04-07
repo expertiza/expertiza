@@ -12,7 +12,7 @@ class InvitationController < ApplicationController
 
     team = AssignmentTeam.find(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
-    student_email = student.user_id
+    student_id = student.user_id
 
     return unless current_user_id?(student.user_id)
 
@@ -40,7 +40,7 @@ class InvitationController < ApplicationController
             @invitation.assignment_id = student.parent_id
             @invitation.reply_status = 'W'
             @invitation.save
-            accept_invitation(student_email) # Call the mailing function
+            email_an_invitation(student_id) # Call the mailing function
           else
             flash[:note] = "You have already sent an invitation to \"#{user.name}\"."
           end
@@ -53,9 +53,9 @@ class InvitationController < ApplicationController
     redirect_to view_student_teams_path student_id: student.id
   end
 
-  def accept_invitation(student_email)
-    Mailer.accept_invitation(
-      to: student_email,
+  def email_an_invitation(student_id)
+    Mailer.invitation(
+      to: student_id,
       subject: "You have a new team invitaion",
       body: {
 
@@ -79,8 +79,8 @@ class InvitationController < ApplicationController
     @users = User.where("LOWER(name) LIKE ?", "%#{search}%") unless search.blank?
   end
 
-  def accepted_invitation(user_email)
-    Mailer.accepted_invitation(
+  def email_an_acceptance(user_email)
+    Mailer.invitation(
       to: user_email,
       subject: "The invitation for the teammate has been accepted",
       body: {
@@ -114,7 +114,7 @@ class InvitationController < ApplicationController
     if ready_to_join
       @inv.reply_status = 'A'
       @inv.save
-      accepted_invitation(user_email)
+      email_an_acceptance(user_email)
       # add the acceptance mailer call here
 
       # Remove the users previous team since they are accepting an invite for possibly a new team.

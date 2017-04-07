@@ -35,7 +35,7 @@ class ParticipantsController < ApplicationController
   # OSS_808 change 28th oct
   # required for sending emails
   def email_sent
-    DelayedMailer.deliver_mail("recipient.address@example.com")
+    # DelayedMailer.deliver_mail("recipient.address@example.com")
   end
 
   def add

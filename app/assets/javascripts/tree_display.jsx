@@ -218,8 +218,8 @@ jQuery(document).ready(function() {
             // if ends
             moreContent.push(
               <span>
-                <a title="View delayed jobs" href={"/assignments/scheduled_tasks?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-scheduled-tasks.png" />
+                <a title="View delayed jobs" href={"/assignments/delayed_mailer?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/view-delayed-mailer.png" />
                 </a>
               </span>
             )
@@ -1159,7 +1159,7 @@ jQuery(document).ready(function() {
                     '/assets/tree_view/view-scores-24.png',
                     '/assets/tree_view/view-review-report-24.png',
                     '/assets/tree_view/view-suggestion-24.png',
-                    '/assets/tree_view/view-scheduled-tasks.png',
+                    '/assets/tree_view/view-delayed-mailer.png',
                     '/assets/tree_view/view-publish-rights-24.png'
                     )
       jQuery.get("/tree_display/session_last_open_tab", function(data) {

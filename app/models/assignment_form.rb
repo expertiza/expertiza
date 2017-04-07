@@ -119,20 +119,20 @@ class AssignmentForm
       # diff = 1
       # mi = 2
       next unless diff > 0
-      dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
+      dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                               1, diff.minutes.from_now)
       change_item_type(dj.id)
       due_date.update_attribute(:delayed_job_id, dj.id)
 
       # If the deadline type is review, add a delayed job to drop outstanding review
       if deadline_type == "review"
-        dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
+        dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
                                 1, mi.minutes.from_now)
         change_item_type(dj.id)
       end
       # If the deadline type is team_formation, add a delayed job to drop one member team
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
-      dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
+      dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
                               1, mi.minutes.from_now)
       change_item_type(dj.id)
     end
@@ -149,7 +149,7 @@ class AssignmentForm
   # Change the item_type displayed in the log
   def change_item_type(delayed_job_id)
     log = Version.where(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: delayed_job_id).first
-    log.update_attribute(:item_type, "ScheduledTask") # Change the item type in the log
+    log.update_attribute(:item_type, "DelayedMailer") # Change the item type in the log
   end
 
   def delete(force = nil)

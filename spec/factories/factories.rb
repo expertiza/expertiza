@@ -17,6 +17,10 @@ FactoryGirl.define do
     description ""
   end
 
+  sequence :student_name do |n|
+    "student#{5000 + n}"
+  end
+
   factory :admin, class: User do
     sequence(:name) {|n| "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
@@ -36,12 +40,12 @@ FactoryGirl.define do
     digital_certificate nil
     timezonepref nil
     public_key nil
-    copy_of_emails  false
+    copy_of_emails false
   end
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2064, 2065, 2066) before each example.
-    sequence(:name) {|n| n = n % 3; "student206#{n + 4}" }
+    name { generate(:student_name) }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password "password"
     password_confirmation "password"
@@ -127,6 +131,10 @@ FactoryGirl.define do
     use_bookmark false
     can_review_same_topic true
     can_choose_topic_to_review true
+
+    factory :oss_project do
+      sequence(:name) {|n| "oss-project#{n}" }
+    end
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -143,6 +151,9 @@ FactoryGirl.define do
   factory :team_user, class: TeamsUser do
     team { AssignmentTeam.first || association(:assignment_team) }
     user { User.where(role_id: 2).first || association(:student) }
+    trait :second_user do
+      user { User.where(role_id: 2).second || association(:student) }
+    end
   end
 
   factory :invitation, class: Invitation do
@@ -156,14 +167,14 @@ FactoryGirl.define do
     type 'CourseTeam'
     comments_for_advertisement nil
     advertise_for_partner nil
-    submitted_hyperlinks "---
-- https://www.expertiza.ncsu.edu"
+    submitted_hyperlinks "---- https://www.expertiza.ncsu.edu"
     directory_num 0
   end
 
   factory :topic, class: SignUpTopic do
-    topic_name "Hello world!"
+    # association :assignment, factory: :oss_project
     assignment { Assignment.first || association(:assignment) }
+    topic_name "Hello world!"
     max_choosers 1
     category nil
     topic_identifier "1"
@@ -171,7 +182,8 @@ FactoryGirl.define do
     private_to nil
   end
 
-  factory :signed_up_team, class: SignedUpTeam do
+  factory :signed_up_team do
+    association :team, factory: :assignment_team
     topic { SignUpTopic.first || association(:topic) }
     team_id 1
     is_waitlisted 0
@@ -179,10 +191,11 @@ FactoryGirl.define do
   end
 
   factory :participant, class: AssignmentParticipant do
+    association :user, factory: :student
+
     can_submit true
     can_review true
     assignment { Assignment.first || association(:assignment) }
-    association :user, factory: :student
     submitted_at nil
     permission_granted nil
     penalty_accumulated 0
@@ -354,5 +367,18 @@ FactoryGirl.define do
     version_num nil
     round 1
     is_submitted false
+  end
+
+  factory :response_map, class: ResponseMap do
+    trait :review_response do
+      type 'ReviewResponseMap'
+    end
+    trait :meta_review_response do
+      type 'MetareviewResponseMap'
+    end
+  end
+
+  factory :review_participant, class: Participant do
+    association :user, factory: :student
   end
 end

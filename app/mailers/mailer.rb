@@ -96,7 +96,7 @@ class Mailer < ActionMailer::Base
 
   def suggested_topic(defn)
     @body = defn[:body]
-    @topic_name = defn[:body][:suggested_topic]
+    @topic_name = defn[:body][:suggested_topic_name]
     @proposer = defn[:body][:proposer]
 
     if Rails.env.development? || Rails.env.test?
@@ -109,7 +109,7 @@ class Mailer < ActionMailer::Base
 
   def invitation(defn)
     @body = defn[:body]
-    @topic_name = defn[:body][:suggested_topic]
+    @topic_name = defn[:body]
     @user = defn[:body]
 
     if Rails.env.development? || Rails.env.test?

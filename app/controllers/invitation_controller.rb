@@ -52,14 +52,14 @@ class InvitationController < ApplicationController
 
     redirect_to view_student_teams_path student_id: student.id
   end
+
   def accept_invitation(student_email)
     Mailer.accept_invitation(
         to: student_email,
-        #cc: cc_mail_list,
-        subject: "You have a new team invitaion",
-        body: {
+          subject: "You have a new team invitaion",
+          body: {
 
-        }
+          }
     ).deliver_now!
   end
 
@@ -82,11 +82,10 @@ class InvitationController < ApplicationController
   def accepted_invitation(user_email)
     Mailer.accepted_invitation(
         to: user_email,
-        #cc: cc_mail_list,
-        subject: "The invitation for the teammate has been accepted",
-        body: {
+          subject: "The invitation for the teammate has been accepted",
+          body: {
 
-        }
+          }
     ).deliver_now!
   end
 

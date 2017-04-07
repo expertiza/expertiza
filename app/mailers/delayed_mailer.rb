@@ -99,7 +99,6 @@ class DelayedMailer
     end
 
   def getTeamMembersMail
-
     teamMembersMailList = []
     assignment = Assignment.find(self.assignment_id)
     teams = Team.where(['parent_id = ?', self.assignment_id])

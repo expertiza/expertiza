@@ -15,16 +15,12 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    #emails = User.where(["role_id = ?",2], ["copy_of_all_emails = ?", true]).select("email")
-    #ins_email = []
-    #ins_email << emails
-
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end
     condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
     if condition == true
-      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2,true]).select("email")
+      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
     end
     else
       defn[:cc] = 'expertiza.development@gmail.com'
@@ -72,7 +68,7 @@ class Mailer < ActionMailer::Base
   def delayed_message(defn)
     condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
     if condition == true
-      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2,true]).select("email")
+      defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
     end
     else
       defn[:cc] = 'expertiza.development@gmail.com'
@@ -81,7 +77,7 @@ class Mailer < ActionMailer::Base
                content_type: "text/html",
                cc: defn[:cc],
                bcc: defn[:bcc])
-    CUSTOM_LOGGER.info(ret.encoded.to_s)
+               CUSTOM_LOGGER.info(ret.encoded.to_s)
   end
 
   def suggested_topic_approved_message(defn)

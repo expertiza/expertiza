@@ -71,12 +71,11 @@ class SuggestionController < ApplicationController
   def send_email_to_instructor(instructor_email)
     Mailer.suggested_topic(
         to: instructor_email,
-        #cc: cc_mail_list,
-        subject: "A new topic named '#{@suggestion.title}' has been suggested",
-        body: {
-            suggested_topic_name: @suggestion.title,
-            proposer: @user_id
-        }
+          subject: "A new topic named '#{@suggestion.title}' has been suggested",
+          body: {
+              suggested_topic_name: @suggestion.title,
+              proposer: @user_id
+          }
     ).deliver_now!
   end
 
@@ -95,7 +94,7 @@ class SuggestionController < ApplicationController
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
       instructor_email = User.where(["role_id = ?", 2]).select("email").first
-      send_email_to_instructor(instructor_email) #an email is sent to the instructor regarding the suggestion
+      send_email_to_instructor(instructor_email) # an email is sent to the instructor regarding the suggestion
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
@@ -198,10 +197,10 @@ class SuggestionController < ApplicationController
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description, 
                                         :status, :unityID, :signup_preference)
-    #the mail to the instructor can be sent here
-    #the view also has to be created
+    # the mail to the instructor can be sent here
+    # the view also has to be created
 
-    #function is getting called
+    # function is getting called
   end
 
   def approve

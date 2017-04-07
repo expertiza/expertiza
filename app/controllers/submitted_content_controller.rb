@@ -142,12 +142,12 @@ class SubmittedContentController < ApplicationController
     # send this only if the last review round has not been completed and before the review_deadline has passed
     last = DueDate.where(["assignment_id =? and deadline_type_id =?", assignment.id, 2]).select("round").last
     date = DueDate.where(["assignment_id =? and deadline_type_id =? and round =?", assignment.id, 2, last]).select("due_at")
-    #get the current round number
+    # get the current round number
 
     # current_round=DueDate.where(["assignment_id =? and deadline_type_id =?",assignment.id, 2]).select("round").last
     # email should go to all reviewers
     if date > DateTime.current
-      participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+      participant.assignment.email(participant.id) rescue nil
     end
 
 

@@ -55,11 +55,11 @@ class InvitationController < ApplicationController
 
   def accept_invitation(student_email)
     Mailer.accept_invitation(
-      to :student_email,
-        subject: "You have a new team invitaion",
-        body: {
+      to: student_email,
+      subject: "You have a new team invitaion",
+      body: {
 
-        }
+      }
     ).deliver_now!
   end
 
@@ -81,10 +81,10 @@ class InvitationController < ApplicationController
 
   def accepted_invitation(user_email)
     Mailer.accepted_invitation(
-      to:user_email,
-        subject: "The invitation for the teammate has been accepted",
-        body: {
-        }
+      to: user_email,
+      subject: "The invitation for the teammate has been accepted",
+      body: {
+      }
     ).deliver_now!
   end
 

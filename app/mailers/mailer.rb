@@ -21,9 +21,9 @@ class Mailer < ActionMailer::Base
     condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
     if condition == true
       defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
-    end
     else
       defn[:cc] = 'expertiza.development@gmail.com'
+    end
 
     mail(subject: defn[:subject],
          to: defn[:to],
@@ -69,9 +69,10 @@ class Mailer < ActionMailer::Base
     condition = User.where(["role_id = ?", 2]).select("copy_of_all_emails = ?")
     if condition == true
       defn[:cc] = User.where(["role_id = ? and copy_of_all_emails = ?", 2, true]).select("email")
-    end
     else
       defn[:cc] = 'expertiza.development@gmail.com'
+    end
+
     ret = mail(subject: defn[:subject],
                body: defn[:body],
                content_type: "text/html",

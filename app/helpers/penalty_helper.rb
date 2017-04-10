@@ -108,7 +108,7 @@ module PenaltyHelper
         if review_map_created_at_list.at(i) > review_due_date
           time_difference = review_map_created_at_list.at(i) - review_due_date
           penalty_units = calculate_penalty_units(time_difference, @penalty_unit)
-          
+
           penalty_for_this_review = penalty_units * @penalty_per_unit
           if penalty_for_this_review > @max_penalty_for_no_submission
             penalty = @max_penalty_for_no_submission
@@ -125,7 +125,7 @@ module PenaltyHelper
 
   def self.calculate_penalty_units(time_difference, penalty_unit)
     penalty_units = 0
-    
+
     if penalty_unit == 'Minute'
       penalty_units = time_difference / 60
     elsif penalty_unit == 'Hour'
@@ -133,18 +133,15 @@ module PenaltyHelper
     elsif penalty_unit == 'Day'
       penalty_units = time_difference / 86_400
     end
-    
-    return penalty_units
   end
 
   # checking that penalty_per_unit is not exceeding max_penalty
   def self.check_penalty_points_validity(max_penalty, penalty_per_unit)
-    return false unless max_penalty < penalty_per_unit
-    return true
+    return max_penalty < penalty_per_unit
   end
 
   # method to check whether the policy name given as a parameter already exists under the current instructor id
-  #it return true if there's another policy with the same name under current instructor else false
+  # it return true if there's another policy with the same name under current instructor else false
   def self.check_policy_with_same_name(late_policy_name, instructor_id)
     @policy = LatePolicy.where(policy_name: late_policy_name)
     if !@policy.nil? && !@policy.empty?

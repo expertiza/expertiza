@@ -70,7 +70,7 @@ class LatePoliciesController < ApplicationController
   # POST /late_policies
   # POST /late_policies.xml
   def create
-    invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, 
+    invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i,
                                                                            params[:late_policy][:penalty_per_unit].to_i)
     if invalid_penalty_per_unit
       flash[:error] = "The maximum penalty cannot be less than penalty per unit."
@@ -101,7 +101,7 @@ class LatePoliciesController < ApplicationController
   def update
     @penalty_policy = LatePolicy.find(params[:id])
 
-    invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i, 
+    invalid_penalty_per_unit = PenaltyHelper.check_penalty_points_validity(params[:late_policy][:max_penalty].to_i,
                                                                            params[:late_policy][:penalty_per_unit].to_i)
     if invalid_penalty_per_unit
       flash[:error] = "The maximum penalty cannot be less than penalty per unit."

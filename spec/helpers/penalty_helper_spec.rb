@@ -46,21 +46,21 @@ describe "PenaltyHelper" do
   describe "#calculate_penalty_units" do
     it "should return 1 when passed a 1 minute time difference and a penalty unit of 'Minute'" do
       penalty_unit = 'Minute'
-      time_difference = ((DateTime.now.in_time_zone) - (DateTime.now.in_time_zone - 1.minute)) 
+      time_difference = DateTime.now.in_time_zone - (DateTime.now.in_time_zone - 1.minute)
       penalty_minutes = PenaltyHelper.calculate_penalty_units(time_difference, penalty_unit)
       expect(penalty_minutes.round).to be == 1
     end
     
     it "should return 1 when passed a 1 hour time difference and a penalty unit of 'Hour'" do
       penalty_unit = 'Hour'
-      time_difference = ((DateTime.now.in_time_zone) - (DateTime.now.in_time_zone - 1.hour)) 
+      time_difference = DateTime.now.in_time_zone - (DateTime.now.in_time_zone - 1.hour)
       penalty_minutes = PenaltyHelper.calculate_penalty_units(time_difference, penalty_unit)
       expect(penalty_minutes.round).to be == 1
     end
     
     it "should return 1 when passed a 1 day time difference and a penalty unit of 'Day'" do
       penalty_unit = 'Day'
-      time_difference = ((DateTime.now.in_time_zone) - (DateTime.now.in_time_zone - 1.day)) 
+      time_difference = DateTime.now.in_time_zone - (DateTime.now.in_time_zone - 1.day)
       penalty_minutes = PenaltyHelper.calculate_penalty_units(time_difference, penalty_unit)
       expect(penalty_minutes.round).to be == 1
     end

@@ -1,7 +1,4 @@
 module PenaltyHelper
-  require 'logger'
-
-  logger = Logger.new '/home/mamoran/expertiza/penalty_helper.log'
 
   def self.calculate_penalty(participant_id)
     @submission_deadline_type_id = 1
@@ -35,7 +32,6 @@ module PenaltyHelper
 
     penalties
   end
-
 
   def self.calculate_submission_penalty
     penalty = 0
@@ -128,25 +124,26 @@ module PenaltyHelper
   end
 
   def self.calculate_penalty_units(time_difference, penalty_unit)
+    penalty_units = 0
+    
     if penalty_unit == 'Minute'
-      return time_difference / 60
+      penalty_units = time_difference / 60
     elsif penalty_unit == 'Hour'
-      return time_difference / 3600
+      penalty_units = time_difference / 3600
     elsif penalty_unit == 'Day'
-      return time_difference / 86_400
+      penalty_units = time_difference / 86_400
     end
+    
+    return penalty_units
   end
 
-  #checking that penalty_per_unit is not exceeding max_penalty
+  # checking that penalty_per_unit is not exceeding max_penalty
   def self.check_penalty_points_validity(max_penalty, penalty_per_unit)
-    if max_penalty < penalty_per_unit
-      return true
-    else
-      return false
-    end
+    return false unless max_penalty < penalty_per_unit
+    return true
   end
 
-  #method to check whether the policy name given as a parameter already exists under the current instructor id
+  # method to check whether the policy name given as a parameter already exists under the current instructor id
   #it return true if there's another policy with the same name under current instructor else false
   def self.check_policy_with_same_name(late_policy_name, instructor_id)
     @policy = LatePolicy.where(policy_name: late_policy_name)
@@ -159,11 +156,11 @@ module PenaltyHelper
     return false
   end
 
-  #this method updates all the penalty objects which uses the penalty policy which is passed as a parameter
-  #whenever a policy is updated, all the existing penalty objects needs to be updated according to new policy
+  # this method updates all the penalty objects which uses the penalty policy which is passed as a parameter
+  # whenever a policy is updated, all the existing penalty objects needs to be updated according to new policy
   def self.update_calculated_penalty_objects(penalty_policy)
-    @penaltyObjs = CalculatedPenalty.all
-    @penaltyObjs.each do |pen|
+    @penalty_objs = CalculatedPenalty.all
+    @penalty_objs.each do |pen|
       @participant = AssignmentParticipant.find(pen.participant_id)
       @assignment = @participant.assignment
       next unless @assignment.late_policy_id == penalty_policy.id
@@ -181,5 +178,4 @@ module PenaltyHelper
       end
     end
   end
-
 end

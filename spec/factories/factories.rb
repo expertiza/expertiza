@@ -68,7 +68,7 @@ FactoryGirl.define do
   end
 
   factory :instructor, class: User do
-    sequence(:name) {|n|  "instructor#{n}" }
+    sequence(:name) {|n|  "instructor#{n}"}
     role { Role.where(name: 'Instructor').first || association(:role_of_instructor) }
     password "password"
     password_confirmation "password"
@@ -356,19 +356,18 @@ FactoryGirl.define do
     round 1
     is_submitted false
   end
-  
+
   factory :late_policy, class: LatePolicy do
-    sequence(:policy_name) { |n| "Late Policy #{n}" }
+    sequence(:policy_name) {|n| "Late Policy #{n}"}
     instructor_id { User.where(role_id: 2).first.id }
     max_penalty 10
     penalty_per_unit 1
     penalty_unit 'Day'
   end
-  
-  
+
+
   factory :calculated_penalty, class: CalculatedPenalty do
     participant { AssignmentParticipant.first || association(:participant) }
     deadline_type { DeadlineType.first || association(:deadline_type) }
   end
-
 end

@@ -3,8 +3,8 @@ require 'selenium-webdriver'
 
 describe 'Student can view review scores in a heat map distribution', js: true do
   before(:each) do
-    create(:assignment_node)
     create(:assignment, name: "NewAssignment", directory_path: 'new_assignment')
+    create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")

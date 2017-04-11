@@ -2,8 +2,8 @@ require 'rails_helper'
 
 describe "peer review testing", type: :feature do
   before(:each) do
-    create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
     create_list(:participant, 3)
+    create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")

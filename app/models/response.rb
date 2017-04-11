@@ -23,7 +23,7 @@ class Response < ActiveRecord::Base
     reviewer.team.has_user user
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil, feedback_html = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -34,20 +34,32 @@ class Response < ActiveRecord::Base
     end
     if prefix # has prefix means view_score page in instructor end
       identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
-      identifier += "<B>Reviewer: </B>" + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
-      str = prefix + "_" + self.id.to_s
+      identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
+      str = prefix + '_' + self.id.to_s
+      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
     else # in student end
-      identifier += '<B>Review ' + count.to_s + '</B>'
+      # identifier += '<B>Review ' + count.to_s + ' Round ' + self.round.to_s + '</B>'
       str = self.id.to_s
+      identifier += '<B>'
+      identifier += '<table width=''100%''>'
+      identifier += '<tr>'
+      identifier += '<td align="left" width="30%">' + 'Review ' + count.to_s + '</td>'
+      identifier += '<td align="center" width="30%">' + 'Round ' + self.round.to_s + '</td>'
+      identifier += '<td align="right" width="30%">' + 'Last Reviewed: '
+      identifier += "<span style=\"font-weight:normal;\">#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span>"
+      identifier += '</td>'
+      identifier += '<td align="center" width="10%">'
+      identifier += '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'
+      identifier += '</td>'
+      identifier += '</tr>'
+      identifier += '</table>'
+      identifier += '</B>'
+      code = identifier
     end
-    code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
-    code += "<B>Last reviewed: </B> "
-    code += if self.updated_at.nil?
-              "Not available"
-            else
-              self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
-            end
-    code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
+
+    code += '<div id="review_' + str + '" style="display: none;">'
+    code += feedback_html if feedback_html
+    code += '<table class="table table-bordered" style="margin-bottom: 1px;">'
     count = 0
     answers = Answer.where(response_id: self.response_id)
 
@@ -79,9 +91,11 @@ class Response < ActiveRecord::Base
                 else
                   ''
                 end
-      code += "<tr><td><B>Additional Comment: </B>" + comment + '</td></tr>'
+      code += '<tr><td><B>Additional Comment: </B>' + comment + '</td></tr>'
     end
-    code += "</table>"
+    code += '</table>'
+    code += feedback_html if feedback_html
+    code += '</div>'
     code.html_safe
   end
 
@@ -275,5 +289,16 @@ class Response < ActiveRecord::Base
          }
         }
     ).deliver_now
+  end
+
+  private
+
+  def feedback_display_as_html(review_id, participant_id)
+    map = FeedbackResponseMap.where(reviewed_object_id: review_id, reviewer_id: participant_id).first
+
+    review_feedbacks = map.try :response
+    if review_feedbacks && !review_feedbacks.empty?
+
+    end
   end
 end

@@ -63,17 +63,21 @@
                         <%= display_directory_tree(@participant, files, true).html_safe %>
                     <% end %>
                 <% end %>
-                
-                <%= review.display_as_html(prefix, index + 1, nil) %><br/>
-                
+
+                <!-- Generate the feedback html -->
+                <% feedback_html = '' %>
                 <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
-                    review_feedbacks = map.try :response %>
+                   review_feedbacks = map.try :response %>
                 <% if review_feedbacks && !review_feedbacks.empty? %>
-                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
-                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
+                    <% feedback_html = link_to 'View', :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %>
+                    <% feedback_html += ' or ' %>
+                    <% feedback_html += link_to 'Edit', :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %>
+                    <% feedback_html += ' feedback for Review ' + count.to_s %>
                 <% else %>
-                    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+                    <% feedback_html += link_to 'Give feedback', :controller => 'response', :action => 'new_feedback', :id => review.id %>
+                    <% feedback_html += ' for Review ' + count.to_s %>
                 <% end %>
+                <%= review.display_as_html(prefix, index + 1, nil, feedback_html) %>
                 </td></tr>
             <% end %>
         </table><hr>

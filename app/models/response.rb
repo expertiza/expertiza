@@ -44,7 +44,7 @@ class Response < ActiveRecord::Base
       identifier += '<table width=''100%''>'
       identifier += '<tr>'
       identifier += '<td align="left" width="30%">' + 'Review ' + count.to_s + '</td>'
-      identifier += '<td align="center" width="30%">' + 'Round ' + self.round.to_s + '</td>'
+      identifier += '<td align="center" width="30%">' + (self.round ? 'Round ' + self.round.to_s : '') + '</td>'
       identifier += '<td align="right" width="30%">' + 'Last Reviewed: '
       identifier += "<span style=\"font-weight:normal;\">#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span>"
       identifier += '</td>'

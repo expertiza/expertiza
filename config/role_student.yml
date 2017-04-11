@@ -116,8 +116,6 @@ development:
         signup: true
         delete_signup: true
         team_details: true
-      leaderboard:
-        index: true
       review_files:
         show_code_file: true
         show_code_file_diff: true
@@ -190,7 +188,6 @@ development:
       popup: false
       sign_up_sheet: false
       suggestion: false
-      leaderboard: true
       delete_object: false
       assessment360: false
       review_files: true
@@ -232,8 +229,6 @@ development:
         parent_id:
         site_controller_id:
         url: "/home"
-        children:
-        - 50
       26: &2 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 33
@@ -276,16 +271,6 @@ development:
         url: "/contact_us"
         children:
         - 14
-      50: &6 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 78
-        id: 50
-        label: Leaderboard
-        name: leaderboard
-        parent:
-        parent_id: 1
-        site_controller_id: 54
-        url: "/leaderboard/index"
       14: &7 !ruby/object:Menu::Node
         content_page_id: 10
         controller_action_id:
@@ -302,7 +287,6 @@ development:
       Course Evaluation: *3
       profile: *4
       contact_us: *5
-      leaderboard: *6
       credits: *7
     crumbs:
     - 1
@@ -426,8 +410,6 @@ test:
       suggestion:
         create: true
         new: true
-      leaderboard:
-        index: true
       advice:
         edit_advice: false
         save_advice: false
@@ -492,7 +474,6 @@ test:
       response: true
       sign_up_sheet: false
       suggestion: false
-      leaderboard: true
       delete_object: false
       advertise_for_partner: true
       join_team_requests: true
@@ -524,8 +505,6 @@ test:
         controller_action_id:
         content_page_id: 1
         url: "/home"
-        children:
-        - 8
       5: &2 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -558,16 +537,6 @@ test:
         url: "/contact_us"
         children:
         - 9
-      8: &5 !ruby/object:Menu::Node
-        parent:
-        parent_id: 1
-        name: leaderboard
-        id: 8
-        label: Leaderboard
-        site_controller_id: 46
-        controller_action_id: 69
-        content_page_id:
-        url: "/leaderboard/index"
       9: &6 !ruby/object:Menu::Node
         parent:
         parent_id: 7
@@ -583,7 +552,6 @@ test:
       student_task: *2
       profile: *3
       contact_us: *4
-      leaderboard: *5
       credits: *6
     selected:
       1: *1
@@ -710,8 +678,6 @@ production:
         signup: true
         delete_signup: true
         team_details: true
-      leaderboard:
-        index: true
       review_files:
         show_code_file: true
         show_code_file_diff: true
@@ -784,7 +750,6 @@ production:
       popup: false
       sign_up_sheet: false
       suggestion: false
-      leaderboard: true
       delete_object: false
       assessment360: false
       review_files: true
@@ -826,8 +791,6 @@ production:
         parent_id:
         site_controller_id:
         url: "/home"
-        children:
-        - 50
       26: &2 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 33
@@ -870,16 +833,6 @@ production:
         url: "/contact_us"
         children:
         - 14
-      50: &6 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 78
-        id: 50
-        label: Leaderboard
-        name: leaderboard
-        parent:
-        parent_id: 1
-        site_controller_id: 54
-        url: "/leaderboard/index"
       14: &7 !ruby/object:Menu::Node
         content_page_id: 10
         controller_action_id:
@@ -896,7 +849,6 @@ production:
       Course Evaluation: *3
       profile: *4
       contact_us: *5
-      leaderboard: *6
       credits: *7
     crumbs:
     - 1

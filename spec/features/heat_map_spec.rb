@@ -4,6 +4,7 @@ require 'selenium-webdriver'
 describe 'Student can view review scores in a heat map distribution', js: true do
   before(:each) do
     create(:assignment, name: "NewAssignment", directory_path: 'new_assignment')
+    create_list(:participant, 3)
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
@@ -11,7 +12,6 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     create(:deadline_type, name: "drop_topic")
     create(:deadline_type, name: "signup")
     create(:deadline_type, name: "team_formation")
-    create_list(:participant, 3)
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')

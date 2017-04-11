@@ -89,5 +89,4 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     click_link 'Alternate View'
     expect(page).to_not have_content('Review 1')
   end
-
 end

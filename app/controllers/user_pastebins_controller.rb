@@ -42,10 +42,13 @@ class UserPastebinsController < ApplicationController
     @user_pastebin.user_id=current_user.id;
 
     if @user_pastebin.save
-      puts "User Pastebin Saved"
-      render :nothing => true, :status => 200, :content_type => 'text/html'
+      data  = UserPastebin.get_current_user_pastebin_json current_user;
+      render :json =>  data, :status => 200
     else
+      data = {:message => "Short Form or Long Form is not valid"}
+      render :json =>  data, :status => 422
     end
+
   end
 
   # PATCH/PUT /user_pastebins/1

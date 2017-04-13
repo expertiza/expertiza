@@ -4,10 +4,10 @@ class UserPastebinsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'index', 'create'
-        ['Instructor',
-         'Teaching Assistant',
-         'Student',
-         'Administrator'].include? current_role_name
+      ['Instructor',
+       'Teaching Assistant',
+       'Student',
+       'Administrator'].include? current_role_name
     end
   end
 
@@ -24,8 +24,7 @@ class UserPastebinsController < ApplicationController
   end
 
   # GET /user_pastebins/1
-  def show
-  end
+  def show; end
 
   # GET /user_pastebins/new
   def new
@@ -33,15 +32,14 @@ class UserPastebinsController < ApplicationController
   end
 
   # GET /user_pastebins/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /user_pastebins
   def create
     @user_pastebin = UserPastebin.new(user_pastebin_params)
     @user_pastebin.user_id = current_user.id
     if @user_pastebin.save
-      data = UserPastebin.get_current_user_pastebin_json current_user;
+      data = UserPastebin.get_current_user_pastebin_json current_user
       render json: data, status: 200
     else
       data = {message: "Short Form or Long Form is not valid"}
@@ -75,4 +73,5 @@ class UserPastebinsController < ApplicationController
     def user_pastebin_params
       params.permit(:user_id, :short_form, :long_form)
     end
+
 end

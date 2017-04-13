@@ -1,5 +1,6 @@
 class UserPastebin < ActiveRecord::Base
   validates :user_id, uniqueness: {scope: :short_form}
+  attr_accessible :user_id,:short_form, :long_form
 
   @markdown_character = "\\"
 
@@ -10,8 +11,9 @@ class UserPastebin < ActiveRecord::Base
   def self.get_current_user_pastebin_json user
     @user_pastebins = get_current_user_pastebin(user)
     @pastebin_list = @user_pastebins.map do |u|
-      {label: @markdown_character+u.short_form, value: u.long_form}
+      {label: @markdown_character + u.short_form, value: u.long_form}
     end
-    return @pastebin_list.to_json
+    @pastebin_list.to_json
   end
+
 end

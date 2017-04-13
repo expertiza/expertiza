@@ -42,7 +42,7 @@ class UserPastebinsController < ApplicationController
       data = UserPastebin.get_current_user_pastebin_json current_user
       render json: data, status: 200
     else
-      data = {message: "Short Form or Long Form is not valid"}
+      data = {message: "Short Form or Long Form in the Text Macro is not valid"}
       render json: data, status: 422
     end
   end

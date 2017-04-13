@@ -4,15 +4,7 @@
       <tr><%= render :partial => 'table_header' %></tr>
       <br/>
       <% i=1 %>
-      <%
-        team_id = TeamsUser.team_id(@assignment_id, session[:user].id)
-        teams_users = TeamsUser.where(team_id: team_id)
-        teams_users_array = Array.new
-        teams_users.each do |teams_user|
-          teams_users_array << teams_user.user_id
-        end
-        @suggested_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: teams_users_array)
-      %>
+      <% @suggested_topics = get_suggested_topics(@assignment_id) %>
       <%if !@suggested_topics.nil? %>
           <% @suggested_topics.each do |topic| %>
               <tr>

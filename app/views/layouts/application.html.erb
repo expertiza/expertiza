@@ -17,6 +17,9 @@
       <div class="main">
         <div class="content">
           <%= render 'shared/flash_messages' %>
+          <% if !session[:user].nil? %>
+            <%= render 'shared/flash_notifications' %> <%# display notifications, Randal Myers, 22 March 2017 %>
+          <% end %>
           <div class="<%= controller_name %> <%= action_name %>">
             <%= yield %>
           </div>

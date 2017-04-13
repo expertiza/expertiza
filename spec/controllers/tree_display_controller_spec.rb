@@ -23,6 +23,15 @@ describe TreeDisplayController do
     end
   end
 
+  describe "#confirm_notifications_access" do
+    it "should verify usertype" do
+      user = build(:student)
+      stub_current_user(user, user.role.name, user.role)
+      get "confirm_notifications_access"
+      expect(response).to redirect_to('/notifications/list')
+    end
+  end
+
   describe "#ta_for_current_mappings?" do
     it "should return true if current user is a TA for current course" do
       allow(session[:user]).to receive("ta?").and_return(true)
@@ -67,14 +76,12 @@ describe TreeDisplayController do
     it "populates a list of FolderNodes when there is a match" do
       @foldernode.node_object_id = 1
       @foldernode.save
-
       get :folder_node_ng_getter
       expect(response.body).to match [@foldernode].to_json
     end
     it "populates an empty list when there is no match" do
       @foldernode.node_object_id = 2
       @foldernode.save
-
       get :folder_node_ng_getter
       expect(response.body).to eq "[]"
     end

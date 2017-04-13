@@ -64,13 +64,13 @@ class UserPastebinsController < ApplicationController
 
   private
 
-    # Use callbacks to share common setup or constraints between actions.
+  # Use callbacks to share common setup or constraints between actions.
   def set_user_pastebin
     @user_pastebin = UserPastebin.find(params[:id])
   end
 
-    # Only allow a trusted parameter "white list" through.
+  # Only allow a trusted parameter "white list" through.
   def user_pastebin_params
-    params.permit(:user_id, :short_form, :long_form)
+    params.permit(:short_form, :long_form)
   end
 end

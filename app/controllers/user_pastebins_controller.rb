@@ -3,7 +3,7 @@ class UserPastebinsController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'index', 'create'
+    when 'index', 'create'
         ['Instructor',
          'Teaching Assistant',
          'Student',
@@ -16,10 +16,10 @@ class UserPastebinsController < ApplicationController
     begin
 
       json = UserPastebin.get_current_user_pastebin_json current_user
-      render :json => json
+      render json: json
 
-      rescue => e
-        flash[:error] = e.message
+    rescue => e
+      flash[:error] = e.message
     end
   end
 
@@ -39,16 +39,14 @@ class UserPastebinsController < ApplicationController
   # POST /user_pastebins
   def create
     @user_pastebin = UserPastebin.new(user_pastebin_params)
-    @user_pastebin.user_id=current_user.id;
-
+    @user_pastebin.user_id = current_user.id
     if @user_pastebin.save
-      data  = UserPastebin.get_current_user_pastebin_json current_user;
-      render :json =>  data, :status => 200
+      data = UserPastebin.get_current_user_pastebin_json current_user;
+      render json: data, status: 200
     else
-      data = {:message => "Short Form or Long Form is not valid"}
-      render :json =>  data, :status => 422
+      data = {message: "Short Form or Long Form is not valid"}
+      render json: data, status: 422
     end
-
   end
 
   # PATCH/PUT /user_pastebins/1
@@ -67,6 +65,7 @@ class UserPastebinsController < ApplicationController
   end
 
   private
+
     # Use callbacks to share common setup or constraints between actions.
     def set_user_pastebin
       @user_pastebin = UserPastebin.find(params[:id])

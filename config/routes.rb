@@ -23,6 +23,9 @@ Expertiza::Application.routes.draw do
   resources :lti_assignments
   #lti end
 
+  resources :track_notifications
+  resources :notifications
+
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
@@ -141,6 +144,7 @@ Expertiza::Application.routes.draw do
       get :start
       get :export
       post :export
+      post :exportdetails
     end
   end
 
@@ -183,7 +187,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :invitation do
+  resources :invitations do
     collection do
       get :cancel
       get :accept
@@ -193,7 +197,7 @@ Expertiza::Application.routes.draw do
 
   resources :join_team_requests do
     collection do
-      get :decline
+      post :decline
       get :edit
     end
   end
@@ -349,7 +353,8 @@ Expertiza::Application.routes.draw do
       post :automatic_review_mapping_staggered
       #E1600
       post :start_self_review
-      post :save_grade_and_comment_for_reviewer 
+      post :save_grade_and_comment_for_reviewer
+      get :unsubmit_review
     end
   end
 
@@ -381,6 +386,8 @@ Expertiza::Application.routes.draw do
       get :team_details
       get :intelligent_sign_up
       get :intelligent_save
+      get :signup_as_instructor
+      post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
     end

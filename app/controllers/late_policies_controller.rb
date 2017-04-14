@@ -55,7 +55,6 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies/new.xml
   def new
     @late_policy = LatePolicy.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render xml: @late_policy }
@@ -98,7 +97,7 @@ class LatePoliciesController < ApplicationController
       end
     end
     if is_number
-      @late_policy = LatePolicy.new(params[:late_policy])
+      @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
 
       begin
@@ -183,5 +182,9 @@ end
   private
   def is_numeric?(obj)
     obj.to_s.match(/\A[+-]?\d*?(\.\d+)?\Z/).nil? ? false : true
+  end
+
+  def late_policy_params
+    params.require(:late_policy).permit(:policy_name, :penalty_per_unit, :penalty_unit, :max_penalty)
   end
 end

@@ -32,12 +32,6 @@ class ParticipantsController < ApplicationController
     end
   end
 
-  # OSS_808 change 28th oct
-  # required for sending emails
-  def email_sent
-    DelayedMailer.deliver_mail("recipient.address@example.com")
-  end
-
   def add
     curr_object = Object.const_get(params[:model]).find(params[:id]) if Participant::PARTICIPANT_TYPES.include? params[:model]
     begin

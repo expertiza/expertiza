@@ -28,11 +28,15 @@ describe "peer review testing", type: :feature do
     # create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
     # create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
     # sleep(10000)
+
+    @student_name_1 = User.first.name
+    @student_name_2 = User.second.name
+    @student_name_3 = User.third.name
   end
 
   def load_questionnaire
-    login_as('student2064')
-    expect(page).to have_content "User: student2064"
+    login_as(@student_name_1)
+    expect(page).to have_content "User: #{@student_name_1}"
     expect(page).to have_content "TestAssignment"
 
     click_link "TestAssignment"

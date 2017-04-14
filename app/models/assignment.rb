@@ -32,6 +32,7 @@ class Assignment < ActiveRecord::Base
 
   validates_presence_of :name
   validates_uniqueness_of :name, scope: :course_id
+  validate :valid_num_review
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
   #  Review Strategy information.
@@ -70,6 +71,15 @@ class Assignment < ActiveRecord::Base
 
   def has_teams?
     @has_teams ||= !self.teams.empty?
+  end
+
+  def valid_num_review
+    self.num_reviews = self.num_reviews_allowed
+    if self.num_reviews_allowed && self.num_reviews_allowed != -1 && self.num_reviews_allowed < self.num_reviews_required
+      self.errors.add(:message, "Num of reviews required cannot be greater than number of reviews allowed")
+    elsif self.num_metareviews_allowed && self.num_metareviews_allowed != -1 && self.num_metareviews_allowed < self.num_metareviews_required
+      self.errors.add(:message, "Number of Meta-Reviews required cannot be greater than number of meta-reviews allowed")
+    end
   end
 
   #--------------------metareview assignment begin

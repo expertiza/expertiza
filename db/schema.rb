@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.integer  "course_id",                  limit: 4,     default: 0
     t.integer  "instructor_id",              limit: 4,     default: 0
     t.boolean  "private",                                  default: false,  null: false
-    t.integer  "num_reviews",                limit: 4,     default: 0,      null: false
+    t.integer  "num_reviews",                limit: 4,     default: 3,      null: false
     t.integer  "num_review_of_reviews",      limit: 4,     default: 0,      null: false
     t.integer  "num_review_of_reviewers",    limit: 4,     default: 0,      null: false
     t.boolean  "reviews_visible_to_all"
@@ -79,6 +79,10 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true
+    t.integer  "num_reviews_required",       limit: 4,     default: 3
+    t.integer  "num_metareviews_required",   limit: 4,     default: 3
+    t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
+    t.integer  "num_reviews_allowed",        limit: 4,     default: 3
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170404122028) do
+ActiveRecord::Schema.define(version: 20170414225908) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -263,6 +263,17 @@ ActiveRecord::Schema.define(version: 20170404122028) do
   end
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
+
+  create_table "local_db_scores", force: :cascade do |t|
+    t.string   "review_type",     limit: 255
+    t.integer  "round",           limit: 4
+    t.integer  "score",           limit: 4
+    t.integer  "response_map_id", limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "local_db_scores", ["response_map_id"], name: "index_local_db_scores_on_response_map_id", using: :btree
 
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -694,6 +705,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
+  add_foreign_key "local_db_scores", "response_maps"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"

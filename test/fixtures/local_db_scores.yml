@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  type: 
+  round: 
+  score: 
+  response_map_id: 
+
+two:
+  type: 
+  round: 
+  score: 
+  response_map_id: 

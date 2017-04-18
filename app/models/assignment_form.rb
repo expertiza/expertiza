@@ -129,13 +129,13 @@ class AssignmentForm
 
       # If the deadline type is review, add a delayed job to drop outstanding review
       if deadline_type == "review"
-        dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
+        dj = DelayedJob.enqueue(ScheduledTask.new(:drop_outstanding_reviews, due_date.due_at.to_s(:db), assignment_id: @assignment.id),
                                 1, mi.minutes.from_now)
         change_item_type(dj.id)
       end
       # If the deadline type is team_formation, add a delayed job to drop one member team
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
-      dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
+      dj = DelayedJob.enqueue(ScheduledTask.new(:drop_one_member_topics, due_date.due_at.to_s(:db), assignment_id: @assignment.id),
                               1, mi.minutes.from_now)
       change_item_type(dj.id)
     end

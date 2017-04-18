@@ -1,4 +1,4 @@
-class ScheduledTasks
+class ScheduledTask
   # Keeps info required for scheduled task (see delayed job gem)
   # to perform an action at a particular time
   attr_accessor :task

@@ -13,10 +13,27 @@ class StudentTaskController < ApplicationController
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
+    @latetasks = @student_tasks.select(&:late_tasks?) #Tasks which are Finished but not submitted
     @taskrevisions = @student_tasks.select(&:revision?)
 
     ######## Students Teamed With###################
     @students_teamed_with = StudentTask.teamed_students current_user
+
+    ######## Next Immediate Due Date ###############
+    @next_deadline = self.next_dead_line
+  end
+
+  def next_dead_line
+    ######## Next Immediate Due Date ###############
+    next_deadline = nil
+    @student_tasks = StudentTask.from_user current_user
+    @student_tasks.reject! {|t| !t.assignment.availability_flag }
+    @student_tasks.each do |student_task|
+	if(student_task.stage_deadline > Time.now)
+	   (next_deadline && next_deadline < student_task.stage_deadline) ? next_deadline : next_deadline = student_task.stage_deadline
+	end
+     end
+    next_deadline
   end
 
   def view

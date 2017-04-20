@@ -386,14 +386,14 @@ class Assignment < ActiveRecord::Base
 
   def find_current_stage(topic_id = nil)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
-    return 'Finished' if next_due_date.nil?
-    next_due_date
+    next_due_date.nil? ? DueDate.get_past_due_date(self.id, topic_id) : next_due_date
   end
 
   def get_current_stage(topic_id=nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    (due_date == nil || due_date == 'Finished') ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+	#Find the stage name if due_at is not past, otherwise return Finished.
+    (due_date != nil && due_date.due_at >= Time.now) ? DeadlineType.find(due_date.deadline_type_id).name : 'Finished'
   end
 
   def review_questionnaire_id(round = nil)

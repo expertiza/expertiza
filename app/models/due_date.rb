@@ -90,4 +90,13 @@ class DueDate < ActiveRecord::Base
     end
     next_due_date
   end
+  
+  #Find the due date at which the assignment was Finished.
+  def self.get_past_due_date(assignment_id, topic_id = nil)
+    past_due_date = AssignmentDueDate.where(['parent_id = ?', assignment_id]).first
+	if past_due_date != nil && past_due_date.due_at < Time.now
+	    past_due_date.deadline_type_id = 12 
+	  end
+    return past_due_date
+  end
 end

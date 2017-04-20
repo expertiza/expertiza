@@ -44,6 +44,22 @@
     </span><br/>
   <% end %>
 
+    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @latetasks.size.to_s %>&nbsp;</span> Late Tasks<br></strong><br>
+     <% @latetasks.each do |student_task|
+      participant = student_task.participant
+      stage = student_task.current_stage
+      controller = "submitted_content"
+      action = "edit"
+      puts "participant id is #{participant.parent_id}"
+      id = participant.parent_id
+      %>
+
+    <span>&nbsp; &raquo;
+      <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
+      (<%= student_task.relative_deadline %> ago)
+    </span><br/>
+  <% end %>
+
   <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
@@ -103,7 +119,12 @@
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
-        <tr class="listingRow">
+        <% if @next_deadline == student_task.stage_deadline
+           rowstyle = "font-weight:bold"
+          else
+           rowstyle = ""
+         end %>
+        <tr class="listingRow" style = <%= rowstyle%> >
           <td>&nbsp;</td>
           <!--assignment-->
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>

@@ -45,7 +45,7 @@ class StudentTask
   delegate :course, to: :assignment
 
   def hyperlinks
-    @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks
+    @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks rescue []
   end
 
   def incomplete?
@@ -62,6 +62,11 @@ class StudentTask
 
   def not_started?
     in_work_stage? && !started?
+  end
+
+  #Find tasks that are in Finished stage but have not been started.
+  def late_tasks?
+    current_stage == 'Finished' && !started?
   end
 
   include ActionView::Helpers::DateHelper

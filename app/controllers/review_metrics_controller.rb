@@ -7,8 +7,7 @@ class ReviewMetricsController < ApplicationController
   end
 
   # GET /review_metrics/1
-  def show
-  end
+  def show; end
 
   # GET /review_metrics/new
   def new
@@ -16,8 +15,7 @@ class ReviewMetricsController < ApplicationController
   end
 
   # GET /review_metrics/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /review_metrics
   def create
@@ -46,13 +44,14 @@ class ReviewMetricsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_review_metric
-      @review_metric = ReviewMetric.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def review_metric_params
-      params.require(:review_metric).permit(:metric)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_review_metric
+    @review_metric = ReviewMetric.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def review_metric_params
+    params.require(:review_metric).permit(:metric)
+  end
 end

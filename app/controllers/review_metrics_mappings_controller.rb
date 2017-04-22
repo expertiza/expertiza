@@ -7,8 +7,7 @@ class ReviewMetricsMappingsController < ApplicationController
   end
 
   # GET /review_metrics_mappings/1
-  def show
-  end
+  def show; end
 
   # GET /review_metrics_mappings/new
   def new
@@ -16,8 +15,7 @@ class ReviewMetricsMappingsController < ApplicationController
   end
 
   # GET /review_metrics_mappings/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /review_metrics_mappings
   def create
@@ -46,13 +44,14 @@ class ReviewMetricsMappingsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_review_metrics_mapping
-      @review_metrics_mapping = ReviewMetricsMapping.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def review_metrics_mapping_params
-      params.require(:review_metrics_mapping).permit(:response_id, :metric_id, :value)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_review_metrics_mapping
+    @review_metrics_mapping = ReviewMetricsMapping.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def review_metrics_mapping_params
+    params.require(:review_metrics_mapping).permit(:response_id, :metric_id, :value)
+  end
 end

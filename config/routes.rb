@@ -1,7 +1,6 @@
 Expertiza::Application.routes.draw do
 
-  resources :review_metrics_mappings
-  resources :review_metrics_mappings
+  resources :review_metrics
   resources :review_metrics_mappings
   resources :review_metrics
   resources :track_notifications

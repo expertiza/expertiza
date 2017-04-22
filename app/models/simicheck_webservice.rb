@@ -103,8 +103,23 @@ class SimiCheckWebService
   end
 
   # Deletes files from a comparison
-  def self.delete_files(comparison_id)
-
+  #   comparison_id - comparison to delete files from
+  #   filenames - array of filenames to delete
+  def self.delete_files(comparison_id, filenames_to_delete)
+    full_url = @@base_uri + '/comparison/' + comparison_id
+    puts full_url
+    json_body = {"filenames" => filenames_to_delete}
+    response = RestClient::Request.execute(method: :delete,
+                                           url: full_url,
+                                           payload: json_body,
+                                           headers:
+                                               {
+                                                   simicheck_api_key: @api_key,
+                                                   content_type: :json,
+                                                   accept: :json
+                                               },
+                                           verify_ssl: false)
+    return response
   end
 
   ############################################
@@ -155,6 +170,8 @@ end
 ###
 # TESTING
 ###
+
+# TODO: Refactor / accept all inputs to methods (no hardcoded values)
 
 # Create new comparison
 response = SimiCheckWebService.new_comparison

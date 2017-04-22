@@ -1,0 +1,31 @@
+<TR <% if prefix %>id='<%= prefix %>_1' style="display:none; background-color: white;"<% end %>>
+<td COLSPAN="10">
+
+  <script>
+  $( function() {
+    $( "#<%= prefix %>_tabs" ).tabs();
+  } );
+  </script>
+
+<div id="<%= prefix %>_tabs">
+  <ul>
+    <li><a href="#<%= prefix %>_tabs-1">Reviews</a></li>
+    <li><a href="#<%= prefix %>_tabs-2">Author Feedback</a></li>
+    <li><a href="#<%= prefix %>_tabs-3">Statistics</a></li>
+    <li><a href="#<%= prefix %>_tabs-4">Heat Grid</a></li>
+  </ul>
+  <div id="<%= prefix %>_tabs-1">
+    <%= render :partial => 'reviews_tab', :locals => {:prefix => prefix} %>  
+  </div>
+  <div id="<%= prefix %>_tabs-2">
+   <%= render :partial => 'author_feedback_tab', :locals => {:prefix => prefix} %>
+  </div>
+  <div id="<%= prefix %>_tabs-3">
+    <%= render :partial => 'statistics_tab', :locals => {:prefix => prefix} %> 
+  </div>
+  <div id="<%= prefix %>_tabs-4">
+    <%= render :partial => 'heat_grid_tab', :locals => {:prefix => prefix} %> 
+  </div>
+</div>
+</td>
+</TR>

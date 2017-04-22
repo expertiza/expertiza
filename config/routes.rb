@@ -453,6 +453,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       get :delete
+      post :delete # change
       get :reminder_thread
     end
   end

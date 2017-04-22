@@ -44,7 +44,7 @@
             text: 'Class Overall Grades, by rubric item'
         },
         xAxis: {
-            categories: ['R1', 'R2', 'R3', 'R4', 'R5'] /* Rubric Items */
+            categories: ['R1', 'R2', 'R3', 'R4', 'R5'] /* Rubric Items.  Currently hardcoding five; perhaps we can find a way for a dynamic number later */
         },
         yAxis: {
             allowDecimals: false,
@@ -59,48 +59,57 @@
         },
         plotOptions: {
             column: {
-                stacking: 'percent'
+                stacking: 'percent' /* Will automagically convert each set of numbers into percentages */
             }
         },
-        series: [{
-            'name': '1',
-            'data': <%= @highchart[0][0] %>,
-            'stack': 'S1'
-        }, {
-            'name': '2',
-            'data': <%= @highchart[0][1] %>,
-            'stack': 'S1'
-        }, {
-            'name': '3',
-            'data': <%= @highchart[0][2] %>,
-            'stack': 'S1'
-        }, {
-            'name': '4',
-            'data': <%= @highchart[0][3] %>,
-            'stack': 'S1' /* Submission 1 */
-        }, {
+        series: [
+        /* Submission 1 Columns */
+        {
             'name': '5',
             'data': <%= @highchart[0][4] %>,
             'stack': 'S1'
-        }, {
-            'name': '1',
-            'data': <%= @highchart[1][0] %>,
-            'stack': 'S2' /* Submission 2 */
-        }, {
-            'name': '2',
-            'data': <%= @highchart[1][1] %>,
-            'stack': 'S2'
-        }, {
+        },{
+            'name': '4',
+            'data': <%= @highchart[0][3] %>,
+            'stack': 'S1'
+        },{
             'name': '3',
-            'data': <%= @highchart[1][2] %>,
+            'data': <%= @highchart[0][2] %>,
+            'stack': 'S1'
+        },{
+            'name': '2',
+            'data': <%= @highchart[0][1] %>,
+            'stack': 'S1'
+        },{
+            'name': '1',
+            'data': <%= @highchart[0][0] %>,
+            'stack': 'S1'
+        },
+
+        /* Start of Submission 2 Columns */
+        {
+            'name': '5',
+            'data': <%= @highchart[1][4] %>,
             'stack': 'S2'
-        }, {
+        },
+        {
             'name': '4',
             'data': <%= @highchart[1][3] %>,
             'stack': 'S2'
-        }, {
-            'name': '5',
-            'data': <%= @highchart[1][4] %>,
+        },
+        {
+            'name': '3',
+            'data': <%= @highchart[1][2] %>,
+            'stack': 'S2'
+        },
+        {
+            'name': '2',
+            'data': <%= @highchart[1][1] %>,
+            'stack': 'S2'
+        },
+        {
+            'name': '1',
+            'data': <%= @highchart[1][0] %>,
             'stack': 'S2'
         }]
     });

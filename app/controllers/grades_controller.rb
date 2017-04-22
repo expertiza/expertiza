@@ -36,7 +36,6 @@ class GradesController < ApplicationController
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
   def view
-
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires
@@ -50,14 +49,45 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
-    display(@scores)
-    @scores.each do |x|
-      print x
-    end
     averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
+
+    # New Experimental Code Based on "view_teams" action
+    @team_data = []
+    for index in 0 .. @scores[:teams].length - 1 # Loops Through All the Teams
+      tscore = @scores[:teams][index.to_s.to_sym] # Indexs a Specific Team
+
+      participant_id = tscore[:team].participants.first.id
+      @participant = AssignmentParticipant.find(participant_id) # Picks the First Participant
+      # We already have assignment
+      @team = @participant.team
+      @team_id = @team.id
+
+      # We already have questionares
+      vmlist = []
+
+      # COPY PASTA
+      questionnaires.each do |questionnaire|
+        @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+                   AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+                 else
+                   nil
+                 end
+
+        vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
+        questions = questionnaire.questions
+        vm.add_questions(questions)
+        vm.add_team_members(@team)
+        vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+        vm.get_number_of_comments_greater_than_10_words
+
+        vmlist << vm
+      end
+
+      @team_data << vmlist
+    end
   end
 
 

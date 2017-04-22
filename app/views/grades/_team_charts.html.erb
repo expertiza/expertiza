@@ -44,7 +44,7 @@
             text: 'Class Overall Grades, by rubric item'
         },
         xAxis: {
-            categories: ['S1', 'S2', 'S3', 'S4', 'S5']
+            categories: ['R1', 'R2', 'R3', 'R4', 'R5'] /* Rubric Items */
         },
         yAxis: {
             allowDecimals: false,
@@ -64,11 +64,11 @@
         },
         series: [{
             'name': '1',
-            'data': [5, 3, 4, 7, 2],
-            'stack': 'S1',
+            'data': [50, 3, 4, 7, 2],
+            'stack': 'S1'
         }, {
             'name': '2',
-            'data': [3, 4, 4, 2, 5],
+            'data': [30, 4, 4, 2, 5],
             'stack': 'S1'
         }, {
             'name': '3',
@@ -77,7 +77,7 @@
         }, {
             'name': '4',
             'data': [3, 4, 4, 2, 5],
-            'stack': 'S1'
+            'stack': 'S1' /* Submission 1 */
         }, {
             'name': '5',
             'data': [3, 4, 4, 2, 5],
@@ -85,7 +85,7 @@
         }, {
             'name': '1',
             'data': [2, 5, 6, 2, 1],
-            'stack': 'S2'
+            'stack': 'S2' /* Submission 2 */
         }, {
             'name': '2',
             'data': [3, 1, 4, 4, 3],
@@ -106,10 +106,20 @@
     });
 </script>
 
-
-
 <style>
  .circles-final{
     font-size: 16px !important;    
   }
-</style> 
+</style>
+
+<% @team_data.each do |team| %>
+    <h3>--- TEAM ---</h3>
+    <% team.each do |vm| %>
+        <% vm.list_of_rows.each do |row| %>
+            <h5>[ROW]</h5>
+            <% row.score_row.each do |score| %>
+                <%= score.score_value.to_s %>
+            <% end %>
+        <% end %>
+    <% end %>
+<% end %>

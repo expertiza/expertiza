@@ -60,10 +60,9 @@ class GradesController < ApplicationController
       tscore = @scores[:teams][index.to_s.to_sym] # Indexs a Specific Team
 
       participant_id = tscore[:team].participants.first.id
-      @participant = AssignmentParticipant.find(participant_id) # Picks the First Participant
+      participant = AssignmentParticipant.find(participant_id) # Picks the First Participant
       # We already have assignment
-      @team = @participant.team
-      @team_id = @team.id
+      team = participant.team
 
       # We already have questionares
       vmlist = []
@@ -79,18 +78,37 @@ class GradesController < ApplicationController
         vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
         questions = questionnaire.questions
         vm.add_questions(questions)
-        vm.add_team_members(@team)
-        vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+        vm.add_team_members(team)
+        vm.add_reviews(participant, team, @assignment.varying_rubrics_by_round?)
         vm.get_number_of_comments_greater_than_10_words
 
         vmlist << vm
       end
-
       @team_data << vmlist
     end
+
+    # Redundant Code to Extract from team_data
+    # @highchart is an instance variable full of nested arrays to match the HighChart formatting
+    # Each element in the outer array stores a different submission
+    # Each element in the submission array represents a score (usually 1-5)
+    # Each element in the score array corresponds to how many people recieved that score
+    @highchart = [[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]] # RIGHT NOW HARDCODING 2 ROUNDS AND SCORES 1-5
+    @team_data.each do |team| # Each Team
+      team.each do |vm| # Each Submission
+        if (vm.round != nil) # Checks that it is a valid submission
+          j = 1
+          vm.list_of_rows.each do |row| # Each Criteria
+            row.score_row.each do |score| # Each Score
+              if (score.score_value != nil) # Checks that it is a valid score
+                @highchart[vm.round-1][j-1][score.score_value-1] += 1
+              end
+            end
+          end
+          j += 1
+        end
+      end
+    end
   end
-
-
 
   # This method is used to retrieve questions for different review rounds
   def retrieve_questions(questionnaires)

@@ -64,43 +64,43 @@
         },
         series: [{
             'name': '1',
-            'data': [50, 3, 4, 7, 2],
+            'data': <%= @highchart[0][0] %>,
             'stack': 'S1'
         }, {
             'name': '2',
-            'data': [30, 4, 4, 2, 5],
+            'data': <%= @highchart[0][1] %>,
             'stack': 'S1'
         }, {
             'name': '3',
-            'data': [3, 4, 4, 2, 5],
+            'data': <%= @highchart[0][2] %>,
             'stack': 'S1'
         }, {
             'name': '4',
-            'data': [3, 4, 4, 2, 5],
+            'data': <%= @highchart[0][3] %>,
             'stack': 'S1' /* Submission 1 */
         }, {
             'name': '5',
-            'data': [3, 4, 4, 2, 5],
+            'data': <%= @highchart[0][4] %>,
             'stack': 'S1'
         }, {
             'name': '1',
-            'data': [2, 5, 6, 2, 1],
+            'data': <%= @highchart[1][0] %>,
             'stack': 'S2' /* Submission 2 */
         }, {
             'name': '2',
-            'data': [3, 1, 4, 4, 3],
+            'data': <%= @highchart[1][1] %>,
             'stack': 'S2'
         }, {
             'name': '3',
-            'data': [3, 2, 4, 4, 3],
+            'data': <%= @highchart[1][2] %>,
             'stack': 'S2'
         }, {
             'name': '4',
-            'data': [3, 3, 4, 4, 3],
+            'data': <%= @highchart[1][3] %>,
             'stack': 'S2'
         }, {
             'name': '5',
-            'data': [3, 4, 4, 4, 3],
+            'data': <%= @highchart[1][4] %>,
             'stack': 'S2'
         }]
     });
@@ -112,14 +112,5 @@
   }
 </style>
 
-<% @team_data.each do |team| %>
-    <h3>--- TEAM ---</h3>
-    <% team.each do |vm| %>
-        <% vm.list_of_rows.each do |row| %>
-            <h5>[ROW]</h5>
-            <% row.score_row.each do |score| %>
-                <%= score.score_value.to_s %>
-            <% end %>
-        <% end %>
-    <% end %>
-<% end %>
+<!-- FOR DEBUGGING - REMOVE ONCE HIGHCHARTS WORKS -->
+<%= debug @highchart %>

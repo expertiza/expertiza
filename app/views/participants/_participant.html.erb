@@ -1,6 +1,11 @@
 <% userid << participant.user_id %>
-<tr class= "exp">
+<tr class= "exp" style="border-bottom:1pt solid black;">
   <td ><%= link_to User.find(participant.user_id).name, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
+  <% if participant.instance_of? AssignmentParticipant%>
+     <td><img src="/assets/firstsubmissionrs.png" title="First Submission">
+     <img src="/assets/dreamteamrs.png" title="Dream Team">
+     <img src="/assets/goodreviewerrs.png" title="Good Reviewer"></td>
+  <% end %>
   <td ><%= User.find(participant.user_id).fullname %></td>
   <td ><%= User.find(participant.user_id).email %></td>
   <td ><%= link_to User.find(participant.user_id).role.name, :controller => 'roles', :action => 'show', :id => User.find(participant.user_id).role.id %></td>

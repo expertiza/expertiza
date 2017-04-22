@@ -21,26 +21,38 @@ class DelayedMailer
 
   def perform
     assignment = Assignment.find(self.assignment_id)
-    return if assignment.nil?
-    if self.deadline_type == "metareview"
-      mail_metareviewers
-      team_mails = find_team_members_email
-      email_reminder(team_mails, "teammate review") unless team_mails.empty?
-    elsif self.deadline_type == "review"
-      mail_reviewers # to all reviewers
-    elsif self.deadline_type == "submission"
-      mail_signed_up_users # to all signed up users
-    elsif self.deadline_type == "drop_topic"
-      if sign_up_topics?
-        mail_signed_up_users # reminder to signed_up users of the assignment
+    if !assignment.nil? && !assignment.id.nil?
+      if self.deadline_type == "metareview"
+        mail_metareviewers
+        team_mails = find_team_members_email
+        email_reminder(team_mails, "teammate review") unless team_mails.empty?
       end
-    elsif self.deadline_type == "signup"
-      if sign_up_topics?
-        mail_assignment_participants # reminder to all participants
+      if self.deadline_type == "review"
+        mail_reviewers # to all reviewers
       end
-    elsif self.deadline_type == "team_formation"
-      emails = find_one_member_team
-      email_reminder(emails, self.deadline_type)
+      if self.deadline_type == "submission"
+        mail_signed_up_users # to all signed up users
+      end
+      if self.deadline_type == "drop_topic"
+        if sign_up_topics?
+          mail_signed_up_users # reminder to signed_up users of the assignment
+        end
+      end
+      if self.deadline_type == "signup"
+        if sign_up_topics?
+          mail_assignment_participants # reminder to all participants
+        end
+      end
+      if self.deadline_type == "team_formation"
+        emails = get_one_member_team
+        email_reminder(emails, self.deadline_type)
+      end
+      if self.deadline_type == "drop_one_member_topics"
+        drop_one_member_topics if assignment.team_assignment?
+      end
+      if self.deadline_type == "drop_outstanding_reviews"
+        drop_outstanding_reviews
+      end
     end
   end
 
@@ -51,7 +63,7 @@ class DelayedMailer
              else
                find_team_members_email_for_all_topics(sign_up_topics)
              end
-    email_reminder(emails, self.deadline_type) if emails.present?
+    email_reminder(emails, self.deadline_type) if emails and !emails.empty?
   end
 
   def find_team_members_email
@@ -74,7 +86,7 @@ class DelayedMailer
     emails
   end
 
-  def find_one_member_team
+  def get_one_member_team
     mail_list = []
     teams = TeamsUser.all.group(:team_id).count(:team_id)
     teams.keys.each do |team_id|
@@ -122,7 +134,7 @@ class DelayedMailer
     body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
     Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
     @count += 1
-    if (@count % 3).zero?
+    if @count % 3 == 0
       if assignment.instructor.copy_of_emails
         emails << assignment.instructor.email
       end
@@ -136,5 +148,26 @@ class DelayedMailer
 
     @mail = Mailer.delayed_message(bcc: emails, subject: subject, body: body)
     @mail.deliver_now
+  end
+
+  def drop_one_member_topics
+    teams = TeamsUser.all.group(:team_id).count(:team_id)
+    teams.keys.each do |team_id|
+      if teams[team_id] == 1
+        topic_to_drop = SignedUpTeam.where(team_id: team_id).first
+        topic_to_drop.delete if topic_to_drop # check if the one-person-team has signed up a topic
+      end
+    end
+  end
+
+  def drop_outstanding_reviews
+    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id)
+    reviews.each do |review|
+      review_has_began = Response.where(map_id: review.id)
+      if review_has_began.size.zero?
+        review_to_drop = ResponseMap.where(id: review.id)
+        review_to_drop.first.destroy
+      end
+    end
   end
 end

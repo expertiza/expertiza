@@ -2,14 +2,14 @@ class SimiCheckWebService
   require 'rest-client'
 
   @api_key = '34fdeffbe203432383df873a0306b005595ff4c6f040447a9ec52cf7bee0af2a4b6ef22fdb414fe09dba556a50085505388f8b837afc4364b226d058a2dc84bc'
-  @@base_uri = 'https://simicheck.com/api'
+  @@base_uri = 'https://www.simicheck.com/api'
 
   ############################################
   # Comparison Operations
   ############################################
 
   # Lists all comparisons for the SimiCheck account
-  def self.get_comparisons
+  def self.get_all_comparisons
     full_url = @@base_uri + '/comparisons'
     puts full_url
     response = RestClient::Request.execute(method: :get,
@@ -20,7 +20,7 @@ class SimiCheckWebService
   end
 
   # Creates a new comparison
-  def self.put_comparison
+  def self.new_comparison
     full_url = @@base_uri + '/comparison'
     puts full_url
     json_body = {:comparison_name => 'test new comparison'}.to_json
@@ -50,7 +50,7 @@ class SimiCheckWebService
   end
 
   # Gets the details about a comparison
-  def self.get_comparison(comparison_id)
+  def self.get_comparison_details(comparison_id)
     full_url = @@base_uri + '/comparison/' + comparison_id
     puts full_url
     response = RestClient::Request.execute(method: :get,
@@ -60,9 +60,23 @@ class SimiCheckWebService
     return response
   end
 
-  # Updates a comparison
+  # Updates a comparison (currently only the name)
   def self.update_comparison(comparison_id)
-
+    full_url = @@base_uri + '/comparison/' + comparison_id
+    puts full_url
+    json_body = {:comparison_name => 'test update comparison'}.to_json
+    puts json_body
+    response = RestClient::Request.execute(method: :post,
+                                           url: full_url,
+                                           payload: json_body,
+                                           headers:
+                                               {
+                                                   simicheck_api_key: @api_key,
+                                                   content_type: :json,
+                                                   accept: :json
+                                               },
+                                           verify_ssl: false)
+    return response
   end
 
   ############################################
@@ -71,7 +85,21 @@ class SimiCheckWebService
 
   # Uploads a file
   def self.upload_file(comparison_id)
-
+    full_url = @@base_uri + '/upload_file/' + comparison_id
+    puts full_url
+    file_to_upload = File.new('/tmp/helloworld.txt', 'rb')
+    json_body = {"file" => file_to_upload}
+    response = RestClient::Request.execute(method: :put,
+                                           url: full_url,
+                                           payload: json_body,
+                                           headers:
+                                               {
+                                                   simicheck_api_key: @api_key,
+                                                   content_type: 'multipart/form-data',
+                                                   accept: :json
+                                               },
+                                           verify_ssl: false)
+    return response
   end
 
   # Deletes files from a comparison
@@ -123,23 +151,38 @@ class SimiCheckWebService
   end
 end
 
+
+###
+# TESTING
+###
+
 # Create new comparison
-response = SimiCheckWebService.put_comparison
+response = SimiCheckWebService.new_comparison
 puts response.code
 json_response = JSON.parse(response.body)
 new_id = json_response["id"]
 puts new_id
 puts '----'
 # Get list of all comparisons
-response = SimiCheckWebService.get_comparisons
+response = SimiCheckWebService.get_all_comparisons
 puts response.code
 json_response = JSON.parse(response.body)
 json_response["comparisons"].each do |comparison|
   puts comparison["comparison_name"] + ' (' + comparison["id"] + ')'
 end
 puts '----'
+# Change the new comparison name
+response = SimiCheckWebService.update_comparison(new_id)
+puts response.code
+puts '----'
+# Upload a file to the new comparison
+response = SimiCheckWebService.upload_file(new_id)
+puts response.code
+json_response = JSON.parse(response.body)
+puts json_response["name"] + ' (' + json_response["id"] + ')'
+puts '----'
 # Look up the details for the newly created comparison
-response = SimiCheckWebService.get_comparison('68003f12ed8b43a9898961a26685af3e3b913945ff064b15b42813acb0ed6cd7')
+response = SimiCheckWebService.get_comparison_details(new_id)
 response.code
 json_response = JSON.parse(response.body)
 puts json_response["name"] + ':'

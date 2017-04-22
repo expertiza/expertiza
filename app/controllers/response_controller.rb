@@ -194,6 +194,8 @@ class ResponseController < ApplicationController
 
     @return = params[:return]
     @map.save
+    #TODO: call method to compute teammate review average, if return == "teammate"
+
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
   

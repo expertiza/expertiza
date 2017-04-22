@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170404122028) do
+ActiveRecord::Schema.define(version: 20170422222450) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
+    t.integer  "first_sub_teamid",           limit: 4,     default: 3
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -317,6 +318,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.boolean  "can_take_quiz",                     default: true
     t.float    "Hamer",               limit: 24,    default: 1.0
     t.float    "Lauw",                limit: 24,    default: 0.0
+    t.float    "t_rev_avg",           limit: 24,    default: -1.0
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
@@ -622,6 +624,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.integer "directory_num",              limit: 4
     t.integer "grade_for_submission",       limit: 4
     t.text    "comment_for_submission",     limit: 65535
+    t.float   "t_rev_avg",                  limit: 24,    default: -1.0
   end
 
   create_table "teams_users", force: :cascade do |t|

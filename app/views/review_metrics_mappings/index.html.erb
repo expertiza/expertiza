@@ -15,8 +15,8 @@
   <tbody>
     <% @review_metrics_mappings.each do |review_metrics_mapping| %>
       <tr>
-        <td><%= review_metrics_mapping.response_id %></td>
-        <td><%= review_metrics_mapping.metric_id %></td>
+        <td><%= review_metrics_mapping.response %></td>
+        <td><%= review_metrics_mapping.metric %></td>
         <td><%= review_metrics_mapping.value %></td>
         <td><%= link_to 'Show', review_metrics_mapping %></td>
         <td><%= link_to 'Edit', edit_review_metrics_mapping_path(review_metrics_mapping) %></td>

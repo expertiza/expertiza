@@ -52,6 +52,6 @@ class ReviewMetricsMappingsController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def review_metrics_mapping_params
-    params.require(:review_metrics_mapping).permit(:response_id, :metric_id, :value)
+    params.require(:review_metrics_mapping).permit(:response, :metric, :value)
   end
 end

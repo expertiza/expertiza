@@ -18,15 +18,11 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def create
-    #survey_deployment = params[:survey_deployment]
-
     @survey_deployment = SurveyDeployment.new(param_test)
     if params[:random_subset]["value"] == "1"
       @survey_deployment.num_of_students = User.where(role_id: Role.student.id).length * rand
     end
-
     if @survey_deployment.save
-      #add_participants(@survey_deployment.num_of_students, @survey_deployment.id)
       redirect_to action: 'list'
     else
       @surveys = Questionnaire.where(type: 'CourseEvaluationQuestionnaire').map {|u| [u.name, u.id] }
@@ -38,19 +34,14 @@ class SurveyDeploymentController < ApplicationController
 
   def list
     @survey_deployments = SurveyDeployment.all
-    puts "SURVEY DEPLOYMENTS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    puts @survey_deployments
     @surveys = {}
     @survey_deployments.each do |sd|
       puts "Course eval id:" + sd.course_evaluation_id.to_s
-      #@surveys[sd.id] = Questionnaire.find(sd.course_evaluation_id).name
       if(sd.course_evaluation_id.nil?)
         corresp_questionnaire_name = "Nil"
       else
         corresp_questionnaire_name = Questionnaire.find(sd.course_evaluation_id).name
-      
       end
-      #corresp_questionnaire_name = Questionnaire.find(sd.course_evaluation_id).name
       @surveys[sd.id] = corresp_questionnaire_name
 
     end

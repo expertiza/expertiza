@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Response:</strong>
+  <%= @review_metrics_mapping.response_id %>
+</p>
+
+<p>
+  <strong>Metric:</strong>
+  <%= @review_metrics_mapping.metric_id %>
+</p>
+
+<p>
+  <strong>Value:</strong>
+  <%= @review_metrics_mapping.value %>
+</p>
+
+<%= link_to 'Edit', edit_review_metrics_mapping_path(@review_metrics_mapping) %> |
+<%= link_to 'Back', review_metrics_mappings_path %>

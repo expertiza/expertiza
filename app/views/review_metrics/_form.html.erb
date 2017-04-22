@@ -1,0 +1,21 @@
+<%= form_for(@review_metric) do |f| %>
+  <% if @review_metric.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@review_metric.errors.count, "error") %> prohibited this review_metric from being saved:</h2>
+
+      <ul>
+      <% @review_metric.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :metric %><br>
+    <%= f.number_field :metric %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Review Metrics Mappings</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Response</th>
+      <th>Metric</th>
+      <th>Value</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @review_metrics_mappings.each do |review_metrics_mapping| %>
+      <tr>
+        <td><%= review_metrics_mapping.response_id %></td>
+        <td><%= review_metrics_mapping.metric_id %></td>
+        <td><%= review_metrics_mapping.value %></td>
+        <td><%= link_to 'Show', review_metrics_mapping %></td>
+        <td><%= link_to 'Edit', edit_review_metrics_mapping_path(review_metrics_mapping) %></td>
+        <td><%= link_to 'Destroy', review_metrics_mapping, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Review metrics mapping', new_review_metrics_mapping_path %>

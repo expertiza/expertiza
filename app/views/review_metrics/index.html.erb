@@ -1,0 +1,27 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Review Metrics</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @review_metrics.each do |review_metric| %>
+      <tr>
+        <td><%= review_metric.metric %></td>
+        <td><%= link_to 'Show', review_metric %></td>
+        <td><%= link_to 'Edit', edit_review_metric_path(review_metric) %></td>
+        <td><%= link_to 'Destroy', review_metric, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Review metric', new_review_metric_path %>

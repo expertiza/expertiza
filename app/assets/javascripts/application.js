@@ -28,6 +28,12 @@
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
 
+//= require_tree .
+
+//= require highcharts/highcharts
+//= require highcharts/highcharts-more
+//= require highcharts/highstock
+
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();
 

@@ -7,7 +7,7 @@
 <!-- If there are no teams, the Teammate Review column should not appear in the score report.
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
 <TABLE class="grades" width="100%">
-  <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
+    <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
 <% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
   <%= render :partial => 'teams' %>
 <% else %>

@@ -4,6 +4,7 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
   include StudentTaskHelper
+  protect_from_forgery
 
   def action_allowed?
     case params[:action]
@@ -35,6 +36,7 @@ class GradesController < ApplicationController
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
   def view
+
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires
@@ -48,11 +50,17 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
+    display(@scores)
+    @scores.each do |x|
+      print x
+    end
     averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
   end
+
+
 
   # This method is used to retrieve questions for different review rounds
   def retrieve_questions(questionnaires)
@@ -316,7 +324,10 @@ class GradesController < ApplicationController
       scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
       scores -= [-1.0]
       @grades_bar_charts[:teammate] = bar_chart(scores)
+
     end
+
+
   end
 
   def get_scores_for_chart(reviews, symbol)
@@ -356,6 +367,13 @@ class GradesController < ApplicationController
       return true
     end
   end
+
+  def display(array)
+    array.each do |x|
+      puts x
+    end
+  end
+
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f

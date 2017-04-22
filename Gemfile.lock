@@ -167,6 +167,7 @@ GEM
       haml (>= 4.0.6, < 5.0)
       html2haml (>= 1.0.1)
       railties (>= 4.0.1)
+    hash-deep-merge (0.1.1)
     hashie (3.4.2)
     html2haml (2.0.0)
       erubis (~> 2.7.0)
@@ -194,6 +195,8 @@ GEM
     jwt (1.5.1)
     launchy (2.4.3)
       addressable (~> 2.3)
+    lazy_high_charts (1.5.6)
+      hash-deep-merge
     libv8 (3.16.14.11)
     lingua (0.6.2)
     listen (3.0.3)
@@ -462,6 +465,7 @@ DEPENDENCIES
   jquery-ui-sass-rails
   json (~> 1.8, >= 1.8.3)
   launchy
+  lazy_high_charts
   lingua
   mysql2
   nokogiri (~> 1.6.8)
@@ -502,6 +506,3 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-BUNDLED WITH
-   1.14.6

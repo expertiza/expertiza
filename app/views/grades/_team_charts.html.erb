@@ -1,5 +1,6 @@
 <a href="#" name='team-chartLink' onClick="toggleElement('team-chart', 'stats');return false;">Hide stats</a>
 <br>
+
 <TR style ="background-color: white;" class="team" id="team-chart">
 	<th>
 
@@ -16,6 +17,7 @@
 	<TH WIDTH="9">&nbsp;</th>
 </TR>
 
+
 <script type="text/javascript">
   var myCircle = Circles.create({
     id:           'average-score',
@@ -31,7 +33,82 @@
 
 </script>
 
-<style> 
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script type="text/javascript">
+    Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Class Overall Grades, by rubric item'
+        },
+        xAxis: {
+            categories: ['S1', 'S2', 'S3', 'S4', 'S5']
+        },
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            title: {
+                text: 'Percentage of teams'
+            }
+        },
+        tooltip: {
+            pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.percentage:.0f}%)<br/>',
+            shared: true
+        },
+        plotOptions: {
+            column: {
+                stacking: 'percent'
+            }
+        },
+        series: [{
+            'name': '1',
+            'data': [5, 3, 4, 7, 2],
+            'stack': 'S1',
+        }, {
+            'name': '2',
+            'data': [3, 4, 4, 2, 5],
+            'stack': 'S1'
+        }, {
+            'name': '3',
+            'data': [3, 4, 4, 2, 5],
+            'stack': 'S1'
+        }, {
+            'name': '4',
+            'data': [3, 4, 4, 2, 5],
+            'stack': 'S1'
+        }, {
+            'name': '5',
+            'data': [3, 4, 4, 2, 5],
+            'stack': 'S1'
+        }, {
+            'name': '1',
+            'data': [2, 5, 6, 2, 1],
+            'stack': 'S2'
+        }, {
+            'name': '2',
+            'data': [3, 1, 4, 4, 3],
+            'stack': 'S2'
+        }, {
+            'name': '3',
+            'data': [3, 2, 4, 4, 3],
+            'stack': 'S2'
+        }, {
+            'name': '4',
+            'data': [3, 3, 4, 4, 3],
+            'stack': 'S2'
+        }, {
+            'name': '5',
+            'data': [3, 4, 4, 4, 3],
+            'stack': 'S2'
+        }]
+    });
+</script>
+
+
+
+<style>
  .circles-final{
     font-size: 16px !important;    
   }

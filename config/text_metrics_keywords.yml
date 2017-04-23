@@ -1,168 +1,19 @@
 development:
-  --- # offensive
-   - lame
-   - stupid
-   - dumb
-   - idiot
-   - horrendous
-   - horrible
-   - non-sense
-   - crap
-   - piss
-   - pissed
-   - bullshit
-   - shit
-   - bloody
-   - hell
-   - stupidity
-   - stupid
-
-  --- # problem
-   - wrong
-   - error
-   - problem
-   - issue
-   - problems
-   - errors
-   - issues
-   - problematic
-   - fix
-   - obstacle
-   - dispute
-   - not
-   - none
-   - didn't
-   - cannot
-   - can't
-   - couldn't
-   - shouldn't
-
-   --- # suggestive
-   - should
-   - recommend
-   - suggest
-   - advise
-   - try
-   - can
-   - maybe
-   - could
-   - should
-   - may
-   - would
-   - should've
-   - could've
-   - would've
-   - plan
+  metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
+  reputation_web_service_url: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
+  summary_webservice_url: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
+  topic_bidding_webservice_url: 'http://peerlogic.csc.ncsu.edu/intelligent_assignment/merge_teams'
 
 test:
-  --- # offensive
-   - lame
-   - stupid
-   - dumb
-   - idiot
-   - horrendous
-   - horrible
-   - non-sense
-   - crap
-   - piss
-   - pissed
-   - bullshit
-   - shit
-   - bloody
-   - hell
-   - stupidity
-   - stupid
+  metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
+  reputation_web_service_url: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
+  summary_webservice_url: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
+  topic_bidding_webservice_url: 'http://peerlogic.csc.ncsu.edu/intelligent_assignment/merge_teams'
 
-  --- # problem
-   - wrong
-   - error
-   - problem
-   - issue
-   - problems
-   - errors
-   - issues
-   - problematic
-   - fix
-   - obstacle
-   - dispute
-   - not
-   - none
-   - didn't
-   - cannot
-   - can't
-   - couldn't
-   - shouldn't
 
-   --- # suggestive
-   - should
-   - recommend
-   - suggest
-   - advise
-   - try
-   - can
-   - maybe
-   - could
-   - should
-   - may
-   - would
-   - should've
-   - could've
-   - would've
-   - plan
 
-# Change these values to appropriate values when deploying to production
 production:
-  --- # offensive
-   - lame
-   - stupid
-   - dumb
-   - idiot
-   - horrendous
-   - horrible
-   - non-sense
-   - crap
-   - piss
-   - pissed
-   - bullshit
-   - shit
-   - bloody
-   - hell
-   - stupidity
-   - stupid
-
-  --- # problem
-   - wrong
-   - error
-   - problem
-   - issue
-   - problems
-   - errors
-   - issues
-   - problematic
-   - fix
-   - obstacle
-   - dispute
-   - not
-   - none
-   - didn't
-   - cannot
-   - can't
-   - couldn't
-   - shouldn't
-
-   --- # suggestive
-   - should
-   - recommend
-   - suggest
-   - advise
-   - try
-   - can
-   - maybe
-   - could
-   - should
-   - may
-   - would
-   - should've
-   - could've
-   - would've
-   - plan
+  metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
+  reputation_web_service_url: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
+  summary_webservice_url: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
+  topic_bidding_webservice_url: 'http://peerlogic.csc.ncsu.edu/intelligent_assignment/merge_teams'

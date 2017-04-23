@@ -58,7 +58,7 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
         <% pindex = 3 %>
         <% tscore[:team].participants.each_with_index do |participant, index2| %>
             <tr>
-              <% prefix = 'newteam'+index.to_s+"_"+pindex.to_s %>
+              <% prefix = 'team'+index.to_s+"_"+pindex.to_s %>
               <% team = true %>
                  <% participant_id = participant.id %>
                  <% index = index %>

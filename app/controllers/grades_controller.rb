@@ -85,7 +85,7 @@ class GradesController < ApplicationController
 
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-    text_metrics_keyword = TEXT_METRICS_KEYWORDS["summary_webservice_url"]
+    text_metrics_keyword = TEXT_METRICS_KEYWORDS["offensive"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
 
     @summary = sum.summary

@@ -1,7 +1,7 @@
 development:
   offensive: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
   problem: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
-  suggestive: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'\
+  suggestive: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
 
 test:
   offensive: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'

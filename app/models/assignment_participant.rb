@@ -129,8 +129,14 @@ class AssignmentParticipant < Participant
                                                    end
       scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
+    # E1731 change: compute_total_score changed to static method
+    scores[:total_score] = OnTheFlyCalc.compute_total_score(self.assignment, scores)
 
-    scores[:total_score] = self.assignment.compute_total_score(scores)
+    # E1731 MODIFICATIONS to be done later as below:
+    # if self.assignment.finished?
+    #   scores[:total_score] = LocalDbCalc.compute_total_score(self.assignment, scores)
+    # else
+    #   scores[:total_score] = OnTheFlyCalc.compute_total_score(self.assignment, scores)
 
     # merge scores[review#] (for each round) to score[review]  -Yang
     if self.assignment.varying_rubrics_by_round?
@@ -190,7 +196,15 @@ class AssignmentParticipant < Participant
     # scores[:quiz][:assessments] = quiz_responses
     # scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
 
-    scores[:total_score] = assignment.compute_total_score(scores)
+    # E1731 change: compute_total_scores changed to static method
+    scores[:total_score] = OnTheFlyCalc.compute_total_score(assignment, scores)
+
+    # E1731 MODIFICATIONS to be done later as below
+    # if self.assignment.finished?
+    #   scores[:total_score] = LocalDbCalc.compute_total_score(self.assignment, scores)
+    # else
+    #   scores[:total_score] = OnTheFlyCalc.compute_total_score(self.assignment, scores)
+
     # scores[:total_score] += compute_quiz_scores(scores)
 
     # move lots of calculation from view(_participant.html.erb) to model

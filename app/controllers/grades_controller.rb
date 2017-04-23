@@ -49,7 +49,7 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
-    averages = calculate_average_vector(@assignment.scores(@questions))
+    averages = calculate_average_vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
@@ -87,20 +87,36 @@ class GradesController < ApplicationController
       @team_data << vmlist
     end
 
+    number_of_review_questions = 0
+    questionnaires.each do |questionnaire|
+      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        number_of_review_questions = questionnaire.questions.size
+        break
+      end
+    end
+
     # Redundant Code to Extract from team_data
     # @highchart is an instance variable full of nested arrays to match the HighChart formatting
     # Each element in the outer array stores a different submission
     # Each element in the submission array represents a score (usually 1-5)
     # Each element in the score array corresponds to how many people recieved that score for a particular critera
-    @highchart = [[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]] # RIGHT NOW HARDCODING 2 ROUNDS AND SCORES 1-5
+
+    @chart_data = {}  # @chart_data is supposed to hold the general information for creating the highchart stack charts
+
+    # Dynamic initialization
+    for i in 1..@assignment.rounds_of_reviews
+      @chart_data[i] = Hash[(0..5).map{|score| [score, Array.new(number_of_review_questions,0)]}]
+    end
+
+    # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission round will be added to the count in the corresponded array field)
     @team_data.each do |team| # Each Team
       team.each do |vm| # Each Submission
         if (vm.round != nil) # Checks that it is a valid submission
-          j = 1
+          j = 0
           vm.list_of_rows.each do |row| # Each Criteria
             row.score_row.each do |score| # Each Score
               if (score.score_value != nil) # Checks that it is a valid score
-                @highchart[vm.round-1][score.score_value-1][j-1] += 1
+                @chart_data[vm.round][score.score_value][j] += 1
               end
             end
             j += 1
@@ -108,6 +124,30 @@ class GradesController < ApplicationController
         end
       end
     end
+
+    # Here we actually build the 'series' array which will be used directly in the highchart Object in the _team_charts view file
+    # This array holds the actual data of our chart with legend names
+    @highchart_series_data = []
+    @chart_data.each do |round, scores|
+      scores.each do |score, rubric_distribution|
+        @highchart_series_data.push({:name=>"Score #{score} - Submission #{round}" , :data=>rubric_distribution, :stack=>"S#{round}"})
+      end
+    end
+
+    # Here we dynamically creates the categories which will be used later in the highchart Object
+    @highchart_categories = []
+    for i in 1..number_of_review_questions
+      @highchart_categories.push("Rubric #{i}")
+    end
+
+    # Here we dynamically creates an array of the colors which the highchart uses to show the stack charts and rotate on
+    # Currently we create 6 different colors based on the assumption that we always have scores from 0 to 5
+    # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
+    @highchart_colors = []
+    for i in 0..5
+      @highchart_colors.push("\##{"%06x" % (rand * 0xffffff)}")
+    end
+
   end
 
   # This method is used to retrieve questions for different review rounds

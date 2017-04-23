@@ -1,5 +1,5 @@
 development:
-  offensive: 'lame', 'stupid'
+  offensive: ['lame', 'stupid']
   problem: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
   suggestive: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
 

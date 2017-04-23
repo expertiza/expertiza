@@ -129,7 +129,7 @@ class GradesController < ApplicationController
     # This array holds the actual data of our chart with legend names
     @highchart_series_data = []
     @chart_data.each do |round, scores|
-      scores.each do |score, rubric_distribution|
+      scores.to_a.reverse.to_h.each do |score, rubric_distribution|
         @highchart_series_data.push({:name=>"Score #{score} - Submission #{round}" , :data=>rubric_distribution, :stack=>"S#{round}"})
       end
     end

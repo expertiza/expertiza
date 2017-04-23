@@ -1,57 +1,54 @@
-offensive: {
-"lame",
-"stupid",
-"dumb",
-"idiot",
-"horrendous",
-"horrible",
-"non-sense",
-"crap",
-"piss",
-"pissed",
-"bullshit",
-"shit",
-"bloody",
-"hell",
-"stupidity",
-"stupid"
-}
+--- # offensive
+ - lame
+ - stupid
+ - dumb
+ - idiot
+ - horrendous
+ - horrible
+ - non-sense
+ - crap
+ - piss
+ - pissed
+ - bullshit
+ - shit
+ - bloody
+ - hell
+ - stupidity
+ - stupid
 
-problem: {
-"wrong",
-"error",
-"problem",
-"issue",
-"problems",
-"errors",
-"issues",
-"problematic",
-"fix",
-"obstacle",
-"dispute",
-"not",
-"none",
-"didn't",
-"cannot",
-"can't",
-"couldn't",
-"shouldn't"
-}
+--- # problem
+ - wrong
+ - error
+ - problem
+ - issue
+ - problems
+ - errors
+ - issues
+ - problematic
+ - fix
+ - obstacle
+ - dispute
+ - not
+ - none
+ - didn't
+ - cannot
+ - can't
+ - couldn't
+ - shouldn't
 
-suggestive: {
-"should",
-"recommend",
-"suggest",
-"advise",
-"try",
-"can",
-"maybe",
-"could",
-"should",
-"may",
-"would",
-"should've",
-"could've",
-"would've",
-"plan"
-}
+ --- # suggestive
+ - should
+ - recommend
+ - suggest
+ - advise
+ - try
+ - can
+ - maybe
+ - could
+ - should
+ - may
+ - would
+ - should've
+ - could've
+ - would've
+ - plan

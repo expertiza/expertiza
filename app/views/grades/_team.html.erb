@@ -1,4 +1,4 @@
-<TRstyle="background-color: white;;"><TD>       
+<TR id="<%= prefix %>_header" style="background-color: white"><TD>       
      <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%=image_tag("expand.png")%></a>
 
   <% topic_id = tscore[:team].topic%>
@@ -16,5 +16,5 @@
      <% end %>
      <TD WIDTH="9">&nbsp;</TD></TR>  
      
-<%= render :partial => 'scores_tabs', :locals => {:prefix => prefix} %>
+<%= render :partial => 'scores_tabs', :locals => {:prefix => prefix, :tscore => tscore } %>
 

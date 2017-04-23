@@ -39,6 +39,11 @@
     Highcharts.chart('container', {
         chart: {
             type: 'column'
+
+        },
+        credits: {
+            text: 'Expertiza',
+            href: 'https://github.com/expertiza/expertiza'
         },
         colors: <%= @highchart_colors.to_json.html_safe %> , // This is an array of colors which highchart rotates on
         title: {

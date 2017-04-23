@@ -106,7 +106,11 @@
         <tr class="listingRow">
           <td>&nbsp;</td>
           <!--assignment-->
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></br>
+            <% if ReviewResponseMap.is_good_reviewer(participant)%>
+                <img src="/assets/goodreviewerrs.png" title="Good Reviewer"></td>
+            <% end %>
+            </td>
           <!--course-->
           <td><%= student_task.course.try :name %></td>
           <!--topic-->

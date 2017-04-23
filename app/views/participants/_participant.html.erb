@@ -4,7 +4,9 @@
   <% if participant.instance_of? AssignmentParticipant%>
      <td><img src="/assets/firstsubmissionrs.png" title="First Submission">
      <img src="/assets/dreamteamrs.png" title="Dream Team">
-     <img src="/assets/goodreviewerrs.png" title="Good Reviewer"></td>
+     <% if ReviewResponseMap.is_good_reviewer(participant)%>
+        <img src="/assets/goodreviewerrs.png" title="Good Reviewer"></td>
+     <% end %>
   <% end %>
   <td ><%= User.find(participant.user_id).fullname %></td>
   <td ><%= User.find(participant.user_id).email %></td>

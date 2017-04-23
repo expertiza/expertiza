@@ -91,7 +91,7 @@ class GradesController < ApplicationController
     # @highchart is an instance variable full of nested arrays to match the HighChart formatting
     # Each element in the outer array stores a different submission
     # Each element in the submission array represents a score (usually 1-5)
-    # Each element in the score array corresponds to how many people recieved that score
+    # Each element in the score array corresponds to how many people recieved that score for a particular critera
     @highchart = [[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]] # RIGHT NOW HARDCODING 2 ROUNDS AND SCORES 1-5
     @team_data.each do |team| # Each Team
       team.each do |vm| # Each Submission
@@ -100,11 +100,11 @@ class GradesController < ApplicationController
           vm.list_of_rows.each do |row| # Each Criteria
             row.score_row.each do |score| # Each Score
               if (score.score_value != nil) # Checks that it is a valid score
-                @highchart[vm.round-1][j-1][score.score_value-1] += 1
+                @highchart[vm.round-1][score.score_value-1][j-1] += 1
               end
             end
+            j += 1
           end
-          j += 1
         end
       end
     end

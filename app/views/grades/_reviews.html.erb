@@ -23,7 +23,6 @@
     <%if flag_varying_rubrics==false%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
     <%end%>
-    <BR/>
     <HR/>
     <% count = 0 %>
     <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->

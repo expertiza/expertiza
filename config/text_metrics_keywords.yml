@@ -1,14 +1,14 @@
 development:
-  offensive: ['lame', 'stupid']
-  problem: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
-  suggestive: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
+  offensive: ["lame","stupid","dumb","idiot","horrendous","horrible","non-sense","crap","piss","pissed","bullshit","bloody","hell","stupidity"]
+  problem: ["wrong","error","problem","issue","problems","errors","issues","problematic","fix","obstacle","dispute","not","none","didn't","cannot","can't","couldn't","shouldn't"]
+  suggestive: ["should","recommend","suggest","advise","try","can","maybe","could","may","would","should've","could've","would've","plan"]
 
 test:
-  offensive: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
-  problem: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
-  suggestive: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
+  offensive: ["lame","stupid","dumb","idiot","horrendous","horrible","non-sense","crap","piss","pissed","bullshit","bloody","hell","stupidity"]
+  problem: ["wrong","error","problem","issue","problems","errors","issues","problematic","fix","obstacle","dispute","not","none","didn't","cannot","can't","couldn't","shouldn't"]
+  suggestive: ["should","recommend","suggest","advise","try","can","maybe","could","may","would","should've","could've","would've","plan"]
 
 production:
-  offensive: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
-  problem: 'http://peerlogic.csc.ncsu.edu/reputation/calculations/reputation_algorithms'
-  suggestive: 'http://peerlogic.csc.ncsu.edu/sum/v1.0/summary/8/lsa'
+  offensive: ["lame","stupid","dumb","idiot","horrendous","horrible","non-sense","crap","piss","pissed","bullshit","bloody","hell","stupidity"]
+  problem: ["wrong","error","problem","issue","problems","errors","issues","problematic","fix","obstacle","dispute","not","none","didn't","cannot","can't","couldn't","shouldn't"]
+  suggestive: ["should","recommend","suggest","advise","try","can","maybe","could","may","would","should've","could've","would've","plan"]

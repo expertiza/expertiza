@@ -9,7 +9,7 @@ class CreateGithubContributors < ActiveRecord::Migration
       t.integer :lines_added
       t.integer :lines_removed
       t.integer :lines_persisted
-      t.references :teams, index: true
+      t.references :submission_records, index: true
       t.timestamp :week_timestamp
       t.timestamps null: false
     end

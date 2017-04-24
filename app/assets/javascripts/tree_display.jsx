@@ -223,6 +223,14 @@ jQuery(document).ready(function() {
                 </a>
               </span>
             )
+            // Prateek , image name is save-scores-in-db.png
+            moreContent.push(
+              <span>
+                <a title="Save scores in DB" href={"/assignments/local_db_cal?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/view-delayed-mailer.png" />
+                </a>
+              </span>
+            )
             if (this.props.has_topic) {
                 // Moved content out of this to the block outside this containing "if" statement
             }

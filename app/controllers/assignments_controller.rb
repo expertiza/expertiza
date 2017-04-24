@@ -235,6 +235,14 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
+  # Prateek
+  def local_db_cal
+    assignment_id = params[:id]
+    ok = Assignment.save_score_in_db(assignment_id)
+    flash[:success] = "Hello world!"
+    redirect_to list_tree_display_index_path
+  end
+
   def associate_assignment_with_course
     @assignment = Assignment.find(params[:id])
     @courses = Assignment.set_courses_to_assignment(current_user)

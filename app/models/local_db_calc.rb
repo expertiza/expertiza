@@ -13,7 +13,8 @@ module LocalDbCalc
   end
 
   # To be modified
-  def self.store_total_scores(assignment, scores)
+  def self.store_total_scores(assignment)
+    raise RuntimeError, "Assignment #{assignment.id} #{assignment.name}"
 
 #    teams = AssignmentTeam.where(parent_id: assignment.id)
 

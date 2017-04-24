@@ -1,5 +1,5 @@
 class ReviewMetricMapping < ActiveRecord::Base
-  attr_accessible :id, :metric_link, :response_link, :value, :review_metrics_id, :responses_id
+  attr_accessible :id, :value, :review_metrics_id, :responses_id
   belongs_to :review_metric
   belongs_to :response
   validates :review_metrics_id, presence: true

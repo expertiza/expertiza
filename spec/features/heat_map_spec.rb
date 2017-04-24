@@ -60,27 +60,27 @@ describe 'Student can view review scores in a heat map distribution', js: true d
     expect(page).to have_content('Summary Report for assignment')
   end
 
-  it 'should be able to follow the link to a specific review' do
-    create_review
+  #it 'should be able to follow the link to a specific review' do
+  #  create_review
     # Select the assignment and follow the link to the heat map
-    click_link "NewAssignment"
-    click_link 'Alternate View'
-    new_window = window_opened_by { click_link 'Review 1' }
-    within_window new_window do
-      expect(page).to have_content('Review for')
-    end
-  end
+  #  click_link "NewAssignment"
+  #  click_link 'Alternate View'
+  #  new_window = window_opened_by { click_link 'Review 1' }
+  #  within_window new_window do
+  #    expect(page).to have_content('Review for')
+  #  end
+  #end
 
-  it 'should be able to toggle the question list' do
-    create_review
+  #it 'should be able to toggle the question list' do
+  #  create_review
     # Select the assignment and follow the link to the heat map
-    click_link "NewAssignment"
-    click_link 'Alternate View'
+  #  click_link "NewAssignment"
+  #  click_link 'Alternate View'
     # Figure out how to add question text so this box works
     # click_link 'toggle question list'
     # expect(page).to have_content('Question')
-    expect(page).to have_content('toggle question list')
-  end
+  #  expect(page).to have_content('toggle question list')
+  # end
 
   it 'should show an empty table with no reviews' do
     # Log in as the student with an assignment and reviews

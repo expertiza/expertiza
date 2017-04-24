@@ -157,6 +157,9 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @map = @response.map
     set_content
+    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
+    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
+    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
   end
 
   def create
@@ -203,6 +206,10 @@ class ResponseController < ApplicationController
 
   def saving
     @map = ResponseMap.find(params[:id])
+    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
+    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
+    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
+
 
     @return = params[:return]
     @map.save

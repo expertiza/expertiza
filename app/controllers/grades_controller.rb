@@ -151,7 +151,7 @@ class GradesController < ApplicationController
     # Currently we create 6 different colors based on the assumption that we always have scores from 0 to 5
     # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
     @highchart_colors = []
-    for i in 0..5
+    for i in min..max
       @highchart_colors.push("\##{"%06x" % (rand * 0xffffff)}")
     end
 

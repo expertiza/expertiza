@@ -277,6 +277,7 @@ Expertiza::Application.routes.draw do
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
   resources :survey_questionnaires, controller: :questionnaires
+  resources :assignment_survey_questionnaires, controller: :questionnaires
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_evaluation_questionnaires, controller: :questionnaires
   resources :bookmarkrating_questionnaires, controller: :questionnaires

@@ -62,6 +62,8 @@ class QuestionnairesController < ApplicationController
         display_type = 'Teammate%Review'
       when 'GlobalSurvey'
         display_type = 'Global%Survey'
+      when 'AssignmentSurvey'
+        display_type = 'Assignment%Survey'
       end
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL

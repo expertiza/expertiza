@@ -70,17 +70,17 @@ jQuery(document).ready(function() {
         <input name="_method" type="hidden" value="put" />
     <%end%>
     <% i = 0 %>
-    <%@questions.each do |question| %>
+    <%@questions.each do |question| %><%= 'New Question' %>
        <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
-       <% if question.instance_of? Criterion%>
+       <% if question.instance_of? Criterion%><%= 'Criterion' %><%= @text_metrics_offensive[5] %><%= @text_metrics_problem[5] %><%= @text_metrics_suggestive[5] %>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-       <% elsif question.instance_of? Scale %>
+       <% elsif question.instance_of? Scale %><%= 'Scale' %>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
-       <% elsif question.instance_of? UploadFile %>
+       <% elsif question.instance_of? UploadFile %><%= 'UploadFile' %>
             <!--One form had better not in another form-->
             <!--Zhewei: I move the Uploadfile question to the end of questionnaire. So multiple forms will not been overlapped.-->
        <% else %>
-            <%= question.complete(i, answer) %>
+            <%= question.complete(i, answer) %><%= 'Done' %>
        <% end %>
        <% i += 1%>
     <% end %>

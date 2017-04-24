@@ -90,7 +90,7 @@ class GradesController < ApplicationController
     end
 
     min=0;
-    max=10;
+    max=5;
 
     number_of_review_questions = 0
     questionnaires.each do |questionnaire|

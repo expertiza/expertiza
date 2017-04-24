@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  metric_link: 1
+  response_link: 1
+  value: 1
+
+two:
+  metric_link: 1
+  response_link: 1
+  value: 1

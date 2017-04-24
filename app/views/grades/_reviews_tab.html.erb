@@ -1,1 +1,3 @@
-<p>Reviews Partial</p>
+<% participant = tscore[:team].participants.first %>
+<% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
+<%= render :partial=>'grades/tabbed_reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %>

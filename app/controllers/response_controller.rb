@@ -55,9 +55,6 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
-    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
-    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
-    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
 
     @map = @response.map
     @contributor = @map.contributor
@@ -86,9 +83,6 @@ class ResponseController < ApplicationController
 
     # the response to be updated
     @response = Response.find(params[:id])
-    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
-    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
-    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
 
     msg = ""
     begin
@@ -126,9 +120,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
-    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
-    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
-    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
 
     # set more handy variables for the view
     set_content(true)
@@ -157,16 +148,10 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @map = @response.map
     set_content
-    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
-    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
-    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
   end
 
   def create
     @map = ResponseMap.find(params[:id]) # assignment/review/metareview id is in params id
-    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
-    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
-    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
 
     set_all_responses
 

@@ -40,8 +40,6 @@ class GradesController < ApplicationController
     @questions = {}
     questionnaires = @assignment.questionnaires
 
-
-
     if @assignment.varying_rubrics_by_round?
       retrieve_questions questionnaires
     else # if this assignment does not have "varying rubric by rounds" feature
@@ -56,105 +54,11 @@ class GradesController < ApplicationController
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
 
-    # New Experimental Code Based on "view_teams" action
-    @team_data = []
-    for index in 0 .. @scores[:teams].length - 1 # Loops Through All the Teams
-      tscore = @scores[:teams][index.to_s.to_sym] # Indexs a Specific Team
-
-      participant_id = tscore[:team].participants.first.id
-      participant = AssignmentParticipant.find(participant_id) # Picks the First Participant
-      # We already have assignment
-      team = participant.team
-
-      # We already have questionares
-      vmlist = []
-
-      # COPY PASTA
-      questionnaires.each do |questionnaire|
-        @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-                   AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
-                 else
-                   nil
-                 end
-
-        vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
-        questions = questionnaire.questions
-        vm.add_questions(questions)
-        vm.add_team_members(team)
-        vm.add_reviews(participant, team, @assignment.varying_rubrics_by_round?)
-        vm.get_number_of_comments_greater_than_10_words
-
-        vmlist << vm
-      end
-      @team_data << vmlist
-    end
-
-    min=0;
-    max=5;
-
-    number_of_review_questions = 0
-    questionnaires.each do |questionnaire|
-      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-        number_of_review_questions = questionnaire.questions.size
-        min = questionnaire.min_question_score < min ? questionnaire.min_question_score : min
-        max = questionnaire.max_question_score > max ? questionnaire.max_question_score : max
-        break
-      end
-    end
-
-    # Redundant Code to Extract from team_data
-    # @highchart is an instance variable full of nested arrays to match the HighChart formatting
-    # Each element in the outer array stores a different submission
-    # Each element in the submission array represents a score (usually 1-5)
-    # Each element in the score array corresponds to how many people recieved that score for a particular critera
-
-    @chart_data = {}  # @chart_data is supposed to hold the general information for creating the highchart stack charts
-
-    # Dynamic initialization
-    for i in 1..@assignment.rounds_of_reviews
-      @chart_data[i] = Hash[(min..max).map{|score| [score, Array.new(number_of_review_questions,0)]}]
-    end
-
-    # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission round will be added to the count in the corresponded array field)
-    @team_data.each do |team| # Each Team
-      team.each do |vm| # Each Submission
-        if (vm.round != nil) # Checks that it is a valid submission
-          j = 0
-          vm.list_of_rows.each do |row| # Each Criteria
-            row.score_row.each do |score| # Each Score
-              if (score.score_value != nil) # Checks that it is a valid score
-                @chart_data[vm.round][score.score_value][j] += 1
-              end
-            end
-            j += 1
-          end
-        end
-      end
-    end
-
-    # Here we actually build the 'series' array which will be used directly in the highchart Object in the _team_charts view file
-    # This array holds the actual data of our chart with legend names
-    @highchart_series_data = []
-    @chart_data.each do |round, scores|
-      scores.to_a.reverse.to_h.each do |score, rubric_distribution|
-        @highchart_series_data.push({:name=>"Score #{score} - Submission #{round}" , :data=>rubric_distribution, :stack=>"S#{round}"})
-      end
-    end
-
-    # Here we dynamically creates the categories which will be used later in the highchart Object
-    @highchart_categories = []
-    for i in 1..number_of_review_questions
-      @highchart_categories.push("Rubric #{i}")
-    end
-
-    # Here we dynamically creates an array of the colors which the highchart uses to show the stack charts and rotate on
-    # Currently we create 6 different colors based on the assumption that we always have scores from 0 to 5
-    # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
-    @highchart_colors = []
-    for i in min..max
-      @highchart_colors.push("\##{"%06x" % (rand * 0xffffff)}")
-    end
-
+    # private functions for generating a valid highchart
+    min, max, number_of_review_questions = calculate_review_questions(@assignment, questionnaires)
+    team_data = get_team_data(@assignment, questionnaires, @scores)
+    highchart_data = get_highchart_data(team_data, @assignment, min, max, number_of_review_questions)
+    @highchart_series_data, @highchart_categories, @highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
   end
 
   # This method is used to retrieve questions for different review rounds
@@ -341,6 +245,22 @@ class GradesController < ApplicationController
         The Expertiza system has brought this to my attention."
   end
 
+  def calculate_review_questions(assignment, questionnaires)
+    min=0;
+    max=5;
+
+    number_of_review_questions = 0
+    questionnaires.each do |questionnaire|
+      if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        number_of_review_questions = questionnaire.questions.size
+        min = questionnaire.min_question_score < min ? questionnaire.min_question_score : min
+        max = questionnaire.max_question_score > max ? questionnaire.max_question_score : max
+        break
+      end
+    end
+    return min, max, number_of_review_questions
+  end
+
   def calculate_all_penalties(assignment_id)
     @all_penalties = {}
     @assignment = Assignment.find(assignment_id)
@@ -421,8 +341,6 @@ class GradesController < ApplicationController
       @grades_bar_charts[:teammate] = bar_chart(scores)
 
     end
-
-
   end
 
   def get_scores_for_chart(reviews, symbol)
@@ -453,6 +371,92 @@ class GradesController < ApplicationController
     link
   end
 
+  def get_team_data(assignment, questionnaires, scores)
+    team_data = []
+    for index in 0 .. scores[:teams].length - 1
+      tscore = scores[:teams][index.to_s.to_sym]
+      participant_id = tscore[:team].participants.first.id
+      participant = AssignmentParticipant.find(participant_id)
+      team = participant.team
+      vmlist = []
+
+      # COPY PASTA
+      questionnaires.each do |questionnaire|
+        round = if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+                else
+                  nil
+                end
+
+        vm = VmQuestionResponse.new(questionnaire, round, assignment.rounds_of_reviews)
+        questions = questionnaire.questions
+        vm.add_questions(questions)
+        vm.add_team_members(team)
+        vm.add_reviews(participant, team, assignment.varying_rubrics_by_round?)
+        vm.get_number_of_comments_greater_than_10_words
+
+        vmlist << vm
+      end
+      team_data << vmlist
+    end
+    team_data
+  end
+
+  def get_highchart_data(team_data, assignment, min, max, number_of_review_questions)
+    chart_data = {}  # @chart_data is supposed to hold the general information for creating the highchart stack charts
+
+    # Dynamic initialization
+    for i in 1..assignment.rounds_of_reviews
+      chart_data[i] = Hash[(min..max).map{|score| [score, Array.new(number_of_review_questions,0)]}]
+    end
+
+    # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission
+    # round will be added to the count in the corresponded array field)
+    team_data.each do |team|
+      team.each do |vm|
+        if (vm.round != nil)
+          j = 0
+          vm.list_of_rows.each do |row|
+            row.score_row.each do |score|
+              if (score.score_value != nil)
+                chart_data[vm.round][score.score_value][j] += 1
+              end
+            end
+            j += 1
+          end
+        end
+      end
+    end
+    chart_data
+  end
+
+  def generate_highchart(chart_data, min, max, number_of_review_questions)
+    # Here we actually build the 'series' array which will be used directly in the highchart Object in the _team_charts view file
+    # This array holds the actual data of our chart with legend names
+    highchart_series_data = []
+    chart_data.each do |round, scores|
+      scores.to_a.reverse.to_h.each do |score, rubric_distribution|
+        highchart_series_data.push({:name=>"Score #{score} - Submission #{round}" , :data=>rubric_distribution, :stack=>"S#{round}"})
+      end
+    end
+
+    # Here we dynamically creates the categories which will be used later in the highchart Object
+    highchart_categories = []
+    for i in 1..number_of_review_questions
+      highchart_categories.push("Rubric #{i}")
+    end
+
+    # Here we dynamically creates an array of the colors which the highchart uses to show the stack charts and rotate on
+    # Currently we create 6 different colors based on the assumption that we always have scores from 0 to 5
+    # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
+    highchart_colors = []
+    for i in min..max
+      highchart_colors.push("\##{"%06x" % (rand * 0xffffff)}")
+    end
+
+    return highchart_series_data, highchart_categories, highchart_colors
+  end
+
   def check_self_review_status
     participant = Participant.find(params[:id])
     assignment = participant.try(:assignment)
@@ -468,7 +472,6 @@ class GradesController < ApplicationController
       puts x
     end
   end
-
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f

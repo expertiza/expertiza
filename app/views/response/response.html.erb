@@ -86,9 +86,11 @@ jQuery(document).ready(function() {
 
        <%= answer.comments %>
 
-       <%= @text_metrics_offensive[5] %>
-       <%= @text_metrics_problem[5] %>
-       <%= @text_metrics_suggestive[5] %>
+       <% if !@text_metrics_offensive.nil? %>
+         <%= @text_metrics_offensive[5] %>
+         <%= @text_metrics_problem[5] %>
+         <%= @text_metrics_suggestive[5] %>
+       <% end %>
     <% end %>
 
     <p>

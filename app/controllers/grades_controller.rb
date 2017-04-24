@@ -40,6 +40,8 @@ class GradesController < ApplicationController
     @questions = {}
     questionnaires = @assignment.questionnaires
 
+
+
     if @assignment.varying_rubrics_by_round?
       retrieve_questions questionnaires
     else # if this assignment does not have "varying rubric by rounds" feature
@@ -87,10 +89,15 @@ class GradesController < ApplicationController
       @team_data << vmlist
     end
 
+    min=0;
+    max=10;
+
     number_of_review_questions = 0
     questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
         number_of_review_questions = questionnaire.questions.size
+        min = questionnaire.min_question_score < min ? questionnaire.min_question_score : min
+        max = questionnaire.max_question_score > max ? questionnaire.max_question_score : max
         break
       end
     end
@@ -105,7 +112,7 @@ class GradesController < ApplicationController
 
     # Dynamic initialization
     for i in 1..@assignment.rounds_of_reviews
-      @chart_data[i] = Hash[(0..5).map{|score| [score, Array.new(number_of_review_questions,0)]}]
+      @chart_data[i] = Hash[(min..max).map{|score| [score, Array.new(number_of_review_questions,0)]}]
     end
 
     # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission round will be added to the count in the corresponded array field)

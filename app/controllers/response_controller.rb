@@ -55,6 +55,9 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
+    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
+    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
+    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
 
     @map = @response.map
     @contributor = @map.contributor

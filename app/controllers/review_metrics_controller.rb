@@ -1,6 +1,13 @@
 class ReviewMetricsController < ApplicationController
   before_action :set_review_metric, only: [:show, :edit, :update, :destroy]
 
+  # Give permission to manage notifications to appropriate roles
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator'].include? current_role_name
+  end
+
   # GET /review_metrics
   def index
     @review_metrics = ReviewMetric.all

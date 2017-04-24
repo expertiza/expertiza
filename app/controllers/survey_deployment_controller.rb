@@ -36,7 +36,6 @@ class SurveyDeploymentController < ApplicationController
     @survey_deployments = SurveyDeployment.all
     @surveys = {}
     @survey_deployments.each do |sd|
-      puts "Course eval id:" + sd.course_evaluation_id.to_s
       if(sd.course_evaluation_id.nil?)
         corresp_questionnaire_name = "Nil"
       else

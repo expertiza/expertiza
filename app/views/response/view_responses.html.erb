@@ -1,0 +1,38 @@
+<h1><%= @questionnaire.name %></h1>
+
+<% if @survey_responses.size < 1 %>
+  <p>No one has responded to the survey</p>
+<% else %>
+  <table>
+    <% @questions.each do |question| %>
+      <tr>
+        <td>
+          <b>Q - <%= question.txt %></b>
+        <td>
+      </tr>
+      <table border="1">
+        <tr>
+          <td>Comments</td>
+          <td>Score</td>    
+        </tr>
+        <% @responses = SurveyResponse.where(question_id: question.id) %>
+        <% @responses.each do |response| %>
+          
+        <tr>
+          
+          <td>
+            <%= response.comments %>
+          </td>
+          <td>
+            <%= response.score %>
+          </td>
+        </tr>
+        
+        <% end %>
+          
+          
+      </table>
+
+    <% end %>
+  </table>
+<% end %>

@@ -81,8 +81,8 @@ def score_assignment(assignment)
   index = 0
 end
 
-def calculate_rounds(assigment)
-  assigment.num_review_rounds.each do |i|
+def calculate_rounds(assignment)
+  assignment.num_review_rounds.each do |i|
     total_score = 0
     total_num_of_assessments = 0 # calculate grades for each rounds
     grades_by_rounds = {}
@@ -94,13 +94,13 @@ def calculate_rounds(assigment)
   end
 end
 
-def calculate_score(assigment)
+def calculate_score(assignment)
   score = {}
   score[:max] = -999_999_999
   score[:min] = 999_999_999
   score[:avg] = 0
   grades_by_rounds = {}
-  assigment.num_review_rounds.each do |i|
+  assignment.num_review_rounds.each do |i|
     round_sym = ("review" + i.to_s).to_sym
     grades_by_rounds = {}
     score[:max] = grades_by_rounds[round_sym][:max] if max_condition

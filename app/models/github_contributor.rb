@@ -15,8 +15,12 @@ class GithubContributor < ActiveRecord::Base
 
 
   def parse_submissions(submission, github_content)
-    # TODO: Optimize this call by checking updated timestamp
-    GithubContributor.where(submission_records_id: submission.id).destroy_all
+    github_contributors = GithubContributor.where(submission_records_id: submission.id).order('created_at DESC')
+    if github_contributors.length > 0 &&
+        github_contributors.length == github_contributors.where('created_at > ?', Time.now - 1.hour).length
+      return github_contributors
+    end
+    github_contributors.delete_all
     github_contributors = []
     github_content.each do |contributions|
       total = contributions['total']
@@ -68,3 +72,8 @@ class GithubContributor < ActiveRecord::Base
   end
 
 end
+
+#
+# @contributor = GithubContributor.new
+# records = @contributor.update_submission(SubmissionRecord.all[5])
+# puts records.length

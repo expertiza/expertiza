@@ -4,7 +4,7 @@ module SurveyHelper
     assigned_surveys = []
     for joiner in joiners
       survey = Questionnaire.find(joiner.questionnaire_id)
-      assigned_surveys << survey if survey.type == 'SurveyQuestionnaire'
+      assigned_surveys << survey if survey.type == 'AssignmentSurveyQuestionnaire'
     end
     assigned_surveys.sort {|a, b| a.name <=> b.name }
   end

@@ -7,7 +7,7 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def new
-    @surveys = Questionnaire.where(type: 'CourseEvaluationQuestionnaire').map {|u| [u.name, u.id] }
+    @surveys = Questionnaire.where("type in ('CourseEvaluationQuestionnaire', 'SurveyQuestionnaire', 'GlobalSurveyQuestionnaire')").map {|u| [u.name, u.id] }
     @course = Course.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
     @total_students = CourseParticipant.where(parent_id: @course[0][1]).count
   end

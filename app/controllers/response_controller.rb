@@ -86,6 +86,9 @@ class ResponseController < ApplicationController
 
     # the response to be updated
     @response = Response.find(params[:id])
+    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
+    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
+    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
 
     msg = ""
     begin
@@ -158,6 +161,9 @@ class ResponseController < ApplicationController
 
   def create
     @map = ResponseMap.find(params[:id]) # assignment/review/metareview id is in params id
+    @text_metrics_offensive = TEXT_METRICS_KEYWORDS['offensive']
+    @text_metrics_problem = TEXT_METRICS_KEYWORDS['problem']
+    @text_metrics_suggestive = TEXT_METRICS_KEYWORDS['suggestive']
 
     set_all_responses
 

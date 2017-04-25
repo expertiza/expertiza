@@ -39,9 +39,7 @@ class Assignment < ActiveRecord::Base
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
-
   DEFAULT_MAX_REVIEWERS = 3
-
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
   def self.max_outstanding_reviews
@@ -87,7 +85,6 @@ class Assignment < ActiveRecord::Base
     # The following method raises an exception if not successful which
     # has to be captured by the caller (in review_mapping_controller)
     response_map = response_map_to_metareview(meta_reviewer)
-
     response_map.assign_metareviewer(meta_reviewer)
   end
 
@@ -332,11 +329,7 @@ class Assignment < ActiveRecord::Base
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
     if self.staggered_deadline?
-      if topic_id.nil?
-        return 'Unknown'
-      else
-        return get_current_stage(topic_id)
-      end
+      return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
     end
     due_date = find_current_stage(topic_id)
 

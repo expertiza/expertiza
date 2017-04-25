@@ -85,7 +85,7 @@ function addUserPastebin() {
 var dialog;
 
 
-function show_pastebin(){
+function show_text_macros(){
     dialog = $("#user-pastebin-form").dialog({
         modal: true,
         draggable: true,

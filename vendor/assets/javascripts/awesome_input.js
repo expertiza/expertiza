@@ -23,6 +23,8 @@ var ready = function() {
     }
 };
 
+//Used to store the currently stored awesome_elements
+//When new text macros are added, these elements are reloaded with new values
 var awesome_elements=[];
 
 function awesome(element, list) {
@@ -78,7 +80,6 @@ function addUserPastebin() {
             alert(data.message);
         }
     });
-    // dialog.dialog("close");
 }
 
 var dialog;

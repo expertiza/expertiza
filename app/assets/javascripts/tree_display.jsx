@@ -839,6 +839,18 @@ var NewAssignmentForm = React.createClass({
         this.setState({assignment: newAssignment});
       },
 
+      nameValidate: function(e){
+              var regex_valid = /^[a-zA-Z0-9]*$/;
+              var regex=/^(?=\s*\S).*$/;
+              if(regex.test(e) && regex_valid.text(e))
+                return true;
+              else{
+                document.getElementById("name_span").innerHTML = "    &#x2716 Name cannot be empty! and no special characters are allowed. Please check the format";
+                //alert('Name cannot be empty!!!');
+                return false;
+              }
+            },
+
       directoryValidate: function(e){
         var regex=/^[a-zA-Z0-9]*$/;
         var regex_empty=/^(?=\s*\S).*$/;
@@ -851,22 +863,10 @@ var NewAssignmentForm = React.createClass({
         }
       },
 
-      nameValidate: function(e){
-        var regex=/^(?=\s*\S).*$/;
-        if(regex.test(e))
-          return true;
-        else{
-
-          document.getElementById("name_span").innerHTML = "    &#x2716 Name cannot be empty!";
-          //alert('Name cannot be empty!!!');
-          return false;
-        }
-      },
-
 
       handleCreateAssignment: function(e) {
         var that = this;
-        if(this.directoryValidate(that.state.assignment_form.assignment.directory_path) && this.nameValidate(that.state.assignment_form.assignment.name) ){
+        if(this.nameValidate(that.state.assignment_form.assignment.name && this.directoryValidate(that.state.assignment_form.assignment.directory_path)) ){
           console.log('It worked');
         $.ajax({
           method: 'POST',

@@ -75,6 +75,11 @@ class Team < ActiveRecord::Base
     TeamsUser.where(["team_id = ?", team_id]).count
   end
 
+  # Check if team was first submitter on assignment
+  def self.first_sub(team_id, assignment_id)
+	return team_id == Assignment.find(assignment_id).first_sub_teamid
+  end
+
   # Copy method to copy this team
   def copy_members(new_team)
     members = TeamsUser.where(team_id: self.id)

@@ -627,6 +627,7 @@ class Assignment < ActiveRecord::Base
     assignment = Assignment.find(ass_id)
     if (not assignment.nil?) && assignment.first_sub_teamid == -1
       assignment.first_sub_teamid = team_id
+      assignment.save
     end
   end
 end

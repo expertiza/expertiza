@@ -103,12 +103,16 @@
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
+        <% teamid = TeamsUser.team_id(participant.assignment.id, participant.user_id) %>
         <tr class="listingRow">
           <td>&nbsp;</td>
           <!--assignment-->
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></br>
             <% if ReviewResponseMap.is_good_reviewer(participant)%>
                 <img src="/assets/goodreviewerrs.png" title="Good Reviewer"></td>
+            <% end %>
+            <% if Team.first_sub(teamid, participant.assignment.id) %>
+                <img src="/assets/firstsubmissionrs.png" title="First Submission"></td>
             <% end %>
             </td>
           <!--course-->

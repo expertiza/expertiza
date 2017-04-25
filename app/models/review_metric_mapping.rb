@@ -10,18 +10,18 @@ end
 def self.calculate_metrics_for_instructor(assignment_id, reviewer_id)
   type = "ReviewResponseMap"
   answers = Answer.joins("join responses on responses.id = answers.response_id")
-                .joins("join response_maps on responses.map_id = response_maps.id")
-                .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ? and responses.is_submitted = 1",assignment_id, reviewer_id,type)
-                .select("answers.comments, answers.response_id, responses.round, response_maps.reviewee_id, responses.is_submitted").order("answers.response_id")
+                  .joins("join response_maps on responses.map_id = response_maps.id")
+                  .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ? and responses.is_submitted = 1", assignment_id, reviewer_id, type)
+                  .select("answers.comments, answers.response_id, responses.round, response_maps.reviewee_id, responses.is_submitted").order("answers.response_id")
   suggestive_words = TEXT_METRICS_KEYWORDS['suggestive']
   offensive_words = TEXT_METRICS_KEYWORDS['offensive']
   problem_words = TEXT_METRICS_KEYWORDS['problem']
   current_response_id = nil
-  response_level_comments = Hash.new()
-  metrics = Hash.new()
-  metrics_per_reviewee = Hash.new()
-  response_reviewee_map = Hash.new()
-  diff_word_count = Hash.new()
+  response_level_comments = Hash.new
+  metrics = Hash.new
+  metrics_per_reviewee = Hash.new
+  response_reviewee_map = Hash.new
+  diff_word_count = Hash.new
   complete_sentences = Hash.new(0)
   answers.each do |ans|
     # puts ans.comments
@@ -44,7 +44,7 @@ def self.calculate_metrics_for_instructor(assignment_id, reviewer_id)
     is_suggestion = false
     is_problem = false
     value.scan(/[\w']+/).each do |word|
-      word_counter = word_counter + 1
+      word_counter += 1
       if offensive_words.include? word
         is_offensive_term = true
       end
@@ -56,11 +56,11 @@ def self.calculate_metrics_for_instructor(assignment_id, reviewer_id)
       end
     end
 
-    #diff_word_count = response_level_comments[current_response_id].scan(/[\w']+/).uniq.count
+    # diff_word_count = response_level_comments[current_response_id].scan(/[\w']+/).uniq.count
     if ReviewMetric.exists?(response_id: key)
       obj = ReviewMetric.find_by(response_id: key)
     else
-      obj = ReviewMetric.new()
+      obj = ReviewMetric.new
       obj.response_id = key
     end
     # puts "Suggestion: #{is_suggestion}, Offensive: #{is_offensive_term}, Problem: #{is_problem}"
@@ -73,14 +73,14 @@ def self.calculate_metrics_for_instructor(assignment_id, reviewer_id)
     answers.each do |ans|
       diff_word_count[ans.response_id] = response_level_comments[ans.response_id].scan(/[\w']+/).uniq.count
     end
-    metrics[key] = [key, response_reviewee_map[key] , word_counter, is_suggestion, is_problem, is_offensive_term,diff_word_count[key]]
+    metrics[key] = [key, response_reviewee_map[key], word_counter, is_suggestion, is_problem, is_offensive_term, diff_word_count[key]]
   end
-  metrics_per_round = Hash.new()
-  temp_dict = Hash.new()
+  metrics_per_round = Hash.new
+  temp_dict = Hash.new
   answers.each do |ans|
 
     puts "Reviewee Id: #{ans.reviewee_id} ---> Response Id: #{ans.response_id} --> Round: #{ans.round} --> Is Submitted: #{ans.is_submitted}"
-    if !temp_dict.has_key?(ans.response_id)
+    unless temp_dict.has_key?(ans.response_id)
       temp_dict[ans.response_id] = metrics[ans.response_id]
       metrics_per_round[ans.round] = metrics_per_round.fetch(ans.round, []) + [temp_dict[ans.response_id]]
     end
@@ -108,31 +108,27 @@ def self.calculate_metrics_for_student(response_id)
     ans_word_count = 0
     comments = ans.comments
     comments.scan(/[\w']+/).each do |word|
-      ans_word_count = ans_word_count + 1;
+      ans_word_count += 1
     end # end for comments.scan
-    concatenated_comment = concatenated_comment + comments
-    if (ans_word_count > 7 )
-      complete_sentences = complete_sentences + 1
-    end #end for if(ans_word_count > 7)
+    concatenated_comment += comments
+    if (ans_word_count > 7)
+      complete_sentences += 1
+    end # end for if(ans_word_count > 7)
   end # end for answers.each
 
   concatenated_comment.scan(/[\w']+/).each do |word|
-    volume = volume + 1
+    volume += 1
 
-    if offensive_words.include? word
-      is_offensive_term = true
-    end
-    if suggestive_words.include? word
-      is_suggestion = true
-    end
-    if problem_words.include? word
-      is_problem = true
-    end
+    is_offensive_term = offensive_words.include?
 
-  end #end of concatenate_comment
+    is_suggestion = suggestive_words.include?
+
+    is_problem = problem_words.include?
+
+  end # end of concatenate_comment
 
   diff_word_count = concatenated_comment.scan(/[\w']+/).uniq.count
 
-  [volume,is_offensive_term,is_suggestion,is_problem, complete_sentences,diff_word_count]
+  [volume, is_offensive_term, is_suggestion, is_problem, complete_sentences, diff_word_count]
 
 end

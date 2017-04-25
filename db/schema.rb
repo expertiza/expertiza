@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170414225908) do
+ActiveRecord::Schema.define(version: 20170425004605) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(version: 20170414225908) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
+    t.boolean  "local_scores_calculated",                  default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -269,7 +270,7 @@ ActiveRecord::Schema.define(version: 20170414225908) do
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
   create_table "local_db_scores", force: :cascade do |t|
-    t.string   "review_type",     limit: 255
+    t.string   "score_type",      limit: 255
     t.integer  "round",           limit: 4
     t.integer  "score",           limit: 4
     t.integer  "response_map_id", limit: 4

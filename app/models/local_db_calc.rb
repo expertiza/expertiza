@@ -6,13 +6,20 @@ module LocalDbCalc
     teams = AssignmentTeam.where(parent_id: assignment.id)
     teams.each { |team|
       response_maps = team.review_mappings
-      response_maps.each { |map| total += LocalDbScore.where(response_map_id: map.id).pluck(:score) }
+      response_maps.each { |map|
+        record = LocalDbScore.find_by_response_map_id(map.map_id)
+        if !record.nil?
+          score = record[:score]
+          if !score.nil?
+            total += score
+          end
+        end
+      }
     }
 
     total
   end
 
-  # To be modified
   def self.store_total_scores(assignment)
     contributors = assignment.contributors
     if assignment.varying_rubrics_by_round?
@@ -43,9 +50,9 @@ module LocalDbCalc
 
               score = Answer.get_total_score(response: [@sort_to[0]], questions: questions)
               if score == -1
-                LocalDbScore.create(review_type: "ReviewLocalDBScore", round: round, score: 0, response_map_id: map.map_id)
+                LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: 0, response_map_id: map.map_id)
               else
-                LocalDbScore.create(review_type: "ReviewLocalDBScore", round: round, score: score, response_map_id: map.map_id)
+                LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: score, response_map_id: map.map_id)
               end
 
               @array_sort.clear
@@ -55,5 +62,7 @@ module LocalDbCalc
         end
       end
     end
+
+    assignment.update_attribute(:local_scores_calculated, true)
   end
 end

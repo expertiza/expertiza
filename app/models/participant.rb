@@ -123,14 +123,13 @@ class Participant < ActiveRecord::Base
         scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
       end
     end
-    # E1731 change: compute_total_score changed to static method
-    scores[:total_score] = OnTheFlyCalc.compute_total_score(assignment, scores)
 
-    # E1731 MODIFICATIONS to be done later as below:
-    # if self.assignment.finished?
-    #   scores[:total_score] = LocalDbCalc.compute_total_score(assignment, scores)
-    # else
-    #   scores[:total_score] = OnTheFlyCalc.compute_total_score(assignment, scores)
+    # E1731 changes: Calling either LocalDbCalc or OnTheFlyCalc based on assignment status
+    if self.assignment.local_scores_calculated?
+      scores[:total_score] = LocalDbCalc.compute_total_score(assignment, scores)
+    else
+      scores[:total_score] = OnTheFlyCalc.compute_total_score(assignment, scores)
+    end
 
     scores
   end

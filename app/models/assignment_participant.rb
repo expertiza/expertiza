@@ -129,14 +129,13 @@ class AssignmentParticipant < Participant
                                                    end
       scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
-    # E1731 change: compute_total_score changed to static method
-    scores[:total_score] = OnTheFlyCalc.compute_total_score(self.assignment, scores)
 
-    # E1731 MODIFICATIONS to be done later as below:
-    # if self.assignment.finished?
-    #   scores[:total_score] = LocalDbCalc.compute_total_score(self.assignment, scores)
-    # else
-    #   scores[:total_score] = OnTheFlyCalc.compute_total_score(self.assignment, scores)
+    # E1731 changes: Calling either LocalDbCalc or OnTheFlyCalc based on assignment status
+    if self.assignment.local_scores_calculated?
+      scores[:total_score] = LocalDbCalc.compute_total_score(self.assignment, scores)
+    else
+      scores[:total_score] = OnTheFlyCalc.compute_total_score(self.assignment, scores)
+    end
 
     # merge scores[review#] (for each round) to score[review]  -Yang
     if self.assignment.varying_rubrics_by_round?
@@ -196,14 +195,12 @@ class AssignmentParticipant < Participant
     # scores[:quiz][:assessments] = quiz_responses
     # scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
 
-    # E1731 change: compute_total_scores changed to static method
-    scores[:total_score] = OnTheFlyCalc.compute_total_score(assignment, scores)
-
-    # E1731 MODIFICATIONS to be done later as below
-    # if self.assignment.finished?
-    #   scores[:total_score] = LocalDbCalc.compute_total_score(self.assignment, scores)
-    # else
-    #   scores[:total_score] = OnTheFlyCalc.compute_total_score(self.assignment, scores)
+    # E1731 changes: Calling either LocalDbCalc or OnTheFlyCalc based on assignment status
+    if self.assignment.local_scores_calculated?
+      scores[:total_score] = LocalDbCalc.compute_total_score(assignment, scores)
+    else
+      scores[:total_score] = OnTheFlyCalc.compute_total_score(assignment, scores)
+    end
 
     # scores[:total_score] += compute_quiz_scores(scores)
 

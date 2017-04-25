@@ -438,8 +438,6 @@ ActiveRecord::Schema.define(version: 20170424090200) do
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
   create_table "review_metric_mappings", force: :cascade do |t|
-    t.integer  "metric_link",       limit: 4
-    t.integer  "response_link",     limit: 4
     t.integer  "value",             limit: 4
     t.integer  "review_metrics_id", limit: 4
     t.integer  "responses_id",      limit: 4

@@ -8,5 +8,12 @@
       <%= @record[0].id %></br>
       <%= "The reviewer_id is: " %>
       <%= @my_reviewer_id %>
+
+      <% @review_record.each do |review| %>
+        <%= review.review_metrics_id %>
+        <%#= @review_metrics[review.review_metrics_id].metric %>
+        <%= review.responses_id %>
+        <%= review.value %>
+      <% end %>
     <% end %>
 <% end %>

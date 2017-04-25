@@ -264,120 +264,120 @@ class SimiCheckWebService
   end
 end
 
-
-###
-# TESTING
-###
-
-# Create new comparison
-response = SimiCheckWebService.new_comparison('test new comparison')
-puts response.code
-json_response = JSON.parse(response.body)
-new_id = json_response["id"]
-puts new_id
-puts '----'
-# Get list of all comparisons
-response = SimiCheckWebService.get_all_comparisons
-puts response.code
-json_response = JSON.parse(response.body)
-json_response["comparisons"].each do |comparison|
-  puts comparison["comparison_name"] + ' (' + comparison["id"] + ')'
-end
-puts '----'
-
-# Upload a file to the new comparison
-response = SimiCheckWebService.upload_file(new_id, '/tmp/helloworld.txt')
-puts response.code
-json_response = JSON.parse(response.body)
-helloworld_id = json_response["id"]
-puts json_response["name"] + ' (' + json_response["id"] + ')'
-puts '----'
-# Upload another file to the new comparison
-response = SimiCheckWebService.upload_file(new_id, '/tmp/helloworld2.txt')
-puts response.code
-json_response = JSON.parse(response.body)
-puts json_response["name"] + ' (' + json_response["id"] + ')'
-puts '----'
-# Upload another file to the new comparison
-response = SimiCheckWebService.upload_file(new_id, '/tmp/not_helloworld.txt')
-puts response.code
-json_response = JSON.parse(response.body)
-not_helloworld_id = json_response["id"]
-puts json_response["name"] + ' (' + json_response["id"] + ')'
-puts '----'
-
-# Change the new comparison name
-response = SimiCheckWebService.update_comparison(new_id, 'test update comparison')
-puts response.code
-puts '----'
-
-# Look up the details for the newly created comparison
-response = SimiCheckWebService.get_comparison_details(new_id)
-puts response.code
-json_response = JSON.parse(response.body)
-puts json_response["name"] + ':'
-json_response["files"].each do |file|
-  puts file["name"] + ' (' + file["id"].to_s + ')'
-end
-puts '----'
-
-# Start the nxn comparison
-response = SimiCheckWebService.post_similarity_nxn(new_id)
-puts response.code
-puts '----'
-# Get the top similarities among the files submitted
-# (Wait until it completes)
-while true
-  begin
-    response = SimiCheckWebService.get_similarity_nxn(new_id)
-    if response.code == 200
-      break
-    end
-  rescue
-    puts 'Waiting 30 seconds to check again...'
-    sleep(30)
-    next
-  end
-end
-json_response = JSON.parse(response.body)
-json_response["similarities"].each do |similarity|
-  puts similarity["fn1"] + ' & ' + similarity["fn2"] + ' are ' + similarity["similarity"].to_s + '% alike'
-end
-puts '----'
-
-# Visualize similarity (all files)
-response = SimiCheckWebService.visualize_similarity(new_id)
-puts response.code
-puts response.body
-puts '----'
-# Visualize comparison (2 files)
-response = SimiCheckWebService.visualize_comparison(new_id, helloworld_id, not_helloworld_id)
-puts response.code
-puts response.body
-puts '----'
-
-# Delete a file from the new comparison
-response = SimiCheckWebService.delete_files(new_id, ["helloworld.txt"])
-puts response.code
-puts '----'
-# Look up the details for the newly created comparison
-response = SimiCheckWebService.get_comparison_details(new_id)
-response.code
-json_response = JSON.parse(response.body)
-puts json_response["name"] + ':'
-json_response["files"].each do |file|
-  puts file["name"] + ' (' + file["id"].to_s + ')'
-end
-puts '----'
-# Delete the newly created comparison
-response = SimiCheckWebService.delete_comparison(new_id)
-puts response.code
-puts '----'
-# Get list of all comparisons
-response = SimiCheckWebService.get_all_comparisons
-puts response.code
-json_response = JSON.parse(response.body)
-json_response["comparisons"].each do |comparison|
-  puts comparison["comparison_name"] + ' (' + comparison["id"] + ')'
-end
-puts '----'
+#
+# ###
+# # TESTING
+# ###
+#
+# # Create new comparison
+# response = SimiCheckWebService.new_comparison('test new comparison')
+# puts response.code
+# json_response = JSON.parse(response.body)
+# new_id = json_response["id"]
+# puts new_id
+# puts '----'
+# # Get list of all comparisons
+# response = SimiCheckWebService.get_all_comparisons
+# puts response.code
+# json_response = JSON.parse(response.body)
+# json_response["comparisons"].each do |comparison|
+#   puts comparison["comparison_name"] + ' (' + comparison["id"] + ')'
+# end
+# puts '----'
+#
+# # Upload a file to the new comparison
+# response = SimiCheckWebService.upload_file(new_id, '/tmp/helloworld.txt')
+# puts response.code
+# json_response = JSON.parse(response.body)
+# helloworld_id = json_response["id"]
+# puts json_response["name"] + ' (' + json_response["id"] + ')'
+# puts '----'
+# # Upload another file to the new comparison
+# response = SimiCheckWebService.upload_file(new_id, '/tmp/helloworld2.txt')
+# puts response.code
+# json_response = JSON.parse(response.body)
+# puts json_response["name"] + ' (' + json_response["id"] + ')'
+# puts '----'
+# # Upload another file to the new comparison
+# response = SimiCheckWebService.upload_file(new_id, '/tmp/not_helloworld.txt')
+# puts response.code
+# json_response = JSON.parse(response.body)
+# not_helloworld_id = json_response["id"]
+# puts json_response["name"] + ' (' + json_response["id"] + ')'
+# puts '----'
+#
+# # Change the new comparison name
+# response = SimiCheckWebService.update_comparison(new_id, 'test update comparison')
+# puts response.code
+# puts '----'
+#
+# # Look up the details for the newly created comparison
+# response = SimiCheckWebService.get_comparison_details(new_id)
+# puts response.code
+# json_response = JSON.parse(response.body)
+# puts json_response["name"] + ':'
+# json_response["files"].each do |file|
+#   puts file["name"] + ' (' + file["id"].to_s + ')'
+# end
+# puts '----'
+#
+# # Start the nxn comparison
+# response = SimiCheckWebService.post_similarity_nxn(new_id)
+# puts response.code
+# puts '----'
+# # Get the top similarities among the files submitted
+# # (Wait until it completes)
+# while true
+#   begin
+#     response = SimiCheckWebService.get_similarity_nxn(new_id)
+#     if response.code == 200
+#       break
+#     end
+#   rescue
+#     puts 'Waiting 30 seconds to check again...'
+#     sleep(30)
+#     next
+#   end
+# end
+# json_response = JSON.parse(response.body)
+# json_response["similarities"].each do |similarity|
+#   puts similarity["fn1"] + ' & ' + similarity["fn2"] + ' are ' + similarity["similarity"].to_s + '% alike'
+# end
+# puts '----'
+#
+# # Visualize similarity (all files)
+# response = SimiCheckWebService.visualize_similarity(new_id)
+# puts response.code
+# puts response.body
+# puts '----'
+# # Visualize comparison (2 files)
+# response = SimiCheckWebService.visualize_comparison(new_id, helloworld_id, not_helloworld_id)
+# puts response.code
+# puts response.body
+# puts '----'
+#
+# # Delete a file from the new comparison
+# response = SimiCheckWebService.delete_files(new_id, ["helloworld.txt"])
+# puts response.code
+# puts '----'
+# # Look up the details for the newly created comparison
+# response = SimiCheckWebService.get_comparison_details(new_id)
+# response.code
+# json_response = JSON.parse(response.body)
+# puts json_response["name"] + ':'
+# json_response["files"].each do |file|
+#   puts file["name"] + ' (' + file["id"].to_s + ')'
+# end
+# puts '----'
+# # Delete the newly created comparison
+# response = SimiCheckWebService.delete_comparison(new_id)
+# puts response.code
+# puts '----'
+# # Get list of all comparisons
+# response = SimiCheckWebService.get_all_comparisons
+# puts response.code
+# json_response = JSON.parse(response.body)
+# json_response["comparisons"].each do |comparison|
+#   puts comparison["comparison_name"] + ' (' + comparison["id"] + ')'
+# end
+# puts '----'

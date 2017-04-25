@@ -223,11 +223,11 @@ jQuery(document).ready(function() {
                 </a>
               </span>
             )
-            // Prateek , image name is save-scores-in-db.png
+            // Prateek
             moreContent.push(
               <span>
                 <a title="Save scores in DB" href={"/assignments/local_db_cal?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-delayed-mailer.png" />
+                  <img src="/assets/tree_view/save-scores-in-db-24.png" />
                 </a>
               </span>
             )

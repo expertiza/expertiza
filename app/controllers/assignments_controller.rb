@@ -238,8 +238,7 @@ class AssignmentsController < ApplicationController
   # Prateek
   def local_db_cal
     assignment_id = params[:id]
-    ok = Assignment.save_score_in_db(assignment_id)
-    flash[:success] = "Hello world!"
+    Assignment.save_score_in_db(assignment_id)
     redirect_to list_tree_display_index_path
   end
 
@@ -256,7 +255,7 @@ class AssignmentsController < ApplicationController
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
     Assignment.remove_assignment_from_course(assignment)
-    redirect_to list_tree_display_index_path
+    #redirect_to list_tree_display_index_path
   end
 
   def delete_delayed_mailer

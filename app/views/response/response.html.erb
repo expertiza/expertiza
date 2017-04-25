@@ -96,10 +96,6 @@ jQuery(document).ready(function() {
         <% end %></textarea>
     </p>
 
-    <% if !@response.additional_comment.nil? %>
-        <%= @response.additional_comment %>
-    <% end %>
-
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>

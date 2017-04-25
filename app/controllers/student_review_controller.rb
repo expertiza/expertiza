@@ -17,6 +17,7 @@ class StudentReviewController < ApplicationController
     @review_phase = @assignment.get_current_stage(@topic_id)
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
+    @myReview = params[:id]
 
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     # if it is an calibrated assignment, change the response_map order in a certain way

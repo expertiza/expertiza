@@ -3,9 +3,15 @@ class ReviewMetricMappingsController < ApplicationController
 
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
-    ['Instructor',
+    ['Student',
+     'Instructor',
      'Teaching Assistant',
      'Administrator'].include? current_role_name
+  end
+
+  def student_metric
+    @mine = params[:showReview] # do student metric value displays here and pass to popup
+    redirect_to list_student_review_index_path(:id => params[:id])
   end
 
   # GET /review_metric_mappings

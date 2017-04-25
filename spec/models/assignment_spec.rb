@@ -143,5 +143,4 @@ describe "#check if the assignment belongs to a course" do
     assignment_node.node_object_id = assignment.id
     expect(assignment_node.belongs_to_course?).to be true
   end
-
 end

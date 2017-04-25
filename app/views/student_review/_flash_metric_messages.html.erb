@@ -2,13 +2,11 @@
 
     <% if (flash_message type) != nil %>
       <%= "This is in shared/flash_metric_messages.html.erb.  We can setup the display for review metrics here." %></br>
-      <%= "The map_id is: " %><%= @myMap %></br>
+      <%= "The map_id is: " %><%= @record[0].map_id %></br>
 
-      <% record = ActiveRecord::Base.connection.execute("SELECT id FROM responses WHERE map_id='#{@myMap}'") %>
-      <% userResponses = record.collect{ |responses| responses[0]} %>
       <%= "The response_id is: " %>
-      <%= userResponses[0] %></br>
+      <%= @record[0].id %></br>
       <%= "The reviewer_id is: " %>
-      <%= @myReviewerId %>
+      <%= @my_reviewer_id %>
     <% end %>
 <% end %>

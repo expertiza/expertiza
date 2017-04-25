@@ -12,7 +12,7 @@ class ReviewMetricMappingsController < ApplicationController
   def student_metric
     @mine = params[:showReview] # do student metric value displays here and pass to popup
     flash[:metrics] = @mine
-    redirect_to list_student_review_index_path(:id => params[:id], :map => params[:showReview])
+    redirect_to list_student_review_index_path(id: params[:id], map: params[:showReview])
   end
 
   # GET /review_metric_mappings

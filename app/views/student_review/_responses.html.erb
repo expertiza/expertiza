@@ -70,7 +70,7 @@
                       <% end %>
                     <% end %>
                     <td>
-                      <%= link_to image_tag('/assets/external-link-16.png'), :controller => 'review_metric_mappings', :action => 'student_metric', :id => @myReviewerId, :showReview => map.map_id %>
+                      <%= link_to image_tag('/assets/external-link-16.png'), :controller => 'review_metric_mappings', :action => 'student_metric', :id => @my_reviewer_id, :showReview => map.map_id %>
                     </td>
                 <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>

@@ -9,10 +9,8 @@
       <%= "The reviewer_id is: " %>
       <%= @my_reviewer_id %> </br>
 
-      <% x = 0 %>
       <% @review_record.each do |review| %>
-        <%= @review_metrics[x].metric %>
-        <% x+= 1 %>
+        <%= @review_metrics[review.id.to_int-1].metric %>
         <%=': ' %>
         <%= review.value %> </br>
       <% end %>

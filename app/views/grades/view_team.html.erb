@@ -196,8 +196,17 @@ th.sorter-true.tablesorter-headerUnSorted{
     <% end %>
 <% end %>
 
+<%if(['Instructor',
+              'Teaching Assistant',
+              'Administrator',
+              'Super-Administrator',
+              'Student'].include? @current_role_name) %>
+<h4 style="font-weight:bold;display:inline-block;">Assign grade and comment for submission</h4>
+<%= form_tag 'save_grade_and_comment_for_submission', remote: true do %>
+      <%= hidden_field_tag :participant_id, params[:id] %>
+      <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %><br/>
+      <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), placeholder: 'Comment' %>
+      <%= submit_tag 'Save' %>
+    <% end %><%end%>
 
-<h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
-Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
-Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
 <!-- termination of the main outer loop. -->

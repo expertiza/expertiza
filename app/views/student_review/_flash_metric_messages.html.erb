@@ -1,19 +1,20 @@
 <% [:metrics].each do |type| %>
 
     <% if (flash_message type) != nil %>
-      <%= "This is in shared/flash_metric_messages.html.erb.  We can setup the display for review metrics here." %></br>
-      <%= "The map_id is: " %><%= @record[0].map_id %></br>
+      <%= "This is in student_review/flash_metric_messages.html.erb.  We can setup the display for review metrics here." %></br>
+      <%= "The map_id is: " %><%= @record[0].map_id %> </br>
 
       <%= "The response_id is: " %>
-      <%= @record[0].id %></br>
+      <%= @record[0].id %> </br>
       <%= "The reviewer_id is: " %>
-      <%= @my_reviewer_id %>
+      <%= @my_reviewer_id %> </br>
 
+      <% x = 0 %>
       <% @review_record.each do |review| %>
-        <%= review.review_metrics_id %>
-        <%#= @review_metrics[review.review_metrics_id].metric %>
-        <%= review.responses_id %>
-        <%= review.value %>
+        <%= @review_metrics[x].metric %>
+        <% x+= 1 %>
+        <%=': ' %>
+        <%= review.value %> </br>
       <% end %>
     <% end %>
 <% end %>

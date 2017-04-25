@@ -17,11 +17,11 @@ def self.calculate_metrics_for_instructor(assignment_id, reviewer_id)
   offensive_words = TEXT_METRICS_KEYWORDS['offensive']
   problem_words = TEXT_METRICS_KEYWORDS['problem']
   current_response_id = nil
-  response_level_comments = Hash.new
-  metrics = Hash.new
-  metrics_per_reviewee = Hash.new
-  response_reviewee_map = Hash.new
-  diff_word_count = Hash.new
+  response_level_comments = {}
+  metrics = {}
+  metrics_per_reviewee = {}
+  response_reviewee_map = {}
+  diff_word_count = {}
   complete_sentences = Hash.new(0)
   answers.each do |ans|
     # puts ans.comments
@@ -45,15 +45,9 @@ def self.calculate_metrics_for_instructor(assignment_id, reviewer_id)
     is_problem = false
     value.scan(/[\w']+/).each do |word|
       word_counter += 1
-      if offensive_words.include? word
-        is_offensive_term = true
-      end
-      if suggestive_words.include? word
-        is_suggestion = true
-      end
-      if problem_words.include? word
-        is_problem = true
-      end
+      is_offensive_term = offensive_words.include?(word)
+      is_suggestion = suggestive_words.include?(word)
+      is_problem = problem_words.include?(word)
     end
 
     # diff_word_count = response_level_comments[current_response_id].scan(/[\w']+/).uniq.count
@@ -111,20 +105,16 @@ def self.calculate_metrics_for_student(response_id)
       ans_word_count += 1
     end # end for comments.scan
     concatenated_comment += comments
-    if (ans_word_count > 7)
+    if ans_word_count > 7
       complete_sentences += 1
     end # end for if(ans_word_count > 7)
   end # end for answers.each
 
   concatenated_comment.scan(/[\w']+/).each do |word|
     volume += 1
-
-    is_offensive_term = offensive_words.include?
-
-    is_suggestion = suggestive_words.include?
-
-    is_problem = problem_words.include?
-
+    is_offensive_term = offensive_words.include?(word)
+    is_suggestion = suggestive_words.include?(word)
+    is_problem = problem_words.include?(word)
   end # end of concatenate_comment
 
   diff_word_count = concatenated_comment.scan(/[\w']+/).uniq.count

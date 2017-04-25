@@ -63,23 +63,4 @@ class SurveyDeploymentController < ApplicationController
       survey_participant.save
     end
   end
-
-  def reminder_thread
-    # Check status of  reminder thread
-    @reminder_thread_status = "Running"
-    unless MiddleMan.get_worker(session[:reminder_key])
-      @reminder_thread_status = "Not Running"
-    end
-  end
-
-  def toggle_reminder_thread
-    # Create reminder thread using BackgroundRb or kill it if its already running
-    if MiddleMan.get_worker(session[:reminder_key])
-      MiddleMan.delete_worker(session[:reminder_key])
-      session[:reminder_key] = nil
-    else
-      session[:reminder_key] = MiddleMan.new_worker class: :reminder_worker, args: {num_reminders: 3} # 3 reminders for now
-    end
-    redirect_to action: 'reminder_thread'
-  end
 end

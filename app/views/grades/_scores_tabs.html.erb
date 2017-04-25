@@ -18,7 +18,7 @@
     <%= render :partial => 'reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %>  
   </div>
   <div id="<%= prefix %>_tabs-2">
-   <%= render :partial => 'author_feedback_tab', :locals => {:prefix => prefix} %>
+   <%= render :partial => 'author_feedback_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
   <div id="<%= prefix %>_tabs-3">
     <%= render :partial => 'statistics_tab', :locals => {:prefix => prefix, :tscore => tscore } %> 

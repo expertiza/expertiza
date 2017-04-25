@@ -85,8 +85,6 @@ var dialog;
 
 
 function show_pastebin(){
-    // dialog.dialog("open");
-    // $("#user-pastebin-form").html('Hello There');
     dialog = $("#user-pastebin-form").dialog({
         modal: true,
         draggable: true,
@@ -101,7 +99,7 @@ function show_pastebin(){
                 dialog.dialog("close");
             }
         }
-    });
+    }).show();
 }
 
 $(document).ready(ready);

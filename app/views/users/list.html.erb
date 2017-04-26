@@ -14,6 +14,8 @@
 
 
 <div class="exp">
+  <%= will_paginate @users %>
+  <%= select_tag(:per_page, options_for_select([[25, 25], [100, 100], [250, 250]])) %>
   <table>
     <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
     <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th></tr>
@@ -21,9 +23,9 @@
     <% for user in @users %>
       <% if ((params[:show] != 'true' && !user.name.include?("_hidden")) || params[:show] == 'true')%>
         <tr class="exp">
-          <td><%= link_to user.name, :action => 'show', :id => user.id %></td>
-          <td><%= user.fullname %></td>
-          <td><%= user.email %></td>
+          <td><%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %></td>
+          <td><%= link_to user.fullname, :action => 'show', :id => user.id %></td>
+          <td><a href="mailto: <%= user.email %>"><%= user.email %></a></td>
           <td><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>
           <td align="center"><%= user.parent.try :name %></td>
           <td><%= User.yesorno(user.email_on_review) %></td>

@@ -230,42 +230,4 @@ class PopupController < ApplicationController
     # puts metrics_per_round
     metrics_per_round
   end
-
-  def calculate_metrics_for_student(response_id)
-    type = "ReviewResponseMap"
-    concatenated_comment = ''
-    answers = Answer.where("answers.response_id = ? ", response_id).select("answers.comments")
-    suggestive_words = TEXT_METRICS_KEYWORDS['suggestive']
-    offensive_words = TEXT_METRICS_KEYWORDS['offensive']
-    problem_words = TEXT_METRICS_KEYWORDS['problem']
-    current_response_id = nil
-    is_offensive_term = false
-    is_suggestion = false
-    is_problem = false
-    volume = 0
-    complete_sentences = 0
-    diff_word_count = 0
-    answers.each do |ans|
-      ans_word_count = 0
-      comments = ans.comments
-      comments.scan(/[\w']+/).each do |word|
-        ans_word_count += 1
-      end # end for comments.scan
-      concatenated_comment += comments
-      if ans_word_count > 7
-        complete_sentences += 1
-      end # end for if(ans_word_count > 7)
-    end # end for answers.each
-
-    concatenated_comment.scan(/[\w']+/).each do |word|
-      volume += 1
-      is_offensive_term = true if offensive_words.include? word
-      is_suggestion = true if suggestive_words.include? word
-      is_problem = true if problem_words.include? word
-    end # end of concatenate_comment
-
-    diff_word_count = concatenated_comment.scan(/[\w']+/).uniq.count
-
-    [volume, is_offensive_term, is_suggestion, is_problem, complete_sentences, diff_word_count]
-  end
 end

@@ -7,28 +7,30 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def new
-    @surveys = Questionnaire.where("type in ('CourseEvaluationQuestionnaire', 'SurveyQuestionnaire', 'GlobalSurveyQuestionnaire')").map {|u| [u.name, u.id] }
+    @surveys = SurveyQuestionnaire.where("type in ('CourseEvaluationQuestionnaire', 'SurveyQuestionnaire')").map {|u| [u.name, u.id] }
     @course = Course.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
     @total_students = CourseParticipant.where(parent_id: @course[0][1]).count
   end
 
   def param_test
-    params.require(:survey_deployment).permit(:course_evaluation_id,:num_of_students,:start_date,:end_date,:validate_survey_deployment)
-
+    params.require(:survey_deployment).permit(:questionnaire_id,:start_date,:end_date,:validate_survey_deployment,:parent_id,:num_of_students)
   end
 
   def create
-    @survey_deployment = SurveyDeployment.new(param_test)
-    if params[:random_subset]["value"] == "1"
-      @survey_deployment.num_of_students = User.where(role_id: Role.student.id).length * rand
+    if params[:add_global_survey]
+      global = GlobalSurveyQuestionnaire.find_by_private(false)
+      if global.size != 1
+        flash[:error] = "More than one active global survey! Please contact the Expertiza team"
+        return redirect_to action: 'new'
+      end
+      global_id = global.id
     end
+    @survey_deployment = SurveyDeployment.new(param_test.merge(global_survey_id: global_id))
     if @survey_deployment.save
       redirect_to action: 'list'
     else
-      @surveys = Questionnaire.where(type: 'CourseEvaluationQuestionnaire').map {|u| [u.name, u.id] }
-      @course = Course.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
-      @total_students = CourseParticipant.where(parent_id: @course[0][1]).count
-      render(action: 'new')
+      flash[:error] = @survey_deployment.errors.full_messages.to_sentence
+      redirect_to action: 'new'
     end
   end
 
@@ -36,10 +38,10 @@ class SurveyDeploymentController < ApplicationController
     @survey_deployments = SurveyDeployment.all
     @surveys = {}
     @survey_deployments.each do |sd|
-      if(sd.course_evaluation_id.nil?)
+      if(sd.questionnaire_id.nil?)
         corresp_questionnaire_name = "Nil"
       else
-        corresp_questionnaire_name = Questionnaire.find(sd.course_evaluation_id).name
+        corresp_questionnaire_name = Questionnaire.find(sd.questionnaire_id).name
       end
       @surveys[sd.id] = corresp_questionnaire_name
 
@@ -48,20 +50,8 @@ class SurveyDeploymentController < ApplicationController
 
   def delete
     SurveyDeployment.find(params[:id]).destroy
-    SurveyParticipant.where(survey_deployment_id: params[:id]).each(&:destroy)
     SurveyResponse.where(survey_deployment_id: params[:id]).each(&:destroy)
     redirect_to action: 'list'
-  end
-
-  def add_participants(num_of_participants, survey_deployment_id) # Add participants
-    users = User.where(role_id: Role.student.id)
-    users_rand = users.sort_by { rand } # randomize user list
-    num_of_participants.times do |i|
-      survey_participant = SurveyParticipant.new
-      survey_participant.user_id = users_rand[i].id
-      survey_participant.survey_deployment_id = survey_deployment_id
-      survey_participant.save
-    end
   end
 
   def reminder_thread

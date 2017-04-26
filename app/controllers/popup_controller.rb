@@ -3,7 +3,7 @@ class PopupController < ApplicationController
     ['Super-Administrator',
      'Administrator',
      'Instructor',
-     'Teaching Assistant', 'Student'].include? current_role_name
+     'Teaching Assistant'].include? current_role_name
   end
 
   # this can be called from "response_report" by clicking student names from instructor end.

@@ -3,7 +3,7 @@ class PopupController < ApplicationController
     ['Super-Administrator',
      'Administrator',
      'Instructor',
-     'Teaching Assistant','Student'].include? current_role_name
+     'Teaching Assistant', 'Student'].include? current_role_name
   end
 
   # this can be called from "response_report" by clicking student names from instructor end.
@@ -148,12 +148,12 @@ class PopupController < ApplicationController
         end
         count += 1
       end
-      @average_volume_per_round[key] = (volume.fdiv(count)).round(2)
-      @average_suggestion_per_round[key] = (s.fdiv(count)).round(2) * 100
-      @average_problem_per_round[key] = (pr.fdiv(count)).round(2) * 100
-      @average_offensive_per_round[key] = (o.fdiv(count)).round(2) * 100
+      @average_volume_per_round[key] = volume.fdiv(count).round(2)
+      @average_suggestion_per_round[key] = s.fdiv(count).round(2) * 100
+      @average_problem_per_round[key] = pr.fdiv(count).round(2) * 100
+      @average_offensive_per_round[key] = o.fdiv(count).round(2) * 100
     end
-  # puts @average_volume_per_round
+    # puts @average_volume_per_round
   end
 
   def view_student_review_metrics_popup
@@ -164,9 +164,9 @@ class PopupController < ApplicationController
   def calculate_metrics_for_instructor(assignment_id, reviewer_id)
     type = "ReviewResponseMap"
     answers = Answer.joins("join responses on responses.id = answers.response_id")
-                  .joins("join response_maps on responses.map_id = response_maps.id")
-                  .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ? and responses.is_submitted = 1",assignment_id, reviewer_id,type)
-                  .select("answers.comments, answers.response_id, responses.round, response_maps.reviewee_id, responses.is_submitted").order("answers.response_id")
+                    .joins("join response_maps on responses.map_id = response_maps.id")
+                    .where("response_maps.reviewed_object_id = ? and response_maps.reviewer_id = ? and response_maps.type = ? and responses.is_submitted = 1", assignment_id, reviewer_id, type)
+                    .select("answers.comments, answers.response_id, responses.round, response_maps.reviewee_id, responses.is_submitted").order("answers.response_id")
     suggestive_words = TEXT_METRICS_KEYWORDS['suggestive']
     offensive_words = TEXT_METRICS_KEYWORDS['offensive']
     problem_words = TEXT_METRICS_KEYWORDS['problem']
@@ -198,7 +198,7 @@ class PopupController < ApplicationController
       is_suggestion = false
       is_problem = false
       value.scan(/[\w']+/).each do |word|
-        word_counter = word_counter + 1
+        word_counter += 1
         if offensive_words.include? word
           is_offensive_term = true
         end
@@ -227,14 +227,14 @@ class PopupController < ApplicationController
       answers.each do |ans|
         diff_word_count[ans.response_id] = response_level_comments[ans.response_id].scan(/[\w']+/).uniq.count
       end
-      metrics[key] = [key, response_reviewee_map[key] , word_counter, is_suggestion, is_problem, is_offensive_term,diff_word_count[key]]
+      metrics[key] = [key, response_reviewee_map[key], word_counter, is_suggestion, is_problem, is_offensive_term, diff_word_count[key]]
     end
     metrics_per_round = {}
     temp_dict = {}
     answers.each do |ans|
 
       puts "Reviewee Id: #{ans.reviewee_id} ---> Response Id: #{ans.response_id} --> Round: #{ans.round} --> Is Submitted: #{ans.is_submitted}"
-      if !temp_dict.has_key?(ans.response_id)
+      unless temp_dict.key?(ans.response_id)
         temp_dict[ans.response_id] = metrics[ans.response_id]
         metrics_per_round[ans.round] = metrics_per_round.fetch(ans.round, []) + [temp_dict[ans.response_id]]
       end
@@ -262,16 +262,16 @@ class PopupController < ApplicationController
       ans_word_count = 0
       comments = ans.comments
       comments.scan(/[\w']+/).each do |word|
-        ans_word_count = ans_word_count + 1;
+        ans_word_count += 1
       end # end for comments.scan
-      concatenated_comment = concatenated_comment + comments
+      concatenated_comment += comments
       if (ans_word_count > 7)
-        complete_sentences = complete_sentences + 1
+        complete_sentences += 1
       end # end for if(ans_word_count > 7)
     end # end for answers.each
 
     concatenated_comment.scan(/[\w']+/).each do |word|
-      volume = volume + 1
+      volume += 1
 
       if offensive_words.include? word
         is_offensive_term = true
@@ -282,12 +282,10 @@ class PopupController < ApplicationController
       if problem_words.include? word
         is_problem = true
       end
-
     end # end of concatenate_comment
 
     diff_word_count = concatenated_comment.scan(/[\w']+/).uniq.count
 
-    [volume,is_offensive_term,is_suggestion,is_problem, complete_sentences,diff_word_count]
-
+    [volume, is_offensive_term, is_suggestion, is_problem, complete_sentences, diff_word_count]
   end
 end

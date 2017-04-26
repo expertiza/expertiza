@@ -82,9 +82,9 @@
 
             <!--[zhewei, 1/20/2016]: show calibration results-->
             <% calibration_response_map = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ? and calibrate_to = ?", @assignment.id, map.reviewee_id, 1]).first rescue nil %>
-            <% if @assignment.is_calibrated == true and !calibration_response_map.nil? and !calibration_response_map.response.nil? and !map.response.empty? and map.response[0].is_submitted == true %>
+            <% if !calibration_response_map.nil? and !calibration_response_map.response.nil? and !map.response.empty? and map.response[0].is_submitted == true %>
               <td>&nbsp;&nbsp;</td>
-              <td><%= link_to "Show calibration results", {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id} %></td>
+              <td><%= link_to "Show expert peer-review result", {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id} %></td>
             <% end %>
           </tr>
       <% end %>

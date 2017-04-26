@@ -35,6 +35,7 @@ class Questionnaire < ActiveRecord::Base
                          'TeammateReviewQuestionnaire',
                          'SurveyQuestionnaire',
                          'AssignmentSurveyQuestionnaire',
+                         'Assignment SurveyQuestionnaire',
                          'Global SurveyQuestionnaire',
                          'GlobalSurveyQuestionnaire',
                          'Course EvaluationQuestionnaire',

@@ -7,6 +7,7 @@ class TreeDisplayController < ApplicationController
 
 #refactored method to provide direct access to parameters
   def goto_controller(name_parameter)
+    byebug
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     redirect_to controller: 'tree_display', action: 'list'
@@ -49,7 +50,7 @@ class TreeDisplayController < ApplicationController
 
   # direct access to surveys
   def goto_surveys
-    goto_controller('Survey')
+    goto_controller('Assignment Survey')
   end
 
   # direct access to course evaluations

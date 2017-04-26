@@ -229,6 +229,13 @@ class ResponseController < ApplicationController
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
+  def view_responses
+    sd = SurveyDeployment.find(params[:id])
+    @questionnaire = Questionnaire.find(sd.course_evaluation_id)
+    @questions = Question.where(questionnaire_id: @questionnaire.id)
+    @survey_responses = SurveyResponse.where(survey_deployment_id: params[:id])
+  end
+  
   private
 
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill

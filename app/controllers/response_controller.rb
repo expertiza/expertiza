@@ -110,7 +110,7 @@ class ResponseController < ApplicationController
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id, return: params[:return], msg: msg, save_options: params[:save_options]
   end
 
   def new
@@ -186,7 +186,7 @@ class ResponseController < ApplicationController
     end
 
     @response.email
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
   def saving
@@ -194,6 +194,70 @@ class ResponseController < ApplicationController
 
     @return = params[:return]
     @map.save
+
+    @response = Response.find(params[:metric_save])
+
+    # the metrics to be updated
+    @word_counter = 0
+    @suggestive_word_count = 0
+    @problem_word_count = 0
+    @offensive_word_count = 0
+
+    @response.additional_comment.scan(/[\w']+/).each do |word|
+      @word_counter += 1
+      @suggestive_word_count += 1 if TEXT_METRICS_KEYWORDS['suggestive'].include? word
+      @problem_word_count += 1 if TEXT_METRICS_KEYWORDS['problem'].include? word
+      @offensive_word_count += 1 if TEXT_METRICS_KEYWORDS['offensive'].include? word
+    end
+
+    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 1)
+    if @review_metric[0] != nil
+      @review_metric[0].value = @word_counter
+      @review_metric[0].save
+    else
+      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
+      @review_metric_mapping.value = @word_counter
+      @review_metric_mapping.review_metrics_id = 1
+      @review_metric_mapping.responses_id = @response.id
+      @review_metric_mapping.save
+    end
+
+    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 2)
+    if @review_metric[0] != nil
+      @review_metric[0].value = @suggestive_word_count
+      @review_metric[0].save
+    else
+      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
+      @review_metric_mapping.value = @suggestive_word_count
+      @review_metric_mapping.review_metrics_id = 2
+      @review_metric_mapping.responses_id = @response.id
+      @review_metric_mapping.save
+    end
+
+    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 3)
+    if @review_metric[0] != nil
+      @review_metric[0].value = @problem_word_count
+      @review_metric[0].save
+    else
+      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
+      @review_metric_mapping.value = @problem_word_count
+      @review_metric_mapping.review_metrics_id = 3
+      @review_metric_mapping.responses_id = @response.id
+      @review_metric_mapping.save
+    end
+
+    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 4)
+    if @review_metric[0] != nil
+      @review_metric[0].value = @offensive_word_count
+      @review_metric[0].save
+    else
+      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
+      @review_metric_mapping.value = @offensive_word_count
+      @review_metric_mapping.review_metrics_id = 4
+      @review_metric_mapping.responses_id = @response.id
+      @review_metric_mapping.save
+    end
+
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
   
@@ -312,5 +376,10 @@ class ResponseController < ApplicationController
     @prev = Response.where(map_id: @map.id)
     # not sure what this is about
     @review_scores = @prev.to_a
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def review_metric_mapping_params
+    params.permit(:review_metrics_id, :responses_id, :value)
   end
 end

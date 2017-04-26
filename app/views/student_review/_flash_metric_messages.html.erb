@@ -10,7 +10,7 @@
       <table border = "1" cellspacing="10">
         <tr>
           <% @review_record.each do |review| %>
-              <th align = 'left' > <%= @review_metrics[review.id.to_int-1].metric %> </th>
+              <th align = 'left' > <%= @review_metrics[review.review_metrics_id.to_int-1].metric %> </th>
           <% end %>
         </tr>
 

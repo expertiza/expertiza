@@ -1,4 +1,4 @@
-ReviewMetric.create!(metric: 'volume')
-ReviewMetric.create!(metric: 'suggestions')
-ReviewMetric.create!(metric: 'problem_identification')
-ReviewMetric.create!(metric: 'offensive_term')
+ReviewMetric.create!(metric: 'Volume')
+ReviewMetric.create!(metric: 'Suggestions')
+ReviewMetric.create!(metric: 'Problem Identification')
+ReviewMetric.create!(metric: 'Offensive Terms')

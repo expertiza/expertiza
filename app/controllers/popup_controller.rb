@@ -3,7 +3,7 @@ class PopupController < ApplicationController
     ['Super-Administrator',
      'Administrator',
      'Instructor',
-     'Teaching Assistant'].include? current_role_name
+     'Teaching Assistant','Student'].include? current_role_name
   end
 
   # this can be called from "response_report" by clicking student names from instructor end.
@@ -118,5 +118,46 @@ class PopupController < ApplicationController
     @userid = Participant.find(params[:id]).user_id
     @user = User.find(@userid)
     @id = params[:assignment_id]
+  end
+
+  # this can be called from "response_report" by clicking on the View Metrics.
+  def view_review_metrics_popup
+    @reviewerid = params[:reviewer_id]
+    @assignment_id = params[:assignment_id]
+    @metrics = ReviewMetricMapping.calculate_metrics_for_instructor(@assignment_id, @reviewerid)
+    @average_volume_per_round = Hash.new()
+    @average_suggestion_per_round = Hash.new()
+    @average_problem_per_round = Hash.new()
+    @average_offensive_per_round = Hash.new()
+    @metrics.each do |key, values|
+      volume = 0
+      count = 0
+      s = 0
+      pr = 0
+      o = 0
+      values.each do |v|
+        volume += v[2]
+        if v[3]
+          s += 1
+        end
+        if v[4]
+          pr += 1
+        end
+        if v[5]
+          o += 1
+        end
+        count += 1
+      end
+      @average_volume_per_round[key] = (volume.fdiv(count)).round(2)
+      @average_suggestion_per_round[key] = (s.fdiv(count)).round(2) * 100
+      @average_problem_per_round[key] = (pr.fdiv(count)).round(2) * 100
+      @average_offensive_per_round[key] = (o.fdiv(count)).round(2) * 100
+    end
+  # puts @average_volume_per_round
+  end
+
+  def view_student_review_metrics_popup
+    @response_id = params[:response_id]
+    @answers = ReviewMetric.calculate_metrics_for_student(@response_id)
   end
 end

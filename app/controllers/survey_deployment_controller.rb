@@ -19,11 +19,14 @@ class SurveyDeploymentController < ApplicationController
   def create
     if params[:add_global_survey]
       global = GlobalSurveyQuestionnaire.find_by_private(false)
-      if global.size != 1
-        flash[:error] = "More than one active global survey! Please contact the Expertiza team"
+      if global.nil?
+        flash[:error] = "No global survey available"
         return redirect_to action: 'new'
+      else
+          global_id = global.id
       end
-      global_id = global.id
+    else
+      global_id = nil
     end
     @survey_deployment = SurveyDeployment.new(param_test.merge(global_survey_id: global_id))
     if @survey_deployment.save

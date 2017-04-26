@@ -3,7 +3,7 @@
 
 <h1> New Survey Deployment </h1>
 
-<%= form_tag :action => 'create', :num_of_students => @total_students do %>
+<%= form_tag :action => 'create' do %>
 
 
   <table>
@@ -27,14 +27,14 @@
     <tr>
       <td><label for="num_of_students">Total number of students:</label></td>
       <td>
-        <%= @total_students %>
+        <input type="text" name="survey_deployment[num_of_students]" value=<%= @total_students %> readonly/>
       </td>
     </tr>
 
     <tr>
       <td><label for="add_global_survey">Include Global Survey?</label></td>
       <td>
-        <%= check_box_tag("add_global_survey") %>
+        <input type="checkbox" name="add_global_survey") />
       </td>
     </tr>
 

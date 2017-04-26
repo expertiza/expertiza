@@ -1,5 +1,5 @@
 # E1731 changes: New file. Not yet finished with the implementation
-module LocalDbCalc
+class LocalDbCalc
   def self.compute_total_score(assignment, scores)
     total = 0
 
@@ -20,6 +20,7 @@ module LocalDbCalc
     total
   end
 
+  # Calculates and stores scores in local_db_scores table for each response map for each round
   def self.store_total_scores(assignment)
     contributors = assignment.contributors
     if assignment.varying_rubrics_by_round?

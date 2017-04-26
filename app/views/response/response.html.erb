@@ -83,10 +83,6 @@ jQuery(document).ready(function() {
             <%= question.complete(i, answer) %>
        <% end %>
        <% i += 1%>
-
-       <% if !answer.nil? %>
-            <%= answer.comments %>
-       <% end %>
     <% end %>
 
     <p>

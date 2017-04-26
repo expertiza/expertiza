@@ -198,10 +198,22 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:metric_save])
 
     # the metrics to be updated
+    @answers = Answer.where(response_id: @response.id)
     @word_counter = 0
     @suggestive_word_count = 0
     @problem_word_count = 0
     @offensive_word_count = 0
+
+    x = 0
+    while x < @answers.count do
+      @answers[x].comments.scan(/[\w']+/).each do |word|
+        @word_counter += 1
+        @suggestive_word_count += 1 if TEXT_METRICS_KEYWORDS['suggestive'].include? word
+        @problem_word_count += 1 if TEXT_METRICS_KEYWORDS['problem'].include? word
+        @offensive_word_count += 1 if TEXT_METRICS_KEYWORDS['offensive'].include? word
+      end
+      x += 1
+    end
 
     @response.additional_comment.scan(/[\w']+/).each do |word|
       @word_counter += 1
@@ -210,55 +222,27 @@ class ResponseController < ApplicationController
       @offensive_word_count += 1 if TEXT_METRICS_KEYWORDS['offensive'].include? word
     end
 
-    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 1)
-    if @review_metric[0] != nil
-      @review_metric[0].value = @word_counter
-      @review_metric[0].save
-    else
-      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
-      @review_metric_mapping.value = @word_counter
-      @review_metric_mapping.review_metrics_id = 1
-      @review_metric_mapping.responses_id = @response.id
-      @review_metric_mapping.save
-    end
-
-    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 2)
-    if @review_metric[0] != nil
-      @review_metric[0].value = @suggestive_word_count
-      @review_metric[0].save
-    else
-      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
-      @review_metric_mapping.value = @suggestive_word_count
-      @review_metric_mapping.review_metrics_id = 2
-      @review_metric_mapping.responses_id = @response.id
-      @review_metric_mapping.save
-    end
-
-    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 3)
-    if @review_metric[0] != nil
-      @review_metric[0].value = @problem_word_count
-      @review_metric[0].save
-    else
-      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
-      @review_metric_mapping.value = @problem_word_count
-      @review_metric_mapping.review_metrics_id = 3
-      @review_metric_mapping.responses_id = @response.id
-      @review_metric_mapping.save
-    end
-
-    @review_metric = ReviewMetricMapping.where(responses_id: @response.id, review_metrics_id: 4)
-    if @review_metric[0] != nil
-      @review_metric[0].value = @offensive_word_count
-      @review_metric[0].save
-    else
-      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
-      @review_metric_mapping.value = @offensive_word_count
-      @review_metric_mapping.review_metrics_id = 4
-      @review_metric_mapping.responses_id = @response.id
-      @review_metric_mapping.save
-    end
+    update_review_metrics(@response.id, 1, @word_counter)
+    update_review_metrics(@response.id, 2, @suggestive_word_count)
+    update_review_metrics(@response.id, 3, @problem_word_count)
+    update_review_metrics(@response.id, 4, @offensive_word_count)
 
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
+  def update_review_metrics(response, metric, value)
+
+    @review_metric = ReviewMetricMapping.where(responses_id: response, review_metrics_id: metric)
+    if !@review_metric[0].nil?
+      @review_metric[0].value = value
+      @review_metric[0].save
+    else
+      @review_metric_mapping = ReviewMetricMapping.new(review_metric_mapping_params)
+      @review_metric_mapping.value = value
+      @review_metric_mapping.review_metrics_id = metric
+      @review_metric_mapping.responses_id = response
+      @review_metric_mapping.save
+    end
   end
   
   def redirection

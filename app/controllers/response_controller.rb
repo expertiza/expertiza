@@ -110,7 +110,8 @@ class ResponseController < ApplicationController
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id, return: params[:return], msg: msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id,
+                return: params[:return], msg: msg, save_options: params[:save_options]
   end
 
   def new
@@ -186,18 +187,24 @@ class ResponseController < ApplicationController
     end
 
     @response.email
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id,
+                return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
   def saving
     @map = ResponseMap.find(params[:id])
-
     @return = params[:return]
     @map.save
 
-    @response = Response.find(params[:metric_save])
-
     # the metrics to be updated
+    save_review_metrics(params[:metric_save])
+
+    redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
+  def save_review_metrics(metric_save)
+    # the metrics to be updated
+    @response = Response.find(metric_save)
     @answers = Answer.where(response_id: @response.id)
     @word_counter = 0
     @suggestive_word_count = 0
@@ -205,12 +212,12 @@ class ResponseController < ApplicationController
     @offensive_word_count = 0
 
     x = 0
-    while x < @answers.count do
+    while x < @answers.count
       @answers[x].comments.scan(/[\w']+/).each do |word|
-        @word_counter += 1
-        @suggestive_word_count += 1 if TEXT_METRICS_KEYWORDS['suggestive'].include? word
-        @problem_word_count += 1 if TEXT_METRICS_KEYWORDS['problem'].include? word
         @offensive_word_count += 1 if TEXT_METRICS_KEYWORDS['offensive'].include? word
+        @problem_word_count += 1 if TEXT_METRICS_KEYWORDS['problem'].include? word
+        @suggestive_word_count += 1 if TEXT_METRICS_KEYWORDS['suggestive'].include? word
+        @word_counter += 1
       end
       x += 1
     end
@@ -226,12 +233,9 @@ class ResponseController < ApplicationController
     update_review_metrics(@response.id, 2, @suggestive_word_count)
     update_review_metrics(@response.id, 3, @problem_word_count)
     update_review_metrics(@response.id, 4, @offensive_word_count)
-
-    redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def update_review_metrics(response, metric, value)
-
     @review_metric = ReviewMetricMapping.where(responses_id: response, review_metrics_id: metric)
     if !@review_metric[0].nil?
       @review_metric[0].value = value

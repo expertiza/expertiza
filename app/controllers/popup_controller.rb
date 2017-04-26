@@ -164,6 +164,7 @@ class PopupController < ApplicationController
     suggestive_words = TEXT_METRICS_KEYWORDS['suggestive']
     offensive_words = TEXT_METRICS_KEYWORDS['offensive']
     problem_words = TEXT_METRICS_KEYWORDS['problem']
+
     current_response_id = nil
     response_level_comments = {}
     metrics = {}

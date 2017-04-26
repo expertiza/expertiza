@@ -54,9 +54,10 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @assignment_questionnaires = AssignmentQuestionnaire.joins(:questionnaire).select('*').where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @reviewvarycheck = false
+    @teammatereviewvarycheck = false
     @due_date_nameurl_notempty = false
     @due_date_nameurl_notempty_checkbox = false
     @metareview_allowed = false
@@ -100,6 +101,14 @@ class AssignmentsController < ApplicationController
         break
       end
     end
+
+    @assignment_questionnaires.each do |aq|
+      if aq.type == 'TeammateReviewQuestionnaire' && aq.used_in_round?
+        @teammatereviewvarycheck = 1
+        break
+      end
+    end
+	
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
 

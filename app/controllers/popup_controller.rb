@@ -137,15 +137,9 @@ class PopupController < ApplicationController
       o = 0
       values.each do |v|
         volume += v[2]
-        if v[3]
-          s += 1
-        end
-        if v[4]
-          pr += 1
-        end
-        if v[5]
-          o += 1
-        end
+        s += 1 if v[3]
+        pr += 1 if v[4]
+        o += 1 if v[5]
         count += 1
       end
       @average_volume_per_round[key] = volume.fdiv(count).round(2)
@@ -199,15 +193,9 @@ class PopupController < ApplicationController
       is_problem = false
       value.scan(/[\w']+/).each do |word|
         word_counter += 1
-        if offensive_words.include? word
-          is_offensive_term = true
-        end
-        if suggestive_words.include? word
-          is_suggestion = true
-        end
-        if problem_words.include? word
-          is_problem = true
-        end
+        is_offensive_term = true if offensive_words.include? word
+        is_suggestion = true if suggestive_words.include? word
+        is_problem = true if problem_words.include? word
       end
 
       # diff_word_count = response_level_comments[current_response_id].scan(/[\w']+/).uniq.count
@@ -232,7 +220,6 @@ class PopupController < ApplicationController
     metrics_per_round = {}
     temp_dict = {}
     answers.each do |ans|
-
       puts "Reviewee Id: #{ans.reviewee_id} ---> Response Id: #{ans.response_id} --> Round: #{ans.round} --> Is Submitted: #{ans.is_submitted}"
       unless temp_dict.key?(ans.response_id)
         temp_dict[ans.response_id] = metrics[ans.response_id]
@@ -265,23 +252,16 @@ class PopupController < ApplicationController
         ans_word_count += 1
       end # end for comments.scan
       concatenated_comment += comments
-      if (ans_word_count > 7)
+      if ans_word_count > 7
         complete_sentences += 1
       end # end for if(ans_word_count > 7)
     end # end for answers.each
 
     concatenated_comment.scan(/[\w']+/).each do |word|
       volume += 1
-
-      if offensive_words.include? word
-        is_offensive_term = true
-      end
-      if suggestive_words.include? word
-        is_suggestion = true
-      end
-      if problem_words.include? word
-        is_problem = true
-      end
+      is_offensive_term = true if offensive_words.include? word
+      is_suggestion = true if suggestive_words.include? word
+      is_problem = true if problem_words.include? word
     end # end of concatenate_comment
 
     diff_word_count = concatenated_comment.scan(/[\w']+/).uniq.count

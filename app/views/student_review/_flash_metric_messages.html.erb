@@ -5,14 +5,20 @@
       <%= "The map_id is: " %><%= @record[0].map_id %> </br>
 
       <%= "The response_id is: " %>
-      <%= @record[0].id %> </br>
-      <%= "The reviewer_id is: " %>
-      <%= @my_reviewer_id %> </br>
+      <%= @record[0].id %> </br></br>
 
-      <% @review_record.each do |review| %>
-        <%= @review_metrics[review.id.to_int-1].metric %>
-        <%=': ' %>
-        <%= review.value %> </br>
-      <% end %>
+      <table border = "1" cellspacing="10">
+        <tr>
+          <% @review_record.each do |review| %>
+              <th align = 'left' > <%= @review_metrics[review.id.to_int-1].metric %> </th>
+          <% end %>
+        </tr>
+
+        <tr>
+          <% @review_record.each do |review| %>
+              <td align = 'center' > <%= review.value %> </td>
+          <% end %>
+        </tr>
+      </table>
     <% end %>
 <% end %>

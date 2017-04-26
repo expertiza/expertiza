@@ -1,14 +1,14 @@
 development:
-  offensive: {0: "lame",1: "stupid",2: "dumb",3: "idiot",4: "horrendous",5: "horrible",6: "non-sense",7: "crap",8: "piss",9: "pissed",10: "bullshit",11: "bloody",12: "hell",13: "stupidity"}
-  problem: {0: "wrong",1: "error",2: "problem",3: "issue",4: "problems",5: "errors",6: "issues",7: "problematic",8: "fix",9: "obstacle",10: "dispute",11: "not",12: "none",13: "didn't",14: "cannot",15: "can't",16: "couldn't",17: "shouldn't"}
-  suggestive: {0: "should",1: "recommend",2: "suggest",3: "advise",4: "try",5: "can",6: "maybe",7: "could",8: "may",9: "would",10: "should've",11: "could've",11: "would've",12: "plan"}
+  offensive: ["lame", "stupid", "dumb", "idiot", "horrendous", "horrible", "non-sense", "crap", "piss", "pissed", "bullshit", "bloody", "hell", "stupidity"]
+  problem: ["wrong", "error", "problem", "issue", "problems", "errors", "issues", "problematic", "fix", "obstacle", "dispute", "not", "none", "didn't", "cannot", "can't", "couldn't", "shouldn't"]
+  suggestive: ["should", "recommend", "suggest", "advise", "try", "can", "maybe", "could", "may", "would", "should've", "could've", "would've", "plan"]
 
 test:
-  offensive: {0: "lame",1: "stupid",2: "dumb",3: "idiot",4: "horrendous",5: "horrible",6: "non-sense",7: "crap",8: "piss",9: "pissed",10: "bullshit",11: "bloody",12: "hell",13: "stupidity"}
-  problem: {0: "wrong",1: "error",2: "problem",3: "issue",4: "problems",5: "errors",6: "issues",7: "problematic",8: "fix",9: "obstacle",10: "dispute",11: "not",12: "none",13: "didn't",14: "cannot",15: "can't",16: "couldn't",17: "shouldn't"}
-  suggestive: {0: "should",1: "recommend",2: "suggest",3: "advise",4: "try",5: "can",6: "maybe",7: "could",8: "may",9: "would",10: "should've",11: "could've",11: "would've",12: "plan"}
+  offensive: ["lame", "stupid", "dumb", "idiot", "horrendous", "horrible", "non-sense", "crap", "piss", "pissed", "bullshit", "bloody", "hell", "stupidity"]
+  problem: ["wrong", "error", "problem", "issue", "problems", "errors", "issues", "problematic", "fix", "obstacle", "dispute", "not", "none", "didn't", "cannot", "can't", "couldn't", "shouldn't"]
+  suggestive: ["should", "recommend", "suggest", "advise", "try", "can", "maybe", "could", "may", "would", "should've", "could've", "would've", "plan"]
 
 production:
-  offensive: {0: "lame",1: "stupid",2: "dumb",3: "idiot",4: "horrendous",5: "horrible",6: "non-sense",7: "crap",8: "piss",9: "pissed",10: "bullshit",11: "bloody",12: "hell",13: "stupidity"}
-  problem: {0: "wrong",1: "error",2: "problem",3: "issue",4: "problems",5: "errors",6: "issues",7: "problematic",8: "fix",9: "obstacle",10: "dispute",11: "not",12: "none",13: "didn't",14: "cannot",15: "can't",16: "couldn't",17: "shouldn't"}
-  suggestive: {0: "should",1: "recommend",2: "suggest",3: "advise",4: "try",5: "can",6: "maybe",7: "could",8: "may",9: "would",10: "should've",11: "could've",11: "would've",12: "plan"}
+  offensive: ["lame", "stupid", "dumb", "idiot", "horrendous", "horrible", "non-sense", "crap", "piss", "pissed", "bullshit", "bloody", "hell", "stupidity"]
+  problem: ["wrong", "error", "problem", "issue", "problems", "errors", "issues", "problematic", "fix", "obstacle", "dispute", "not", "none", "didn't", "cannot", "can't", "couldn't", "shouldn't"]
+  suggestive: ["should", "recommend", "suggest", "advise", "try", "can", "maybe", "could", "may", "would", "should've", "could've", "would've", "plan"]

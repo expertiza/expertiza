@@ -123,14 +123,9 @@ class ApplicationController < ActionController::Base
 
     key = oauth_consumer_key
     unless key
-      if is_parameters_in_flash
-        # no oauth_consumer_key but but flash has been saved from *last* request
-        return
-      else
-        error_code = "LTI_INVALID_REQUEST"
-        message = "Improper LTI context: LTI Consumer key is missing or not valid!"
-        return [error_code, message];
-      end
+      error_code = "LTI_INVALID_REQUEST"
+      message = "Improper LTI context: LTI Consumer key is missing or not valid!"
+      return [error_code, message];
     end
     @tenant = Tenant.where(:tenant_key => key).first
     @registration = Lti2Tp::Registration.where(:tenant_id => @tenant.id).first
@@ -241,23 +236,6 @@ class ApplicationController < ActionController::Base
 
   def is_parameters_in_flash
     not flash[:lti_context].nil?
-  end
-
-  def restore_request_parameters_from_flash
-    request[:lti_context] = flash[:lti_context]
-  end
-
-  def save_request_parameters_to_flash
-    flash[:lti_context] = request.parameters.dup
-  end
-
-  def restore_request_parameters_from_session
-    request[:lti_context] = session[:lti_context]
-    session[:lti_context] = nil
-  end
-
-  def save_request_parameters_to_session
-    session[:lti_context] = request.parameters.dup
   end
 
   #lti end

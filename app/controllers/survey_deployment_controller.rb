@@ -1,15 +1,43 @@
 
 class SurveyDeploymentController < ApplicationController
+  include SurveyDeploymentHelper
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
      'Administrator'].include? current_role_name
   end
 
+  def survey_deployment_types
+    ["AssignmentSurveyDeployment",
+    "CourseSurveyDeployment"]
+  end
+
+  def survey_deployment_type
+    params[:type].constantize if params[:type].in? survey_deployment_types
+  end
+
   def new
-    @surveys = SurveyQuestionnaire.where("type in ('CourseEvaluationQuestionnaire', 'SurveyQuestionnaire')").map {|u| [u.name, u.id] }
-    @course = Course.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
-    @total_students = CourseParticipant.where(parent_id: @course[0][1]).count
+    case params[:type]
+      when "AssignmentSurveyDeployment"
+        new_assignment_deployment
+      when "CourseSurveyDeployment"
+        new_course_deployment
+      else
+        flash[:error] = "Unexpected type " + params[:type]
+    end
+    @survey_type = params[:type]
+    @surveys = SurveyQuestionnaire.where("type in ('SurveyQuestionnaire')").map {|u| [u.name, u.id] }
+  end
+
+  def new_assignment_deployment
+    @parent = Assignment.find_by_id( params[:id])
+    @total_students = AssignmentParticipant.where(parent_id: @parent.id).count
+  end
+
+  def new_course_deployment
+    @parent = Course.find_by_id( params[:id])
+    puts @parent.id
+    @total_students = CourseParticipant.where(parent_id: @parent.id).count
   end
 
   def param_test
@@ -28,7 +56,7 @@ class SurveyDeploymentController < ApplicationController
     else
       global_id = nil
     end
-    @survey_deployment = SurveyDeployment.new(param_test.merge(global_survey_id: global_id))
+    @survey_deployment = survey_deployment_type.new(param_test.merge(global_survey_id: global_id))
     if @survey_deployment.save
       redirect_to action: 'list'
     else
@@ -57,22 +85,45 @@ class SurveyDeploymentController < ApplicationController
     redirect_to action: 'list'
   end
 
-  def reminder_thread
-    # Check status of  reminder thread
-    @reminder_thread_status = "Running"
-    unless MiddleMan.get_worker(session[:reminder_key])
-      @reminder_thread_status = "Not Running"
+  def add_participants(num_of_participants, survey_deployment_id) # Add participants
+    users = User.where(role_id: Role.student.id)
+    users_rand = users.sort_by { rand } # randomize user list
+    num_of_participants.times do |i|
+      survey_participant = SurveyParticipant.new
+      survey_participant.user_id = users_rand[i].id
+      survey_participant.survey_deployment_id = survey_deployment_id
+      survey_participant.save
     end
   end
 
-  def toggle_reminder_thread
-    # Create reminder thread using BackgroundRb or kill it if its already running
-    if MiddleMan.get_worker(session[:reminder_key])
-      MiddleMan.delete_worker(session[:reminder_key])
-      session[:reminder_key] = nil
-    else
-      session[:reminder_key] = MiddleMan.new_worker class: :reminder_worker, args: {num_reminders: 3} # 3 reminders for now
+  def generate_statistics
+    @sd = SurveyDeployment.find(params[:id])
+    questionnaire = Questionnaire.find(@sd.questionnaire_id)
+    @range_of_scores = (questionnaire.min_question_score..questionnaire.max_question_score).to_a
+    @questions = Question.where(questionnaire_id: questionnaire.id)
+    responses_for_all_questions = []
+    @questions.each do |question|
+      responses_for_all_questions << get_responses_for_question_in_a_survey_deployment(question.id, @sd.id)
     end
-    redirect_to action: 'reminder_thread'
+    @chart_data_table = []
+    responses_for_all_questions.each_with_index do |response, index|
+      data_table_row = []
+      data_table_row << ['Label', 'Number']
+      response.each_with_index do |response_value, index|
+        data_table_row << [index.to_s, response_value]
+      end
+      @chart_data_table << data_table_row
+    end
   end
+
+  #Allows for children to rediect to this controller
+  def self.inherited(child)
+    child.instance_eval do
+      def model_name
+        SurveyDeployment.model_name
+      end
+    end
+    super
+  end
+
 end

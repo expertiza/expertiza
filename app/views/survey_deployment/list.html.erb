@@ -16,12 +16,13 @@
       <td align=center><%= survey_deployment.start_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
       <td align=center><%= survey_deployment.end_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
       <td align=center><%= survey_deployment.num_of_students %></td>
-      <td align=center><%= link_to "View Responses", {:controller=>'response',:action=>'view_responses',:id=>survey_deployment.id} %> <%= link_to "Delete", {:action=>"delete", :id=>survey_deployment.id}, :confirm=>"Are You Sure?", :method=>"post" %>
+      <td align=center><%= link_to "View Responses", {:controller=>'response',:action=>'view_responses',:id=>survey_deployment.id} %> 
+      <%= link_to "Statistics", {:action => "generate_statistics", :id => survey_deployment.id} %>
+      <%= link_to "Delete", {:action=>"delete", :id=>survey_deployment.id}, :confirm=>"Are You Sure?", :method=>"post" %>
     </td>
   </tr>
 <% end %>
 </table>
 
-  <% if current_user.role == Role.super_admin %>
-    <%= link_to "Reminder thread status", :action=>"reminder_thread" %>
-  <% end %>
+<%= link_to "Add New Deployment", :action=>"new" %><p>
+

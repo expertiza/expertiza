@@ -208,7 +208,7 @@ class ResponseController < ApplicationController
     offensive_count = 0
 
     x = 0
-    until x = @answers.count - 1
+    while x < @answers.count
       @answers[x].comments.scan(/[\w']+/).each do |word|
         offensive_count += update_individual_metric('offensive', word)
         problem_count += update_individual_metric('problem', word)
@@ -232,7 +232,7 @@ class ResponseController < ApplicationController
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
-
+    
   def update_individual_metric(type, word)
     my_return = 0
     my_return += 1 if TEXT_METRICS_KEYWORDS[type].include? word

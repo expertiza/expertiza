@@ -194,13 +194,20 @@ class ResponseController < ApplicationController
   def saving
     @map = ResponseMap.find(params[:id])
     @map.save
-    redirect_to action: 'save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
+    redirect_to action: 'prepare_to_save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
                 return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def save_review_metrics
+  def prepare_to_save_review_metrics
     # the metrics to be updated
     @response = Response.find(params[:metric_save])
+    save_review_metrics(@response)
+
+    redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
+  def save_review_metrics(response)
+    # the metrics to be updated
     @answers = Answer.where(response_id: @response.id)
     word_counter = 0
     suggestive_word_count = 0
@@ -218,19 +225,17 @@ class ResponseController < ApplicationController
       x += 1
     end
 
-    @response.additional_comment.scan(/[\w']+/).each do |word|
+    response.additional_comment.scan(/[\w']+/).each do |word|
       word_counter += 1
       suggestive_word_count += 1 if TEXT_METRICS_KEYWORDS['suggestive'].include? word
       problem_word_count += 1 if TEXT_METRICS_KEYWORDS['problem'].include? word
       offensive_word_count += 1 if TEXT_METRICS_KEYWORDS['offensive'].include? word
     end
 
-    update_review_metrics(@response.id, 1, word_counter)
-    update_review_metrics(@response.id, 2, suggestive_word_count)
-    update_review_metrics(@response.id, 3, problem_word_count)
-    update_review_metrics(@response.id, 4, offensive_word_count)
-
-    redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    update_review_metrics(response.id, 1, word_counter)
+    update_review_metrics(response.id, 2, suggestive_word_count)
+    update_review_metrics(response.id, 3, problem_word_count)
+    update_review_metrics(response.id, 4, offensive_word_count)
   end
 
   def update_review_metrics(response, metric, value)

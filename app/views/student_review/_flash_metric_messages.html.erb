@@ -5,28 +5,31 @@
 
       <% @record.each do |records| %>
         <% my_review_record = @review_record.where(responses_id: records.id) %>
-        <table border = "1" cellspacing="10">
-          <tr>
-            <th align = 'left' > <%= " Map ID " %> </th>
-            <th align = 'left' > <%= " Response ID " %> </th>
-            <th align = 'left' > <%= " Assignment " %> </th>
-            <th align = 'left' > <%= " Round " %> </th>
+        <table border = "2">
+          <tr align="center">
+            <th align = 'center' > <%= " Map ID " %> </th>
+            <th align = 'center' > <%= " Response ID " %> </th>
+            <th align = 'center' > <%= " Assignment " %> </th>
+            <th align = 'center' > <%= " Round " %> </th>
             <% my_review_record.each do |review| %>
-                <th align = 'left' > <%= @review_metrics[review.review_metrics_id.to_int-1].metric %> </th>
+                <th align = 'center' > <%= @review_metrics[review.review_metrics_id.to_int-1].metric %> </th>
             <% end %>
           </tr>
 
-          <tr>
+          <tr align="center">
             <td align = 'center' > <%= records.map_id %> </td>
             <td align = 'center' > <%= records.id %> </td>
             <% assignment = @map.where(id: records.map_id) %>
             <td align = 'center' > <%= assignment[0].reviewed_object_id %> </td>
             <td align = 'center' > <%= records.round %> </td>
-            <% my_review_record.each do |review| %>
-                <td align = 'center' > <%= review.value %> </td>
+            <% unless my_review_record[0].nil? %>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[0].value %> <%= '/' %> <%= @percentages[0] %> </td>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[1].value %> <%= '/' %> <%= number_to_percentage(@percentages[1], precision: 0) %> </td>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[2].value %> <%= '/' %> <%= number_to_percentage(@percentages[2], precision: 0) %> </td>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[3].value %> <%= '/' %> <%= number_to_percentage(@percentages[3], precision: 0) %> </td>
             <% end %>
           </tr>
-        </table></br> <%= @percentages[0] %> <%= @percentages[1] %> <%= @percentages[2] %> <%= @percentages[3] %> <%= @percentages[4] %>
+        </table></br>
       <% end %>
     <% end %>
 <% end %>

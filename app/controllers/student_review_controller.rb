@@ -59,8 +59,8 @@ class StudentReviewController < ApplicationController
     single_response = Response.where(id: record_id)
     mapped_response = ResponseMap.where(id: single_response[0].map_id)
     review_maps = ResponseMap.where(reviewed_object_id: mapped_response[0].reviewed_object_id)
-    keys = [0.00, 0.00, 0.00, 0.00, 0.00]
-    response_count = 0.0
+    keys = [0.00, 0.00, 0.00, 0.00]
+    response_count = 0.00
     word_counter = 0
     suggestive_count = 0
     problem_count = 0
@@ -72,7 +72,7 @@ class StudentReviewController < ApplicationController
         response_count += 1
         my_review_metric = ReviewMetricMapping.where(responses_id: each_response.id)
         my_review_metric.each do |my_metric|
-          word_counter += 1 if my_metric.review_metrics_id == 1 && my_metric.value > 0
+          word_counter += my_metric.value if my_metric.review_metrics_id == 1 && my_metric.value > 0
           suggestive_count += 1 if my_metric.review_metrics_id == 2 && my_metric.value > 0
           problem_count += 1 if my_metric.review_metrics_id == 3 && my_metric.value > 0
           offensive_count += 1 if my_metric.review_metrics_id == 4 && my_metric.value > 0
@@ -80,11 +80,11 @@ class StudentReviewController < ApplicationController
       end
     end
 
-    keys[0] = word_counter
-    keys[1] = suggestive_count
-    keys[2] = problem_count
-    keys[3] = offensive_count
-    keys[4] = response_count
+    keys[0] = word_counter/response_count
+    keys[1] = (suggestive_count/response_count)*100
+    keys[2] = (problem_count/response_count)*100
+    keys[3] = (offensive_count/response_count)*100
+
     return keys
   end
 end

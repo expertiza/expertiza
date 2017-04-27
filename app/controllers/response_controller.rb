@@ -187,21 +187,20 @@ class ResponseController < ApplicationController
     end
 
     @response.email
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id,
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_resp: @response.id, metric: @response.additional_comment,
                 return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
   def saving
     @map = ResponseMap.find(params[:id])
     @map.save
-    redirect_to action: 'save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
+    redirect_to action: 'save_review_metrics', id: @map.map_id, metric_resp: params[:metric_resp], metric: params[:metric],
                 return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def save_review_metrics
     # the metrics to be updated
-    @response = Response.find(params[:metric_save])
-    @answers = Answer.where(response_id: @response.id)
+    @answers = Answer.where(response_id: params[:metric_resp])
     word_counter = 0
     suggestive_count = 0
     problem_count = 0
@@ -218,7 +217,7 @@ class ResponseController < ApplicationController
       x += 1
     end
 
-    @response.additional_comment.scan(/[\w']+/).each do |word|
+    params[:metric].scan(/[\w']+/).each do |word|
       word_counter += 1
       suggestive_count += update_individual_metric('suggestive', word)
       problem_count += update_individual_metric('problem', word)
@@ -232,7 +231,7 @@ class ResponseController < ApplicationController
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
-    
+
   def update_individual_metric(type, word)
     my_return = 0
     my_return += 1 if TEXT_METRICS_KEYWORDS[type].include? word

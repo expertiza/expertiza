@@ -16,4 +16,24 @@ class PlagiarismCheckerHelper
     assignment_submission.save!
   end
 
+  def self.upload_files(assignment_submission_simicheck_id, team_name)
+    filenumber = 1
+    parsed_text = # TODO: David's parser
+    filename = "%04d.txt" % filenumber
+    filepath = "tmp/" + filename
+    File.open(filename, "w") { |file| file.write(parsed_text) }
+    response = SimiCheckWebService.upload_file(assignment_submission_simicheck_id, filepath)
+    json_response = JSON.parse(response.body)
+    file_id = json_response["id"]
+    
+
+
+    # response = SimiCheckWebService.upload_file(new_id, '/tmp/not_helloworld.txt')
+    # puts response.code
+    # json_response = JSON.parse(response.body)
+    # not_helloworld_id = json_response["id"]
+    # puts json_response["name"] + ' (' + json_response["id"] + ')'
+
+  end
+
 end

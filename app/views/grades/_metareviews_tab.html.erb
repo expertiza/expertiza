@@ -1,0 +1,15 @@
+<table class="participants" width="100%">
+  <% tscore[:team].participants.each_with_index do |participant, index| %>
+    <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
+    <tr style="background-color: #F7DC6F">
+      <td>
+        <b> <%=participant.fullname %></b>
+        <a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)
+      </td>
+    <tr id="<%=prefix%>_<%=index.to_s%>_mreviews" style="display:none">
+      <td>
+        <%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %>
+      </td>
+    </tr>
+  <% end %>
+</table>

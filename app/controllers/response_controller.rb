@@ -201,30 +201,11 @@ class ResponseController < ApplicationController
   def save_review_metrics
     # the metrics to be updated
     @response = Response.find(params[:metric_save])
+    @answers = Answer.where(response_id: @response.id)
     word_counter = 0
     suggestive_count = 0
     problem_count = 0
     offensive_count = 0
-
-    @response.additional_comment.scan(/[\w']+/).each do |word|
-      word_counter += 1
-      suggestive_count += update_individual_metric('suggestive', word)
-      problem_count += update_individual_metric('problem', word)
-      offensive_count += update_individual_metric('offensive', word)
-    end
-
-    redirect_to action: 'save_individual_metrics', id: params[:id], word: word_counter, suggest: suggestive_count,
-                problems: problem_count, offense: offensive_count, response: @response.id, return: params[:return],
-                msg: params[:msg], error_msg: params[:error_msg]
-  end
-
-  def save_individual_metrics
-    # the metrics to be updated
-    @answers = Answer.where(response_id: params[:response].to_i)
-    word_counter = params[:word].to_i
-    suggestive_count = params[:suggest].to_i
-    problem_count = params[:problems].to_i
-    offensive_count = params[:offense].to_i
 
     x = 0
     while x < @answers.count
@@ -237,10 +218,14 @@ class ResponseController < ApplicationController
       x += 1
     end
 
-    update_review_metrics(params[:response].to_i, 1, word_counter)
-    update_review_metrics(params[:response].to_i, 2, suggestive_count)
-    update_review_metrics(params[:response].to_i, 3, problem_count)
-    update_review_metrics(params[:response].to_i, 4, offensive_count)
+    @response.additional_comment.scan(/[\w']+/).each do |word|
+      word_counter += 1
+      suggestive_count += update_individual_metric('suggestive', word)
+      problem_count += update_individual_metric('problem', word)
+      offensive_count += update_individual_metric('offensive', word)
+    end
+
+    update_interface_review(@response.id, word_counter, suggestive_count, problem_count, offensive_count)
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
@@ -249,6 +234,13 @@ class ResponseController < ApplicationController
     my_return = 0
     my_return += 1 if TEXT_METRICS_KEYWORDS[type].include? word
     return my_return
+  end
+
+  def update_interface_review(response, word, suggest, problem, offense)
+    update_review_metrics(response, 1, word)
+    update_review_metrics(response, 2, suggest)
+    update_review_metrics(response, 3, problem)
+    update_review_metrics(response, 4, offense)
   end
 
   def update_review_metrics(response, metric, value)

@@ -211,6 +211,9 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
                         <% end %>
                     <% end %>
                   </TD>
+                  <td>
+                    <%= link_to "View Reviews", "/popup/view_review_scores_popup?assignment_id=#{@assignment.id}&reviewer_id=#{participant.id}"%>
+                  </td>
               <% end %>
 
             <% pindex += 1 %>

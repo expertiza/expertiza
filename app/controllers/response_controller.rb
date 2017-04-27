@@ -110,7 +110,7 @@ class ResponseController < ApplicationController
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to action: 'saving', id: @map.map_id, metric_resp: @response.id, metric: @response.additional_comment,
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id,
                 return: params[:return], msg: msg, save_options: params[:save_options]
   end
 
@@ -187,20 +187,21 @@ class ResponseController < ApplicationController
     end
 
     @response.email
-    redirect_to action: 'saving', id: @map.map_id, metric_resp: @response.id, metric: @response.additional_comment,
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id,
                 return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
   def saving
     @map = ResponseMap.find(params[:id])
     @map.save
-    redirect_to action: 'save_review_metrics', id: @map.map_id, metric_resp: params[:metric_resp], metric: params[:metric],
+    redirect_to action: 'save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
                 return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def save_review_metrics
     # the metrics to be updated
-    @answers = Answer.where(response_id: params[:metric_resp])
+    @response = Response.find(params[:metric_save])
+    @answers = Answer.where(response_id: @response.id)
     word_counter = 0
     suggestive_count = 0
     problem_count = 0
@@ -217,17 +218,17 @@ class ResponseController < ApplicationController
       x += 1
     end
 
-    params[:metric].scan(/[\w']+/).each do |word|
+    @response.additional_comment.scan(/[\w']+/).each do |word|
       word_counter += 1
       suggestive_count += update_individual_metric('suggestive', word)
       problem_count += update_individual_metric('problem', word)
       offensive_count += update_individual_metric('offensive', word)
     end
 
-    update_review_metrics(params[:metric_resp], 1, word_counter)
-    update_review_metrics(params[:metric_resp], 2, suggestive_count)
-    update_review_metrics(params[:metric_resp], 3, problem_count)
-    update_review_metrics(params[:metric_resp], 4, offensive_count)
+    update_review_metrics(@response.id, 1, word_counter)
+    update_review_metrics(@response.id, 2, suggestive_count)
+    update_review_metrics(@response.id, 3, problem_count)
+    update_review_metrics(@response.id, 4, offensive_count)
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

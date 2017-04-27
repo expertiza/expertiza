@@ -6,10 +6,36 @@ class SurveyDeploymentController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
+  def survey_deployment_types
+    ["AssignmentSurveyDeployment",
+    "CourseSurveyDeployment"]
+  end
+
+  def survey_deployment_type
+    params[:type].constantize if params[:type].in? survey_deployment_types
+  end
+
   def new
-    @surveys = SurveyQuestionnaire.where("type in ('CourseEvaluationQuestionnaire', 'SurveyQuestionnaire')").map {|u| [u.name, u.id] }
-    @course = Course.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
-    @total_students = CourseParticipant.where(parent_id: @course[0][1]).count
+    case params[:type]
+      when "AssignmentSurveyDeployment"
+        new_assignment_deployment
+      when "CourseSurveyDeployment"
+        new_course_deployment
+      else
+        flash[:error] = "Unexpected type " + params[:type]
+    end
+    @survey_type = params[:type]
+    @surveys = SurveyQuestionnaire.where("type in ('SurveyQuestionnaire')").map {|u| [u.name, u.id] }
+  end
+
+  def new_assignment_deployment
+    @parent = Assignment.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
+    @total_students = AssignmentParticipant.where(parent_id: @parent[0][1]).count
+  end
+
+  def new_course_deployment
+    @parent = Course.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
+    @total_students = CourseParticipant.where(parent_id: @parent[0][1]).count
   end
 
   def param_test
@@ -28,7 +54,7 @@ class SurveyDeploymentController < ApplicationController
     else
       global_id = nil
     end
-    @survey_deployment = SurveyDeployment.new(param_test.merge(global_survey_id: global_id))
+    @survey_deployment = survey_deployment_type.new(param_test.merge(global_survey_id: global_id))
     if @survey_deployment.save
       redirect_to action: 'list'
     else
@@ -75,4 +101,15 @@ class SurveyDeploymentController < ApplicationController
     end
     redirect_to action: 'reminder_thread'
   end
+
+  #Allows for children to rediect to this controller
+  def self.inherited(child)
+    child.instance_eval do
+      def model_name
+        SurveyDeployment.model_name
+      end
+    end
+    super
+  end
+
 end

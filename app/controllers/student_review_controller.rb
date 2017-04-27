@@ -80,10 +80,10 @@ class StudentReviewController < ApplicationController
       end
     end
 
-    keys[0] = word_counter/response_count
-    keys[1] = (suggestive_count/response_count)*100
-    keys[2] = (problem_count/response_count)*100
-    keys[3] = (offensive_count/response_count)*100
+    keys[0] = word_counter / response_count
+    keys[1] = (suggestive_count / response_count) * 100
+    keys[2] = (problem_count / response_count) * 100
+    keys[3] = (offensive_count / response_count) * 100
 
     return keys
   end

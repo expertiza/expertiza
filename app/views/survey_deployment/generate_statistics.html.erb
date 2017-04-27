@@ -28,13 +28,15 @@
   </head>
   	<body>
   		<% @questions.count.times do |i| %>
-  			<% @t = get_responses_for_question_in_a_survey_deployment(@questions[i].id, @sd.id)%>
+			<% if allowed_question_type?(@questions[i]) %>
+				<% @t = get_responses_for_question_in_a_survey_deployment(@questions[i].id, @sd.id)%>
    				<p><b><%= @questions[i].txt %></b></p>
    				<% if @t.sum > 0 %>
    					<div id = "piechart_<%= i %>" style = "width: 900px; height: 500px;"></div> 		
   				<% else %>
   					<p>No responses for this question</p>
   				<% end %>
+			<% end %>
   		<% end %>
 	</body>
 </html>

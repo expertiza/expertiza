@@ -231,7 +231,7 @@ class ResponseController < ApplicationController
 
   def view_responses
     sd = SurveyDeployment.find(params[:id])
-    @questionnaire = Questionnaire.find(sd.course_evaluation_id)
+    @questionnaire = Questionnaire.find(sd.questionnaire_id)
     @questions = Question.where(questionnaire_id: @questionnaire.id)
     @survey_responses = SurveyResponse.where(survey_deployment_id: params[:id])
   end

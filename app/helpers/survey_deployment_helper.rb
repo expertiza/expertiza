@@ -7,4 +7,7 @@ module SurveyDeploymentHelper
 			end
 		responses
 	end
+	def allowed_question_type?(question)
+		question.type == "Criterion" || question.type == "Checkbox"
+	end
 end

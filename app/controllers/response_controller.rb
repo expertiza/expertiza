@@ -110,7 +110,7 @@ class ResponseController < ApplicationController
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_save: @response.id,
+    redirect_to action: 'saving', id: @map.map_id, metric_resp: @response.id, metric: @response.additional_comment,
                 return: params[:return], msg: msg, save_options: params[:save_options]
   end
 
@@ -187,7 +187,7 @@ class ResponseController < ApplicationController
     end
 
     @response.email
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, metric_resp: @response.id, metric: @response.additional_comment,
+    redirect_to action: 'saving', id: @map.map_id, metric_resp: @response.id, metric: @response.additional_comment,
                 return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
@@ -224,10 +224,10 @@ class ResponseController < ApplicationController
       offensive_count += update_individual_metric('offensive', word)
     end
 
-    update_review_metrics(@response.id, 1, word_counter)
-    update_review_metrics(@response.id, 2, suggestive_count)
-    update_review_metrics(@response.id, 3, problem_count)
-    update_review_metrics(@response.id, 4, offensive_count)
+    update_review_metrics(params[:metric_resp], 1, word_counter)
+    update_review_metrics(params[:metric_resp], 2, suggestive_count)
+    update_review_metrics(params[:metric_resp], 3, problem_count)
+    update_review_metrics(params[:metric_resp], 4, offensive_count)
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

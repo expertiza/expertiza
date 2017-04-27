@@ -202,30 +202,33 @@ class ResponseController < ApplicationController
     # the metrics to be updated
     @response = Response.find(params[:metric_save])
     @answers = Answer.where(response_id: @response.id)
-    metrics = [0, 0, 0, 0]
+    word_counter = 0
+    suggestive_count = 0
+    problem_count = 0
+    offensive_count = 0
 
     x = 0
-    while x < @answers.count
+    until x <= @answers.count
       @answers[x].comments.scan(/[\w']+/).each do |word|
-        metrics[0] += update_individual_metric('offensive', word)
-        metrics[1] += update_individual_metric('problem', word)
-        metrics[2] += update_individual_metric('suggestive', word)
-        metrics[3] += 1
+        offensive_count += update_individual_metric('offensive', word)
+        problem_count += update_individual_metric('problem', word)
+        suggestive_count += update_individual_metric('suggestive', word)
+        word_counter += 1
       end
       x += 1
     end
 
     @response.additional_comment.scan(/[\w']+/).each do |word|
-      metrics[3] += 1
-      metrics[2] += update_individual_metric('suggestive', word)
-      metrics[1] += update_individual_metric('problem', word)
-      metrics[0] += update_individual_metric('offensive', word)
+      word_counter += 1
+      suggestive_count += update_individual_metric('suggestive', word)
+      problem_count += update_individual_metric('problem', word)
+      offensive_count += update_individual_metric('offensive', word)
     end
 
-    update_review_metrics(@response.id, 1, metrics[0])
-    update_review_metrics(@response.id, 2, metrics[1])
-    update_review_metrics(@response.id, 3, metrics[2])
-    update_review_metrics(@response.id, 4, metrics[3])
+    update_review_metrics(@response.id, 1, word_counter)
+    update_review_metrics(@response.id, 2, suggestive_count)
+    update_review_metrics(@response.id, 3, problem_count)
+    update_review_metrics(@response.id, 4, offensive_count)
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

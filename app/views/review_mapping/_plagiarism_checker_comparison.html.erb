@@ -1,0 +1,32 @@
+<!--
+if plagiarism_checker_assignment_submission doesn't exist, say there is no plagiarism report
+else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
+else show records
+-->
+
+<div class="container"><p></p>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Plagiarism Report</th>
+      <th style="text-align: right">Similarity</th>
+      <th>Submission 1</th>
+      <th>Team 1</th>
+      <th>Submission 2</th>
+      <th>Team 2</th>
+    </tr>
+    </thead>
+    <% if @plagiarism_reports != nil %>
+        <% @plagiarism_report.each do |pr| %>
+            <tr>
+              <td><%= link_to pr.Similarity, pr.Similarity_link %></td>
+              <td><%= pr.Submission1%></td>
+              <td><%= pr.Team1%></td>
+              <td><%= pr.Submission2%></td>
+              <td><%= pr.Team2%></td>
+            </tr>
+        <% end %>
+    <% end %>
+  </table>
+</div>
+

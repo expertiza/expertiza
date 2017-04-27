@@ -1,5 +1,6 @@
 require 'rails_helper'
 # include GradesHelper
+include LogInHelper # TEMP USED TO AUTHORIZE SESSION
 
 describe GradesController do
   before :each do
@@ -121,5 +122,35 @@ describe GradesController do
     @params = {submission: "review", id: 5}
 
     get :conflict_notification, @params
+  end
+end
+
+describe GradesController do
+  before(:each) do
+    # Simulate Authorized Session
+    instructor.save
+    @user = User.find_by_name("instructor")
+    allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return('Instructor')
+    allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(TRUE)
+
+    # Allow Access to Private Methods
+    @controller = GradesController.new
+
+    # Create Assignment and Questionnaires
+    @assignment = create(:assignment)
+    @questionnaire = create(:questionnaire)
+    @assignment_questionnaire = create(:assignment_questionnaire, used_in_round: 2)
+    @question1 = create(:question, txt: "Who?")
+    @question2 = create(:question, txt: "What?")
+    @questionnaires = [@questionnaire]
+  end
+
+  describe "Calculate review questions" do
+    it "returns the correct minimum, maximum, and number of questions" do
+      min, max, questions = @controller.send(:calculate_review_questions, @assignment, @questionnaires)
+      expect(min).to eq(0)
+      expect(max).to eq(5)
+      expect(questions).to eq(2)
+    end
   end
 end

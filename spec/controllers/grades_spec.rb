@@ -142,6 +142,7 @@ describe GradesController do
     @assignment_questionnaire = create(:assignment_questionnaire, used_in_round: 2)
     @question1 = create(:question, txt: "Who?")
     @question2 = create(:question, txt: "What?")
+    @questions = {question1: @question1, question2: @question2}
     @questionnaires = [@questionnaire]
   end
 
@@ -151,6 +152,21 @@ describe GradesController do
       expect(min).to eq(0)
       expect(max).to eq(5)
       expect(questions).to eq(2)
+    end
+  end
+
+  describe "Get team data" do
+    it "returns a blank array when there are no teams" do
+      scores = @assignment.scores(@questions)
+      data =  @controller.send(:get_team_data, @assignment, @questionnaires, scores)
+      expect(data).to eq([])
+    end
+  end
+
+  describe "Get highchart data" do
+    it "properly initializes the chart hash" do
+      data = @controller.send(:get_highchart_data, [], @assignment, 1, 3, 1)
+      expect(data).to eq({1 => {1 => [0], 2 => [0], 3 => [0]}})
     end
   end
 end

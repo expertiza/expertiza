@@ -1,24 +1,27 @@
 <% [:metrics].each do |type| %>
 
     <% if (flash_message type) != nil %>
-      <%= "This is in student_review/flash_metric_messages.html.erb.  We can setup the display for review metrics here." %></br>
-      <%= "The map_id is: " %><%= @record[0].map_id %> </br>
+      <%= "This is in student_review/flash_metric_messages.html.erb.  We can setup the display for review metrics here." %></br></br>
 
-      <%= "The response_id is: " %>
-      <%= @record[0].id %> </br></br>
+      <% @record.each do |records| %>
+        <% my_review_record = @review_record.where(responses_id: records.id) %>
+        <table border = "1" cellspacing="10">
+          <tr>
+            <th align = 'left' > <%= " Map ID " %> </th>
+            <th align = 'left' > <%= " Response ID " %> </th>
+            <% my_review_record.each do |review| %>
+                <th align = 'left' > <%= @review_metrics[review.review_metrics_id.to_int-1].metric %> </th>
+            <% end %>
+          </tr>
 
-      <table border = "1" cellspacing="10">
-        <tr>
-          <% @review_record.each do |review| %>
-              <th align = 'left' > <%= @review_metrics[review.review_metrics_id.to_int-1].metric %> </th>
-          <% end %>
-        </tr>
-
-        <tr>
-          <% @review_record.each do |review| %>
-              <td align = 'center' > <%= review.value %> </td>
-          <% end %>
-        </tr>
-      </table>
+          <tr>
+            <td align = 'center' > <%= records.map_id %> </td>
+            <td align = 'center' > <%= records.id %> </td>
+            <% my_review_record.each do |review| %>
+                <td align = 'center' > <%= review.value %> </td>
+            <% end %>
+          </tr>
+        </table></br>
+      <% end %>
     <% end %>
 <% end %>

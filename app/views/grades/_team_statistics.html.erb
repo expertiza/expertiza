@@ -1,4 +1,9 @@
 <table class="participant" width="100%">
+  <tr>
+    <td>
+      <h3>Team Statistics</h3>
+    </td>
+  </tr>
 <% participant = tscore[:team].participants.first %>
   <%= render :partial => 'grades/team_review_statistics_table',
              :locals => {:prefix => prefix+"_1",

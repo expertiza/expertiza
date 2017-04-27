@@ -1,6 +1,11 @@
 <table class="participants" width="100%">
+  <tr>
+    <td>
+      <h3>Participants Statistics</h3>
+    </td>
+  </tr>
+
 <%= render :partial => 'tabbed_participant_title', :locals => {:prefix => prefix } %>        
-<!--Zhewei: If several participants coming from same team, view score page only needs to display same review once. -->
 <% pindex = 3 %>
   <% tscore[:team].participants.each_with_index do |participant, index| %>
      <%= render :partial => 'grades/tabbed_participant',

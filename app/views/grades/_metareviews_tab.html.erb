@@ -1,3 +1,4 @@
+<% if has_team_and_metareview?[:has_metareview] %>
 <table class="participants" width="100%">
   <% tscore[:team].participants.each_with_index do |participant, index| %>
     <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
@@ -13,3 +14,4 @@
     </tr>
   <% end %>
 </table>
+<% end %>

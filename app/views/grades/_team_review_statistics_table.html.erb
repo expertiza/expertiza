@@ -2,7 +2,6 @@
 <tr>
     <td colspan="10">
 <% if rscore and rscore[:assessments].length > 0 %>
-    <BR/>
     <%flag_varying_rubrics=false%>
 
     <%if @questions.has_key?("review1".to_sym)%>
@@ -26,7 +25,6 @@
     <%if flag_varying_rubrics==false%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
     <%end%>
-    <BR/>
     </td>
 </tr>
 <% end %>

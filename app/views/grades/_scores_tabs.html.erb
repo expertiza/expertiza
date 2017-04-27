@@ -11,9 +11,10 @@
   <ul>
     <li><a href="#<%= prefix %>_tabs-1">Reviews</a></li>
     <li><a href="#<%= prefix %>_tabs-2">Author Feedback</a></li>
-    <li><a href="#<%= prefix %>_tabs-3">Metareviews</a></li>
-    <li><a href="#<%= prefix %>_tabs-4">Statistics</a></li>
-    <li><a href="#<%= prefix %>_tabs-5">Heat Grid</a></li>
+    <li><a href="#<%= prefix %>_tabs-3">Teammate Reviews</a></li>
+    <li><a href="#<%= prefix %>_tabs-4">Metareviews</a></li>
+    <li><a href="#<%= prefix %>_tabs-5">Statistics</a></li>
+    <li><a href="#<%= prefix %>_tabs-6">Heat Grid</a></li>
   </ul>
   <div id="<%= prefix %>_tabs-1">
     <%= render :partial => 'reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %>  
@@ -22,12 +23,15 @@
    <%= render :partial => 'author_feedback_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
   <div id="<%= prefix %>_tabs-3">
-    <%= render :partial => 'metareviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %> 
+    <%= render :partial => 'teammate_reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %> 
   </div>
   <div id="<%= prefix %>_tabs-4">
-    <%= render :partial => 'statistics_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
+    <%= render :partial => 'metareviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
   <div id="<%= prefix %>_tabs-5">
+    <%= render :partial => 'statistics_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
+  </div>
+  <div id="<%= prefix %>_tabs-6">
     <%= render :partial => 'heat_grid_tab', :locals => {:prefix => prefix} %> 
   </div>
 </div>

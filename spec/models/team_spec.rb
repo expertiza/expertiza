@@ -27,8 +27,7 @@ describe 'Team', type: :feature do
   end
 
   it "verify create team and node for Assignment Team" do
-    assignment = build(Assignment)
-    assignment.name = "newAssignment"
+    assignment = Assignment.find_by(name: "TestAssignment")
     assignment.save
     team = AssignmentTeam.create_team_and_node(assignment.id)
     expect(team).to be_kind_of(AssignmentTeam)
@@ -37,8 +36,11 @@ describe 'Team', type: :feature do
 
   it "verify the first submission is recorded correctly" do
     assignment = Assignment.find_by(name: "TestAssignment")
-    expect(assignment).to have_attributes(:first_sub_teamid => -1)
+    assignment.first_sub_teamid = -1
+    assignment.save
+    team = AssignmentTeam.create_team_and_node(assignment.id)
     user = User.find_by(name: "student2064")
+    team.add_member(user, assignment.id)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     click_link "TestAssignment"
@@ -46,7 +48,8 @@ describe 'Team', type: :feature do
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
     visit '/student_task/list'
+    assignment = Assignment.find_by(name: "TestAssignment")
     expect(assignment).to have_attributes(:first_sub_teamid => TeamsUser.team_id(assignment.id, user.id))
-    expect(page).to have_xpath("//img[contains(@src, 'firstsubmissionrs.jpg')]")
+    expect(page).to have_xpath("//img[contains(@src, 'firstsubmissionrs.png')]")
   end
 end

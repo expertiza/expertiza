@@ -49,7 +49,7 @@ class TreeDisplayController < ApplicationController
 
   # direct access to surveys
   def goto_surveys
-    goto_controller('Survey')
+    goto_controller('Assignment Survey')
   end
 
   # direct access to course evaluations

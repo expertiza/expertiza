@@ -10,23 +10,27 @@
           <b>Q - <%= question.txt %></b>
         <td>
       </tr>
-      <table border="1">
-        <tr>
-          <td>Comments</td>
-          <td>Score</td>    
-        </tr>
-        <% @responses = SurveyResponse.where(question_id: question.id) %>
-        <% @responses.each do |response| %> 
+      <% @responses = SurveyResponse.where(question_id: question.id) %>
+      <% if @responses.count > 0 %>
+        <table border="1">
           <tr>
-            <td>
-              <%= response.comments %>
-            </td>
-            <td>
-              <%= response.score %>
-            </td>
+            <td>Comments</td>
+            <td>Score</td>    
           </tr>
-        <% end %>
-      </table>
+          <% @responses.each do |response| %> 
+            <tr>
+              <td>
+                <%= response.comments %>
+              </td>
+              <td>
+                <%= response.score %>
+              </td>
+            </tr>
+          <% end %>
+        </table>
+      <% else %>
+        <p>No responses for this question</p>
+      <% end %>  
     <% end %>
   </table>
 <% end %>

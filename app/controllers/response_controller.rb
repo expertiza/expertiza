@@ -194,50 +194,49 @@ class ResponseController < ApplicationController
   def saving
     @map = ResponseMap.find(params[:id])
     @map.save
-    redirect_to action: 'prepare_to_save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
+    redirect_to action: 'save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
                 return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def prepare_to_save_review_metrics
+  def save_review_metrics
     # the metrics to be updated
     @response = Response.find(params[:metric_save])
     @answers = Answer.where(response_id: @response.id)
-    @word_counter = 0
-    @suggestive_word_count = 0
-    @problem_word_count = 0
-    @offensive_word_count = 0
+    word_counter = 0
+    suggestive_count = 0
+    problem_count = 0
+    offensive_count = 0
 
     x = 0
     while x < @answers.count
       @answers[x].comments.scan(/[\w']+/).each do |word|
-        @offensive_word_count += 1 if TEXT_METRICS_KEYWORDS['offensive'].include? word
-        @problem_word_count += 1 if TEXT_METRICS_KEYWORDS['problem'].include? word
-        @suggestive_word_count += 1 if TEXT_METRICS_KEYWORDS['suggestive'].include? word
-        @word_counter += 1
+        offensive_count += update_individual_metric('offensive', word)
+        problem_count += update_individual_metric('problem', word)
+        suggestive_count += update_individual_metric('suggestive', word)
+        word_counter += 1
       end
       x += 1
     end
 
-    save_review_metrics(@response, @word_counter, @suggestive_word_count, @problem_word_count, @offensive_word_count)
+    @response.additional_comment.scan(/[\w']+/).each do |word|
+      word_counter += 1
+      suggestive_count += update_individual_metric('suggestive', word)
+      problem_count += update_individual_metric('problem', word)
+      offensive_count += update_individual_metric('offensive', word)
+    end
+
+    update_review_metrics(@response.id, 1, word_counter)
+    update_review_metrics(@response.id, 2, suggestive_count)
+    update_review_metrics(@response.id, 3, problem_count)
+    update_review_metrics(@response.id, 4, offensive_count)
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def save_review_metrics(response, word_counter, suggestive_count, problem_word_count, offensive_word_count )
-    # the metrics to be updated
-    @answers = Answer.where(response_id: @response.id)
-
-    response.additional_comment.scan(/[\w']+/).each do |word|
-      word_counter += 1
-      suggestive_count += 1 if TEXT_METRICS_KEYWORDS['suggestive'].include? word
-      problem_word_count += 1 if TEXT_METRICS_KEYWORDS['problem'].include? word
-      offensive_word_count += 1 if TEXT_METRICS_KEYWORDS['offensive'].include? word
-    end
-
-    update_review_metrics(response.id, 1, word_counter)
-    update_review_metrics(response.id, 2, suggestive_count)
-    update_review_metrics(response.id, 3, problem_word_count)
-    update_review_metrics(response.id, 4, offensive_word_count)
+  def update_individual_metric(type, word)
+    my_return = 0
+    my_return += 1 if TEXT_METRICS_KEYWORDS[type].include? word
+    return my_return
   end
 
   def update_review_metrics(response, metric, value)

@@ -251,7 +251,7 @@ class GradesController < ApplicationController
 
     number_of_review_questions = 0
     questionnaires.each do |questionnaire|
-      if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+      if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire" # WHAT ABOUT NOT VARYING RUBRICS?
         number_of_review_questions = questionnaire.questions.size
         min = questionnaire.min_question_score < min ? questionnaire.min_question_score : min
         max = questionnaire.max_question_score > max ? questionnaire.max_question_score : max
@@ -383,7 +383,7 @@ class GradesController < ApplicationController
       # COPY PASTA
       questionnaires.each do |questionnaire|
         round = if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, questionnaire.id).used_in_round
                 else
                   nil
                 end

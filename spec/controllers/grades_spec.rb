@@ -161,6 +161,19 @@ describe GradesController do
       data =  @controller.send(:get_team_data, @assignment, @questionnaires, scores)
       expect(data).to eq([])
     end
+    it "returns a valid data structure with the correct participants" do
+      create_list(:participant, 1)
+      student = User.where(role_id: 2).second # Since Instructor is First
+      team = create(:assignment_team)
+      create(:team_user, user: student, team: team)
+
+      scores = @assignment.scores(@questions)
+      scores[:teams]["0".to_sym][:team] = team
+
+      data =  @controller.send(:get_team_data, @assignment, @questionnaires, scores)
+      participants = data.first.first.listofteamparticipants # Team Data -> VMList -> VmQuestionResponse
+      expect(participants.first.user_id).to eq(student.id)
+    end
   end
 
   describe "Get highchart data" do

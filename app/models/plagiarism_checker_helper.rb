@@ -1,3 +1,5 @@
+require 'simicheck_webservice'
+
 class PlagiarismCheckerHelper
 
   # PlagiarismCheckerHelper acts as the integration point between all services and models
@@ -8,9 +10,9 @@ class PlagiarismCheckerHelper
     # Start by creating a new assignment submission
     response = SimiCheckWebService.new_comparison(submission_name)
     json_response = JSON.parse(response.body)
-    submission_name = json_response["name"]
-    submission_id = json_response["id"]
-    assignment_submission = PlagiarismCheckerAssignmentSubmission.new(name: submission_name, simicheck_id: submission_id)
+    as_name = json_response["name"]
+    as_id = json_response["id"]
+    assignment_submission = PlagiarismCheckerAssignmentSubmission.new(name: as_name, simicheck_id: as_id)
     assignment_submission.save!
   end
 

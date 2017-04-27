@@ -41,6 +41,7 @@ module Expertiza
 
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
 
+    #Allow application to be opened in an i-frame
     config.action_dispatch.default_headers = {
         'X-Frame-Options' => 'ALLOWALL',
         'X-XSS-Protection' => '1; mode=block',

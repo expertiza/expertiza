@@ -209,38 +209,43 @@ class ResponseController < ApplicationController
 
     x = 0
     while x < @answers.count
-      @answers[x].comments.scan(/[\w']+/).each do |word|
-        offensive_count += update_individual_metric('offensive', word)
-        problem_count += update_individual_metric('problem', word)
-        suggestive_count += update_individual_metric('suggestive', word)
-        word_counter += 1
-      end
+      key = scan_words(@answers[x].comments)
+      offensive_count += key[0]
+      problem_count += key[1]
+      suggestive_count += key[2]
+      word_counter += key[3]
       x += 1
     end
 
-    @response.additional_comment.scan(/[\w']+/).each do |word|
-      word_counter += 1
-      suggestive_count += update_individual_metric('suggestive', word)
-      problem_count += update_individual_metric('problem', word)
-      offensive_count += update_individual_metric('offensive', word)
-    end
+    key = scan_words(@response.additional_comment)
+    word_counter += key[3]
+    suggestive_count += key[2]
+    problem_count += key[1]
+    offensive_count += key[0]
 
-    update_interface_review(@response.id, word_counter, suggestive_count, problem_count, offensive_count)
+    update_review_metrics(@response.id, 1, word_counter)
+    update_review_metrics(@response.id, 2, suggestive_count)
+    update_review_metrics(@response.id, 3, problem_count)
+    update_review_metrics(@response.id, 4, offensive_count)
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
+  def scan_words(message)
+    key = [0,0,0,0]
+    message.scan(/[\w']+/).each do |word|
+      key[0] += update_individual_metric('offensive', word)
+      key[1] += update_individual_metric('problem', word)
+      key[2] += update_individual_metric('offensive', word)
+      key[3] += 1
+    end
+    return key
   end
 
   def update_individual_metric(type, word)
     my_return = 0
     my_return += 1 if TEXT_METRICS_KEYWORDS[type].include? word
     return my_return
-  end
-
-  def update_interface_review(response, word, suggest, problem, offense)
-    update_review_metrics(response, 1, word)
-    update_review_metrics(response, 2, suggest)
-    update_review_metrics(response, 3, problem)
-    update_review_metrics(response, 4, offense)
   end
 
   def update_review_metrics(response, metric, value)

@@ -202,44 +202,32 @@ class ResponseController < ApplicationController
     # the metrics to be updated
     @response = Response.find(params[:metric_save])
     @answers = Answer.where(response_id: @response.id)
-    word_counter = 0
-    suggestive_count = 0
-    problem_count = 0
-    offensive_count = 0
+    metrics = [0, 0, 0, 0]
 
     x = 0
     while x < @answers.count
-      key = scan_words(@answers[x].comments)
-      offensive_count += key[0]
-      problem_count += key[1]
-      suggestive_count += key[2]
-      word_counter += key[3]
+      @answers[x].comments.scan(/[\w']+/).each do |word|
+        metrics[0] += update_individual_metric('offensive', word)
+        metrics[1] += update_individual_metric('problem', word)
+        metrics[2] += update_individual_metric('suggestive', word)
+        metrics[3] += 1
+      end
       x += 1
     end
 
-    key = scan_words(@response.additional_comment)
-    word_counter += key[3]
-    suggestive_count += key[2]
-    problem_count += key[1]
-    offensive_count += key[0]
+    @response.additional_comment.scan(/[\w']+/).each do |word|
+      metrics[3] += 1
+      metrics[2] += update_individual_metric('suggestive', word)
+      metrics[1] += update_individual_metric('problem', word)
+      metrics[0] += update_individual_metric('offensive', word)
+    end
 
-    update_review_metrics(@response.id, 1, word_counter)
-    update_review_metrics(@response.id, 2, suggestive_count)
-    update_review_metrics(@response.id, 3, problem_count)
-    update_review_metrics(@response.id, 4, offensive_count)
+    update_review_metrics(@response.id, 1, metrics[0])
+    update_review_metrics(@response.id, 2, metrics[1])
+    update_review_metrics(@response.id, 3, metrics[2])
+    update_review_metrics(@response.id, 4, metrics[3])
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
-  end
-
-  def scan_words(message)
-    key = [0,0,0,0]
-    message.scan(/[\w']+/).each do |word|
-      key[0] += update_individual_metric('offensive', word)
-      key[1] += update_individual_metric('problem', word)
-      key[2] += update_individual_metric('offensive', word)
-      key[3] += 1
-    end
-    return key
   end
 
   def update_individual_metric(type, word)

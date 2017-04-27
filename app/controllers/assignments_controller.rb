@@ -235,7 +235,7 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  # Prateek
+  # E1731: Improve Score Calculation - After scoring, redirect to display
   def local_db_cal
     assignment_id = params[:id]
     Assignment.save_score_in_db(assignment_id)

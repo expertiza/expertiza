@@ -223,7 +223,7 @@ jQuery(document).ready(function() {
                 </a>
               </span>
             )
-            // Prateek
+            // E1731: Improve Score Calculation - Adding a button which, when clicked, stores scores of that assignment in DB
             moreContent.push(
               <span>
                 <a title="Save scores in DB" href={"/assignments/local_db_cal?id="+(parseInt(this.props.id)/2).toString()}>

@@ -463,12 +463,12 @@ class Assignment < ActiveRecord::Base
   def self.export_details_fields(detail_options)
     fields = []
     fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
-    fields << 'Reviewee (Team/Student Name)' if detail_options['team_name'] == 'true'
+    fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
     fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
     fields << 'Question / Criterion' if detail_options['question'] == 'true'
     fields << 'Question ID' if detail_options['question_id'] == 'true'
-    fields << 'Answer/Comment ID' if detail_options['comment_id'] == 'true'
-    fields << 'Answer/Comment' if detail_options['comments'] == 'true'
+    fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
+    fields << 'Answer / Comment' if detail_options['comments'] == 'true'
     fields << 'Score' if detail_options['score'] == 'true'  
     fields
   end

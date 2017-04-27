@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170316023042) do
+ActiveRecord::Schema.define(version: 20170404122028) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20170316023042) do
     t.integer  "course_id",                  limit: 4,     default: 0
     t.integer  "instructor_id",              limit: 4,     default: 0
     t.boolean  "private",                                  default: false,  null: false
-    t.integer  "num_reviews",                limit: 4,     default: 0,      null: false
+    t.integer  "num_reviews",                limit: 4,     default: 3,      null: false
     t.integer  "num_review_of_reviews",      limit: 4,     default: 0,      null: false
     t.integer  "num_review_of_reviewers",    limit: 4,     default: 0,      null: false
     t.boolean  "reviews_visible_to_all"
@@ -79,6 +79,10 @@ ActiveRecord::Schema.define(version: 20170316023042) do
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true
+    t.integer  "num_reviews_required",       limit: 4,     default: 3
+    t.integer  "num_metareviews_required",   limit: 4,     default: 3
+    t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
+    t.integer  "num_reviews_allowed",        limit: 4,     default: 3
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -264,74 +268,6 @@ ActiveRecord::Schema.define(version: 20170316023042) do
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
-  create_table "lti2_tp_registrations", force: :cascade do |t|
-    t.integer  "tenant_id",                      limit: 4
-    t.string   "tenant_name",                    limit: 255
-    t.string   "tenant_basename",                limit: 255
-    t.string   "user_id",                        limit: 255
-    t.string   "reg_key",                        limit: 255
-    t.text     "reg_password",                   limit: 65535
-    t.string   "tool_proxy_guid",                limit: 255
-    t.text     "final_secret",                   limit: 65535
-    t.string   "tc_profile_url",                 limit: 255
-    t.string   "launch_presentation_return_url", limit: 255
-    t.string   "status",                         limit: 255
-    t.string   "message_type",                   limit: 255
-    t.string   "lti_version",                    limit: 32
-    t.string   "end_registration_id",            limit: 255
-    t.integer  "tool_id",                        limit: 4
-    t.text     "tool_consumer_profile_json",     limit: 65535
-    t.text     "tool_profile_json",              limit: 65535
-    t.text     "tool_proxy_json",                limit: 65535
-    t.text     "proposed_tool_proxy_json",       limit: 65535
-    t.text     "tool_proxy_response",            limit: 65535
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-  end
-
-  create_table "lti2_tp_registries", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.text     "content",    limit: 65535
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-  end
-
-  create_table "lti2_tp_tools", force: :cascade do |t|
-    t.string   "tool_name",             limit: 255
-    t.text     "tool_profile_template", limit: 65535
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-  end
-
-  create_table "lti_assignment_users", force: :cascade do |t|
-    t.integer  "user_id",               limit: 4
-    t.integer  "assignment_id",         limit: 4
-    t.integer  "participant_id",        limit: 4
-    t.text     "lis_result_source_did", limit: 65535
-    t.integer  "tenant_id",             limit: 4
-    t.string   "grade",                 limit: 255
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-  end
-
-  create_table "lti_registration_wips", force: :cascade do |t|
-    t.string   "tenant_name",             limit: 255
-    t.integer  "registration_id",         limit: 4
-    t.string   "lti_version",             limit: 255
-    t.text     "tool_consumer_profile",   limit: 65535
-    t.text     "tool_profile",            limit: 65535
-    t.string   "registration_return_url", limit: 255
-    t.string   "message_type",            limit: 255
-    t.text     "tool_proxy",              limit: 65535
-    t.string   "state",                   limit: 255
-    t.integer  "result_status",           limit: 4
-    t.string   "result_message",          limit: 255
-    t.string   "support_email",           limit: 255
-    t.string   "product_name",            limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-  end
-
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -353,6 +289,15 @@ ActiveRecord::Schema.define(version: 20170316023042) do
     t.integer "parent_id",      limit: 4
     t.integer "node_object_id", limit: 4
     t.string  "type",           limit: 255
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string   "subject",         limit: 255
+    t.text     "description",     limit: 65535
+    t.date     "expiration_date"
+    t.boolean  "active_flag"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "participants", force: :cascade do |t|
@@ -497,11 +442,10 @@ ActiveRecord::Schema.define(version: 20170316023042) do
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
   create_table "roles", force: :cascade do |t|
-    t.string   "name",            limit: 255,   default: "", null: false
+    t.string   "name",            limit: 255, default: "", null: false
     t.integer  "parent_id",       limit: 4
-    t.string   "description",     limit: 255,   default: "", null: false
+    t.string   "description",     limit: 255, default: "", null: false
     t.integer  "default_page_id", limit: 4
-    t.text     "cache",           limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -565,7 +509,7 @@ ActiveRecord::Schema.define(version: 20170316023042) do
     t.integer "micropayment",     limit: 4,     default: 0
     t.integer "private_to",       limit: 4
     t.text    "description",      limit: 65535
-    t.text    "link",             limit: 65535
+    t.string  "link",             limit: 255
   end
 
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree
@@ -688,23 +632,11 @@ ActiveRecord::Schema.define(version: 20170316023042) do
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
-  create_table "tenant_users", force: :cascade do |t|
-    t.integer  "tenant_id",  limit: 4
-    t.string   "user_id",    limit: 255
-    t.string   "first_name", limit: 255
-    t.string   "last_name",  limit: 255
-    t.string   "email",      limit: 255
+  create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification", limit: 4
+    t.integer  "user_id",      limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
-  end
-
-  create_table "tenants", force: :cascade do |t|
-    t.string   "tenant_key",              limit: 255
-    t.text     "secret",                  limit: 65535
-    t.string   "tenant_name",             limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.text     "lis_outcome_service_url", limit: 65535
   end
 
   create_table "tree_folders", force: :cascade do |t|
@@ -714,26 +646,26 @@ ActiveRecord::Schema.define(version: 20170316023042) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,   default: "",    null: false
-    t.string  "crypted_password",          limit: 40,    default: "",    null: false
-    t.integer "role_id",                   limit: 4,     default: 0,     null: false
+    t.string  "name",                      limit: 255,      default: "",    null: false
+    t.string  "crypted_password",          limit: 40,       default: "",    null: false
+    t.integer "role_id",                   limit: 4,        default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                      default: false
+    t.boolean "private_by_default",                         default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                             default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,     default: 0
+    t.boolean "is_new_user",                                default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,        default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 65535
+    t.text    "digital_certificate",       limit: 16777215
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 65535
-    t.boolean "copy_of_emails",                          default: false
+    t.text    "public_key",                limit: 16777215
+    t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
   end
 

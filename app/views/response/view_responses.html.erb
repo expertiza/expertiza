@@ -12,10 +12,10 @@
       </tr>
       <% @responses = SurveyResponse.where(question_id: question.id) %>
       <% if @responses.count > 0 %>
-        <table border="1">
+        <table border="1" style ="text-align: center">
           <tr>
-            <td>Comments</td>
-            <td>Score</td>    
+            <td><b>Comments</b></td>
+            <td><b>Score</b></td>    
           </tr>
           <% @responses.each do |response| %> 
             <tr>

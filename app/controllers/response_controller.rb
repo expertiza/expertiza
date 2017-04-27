@@ -193,11 +193,11 @@ class ResponseController < ApplicationController
 
   def saving
     @map = ResponseMap.find(params[:id])
+
     @return = params[:return]
     @map.save
-
-    redirect_to controller: 'response', action: 'save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
-                return: params[:return], msg: params[:msg], error_msg: params[:error_msg], save_options: params[:save_options]
+    redirect_to action: 'save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
+                return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def save_review_metrics
@@ -232,7 +232,7 @@ class ResponseController < ApplicationController
     update_review_metrics(@response.id, 3, @problem_word_count)
     update_review_metrics(@response.id, 4, @offensive_word_count)
 
-    redirect_to controller: 'response', action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def update_review_metrics(response, metric, value)

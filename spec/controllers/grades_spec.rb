@@ -169,4 +169,15 @@ describe GradesController do
       expect(data).to eq({1 => {1 => [0], 2 => [0], 3 => [0]}})
     end
   end
+
+  describe "Generate highchart" do
+    it "returns the correct series" do
+      series, categories = @controller.send(:generate_highchart, {1 => {1 => [5]}}, 1, 1, 1)
+      expect(series).to eq([{:name=>"Score 1 - Submission 1", :data=>[5], :stack=>"S1"}])
+    end
+    it "returns the correct categories" do
+      series, categories = @controller.send(:generate_highchart, {1 => {1 => [5,10]}}, 1, 1, 2)
+      expect(categories).to eq(["Rubric 1", "Rubric 2"])
+    end
+  end
 end

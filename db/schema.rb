@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
+    t.integer  "simicheck",                  limit: 4,     default: -1
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

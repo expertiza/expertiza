@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170404122028) do
+ActiveRecord::Schema.define(version: 20170427005000) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -329,6 +329,13 @@ ActiveRecord::Schema.define(version: 20170404122028) do
 
   create_table "permissions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
+  end
+
+  create_table "plagiarism_checker_assignment_submissions", force: :cascade do |t|
+    t.string   "name",         limit: 255
+    t.string   "simicheck_id", limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "plugin_schema_info", id: false, force: :cascade do |t|

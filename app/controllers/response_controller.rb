@@ -194,6 +194,11 @@ class ResponseController < ApplicationController
 
     @return = params[:return]
     @map.save
+    #TODO: call method to compute teammate review average, if return == "teammate"
+    if params[:return] == "teammate"
+      TeammateReviewResponseMap.assign_t_avg_to_part(@map.reviewee)
+    end
+
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
   

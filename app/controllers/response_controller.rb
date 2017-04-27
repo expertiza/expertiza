@@ -208,7 +208,7 @@ class ResponseController < ApplicationController
     offensive_count = 0
 
     x = 0
-    until x <= @answers.count
+    until x = @answers.count - 1
       @answers[x].comments.scan(/[\w']+/).each do |word|
         offensive_count += update_individual_metric('offensive', word)
         problem_count += update_individual_metric('problem', word)

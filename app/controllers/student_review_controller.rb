@@ -20,6 +20,7 @@ class StudentReviewController < ApplicationController
 
     # These variables are used by the flash message to display statistics to users
     @record = Response.where(map_id: params[:map])
+    @map = ResponseMap.all
     @review_record = ReviewMetricMapping.all
     @review_metrics = ReviewMetric.all
     @my_reviewer_id = params[:id]

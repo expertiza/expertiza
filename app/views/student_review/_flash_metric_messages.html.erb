@@ -9,6 +9,8 @@
           <tr>
             <th align = 'left' > <%= " Map ID " %> </th>
             <th align = 'left' > <%= " Response ID " %> </th>
+            <th align = 'left' > <%= " Assignment " %> </th>
+            <th align = 'left' > <%= " Round " %> </th>
             <% my_review_record.each do |review| %>
                 <th align = 'left' > <%= @review_metrics[review.review_metrics_id.to_int-1].metric %> </th>
             <% end %>
@@ -17,6 +19,9 @@
           <tr>
             <td align = 'center' > <%= records.map_id %> </td>
             <td align = 'center' > <%= records.id %> </td>
+            <% assignment = @map.where(id: records.map_id) %>
+            <td align = 'center' > <%= assignment[0].reviewed_object_id %> </td>
+            <td align = 'center' > <%= records.round %> </td>
             <% my_review_record.each do |review| %>
                 <td align = 'center' > <%= review.value %> </td>
             <% end %>

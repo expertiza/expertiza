@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170426015643) do
+ActiveRecord::Schema.define(version: 20170427145653) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -557,18 +557,17 @@ ActiveRecord::Schema.define(version: 20170426015643) do
   end
 
   create_table "survey_deployments", force: :cascade do |t|
-    t.integer  "course_evaluation_id", limit: 4
+    t.integer  "questionnaire_id", limit: 4
     t.datetime "start_date"
     t.datetime "end_date"
-    t.integer  "num_of_students",      limit: 4
+    t.integer  "num_of_students",  limit: 4
     t.datetime "last_reminder"
-    t.integer  "course_id",            limit: 4, default: 0, null: false
+    t.integer  "parent_id",        limit: 4,   default: 0, null: false
+    t.integer  "global_survey_id", limit: 4
+    t.string   "type",             limit: 255
   end
 
-  create_table "survey_participants", force: :cascade do |t|
-    t.integer "user_id",              limit: 4
-    t.integer "survey_deployment_id", limit: 4
-  end
+  add_index "survey_deployments", ["questionnaire_id"], name: "fk_rails_7c62b6ef2b", using: :btree
 
   create_table "survey_responses", force: :cascade do |t|
     t.integer "score",                limit: 4
@@ -702,6 +701,7 @@ ActiveRecord::Schema.define(version: 20170426015643) do
   add_foreign_key "review_grades", "participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
+  add_foreign_key "survey_deployments", "questionnaires"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"

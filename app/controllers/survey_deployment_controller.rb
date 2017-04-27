@@ -98,7 +98,7 @@ class SurveyDeploymentController < ApplicationController
 
   def generate_statistics
     @sd = SurveyDeployment.find(params[:id])
-    questionnaire = Questionnaire.find(@sd.course_evaluation_id)
+    questionnaire = Questionnaire.find(@sd.questionnaire_id)
     @range_of_scores = (questionnaire.min_question_score..questionnaire.max_question_score).to_a
     @questions = Question.where(questionnaire_id: questionnaire.id)
     responses_for_all_questions = []

@@ -299,7 +299,7 @@ development:
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/course_evaluation/list"
+        url: "/tree_display/goto_surveys"
       27: &7 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -1565,7 +1565,7 @@ production:
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/course_evaluation/list"
+        url: "/tree_display/goto_surveys"
       27: &7 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36

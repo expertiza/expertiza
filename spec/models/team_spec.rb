@@ -36,8 +36,6 @@ describe 'Team', type: :feature do
 
   it "verify the first submission is recorded correctly" do
     assignment = Assignment.find_by(name: "TestAssignment")
-    assignment.first_sub_teamid = -1
-    assignment.save
     team = AssignmentTeam.create_team_and_node(assignment.id)
     user = User.find_by(name: "student2064")
     team.add_member(user, assignment.id)

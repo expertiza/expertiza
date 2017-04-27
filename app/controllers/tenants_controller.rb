@@ -1,4 +1,4 @@
-class TenantsController < InheritedResources::Base
+class TenantsController < ApplicationController
 
   private
 

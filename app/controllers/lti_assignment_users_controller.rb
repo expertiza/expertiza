@@ -2,7 +2,7 @@ include Lti2Commons
 include Signer
 include MessageSupport
 include OAuth::OAuthProxy
-class LtiAssignmentUsersController < InheritedResources::Base
+class LtiAssignmentUsersController < ApplicationController
 
   def create
     (@error_code, @message) = pre_process_tenant

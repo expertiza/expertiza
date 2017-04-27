@@ -1,4 +1,4 @@
-class LtiRegistrationWipsController < InheritedResources::Base
+class LtiRegistrationWipsController < ApplicationController
   def index
     action = params[:action]
     registration_id = params[:registration_id]

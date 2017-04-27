@@ -193,8 +193,6 @@ class ResponseController < ApplicationController
 
   def saving
     @map = ResponseMap.find(params[:id])
-
-    @return = params[:return]
     @map.save
     redirect_to action: 'save_review_metrics', id: @map.map_id, metric_save: params[:metric_save],
                 return: params[:return], msg: params[:msg], error_msg: params[:error_msg]

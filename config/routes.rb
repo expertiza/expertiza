@@ -534,4 +534,6 @@ Expertiza::Application.routes.draw do
 
   get ':controller(/:action(/:id))(.:format)'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
+  get 'github_contributors/show', controller: :github_contributors, action: :show
+
 end

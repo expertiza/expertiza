@@ -5,6 +5,7 @@
 <% else %>
   <table>
     <% @questions.each do |question| %>
+    <p><%= question.id %></p>
       <tr>
         <td>
           <b>Q - <%= question.txt %></b>
@@ -16,23 +17,17 @@
           <td>Score</td>    
         </tr>
         <% @responses = SurveyResponse.where(question_id: question.id) %>
-        <% @responses.each do |response| %>
-          
-        <tr>
-          
-          <td>
-            <%= response.comments %>
-          </td>
-          <td>
-            <%= response.score %>
-          </td>
-        </tr>
-        
+        <% @responses.each do |response| %> 
+          <tr>
+            <td>
+              <%= response.comments %>
+            </td>
+            <td>
+              <%= response.score %>
+            </td>
+          </tr>
         <% end %>
-          
-          
       </table>
-
     <% end %>
   </table>
 <% end %>

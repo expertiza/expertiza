@@ -1,5 +1,6 @@
 
 class SurveyDeploymentController < ApplicationController
+  include SurveyDeploymentHelper
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -61,6 +62,26 @@ class SurveyDeploymentController < ApplicationController
       survey_participant.user_id = users_rand[i].id
       survey_participant.survey_deployment_id = survey_deployment_id
       survey_participant.save
+    end
+  end
+
+  def generate_statistics
+    @sd = SurveyDeployment.find(params[:id])
+    questionnaire = Questionnaire.find(@sd.course_evaluation_id)
+    @range_of_scores = (questionnaire.min_question_score..questionnaire.max_question_score).to_a
+    @questions = Question.where(questionnaire_id: questionnaire.id)
+    responses_for_all_questions = []
+    @questions.each do |question|
+      responses_for_all_questions << get_responses_for_question_in_a_survey_deployment(question.id, @sd.id)
+    end
+    @chart_data_table = []
+    responses_for_all_questions.each_with_index do |response, index|
+      data_table_row = []
+      data_table_row << ['Label', 'Number']
+      response.each_with_index do |response_value, index|
+        data_table_row << [index.to_s, response_value]
+      end
+      @chart_data_table << data_table_row
     end
   end
 end

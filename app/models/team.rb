@@ -262,4 +262,15 @@ class Team < ActiveRecord::Base
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
+
+
+  #return the team in which the participant exist
+  def self.get_team(participant)
+    team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
+    if team_id.nil?
+      nil
+    else
+      Team.find(team_id)
+    end
+  end
 end

@@ -201,22 +201,11 @@ class ResponseController < ApplicationController
   def save_review_metrics
     # the metrics to be updated
     @response = Response.find(params[:metric_save])
-    @answers = Answer.where(response_id: @response.id)
-    word_counter = 0
-    suggestive_count = 0
-    problem_count = 0
-    offensive_count = 0
-
-    x = 0
-    while x < @answers.count
-      @answers[x].comments.scan(/[\w']+/).each do |word|
-        offensive_count += update_individual_metric('offensive', word)
-        problem_count += update_individual_metric('problem', word)
-        suggestive_count += update_individual_metric('suggestive', word)
-        word_counter += 1
-      end
-      x += 1
-    end
+    loader = save_individual(@response.id)
+    word_counter = loader[3]
+    suggestive_count = loader[2]
+    problem_count = loader[1]
+    offensive_count = loader[0]
 
     @response.additional_comment.scan(/[\w']+/).each do |word|
       word_counter += 1
@@ -231,6 +220,22 @@ class ResponseController < ApplicationController
     update_review_metrics(@response.id, 4, offensive_count)
 
     redirect_to action: 'redirection', id: params[:id], return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
+  def save_individual(response)
+    @answers = Answer.where(response_id: response)
+    key = [0, 0, 0, 0]
+    x = 0
+    while x < @answers.count
+      @answers[x].comments.scan(/[\w']+/).each do |word|
+        key[0] += update_individual_metric('offensive', word)
+        key[1] += update_individual_metric('problem', word)
+        key[2] += update_individual_metric('suggestive', word)
+        key[3] += 1
+      end
+      x += 1
+    end
+    return key
   end
 
   def update_individual_metric(type, word)

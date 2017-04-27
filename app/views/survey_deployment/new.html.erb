@@ -5,6 +5,8 @@
 
 <%= form_tag :action => 'create', :type => @survey_type do %>
 
+    <input type="hidden" name="survey_deployment[parent_id]" value=<%=@parent.id%> />
+    <input type="hidden" name="type" value=<%=@survey_type%> />
 
   <table>
     <tr>

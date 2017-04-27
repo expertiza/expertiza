@@ -29,13 +29,14 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def new_assignment_deployment
-    @parent = Assignment.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
-    @total_students = AssignmentParticipant.where(parent_id: @parent[0][1]).count
+    @parent = Assignment.find_by_id( params[:id])
+    @total_students = AssignmentParticipant.where(parent_id: @parent.id).count
   end
 
   def new_course_deployment
-    @parent = Course.where(instructor_id: session[:user].id).map {|u| [u.name, u.id] }
-    @total_students = CourseParticipant.where(parent_id: @parent[0][1]).count
+    @parent = Course.find_by_id( params[:id])
+    puts @parent.id
+    @total_students = CourseParticipant.where(parent_id: @parent.id).count
   end
 
   def param_test

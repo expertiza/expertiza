@@ -192,7 +192,7 @@ jQuery(document).ready(function() {
                 <a title="View review report" href={"/review_mapping/response_report?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-review-report-24.png" />
                 </a>
-              <a title="View plagiarism comparison report" href={"/plagiarism_checker_comparison/index?id="+(parseInt(this.props.id)/2).toString()}>
+              <a title="View plagiarism checker report" href={"/plagiarism_checker_report?id="+(parseInt(this.props.id)/2).toString()}>
                 <img src="/assets/tree_view/view-plagiarism-report-24.png" />
               </a>
               <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>

@@ -3,7 +3,6 @@ if plagiarism_checker_assignment_submission doesn't exist, say there is no plagi
 else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
 else show records
 -->
-<h2>Plagiarism Comparison Report</h2>
 
 <% if @PlagiarismCheckerComparisons = nil %>
     <div class="text-center">
@@ -11,8 +10,8 @@ else show records
     </div>
 <% else %>
 
-  <div class="container"><p></p>
-    <table class="table table-striped">
+    <div class="container"><p></p>
+      <table class="table table-striped">
         <thead>
         <tr>
           <th>Plagiarism Report</th>
@@ -32,6 +31,6 @@ else show records
               <td><%= pcc.file2_team%></td>
             </tr>
         <% end %>
-    </table>
-  </div>
+      </table>
+    </div>
 <% end %>

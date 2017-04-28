@@ -439,7 +439,10 @@ class ReviewMappingController < ApplicationController
       @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id:params[:id], calibrate_to:1)
       @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id:params[:id], calibrate_to:0)
       @responses = Response.where(:map_id => @review_response_map_ids)
-      end
+
+    when "PlagiarismCheckerReport"
+      @PlagiarismCheckerComparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: plagiarism_checker_assignment_submission_id)
+    end
     end
 
   def save_grade_and_comment_for_reviewer

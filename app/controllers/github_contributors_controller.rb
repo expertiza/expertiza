@@ -6,11 +6,10 @@ class GithubContributorsController < ApplicationController
     assignment_team = AssignmentTeam.find(@submission_record.team_id)
     assignment = Assignment.find(assignment_team.parent_id)
     return true if (['Super-Administrator', 'Administrator'].include? current_role_name) ||
-        (assignment.instructor_id == current_user.id)
-    return true if TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id) &&
-        TaMapping.where(course_id: assignment.course_id).include?
-        TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first
-    return true if assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id
+        (assignment.instructor_id == current_user.id) || (TaMapping.exists?(ta_id: current_user.id,
+        course_id: assignment.course_id) && TaMapping.where(course_id: assignment.course_id).include?
+        TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first) || (assignment.course_id &&
+        Course.find(assignment.course_id).instructor_id == current_user.id)
     false
   end
 
@@ -19,11 +18,11 @@ class GithubContributorsController < ApplicationController
     matches = GITHUB_REGEX.match(@submission_record.content)
     if metrics.nil?
       @message = if matches.nil?
-         'This is not a github repository.'
-      else
-        'Accessed the github API too soon. Refresh the page, if ' \
-            'it fails again, please contact the administrator.'
-      end
+                     'This is not a github repository.'
+                 else
+                    'Accessed the github API too soon. Refresh the page, if ' \
+                    'it fails again, please contact the administrator.'
+                 end
       render 'github_contributors/not_found'
     else
       metrics_map = format_metrics(metrics)
@@ -40,7 +39,7 @@ class GithubContributorsController < ApplicationController
 
   BASE_URI = 'https://api.github.com'.freeze
   API_TOKEN = "token #{ENV['EXPERTIZA_GITHUB_TOKEN']}".freeze
-  GITHUB_REGEX = %r{/https?:\/\/([w]{3}\.)?github.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)[\S]*/i}
+  GITHUB_REGEX = /https?:\/\/([w]{3}\.)?github.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)[\S]*/i
 
   def fetch_metrics(owner, repo)
     resp = HTTP.headers(Authorization: API_TOKEN).get("#{BASE_URI}/repos/#{owner}/#{repo}/stats/contributors")
@@ -67,7 +66,7 @@ class GithubContributorsController < ApplicationController
         contribution.lines_changed = week['c']
         contribution.lines_added = week['a']
         contribution.lines_removed = week['d']
-        contribution.week_timestamp = Time.current(week['w']).to_s(:db)
+        contribution.week_timestamp = Time.zone.at(week['w']).to_s(:db)
         contribution.submission_records_id = submission.id
         github_contributors << contribution
       end
@@ -78,17 +77,15 @@ class GithubContributorsController < ApplicationController
 
   def retrieve_content(submission)
     if submission.operation != 'Submit Hyperlink'
-      # || !has_submission_finished(submission)
+      # || !submission_finished?(submission)
       return nil
     end
     matches = GITHUB_REGEX.match(submission.content)
-    if matches.nil?
-      return nil
-    end
+    return nil if matches.nil?
     [matches[2], matches[3]]
   end
 
-  def has_submission_finished(submission)
+  def submission_finished?(submission)
     Assignment.find(Team.find(submission.team_id).parent_id).current_stage_name == 'Finished'
   end
 
@@ -96,7 +93,9 @@ class GithubContributorsController < ApplicationController
     content = retrieve_content(submission)
     unless content.nil?
       github_data = fetch_metrics(content[0], content[1])
-      return parse_submissions(submission, github_data) unless github_data.nil?
+      unless github_data.nil?
+        return parse_submissions(submission, github_data)
+      end
     end
     nil
   end

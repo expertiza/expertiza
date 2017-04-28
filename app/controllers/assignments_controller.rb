@@ -235,7 +235,7 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  # E1731: Improve Score Calculation - After scoring, redirect to display
+  # E1731: Improve Score Calculation: Method called after clicking the icon "save scores to db"
   def local_db_cal
     assignment_id = params[:id]
     Assignment.save_score_in_db(assignment_id)
@@ -255,7 +255,7 @@ class AssignmentsController < ApplicationController
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
     Assignment.remove_assignment_from_course(assignment)
-    #redirect_to list_tree_display_index_path
+    redirect_to list_tree_display_index_path
   end
 
   def delete_delayed_mailer

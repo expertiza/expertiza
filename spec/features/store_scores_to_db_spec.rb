@@ -1,10 +1,9 @@
-#E1731: Some preliminary tests. Need to verify if correct. Also need to add more test cases
-
+# E1731: Tests to check if total score is getting stored in the local_db_scores database
 require 'rails_helper'
-# include GradesHelper
+
 describe "Store Scores in DB", type: :feature do
   before(:each) do
-    create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
+    @assignment = create(:assignment, name: "TestAssignment", directory_path: 'test_assignment', rounds_of_reviews: 1)
     create_list(:participant, 3)
     create(:assignment_node)
     create(:deadline_type, name: "submission")
@@ -26,24 +25,15 @@ describe "Store Scores in DB", type: :feature do
     create(:signed_up_team)
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
     create(:assignment_questionnaire)
-    create(:question)
+    create(:question, weight: 100)
   end
 
   def load_questionnaire
     login_as('student2064')
-    #expect(page).to have_content "User: student2063"
-    #expect(page).to have_content "TestAssignment"
-
     click_link "TestAssignment"
-    #expect(page).to have_content "Submit or Review work for TestAssignment"
-    #expect(page).to have_content "Others' work"
-
     click_link "Others' work"
-    #expect(page).to have_content 'Reviews for "TestAssignment"'
-
     choose "topic_id"
     click_button "Request a new submission to review"
-
     click_link "Begin"
   end
 
@@ -52,25 +42,13 @@ describe "Store Scores in DB", type: :feature do
     fill_in "responses[0][comment]", with: "Hello World. Sample Review Comment"
     select 5, from: "responses[0][score]"
     click_button "Submit Review"
+    Response.find(1).update_attribute('is_submitted', true)
   end
 
-  it "Store scores of Assignment in DB" do
+  it "store assignment scores in DB" do
     submit_review
-    post :save_score_in_db, {assignment: :assignment}
-    expect(LocalDbScore.where(score: 100)).to exist
+    expect do
+      Assignment.save_score_in_db(@assignment.id)
+    end.to change { LocalDbScore.count }.by 1
   end
 end
-
-
-#  @response_maps = ResponseMap.new
-#  @response_maps.id = 123456
-#  @response_maps.save!
-#  it 'Check if scores stored in db' do
-#    @scores = LocalDbScore.new
-#    @scores.score_type = "ReviewLocalDBScore"
-#    @scores.round = 1
-#    @scores.score = 75
-#    @scores.response_map_id = 123456
-#    @scores.save!
-#    expect(LocalDbScore.where(response_map_id: 123456)).to exist
-#  end

@@ -1,0 +1,2 @@
+class GlobalSurveyResponseMap < SurveyResponseMap
+end

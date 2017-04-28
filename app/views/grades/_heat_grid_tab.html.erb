@@ -1,1 +1,16 @@
-<p>Heat Grid Partial</p>
+<table class="participants" width="100%">
+  <% tscore[:team].participants.each_with_index do |participant, index| %>
+    <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
+    <tr style="background-color: white">
+      <td>
+        <b> <%=participant.fullname %></b>
+        <FONT SIZE="-1"><a href="../grades/view_team?id=<%= participant.id%>"  >view heatgrid</a></FONT>
+      </td>
+    <tr id="<%=prefix%>_<%=index.to_s%>_feedback" style="display:none">
+      <td>
+        <%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+

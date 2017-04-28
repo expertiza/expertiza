@@ -123,7 +123,7 @@ describe "airbrake-1517247902792549741" do
     expect(page).to have_content('Password')
   end
 
-  it "can access to '/tree_display/list' after login as an admin/instructor/TA" do
+  it "can access to '/tree_display/list' after login as an admin/instructor/TA", js: true do
     create(:instructor)
     login_as 'instructor6'
     visit '/tree_display/list'

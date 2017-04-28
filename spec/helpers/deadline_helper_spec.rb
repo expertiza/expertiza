@@ -5,13 +5,13 @@ describe "DeadlineHelper" do
     @deadline_type = create(:deadline_type)
     @deadline_right = create(:deadline_right)
     @topic_due_date = create(:topic_due_date, deadline_type: @deadline_type,
-      submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-      review_of_review_allowed_id: @deadline_right.id)
+                                              submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+                                              review_of_review_allowed_id: @deadline_right.id)
   end
-  
-   describe "#create_topic_deadline" do
+
+  describe "#create_topic_deadline" do
     it "should fail because of invalid due_date" do
-      expect { DeadlineHelper.create_topic_deadline(nil, 0, 0)}.to raise_exception(NoMethodError)
+      expect { DeadlineHelper.create_topic_deadline(nil, 0, 0) }.to raise_exception(NoMethodError)
     end
 
     it "new due_date object created" do
@@ -45,8 +45,8 @@ describe "DeadlineHelper" do
       new_due_date = TopicDueDate.find_by(parent_id: 10)
       expect(new_due_date).to be_valid
       expect(new_due_date.due_at.to_s).to be == (Time.zone.parse(@topic_due_date.due_at.to_s) + 5000).to_s
-      end
-   end
+    end
+  end
 
   it "has a valid factory" do
     factory = FactoryGirl.build(:topic_due_date)

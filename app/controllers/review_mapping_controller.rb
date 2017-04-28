@@ -218,6 +218,21 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: mapping.assignment.id
   end
 
+  # E1721: Unsubmit reviews using AJAX
+  def unsubmit_review
+    @response = Response.where(map_id: params[:id]).last
+    review_response_map = ReviewResponseMap.find_by(id: params[:id])
+    reviewer = review_response_map.reviewer.name
+    reviewee = review_response_map.reviewee.name
+    if @response.update_attribute('is_submitted', false)
+      flash.now[:success] = "The review by \"" + reviewer + "\" for \"" + reviewee + "\" has been unsubmitted."
+    else
+      flash.now[:error] = "The review by \"" + reviewer + "\" for \"" + reviewee + "\" could not be unsubmitted."
+    end
+    render action: 'unsubmit_review.js.erb', layout: false
+  end
+  # E1721 changes End
+
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
     if review_response_map and !Response.exists?(map_id: review_response_map.id)
@@ -424,8 +439,9 @@ class ReviewMappingController < ApplicationController
       @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id:params[:id], calibrate_to:1)
       @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id:params[:id], calibrate_to:0)
       @responses = Response.where(:map_id => @review_response_map_ids)
-      end
     end
+    @user_pastebins = UserPastebin.get_current_user_pastebin current_user
+  end
 
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])

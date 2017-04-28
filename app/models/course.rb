@@ -4,7 +4,7 @@ class Course < ActiveRecord::Base
   validates_presence_of :name
   has_many :assignments, dependent: :destroy
   belongs_to :instructor, class_name: 'User', foreign_key: 'instructor_id'
-  belongs_to :institution, class_name: 'Institution', foreign_key: 'instituition_id'
+  belongs_to :institution, class_name: 'Institution', foreign_key: 'institutions_id'
   has_many :participants, class_name: 'CourseParticipant', foreign_key: 'parent_id'
   has_one :course_node, foreign_key: :node_object_id, dependent: :destroy
   has_paper_trail
@@ -38,7 +38,9 @@ class Course < ActiveRecord::Base
       raise "No user account exists with the name " + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
     participant = CourseParticipant.where(parent_id: self.id, user_id:  user.id).first
-    unless participant # If there is already a participant, it has already been added. done. Otherwise, create it
+    if participant # If there is already a participant, raise an error. Otherwise, create it
+      raise "The user #{user.name} is already a participant."
+    else
       CourseParticipant.create(parent_id: self.id, user_id: user.id, permission_granted: user.master_permission_granted)
     end
   end

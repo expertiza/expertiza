@@ -22,6 +22,35 @@ describe "validations" do
   it "checks whether signed up topic is created or not" do
     expect(create(:topic)).to be_valid
   end
+
+  it "checks whether num_reviews_allowed and num_reviews_required is valid or not" do
+    @assignment.num_reviews_required = 2
+    @assignment.num_reviews_allowed = 5
+    expect(@assignment).to be_valid
+    # indicated infinite upperbouned
+    @assignment.num_reviews_allowed = -1
+    expect(@assignment).to be_valid
+  end
+
+  it "checks whether num_meta_reviews_allowed and num_meta_reviews_required is valid or not" do
+    @assignment.num_metareviews_allowed = 3
+    @assignment.num_metareviews_required = 1
+    expect(@assignment).to be_valid
+    @assignment.num_metareviews_allowed = -1 # indicated infinite upperbouned
+    expect(@assignment).to be_valid
+  end
+
+  it "check whether assignment doesnot accept required value greater than allowed value - Review" do
+    @assignment.num_reviews_allowed = 2
+    @assignment.num_reviews_required = 5
+    expect(@assignment).not_to be_valid
+  end
+
+  it "check whether assignment doesnot accept required value greater than allowed value - Meta-Review" do
+    @assignment.num_metareviews_allowed = 1
+    @assignment.num_metareviews_required = 3
+    expect(@assignment).not_to be_valid
+  end
 end
 
 describe "#team_assignment" do
@@ -114,5 +143,64 @@ describe "#check if the assignment belongs to a course" do
     assignment_node.node_object_id = assignment.id
     expect(assignment_node.belongs_to_course?).to be true
   end
+end
 
+describe "has correct csv values?" do
+  before(:each) do
+    @assignment = create(:assignment)
+    create(:assignment_team, name: "team1")
+    @student = create(:student, name: "student1")
+    create(:participant, user: @student)
+    create(:questionnaire)
+    create(:question)
+    create(:review_response_map)
+    create(:response)
+    @options = {"team_id" => "true", "team_name" => "true",
+                "reviewer" => "true", "question" => "true",
+                "question_id" => "true", "comment_id" => "true",
+                "comments" => "true", "score" => "true"}
+  end
+
+  def generated_csv(t_assignment, t_options)
+    delimiter = ","
+    CSV.generate(col_sep: delimiter) do |csv|
+      csv << Assignment.export_headers(t_assignment.id)
+      csv << Assignment.export_details_fields(t_options)
+      Assignment.export_details(csv, t_assignment.id, t_options)
+    end
+  end
+
+  it "checks_if_csv has the correct data" do
+    create(:answer, comments: "Test comment")
+    expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
+  end
+
+  it "checks csv with some options" do
+    create(:answer, comments: "Test comment")
+    @options["team_id"] = "false"
+    @options["question_id"] = "false"
+    @options["comment_id"] = "false"
+    expected_csv = File.read('spec/features/assignment_export_details/expected_details_some_options_csv.txt')
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
+  end
+
+  it "checks csv with no data" do
+    expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_data_csv.txt')
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
+  end
+
+  it "checks csv with data and no options" do
+    create(:answer, comments: "Test comment")
+    @options["team_id"] = "false"
+    @options["team_name"] = "false"
+    @options["reviewer"] = "false"
+    @options["question"] = "false"
+    @options["question_id"] = "false"
+    @options["comment_id"] = "false"
+    @options["comments"] = "false"
+    @options["score"] = "false"
+    expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
+    expect(generated_csv(@assignment, @options)).to eq(expected_csv)
+  end
 end

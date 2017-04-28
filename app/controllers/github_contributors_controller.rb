@@ -57,15 +57,15 @@ class GithubContributorsController < ApplicationController
       user_name = contributions['author']['login']
       github_id = contributions['author']['id']
       contributions['weeks'].each do |week|
-        contribution = GithubContributor.new(
-            user_name: user_name,
-            github_id: github_id,
-            total_commits: total,
-            lines_changed: week['c'],
-            lines_added: week['a'],
-            lines_removed: week['d'],
-            week_timestamp: Time.zone.at(week['w']).to_s(:db),
-            submission_records_id: submission.id)
+        contribution = GithubContributor.new
+        contribution.user_name = user_name
+        contribution.github_id = github_id
+        contribution.total_commits = total
+        contribution.lines_changed = week['c']
+        contribution.lines_added = week['a']
+        contribution.lines_removed = week['d']
+        contribution.week_timestamp = Time.zone.at(week['w']).to_s(:db)
+        contribution.submission_records_id = submission.id
         github_contributors << contribution
       end
     end

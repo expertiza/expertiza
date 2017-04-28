@@ -34,8 +34,7 @@ describe GithubContributorsController do
       @sub_record.save
       allow(AssignmentTeam).to receive(:find).with(@assignment_team.id).and_return @assignment_team
       allow(Assignment).to receive(:find).with(@assignment.id).and_return @assignment
-      @params = {id: @sub_record.id}
-      get('show', @params)
+      get 'show', {id: @sub_record.id}
       expect(response).to have_http_status(200)
     end
 
@@ -45,8 +44,7 @@ describe GithubContributorsController do
       @sub_record.save
       allow(AssignmentTeam).to receive(:find).with(@assignment_team.id).and_return @assignment_team
       allow(Assignment).to receive(:find).with(@assignment.id).and_return @assignment
-      @params = {id: @sub_record.id}
-      get('show', @params)
+      get 'show', {id: @sub_record.id}
       expect(response).to redirect_to('/')
     end
 
@@ -56,8 +54,7 @@ describe GithubContributorsController do
       @sub_record.save
       allow(AssignmentTeam).to receive(:find).with(@assignment_team.id).and_return @assignment_team
       allow(Assignment).to receive(:find).with(@assignment.id).and_return @assignment
-      @params = {id: @sub_record.id}
-      get('show', @params)
+      get 'show', {id: @sub_record.id}
       expect(response).to render_template('github_contributors/not_found')
     end
 
@@ -67,8 +64,7 @@ describe GithubContributorsController do
       @sub_record.save
       allow(AssignmentTeam).to receive(:find).with(@assignment_team.id).and_return @assignment_team
       allow(Assignment).to receive(:find).with(@assignment.id).and_return @assignment
-      @params = {id: @sub_record.id}
-      get('show', @params)
+      get 'show', {id: @sub_record.id}
       expect(response).to render_template('github_contributors/not_found')
     end
   end

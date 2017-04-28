@@ -4,11 +4,11 @@ module SurveyDeploymentHelper
 		question = Question.find(q_id)
 		responses = []
 		type_of_response_map = ["AssignmentSurveyResponseMap","CourseSurveyResponseMap"]
-		rm = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewee_id = ? AND (type = ? OR type = ?)",sd_id, type_of_response_map[0], type_of_response_map[1]])
+		response_map_list = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewee_id = ? AND (type = ? OR type = ?)",sd_id, type_of_response_map[0], type_of_response_map[1]])
 			@range_of_scores.count.times do |i|
 				count = 0
-				rm.each do |r|
-					response_list = Response.where(map_id: r.id)
+				response_map_list.each do |response_map|
+					response_list = Response.where(map_id: response_map.id)
 					response_list.each do |response|
 						count += Answer.where(question_id: question.id, answer: i, response_id: response.id).count
 					end 

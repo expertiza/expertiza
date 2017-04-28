@@ -19,7 +19,11 @@ function loadGithubCharts(data, container, title, color) {
            color: color,
            data: data
        }], tooltip: {
-           // pointFormat: '<span style="color:{point.color}">\u25CF</span> <b>{point.y}</b><br/>'
+           formatter: function () {
+                return '<span style="color:' + this.color + '">\u25CF</span> <b>' + this.y + '</b><br/>' +
+                    '<span style="font-size: 10px">' + Highcharts.dateFormat('%e - %b - %Y',
+                        new Date(this.x))+ '</span><br/>';
+           }
        }, legend: {
            enabled: false
        }, credits: {

@@ -34,7 +34,7 @@
         <% rounds << response.round %>
     <% end %>
 
-    <% rounds.each do |round| %>
+    <% rounds.sort.each do |round| %>
         <h3>Round <%= round %></h3>
         <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
         <table class="table table-striped" style="display: none;" id=<%= participant.id.to_s + '_' + round.to_s %>>

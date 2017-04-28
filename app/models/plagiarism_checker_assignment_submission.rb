@@ -1,4 +1,5 @@
 class PlagiarismCheckerAssignmentSubmission < ActiveRecord::Base
+  belongs_to :assignment
   has_many :plagiarism_checker_comparisons
 
   # t.string :name

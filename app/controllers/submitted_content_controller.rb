@@ -66,6 +66,7 @@ class SubmittedContentController < ApplicationController
         #create a submission record
         @submission_record = SubmissionRecord.new(team_id: team.id, content: params['submission'], user: @participant.name, assignment_id: params[:id], operation: "Submit Hyperlink")
         @submission_record.save
+        Assignment.first_submission_reward(@participant.assignment.id, @submission_record.team_id)
       rescue
         flash[:error] = "The URL or URI is not valid. Reason: #{$ERROR_INFO}"
       end
@@ -135,8 +136,9 @@ class SubmittedContentController < ApplicationController
     team = participant.team
     @submission_record = SubmissionRecord.new(team_id: team.id, content: full_filename, user: participant.name , assignment_id: assignment.id, operation: "Submit File")
     @submission_record.save
+    Assignment.first_submission_reward(participant.assignment.id, @submission_record.team_id)
 
-   # params = ActionController::Parameters.new(a: "123", b: "456")
+    # params = ActionController::Parameters.new(a: "123", b: "456")
     # send message to reviewers when submission has been updated
     participant.assignment.email(participant.id) rescue nil # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
     if params[:origin] == 'review'

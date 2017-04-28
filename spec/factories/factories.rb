@@ -127,6 +127,7 @@ FactoryGirl.define do
     use_bookmark false
     can_review_same_topic true
     can_choose_topic_to_review true
+    first_sub_teamid :assignment_team
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -138,6 +139,7 @@ FactoryGirl.define do
     submitted_hyperlinks "---
 - https://www.expertiza.ncsu.edu"
     directory_num 0
+    t_rev_avg 96
   end
 
   factory :team_user, class: TeamsUser do

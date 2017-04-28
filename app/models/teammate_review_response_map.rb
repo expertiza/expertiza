@@ -32,4 +32,46 @@ class TeammateReviewResponseMap < ResponseMap
     defn[:to] = user.email
     Mailer.sync_message(defn).deliver
   end
+
+  #calculating the average teammate review score for the participant.
+  #Avg will be calculated only when all teammate submits their teammate review.
+  def self.assign_t_avg_to_part(participant)
+    teammate_reviews = participant.teammate_reviews
+    team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
+    if team_id.nil?
+      return false
+    end
+    team = Team.find(team_id)
+    team_size = team.participants.size
+    sum = 0;
+    if team_size == 0 || team_size == 1
+      return false
+    end
+    if teammate_reviews.size == team_size - 1
+      teammate_reviews.each do |teammate_review|
+        sum += teammate_review.get_average_score
+      end
+      participant.t_rev_avg = sum / (team_size - 1)
+      participant.save
+    end
+    TeammateReviewResponseMap.calc_team_avg_t_rev(team)
+  end
+
+
+  def self.calc_team_avg_t_rev(team)
+    if team.nil?
+      return false
+    end
+    team_participants = team.participants
+    sum = 0;
+    team_participants.each do |team_member|
+      if team_member.t_rev_avg != -1
+        sum += team_member.t_rev_avg
+      else
+        return false
+      end
+    end
+    team.t_rev_avg = sum / team_participants.size
+    team.save
+  end
 end

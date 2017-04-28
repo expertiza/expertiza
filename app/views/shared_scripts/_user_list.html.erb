@@ -6,8 +6,11 @@
     <th colspan=3 class="head">E-mail on ...</th>
     <th colspan=3 class="head">Permissions ...</th>
   </tr>  
-  <tr>
+  <tr style="border-bottom:1pt solid black;">
     <th class="head">Name</th>
+    <% if user_list.first.instance_of? AssignmentParticipant%>
+      <th class="head">Badge</th>
+    <% end %>
     <th class="head">Full Name</th>
     <th class="head">Email Address</th>
     <th class="head">Role</th>

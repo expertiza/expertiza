@@ -610,4 +610,13 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
+
+  #check if the first submission is assigned to any other teams. If not current team is the first team to submit.
+  def self.first_submission_reward(ass_id,team_id)
+    assignment = Assignment.find(ass_id)
+    if (not assignment.nil?) && assignment.first_sub_teamid == -1
+      assignment.first_sub_teamid = team_id
+      assignment.save
+    end
+  end
 end

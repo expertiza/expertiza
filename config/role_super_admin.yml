@@ -546,8 +546,8 @@ development:
         content_page_id:
         controller_action_id: 64
         id: 42
-        label: Surveys
-        name: manage/questionnaires/surveys
+        label: Assignment surveys
+        name: manage/questionnaires/assignment surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -556,8 +556,8 @@ development:
         content_page_id:
         controller_action_id: 64
         id: 43
-        label: Course evaluations
-        name: manage/questionnaires/course evaluations
+        label: Course surveys
+        name: manage/questionnaires/course surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -631,8 +631,8 @@ development:
       manage/questionnaires/teammate review rubrics: *27
       manage/questionnaires/author feedbacks: *28
       manage/questionnaires/global survey: *29
-      manage/questionnaires/surveys: *30
-      manage/questionnaires/course evaluations: *31
+      manage/questionnaires/assignment surveys: *30
+      manage/questionnaires/course surveys: *31
       show/institutions: *32
       show/super-administrators: *33
       show/administrators: *34
@@ -1206,9 +1206,9 @@ test:
       29: &33 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/surveys
+        name: manage/questionnaires/assignment surveys
         id: 29
-        label: Surveys
+        label: Assignment surveys
         site_controller_id: 33
         controller_action_id: 57
         content_page_id:
@@ -1216,9 +1216,9 @@ test:
       30: &34 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/course evaluations
+        name: manage/questionnaires/course surveys
         id: 30
-        label: Course evaluations
+        label: Course surveys
         site_controller_id: 33
         controller_action_id: 57
         content_page_id:
@@ -1255,8 +1255,8 @@ test:
       manage/questionnaires/teammate review rubrics: *30
       manage/questionnaires/author feedbacks: *31
       manage/questionnaires/global survey: *32
-      manage/questionnaires/surveys: *33
-      manage/questionnaires/course evaluations: *34
+      manage/questionnaires/assignment surveys: *33
+      manage/questionnaires/course surveys: *34
     selected:
       1: *1
     vector:
@@ -1812,8 +1812,8 @@ production:
         content_page_id:
         controller_action_id: 64
         id: 42
-        label: Surveys
-        name: manage/questionnaires/surveys
+        label: Assignment surveys
+        name: manage/questionnaires/assignment surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1822,8 +1822,8 @@ production:
         content_page_id:
         controller_action_id: 64
         id: 43
-        label: Course evaluations
-        name: manage/questionnaires/course evaluations
+        label: Course surveys
+        name: manage/questionnaires/course surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1897,8 +1897,8 @@ production:
       manage/questionnaires/teammate review rubrics: *27
       manage/questionnaires/author feedbacks: *28
       manage/questionnaires/global survey: *29
-      manage/questionnaires/surveys: *30
-      manage/questionnaires/course evaluations: *31
+      manage/questionnaires/assignment surveys: *30
+      manage/questionnaires/course surveys: *31
       show/institutions: *32
       show/super-administrators: *33
       show/administrators: *34

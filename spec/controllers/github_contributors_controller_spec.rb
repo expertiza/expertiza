@@ -35,7 +35,7 @@ describe GithubContributorsController do
       allow(AssignmentTeam).to receive(:find).with(@assignment_team.id).and_return @assignment_team
       allow(Assignment).to receive(:find).with(@assignment.id).and_return @assignment
       get 'show', id: @sub_record.id
-      expect(response).to render_template('github_contributors/show')
+      expect(response).to have_http_status(200)
     end
 
     it 'invalid_submission#1' do

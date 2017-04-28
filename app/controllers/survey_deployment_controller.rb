@@ -96,6 +96,7 @@ class SurveyDeploymentController < ApplicationController
     end
   end
 
+  # Creates pie charts for visualizing survey responses to Criterion and Checkbox questions
   def generate_statistics
     @sd = SurveyDeployment.find(params[:id])
     questionnaire = Questionnaire.find(@sd.questionnaire_id)
@@ -105,6 +106,8 @@ class SurveyDeploymentController < ApplicationController
     @questions.each do |question|
       responses_for_all_questions << get_responses_for_question_in_a_survey_deployment(question.id, @sd.id)
     end
+    # @chart_data_table is passed to the JavaScript code in the view
+    # Google Charts requires a 2-D Data Table to create a chart, @chart_data_table is 3-D because there are multiple charts
     @chart_data_table = []
     responses_for_all_questions.each_with_index do |response, index|
       data_table_row = []

@@ -1,3 +1,7 @@
+ /*
+Google Charts tutorial - https://developers.google.com/chart/interactive/docs/quick_start
+The function below is called by generate_statistics.html.erb
+ */
  function chart(chart_data,element_id) {
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);

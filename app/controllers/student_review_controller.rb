@@ -59,31 +59,35 @@ class StudentReviewController < ApplicationController
     single_response = Response.where(id: record_id)
     mapped_response = ResponseMap.where(id: single_response[0].map_id)
     review_maps = ResponseMap.where(reviewed_object_id: mapped_response[0].reviewed_object_id)
-    keys = [0.00, 0.00, 0.00, 0.00]
-    response_count = 0.00
-    word_counter = 0
-    suggestive_count = 0
-    problem_count = 0
-    offensive_count = 0
+    keys = [[0.00, 0.00, 0.00, 0.00], [0.00, 0.00, 0.00, 0.00], [0.00, 0.00, 0.00, 0.00], [0.00, 0.00, 0.00, 0.00]]
+    response_count = [0.00, 0.00, 0.00, 0.00, 0.00, 0.00]
+    word_counter = [0, 0, 0, 0, 0, 0]
+    suggestive_count = [0, 0, 0, 0, 0, 0]
+    problem_count = [0, 0, 0, 0, 0, 0]
+    offensive_count = [0, 0, 0, 0, 0, 0]
 
     review_maps.each do |my_assignment|
       my_responses = Response.where(map_id: my_assignment.id)
       my_responses.each do |each_response|
-        response_count += 1
+        response_count[each_response.round - 1] += 1
         my_review_metric = ReviewMetricMapping.where(responses_id: each_response.id)
         my_review_metric.each do |my_metric|
-          word_counter += my_metric.value if my_metric.review_metrics_id == 1 && my_metric.value > 0
-          suggestive_count += 1 if my_metric.review_metrics_id == 2 && my_metric.value > 0
-          problem_count += 1 if my_metric.review_metrics_id == 3 && my_metric.value > 0
-          offensive_count += 1 if my_metric.review_metrics_id == 4 && my_metric.value > 0
+          word_counter[each_response.round - 1] += my_metric.value if my_metric.review_metrics_id == 1 && my_metric.value > 0
+          suggestive_count[each_response.round - 1] += 1 if my_metric.review_metrics_id == 2 && my_metric.value > 0
+          problem_count[each_response.round - 1] += 1 if my_metric.review_metrics_id == 3 && my_metric.value > 0
+          offensive_count[each_response.round - 1] += 1 if my_metric.review_metrics_id == 4 && my_metric.value > 0
         end
       end
     end
 
-    keys[0] = word_counter / response_count
-    keys[1] = (suggestive_count / response_count) * 100
-    keys[2] = (problem_count / response_count) * 100
-    keys[3] = (offensive_count / response_count) * 100
+    (0..5).each do |i|
+      unless response_count[i] == 0
+        keys[i][0] = word_counter[i] / response_count[i]
+        keys[i][1] = (suggestive_count[i] / response_count[i]) * 100
+        keys[i][2] = (problem_count[i] / response_count[i]) * 100
+        keys[i][3] = (offensive_count[i] / response_count[i]) * 100
+      end
+    end
 
     return keys
   end

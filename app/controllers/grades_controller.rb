@@ -56,7 +56,8 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
 
     if @assignment.varying_rubrics_by_round?
-      @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+      @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
+          FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     else
       @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     end
@@ -66,9 +67,6 @@ class GradesController < ApplicationController
     team_data = get_team_data(@assignment, questionnaires, @scores)
     highchart_data = get_highchart_data(team_data, @assignment, min, max, number_of_review_questions)
     @highchart_series_data, @highchart_categories, @highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
-
-
-
   end
 
   # This method is used to retrieve questions for different review rounds
@@ -256,8 +254,8 @@ class GradesController < ApplicationController
   end
 
   def calculate_review_questions(assignment, questionnaires)
-    min=0;
-    max=5;
+    min = 0
+    max = 5
 
     number_of_review_questions = 0
     questionnaires.each do |questionnaire|
@@ -268,7 +266,7 @@ class GradesController < ApplicationController
         break
       end
     end
-    return min, max, number_of_review_questions
+    min, max, number_of_review_questions
   end
 
   def calculate_all_penalties(assignment_id)
@@ -383,7 +381,7 @@ class GradesController < ApplicationController
 
   def get_team_data(assignment, questionnaires, scores)
     team_data = []
-    for index in 0 .. scores[:teams].length - 1
+    for index in 0..scores[:teams].length - 1
       tscore = scores[:teams][index.to_s.to_sym]
       participant_id = tscore[:team].participants.first.id
       participant = AssignmentParticipant.find(participant_id)
@@ -417,18 +415,18 @@ class GradesController < ApplicationController
 
     # Dynamic initialization
     for i in 1..assignment.rounds_of_reviews
-      chart_data[i] = Hash[(min..max).map{|score| [score, Array.new(number_of_review_questions,0)]}]
+      chart_data[i] = Hash[(min..max).map {|score| [score, Array.new(number_of_review_questions,0)]}]
     end
 
     # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission
     # round will be added to the count in the corresponded array field)
     team_data.each do |team|
       team.each do |vm|
-        if (vm.round != nil)
+        if !vm.round.nil?
           j = 0
           vm.list_of_rows.each do |row|
             row.score_row.each do |score|
-              if (score.score_value != nil)
+              if !score.score_value.nil?
                 chart_data[vm.round][score.score_value][j] += 1
               end
             end
@@ -446,13 +444,13 @@ class GradesController < ApplicationController
     highchart_series_data = []
     chart_data.each do |round, scores|
       scores.to_a.reverse.to_h.each do |score, rubric_distribution|
-        highchart_series_data.push({:name=>"Score #{score} - Submission #{round}" , :data=>rubric_distribution, :stack=>"S#{round}"})
+        highchart_series_data.push(:name => "Score #{score} - Submission #{round}", :data => rubric_distribution, :stack => "S#{round}")
       end
     end
 
     # Here we dynamically creates the categories which will be used later in the highchart Object
     highchart_categories = []
-    for i in 1..number_of_review_questions
+    for in 1..number_of_review_questions
       highchart_categories.push("Rubric #{i}")
     end
 
@@ -463,8 +461,7 @@ class GradesController < ApplicationController
     for i in min..max
       highchart_colors.push("\##{"%06x" % (rand * 0xffffff)}")
     end
-
-    return highchart_series_data, highchart_categories, highchart_colors
+    highchart_series_data, highchart_categories, highchart_colors
   end
 
   def check_self_review_status
@@ -474,12 +471,6 @@ class GradesController < ApplicationController
       return false
     else
       return true
-    end
-  end
-
-  def display(array)
-    array.each do |x|
-      puts x
     end
   end
 

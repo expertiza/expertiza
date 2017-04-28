@@ -70,7 +70,7 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
                 <td> <%= tscore[:team].name %> </td>
             <% end %>
 
-             <% if false %> <!-- TODO -->
+             <% if false %>
             <% if tscore[:scores][:avg] %>
                 <TD ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>
                 <TD ALIGN="CENTER"><%= sprintf("%.0f",tscore[:scores][:min]) %>% - <%= sprintf("%.0f",tscore[:scores][:max]) %>%</TD>
@@ -91,7 +91,7 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
                         <FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="var td=document.getElementById('<%="rowspanTd1#{participant_id}"%>'); var td2=document.getElementById('<%="rowspanTd2#{participant_id}"%>'); if(td.rowSpan=='1'){td.rowSpan=<%=team_size.to_s%>;td2.rowSpan=<%=team_size.to_s%>;}else{td.rowSpan='1'; td2.rowSpan='1';};toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
                       </TD>
 
-                      <% if false %> <!-- TODO FOR TESTING PURPOSES -->
+                      <% if false %>
                       <TD id=<%="rowspanTd2#{participant_id}"%> ALIGN="CENTER">
                         <%= rscore_review.my_min.is_a?(Float)? sprintf("%.0f",rscore_review.my_min): rscore_review.my_min %>% - <%= rscore_review.my_max.is_a?(Float)? sprintf("%.0f",rscore_review.my_max): rscore_review.my_max %>%
                         <% if controller.action_name != "view_my_scores" %>
@@ -178,7 +178,6 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
                    score_postfix = "%"
                  end %>
 
-              <!-- TODO: Author Feedback Given -->
               <TD ALIGN="CENTER">---</TD>
 
               <% topic_id = SignedUpTeam.topic_id(@assignment.id, participant.user_id) %>

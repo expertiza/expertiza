@@ -61,7 +61,6 @@ gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'timecop', '0.8.1'
 
-
 group :development do
   gem 'daemons'
   gem 'pry'

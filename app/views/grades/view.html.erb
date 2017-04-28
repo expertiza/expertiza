@@ -123,7 +123,7 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
 
               <% if !rscore_feedback.nil? && rscore_feedback.my_avg %>
                   <TD ALIGN="CENTER" VALIGN="TOP">
-                    <%= pscore[:feedback][:assessments].size %> <%= " of ???"%> <BR/>
+                    <%= pscore[:feedback][:assessments].size %> <%= " received"%> <BR/>
                     <%= "Range: " %>
                     <%= rscore_feedback.my_min.is_a?(Float)? sprintf("%.0f",rscore_feedback.my_min): rscore_feedback.my_min %>% - <%= rscore_feedback.my_max.is_a?(Float)? sprintf("%.0f",rscore_feedback.my_max):rscore_feedback.my_max %>% <BR/>
                     <%= "Avg: " %>

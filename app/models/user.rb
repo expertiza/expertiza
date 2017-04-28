@@ -87,7 +87,13 @@ class User < ActiveRecord::Base
       end
     end
 
-    user_list = user_list.paginate(page: a, per_page: b)
+    if b.nil?
+      user_list = user_list.paginate(page: a, per_page: 25)
+    elsif b == "All"
+        user_list
+    else
+      user_list = user_list.paginate(page: a, per_page: b)
+    end
   end
 
   def first_name

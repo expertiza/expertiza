@@ -69,7 +69,7 @@ class User < ActiveRecord::Base
     self.is_recursively_parent_of(p)
   end
 
-  def get_user_list(a, b)
+  def get_user_list(page_num, per_page)
     user_list = []
     # If the user is a super admin, fetch all users
     if self.role.super_admin?
@@ -87,12 +87,12 @@ class User < ActiveRecord::Base
       end
     end
 
-    if b.nil?
-      user_list = user_list.paginate(page: a, per_page: 25)
-    elsif b == "All"
+    if per_page.nil?
+      user_list = user_list.paginate(page: page_num, per_page: 25)
+    elsif per_page == "All"
         user_list
     else
-      user_list = user_list.paginate(page: a, per_page: b)
+      user_list = user_list.paginate(page: page_num, per_page: per_page)
     end
   end
 

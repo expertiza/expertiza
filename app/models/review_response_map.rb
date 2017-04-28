@@ -197,9 +197,8 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol][:response_ids] = response_ids
   end
 
-  #adding logic to determine whether the given participant receives good reivewer badge.
-  def self.is_good_reviewer(participant)
+  def self.good_reviewer?(participant)
     score = participant.try(:review_grade).try(:grade_for_reviewer)
-    (not score.nil?) && score > 95
+    (!score.nil?) && score > 95
   end
 end

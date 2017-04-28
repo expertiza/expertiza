@@ -107,12 +107,17 @@
         <tr class="listingRow">
           <td>&nbsp;</td>
           <!--assignment-->
+
+          <% team = Team.get_team(participant) %>
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></br>
-            <% if ReviewResponseMap.is_good_reviewer(participant)%>
-                <img src="/assets/goodreviewerrs.png" title="Good Reviewer"></td>
-            <% end %>
             <% if Team.first_sub(teamid, participant.assignment.id) %>
                 <img src="/assets/firstsubmissionrs.png" title="First Submission"></td>
+            <% end %>
+            <% if (!team.nil?) && team.t_rev_avg > 95 %>
+                <img src="/assets/dreamteamrs.png" title="Dream Team">
+            <% end %>
+            <% if ReviewResponseMap.good_reviewer?(participant)%>
+                <img src="/assets/goodreviewerrs.png" title="Good Reviewer"></td>
             <% end %>
             </td>
           <!--course-->

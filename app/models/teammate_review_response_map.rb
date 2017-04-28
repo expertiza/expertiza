@@ -33,8 +33,6 @@ class TeammateReviewResponseMap < ResponseMap
     Mailer.sync_message(defn).deliver
   end
 
-  #calculating the average teammate review score for the participant.
-  #Avg will be calculated only when all teammate submits their teammate review.
   def self.assign_t_avg_to_part(participant)
     teammate_reviews = participant.teammate_reviews
     team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
@@ -56,7 +54,6 @@ class TeammateReviewResponseMap < ResponseMap
     end
     TeammateReviewResponseMap.calc_team_avg_t_rev(team)
   end
-
 
   def self.calc_team_avg_t_rev(team)
     if team.nil?

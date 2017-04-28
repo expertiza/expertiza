@@ -58,8 +58,10 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
               <% rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview] %>
               <% rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback] %>
               <% rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate] %>
-            <td> <%= participant.fullname %> </td>
-            <td> <%= "View" %> </td>
+              <td> <%= participant.fullname %> </td>
+              <td> <FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">View</a>
+                <% if @topic_id %> (<%= SignUpTopic.find(@topic_id).topic_identifier %>)<% end %>
+              </FONT> </td>
 
             <% topic_id = tscore[:team].topic%>
             <% if topic_id%>
@@ -271,7 +273,7 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
     $(function () {
         /*Function for sorting the table */
         $("#myTable").tablesorter({
-            sortList: [[0,0]], //sort First Column by default when page loads
+            //Begins by being sorted by team, then can be sorted alphabetically with the arrow key
             headers: {
                 4: {
                     sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser

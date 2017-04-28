@@ -37,6 +37,7 @@ class GradesController < ApplicationController
   # in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
+    @id = params[:id]
     @questions = {}
     questionnaires = @assignment.questionnaires
 
@@ -53,6 +54,12 @@ class GradesController < ApplicationController
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
+
+    if @assignment.varying_rubrics_by_round?
+      @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+    else
+      @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+    end
 
     # private functions for generating a valid highchart
     min, max, number_of_review_questions = calculate_review_questions(@assignment, questionnaires)

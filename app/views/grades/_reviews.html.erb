@@ -23,7 +23,6 @@
     <%if flag_varying_rubrics==false%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
     <%end%>
-    <BR/>
     <HR/>
     <% count = 0 %>
     <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->
@@ -35,12 +34,10 @@
         <% rounds << response.round %>
     <% end %>
 
-    <% rounds.each do |round| %>
+    <% rounds.sort.each do |round| %>
         <h3>Round <%= round %></h3>
-        <% if controller.action_name != "view_my_scores"%> %>
-            <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
-        <% end %>
-        <table class="table table-striped" id=<%= participant.id.to_s + '_' + round.to_s %> <%= style="display: none;" if controller.action_name != "view_my_scores"%>>
+        <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
+        <table class="table table-striped" style="display: none;" id=<%= participant.id.to_s + '_' + round.to_s %>>
             <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>
                 <tr><td>
                 <% review_feedback = nil %>
@@ -63,17 +60,21 @@
                         <%= display_directory_tree(@participant, files, true).html_safe %>
                     <% end %>
                 <% end %>
-                
-                <%= review.display_as_html(prefix, index + 1, nil) %><br/>
-                
+
+                <!-- Generate the feedback html -->
+                <% feedback_html = '' %>
                 <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
-                    review_feedbacks = map.try :response %>
+                   review_feedbacks = map.try :response %>
                 <% if review_feedbacks && !review_feedbacks.empty? %>
-                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
-                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
+                    <% feedback_html = link_to 'View', :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %>
+                    <% feedback_html += ' or ' %>
+                    <% feedback_html += link_to 'Edit', :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %>
+                    <% feedback_html += ' feedback for Review ' + count.to_s %>
                 <% else %>
-                    <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
+                    <% feedback_html += link_to 'Give feedback', :controller => 'response', :action => 'new_feedback', :id => review.id %>
+                    <% feedback_html += ' for Review ' + count.to_s %>
                 <% end %>
+                <%= review.display_as_html(prefix, index + 1, nil, feedback_html) %>
                 </td></tr>
             <% end %>
         </table><hr>

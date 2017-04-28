@@ -120,9 +120,9 @@ class Checkbox < UnscoredQuestion
 
   def view_completed_question_answer(count, answer)
     html = if answer.answer == 1
-             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/Check-icon.png">' + self.txt + '</b><BR/>'
+             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/Check-icon.png">' + self.txt + '</b>'
            else
-             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/delete_icon.png">' + self.txt + '</b><BR/>'
+             '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/delete_icon.png">' + self.txt + '</b>'
            end
     html
   end
@@ -133,9 +133,9 @@ class Checkbox < UnscoredQuestion
     html = if next_question.type == 'ColumnHeader'
              '</td></tr>'
            elsif next_question.type == 'TableHeader'
-             '</td></tr></table><br/>'
+             '</td></tr></table>'
            else
-             '<BR/>'
+             ''
            end
     html
   end

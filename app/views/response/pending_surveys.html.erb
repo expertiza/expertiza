@@ -5,7 +5,7 @@ table
 }
 
 </style>
-<h1> Pending Course Evaluations </h1>
+<h1> Pending Surveys </h1>
 
 <table class=listing cellpadding=2 width=50% border=1>
 <% if (@surveys.size > 0) %>
@@ -23,7 +23,7 @@ table
             <td align=left><%= survey.first['survey']['type'] %></td>
             <td align=left><%= survey.first['start_date'].strftime('%A %B %d %Y, %I:%M%p') %></td>
             <td align=left><%= survey.first['end_date'].strftime('%A %B %d %Y, %I:%M%p') %></td>
-            <% if survey.first['survey']['type'] == 'CourseEvaluationQuestionnaire' %>
+            <% if survey.first['survey']['type'] == 'CourseSurveyQuestionnaire' %>
                <td align=left><%= Course.find_by_id(survey.first['parent_id']).name %></td>
             <% elsif survey.first['survey']['type'] == 'AssignmentSurveyQuestionnaire' %>
                <td align=left><%= Assignment.find_by_id(survey.first['parent_id']).name %></td>

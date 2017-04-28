@@ -52,9 +52,9 @@ class TreeDisplayController < ApplicationController
     goto_controller('Assignment Survey')
   end
 
-  # direct access to course evaluations
-  def goto_course_evaluations
-    goto_controller('Course Evaluation')
+  # direct access to course surveys
+  def goto_course_surveys
+    goto_controller('Course Survey')
   end
 
   # direct access to courses

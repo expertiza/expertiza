@@ -35,12 +35,8 @@ class SurveyDeploymentController < ApplicationController
     case @survey_type
       when "AssignmentSurveyQuestionnaire"
         @surveys = Questionnaire.where(type: "AssignmentSurveyQuestionnaire").map {|u| [u.name, u.id] }
-      when "CourseEvaluationQuestionnaire"
-        @surveys = Questionnaire.where(type: "CourseEvaluationQuestionnaire").map {|u| [u.name, u.id] }
       when "CourseSurveyQuestionnaire"
-        @surveys = Questionnaire.where(type: "CourseEvaluationQuestionnaire").map {|u| [u.name, u.id] }
-        # survey type for course survey deployment is course evaluation questionnaire. Below is defensive code to set survey type that matches the model value
-        @survey_type = "CourseEvaluationQuestionnaire"
+        @surveys = Questionnaire.where(type: "CourseSurveyQuestionnaire").map {|u| [u.name, u.id] }
       else
         flash[:error] = "Unexpected type. Check your dates! Dates should be in the future."
         redirect_to '/tree_display/list'

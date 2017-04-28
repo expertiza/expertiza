@@ -18,7 +18,9 @@ function loadGithubCharts(data, container, title, color) {
        }, series: [{
            color: color,
            data: data
-       }], legend: {
+       }], tooltip: {
+           // pointFormat: '<span style="color:{point.color}">\u25CF</span> <b>{point.y}</b><br/>'
+       }, legend: {
            enabled: false
        }, credits: {
            enabled: false

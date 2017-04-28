@@ -110,7 +110,7 @@ class GithubContributorsController < ApplicationController
 
   def format_metrics(metrics)
     metrics_map = {}
-    metrics.sort_by { |m| m.week_timestamp}.each do |metric|
+    metrics.sort_by { |m| [m.week_timestamp, -m.total_commits]}.each do |metric|
       if metrics_map.key?(metric.github_id)
         metric_map = metrics_map[metric.github_id]
       else

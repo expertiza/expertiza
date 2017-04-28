@@ -224,7 +224,7 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
                     %>
                         <%= count %> done
                     <%= unless count==0
-                          link_to "View Reviews", "/popup/view_review_scores_popup?assignment_id=#{@assignment.id}&reviewer_id=#{participant.id}"
+                          link_to "show reviews", "/popup/view_review_scores_popup?assignment_id=#{@assignment.id}&reviewer_id=#{participant.id}"
                         end
                     %>
                   </td>

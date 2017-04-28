@@ -18,10 +18,10 @@ class GithubContributorsController < ApplicationController
     matches = GITHUB_REGEX.match(@submission_record.content)
     if metrics.nil?
       @message = if matches.nil?
-                     'This is not a github repository.'
+                   'This is not a github repository.'
                  else
-                    'Accessed the github API too soon. Refresh the page, if ' \
-                    'it fails again, please contact the administrator.'
+                   'Accessed the github API too soon. Refresh the page, if ' \
+                   'it fails again, please contact the administrator.'
                  end
       render 'github_contributors/not_found'
     else
@@ -39,7 +39,7 @@ class GithubContributorsController < ApplicationController
 
   BASE_URI = 'https://api.github.com'.freeze
   API_TOKEN = "token #{ENV['EXPERTIZA_GITHUB_TOKEN']}".freeze
-  GITHUB_REGEX = /https?:\/\/([w]{3}\.)?github.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)[\S]*/i
+  GITHUB_REGEX = %r(https?:\/\/([w]{3}\.)?github.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)[\S]*)i
 
   def fetch_metrics(owner, repo)
     resp = HTTP.headers(Authorization: API_TOKEN).get("#{BASE_URI}/repos/#{owner}/#{repo}/stats/contributors")
@@ -48,10 +48,8 @@ class GithubContributorsController < ApplicationController
 
   def parse_submissions(submission, github_content)
     github_contributors = GithubContributor.where(submission_records_id: submission.id).order('created_at DESC')
-    if !github_contributors.empty? &&
+    return github_contributors if !github_contributors.empty? &&
         github_contributors.length == github_contributors.where('created_at > ?', Time.current - 1.hour).length
-      return github_contributors
-    end
     github_contributors.delete_all
     github_contributors = []
     github_content.each do |contributions|
@@ -93,9 +91,7 @@ class GithubContributorsController < ApplicationController
     content = retrieve_content(submission)
     unless content.nil?
       github_data = fetch_metrics(content[0], content[1])
-      unless github_data.nil?
-        return parse_submissions(submission, github_data)
-      end
+      return parse_submissions(submission, github_data) unless github_data.nil?
     end
     nil
   end

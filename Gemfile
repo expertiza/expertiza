@@ -4,6 +4,7 @@ gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
 
+gem 'activerecord-import'
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
@@ -23,6 +24,7 @@ gem 'gchartrb', require: 'google_chart'
 gem "googlecharts", require: "gchart"
 gem 'gdata', require: false
 gem 'haml-rails'
+gem 'http'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
@@ -57,8 +59,6 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
-gem 'activerecord-import'
-gem 'http'
 gem 'timecop', '0.8.1'
 
 

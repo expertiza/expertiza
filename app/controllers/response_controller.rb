@@ -241,19 +241,37 @@ class ResponseController < ApplicationController
       redirect_to '/'
       return
     end
+
+    # Get all the participant(course or assignment) entries for this user
     course_participants = CourseParticipant.where(user_id: session[:user].id)
     assignment_participants = AssignmentParticipant.where(user_id: session[:user].id)
+
+    # Get all the course survey deployments for this user
     @surveys = []
-    course_participants.each do |cp|
-      survey_deployment = CourseSurveyDeployment.find(cp.parent_id)
-      if Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-        @surveys << [Questionnaire.find(survey_deployment.questionnaire_id), survey_deployment.id, survey_deployment.end_date, cp.parent_id]
+    if course_participants
+      course_participants.each do |cp|
+        survey_deployments = CourseSurveyDeployment.where(id: cp.parent_id)
+        if survey_deployments
+          survey_deployments.each do|survey_deployment|
+            if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+              @surveys << [Questionnaire.find(survey_deployment.questionnaire_id), survey_deployment.id, survey_deployment.end_date, cp.parent_id]
+            end
+          end
+        end
       end
     end
-    assignment_participants.each do |ap|
-      survey_deployment = AssignmentSurveyDeployment.find(ap.parent_id)
-      if Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-        @surveys << [Questionnaire.find(survey_deployment.questionnaire_id), survey_deployment.id, survey_deployment.end_date, ap.parent_id]
+
+    # Get all the assignment survey deployments for this user
+    if assignment_participants
+      assignment_participants.each do |ap|
+        survey_deployments = AssignmentSurveyDeployment.find_by_id(ap.parent_id)
+        if survey_deployments
+          survey_deployments.each do |survey_deployment|
+            if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+              @surveys << [Questionnaire.find(survey_deployment.questionnaire_id), survey_deployment.id, survey_deployment.end_date, ap.parent_id]
+            end
+          end
+        end
       end
     end
   end

@@ -266,7 +266,7 @@ class GradesController < ApplicationController
         break
       end
     end
-    min, max, number_of_review_questions
+    return min, max, number_of_review_questions
   end
 
   def calculate_all_penalties(assignment_id)
@@ -450,7 +450,7 @@ class GradesController < ApplicationController
 
     # Here we dynamically creates the categories which will be used later in the highchart Object
     highchart_categories = []
-    for in 1..number_of_review_questions
+    for i in 1..number_of_review_questions
       highchart_categories.push("Rubric #{i}")
     end
 
@@ -458,10 +458,10 @@ class GradesController < ApplicationController
     # Currently we create 6 different colors based on the assumption that we always have scores from 0 to 5
     # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
     highchart_colors = []
-    for i in min..max
+    for _i in min..max
       highchart_colors.push("\##{"%06x" % (rand * 0xffffff)}")
     end
-    highchart_series_data, highchart_categories, highchart_colors
+    return highchart_series_data, highchart_categories, highchart_colors
   end
 
   def check_self_review_status

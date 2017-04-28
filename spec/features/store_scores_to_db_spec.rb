@@ -48,7 +48,8 @@ describe "Store Scores in DB", type: :feature do
   it "store assignment scores in DB" do
     submit_review
     expect do
-      Assignment.save_score_in_db(@assignment.id)
+      # Assignment.save_score_in_db(@assignment.id)
+      LocalDbCalc.store_total_scores(@assignment)
     end.to change { LocalDbScore.count }.by 1
   end
 end

@@ -167,11 +167,11 @@ class AssignmentTeam < Team
     end
 
     # E1731 changes: Calling either LocalDbCalc or OnTheFlyCalc based on assignment status
-    if self.assignment.local_scores_calculated?
-      scores[:total_score] = LocalDbCalc.compute_total_score(assignment)
-    else
-      scores[:total_score] = OnTheFlyCalc.compute_total_score(assignment, scores)
-    end
+    scores[:total_score] = if self.assignment.local_scores_calculated?
+                             LocalDbCalc.compute_total_score(assignment)
+                           else
+                             OnTheFlyCalc.compute_total_score(assignment, scores)
+                           end
 
     scores
   end

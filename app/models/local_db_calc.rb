@@ -3,18 +3,15 @@ class LocalDbCalc
   def self.compute_total_score(assignment)
     total = 0
     teams = AssignmentTeam.where(parent_id: assignment.id)
-    teams.each { |team|
+    teams.each do |team|
       response_maps = team.review_mappings
-      response_maps.each { |map|
+      response_maps.each do |map|
         record = LocalDbScore.where(response_map_id: map.map_id).last
-        if !record.nil?
-          score = record[:score]
-          if !score.nil?
-            total += score
-          end
-        end
-      }
-    }
+        next if record.nil?
+        score = record[:score]
+        total += score unless score.nil?
+      end
+    end
     total
   end
 
@@ -26,23 +23,22 @@ class LocalDbCalc
       review_questionnaire_id = assignment.review_questionnaire_id(round)
       questions = Question.where(questionnaire_id: review_questionnaire_id)
       contributors.each do |contributor|
-        if contributor
-          maps = ReviewResponseMap.where(reviewee_id: contributor.id)
-          maps.each do |map|
-            next if map.response.empty?
-            @response = Response.where(map_id: map.map_id).last
-            if map.type.eql?('ReviewResponseMap')
-              # If its ReviewResponseMap then only consider those response which are submitted.
-              if !@response.is_submitted
-                @response = nil
-              end
+        next unless contributor
+        maps = ReviewResponseMap.where(reviewee_id: contributor.id)
+        maps.each do |map|
+          next if map.response.empty?
+          @response = Response.where(map_id: map.map_id).last
+          if map.type.eql?('ReviewResponseMap')
+            # If its ReviewResponseMap then only consider those response which are submitted.
+            if !@response.is_submitted
+              @response = nil
             end
-            score = Answer.get_total_score(response: [@response], questions: questions)
-            if score == -1
-              LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: 0, response_map_id: map.map_id)
-            else
-              LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: score, response_map_id: map.map_id)
-            end
+          end
+          score = Answer.get_total_score(response: [@response], questions: questions)
+          if score == -1
+            LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: 0, response_map_id: map.map_id)
+          else
+            LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: score, response_map_id: map.map_id)
           end
         end
       end

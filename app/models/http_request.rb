@@ -5,7 +5,7 @@ class HttpRequest
   class << self
 
     # http://ruby-doc.org/stdlib-2.4.1/libdoc/net/http/rdoc/Net/HTTP.html
-    def Get(url, limit = 5)
+    def get(url, limit = 5)
       if limit <= 0
         puts "Too many redirects, last URL: #{url}"
         ""
@@ -37,7 +37,7 @@ class HttpRequest
       end
     end
 
-    def GetFile(url, filename)
+    def get_file(url, filename)
       res = self.Get(url)
 
       # http://stackoverflow.com/questions/2571547/rails-how-to-to-download-a-file-from-a-http-and-save-it-into-database

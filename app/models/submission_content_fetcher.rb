@@ -4,10 +4,10 @@ class SubmissionContentFetcher
     def DocFactory(url)
       params = { "url" => url }
 
-      if GoogleDocFetcher.SupportsUrl?(url)
+      if GoogleDocFetcher.supports_url?(url)
         GoogleDocFetcher.new(params)
 
-      elsif WebsiteFetcher.SupportsUrl?(url) # leave last as catch-all
+      elsif WebsiteFetcher.supports_url?(url) # leave last as catch-all
         WebsiteFetcher.new(params)
 
       else
@@ -18,7 +18,7 @@ class SubmissionContentFetcher
     def CodeFactory(url)
       params = { "url" => url }
 
-      if GithubPullRequestFetcher.SupportsUrl?(url)
+      if GithubPullRequestFetcher.supports_url?(url)
         GithubPullRequestFetcher.new(params)
       else
         nil

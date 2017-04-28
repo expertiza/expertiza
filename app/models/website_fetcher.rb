@@ -3,7 +3,7 @@ class WebsiteFetcher
   require 'http_request'
   
   class << self
-    def SupportsUrl?(url)
+    def supports_url?(url)
       true
     end
   end
@@ -12,9 +12,9 @@ class WebsiteFetcher
     @url = params["url"]
   end
 
-  def FetchContent
+  def fetch_content
     puts "Fetching from website URL: " + @url
-    res = HttpRequest.Get(@url)
+    res = HttpRequest.get(@url)
 
     if res.is_a? Net::HTTPSuccess
       sanitize(res.body)

@@ -3,7 +3,7 @@ class GithubPullRequestFetcher
   require 'http_request'
   
   class << self
-    def SupportsUrl?(url)
+    def supports_url?(url)
       lowerCaseUrl = url.downcase
       ((lowerCaseUrl.include? "github") and
        (/\/pull\/[0-9]+$/.match(lowerCaseUrl) != nil))
@@ -14,11 +14,11 @@ class GithubPullRequestFetcher
     @url = params["url"]
   end
 
-  def FetchContent
+  def fetch_content
     url = @url + ".diff"
 
     puts "Fetching GitHub pull request: " + url
-    res = HttpRequest.Get(url)
+    res = HttpRequest.get(url)
 
     if res.is_a? Net::HTTPSuccess
       res.body

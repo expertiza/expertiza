@@ -59,6 +59,9 @@ class GradesController < ApplicationController
     team_data = get_team_data(@assignment, questionnaires, @scores)
     highchart_data = get_highchart_data(team_data, @assignment, min, max, number_of_review_questions)
     @highchart_series_data, @highchart_categories, @highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
+
+
+
   end
 
   # This method is used to retrieve questions for different review rounds

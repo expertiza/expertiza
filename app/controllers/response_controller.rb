@@ -242,7 +242,6 @@ class ResponseController < ApplicationController
       return
     end
 
-    byebug
     # Get all the participant(course or assignment) entries for this user
     course_participants = CourseParticipant.where(user_id: session[:user].id)
     assignment_participants = AssignmentParticipant.where(user_id: session[:user].id)
@@ -253,11 +252,8 @@ class ResponseController < ApplicationController
       course_participants.each do |cp|
         survey_deployments = CourseSurveyDeployment.where(parent_id: cp.parent_id)
         if survey_deployments
-          byebug
           survey_deployments.each do|survey_deployment|
-            byebug
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              byebug
               @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> cp.parent_id]
             end
           end

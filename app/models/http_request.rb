@@ -29,7 +29,7 @@ class HttpRequest
           new_uri.host = uri.host
         end
         puts "Http get redirected to: " + new_uri.to_s
-        self.Get(new_uri.to_s, limit - 1)
+        self.get(new_uri.to_s, limit - 1)
 
       else
         puts "Unhandled Http request status: #{res.code}"
@@ -38,7 +38,7 @@ class HttpRequest
     end
 
     def get_file(url, filename)
-      res = self.Get(url)
+      res = self.get(url)
 
       # http://stackoverflow.com/questions/2571547/rails-how-to-to-download-a-file-from-a-http-and-save-it-into-database
       if res.is_a? Net::HTTPSuccess

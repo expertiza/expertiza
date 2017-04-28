@@ -1,7 +1,6 @@
 require 'rails_helper'
 include LogInHelper
 
-
 describe GithubContributorsController do
   before(:each) do
     student.save
@@ -28,7 +27,6 @@ describe GithubContributorsController do
   end
 
   describe '#show_github_contributor' do
-
     let(:github_contributors_controller) { GithubContributorsController.new }
     it 'valid_submission' do
       @sub_record.content = 'https://github.com/mozilla/geckodriver'

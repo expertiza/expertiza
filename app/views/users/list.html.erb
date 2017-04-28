@@ -14,8 +14,10 @@
 
 
 <div class="exp">
-  <%= will_paginate @users %>
-  <%= select_tag(:per_page, options_for_select([[25, 25], [100, 100], [250, 250]])) %>
+  <% if (params[:per_page] != 'All')%>
+     <%= will_paginate @users %>
+  <% end %>
+  Per Page: <%= select_tag(:per_page, options_for_select([[25, 25], [100, 100], [250, 250], ["All", "All"]], selected: params[:per_page])) %>
   <table>
     <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
     <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th></tr>

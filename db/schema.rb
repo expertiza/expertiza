@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170222161826) do
+ActiveRecord::Schema.define(version: 20170404122028) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20170222161826) do
     t.integer  "course_id",                  limit: 4,     default: 0
     t.integer  "instructor_id",              limit: 4,     default: 0
     t.boolean  "private",                                  default: false,  null: false
-    t.integer  "num_reviews",                limit: 4,     default: 0,      null: false
+    t.integer  "num_reviews",                limit: 4,     default: 3,      null: false
     t.integer  "num_review_of_reviews",      limit: 4,     default: 0,      null: false
     t.integer  "num_review_of_reviewers",    limit: 4,     default: 0,      null: false
     t.boolean  "reviews_visible_to_all"
@@ -79,6 +79,10 @@ ActiveRecord::Schema.define(version: 20170222161826) do
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true
+    t.integer  "num_reviews_required",       limit: 4,     default: 3
+    t.integer  "num_metareviews_required",   limit: 4,     default: 3
+    t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
+    t.integer  "num_reviews_allowed",        limit: 4,     default: 3
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -287,6 +291,15 @@ ActiveRecord::Schema.define(version: 20170222161826) do
     t.string  "type",           limit: 255
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.string   "subject",         limit: 255
+    t.text     "description",     limit: 65535
+    t.date     "expiration_date"
+    t.boolean  "active_flag"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
   create_table "participants", force: :cascade do |t|
     t.boolean  "can_submit",                        default: true
     t.boolean  "can_review",                        default: true
@@ -429,11 +442,10 @@ ActiveRecord::Schema.define(version: 20170222161826) do
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
   create_table "roles", force: :cascade do |t|
-    t.string   "name",            limit: 255,   default: "", null: false
+    t.string   "name",            limit: 255, default: "", null: false
     t.integer  "parent_id",       limit: 4
-    t.string   "description",     limit: 255,   default: "", null: false
+    t.string   "description",     limit: 255, default: "", null: false
     t.integer  "default_page_id", limit: 4
-    t.text     "cache",           limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -619,6 +631,13 @@ ActiveRecord::Schema.define(version: 20170222161826) do
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
+
+  create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification", limit: 4
+    t.integer  "user_id",      limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255

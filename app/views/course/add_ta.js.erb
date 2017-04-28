@@ -1,0 +1,4 @@
+<% if !flash[:error] %>
+  $("#ta_list").append("<%= j render :partial => 'ta', locals: { ta: @ta_mapping } %>");
+<% end %>
+$("#flash_message").html("<%= j render partial: "shared/flash_messages" %>");

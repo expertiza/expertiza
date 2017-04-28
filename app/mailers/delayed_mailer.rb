@@ -1,11 +1,12 @@
 class DelayedMailer
   # Keeps info required for delayed job
-  # to send mail at a particular time
+  # to perform an action at a particular time
+  # such as sending a reminder email, or dropping outstanding review
   attr_accessor :assignment_id
   attr_accessor :deadline_type
   attr_accessor :due_at
-  # require PaperTrailForDelayedJob
-  @@count = 0
+  attr_accessor :mail
+  @count = 0
 
   def initialize(assignment_id, deadline_type, due_at)
     self.assignment_id = assignment_id
@@ -13,173 +14,128 @@ class DelayedMailer
     self.due_at = due_at
   end
 
+  def sign_up_topics?
+    sign_up_topics = SignUpTopic.where(assignment_id: self.assignment_id)
+    (!sign_up_topics.nil? && sign_up_topics.count != 0)
+  end
+
   def perform
     assignment = Assignment.find(self.assignment_id)
     if !assignment.nil? && !assignment.id.nil?
-      if (self.deadline_type == "metareview")
+      if self.deadline_type == "metareview"
         mail_metareviewers
-        if assignment.team_assignment?
-          teamMails = getTeamMembersMail
-          email_reminder(teamMails, "teammate review")
-        end
+        team_mails = find_team_members_email
+        email_reminder(team_mails, "teammate review") unless team_mails.empty?
       end
-
-      if (self.deadline_type == "review")
+      if self.deadline_type == "review"
         mail_reviewers # to all reviewers
       end
-
-      if (self.deadline_type == "submission")
+      if self.deadline_type == "submission"
         mail_signed_up_users # to all signed up users
       end
-
-      if (self.deadline_type == "drop_topic")
-        # sign_up_topics = SignUpTopic.where( ['assignment_id = ?', self.assignment_id])
-        # if(sign_up_topics != nil && sign_up_topics.count != 0)
-        drop_topics # drop topics from teams that only have one member
-        # reminder to signed_up users of the assignment
-        # end
+      if self.deadline_type == "drop_topic"
+        if sign_up_topics?
+          mail_signed_up_users # reminder to signed_up users of the assignment
+        end
       end
-
-      if (self.deadline_type == "signup")
-        sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
-        if (!sign_up_topics.nil? && sign_up_topics.count != 0)
+      if self.deadline_type == "signup"
+        if sign_up_topics?
           mail_assignment_participants # reminder to all participants
         end
       end
-
-      if (self.deadline_type == "team_formation")
-        assignment = Assignment.find(self.assignment_id)
-        if (assignment.team_assignment?)
-          emails = get_one_member_team
-          email_reminder(emails, self.deadline_type)
-        end
+      if self.deadline_type == "team_formation"
+        emails = get_one_member_team
+        email_reminder(emails, self.deadline_type)
+      end
+      if self.deadline_type == "drop_one_member_topics"
+        drop_one_member_topics if assignment.team_assignment?
+      end
+      if self.deadline_type == "drop_outstanding_reviews"
+        drop_outstanding_reviews
       end
     end
   end
 
-  # Find the signed_up_teams of the assignment and send mails to them
   def mail_signed_up_users
+    sign_up_topics = SignUpTopic.where(assignment_id: self.assignment_id)
+    emails = if sign_up_topics.nil? || sign_up_topics.count.zero?
+               find_team_members_email
+             else
+               find_team_members_email_for_all_topics(sign_up_topics)
+             end
+    email_reminder(emails, self.deadline_type) if emails and !emails.empty?
+  end
+
+  def find_team_members_email
     emails = []
-    assignment = Assignment.find(self.assignment_id)
-    sign_up_topics = SignUpTopic.where(['assignment_id = ?', self.assignment_id])
+    teams = Team.where(parent_id: self.assignment_id)
+    teams.each do |team|
+      team.users.each {|team_member| emails << team_member.email }
+    end
+    emails
+  end
 
-    # If there are sign_up topics for an assignement then send a mail toonly signed_up_teams else send a mail to all participants
-    if (sign_up_topics.nil? || sign_up_topics.count == 0)
-      if assignment.team_assignment?
-        teamMails = getTeamMembersMail
-        for mail in teamMails
-          emails << mail
-          email_reminder(emails, self.deadline_type)
-        end
-      else
-        mail_assignment_participants
-      end
-    else
-      for topic in sign_up_topics
-        signedUpTeams = SignedUpTeam.where(['topic_id = ?', topic.id])
-        unless assignment.team_assignment?
-          for signedUser in signedUpTeams
-            uid  = signedUser.team_id
-            user = User.find(uid)
-            emails << user.email
-          end
-        else
-          for signedUser in signedUpTeams
-            teamid = signedUser.team_id
-            team_members = TeamsUser.where(team_id: teamid)
-            for team_member in team_members
-              user = User.find(team_member.user_id)
-              emails << user.email
-            end
-          end
-        end
-      end
-      email_reminder(emails, self.deadline_type)
-    end
-    end
-
-  def getTeamMembersMail
-    teamMembersMailList = []
-    assignment = Assignment.find(self.assignment_id)
-    teams = Team.where(['parent_id = ?', self.assignment_id])
-    for team in teams
-      team_participants = TeamsUser.where(['team_id = ?', team.id])
-      for team_participant in team_participants
-        user = User.find(team_participant.user_id)
-        teamMembersMailList << user.email
+  def find_team_members_email_for_all_topics(sign_up_topics)
+    emails = []
+    sign_up_topics = [sign_up_topics] unless sign_up_topics.respond_to?(:each)
+    sign_up_topics.each do |sign_up_topic|
+      sign_up_topic.signed_up_teams.each do |signed_up_team|
+        signed_up_team.team.users.each {|user| emails << user.email }
       end
     end
-    teamMembersMailList
+    emails
   end
 
   def get_one_member_team
-    mailList = []
+    mail_list = []
     teams = TeamsUser.all.group(:team_id).count(:team_id)
-    for team_id in teams.keys
+    teams.keys.each do |team_id|
       next unless teams[team_id] == 1
-        user_id = TeamsUser.where(team_id: team).first.user_id
-        email = User.find(user_id).email
-        mailList << email
+      user_id = TeamsUser.where(team_id: team_id).first.user_id
+      email = User.find(user_id).email
+      mail_list << email
     end
-    mailList
+    mail_list
   end
 
   def mail_metareviewers
     emails = []
     # find reviewers for the assignment
-    reviewer_tuples = ResponseMap.where(['reviewed_object_id = ? AND type = "ReviewResponseMap"', self.assignment_id])
-    for reviewer in reviewer_tuples
+    reviewer_tuples = ReviewResponseMap.where(reviewed_object_id: self.assignment_id)
+    reviewer_tuples.each do |reviewer|
       # find metareviewers - people who will review the reviewers
-      meta_reviewer_tuples = ResponseMap.where(['reviewed_object_id = ? AND type = "MetareviewResponseMap"', reviewer.id])
-      for metareviewer in meta_reviewer_tuples
-        participant = Participant.where(['parent_id = ? AND id = ?', self.assignment_id, metareviewer.reviewer_id])
-        uid  = participant.user_id
-        user = User.find(uid)
-        emails << user.email
+      meta_reviewer_tuples = MetareviewResponseMap.where(reviewed_object_id: reviewer.id)
+      meta_reviewer_tuples.each do |metareviewer|
+        emails << metareviewer.reviewer.user.email
       end
     end
-    email_reminder(emails, self.deadline_type)
+    email_reminder(emails, self.deadline_type) unless emails.empty?
   end
 
   def mail_reviewers
     emails = []
-    reviewer_tuples = ResponseMap.where(['reviewed_object_id = ? AND type = "ReviewResponseMap"', self.assignment_id])
-    for reviewer in reviewer_tuples
-      participant = Participant.where(['parent_id = ? AND id = ?', self.assignment_id, reviewer.reviewer_id])
-      uid  = participant.user_id
-      user = User.find(uid)
-      emails << user.email
+    reviews = ReviewResponseMap.where(reviewed_object_id: self.assignment_id)
+    reviews.each do |review|
+      participant = Participant.where(parent_id: self.assignment_id, id: review.reviewer_id).first
+      emails << participant.user.email
     end
-    email_reminder(emails, self.deadline_type)
+    email_reminder(emails, self.deadline_type) unless emails.empty?
   end
 
   def mail_assignment_participants
     emails = []
-    assignment = Assignment.find(self.assignment_id)
-    for participant in assignment.participants
-      uid = participant.user_id
-      user = User.find(uid)
-      emails << user.email
-    end
+    Assignment.find(self.assignment_id).users.each {|user| emails << user.email }
     email_reminder(emails, self.deadline_type)
   end
 
-  def email_reminder(emails, deadlineType)
+  def email_reminder(emails, deadline_type)
     assignment = Assignment.find(self.assignment_id)
-    subject = "Message regarding #{deadlineType} for assignment #{assignment.name}"
-    body = "This is a reminder to complete #{deadlineType} for assignment #{assignment.name}. Deadline is #{self.due_at}.If you have already done the  #{deadlineType}, Please ignore this mail."
-
-      # emails<<"vikas.023@gmail.com"
-      # emails<<"vsharma4@ncsu.edu"
-    @@count += 1
-    Rails.logger.info "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    Rails.logger.info deadlineType
-    Rails.logger.info "Count:" + @@count.to_s
-
-    if @@count % 3 == 0
-      assignment = Assignment.find(self.assignment_id)
-
-      if (assignment.instructor.copy_of_emails)
+    subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
+    body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
+    Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
+    @count += 1
+    if @count % 3 == 0
+      if assignment.instructor.copy_of_emails
         emails << assignment.instructor.email
       end
 
@@ -190,30 +146,27 @@ class DelayedMailer
       Rails.logger.info mail
     end
 
-    Mailer.delayed_message(
-      bcc: emails,
-       subject: subject,
-       body: body
-).deliver
+    @mail = Mailer.delayed_message(bcc: emails, subject: subject, body: body)
+    @mail.deliver_now
   end
 
-  def drop_topics
+  def drop_one_member_topics
     teams = TeamsUser.all.group(:team_id).count(:team_id)
-    for team_id in teams.keys
+    teams.keys.each do |team_id|
       if teams[team_id] == 1
         topic_to_drop = SignedUpTeam.where(team_id: team_id).first
-        topic_to_drop.delete if topic_to_drop #check if the one-person-team has signed up a topic
+        topic_to_drop.delete if topic_to_drop # check if the one-person-team has signed up a topic
       end
     end
   end
 
-  def drop_reviews
-    reviews = ResponseMap.all
-    for review in reviews
+  def drop_outstanding_reviews
+    reviews = ResponseMap.where(reviewed_object_id: self.assignment_id)
+    reviews.each do |review|
       review_has_began = Response.where(map_id: review.id)
-      if review_has_began.nil? # check if the one-person-team has signed up a topic
+      if review_has_began.size.zero?
         review_to_drop = ResponseMap.where(id: review.id)
-        review_to_drop.first.delete
+        review_to_drop.first.destroy
       end
     end
   end

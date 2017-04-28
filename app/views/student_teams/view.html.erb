@@ -83,10 +83,10 @@
       <!-- start invited people table -->
       <table style="width:80%" align="center" >
         <tr style="border: 1px outset #000000; ">
-          <td class="head"><b>Username</b></td>
-          <td class="head"><b>Full name</b></td>
-          <td class="head"><b>Email address</b></td>
-          <td class="head" align="center"><b>Status</b></td>
+          <th class="head"><b>Username</b></th>
+          <th class="head"><b>Full name</b></th>
+          <th class="head"><b>Email address</b></th>
+          <th class="head" align="center"><b>Status</b></th>
         </tr>
           <% for inv in @send_invs %>
             <tr>
@@ -99,7 +99,7 @@
                   <td align = "center">Declined</td>
                 <% else %>
                   <td align = "center">Waiting for reply
-                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitation', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
+                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
                 <% end %>
              </tr>
           <% end %>
@@ -122,7 +122,7 @@
        <% end %>
      <% elsif !@student.team.full?%>
        <b>Invite people</b>
-       <%= form_tag :controller => 'invitation', :action => 'create' do %>
+       <%= form_tag :controller => 'invitations', :action => 'create' do %>
          <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
@@ -159,12 +159,12 @@
 
 <!--display a table of received invitation-->
   <% if @received_invs && @received_invs.length > 0 %>
-    <table>
+    <table style="width:80%" align="center" >
       <h3>Received Invitations</h3>
-      <tr>
-        <td><b>From &nbsp</b></td>
-        <td><b>Team Name &nbsp</b></td>
-        <td><b>Reply &nbsp</b></td>
+      <tr style="border: 1px outset #000000; padding: 10px 20px" >
+        <th class="head">From </th>
+        <th class="head">Team Name </th>
+        <th class="head">Reply </th>
       </tr>
       <% for inv in @received_invs %>
           <% if inv.reply_status == 'W' %>
@@ -186,12 +186,12 @@
                       @team_id = @student.team.id
                     end %>
                   <%= link_to "Accept",
-                              {:controller => 'invitation', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
+                              {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
                               {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}
                   %>
                   |
                   <%= link_to "Decline",
-                              {:controller => 'invitation', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
+                              {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
                   %>
                 </td>
               </tr>

@@ -11,14 +11,8 @@ before_install:
     - uname -a
     - lsb_release -a
     - sudo apt-get update
-    - sudo apt-get install git-core curl
-    - sudo apt-get --no-install-recommends install build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev libgdbm-dev ncurses-dev automake libtool bison subversion pkg-config libffi-dev
-    - sudo apt-get install libaspell-dev openjdk-6-jdk gcc libxml2 libxml2-dev libxslt1-dev
-    - sudo apt-get install libmysqlclient-dev
     - unset RAILS_ENV
     - rvm rubygems current
-    - gem install raspell -- --with-ruby-include=$rvm_path/src/ruby-2.1.5-head/
-    - bundle config build.raspell --with-opt-dir=
     - npm install -g bower
     - bower install
 before_script:
@@ -32,6 +26,8 @@ before_script:
     - "sh -e /etc/init.d/xvfb start"
 script:
     - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake 2> /dev/null"
+services:
+    - mysql
 notifications:
     email:
       recipients:

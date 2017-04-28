@@ -42,7 +42,7 @@
       <tbody id="selections" data-update-url="/sign_up_sheet/set_priority" class="connectedSortable">
         <tr class="sort-disabled"><td></td><td></td></tr>
         <% for topic in @bids %>
-          <tr style= "background-color:<%= get_topic_bg_color(topic) %>" id="topic_<%= topic.id %>">
+          <tr style= "background-color:<%= get_topic_bg_color(topic, @max_team_size) %>" id="topic_<%= topic.id %>">
              <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
           </tr>
           <% i=i+1 %>

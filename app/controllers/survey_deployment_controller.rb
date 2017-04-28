@@ -25,8 +25,23 @@ class SurveyDeploymentController < ApplicationController
       else
         flash[:error] = "Unexpected type " + params[:type]
     end
-    @survey_type = params[:type]
-    @surveys = SurveyQuestionnaire.where("type in ('SurveyQuestionnaire')").map {|u| [u.name, u.id] }
+    @survey_deployment_type = params[:type]
+    @survey_type = params[:type].sub("Deployment","Questionnaire")
+
+    # Get the list of surveys that match the deployment type
+    case @survey_type
+      when "AssignmentSurveyQuestionnaire"
+        @surveys = Questionnaire.where(type: "AssignmentSurveyQuestionnaire").map {|u| [u.name, u.id] }
+      when "CourseEvaluationQuestionnaire"
+        @surveys = Questionnaire.where(type: "CourseEvaluationQuestionnaire").map {|u| [u.name, u.id] }
+      when "CourseSurveyQuestionnaire"
+        @surveys = Questionnaire.where(type: "CourseEvaluationQuestionnaire").map {|u| [u.name, u.id] }
+        # survey type for course survey deployment is course evaluation questionnaire. Below is defensive code to set survey type that matches the model value
+        @survey_type = "CourseEvaluationQuestionnaire"
+      else
+        flash[:error] = "Unexpected type " + params[:type]
+    end
+
   end
 
   def new_assignment_deployment

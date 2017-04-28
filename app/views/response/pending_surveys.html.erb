@@ -1,21 +1,44 @@
+<style>
+table
+{
+  width:960px;
+}
+
+</style>
 <h1> Pending Course Evaluations </h1>
 
-<table class=listing cellpadding=2 width=50%>
+<table class=listing cellpadding=2 width=50% border=1>
 <% if (@surveys.size > 0) %>
-  <tr><th align = left> Course </th>
-    <th align=left> Due Date </th></tr>
-  <% i=0 %>
-  <% @surveys.each do |s| %>
-    <tr><td align = left><%= link_to Course.find(s[3]).name ,:controller=>'survey_response',:action=>'submit' ,:id=> s[1],:questionnaire_id=>s[0].id, :course_eval=>'1', :course_id=> s[3] , :survey_id=> s[0]%>&nbsp &nbsp</td>
-      <td align = left><%= s[2].strftime('%A %B %d %Y, %I:%M%p') %></td></tr>
-  <% end %>
+      <tr>
+        <th> Survey Name&nbsp;&nbsp;</th>
+        <th> Survey Type </th>
+        <th> Start Date&nbsp;&nbsp;</th>
+        <th> End Date&nbsp;&nbsp;</th>
+        <th> Course/Assignment Name</th>
+        <th> Actions&nbsp;&nbsp;</th>
+      </tr>
+      <% @surveys.each do |survey| %>
+          <tr>
+            <td align=left><%= survey.first['survey']['name'] %></td>
+            <td align=left><%= survey.first['survey']['type'] %></td>
+            <td align=left><%= survey.first['start_date'].strftime('%A %B %d %Y, %I:%M%p') %></td>
+            <td align=left><%= survey.first['end_date'].strftime('%A %B %d %Y, %I:%M%p') %></td>
+            <% if survey.first['survey']['type'] == 'CourseEvaluationQuestionnaire' %>
+               <td align=left><%= Course.find_by_id(survey.first['parent_id']).name %></td>
+            <% elsif survey.first['survey']['type'] == 'AssignmentSurveyQuestionnaire' %>
+               <td align=left><%= Assignment.find_by_id(survey.first['parent_id']).name %></td>
+            <% end %>
+            <td align=left><%= link_to "Take Survey", {:controller=>'response',:action=>'view_responses',:survey_info=>survey} %>
+            </td>
+          </tr>
+      <% end %>
 <% else %>
   <tr>
     <td>
       <div class="flash_note">
-        There exist no pending course evaluations.
+        There exist no pending Surveys.
       </div>
   </td> </tr>
-<%end%>
+<% end %>
 
 </table>

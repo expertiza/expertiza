@@ -3,10 +3,10 @@
 
 <h1> New Survey Deployment </h1>
 
-<%= form_tag :action => 'create', :type => @survey_type do %>
+<%= form_tag :action => 'create', :type => @survey_deployment_type do %>
 
     <input type="hidden" name="survey_deployment[parent_id]" value=<%=@parent.id%> />
-    <input type="hidden" name="type" value=<%=@survey_type%> />
+    <input type="hidden" name="type" value=<%=@survey_deployment_type%> />
 
   <table>
     <tr>
@@ -41,7 +41,7 @@
     </tr>
 
   <tr>
-    <td><label>Survey Assigned:</label></td>
+    <td><label>Select Survey:</label></td>
   <td>
     <%= select(:survey_deployment, :questionnaire_id, @surveys) %>
   </td>

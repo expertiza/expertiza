@@ -39,6 +39,8 @@ GEM
       activemodel (= 4.2.6)
       activesupport (= 4.2.6)
       arel (~> 6.0)
+    activerecord-import (0.18.1)
+      activerecord (>= 3.2)
     activerecord-session_store (0.1.1)
       actionpack (>= 4.0.0, < 5)
       activerecord (>= 4.0.0, < 5)
@@ -173,8 +175,15 @@ GEM
       haml (~> 4.0.0)
       nokogiri (~> 1.6.0)
       ruby_parser (~> 3.5)
+    http (2.2.1)
+      addressable (~> 2.3)
+      http-cookie (~> 1.0)
+      http-form_data (~> 1.0.1)
+      http_parser.rb (~> 0.6.0)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
+    http-form_data (1.0.1)
+    http_parser.rb (0.6.0)
     i18n (0.7.0)
     jquery-datetimepicker-rails (2.4.1.0)
     jquery-rails (4.0.4)
@@ -429,6 +438,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
+  activerecord-import
   activerecord-session_store
   airbrake
   awesome_nested_set
@@ -456,6 +466,7 @@ DEPENDENCIES
   guard-rails
   guard-rspec
   haml-rails
+  http
   jquery-datetimepicker-rails
   jquery-rails
   jquery-tablesorter

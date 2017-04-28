@@ -3,6 +3,7 @@ class GithubContributorsController < ApplicationController
   def action_allowed?
     # currently we only have a index method which shows all the submission records given a team_id
     @submission_record = SubmissionRecord.find(params[:id])
+    return false if @submission_record.operation != 'Submit Hyperlink'
     assignment_team = AssignmentTeam.find(@submission_record.team_id)
     assignment = Assignment.find(assignment_team.parent_id)
     return true if ['Super-Administrator', 'Administrator'].include? current_role_name

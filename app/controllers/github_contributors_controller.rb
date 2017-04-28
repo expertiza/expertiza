@@ -125,10 +125,6 @@ class GithubContributorsController < ApplicationController
             lines_changed: []
         }
       end
-      # metric_map[:week_timestamp] << metric.week_timestamp.to_i * 1000
-      # metric_map[:lines_added] << metric.lines_added
-      # metric_map[:lines_removed] << metric.lines_removed
-      # metric_map[:lines_changed] << metric.lines_changed
       time_stamp = metric.week_timestamp.to_i * 1000
       metric_map[:lines_added] << [time_stamp, metric.lines_added]
       metric_map[:lines_removed] << [time_stamp, metric.lines_removed]

@@ -235,7 +235,29 @@ class ResponseController < ApplicationController
     @questions = Question.where(questionnaire_id: @questionnaire.id)
     @survey_responses = SurveyResponse.where(survey_deployment_id: params[:id])
   end
-  
+
+  def pending_surveys
+    unless session[:user] # Check for a valid user
+      redirect_to '/'
+      return
+    end
+    course_participants = CourseParticipant.where(user_id: session[:user].id)
+    assignment_participants = AssignmentParticipant.where(user_id: session[:user].id)
+    @surveys = []
+    course_participants.each do |cp|
+      survey_deployment = CourseSurveyDeployment.find(cp.parent_id)
+      if Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+        @surveys << [Questionnaire.find(survey_deployment.questionnaire_id), survey_deployment.id, survey_deployment.end_date, cp.parent_id]
+      end
+    end
+    assignment_participants.each do |ap|
+      survey_deployment = AssignmentSurveyDeployment.find(ap.parent_id)
+      if Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+        @surveys << [Questionnaire.find(survey_deployment.questionnaire_id), survey_deployment.id, survey_deployment.end_date, ap.parent_id]
+      end
+    end
+  end
+
   private
 
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill

@@ -1,14 +1,15 @@
 class GithubContributorsController < ApplicationController
-
   def action_allowed?
     # currently we only have a index method which shows all the submission records given a team_id
     @submission_record = SubmissionRecord.find(params[:id])
     return false if @submission_record.operation != 'Submit Hyperlink'
     assignment_team = AssignmentTeam.find(@submission_record.team_id)
     assignment = Assignment.find(assignment_team.parent_id)
-    return true if ['Super-Administrator', 'Administrator'].include? current_role_name
-    return true if assignment.instructor_id == current_user.id
-    return true if TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id) && (TaMapping.where(course_id: assignment.course_id).include?TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first)
+    return true if (['Super-Administrator', 'Administrator'].include? current_role_name) ||
+                                                                         (assignment.instructor_id == current_user.id)
+    return true if TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id) &&
+        (TaMapping.where(course_id: assignment.course_id).include?
+        TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first)
     return true if assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id
     return false
   end
@@ -38,19 +39,13 @@ class GithubContributorsController < ApplicationController
   private
 
   BASE_URI = 'https://api.github.com'
-  API_TOKEN = 'token %s'%ENV['EXPERTIZA_GITHUB_TOKEN']
+  API_TOKEN = "token #{ENV['EXPERTIZA_GITHUB_TOKEN']}"
   GITHUB_REGEX = /https?:\/\/([w]{3}\.)?github.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)[\S]*/i
-
 
   def fetch_metrics(owner, repo)
     resp = HTTP.headers(Authorization: API_TOKEN).get("#{BASE_URI}/repos/#{owner}/#{repo}/stats/contributors")
-    if resp.code == 200
-      return resp.parse
-    else
-      return nil
-    end
+    resp.parse if resp.code == 200
   end
-
 
   def parse_submissions(submission, github_content)
     github_contributors = GithubContributor.where(submission_records_id: submission.id).order('created_at DESC')
@@ -80,7 +75,6 @@ class GithubContributorsController < ApplicationController
     GithubContributor.import github_contributors
     return github_contributors
   end
-
 
   def retrieve_content(submission)
     if submission.operation != 'Submit Hyperlink'
@@ -133,6 +127,5 @@ class GithubContributorsController < ApplicationController
     end
     return metrics_map
   end
-
 
 end

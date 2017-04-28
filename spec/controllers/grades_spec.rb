@@ -158,7 +158,7 @@ describe GradesController do
   describe "Get team data" do
     it "returns a blank array when there are no teams" do
       scores = @assignment.scores(@questions)
-      data =  @controller.send(:get_team_data, @assignment, @questionnaires, scores)
+      data = @controller.send(:get_team_data, @assignment, @questionnaires, scores)
       expect(data).to eq([])
     end
     it "returns a valid data structure with the correct participants" do
@@ -170,7 +170,7 @@ describe GradesController do
       scores = @assignment.scores(@questions)
       scores[:teams]["0".to_sym][:team] = team
 
-      data =  @controller.send(:get_team_data, @assignment, @questionnaires, scores)
+      data = @controller.send(:get_team_data, @assignment, @questionnaires, scores)
       participants = data.first.first.listofteamparticipants # Team Data -> VMList -> VmQuestionResponse
       expect(participants.first.user_id).to eq(student.id)
     end
@@ -179,17 +179,17 @@ describe GradesController do
   describe "Get highchart data" do
     it "properly initializes the chart hash" do
       data = @controller.send(:get_highchart_data, [], @assignment, 1, 3, 1)
-      expect(data).to eq({1 => {1 => [0], 2 => [0], 3 => [0]}})
+      expect(data).to eq(1 => {1 => [0], 2 => [0], 3 => [0]})
     end
   end
 
   describe "Generate highchart" do
     it "returns the correct series" do
-      series, categories = @controller.send(:generate_highchart, {1 => {1 => [5]}}, 1, 1, 1)
-      expect(series).to eq([{:name=>"Score 1 - Submission 1", :data=>[5], :stack=>"S1"}])
+      series, _categories = @controller.send(:generate_highchart, {1 => {1 => [5]}}, 1, 1, 1)
+      expect(series).to eq([{name: "Score 1 - Submission 1", data: [5], stack: "S1"}])
     end
     it "returns the correct categories" do
-      series, categories = @controller.send(:generate_highchart, {1 => {1 => [5,10]}}, 1, 1, 2)
+      _series, categories = @controller.send(:generate_highchart, {1 => {1 => [5,10]}}, 1, 1, 2)
       expect(categories).to eq(["Rubric 1", "Rubric 2"])
     end
   end

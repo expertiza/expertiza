@@ -57,7 +57,7 @@ class GradesController < ApplicationController
 
     if @assignment.varying_rubrics_by_round?
       @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
-          FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+                                                      FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     else
       @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     end
@@ -388,7 +388,6 @@ class GradesController < ApplicationController
       team = participant.team
       vmlist = []
 
-      # COPY PASTA
       questionnaires.each do |questionnaire|
         round = if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
                   AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, questionnaire.id).used_in_round
@@ -415,18 +414,18 @@ class GradesController < ApplicationController
 
     # Dynamic initialization
     for i in 1..assignment.rounds_of_reviews
-      chart_data[i] = Hash[(min..max).map {|score| [score, Array.new(number_of_review_questions,0)]}]
+      chart_data[i] = Hash[(min..max).map {|score| [score, Array.new(number_of_review_questions,0)] }]
     end
 
     # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission
     # round will be added to the count in the corresponded array field)
     team_data.each do |team|
       team.each do |vm|
-        if !vm.round.nil?
+        unless vm.round.nil?
           j = 0
           vm.list_of_rows.each do |row|
             row.score_row.each do |score|
-              if !score.score_value.nil?
+              unless score.score_value.nil?
                 chart_data[vm.round][score.score_value][j] += 1
               end
             end
@@ -444,7 +443,7 @@ class GradesController < ApplicationController
     highchart_series_data = []
     chart_data.each do |round, scores|
       scores.to_a.reverse.to_h.each do |score, rubric_distribution|
-        highchart_series_data.push(:name => "Score #{score} - Submission #{round}", :data => rubric_distribution, :stack => "S#{round}")
+        highchart_series_data.push(name: "Score #{score} - Submission #{round}", data: rubric_distribution, stack: "S#{round}")
       end
     end
 
@@ -459,7 +458,7 @@ class GradesController < ApplicationController
     # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
     highchart_colors = []
     for _i in min..max
-      highchart_colors.push("\##{"%06x" % (rand * 0xffffff)}")
+      highchart_colors.push("\##{'%06x' % (rand * 0xffffff)}")
     end
     return highchart_series_data, highchart_categories, highchart_colors
   end

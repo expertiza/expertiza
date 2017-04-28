@@ -236,9 +236,9 @@ class AssignmentsController < ApplicationController
   end
 
   # E1731: Improve Score Calculation: Method called after clicking the icon "save scores to db"
-  def local_db_cal
-    assignment_id = params[:id]
-    Assignment.save_score_in_db(assignment_id)
+  def store_scores_to_db
+    assignment = Assignment.find_by(id: params[:id])
+    LocalDbCalc.store_total_scores(assignment)
     redirect_to list_tree_display_index_path
   end
 

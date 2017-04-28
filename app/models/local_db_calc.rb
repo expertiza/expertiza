@@ -20,8 +20,7 @@ class LocalDbCalc
     contributors = assignment.contributors
     rounds = assignment.rounds_of_reviews
     (1..rounds).each do |round|
-      review_questionnaire_id = assignment.review_questionnaire_id(round)
-      questions = Question.where(questionnaire_id: review_questionnaire_id)
+      questions = fetch_questions(assignment, round)
       contributors.each do |contributor|
         next unless contributor
         maps = ReviewResponseMap.where(reviewee_id: contributor.id)
@@ -30,9 +29,7 @@ class LocalDbCalc
           @response = Response.where(map_id: map.map_id).last
           if map.type.eql?('ReviewResponseMap')
             # If its ReviewResponseMap then only consider those response which are submitted.
-            if !@response.is_submitted
-              @response = nil
-            end
+            @response = nil unless @response.is_submitted
           end
           score = Answer.get_total_score(response: [@response], questions: questions)
           if score == -1
@@ -45,4 +42,11 @@ class LocalDbCalc
     end
     assignment.update_attribute(:local_scores_calculated, true)
   end
+end
+
+private
+
+def fetch_questions(assignment, round)
+  review_questionnaire_id = assignment.review_questionnaire_id(round)
+  Question.where(questionnaire_id: review_questionnaire_id)
 end

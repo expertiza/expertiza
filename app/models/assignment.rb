@@ -620,11 +620,4 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
-
-  # E1731: Improve Score Calculation - Method to save scores in DB
-  def self.save_score_in_db(assignment_id)
-    assignment = Assignment.find_by(id: assignment_id)
-    LocalDbCalc.store_total_scores(assignment)
-  end
-
 end

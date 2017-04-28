@@ -58,7 +58,7 @@ Expertiza::Application.routes.draw do
       get :copy
       get :toggle_access
       get :delayed_mailer
-      get :local_db_cal # E1731
+      get :store_scores_to_db # E1731
       get :list_submissions
       get :delete_delayed_mailer
       get :remove_assignment_from_course

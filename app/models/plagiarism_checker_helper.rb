@@ -1,9 +1,55 @@
-require 'simicheck_webservice'
 
 class PlagiarismCheckerHelper
+  require 'simicheck_webservice'
+  require 'submission_content_fetcher'
 
   # PlagiarismCheckerHelper acts as the integration point between all services and models
   # related to PlagiarismChecker
+
+  def self.run(assignment_id)
+    submission_name = Assignment.
+      student_groups = Assignment.
+
+      self.send_notification_email("task started")
+
+    code_assignment_submission_id = self.create_new_assignment_submission(submission_name + " (Code)")
+    doc_assignment_submission_id  = self.create_new_assignment_submission(submission_name + " (Doc)")
+
+    for team in student_groups
+      submission_links = AssignmentSubmission.
+
+        for url in submission_links
+          fetcher = SubmissionContentFetcher.CodeFactory(url)
+          id = code_assignment_submission_id
+
+          if not fetcher
+            fetcher = SubmissionContentFetcher.DocFactory(url)
+            id = doc_assignment_submission_id
+          end
+
+          if fetcher
+            content = fetcher.fetch_content
+            if content.length > 0
+              self.upload_file(id, team)
+            else
+              self.send_notification_email("no content found for submission URL: " + url)
+            end
+
+          else
+            self.send_notification_email("invalid submission URL: " + url)
+          end
+        end
+
+    end
+
+    callback_url = ?
+    self.start_plagiarism_checker(assignment_submission_simicheck_id, callback_url)
+    self.send_notification_email("submission comparison started")
+
+  end
+
+  def self.send_notification_email(type)
+  end
 
   # Create a new PlagiarismCheckerAssignmentSubmission
   def self.create_new_assignment_submission(submission_name = '')
@@ -14,6 +60,7 @@ class PlagiarismCheckerHelper
     as_id = json_response["id"]
     assignment_submission = PlagiarismCheckerAssignmentSubmission.new(name: as_name, simicheck_id: as_id)
     assignment_submission.save!
+    as_id
   end
 
   # Upload file (do we have text at this point?)

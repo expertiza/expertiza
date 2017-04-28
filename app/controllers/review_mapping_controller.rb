@@ -441,7 +441,15 @@ class ReviewMappingController < ApplicationController
       @responses = Response.where(:map_id => @review_response_map_ids)
 
     when "PlagiarismCheckerReport"
-      @PlagiarismCheckerComparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: plagiarism_checker_assignment_submission_id)
+      @assignment = Assignment.find(params[:id])
+      @PlagiarismCheckerAssignmentSubmission = PlagiarismCheckerAssignmentSubmission.find(params[:id])
+      @PlagiarismCheckerComparisons = nil
+
+      if !@PlagiarismCheckerAssignmentSubmission.nil
+        plagiarism_checker_assignment_submission_id = session[:plagiarism_checker_assignment_submission_id]
+        @PlagiarismCheckerComparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: plagiarism_checker_assignment_submission_id)
+      end
+
     end
     end
 

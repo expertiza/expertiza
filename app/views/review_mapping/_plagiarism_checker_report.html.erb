@@ -3,8 +3,12 @@ if plagiarism_checker_assignment_submission doesn't exist, say there is no plagi
 else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
 else show records
 -->
+<% if @PlagiarismCheckerAssignmentSubmission = nil %>
+    <div class="text-center">
+      "There is no plagiarism checker report for this assignment"
+    </div>
 
-<% if @PlagiarismCheckerComparisons = nil %>
+<% elsif @PlagiarismCheckerComparisons = nil %>
     <div class="text-center">
       "There are no cheaters in this assignment! Hooray!"
     </div>

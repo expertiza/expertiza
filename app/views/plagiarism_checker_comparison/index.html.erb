@@ -1,0 +1,37 @@
+<!--
+if plagiarism_checker_assignment_submission doesn't exist, say there is no plagiarism report
+else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
+else show records
+-->
+<h2>Plagiarism Comparison Report</h2>
+
+<% if @PlagiarismCheckerComparisons = nil %>
+    <div class="text-center">
+      "There are no cheaters in this assignment! Hooray!"
+    </div>
+<% else %>
+
+  <div class="container"><p></p>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Plagiarism Report</th>
+          <th style="text-align: right">Similarity</th>
+          <th>Submission 1</th>
+          <th>Team 1</th>
+          <th>Submission 2</th>
+          <th>Team 2</th>
+        </tr>
+        </thead>
+        <% @PlagiarismCheckerComparisons.each do |pcc| %>
+            <tr>
+              <td><%= link_to pcc.similarity_percentage, pcc.similarity_link %></td>
+              <td><%= pcc.file1_name%></td>
+              <td><%= pcc.file1_team%></td>
+              <td><%= pcc.file2_name%></td>
+              <td><%= pcc.file2_team%></td>
+            </tr>
+        <% end %>
+    </table>
+  </div>
+<% end %>

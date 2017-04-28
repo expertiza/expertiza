@@ -47,7 +47,7 @@
           <div>
             <%= link_to image_tag('/assets/tree_view/view-scores-24.png', :title => 'View scores'), {:controller => 'grades', :action => 'view', :id => node.node_object_id}, {:title => 'View scores'} %>
             <%= link_to image_tag('/assets/tree_view/view-review-report-24.png', :title => 'View review report'), {:controller => 'review_mapping', :action => 'response_report', :id => node.node_object_id}, {:title => 'View review report'} %>
-            <%= link_to image_tag('/assets/tree_view/view-plagiarism-report-24.png', :title => 'View plagiarism report'), {:controller => 'plagiarism_checker_comparison', :action => 'view_plagiarism_checker_comparison', :id => node.node_object_id}, {:title => 'View plagiarism report'} %>
+            <%= link_to image_tag('/assets/tree_view/view-plagiarism-report-24.png', :title => 'View plagiarism comparison report'), {:controller => 'plagiarism_checker_comparison', :action => 'index', :id => node.node_object_id}, {:title => 'View plagiarism comparison report'} %>
             <%= link_to image_tag('/assets/tree_view/view-survey-24.png', :title => 'View survey responses'), {:controller => 'survey_response', :action => 'view_responses', :id => node.node_object_id}, {:title => 'View survey responses'} %>
             <%= link_to image_tag('/assets/tree_view/view-delayed-mailer.png', :title => 'View delayed jobs'), {:controller => 'assignments', :action => 'delayed_mailer', :id => node.node_object_id}, {:title => 'View delayed jobs'} %>
             <% if signup_topic %>

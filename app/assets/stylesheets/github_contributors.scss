@@ -1,3 +1,15 @@
 // Place all the styles related to the GithubContributors controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.centered {
+  text-align: center;
+}
+
+table.gh-table {
+  border-collapse: collapse;
+  margin: 10px auto;
+  th, td {
+    border: 1px solid black;
+  }
+}

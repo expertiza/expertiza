@@ -14,11 +14,22 @@ class GithubContributorsController < ApplicationController
 
   def show
     metrics = update_submission(@submission_record)
+    matches = GITHUB_REGEX.match(@submission_record.content)
     if metrics.nil?
+      if matches.nil?
+        @message = 'This is not a github repository.'
+      else
+        @message = 'Accessed the github API too soon. Refresh the page, if '+
+            'it fails again, please contact the administrator.'
+      end
       render 'github_contributors/not_found'
     else
-      @metrics_map = format_metrics(metrics)
-      puts @metrics_map.size
+      metrics_map = format_metrics(metrics)
+      @github_data = {
+          metrics_map: metrics_map,
+          owner: matches[2],
+          repo: matches[3]
+      }
       render 'github_contributors/show'
     end
   end
@@ -113,10 +124,14 @@ class GithubContributorsController < ApplicationController
             lines_changed: []
         }
       end
-      metric_map[:week_timestamp] << metric.week_timestamp.to_i
-      metric_map[:lines_added] << metric.lines_added
-      metric_map[:lines_removed] << metric.lines_removed
-      metric_map[:lines_changed] << metric.lines_changed
+      # metric_map[:week_timestamp] << metric.week_timestamp.to_i * 1000
+      # metric_map[:lines_added] << metric.lines_added
+      # metric_map[:lines_removed] << metric.lines_removed
+      # metric_map[:lines_changed] << metric.lines_changed
+      time_stamp = metric.week_timestamp.to_i * 1000
+      metric_map[:lines_added] << [time_stamp, metric.lines_added]
+      metric_map[:lines_removed] << [time_stamp, metric.lines_removed]
+      metric_map[:lines_changed] << [time_stamp, metric.lines_changed]
       metrics_map[metric.github_id] = metric_map
     end
     return metrics_map

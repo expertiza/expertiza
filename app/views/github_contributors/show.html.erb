@@ -1,15 +1,38 @@
-<h1>Github Contributors</h1>
-<table>
+<h1 class="centered">Github Contributors</h1>
+<table class="gh-table">
   <thead>
     <tr>
-      <th>Contributor</th>
-      <th>Total Commits</th>
-      <th>Lines Added</th>
-      <th>Lines Deleted</th>
-      <th>Lines Updated</th>
+      <th class="centered">Contributor</th>
+      <th class="centered">Total Commits</th>
+      <th class="centered">Lines Added</th>
+      <th class="centered">Lines Deleted</th>
+      <th class="centered">Lines Updated</th>
     </tr>
   </thead>
   <tbody>
-
+  <% @github_data[:metrics_map].each do |github_id, metric_map|%>
+    <tr>
+      <td class="centered">
+        <a target="_blank" href="http://github.com/<%= metric_map[:user_name] %>">@<%= metric_map[:user_name]%></a>
+      </td>
+      <td class="centered">
+        <a target="_blank" href="http://github.com/<%=
+          @github_data[:owner] + '/' + @github_data[:repo] + '/commits?author=' + metric_map[:user_name] %>">
+          <%= metric_map[:total_commits]%>
+        </a>
+      </td>
+      <td id="added<%= github_id %>" style="min-width: 200px; height: 200px; margin: 0 auto"></td>
+      <td id="removed<%= github_id %>" style="min-width: 200px; height: 100px; margin: 0 auto"></td>
+      <td id="changed<%= github_id %>" style="min-width: 200px; height: 100px; margin: 0 auto"></td>
+    </tr>
+  <% end %>
   </tbody>
 </table>
+<script>
+  <% @github_data[:metrics_map].each do |github_id, metric_map|%>
+    github_id = <%= github_id %>;
+    loadGithubCharts(<%= metric_map[:lines_added] %>, "added"+github_id, "Lines Added", '#00FF00');
+    loadGithubCharts(<%= metric_map[:lines_removed] %>, "removed"+github_id, "Lines Removed", '#FF0000');
+    loadGithubCharts(<%= metric_map[:lines_changed] %>, "changed"+github_id, "Lines Changed", '#0000FF');
+  <% end %>
+</script>

@@ -1,0 +1,2 @@
+class SurveyResponseMap < ResponseMap
+end

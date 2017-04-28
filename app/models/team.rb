@@ -77,7 +77,7 @@ class Team < ActiveRecord::Base
 
   # Check if team was first submitter on assignment
   def self.first_sub(team_id, assignment_id)
-	return team_id == Assignment.find(assignment_id).first_sub_teamid
+    team_id == Assignment.find(assignment_id).first_sub_teamid
   end
 
   # Copy method to copy this team
@@ -261,10 +261,6 @@ class Team < ActiveRecord::Base
     team
   end
 
-  # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
-
-
-  #return the team in which the participant exist
   def self.get_team(participant)
     team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
     if team_id.nil?

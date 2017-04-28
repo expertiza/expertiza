@@ -199,6 +199,6 @@ class ReviewResponseMap < ResponseMap
 
   def self.good_reviewer?(participant)
     score = participant.try(:review_grade).try(:grade_for_reviewer)
-    (!score.nil?) && score > 95
+    !score.nil? && score > 95
   end
 end

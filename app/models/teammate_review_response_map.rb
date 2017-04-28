@@ -41,7 +41,7 @@ class TeammateReviewResponseMap < ResponseMap
     end
     team = Team.find(team_id)
     team_size = team.participants.size
-    sum = 0;
+    sum = 0
     if team_size == 0 || team_size == 1
       return false
     end
@@ -60,7 +60,7 @@ class TeammateReviewResponseMap < ResponseMap
       return false
     end
     team_participants = team.participants
-    sum = 0;
+    sum = 0
     team_participants.each do |team_member|
       if team_member.t_rev_avg != -1
         sum += team_member.t_rev_avg

@@ -624,7 +624,7 @@ class Assignment < ActiveRecord::Base
 
   def self.first_submission_reward(ass_id, team_id)
     assignment = Assignment.find(ass_id)
-    if (!assignment.nil?) && assignment.first_sub_teamid == -1
+    if !assignment.nil? && assignment.first_sub_teamid == -1
       assignment.first_sub_teamid = team_id
       assignment.save
     end

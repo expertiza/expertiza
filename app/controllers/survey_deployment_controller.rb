@@ -23,10 +23,13 @@ class SurveyDeploymentController < ApplicationController
       when "CourseSurveyDeployment"
         new_course_deployment
       else
-        flash[:error] = "Unexpected type " + params[:type]
+        flash[:error] = "Unexpected type. Check your dates! Dates should be in the future. "
     end
-    @survey_deployment_type = params[:type]
-    @survey_type = params[:type].sub("Deployment","Questionnaire")
+
+    if params[:type]
+      @survey_deployment_type = params[:type]
+      @survey_type = params[:type].sub("Deployment","Questionnaire")
+    end
 
     # Get the list of surveys that match the deployment type
     case @survey_type
@@ -39,9 +42,9 @@ class SurveyDeploymentController < ApplicationController
         # survey type for course survey deployment is course evaluation questionnaire. Below is defensive code to set survey type that matches the model value
         @survey_type = "CourseEvaluationQuestionnaire"
       else
-        flash[:error] = "Unexpected type " + params[:type]
+        flash[:error] = "Unexpected type. Check your dates! Dates should be in the future."
+        redirect_to '/tree_display/list'
     end
-
   end
 
   def new_assignment_deployment

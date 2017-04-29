@@ -5,10 +5,7 @@ class AssignmentForm
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
-
-  include PublicActivity::Model
-  tracked owner: ->(controller, model) { controller && controller.current_user }
-
+  
   def initialize(args = {})
     @assignment = Assignment.new(args[:assignment])
     if args[:assignment].nil?

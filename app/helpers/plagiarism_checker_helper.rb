@@ -8,36 +8,46 @@ class PlagiarismCheckerHelper
 
   def self.run(assignment_id)
     assignment = Assignment.find(assignment_id)
+    teams = Team.where(parent_id: assignment_id)
+
+    puts "Started comparison for assignment #{assignment_id}"
 
     self.send_notification_email("task started")
 
     code_assignment_submission_id = self.create_new_assignment_submission(assignment.name + " (Code)")
     doc_assignment_submission_id  = self.create_new_assignment_submission(assignment.name + " (Doc)")
 
-    for team in assignment.teams
-      submission_links = AssignmentSubmission.
+    puts "Created code submission #{code_assignment_submission_id}, and doc submission #{doc_assignment_submission_id}"
 
-        for url in submission_links
-          fetcher = SubmissionContentFetcher.CodeFactory(url)
-          id = code_assignment_submission_id
+    for team in teams
+      puts "Getting submission links for team #{team}"
+      
+      for url in team.hyperlinks # in assignment_team model
+        fetcher = SubmissionContentFetcher.CodeFactory(url)
+        id = code_assignment_submission_id
 
-          if not fetcher
-            fetcher = SubmissionContentFetcher.DocFactory(url)
-            id = doc_assignment_submission_id
-          end
+        if not fetcher
+          fetcher = SubmissionContentFetcher.DocFactory(url)
+          id = doc_assignment_submission_id
+        end
 
-          if fetcher
-            content = fetcher.fetch_content
-            if content.length > 0
-              self.upload_file(id, team)
-            else
-              self.send_notification_email("no content found for submission URL: " + url)
-            end
+        puts "Created fetcher for URL: #{url}"
 
+        if fetcher
+          content = fetcher.fetch_content
+          if content.length > 0
+            self.upload_file(id, team.id)
+            puts "File uploaded for team #{team.id}"
           else
-            self.send_notification_email("invalid submission URL: " + url)
+            msg = "no content found for submission URL: " + url
+            puts msg
+            self.send_notification_email(msg)
           end
-        end # each submission per team
+
+        else
+          self.send_notification_email("invalid submission URL: " + url)
+        end
+      end # each submission per team
     end # each team
 
     # TODO: Bradford enter callback URL here
@@ -67,8 +77,8 @@ class PlagiarismCheckerHelper
     filenumber = 1
     # Call method to parse text
     parsed_text = # TODO: David's parser
-    # Set up filename structure: "teamID_000N.txt"
-    filename = team_id + "_%04d.txt" % filenumber
+      # Set up filename structure: "teamID_000N.txt"
+      filename = team_id + "_%04d.txt" % filenumber
     # Set up full filepath (in tmp dir)
     filepath = "tmp/" + filename
     # Create new file using parsed text

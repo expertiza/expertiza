@@ -7,9 +7,7 @@ class GithubContributorsController < ApplicationController
     assignment = Assignment.find(assignment_team.parent_id)
     (['Super-Administrator', 'Administrator'].include? current_role_name) ||
         (assignment.instructor_id == current_user.id) ||
-        (TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id) &&
-            TaMapping.where(course_id: assignment.course_id).include?
-              TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first) ||
+        ta?(assignment) ||
         (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id)
   end
 
@@ -98,7 +96,8 @@ class GithubContributorsController < ApplicationController
 
   def format_metrics(metrics)
     metrics_map = {}
-    metrics.sort_by{ |m| [m.week_timestamp, -m.total_commits] }.each do |metric|
+    metrics = metrics.sort_by {|m| [m.week_timestamp, -m.total_commits]}
+    metrics.each do |metric|
       if metrics_map.key?(metric.github_id)
         metric_map = metrics_map[metric.github_id]
       else
@@ -119,5 +118,11 @@ class GithubContributorsController < ApplicationController
       metrics_map[metric.github_id] = metric_map
     end
     metrics_map
+  end
+
+  def ta?(assignment)
+    TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id) &&
+        TaMapping.where(course_id: assignment.course_id).include?
+    TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first
   end
 end

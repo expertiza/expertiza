@@ -1,6 +1,6 @@
 class SimiCheckWebService
 
-  @@api_key = '34fdeffbe203432383df873a0306b005595ff4c6f040447a9ec52cf7bee0af2a4b6ef22fdb414fe09dba556a50085505388f8b837afc4364b226d058a2dc84bc'
+  @@api_key = PLAGIARISM_CHECKER_CONFIG['simicheck_api_key']
   @@base_uri = 'https://www.simicheck.com/api'
 
   ############################################

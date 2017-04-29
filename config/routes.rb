@@ -1,5 +1,7 @@
 Expertiza::Application.routes.draw do
 
+  get 'plagiarism_checker_assignment_submissions/new'
+
   resources :track_notifications
   resources :notifications
   resources :submission_records

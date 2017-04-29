@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  plagiarism_checker_assignment_submission_id: 
+  similarity_link: MyString
+  similarity_percentage: 9.99
+  file1_name: MyString
+  file1_id: MyString
+  file1_team: MyString
+  file2_name: MyString
+  file2_id: MyString
+  file2_team: MyString
+
+two:
+  plagiarism_checker_assignment_submission_id: 
+  similarity_link: MyString
+  similarity_percentage: 9.99
+  file1_name: MyString
+  file1_id: MyString
+  file1_team: MyString
+  file2_name: MyString
+  file2_id: MyString
+  file2_team: MyString

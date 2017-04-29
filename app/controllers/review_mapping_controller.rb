@@ -441,16 +441,7 @@ class ReviewMappingController < ApplicationController
       @responses = Response.where(:map_id => @review_response_map_ids)
 
     when "PlagiarismCheckerReport"
-      @assignment = Assignment.find(params[:id])
-
-      if @assignment.simicheck > -1 #-1 is the default and means "No SimiCheck" any other value is # hours
-        @PlagiarismCheckerAssignmentSubmissions = PlagiarismCheckerAssignmentSubmissions.where(assignment_id: params[:id])
-
-        plagiarism_checker_assignment_submission_id = session[:plagiarism_checker_assignment_submission_id]
-        @PlagiarismCheckerComparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: plagiarism_checker_assignment_submission_id)
-
-      end
-
+        @PlagiarismCheckerComparisons = PlagiarismCheckerComparison.where(:plagiarism_checker_assignment_submission_id => PlagiarismCheckerAssignmentSubmission.where(assignment_id: params[:id]).pluck(:simicheck_id))
     end
     end
 

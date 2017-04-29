@@ -4,7 +4,7 @@ else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
 else show records
 -->
 
-<% if @PlagiarismCheckerComparisons = nil %>
+<% if @PlagiarismCheckerComparisons.nil? %>
     <div class="text-center">
       "There are no cheaters in this assignment! Hooray!"
     </div>

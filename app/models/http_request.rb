@@ -4,9 +4,9 @@ class HttpRequest
   
   class << self
 
-    # http://stackoverflow.com/questions/1805761/check-if-url-is-valid-ruby
+    # IP addresses and local URLs will not match, must include http(s)
     def is_valid_url(url)
-      url =~ /\A#{URI::regexp}\z/
+      /^#{URI::regexp}$/.match(url)
     end
 
     # http://ruby-doc.org/stdlib-2.4.1/libdoc/net/http/rdoc/Net/HTTP.html

@@ -233,7 +233,23 @@ class ResponseController < ApplicationController
     sd = SurveyDeployment.find(params[:id])
     @questionnaire = Questionnaire.find(sd.questionnaire_id)
     @questions = Question.where(questionnaire_id: @questionnaire.id)
-    @survey_responses = SurveyResponse.where(survey_deployment_id: params[:id])
+    response_map_list = ResponseMap.where(reviewee_id: sd.id)
+    @all_answers = []
+    @questions.each do |question|
+      answers = []
+      response_map_list.each do |response_map|
+        response_list = Response.where(map_id: response_map.id)
+        response_list.each do |response|
+          an_answer = Answer.where(question_id: question.id, response_id: response.id).first
+          unless an_answer.blank?
+            answers << an_answer
+          end
+        end
+      end
+      if answers.size > 0
+        @all_answers << answers
+      end
+    end
   end
 
   def pending_surveys

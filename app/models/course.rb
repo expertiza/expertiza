@@ -8,6 +8,8 @@ class Course < ActiveRecord::Base
   has_many :participants, class_name: 'CourseParticipant', foreign_key: 'parent_id'
   has_one :course_node, foreign_key: :node_object_id, dependent: :destroy
   has_paper_trail
+  include PublicActivity::Model
+  tracked owner: ->(controller, model) { controller && controller.current_user }
 
   # Return any predefined teams associated with this course
   # Author: ajbudlon

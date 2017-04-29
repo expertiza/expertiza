@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  include PublicActivity::StoreController
   include AccessHelper
 
   # You want to get exceptions in development, but not in production.
@@ -58,12 +59,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  private
-
   def current_user
     @current_user ||= session[:user]
   end
   helper_method :current_user
+  hide_action :current_user
+
+  private
 
   def current_user_role
     current_user.role

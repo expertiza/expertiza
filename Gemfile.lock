@@ -118,7 +118,7 @@ GEM
       json
     engtagger (0.2.0)
     erubis (2.7.0)
-    eventmachine (1.0.8)
+    eventmachine (1.2.3)
     execjs (2.6.0)
     factory_girl (4.5.0)
       activesupport (>= 3.0.0)
@@ -259,6 +259,11 @@ GEM
     pry-remote (0.1.8)
       pry (~> 0.9)
       slop (~> 3.0)
+    public_activity (1.5.0)
+      actionpack (>= 3.0.0)
+      activerecord (>= 3.0)
+      i18n (>= 0.5.0)
+      railties (>= 3.0.0)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.4)
@@ -472,6 +477,7 @@ DEPENDENCIES
   pry
   pry-nav
   pry-remote
+  public_activity
   quiet_assets
   rails (~> 4.2.6)
   rails4-autocomplete
@@ -502,6 +508,3 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-BUNDLED WITH
-   1.14.6

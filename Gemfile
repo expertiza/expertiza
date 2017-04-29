@@ -58,6 +58,7 @@ gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'timecop', '0.8.1'
+gem 'public_activity'
 
 group :development do
   gem 'daemons'

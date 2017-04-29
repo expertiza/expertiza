@@ -1,5 +1,4 @@
-
-class PlagiarismCheckerHelper
+module PlagiarismCheckerHelper
   require 'simicheck_webservice'
   require 'submission_content_fetcher'
 
@@ -80,11 +79,11 @@ class PlagiarismCheckerHelper
   # Upload file
   def self.upload_file(assignment_submission_simicheck_id, team_id, parsed_text, file_number)
     # Set up filename structure: "teamID_000N.txt"
-    filename = team_id + "_%04d.txt" % file_number
+    filename = "team" + team_id.to_s + "_%04d.txt" % file_number
     # Set up full filepath (in tmp dir)
     filepath = "tmp/" + filename
     # Create new file using parsed text
-    File.open(filename, "w") { |file| file.write(parsed_text) }
+    File.open(filepath, "w") { |file| file.write(parsed_text) }
     # Upload file to simicheck
     response = SimiCheckWebService.upload_file(assignment_submission_simicheck_id, filepath)
     # Delete temporary file
@@ -113,14 +112,15 @@ class PlagiarismCheckerHelper
         f2_id = similarity["fid2"]
         # Team ID is embedded in the file name
         # Team 1 ID
-        t1_id = f1_name.split("_").first
+        t1_id = f1_name.split("_").first.sub("team", "")
         # Team 2 ID
-        t2_id = f2_name.split("_").first
+        t2_id = f2_name.split("_").first.sub("team", "")
         # Get similarity display link
         get_sim_link_response = SimiCheckWebService.visualize_comparison(assignment_submission_simicheck_id, f1_id, f2_id)
         sim_link = 'https://www.simicheck.com' + get_sim_link_response.body
 
-        comparison = PlagiarismCheckerComparison.new(similarity_link: sim_link, similarity_percentage: percent_similar, file1_name: f1_name, file1_id: f1_id, file1_team: t1_id, file2_name: f2_name, file2_id: f2_id, file2_team: t2_id)
+        as_id = PlagiarismCheckerAssignmentSubmission.find_by_simicheck_id(assignment_submission_simicheck_id).id
+        comparison = PlagiarismCheckerComparison.new(plagiarism_checker_assignment_submission_id: as_id, similarity_link: sim_link, similarity_percentage: percent_similar, file1_name: f1_name, file1_id: f1_id, file1_team: t1_id, file2_name: f2_name, file2_id: f2_id, file2_team: t2_id)
         comparison.save!
       end
     end

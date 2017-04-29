@@ -1,25 +1,21 @@
 <!--
-if plagiarism_checker_assignment_submission doesn't exist, say there is no plagiarism report
+if plagiarism_checker_assignment_submission doesn't exist, you won't be able to come to this page
 else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
 else show records
 -->
-<% if @PlagiarismCheckerAssignmentSubmission = nil %>
-    <div class="text-center">
-      "There is no plagiarism checker report for this assignment"
-    </div>
 
-<% elsif @PlagiarismCheckerComparisons = nil %>
+
+<% if @PlagiarismCheckerComparisons.nil? %>
     <div class="text-center">
-      "There are no cheaters in this assignment! Hooray!"
+      <h4>There are no cheaters in this assignment! Hooray!</h4>
     </div>
 <% else %>
 
-    <div class="container"><p></p>
+    <div class="container">
       <table class="table table-striped">
         <thead>
         <tr>
-          <th>Plagiarism Report</th>
-          <th style="text-align: right">Similarity</th>
+          <th>Similarity</th>
           <th>Submission 1</th>
           <th>Team 1</th>
           <th>Submission 2</th>
@@ -28,11 +24,25 @@ else show records
         </thead>
         <% @PlagiarismCheckerComparisons.each do |pcc| %>
             <tr>
-              <td><%= link_to pcc.similarity_percentage, pcc.similarity_link %></td>
+
+              <td><%= link_to (pcc.similarity_percentage).to_s + "%", pcc.similarity_link %></td>
               <td><%= pcc.file1_name%></td>
-              <td><%= pcc.file1_team%></td>
+
+              <% team = Team.find(pcc.file1_team) %>
+              <% if team.nil? %>
+                  <td>Unknown</td>
+              <% else %>
+                  <td><%= team.name %></td>
+              <% end %>
+
               <td><%= pcc.file2_name%></td>
-              <td><%= pcc.file2_team%></td>
+
+              <% team = Team.find(pcc.file2_team) %>
+              <% if team.nil? %>
+                  <td>Unknown</td>
+              <% else %>
+                  <td><%= team.name %></td>
+              <% end %>
             </tr>
         <% end %>
       </table>

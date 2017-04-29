@@ -29,6 +29,7 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
   has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
   has_many :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewed_object_id'
+  has_many :plagiarism_checker_assignment_submissions
 
   validates_presence_of :name
   validates_uniqueness_of :name, scope: :course_id

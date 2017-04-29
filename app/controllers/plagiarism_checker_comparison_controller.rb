@@ -3,8 +3,6 @@ class PlagiarismCheckerComparisonController < ApplicationController
   skip_before_action :authorize, only: [:save_results]
 
   def index
-    plagiarism_checker_assignment_submission_id = session[:plagiarism_checker_assignment_submission_id]
-    @PlagiarismCheckerComparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: plagiarism_checker_assignment_submission_id)
   end
 
   def save_results

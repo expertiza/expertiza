@@ -454,7 +454,7 @@ class GradesController < ApplicationController
     # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
     highchart_colors = []
     for _i in min..max
-      highchart_colors.push("\##{'%06x' % (rand * 0xffffff)}")
+      highchart_colors.push("\##{sprintf('%06x', (rand * 0xffffff))}")
     end
     [highchart_series_data, highchart_categories, highchart_colors]
   end

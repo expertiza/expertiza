@@ -51,8 +51,13 @@ class PlagiarismCheckerHelper
     end # each team
 
     # TODO: Bradford enter callback URL here
-    callback_url = ""
-    self.start_plagiarism_checker(assignment_submission_simicheck_id, callback_url)
+    # Start comparison on code submission
+    callback_url = request.protocol + request.host + "/" + code_assignment_submission_id
+    self.start_plagiarism_checker(code_assignment_submission_id, callback_url)
+    # Start comparison on doc submission
+    callback_url = request.protocol + request.host + "/" + doc_assignment_submission_id
+    self.start_plagiarism_checker(doc_assignment_submission_id, callback_url)
+    
     self.send_notification_email("submission comparison started")
   end
 

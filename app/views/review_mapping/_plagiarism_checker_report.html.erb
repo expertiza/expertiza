@@ -3,7 +3,7 @@ if plagiarism_checker_assignment_submission doesn't exist, you won't be able to 
 else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
 else show records
 -->
-<%@l = -1 %>
+
 
 <% if @PlagiarismCheckerComparisons.nil? %>
     <div class="text-center">
@@ -28,7 +28,7 @@ else show records
               <td><%= link_to (pcc.similarity_percentage).to_s + "%", pcc.similarity_link %></td>
               <td><%= pcc.file1_name%></td>
 
-              <%= team = Team.find(pcc.file1_team) %>
+              <% team = Team.find(pcc.file1_team) %>
               <% if team.nil? %>
                   <td>Unknown</td>
               <% else %>
@@ -37,7 +37,7 @@ else show records
 
               <td><%= pcc.file2_name%></td>
 
-              <%= team = Team.find(pcc.file2_team) %>
+              <% team = Team.find(pcc.file2_team) %>
               <% if team.nil? %>
                   <td>Unknown</td>
               <% else %>

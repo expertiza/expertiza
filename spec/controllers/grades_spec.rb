@@ -129,7 +129,7 @@ describe GradesController do
   before(:each) do
     # Simulate Authorized Session
     instructor.save
-    @user = User.find_by_name("instructor")
+    @user = User.find_by(name: "instructor")
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return('Instructor')
     allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(TRUE)
 

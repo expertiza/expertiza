@@ -57,7 +57,7 @@ class GradesController < ApplicationController
 
     if @assignment.varying_rubrics_by_round?
       @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
-      FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+        FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     else
       @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     end
@@ -259,14 +259,13 @@ class GradesController < ApplicationController
 
     number_of_review_questions = 0
     questionnaires.each do |questionnaire|
-      if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire" # WHAT ABOUT NOT VARYING RUBRICS?
-        number_of_review_questions = questionnaire.questions.size
-        min = questionnaire.min_question_score < min ? questionnaire.min_question_score : min
-        max = questionnaire.max_question_score > max ? questionnaire.max_question_score : max
-        break
-      end
+      next unless assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire" # WHAT ABOUT NOT VARYING RUBRICS?
+      number_of_review_questions = questionnaire.questions.size
+      min = questionnaire.min_question_score < min ? questionnaire.min_question_score : min
+      max = questionnaire.max_question_score > max ? questionnaire.max_question_score : max
+      break
     end
-    return min, max, number_of_review_questions
+    [min, max, number_of_review_questions]
   end
 
   def calculate_all_penalties(assignment_id)
@@ -382,15 +381,13 @@ class GradesController < ApplicationController
   def get_team_data(assignment, questionnaires, scores)
     team_data = []
     for index in 0..scores[:teams].length - 1
-      tscore = scores[:teams][index.to_s.to_sym]
-      participant_id = tscore[:team].participants.first.id
-      participant = AssignmentParticipant.find(participant_id)
+      participant = AssignmentParticipant.find(scores[:teams][index.to_s.to_sym][:team].participants.first.id)
       team = participant.team
       vmlist = []
 
       questionnaires.each do |questionnaire|
         round = if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, questionnaire.id).used_in_round
+                  AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id).used_in_round
                 else
                   nil
                 end
@@ -421,16 +418,15 @@ class GradesController < ApplicationController
     # round will be added to the count in the corresponded array field)
     team_data.each do |team|
       team.each do |vm|
-        unless vm.round.nil?
-          j = 0
-          vm.list_of_rows.each do |row|
-            row.score_row.each do |score|
-              unless score.score_value.nil?
-                chart_data[vm.round][score.score_value][j] += 1
-              end
+        next if vm.round.nil?
+        j = 0
+        vm.list_of_rows.each do |row|
+          row.score_row.each do |score|
+            unless score.score_value.nil?
+              chart_data[vm.round][score.score_value][j] += 1
             end
-            j += 1
           end
+          j += 1
         end
       end
     end
@@ -460,7 +456,7 @@ class GradesController < ApplicationController
     for _i in min..max
       highchart_colors.push("\##{'%06x' % (rand * 0xffffff)}")
     end
-    return highchart_series_data, highchart_categories, highchart_colors
+    [highchart_series_data, highchart_categories, highchart_colors]
   end
 
   def check_self_review_status

@@ -1,4 +1,3 @@
-
 class SurveyDeploymentController < ApplicationController
   include SurveyDeploymentHelper
   def action_allowed?
@@ -9,7 +8,7 @@ class SurveyDeploymentController < ApplicationController
 
   def survey_deployment_types
     ["AssignmentSurveyDeployment",
-    "CourseSurveyDeployment"]
+     "CourseSurveyDeployment"]
   end
 
   def survey_deployment_type
@@ -18,44 +17,44 @@ class SurveyDeploymentController < ApplicationController
 
   def new
     case params[:type]
-      when "AssignmentSurveyDeployment"
-        new_assignment_deployment
-      when "CourseSurveyDeployment"
-        new_course_deployment
-      else
-        flash[:error] = "Unexpected type. Check your dates! Dates should be in the future. "
+    when "AssignmentSurveyDeployment"
+      new_assignment_deployment
+    when "CourseSurveyDeployment"
+      new_course_deployment
+    else
+      flash[:error] = "Unexpected type. Check your dates! Dates should be in the future. "
     end
 
     if params[:type]
       @survey_deployment_type = params[:type]
-      @survey_type = params[:type].sub("Deployment","Questionnaire")
+      @survey_type = params[:type].sub("Deployment", "Questionnaire")
     end
 
     # Get the list of surveys that match the deployment type
     case @survey_type
-      when "AssignmentSurveyQuestionnaire"
-        @surveys = Questionnaire.where(type: "AssignmentSurveyQuestionnaire").map {|u| [u.name, u.id] }
-      when "CourseSurveyQuestionnaire"
-        @surveys = Questionnaire.where(type: "CourseSurveyQuestionnaire").map {|u| [u.name, u.id] }
-      else
-        flash[:error] = "Unexpected type. Check your dates! Dates should be in the future."
-        redirect_to '/tree_display/list'
+    when "AssignmentSurveyQuestionnaire"
+      @surveys = Questionnaire.where(type: "AssignmentSurveyQuestionnaire").map {|u| [u.name, u.id] }
+    when "CourseSurveyQuestionnaire"
+      @surveys = Questionnaire.where(type: "CourseSurveyQuestionnaire").map {|u| [u.name, u.id] }
+    else
+      flash[:error] = "Unexpected type. Check your dates! Dates should be in the future."
+      redirect_to '/tree_display/list'
     end
   end
 
   def new_assignment_deployment
-    @parent = Assignment.find_by_id( params[:id])
+    @parent = Assignment.find_by_id(params[:id])
     @total_students = AssignmentParticipant.where(parent_id: @parent.id).count
   end
 
   def new_course_deployment
-    @parent = Course.find_by_id( params[:id])
-    puts @parent.id
+    @parent = Course.find_by_id(params[:id])
+    # puts @parent.id
     @total_students = CourseParticipant.where(parent_id: @parent.id).count
   end
 
   def param_test
-    params.require(:survey_deployment).permit(:questionnaire_id,:start_date,:end_date,:validate_survey_deployment,:parent_id,:num_of_students)
+    params.require(:survey_deployment).permit(:questionnaire_id, :start_date, :end_date, :validate_survey_deployment, :parent_id, :num_of_students)
   end
 
   def create
@@ -65,7 +64,7 @@ class SurveyDeploymentController < ApplicationController
         flash[:error] = "No global survey available"
         return redirect_to action: 'new'
       else
-          global_id = global.id
+        global_id = global.id
       end
     else
       global_id = nil
@@ -83,13 +82,12 @@ class SurveyDeploymentController < ApplicationController
     @survey_deployments = SurveyDeployment.all
     @surveys = {}
     @survey_deployments.each do |sd|
-      if(sd.questionnaire_id.nil?)
+      if sd.questionnaire_id.nil?
         corresp_questionnaire_name = "Nil"
       else
         corresp_questionnaire_name = Questionnaire.find(sd.questionnaire_id).name
       end
       @surveys[sd.id] = corresp_questionnaire_name
-
     end
   end
 
@@ -133,7 +131,7 @@ class SurveyDeploymentController < ApplicationController
     end
   end
 
-  #Allows for children to rediect to this controller
+  # Allows for children to rediect to this controller
   def self.inherited(child)
     child.instance_eval do
       def model_name
@@ -142,5 +140,4 @@ class SurveyDeploymentController < ApplicationController
     end
     super
   end
-
 end

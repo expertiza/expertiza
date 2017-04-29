@@ -5,10 +5,7 @@ class GithubContributorsController < ApplicationController
     return false if @submission_record.operation != 'Submit Hyperlink'
     assignment_team = AssignmentTeam.find(@submission_record.team_id)
     assignment = Assignment.find(assignment_team.parent_id)
-    (['Super-Administrator', 'Administrator'].include? current_role_name) ||
-        (assignment.instructor_id == current_user.id) ||
-        ta?(assignment) ||
-        (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id)
+    admin? || (assignment.instructor_id == current_user.id) || ta?(assignment) || course_instructor?(assignment)
   end
 
   def show
@@ -96,7 +93,7 @@ class GithubContributorsController < ApplicationController
 
   def format_metrics(metrics)
     metrics_map = {}
-    metrics = metrics.sort_by {|m| [m.week_timestamp, -m.total_commits]}
+    metrics = metrics.sort_by { |m| [m.week_timestamp, -m.total_commits] }
     metrics.each do |metric|
       if metrics_map.key?(metric.github_id)
         metric_map = metrics_map[metric.github_id]
@@ -124,5 +121,13 @@ class GithubContributorsController < ApplicationController
     TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id) &&
         TaMapping.where(course_id: assignment.course_id).include?
     TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first
+  end
+
+  def course_instructor?(assignment)
+    assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id
+  end
+
+  def admin?
+    %w[Super-Administrator, Administrator].include? current_role_name
   end
 end

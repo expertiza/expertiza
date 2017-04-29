@@ -86,6 +86,8 @@ class AuthController < ApplicationController
   end
 
   def logout
+    user = session[:user]
+    user.create_activity :logout, owner: user
     AuthController.logout(session)
     redirect_to '/'
   end

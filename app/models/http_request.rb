@@ -4,6 +4,11 @@ class HttpRequest
   
   class << self
 
+    # http://stackoverflow.com/questions/1805761/check-if-url-is-valid-ruby
+    def is_valid_url(url)
+      url =~ /\A#{URI::regexp}\z/
+    end
+
     # http://ruby-doc.org/stdlib-2.4.1/libdoc/net/http/rdoc/Net/HTTP.html
     def get(url, limit = 5)
       if limit <= 0

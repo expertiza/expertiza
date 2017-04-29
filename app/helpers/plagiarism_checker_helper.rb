@@ -7,15 +7,14 @@ class PlagiarismCheckerHelper
   # related to PlagiarismChecker
 
   def self.run(assignment_id)
-    submission_name = Assignment.
-      student_groups = Assignment.
+    assignment = Assignment.find(assignment_id)
 
-      self.send_notification_email("task started")
+    self.send_notification_email("task started")
 
-    code_assignment_submission_id = self.create_new_assignment_submission(submission_name + " (Code)")
-    doc_assignment_submission_id  = self.create_new_assignment_submission(submission_name + " (Doc)")
+    code_assignment_submission_id = self.create_new_assignment_submission(assignment.name + " (Code)")
+    doc_assignment_submission_id  = self.create_new_assignment_submission(assignment.name + " (Doc)")
 
-    for team in student_groups
+    for team in assignment.teams
       submission_links = AssignmentSubmission.
 
         for url in submission_links
@@ -38,14 +37,13 @@ class PlagiarismCheckerHelper
           else
             self.send_notification_email("invalid submission URL: " + url)
           end
-        end
+        end # each submission per team
+    end # each team
 
-    end
-
-    callback_url = ?
+    # TODO: Bradford enter callback URL here
+    callback_url = ""
     self.start_plagiarism_checker(assignment_submission_simicheck_id, callback_url)
     self.send_notification_email("submission comparison started")
-
   end
 
   def self.send_notification_email(type)

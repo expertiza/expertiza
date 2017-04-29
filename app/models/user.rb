@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  include PublicActivity::Common
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
     config.crypto_provider = Authlogic::CryptoProviders::Sha1

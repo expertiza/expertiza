@@ -1,6 +1,5 @@
 Expertiza::Application.routes.draw do
 
-  resources :activities
   resources :user_pastebins
   resources :track_notifications
   resources :notifications
@@ -542,4 +541,5 @@ Expertiza::Application.routes.draw do
 
   get ':controller(/:action(/:id))(.:format)'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
+  resources :activities
 end

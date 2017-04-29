@@ -1,8 +1,19 @@
 <h1>Activity Log </h1>
-
-<% @activities.each do |activity| %>
-    <div class="activity">
-      <%= link_to activity.owner.name, activity.owner if activity.owner %>
-      <%= render_activity activity %>
-    </div>
-<% end %>
+<table style="width:100%">
+  <tr>
+    <th>User</th>
+    <th>Action On</th>
+    <th>Action Type</th>
+    <th>Details</th>
+    <th>Date Time</th>
+  </tr>
+  <% @activities.each do |activity| %>
+      <tr class="activity">
+        <td><%= link_to activity.owner.name, activity.owner if activity.owner %></td>
+        <td><%= (activity.key).split(".")[0] %></td>
+        <td><%= (activity.key).split(".")[1] %></td>
+        <td><%= render_activity activity %></td>
+        <td><%= activity.created_at.strftime("%H:%M:%S") %></td>
+      </tr>
+  <% end %>
+</table>

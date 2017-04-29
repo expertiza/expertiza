@@ -4,6 +4,9 @@ class AssignmentTeam < Team
   has_many :review_response_maps, foreign_key: :reviewee_id
   has_many :responses, through: :review_response_maps, foreign_key: :map_id
 
+  include PublicActivity::Model
+  tracked owner: ->(controller, model) { controller && controller.current_user }
+
   # START of contributor methods, shared with AssignmentParticipant
 
   # Whether this team includes a given participant or not

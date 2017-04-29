@@ -31,6 +31,7 @@ class ImpersonateController < ApplicationController
         if user
           unless original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
+            user.create_activity :cannot_impersonate, owner: current_user
             redirect_back
             return
           end
@@ -50,6 +51,7 @@ class ImpersonateController < ApplicationController
           if user
             unless original_user.can_impersonate? user
               flash[:error] = "You cannot impersonate #{params[:user][:name]}."
+              user.create_activity :cannot_impersonate, owner: current_user
               redirect_back
               return
             end
@@ -76,6 +78,7 @@ class ImpersonateController < ApplicationController
         end
       end
       # Navigate to user's home location
+      user.create_activity :impersonate, owner: current_user
       AuthController.set_current_role(user.role_id, session)
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170427005520) do
+ActiveRecord::Schema.define(version: 20170429164240) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -333,11 +333,14 @@ ActiveRecord::Schema.define(version: 20170427005520) do
   end
 
   create_table "plagiarism_checker_assignment_submissions", force: :cascade do |t|
-    t.string   "name",         limit: 255
-    t.string   "simicheck_id", limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.string   "name",          limit: 255
+    t.string   "simicheck_id",  limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "assignment_id", limit: 4
   end
+
+  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assignment_submissions_on_assignment_id", using: :btree
 
   create_table "plagiarism_checker_comparisons", force: :cascade do |t|
     t.integer  "plagiarism_checker_assignment_submission_id", limit: 4
@@ -723,6 +726,7 @@ ActiveRecord::Schema.define(version: 20170427005520) do
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
   add_foreign_key "participants", "users", name: "fk_participant_users"
+  add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"

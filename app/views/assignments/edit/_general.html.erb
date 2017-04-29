@@ -165,8 +165,8 @@ function microtaskChanged() {
   </tr>
   <tr>
     <td style='padding:5px' id='assignment_simicheck_field'>
-      <%= label_tag('assignment_form[assignment][simicheck]', 'Simicheck Hour Delay') %>
-      <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No Simicheck', -1] : [n, n]}, :selected => @assignment_form.assignment.simicheck) %>
+      <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Hour Delay') %>
+      <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, :selected => @assignment_form.assignment.simicheck) %>
     </td>
   </tr>
 

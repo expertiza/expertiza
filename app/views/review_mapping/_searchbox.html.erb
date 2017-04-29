@@ -25,9 +25,11 @@
     <option value='Collusion' >
       Potential collusion report
     </option>
-    <option value='PlagiarismCheckerReport' >
-      Plagiarism Checker Report
-    </option>
+    <% if @assignment.simicheck > -1 %>
+        <option value='PlagiarismCheckerReport' >
+          Plagiarism Checker Report
+        </option>
+    <% end %>
   </select>
   <%= submit_tag("Submit") %>
 <% end %>

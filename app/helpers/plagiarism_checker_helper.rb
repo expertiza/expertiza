@@ -21,7 +21,8 @@ class PlagiarismCheckerHelper
 
     for team in teams
       puts "Getting submission links for team #{team}"
-      
+      file_number = 1
+
       for url in team.hyperlinks # in assignment_team model
         fetcher = SubmissionContentFetcher.CodeFactory(url)
         id = code_assignment_submission_id
@@ -36,7 +37,7 @@ class PlagiarismCheckerHelper
         if fetcher
           content = fetcher.fetch_content
           if content.length > 0
-            self.upload_file(id, team.id)
+            self.upload_file(id, team.id, content, file_number)
             puts "File uploaded for team #{team.id}"
           else
             msg = "no content found for submission URL: " + url
@@ -52,12 +53,12 @@ class PlagiarismCheckerHelper
 
     # TODO: Bradford enter callback URL here
     # Start comparison on code submission
-    callback_url = request.protocol + request.host + "/" + code_assignment_submission_id
+    callback_url = request.protocol + request.host + "/plagiarism_checker_results/" + code_assignment_submission_id
     self.start_plagiarism_checker(code_assignment_submission_id, callback_url)
     # Start comparison on doc submission
-    callback_url = request.protocol + request.host + "/" + doc_assignment_submission_id
+    callback_url = request.protocol + request.host + "/plagiarism_checker_results/" + doc_assignment_submission_id
     self.start_plagiarism_checker(doc_assignment_submission_id, callback_url)
-    
+
     self.send_notification_email("submission comparison started")
   end
 
@@ -76,20 +77,18 @@ class PlagiarismCheckerHelper
     as_id
   end
 
-  # Upload file (do we have text at this point?)
-  def self.upload_file(assignment_submission_simicheck_id, team_id)
-    # Setup file number (for unique files)
-    filenumber = 1
-    # Call method to parse text
-    parsed_text = # TODO: David's parser
-      # Set up filename structure: "teamID_000N.txt"
-      filename = team_id + "_%04d.txt" % filenumber
+  # Upload file
+  def self.upload_file(assignment_submission_simicheck_id, team_id, parsed_text, file_number)
+    # Set up filename structure: "teamID_000N.txt"
+    filename = team_id + "_%04d.txt" % file_number
     # Set up full filepath (in tmp dir)
     filepath = "tmp/" + filename
     # Create new file using parsed text
     File.open(filename, "w") { |file| file.write(parsed_text) }
     # Upload file to simicheck
     response = SimiCheckWebService.upload_file(assignment_submission_simicheck_id, filepath)
+    # Delete temporary file
+    File.delete(filepath) if File.exist?(filepath)
   end
 
   def self.start_plagiarism_checker(assignment_submission_simicheck_id, callback_url)

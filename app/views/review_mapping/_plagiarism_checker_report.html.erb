@@ -3,8 +3,7 @@ if plagiarism_checker_assignment_submission doesn't exist, you won't be able to 
 else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
 else show records
 -->
-
-<h3 class="text-center"> Plagiarism Checker Report</h3>
+<%@l = -1 %>
 
 <% if @PlagiarismCheckerComparisons.nil? %>
     <div class="text-center">
@@ -12,7 +11,7 @@ else show records
     </div>
 <% else %>
 
-    <div class="container"><p></p>
+    <div class="container">
       <table class="table table-striped">
         <thead>
         <tr>

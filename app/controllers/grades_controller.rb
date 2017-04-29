@@ -57,7 +57,7 @@ class GradesController < ApplicationController
 
     if @assignment.varying_rubrics_by_round?
       @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
-                                                      FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+      FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     else
       @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
     end
@@ -414,7 +414,7 @@ class GradesController < ApplicationController
 
     # Dynamic initialization
     for i in 1..assignment.rounds_of_reviews
-      chart_data[i] = Hash[(min..max).map {|score| [score, Array.new(number_of_review_questions,0)] }]
+      chart_data[i] = Hash[(min..max).map {|score| [score, Array.new(number_of_review_questions, 0)] }]
     end
 
     # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission

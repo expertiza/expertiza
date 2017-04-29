@@ -54,7 +54,7 @@ class DelayedMailer
         drop_outstanding_reviews
       end
       if (self.deadline_type == "compare_files_with_simicheck")
-        perform_simicheck_comparisons
+        perform_simicheck_comparisons(self.assignment_id)
       end
     end
   end
@@ -174,7 +174,7 @@ class DelayedMailer
     end
   end
 
-  def perform_simicheck_comparisons
-
+  def perform_simicheck_comparisons(assignment_id)
+    PlagiarismCheckerHelper.run(assignment_id)
   end
 end

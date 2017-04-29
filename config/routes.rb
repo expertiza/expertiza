@@ -1,7 +1,5 @@
 Expertiza::Application.routes.draw do
 
-  get 'plagiarism_checker_assignment_submissions/new'
-
   resources :track_notifications
   resources :notifications
   resources :submission_records
@@ -231,6 +229,8 @@ Expertiza::Application.routes.draw do
       delete ':id', action: :destroy
     end
   end
+
+  post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
 
   resources :profile do
     collection do

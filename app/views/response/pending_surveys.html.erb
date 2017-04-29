@@ -25,11 +25,35 @@ table
             <td align=left><%= survey.first['end_date'].strftime('%A %B %d %Y, %I:%M%p') %></td>
             <% if survey.first['survey']['type'] == 'CourseSurveyQuestionnaire' %>
                <td align=left><%= Course.find_by_id(survey.first['parent_id']).name %></td>
+               <% map = CourseSurveyResponseMap.where(['reviewer_id = ? and reviewee_id = ?', survey.first['participant_id'], survey.first['survey_deployment_id']]).first
+                   if map.nil?
+                     map = CourseSurveyResponseMap.create(:reviewer_id => survey.first['participant_id'], :reviewee_id => survey.first['survey_deployment_id'], :reviewed_object_id => survey.first['parent_id'])
+                   end
+                   survey_response = map.response.last
+                   if survey_response.nil? %>
+                <td align=left><%= link_to "Take Survey", {:controller=>'response',:action=>'new',:id => map.map_id, :return => "survey"} %>
+                </td>
+                <% else %>
+                    <td>
+                      <%= link_to "View Survey", {:controller => 'response', :action => 'view', :id => survey_response.id} %>
+                    </td>
+                <% end %>
             <% elsif survey.first['survey']['type'] == 'AssignmentSurveyQuestionnaire' %>
                <td align=left><%= Assignment.find_by_id(survey.first['parent_id']).name %></td>
+                <% map = AssignmentSurveyResponseMap.where(['reviewer_id = ? and reviewee_id = ?', survey.first['participant_id'], survey.first['survey_deployment_id']]).first
+                   if map.nil?
+                     map = AssignmentSurveyResponseMap.create(:reviewer_id => survey.first['participant_id'], :reviewee_id => survey.first['survey_deployment_id'], :reviewed_object_id => survey.first['parent_id'])
+                   end
+                   survey_response = map.response.last
+                   if survey_response.nil? %>
+                <td align=left><%= link_to "Take Survey", {:controller=>'response',:action=>'new',:id => map.map_id, :return => "survey"} %>
+                </td>
+                <% else %>
+                    <td>
+                      <%= link_to "View Survey", {:controller => 'response', :action => 'view', :id => survey_response.id} %>
+                    </td>
+                <% end %>
             <% end %>
-            <td align=left><%= link_to "Take Survey", {:controller=>'response',:action=>'view_responses',:survey_info=>survey} %>
-            </td>
           </tr>
       <% end %>
 <% else %>

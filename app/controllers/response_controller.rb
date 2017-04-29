@@ -124,7 +124,9 @@ class ResponseController < ApplicationController
     # set more handy variables for the view
     set_content(true)
 
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    if @assignment
+      @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    end
     render action: 'response'
   end
 
@@ -212,6 +214,8 @@ class ResponseController < ApplicationController
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     elsif params[:return] == "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
+    elsif params[:return] == "survey"
+      redirect_to controller: 'response', action: 'pending_surveys'
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
 
@@ -254,7 +258,7 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do|survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> cp.parent_id]
+              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> cp.parent_id, 'participant_id'=> cp.id]
             end
           end
         end
@@ -268,7 +272,7 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> ap.parent_id]
+              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> ap.parent_id, 'participant_id'=> ap.id]
             end
           end
         end
@@ -288,7 +292,12 @@ class ResponseController < ApplicationController
     @title = @map.get_title
 
     # handy reference to response assignment for ???
-    @assignment = @map.assignment
+
+    if @map.survey?
+      @survey_parent = @map.survey_parent
+    else
+      @assignment = @map.assignment
+    end
 
     # handy reference to the reviewer for ???
     @participant = @map.reviewer
@@ -317,7 +326,7 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap"
+    when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap", "CourseSurveyResponseMap", "AssignmentSurveyResponseMap", "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end

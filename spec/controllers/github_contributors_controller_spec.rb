@@ -56,5 +56,5 @@ def update_submission_record(submission_record, content, operation)
   submission_record.content = content
   submission_record.operation = operation
   submission_record.save
-  get 'show', {id: @sub_record.id}
+  get 'show', id: @sub_record.id
 end

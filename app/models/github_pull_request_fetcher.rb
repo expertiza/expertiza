@@ -7,7 +7,7 @@ class GithubPullRequestFetcher
       lower_case_url = url.downcase
       (HttpRequest.is_valid_url(url) and
        (lower_case_url.include? "github") and
-       (/\/pull\/[0-9]+$/.match(lower_case_url) != nil))
+       !(%r{/pull/[0-9]+$}.match(lower_case_url).nil))
     end
   end
 
@@ -26,4 +26,3 @@ class GithubPullRequestFetcher
     end
   end
 end
-

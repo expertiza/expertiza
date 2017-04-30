@@ -1,17 +1,12 @@
 require 'rails_helper'
 
 describe "SimiCheckWebservice" do
-  def is_success(code)
-    code == 200
-  end
-
-  def poll
-    loop do
+  def poll(comp_id)
+    is_success = false
+    while not is_success
       begin
         response = SimiCheckWebService.get_similarity_nxn(comp_id)
-        if is_success
-          break
-        end
+        is_success = (response.code == 200)
       rescue
         puts '   Waiting 30 seconds to check again for results...'
         sleep(30)
@@ -146,7 +141,8 @@ describe "SimiCheckWebservice" do
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
-        poll
+        poll(comp_id)
+        response = SimiCheckWebService.get_similarity_nxn(comp_id)
         expect(response.code).to eql(200)
         json_response = JSON.parse(response.body)
         expect(json_response["similarities"]).to be_truthy
@@ -173,7 +169,7 @@ describe "SimiCheckWebservice" do
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
-        poll
+        poll(comp_id)
         response = SimiCheckWebService.visualize_similarity(comp_id)
         expect(response.code).to eql(200)
         expect(response.body).to be_truthy
@@ -200,7 +196,7 @@ describe "SimiCheckWebservice" do
         file2_id = JSON.parse(SimiCheckWebService.upload_file(comp_id, filepath).body)["id"]
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
-        poll
+        poll(comp_id)
         response = SimiCheckWebService.visualize_comparison(comp_id, file1_id, file2_id)
         expect(response.code).to eql(200)
         expect(response.body).to be_truthy

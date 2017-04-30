@@ -9,59 +9,38 @@ module PlagiarismCheckerHelper
     assignment = Assignment.find(assignment_id)
     teams = Team.where(parent_id: assignment_id)
 
-    puts "Started comparison for assignment #{assignment_id}"
-
-    self.send_notification_email("task started")
-
     code_assignment_submission_id = self.create_new_assignment_submission(assignment.name + " (Code)")
     doc_assignment_submission_id  = self.create_new_assignment_submission(assignment.name + " (Doc)")
 
-    puts "Created code submission #{code_assignment_submission_id}, and doc submission #{doc_assignment_submission_id}"
-
-    for team in teams
-      puts "Getting submission links for team #{team}"
+    teams.each do |team|
       file_number = 1
 
-      for url in team.hyperlinks # in assignment_team model
-        fetcher = SubmissionContentFetcher.CodeFactory(url)
+      team.hyperlinks do |url| # in assignment_team model
+        fetcher = SubmissionContentFetcher.code_factory(url)
         id = code_assignment_submission_id
 
-        if not fetcher
-          fetcher = SubmissionContentFetcher.DocFactory(url)
+        if !fetcher
+          fetcher = SubmissionContentFetcher.doc_factory(url)
           id = doc_assignment_submission_id
         end
 
-        puts "Created fetcher for URL: #{url}"
+        if !fetcher
+          next
+        end
 
-        if fetcher
-          content = fetcher.fetch_content
-          if content.length > 0
-            self.upload_file(id, team.id, content, file_number)
-            puts "File uploaded for team #{team.id}"
-          else
-            msg = "no content found for submission URL: " + url
-            puts msg
-            self.send_notification_email(msg)
-          end
-
-        else
-          self.send_notification_email("invalid submission URL: " + url)
+        content = fetcher.fetch_content
+        if !content.empty?
+          self.upload_file(id, team.id, content, file_number)
         end
       end # each submission per team
     end # each team
 
-    # TODO: Bradford enter callback URL here
     # Start comparison on code submission
     callback_url = request.protocol + request.host + "/plagiarism_checker_results/" + code_assignment_submission_id
     self.start_plagiarism_checker(code_assignment_submission_id, callback_url)
     # Start comparison on doc submission
     callback_url = request.protocol + request.host + "/plagiarism_checker_results/" + doc_assignment_submission_id
     self.start_plagiarism_checker(doc_assignment_submission_id, callback_url)
-
-    self.send_notification_email("submission comparison started")
-  end
-
-  def self.send_notification_email(type)
   end
 
   # Create a new PlagiarismCheckerAssignmentSubmission
@@ -83,16 +62,16 @@ module PlagiarismCheckerHelper
     # Set up full filepath (in tmp dir)
     filepath = "tmp/" + filename
     # Create new file using parsed text
-    File.open(filepath, "w") { |file| file.write(parsed_text) }
+    File.open(filepath, "w") {|file| file.write(parsed_text) }
     # Upload file to simicheck
-    response = SimiCheckWebService.upload_file(assignment_submission_simicheck_id, filepath)
+    SimiCheckWebService.upload_file(assignment_submission_simicheck_id, filepath)
     # Delete temporary file
     File.delete(filepath) if File.exist?(filepath)
   end
 
   def self.start_plagiarism_checker(assignment_submission_simicheck_id, callback_url)
     # callback_url = server.com/plagiarism_checker_results/<assignment_submission_simicheck_id>
-    response = SimiCheckWebService.post_similarity_nxn(assignment_submission_simicheck_id, callback_url)
+    SimiCheckWebService.post_similarity_nxn(assignment_submission_simicheck_id, callback_url)
   end
 
   def self.store_results(assignment_submission_simicheck_id, threshold)
@@ -120,10 +99,17 @@ module PlagiarismCheckerHelper
         sim_link = 'https://www.simicheck.com' + get_sim_link_response.body
 
         as_id = PlagiarismCheckerAssignmentSubmission.find_by_simicheck_id(assignment_submission_simicheck_id).id
-        comparison = PlagiarismCheckerComparison.new(plagiarism_checker_assignment_submission_id: as_id, similarity_link: sim_link, similarity_percentage: percent_similar, file1_name: f1_name, file1_id: f1_id, file1_team: t1_id, file2_name: f2_name, file2_id: f2_id, file2_team: t2_id)
+        comparison = PlagiarismCheckerComparison.new(plagiarism_checker_assignment_submission_id: as_id, 
+                                                     similarity_link: sim_link, 
+                                                     similarity_percentage: percent_similar, 
+                                                     file1_name: f1_name, 
+                                                     file1_id: f1_id, 
+                                                     file1_team: t1_id, 
+                                                     file2_name: f2_name, 
+                                                     file2_id: f2_id, 
+                                                     file2_team: t2_id)
         comparison.save!
       end
     end
   end
-
 end

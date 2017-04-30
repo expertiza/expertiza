@@ -11,8 +11,4 @@ class PlagiarismCheckerComparison < ActiveRecord::Base
   # t.string :file2_name
   # t.string :file2_id
   # t.string :file2_team
-
-
 end
-
-

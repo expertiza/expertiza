@@ -53,7 +53,7 @@ class DelayedMailer
       if self.deadline_type == "drop_outstanding_reviews"
         drop_outstanding_reviews
       end
-      if (self.deadline_type == "compare_files_with_simicheck")
+      if self.deadline_type == "compare_files_with_simicheck"
         perform_simicheck_comparisons(self.assignment_id)
       end
     end

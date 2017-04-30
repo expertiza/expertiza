@@ -99,14 +99,14 @@ module PlagiarismCheckerHelper
         sim_link = 'https://www.simicheck.com' + get_sim_link_response.body
 
         as_id = PlagiarismCheckerAssignmentSubmission.find_by_simicheck_id(assignment_submission_simicheck_id).id
-        comparison = PlagiarismCheckerComparison.new(plagiarism_checker_assignment_submission_id: as_id, 
-                                                     similarity_link: sim_link, 
-                                                     similarity_percentage: percent_similar, 
-                                                     file1_name: f1_name, 
-                                                     file1_id: f1_id, 
-                                                     file1_team: t1_id, 
-                                                     file2_name: f2_name, 
-                                                     file2_id: f2_id, 
+        comparison = PlagiarismCheckerComparison.new(plagiarism_checker_assignment_submission_id: as_id,
+                                                     similarity_link: sim_link,
+                                                     similarity_percentage: percent_similar,
+                                                     file1_name: f1_name,
+                                                     file1_id: f1_id,
+                                                     file1_team: t1_id,
+                                                     file2_name: f2_name,
+                                                     file2_id: f2_id,
                                                      file2_team: t2_id)
         comparison.save!
       end

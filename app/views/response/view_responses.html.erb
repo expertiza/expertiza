@@ -1,5 +1,5 @@
 <h1><%= @questionnaire.name %></h1>
-
+  
     <% @questions.each_with_index do |question,index| %>
       <b>Q - <%= question.txt %></b>
       <% answer_list = @all_answers[index] %>

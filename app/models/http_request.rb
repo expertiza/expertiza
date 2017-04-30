@@ -1,10 +1,10 @@
 
 class HttpRequest
   require 'net/http'
-  
+
   class << self
     # IP addresses and local URLs will not match, must include http(s)
-    def is_valid_url(url)
+    def valid_url?(url)
       /^#{URI.regexp}$/.match(url)
     end
 
@@ -16,7 +16,7 @@ class HttpRequest
 
       uri = URI.parse(url)
       req = Net::HTTP::Get.new(uri.to_s)
-      res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
+      res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
         http.request(req)
       end
 
@@ -26,8 +26,8 @@ class HttpRequest
 
       when Net::HTTPRedirection then
         # http://stackoverflow.com/questions/6934185/ruby-net-http-following-redirects
-        new_uri = URI.parse(res['Location']) 
-        if new_uri.relative? 
+        new_uri = URI.parse(res['Location'])
+        if new_uri.relative?
           new_uri.scheme = uri.scheme
           new_uri.host = uri.host
         end

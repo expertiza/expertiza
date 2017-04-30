@@ -23,10 +23,12 @@
 //= require jquery.ui.all
 //= require react-simpletabs
 //= require sisyphus
+//= require awesomplete
 //= require_self
 //= require_tree .
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
+//= require awesome_input
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

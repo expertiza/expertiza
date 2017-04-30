@@ -40,9 +40,7 @@ class Assignment < ActiveRecord::Base
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
-
   DEFAULT_MAX_REVIEWERS = 3
-
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
   def self.max_outstanding_reviews
@@ -52,8 +50,8 @@ class Assignment < ActiveRecord::Base
   def team_assignment?
     true
   end
-  alias_method :team_assignment,:team_assignment?
-  
+  alias team_assignment team_assignment?
+
   def has_topics?
     @has_topics ||= !sign_up_topics.empty?
   end
@@ -88,7 +86,6 @@ class Assignment < ActiveRecord::Base
     # The following method raises an exception if not successful which
     # has to be captured by the caller (in review_mapping_controller)
     response_map = response_map_to_metareview(meta_reviewer)
-
     response_map.assign_metareviewer(meta_reviewer)
   end
 
@@ -168,7 +165,7 @@ class Assignment < ActiveRecord::Base
 
         total_score = 0
         total_num_of_assessments = 0 # calculate grades for each rounds
-        for i in 1..self.num_review_rounds
+        (1..self.num_review_rounds).each do |i|
           assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
           round_sym = ("review" + i.to_s).to_sym
           grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
@@ -183,7 +180,7 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        for i in 1..self.num_review_rounds
+        (1..self.num_review_rounds).each do |i|
           round_sym = ("review" + i.to_s).to_sym
           if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
             scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
@@ -212,17 +209,22 @@ class Assignment < ActiveRecord::Base
   end
 
   def path
-    raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.' if self.course_id.nil? && self.instructor_id.nil?
+    if self.course_id.nil? && self.instructor_id.nil?
+      raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
+    end
     path_text = ""
-    (!self.course_id.nil? && self.course_id > 0) ?
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' + FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/' :
+    if !self.course_id.nil? && self.course_id > 0
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' +
+        FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/'
+    else
       path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
+    end
     path_text += FileHelper.clean_path(self.directory_path)
     path_text
   end
 
   # Check whether review, metareview, etc.. is allowed
-  # The permissions of TopicDueDate is the same as AssignmentDueDate. 
+  # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
@@ -275,12 +277,7 @@ class Assignment < ActiveRecord::Base
 
     # The size of an empty directory is 2
     # Delete the directory if it is empty
-    begin
-      directory = Dir.entries(Rails.root + '/pg_data/' + self.directory_path)
-    rescue
-      # directory is empty
-    end
-
+    directory = Dir.entries(Rails.root + '/pg_data/' + self.directory_path) rescue nil
     if !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
       if directory.size == 2
         Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
@@ -302,14 +299,17 @@ class Assignment < ActiveRecord::Base
   # user_name - the user account name of the participant to add
   def add_participant(user_name, can_submit, can_review, can_take_quiz)
     user = User.find_by_name(user_name)
-    raise "The user account with the name #{user_name} does not exist. Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
-    participant = AssignmentParticipant.where(parent_id: self.id, user_id:  user.id).first
-    if participant
-      raise "The user #{user.name} is already a participant."
-    else
-      new_part = AssignmentParticipant.create(parent_id: self.id, user_id: user.id, permission_granted: user.master_permission_granted, can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
-      new_part.set_handle
-    end
+    raise "The user account with the name #{user_name} does not exist. Please <a href='" +
+      url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
+    participant = AssignmentParticipant.find_by(parent_id: self.id, user_id:  user.id)
+    raise "The user #{user.name} is already a participant." if participant
+    new_part = AssignmentParticipant.create(parent_id: self.id,
+                                            user_id: user.id,
+                                            permission_granted: user.master_permission_granted,
+                                            can_submit: can_submit,
+                                            can_review: can_review,
+                                            can_take_quiz: can_take_quiz)
+    new_part.set_handle
   end
 
   def create_node
@@ -319,8 +319,8 @@ class Assignment < ActiveRecord::Base
     node.save
   end
 
-  #if current  stage is submission or review, find the round number
-  #otherwise, return 0
+  # if current  stage is submission or review, find the round number
+  # otherwise, return 0
   def number_of_current_round(topic_id)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
     return 0 if next_due_date.nil?
@@ -330,11 +330,7 @@ class Assignment < ActiveRecord::Base
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
     if self.staggered_deadline?
-      if topic_id.nil?
-        return 'Unknown'
-      else
-        return get_current_stage(topic_id)
-       end
+      return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
     end
     due_date = find_current_stage(topic_id)
 
@@ -349,13 +345,7 @@ class Assignment < ActiveRecord::Base
 
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
-    assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2)
-
-    if assignment_questionnaires.size >= 1
-      true
-    else
-      false
-    end
+    AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
   end
 
   def link_for_current_stage(topic_id = nil)
@@ -391,16 +381,16 @@ class Assignment < ActiveRecord::Base
     next_due_date
   end
 
-  def get_current_stage(topic_id=nil)
+  def get_current_stage(topic_id = nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    (due_date == nil || due_date == 'Finished') ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+    (due_date.nil? || due_date == 'Finished') ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)
     rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id).where(used_in_round: round)
-    # for program 1 like assignment, if same rubric is used in both rounds, 
-    # the 'used_in_round' field in 'assignment_questionnaires' will be null, 
+    # for program 1 like assignment, if same rubric is used in both rounds,
+    # the 'used_in_round' field in 'assignment_questionnaires' will be null,
     # since one field can only store one integer
     # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
     if rev_q_ids.empty?
@@ -464,12 +454,12 @@ class Assignment < ActiveRecord::Base
   def self.export_details_fields(detail_options)
     fields = []
     fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
-    fields << 'Team Name / Author Name' if detail_options['team_name'] == 'true' 
+    fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
     fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
-    fields << 'Question / Dimension Name' if detail_options['question'] == 'true'
-    fields << 'Question ID / Dimension' if detail_options['question_id'] == 'true'
-    fields << 'Comment ID' if detail_options['comment_id'] == 'true'   
-    fields << 'Comments' if detail_options['comments'] == 'true'      
+    fields << 'Question / Criterion' if detail_options['question'] == 'true'
+    fields << 'Question ID' if detail_options['question_id'] == 'true'
+    fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
+    fields << 'Answer / Comment' if detail_options['comments'] == 'true'
     fields << 'Score' if detail_options['score'] == 'true'  
     fields
   end
@@ -482,14 +472,13 @@ class Assignment < ActiveRecord::Base
   # Generates a single row based on the detail_options selected
   def self.csv_row(detail_options, answer)
     tcsv = []
-    @response = Response.find_by(answer.response_id)
-    ans = ResponseMap.find_by(@response.map_id)
+    @response = Response.find(answer.response_id)
+    map = ResponseMap.find(@response.map_id)
 
-    @reviewee = Team.find_by(ans.reviewee_id)
-    @reviewee = Participant.find_by(ans.reviewee_id).user if @reviewee.nil?
+    @reviewee = Team.find_by id: map.reviewee_id
+    @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
 
-    reviewer = Participant.find_by(ans.reviewer_id).user
-
+    reviewer = Participant.find(map.reviewer_id).user
     tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
     tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
     tcsv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
@@ -510,11 +499,11 @@ class Assignment < ActiveRecord::Base
     @response_maps_for_assignment.each do |map|
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
-      @response_for_this_map.each do |res_map|
-        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
+      @response_for_this_map.each do |resp|
+        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
         
         @answer.each do |ans|
-          answers[res_map.round][map.type].push(ans)
+          answers[resp.round][map.type].push(ans)
         end
       end
     end
@@ -567,7 +556,7 @@ class Assignment < ActiveRecord::Base
 
     return csv if @scores[:teams].nil?
 
-    for index in 0..@scores[:teams].length - 1
+    (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
       pscore = @scores[:participants][first_participant.id.to_s.to_sym]
@@ -622,5 +611,4 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
-
 end

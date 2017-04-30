@@ -443,7 +443,10 @@ class ReviewMappingController < ApplicationController
     when "PlagiarismCheckerReport"
         @PlagiarismCheckerComparisons = PlagiarismCheckerComparison.where(:plagiarism_checker_assignment_submission_id => PlagiarismCheckerAssignmentSubmission.where(assignment_id: params[:id]).pluck(:id))
     end
+    
     end
+    @user_pastebins = UserPastebin.get_current_user_pastebin current_user
+  end
 
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])

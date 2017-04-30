@@ -107,7 +107,7 @@ RSpec.configure do |config|
   # Attempts to parameterize this function failed
   def http_setup_get_request_mock_success
     class << HttpRequest
-      define_method(:get) do |url|
+      define_method(:get) do |_url|
         res = http_status_factory(200)
         def res.body
           http_mock_success_text(true)
@@ -120,7 +120,7 @@ RSpec.configure do |config|
   # Attempts to parameterize this function failed
   def http_setup_get_request_mock_error
     class << HttpRequest
-      define_method(:get) do |url|
+      define_method(:get) do |_url|
         res = http_status_factory(500)
         def res.body
           http_mock_error_text(false)
@@ -129,5 +129,4 @@ RSpec.configure do |config|
       end
     end
   end
-
 end

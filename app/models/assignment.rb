@@ -16,23 +16,23 @@ class Assignment < ActiveRecord::Base
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
-  has_many :participants, :class_name => 'AssignmentParticipant', :foreign_key => 'parent_id'
-  has_many :users, :through => :participants
-  has_many :due_dates, :class_name => 'AssignmentDueDate', :foreign_key => 'parent_id', :dependent => :destroy
-  has_many :teams, :class_name => 'AssignmentTeam', :foreign_key => 'parent_id'
-  has_many :team_review_mappings, :class_name => 'ReviewResponseMap', :through => :teams, :source => :review_mappings
-  has_many :invitations, :class_name => 'Invitation', :foreign_key => 'assignment_id', :dependent => :destroy
-  has_many :assignment_questionnaires,:dependent => :destroy
-  has_many :questionnaires, :through => :assignment_questionnaires
-  belongs_to :instructor, :class_name => 'User', :foreign_key => 'instructor_id'
-  has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy
-  has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
-  has_one :assignment_node,:foreign_key => :node_object_id,:dependent => :destroy
-  has_many :review_mappings, :class_name => 'ReviewResponseMap', :foreign_key => 'reviewed_object_id'
+  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id'
+  has_many :users, through: :participants
+  has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy
+  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id'
+  has_many :team_review_mappings, class_name: 'ReviewResponseMap', through: :teams, source: :review_mappings
+  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy
+  has_many :assignment_questionnaires, dependent: :destroy
+  has_many :questionnaires, through: :assignment_questionnaires
+  belongs_to :instructor, class_name: 'User', foreign_key: 'instructor_id'
+  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy
+  has_many :response_maps, foreign_key: 'reviewed_object_id', class_name: 'ResponseMap'
+  has_one :assignment_node, foreign_key: :node_object_id, dependent: :destroy
+  has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id'
   has_many :plagiarism_checker_assignment_submissions
 
-  validates_presence_of :name
-  validates_uniqueness_of :name, scope: :course_id
+  validates :name, presence: true
+  validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze

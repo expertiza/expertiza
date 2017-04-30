@@ -5,6 +5,9 @@ class TeamsUser < ActiveRecord::Base
   has_paper_trail
   attr_accessible :user_id, :team_id
 
+  include PublicActivity::Model
+  tracked except: :update, owner: ->(controller, model) { controller && controller.current_user }
+
   def name
     self.user.name
   end

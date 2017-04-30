@@ -1,3 +1,2 @@
 class PlagiarismCheckerAssignmentSubmissionsController < ApplicationController
-
 end

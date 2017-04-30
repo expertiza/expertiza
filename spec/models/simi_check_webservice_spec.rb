@@ -19,7 +19,7 @@ describe "SimiCheckWebservice" do
     context "any time called" do
       it "returns a response with code 200 and body containing all comparisons" do
         puts "Testing SimiCheck get all comparisons"
-        response = SimiCheckWebService.get_all_comparisons
+        response = SimiCheckWebService.all_comparisons
         json_response = JSON.parse(response.body)
         expect(response.code).to eql(200)
         expect(json_response["comparisons"]).to be_truthy

@@ -1,17 +1,12 @@
 require 'rails_helper'
 
 describe "SimiCheckWebservice" do
-  def is_success(code)
-    code == 200
-  end
-
   def poll
-    loop do
+    is_success = false
+    while not is_success
       begin
         response = SimiCheckWebService.get_similarity_nxn(comp_id)
-        if is_success
-          break
-        end
+        is_success = (response.code == 200)
       rescue
         puts '   Waiting 30 seconds to check again for results...'
         sleep(30)

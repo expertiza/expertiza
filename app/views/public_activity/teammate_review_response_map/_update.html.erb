@@ -1,0 +1,7 @@
+<% if activity.trackable %>
+    <%= link_to User.find(Participant.find(activity.trackable.reviewer_id).user_id).name %> reviewed
+    <%= link_to User.find(Participant.find(activity.trackable.reviewee_id).user_id).name %> for assignment
+    <%= link_to Assignment.find(Participant.find(activity.trackable.reviewed_object_id).user_id).name %>
+<% else %>
+    which has since been removed
+<% end %>

@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "SimiCheckWebservice" do
   def poll(comp_id)
     is_success = false
-    while not is_success
+    until is_success
       begin
         response = SimiCheckWebService.get_similarity_nxn(comp_id)
         is_success = (response.code == 200)

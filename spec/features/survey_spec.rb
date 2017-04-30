@@ -88,15 +88,6 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
     survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
 
-    # before adding any responses:
-    visit '/response/view_responses/' + survey_deployment.id.to_s
-    expect(page).to have_content('No one has responded to the survey')
-
-    # add a response for the survey_deployment: survey_deployment.id
-    @response = create(:response)
-    response_map = ResponseMap.find(@response.map_id)
-    response_map.reviewee_id = survey_deployment.id
-
     # after adding a response:
     visit '/response/view_responses/' + survey_deployment.id.to_s
     expect(page).to have_content(survey_name)

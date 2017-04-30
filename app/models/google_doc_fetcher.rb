@@ -4,9 +4,9 @@ class GoogleDocFetcher
 
   class << self
     def supports_url?(url)
-      lowerCaseUrl = url.downcase
+      lower_case_url = url.downcase
       (HttpRequest.is_valid_url(url) and
-       ((lowerCaseUrl.include? "drive.google.com") or (lowerCaseUrl.include? "docs.google.com")))
+       ((lower_case_url.include? "drive.google.com") or (lower_case_url.include? "docs.google.com")))
     end
   end
 
@@ -17,7 +17,9 @@ class GoogleDocFetcher
   def fetch_content
     file_id = get_id_from_url(@url)
     if file_id.length >= 0
-      req_url = "https://www.googleapis.com/drive/v3/files/#{file_id}" + "/export?" + "mimeType=text/plain" + "&key=" + PLAGIARISM_CHECKER_CONFIG['google_docs_key']
+      req_url = "https://www.googleapis.com/drive/v3/files/#{file_id}" \
+                + "/export?" + "mimeType=text/plain" \
+                + "&key=" + PLAGIARISM_CHECKER_CONFIG['google_docs_key']
 
       res = HttpRequest.get(req_url)
 
@@ -32,18 +34,19 @@ class GoogleDocFetcher
   end
 
   private
+
   def get_id_from_url(url)
     id_regex = /[a-zA-Z0-9\-\_\+\.\~]+/
     id_query_regex = /id=(#{id_regex})[\/&]?/
     id_path_regex = /\/d\/(#{id_regex})\//
 
-    id_query_regex.match(url) {|m|
+    id_query_regex.match(url) do |m|
       return m.captures[0]
-    }
+    end
 
-    id_path_regex.match(url) {|m|
+    id_path_regex.match(url) do |m|
       return m.captures[0]
-    }
+    end
 
     ""
   end

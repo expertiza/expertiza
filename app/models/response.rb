@@ -290,15 +290,4 @@ class Response < ActiveRecord::Base
         }
     ).deliver_now
   end
-
-  private
-
-  def feedback_display_as_html(review_id, participant_id)
-    map = FeedbackResponseMap.where(reviewed_object_id: review_id, reviewer_id: participant_id).first
-
-    review_feedbacks = map.try :response
-    if review_feedbacks && !review_feedbacks.empty?
-
-    end
-  end
 end

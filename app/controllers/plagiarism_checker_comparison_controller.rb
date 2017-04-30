@@ -7,7 +7,8 @@ class PlagiarismCheckerComparisonController < ApplicationController
 
   def save_results
     assignment_submission_id = params[:id]
-    PlagiarismCheckerHelper.store_results(assignment_submission_id, 50.0)
+    threshold = Assignment.find(params[:id]).simicheck_threshold
+    PlagiarismCheckerHelper.store_results(assignment_submission_id, threshold)
     render :nothing => true
   end
 end

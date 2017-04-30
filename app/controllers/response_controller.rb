@@ -274,7 +274,7 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do|survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> cp.parent_id, 'participant_id'=> cp.id]
+              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> cp.parent_id, 'participant_id'=> cp.id, 'global_survey_id'=> survey_deployment.global_survey_id]
             end
           end
         end
@@ -288,7 +288,7 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> ap.parent_id, 'participant_id'=> ap.id]
+              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> ap.parent_id, 'participant_id'=> ap.id, 'global_survey_id'=> survey_deployment.global_survey_id]
             end
           end
         end

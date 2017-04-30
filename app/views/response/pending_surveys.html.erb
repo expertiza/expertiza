@@ -15,7 +15,8 @@ table
         <th> Start Date&nbsp;&nbsp;</th>
         <th> End Date&nbsp;&nbsp;</th>
         <th> Course/Assignment Name</th>
-        <th> Actions&nbsp;&nbsp;</th>
+        <th> Survey Actions&nbsp;&nbsp;</th>
+        <th> Global Survey </th>
       </tr>
       <% @surveys.each do |survey| %>
           <tr>
@@ -54,6 +55,20 @@ table
                     </td>
                 <% end %>
             <% end %>
+            <td align=left>
+            <% if survey.first['global_survey_id']
+                   global_map = GlobalSurveyResponseMap.where(['reviewer_id = ? and reviewee_id = ?', survey.first['participant_id'], survey.first['survey_deployment_id']]).first
+                   if global_map.nil?
+                     global_map = GlobalSurveyResponseMap.create(:reviewer_id => survey.first['participant_id'], :reviewee_id => survey.first['survey_deployment_id'], :reviewed_object_id => survey.first['global_survey_id'])
+                   end
+                   survey_response = global_map.response.last
+                   if survey_response.nil? %>
+                    <%= link_to "Take Global Survey", {:controller=>'response',:action=>'new',:id => global_map.map_id, :return => "survey"} %>
+                   <% else %>
+                      <%= link_to "View Global Survey", {:controller => 'response', :action => 'view', :id => survey_response.id} %>
+                   <% end %>
+            <% end %>
+            </td>
           </tr>
       <% end %>
 <% else %>

@@ -1,10 +1,10 @@
 class GlobalSurveyResponseMap < SurveyResponseMap
   belongs_to :survey_deployment, class_name: 'SurveyDeployment', foreign_key: 'reviewee_id'
-  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  belongs_to :questionnaire, class_name: 'Questionnaire', foreign_key: 'reviewed_object_id'
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
 
   def questionnaire
-    Questionnaire.find_by_id(self.survey_deployment.questionnaire_id)
+    Questionnaire.find_by_id(self.reviewed_object_id)
   end
 
   def contributor
@@ -12,10 +12,10 @@ class GlobalSurveyResponseMap < SurveyResponseMap
   end
 
   def survey_parent
-    nil
+    self.questionnaire
   end
 
   def get_title
-    "Course Survey"
+    "Global Survey"
   end
 end

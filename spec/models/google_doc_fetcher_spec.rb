@@ -12,7 +12,7 @@ describe "GoogleDocFetcher" do
     params = {"url" => "https://docs.google.com/document/d/1-waDJtPB8VGLyubb40-X951PF9R3jdhm6Kb4ga__S0E/edit"}
     fetcher = GoogleDocFetcher.new(params)
     res = fetcher.fetch_content
-    expect(not res.empty?)
+    expect(!res.empty?)
   end
 
   it "fetch gives error and returns an empty string" do

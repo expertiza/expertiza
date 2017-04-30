@@ -17,8 +17,6 @@ class GoogleDocFetcher
   def fetch_content
     file_id = get_id_from_url(@url)
     if file_id.length >= 0
-      # TODO: requires that permissions on the doc are public, or anyone with the link can view, maybe write a validate function
-      # TODO: need to move API key elsewhere
       req_url = "https://www.googleapis.com/drive/v3/files/#{file_id}" + "/export?" + "mimeType=text/plain" + "&key=" + PLAGIARISM_CHECKER_CONFIG['google_docs_key']
 
       res = HttpRequest.get(req_url)

@@ -8,7 +8,6 @@ class LtiRegistrationWipsController < ApplicationController
   end
 
   def index
-    action = params[:action]
     registration_id = params[:registration_id]
     registration = Lti2Tp::Registration.find(registration_id)
     @lti_registration_wip = LtiRegistrationWip.new
@@ -27,7 +26,6 @@ class LtiRegistrationWipsController < ApplicationController
     @lti_registration_state = 'check_tenant'
 
     @lti_registration_wip.save
-
   end
 
   def show
@@ -70,13 +68,10 @@ class LtiRegistrationWipsController < ApplicationController
   end
 
   def show_reregistration
-    tenant = Tenant.where(:tenant_key=>@registration.reg_key).first
     disposition = @registration.prepare_tool_proxy('reregister')
 
     @registration.status = "reregistered"
     @registration.save!
-
-    return_url = @registration.launch_presentation_return_url + disposition
 
     redirect_to_registration @registration, disposition
   end

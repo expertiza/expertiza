@@ -1,0 +1,7 @@
+updated join team request for
+
+<% if activity.trackable %>
+    <%= link_to User.find(Participant.find(activity.trackable.participant_id).user_id).name, activity.trackable %>
+<% else %>
+    which has since been removed
+<% end %>

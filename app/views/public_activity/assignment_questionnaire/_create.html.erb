@@ -1,0 +1,7 @@
+Created Questionnarie for Assignment:
+
+<% if activity.trackable %>
+    <%= Assignment.find(AssignmentQuestionnaire.find(activity.trackable_id).assignment_id).name %>
+<% else %>
+    which has since been removed
+<% end %>

@@ -1,5 +1,7 @@
-<% if activity.trackable %>
+Created Assignment:
 
+<% if activity.trackable %>
+    <%= Assignment.find(DueDate.find(activity.trackable_id).parent_id).name %>
 <% else %>
     which has since been removed
 <% end %>

@@ -1,5 +1,8 @@
-<% if activity.trackable %>
+Updated the due date:
 
+<% if activity.trackable %>
+    <%= Assignment.find(DueDate.find(activity.trackable_id).parent_id).name %>
 <% else %>
     which has since been removed
 <% end %>
+

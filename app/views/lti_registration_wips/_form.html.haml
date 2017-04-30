@@ -1,28 +1,30 @@
 
 #deployment
-  %h2 
-    %img#thumb{:src => "/assets/fabericious.png", :alt => "Fabericious"}
-    %br
-    Tool Consumer Registration
+  %h2
+    Expertiza Registration
 
-  = semantic_form_for(@lti_registration_wip) do |f|
+  = form_for(@lti_registration_wip) do |f|
     .label-column
       &nbsp;
-      
-    .form-box
-      %ul
-        %li
-          = f.input :support_email, :label => "Support email", :input_html => { :size => 30, :readonly => true  }
 
-        %li
-          = f.input :product_name, :label => "Product name", :input_html => { :size => 30, :readonly => true }
-
-        %li
-          = f.input :tenant_name, :label => "Institution name", :input_html => { :size => 30 },
-                :wrapper_html => {:title => "A human-readable institution name"}
-
-             
+      .form-box
+        %table
+          %tr
+            %td
+              %label Product Name:
+            %td
+              &nbsp;
+              = f.text_field :product_name, :label => "Product name", :size => 30, :readonly => true
+          %tr
+            %td
+              %br
+          %tr
+            %td{:padding => "10px"}
+              %label Institution Name:
+            %td
+              &nbsp;
+              = f.text_field :tenant_name, :label => "Institution name", :size => 30
       .buttons
-        %ul
-          %br
-          = f.action :submit
+        %br
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        %input{:type => "submit", :value => "Add Provider", :size => 30, :class => "button"}

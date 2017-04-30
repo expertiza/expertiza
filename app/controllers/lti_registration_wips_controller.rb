@@ -1,3 +1,7 @@
+include Lti2Commons
+include Signer
+include MessageSupport
+include OAuth::OAuthProxy
 class LtiRegistrationWipsController < ApplicationController
   def index
     action = params[:action]
@@ -14,7 +18,6 @@ class LtiRegistrationWipsController < ApplicationController
     @lti_registration_wip.registration_return_url = params[:return_url]
 
     tcp_wrapper = JsonWrapper.new JSON.load(registration.tool_consumer_profile_json)
-    @lti_registration_wip.support_email = tcp_wrapper.first_at('product_instance.support.email')
     @lti_registration_wip.product_name = tcp_wrapper.first_at('product_instance.product_info.product_name.default_value')
 
     @lti_registration_state = 'check_tenant'

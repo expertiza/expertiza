@@ -171,12 +171,12 @@ class ResponseController < ApplicationController
     else
       is_submitted = false
     end
-    @response = Response.create(
+    @response = Response.create (
       map_id: @map.id,
       additional_comment: params[:review][:comments], 
       round: @round, 
       is_submitted: is_submitted
-      )
+    )
     # ,:version_num=>@version)
 
     # Change the order for displaying questions for editing response views.
@@ -252,7 +252,7 @@ class ResponseController < ApplicationController
           end
         end
       end
-      if answers.size > 0
+      if !answers.empty?
         all_answers << answers
       end
     end
@@ -267,7 +267,7 @@ class ResponseController < ApplicationController
     @all_answers = list_answers(@questions, response_map_list)
     @global_survey_present = false
 
-    if (sd.global_survey_id)
+    if sd.global_survey_id
       @global_survey_present = true
       @global_questionnaire = Questionnaire.find(sd.global_survey_id)
       @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
@@ -324,7 +324,7 @@ class ResponseController < ApplicationController
                 'end_date' => survey_deployment.end_date, 
                 'parent_id' => ap.parent_id, 
                 'participant_id' => ap.id,
-                'global_survey_id'=> survey_deployment.global_survey_id
+                'global_survey_id' => survey_deployment.global_survey_id
               ]
             end
           end

@@ -107,7 +107,7 @@ class SurveyDeploymentController < ApplicationController
   # Creates pie charts for visualizing survey responses to Criterion and Checkbox questions
   def generate_statistics
     @sd = SurveyDeployment.find(params[:id])
-    if (params[:global_survey] == 'true')
+    if params[:global_survey] == 'true'
       questionnaire = Questionnaire.find(@sd.global_survey_id)
     else
       questionnaire = Questionnaire.find(@sd.questionnaire_id)
@@ -127,7 +127,7 @@ class SurveyDeploymentController < ApplicationController
       label_value = @range_of_scores.first
       response.each_with_index do |response_value, index|
         data_table_row << [label_value.to_s, response_value]
-        label_value = label_value + 1
+        label_value += 1
       end
       @chart_data_table << data_table_row
     end

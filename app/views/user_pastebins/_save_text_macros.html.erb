@@ -1,0 +1,29 @@
+<!--This view is hidden by default by setting display style to none.
+It is displayed only when user clicks on the icon.
+This view is showed from the show_pastebin method in the javscript-->
+<div style="display: none; word-wrap: normal" id="user-pastebin-form" title="Text Macros / Pastebin" class="ui-widget">
+  <table id="user-pastebin-table" class="ui-widget ui-widget-content">
+    <thead>
+    <tr class="ui-widget-header ">
+      <th>Short Form </th><th>Long Form </th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for user_pastebin in @user_pastebins %>
+        <tr>
+          <td><%= user_pastebin.short_form %></td>
+          <td><%= user_pastebin.long_form %></td>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <br />
+  <%= form_tag :action => 'save_pastebin' do %>
+      <fieldset>
+        <label for="short_form">Short Form</label>
+        <input type="text" name="short_form" id="short_form" class="text ui-widget-content ui-corner-all"/>
+        <label for="long_form">Long Form</label>
+        <input type="text" name="long_form" id="long_form" class="text ui-widget-content ui-corner-all"/>
+      </fieldset>
+  <%end %>
+</div>

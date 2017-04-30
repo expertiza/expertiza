@@ -37,8 +37,8 @@ class GoogleDocFetcher
 
   def get_id_from_url(url)
     id_regex = /[a-zA-Z0-9\-\_\+\.\~]+/
-    id_query_regex = /id=(#{id_regex})[\/&]?/
-    id_path_regex = /\/d\/(#{id_regex})\//
+    id_query_regex = %r{id=(#{id_regex})[/&]?}
+    id_path_regex = %r{/d/(#{id_regex})/}
 
     id_query_regex.match(url) do |m|
       return m.captures[0]

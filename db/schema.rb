@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170429164240) do
+ActiveRecord::Schema.define(version: 20170430013201) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -84,6 +84,7 @@ ActiveRecord::Schema.define(version: 20170429164240) do
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "simicheck",                  limit: 4,     default: -1
+    t.integer  "simicheck_threshold",        limit: 4,     default: 100
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

@@ -171,7 +171,12 @@ class ResponseController < ApplicationController
     else
       is_submitted = false
     end
-    @response = Response.create(map_id: @map.id, additional_comment: params[:review][:comments], round: @round, is_submitted: is_submitted) # ,:version_num=>@version)
+    @response = Response.create(
+      map_id: @map.id,
+      additional_comment: params[:review][:comments], 
+      round: @round, 
+      is_submitted: is_submitted)
+      # ,:version_num=>@version)
 
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
@@ -274,7 +279,12 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey' => Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id' => survey_deployment.id, 'start_date' => survey_deployment.start_date, 'end_date' => survey_deployment.end_date, 'parent_id' => cp.parent_id, 'participant_id' => cp.id]
+              @surveys << ['survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
+                'survey_deployment_id' => survey_deployment.id, 
+                'start_date' => survey_deployment.start_date, 
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => cp.parent_id, 
+                'participant_id' => cp.id]
             end
           end
         end
@@ -288,7 +298,12 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey' => Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id' => survey_deployment.id, 'start_date' => survey_deployment.start_date, 'end_date' => survey_deployment.end_date, 'parent_id' => ap.parent_id, 'participant_id' => ap.id]
+              @surveys << ['survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date, 
+                'end_date' => survey_deployment.end_date, 
+                'parent_id' => ap.parent_id, 
+                'participant_id' => ap.id]
             end
           end
         end
@@ -342,7 +357,13 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap", "CourseSurveyResponseMap", "AssignmentSurveyResponseMap", "GlobalSurveyResponseMap"
+    when 
+      "MetareviewResponseMap", 
+      "TeammateReviewResponseMap", 
+      "FeedbackResponseMap", 
+      "CourseSurveyResponseMap", 
+      "AssignmentSurveyResponseMap", 
+      "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end

@@ -245,17 +245,15 @@ class AssignmentForm
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|
         next if DeadlineType.find(due_date.deadline_type_id).name != "submission"
-        enqueue_simicheck_task(due_date,simicheck_delay)
+        enqueue_simicheck_task(due_date, simicheck_delay)
       end
     end
   end
 
-  def enqueue_simicheck_task(due_date,simicheck_delay)
-    due_at = due_date.due_at.to_s(:db)
-    due_at = Time.parse(due_at) + simicheck_delay.to_i.hours
-    mi = find_min_from_now(due_at)
+  def enqueue_simicheck_task(due_date, simicheck_delay) 
+    due_at = Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours
     dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
-                            1, mi.minutes.from_now)
+                            1, find_min_from_now(due_at).minutes.from_now)
     change_item_type(dj.id)
   end
 

@@ -171,12 +171,11 @@ class ResponseController < ApplicationController
     else
       is_submitted = false
     end
-    @response = Response.create (
+    @response = Response.create(
       map_id: @map.id,
       additional_comment: params[:review][:comments], 
       round: @round, 
-      is_submitted: is_submitted
-    )
+      is_submitted: is_submitted)
     # ,:version_num=>@version)
 
     # Change the order for displaying questions for editing response views.

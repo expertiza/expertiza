@@ -56,8 +56,8 @@ class QuestionnairesController < ApplicationController
       case display_type
       when 'AuthorFeedback'
         display_type = 'Author%Feedback'
-      when 'CourseEvaluation'
-        display_type = 'Course%Evaluation'
+      when 'CourseSurvey'
+        display_type = 'Course%Survey'
       when 'TeammateReview'
         display_type = 'Teammate%Review'
       when 'GlobalSurvey'

@@ -272,7 +272,6 @@ class ResponseController < ApplicationController
       @global_questionnaire = Questionnaire.find(sd.global_survey_id)
       @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
       @global_answers = list_answers(@global_questions, response_map_list)
-      byebug
     end
   end
 

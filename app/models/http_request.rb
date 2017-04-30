@@ -3,24 +3,22 @@ class HttpRequest
   require 'net/http'
   
   class << self
-
     # IP addresses and local URLs will not match, must include http(s)
     def is_valid_url(url)
-      /^#{URI::regexp}$/.match(url)
+      /^#{URI.regexp}$/.match(url)
     end
 
     # http://ruby-doc.org/stdlib-2.4.1/libdoc/net/http/rdoc/Net/HTTP.html
     def get(url, limit = 5)
       if limit <= 0
-        puts "Too many redirects, last URL: #{url}"
-        ""
+        return ""
       end
 
       uri = URI.parse(url)
       req = Net::HTTP::Get.new(uri.to_s)
-      res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') { |http|
+      res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
         http.request(req)
-      }
+      end
 
       case res
       when Net::HTTPSuccess then
@@ -33,33 +31,10 @@ class HttpRequest
           new_uri.scheme = uri.scheme
           new_uri.host = uri.host
         end
-        puts "Http get redirected to: " + new_uri.to_s
         self.get(new_uri.to_s, limit - 1)
 
       else
-        puts "Unhandled Http request status: #{res.code}"
         ""
-      end
-    end
-
-    def get_file(url, filename)
-      res = self.get(url)
-
-      # http://stackoverflow.com/questions/2571547/rails-how-to-to-download-a-file-from-a-http-and-save-it-into-database
-      if res.is_a? Net::HTTPSuccess
-        # Note from docs (https://apidock.com/ruby/Tempfile)
-        # When a Tempfile object is garbage collected, or when the Ruby interpreter exits, 
-        # its associated temporary file is automatically deleted.
-        tempfile = Tempfile.new(filename)
-        File.open(tempfile.path, 'wb') { |f|
-          f.write res.body
-        }
-
-        # It is assumed that this file will be deleted externally
-        tempfile
-      else
-        puts "Failed to get file at URL: #{@url}, code #{res.code}"
-        false
       end
     end
 

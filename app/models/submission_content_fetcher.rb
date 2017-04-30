@@ -5,9 +5,9 @@ class SubmissionContentFetcher
       params = {"url" => url}
 
       if GoogleDocFetcher.supports_url?(url)
-        GoogleDocFetcher.new(params)
+        return GoogleDocFetcher.new(params)
       elsif WebsiteFetcher.supports_url?(url) # leave last as catch-all
-        WebsiteFetcher.new(params)
+        return WebsiteFetcher.new(params)
       end
       nil
     end
@@ -16,7 +16,7 @@ class SubmissionContentFetcher
       params = {"url" => url}
 
       if GithubPullRequestFetcher.supports_url?(url)
-        GithubPullRequestFetcher.new(params)
+        return GithubPullRequestFetcher.new(params)
       end
       nil
     end

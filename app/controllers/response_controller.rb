@@ -239,13 +239,9 @@ class ResponseController < ApplicationController
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
-  def view_responses
-    sd = SurveyDeployment.find(params[:id])
-    @questionnaire = Questionnaire.find(sd.questionnaire_id)
-    @questions = Question.where(questionnaire_id: @questionnaire.id)
-    response_map_list = ResponseMap.where(reviewee_id: sd.id)
-    @all_answers = []
-    @questions.each do |question|
+  def list_answers(questions, response_map_list)
+    all_answers = []
+    questions.each do |question|
       answers = []
       response_map_list.each do |response_map|
         response_list = Response.where(map_id: response_map.id)
@@ -257,8 +253,26 @@ class ResponseController < ApplicationController
         end
       end
       if answers.size > 0
-        @all_answers << answers
+        all_answers << answers
       end
+    end
+    all_answers
+  end
+
+  def view_responses
+    sd = SurveyDeployment.find(params[:id])
+    @questionnaire = Questionnaire.find(sd.questionnaire_id)
+    @questions = Question.where(questionnaire_id: @questionnaire.id)
+    response_map_list = ResponseMap.where(reviewee_id: sd.id)
+    @all_answers = list_answers(@questions, response_map_list)
+    @global_survey_present = false
+
+    if (sd.global_survey_id)
+      @global_survey_present = true
+      @global_questionnaire = Questionnaire.find(sd.global_survey_id)
+      @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
+      @global_answers = list_answers(@global_questions, response_map_list)
+      byebug
     end
   end
 

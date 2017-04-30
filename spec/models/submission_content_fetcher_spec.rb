@@ -15,14 +15,14 @@ describe "SubmissionContentFetcher" do
   it "creates factory for google docs edit URL documentation" do
     url = "https://docs.google.com/document/d/1-waDJtPB8VGLyubb40-X951PF9R3jdhm6Kb4ga__S0E/edit"
     fetcher = SubmissionContentFetcher.doc_factory(url)
-    expect(fetcher).to be_instance_of(Googledoc_fetcher)
+    expect(fetcher).to be_instance_of(GoogleDocFetcher)
     expect(fetcher.instance_variable_get(:@url)).to eql(url)
   end
 
   it "creates factory for google docs drive URL documentation" do
     url = "https://drive.google.com/open?id=1Ngds9Fr4vas8n0cA-uvZDOU7VMarMfGytbC9VLc0IYI"
     fetcher = SubmissionContentFetcher.doc_factory(url)
-    expect(fetcher).to be_instance_of(Googledoc_fetcher)
+    expect(fetcher).to be_instance_of(GoogleDocFetcher)
     expect(fetcher.instance_variable_get(:@url)).to eql(url)
   end
 

@@ -4,7 +4,7 @@ class WebsiteFetcher
   
   class << self
     def supports_url?(url)
-      true
+      HttpRequest.is_valid_url(url)
     end
   end
 

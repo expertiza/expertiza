@@ -5,7 +5,8 @@ class GithubPullRequestFetcher
   class << self
     def supports_url?(url)
       lowerCaseUrl = url.downcase
-      ((lowerCaseUrl.include? "github") and
+      (HttpRequest.is_valid_url(url) and
+       (lowerCaseUrl.include? "github") and
        (/\/pull\/[0-9]+$/.match(lowerCaseUrl) != nil))
     end
   end

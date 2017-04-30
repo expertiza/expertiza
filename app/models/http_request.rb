@@ -4,6 +4,11 @@ class HttpRequest
   
   class << self
 
+    # IP addresses and local URLs will not match, must include http(s)
+    def is_valid_url(url)
+      /^#{URI::regexp}$/.match(url)
+    end
+
     # http://ruby-doc.org/stdlib-2.4.1/libdoc/net/http/rdoc/Net/HTTP.html
     def get(url, limit = 5)
       if limit <= 0

@@ -10,17 +10,16 @@ describe "WebsiteFetcher" do
   end
 
   it "fetches a website and removes all HTML" do
-    text = "some test text"
-    HttpRequestTestHelper.setup_mock((Net::HTTPSuccess, "<img /><i>#{text}</i>")
+    http_setup_get_request_mock_success
 
     params = { "url" => "test.com" }
     fetcher = WebsiteFetcher.new(params)
     res = fetcher.fetch_content
-    expect(res).to eql(text)
+    expect(res).to eql(http_mock_success_text(false))
   end
 
   it "fetches a bogus website and returns an empty string" do
-    HttpRequestTestHelper.setup_mock((Net::HTTPServerError, "Internal Server Error")
+    http_setup_get_request_mock_error
 
     params = { "url" => "test.com" }
     fetcher = WebsiteFetcher.new(params)

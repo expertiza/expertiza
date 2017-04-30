@@ -1,6 +1,9 @@
 class CourseParticipant < Participant
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
 
+  include PublicActivity::Model
+  tracked except: :update, owner: ->(controller, model) { controller && controller.current_user }
+
   # Copy this participant to an assignment
   def copy(assignment_id)
     part = AssignmentParticipant.where(user_id: self.user_id, parent_id: assignment_id).first

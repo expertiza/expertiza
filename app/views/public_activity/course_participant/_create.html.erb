@@ -1,8 +1,8 @@
-Assignment participant added
+Course participant added
 
 <% if activity.trackable %>
     <%= link_to User.find(Participant.find(activity.trackable_id).user_id).name %>
-    to <%= link_to Assignment.find(Participant.find(activity.trackable_id).parent_id).name %>
+    to <%= link_to Course.find(Participant.find(activity.trackable_id).parent_id).name %>
 <% else %>
     which has since been removed
 <% end %>

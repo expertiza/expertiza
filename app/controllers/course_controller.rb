@@ -160,6 +160,7 @@ class CourseController < ApplicationController
 
       @course = @ta_mapping
       undo_link("The TA \"#{@user.name}\" has been successfully added.")
+      @user.create_activity :add_ta, owner: current_user
     end
     render action: 'add_ta.js.erb', layout: false
   end

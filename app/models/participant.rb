@@ -10,6 +10,9 @@ class Participant < ActiveRecord::Base
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
   has_one :review_grade
 
+  include PublicActivity::Model
+  tracked except: :update, owner: ->(controller, model) { controller && controller.current_user }
+
   PARTICIPANT_TYPES = ['Course', 'Assignment']
 
   def team

@@ -26,4 +26,3 @@ class GithubPullRequestFetcher
     end
   end
 end
-

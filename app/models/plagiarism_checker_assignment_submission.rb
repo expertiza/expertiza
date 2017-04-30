@@ -6,5 +6,4 @@ class PlagiarismCheckerAssignmentSubmission < ActiveRecord::Base
   validates :name, presence: true
   # t.string :simicheck_id
   validates :simicheck_id, presence: true, uniqueness: true
-
 end

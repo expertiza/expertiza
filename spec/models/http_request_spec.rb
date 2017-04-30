@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe "HttpRequest" do
-
   it "cannot be instantiated" do
     expect { HttpRequest.new }.to raise_error(NoMethodError)
   end
@@ -18,5 +17,4 @@ describe "HttpRequest" do
   end
 
   # NOTE: no need to test get() and get_file() since they wrap net/http methods which should have their own tests
-
 end

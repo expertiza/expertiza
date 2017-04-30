@@ -60,7 +60,7 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     set_all_responses
     if @prev.present?
-      @sorted = @review_scores.sort {|m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1)}
+      @sorted = @review_scores.sort {|m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
 
@@ -272,7 +272,7 @@ class ResponseController < ApplicationController
       course_participants.each do |cp|
         survey_deployments = CourseSurveyDeployment.where(parent_id: cp.parent_id)
         if survey_deployments
-          survey_deployments.each do|survey_deployment|
+          survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
               @surveys << ['survey' => Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id' => survey_deployment.id, 'start_date' => survey_deployment.start_date, 'end_date' => survey_deployment.end_date, 'parent_id' => cp.parent_id, 'participant_id' => cp.id]
             end

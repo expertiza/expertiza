@@ -43,12 +43,12 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def new_assignment_deployment
-    @parent = Assignment.find_by_id(params[:id])
+    @parent = Assignment.find(params[:id])
     @total_students = AssignmentParticipant.where(parent_id: @parent.id).count
   end
 
   def new_course_deployment
-    @parent = Course.find_by_id(params[:id])
+    @parent = Course.find(params[:id])
     # puts @parent.id
     @total_students = CourseParticipant.where(parent_id: @parent.id).count
   end
@@ -82,11 +82,7 @@ class SurveyDeploymentController < ApplicationController
     @survey_deployments = SurveyDeployment.all
     @surveys = {}
     @survey_deployments.each do |sd|
-      if sd.questionnaire_id.nil?
-        corresp_questionnaire_name = "Nil"
-      else
-        corresp_questionnaire_name = Questionnaire.find(sd.questionnaire_id).name
-      end
+      corresp_questionnaire_name = Questionnaire.find(sd.questionnaire_id).name
       @surveys[sd.id] = corresp_questionnaire_name
     end
   end
@@ -123,7 +119,7 @@ class SurveyDeploymentController < ApplicationController
     @chart_data_table = []
     responses_for_all_questions.each_with_index do |response, index|
       data_table_row = []
-      data_table_row << ['Label', 'Number']
+      data_table_row << %w(Label Number)
       response.each_with_index do |response_value, index|
         data_table_row << [index.to_s, response_value]
       end

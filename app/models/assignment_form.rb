@@ -245,15 +245,15 @@ class AssignmentForm
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|
         next if DeadlineType.find(due_date.deadline_type_id).name != "submission"
-        enqueue_simicheck_task(due_date, simicheck_delay)
+        change_item_type(enqueue_simicheck_task(due_date, simicheck_delay).id)
+
       end
     end
   end
 
   def enqueue_simicheck_task(due_date, simicheck_delay)
-    dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
+    return DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
                             1, find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now)
-    change_item_type(dj.id)
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

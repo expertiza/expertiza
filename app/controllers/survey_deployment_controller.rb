@@ -7,8 +7,8 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def survey_deployment_types
-    ["AssignmentSurveyDeployment",
-     "CourseSurveyDeployment"]
+    %w(AssignmentSurveyDeployment
+     CourseSurveyDeployment)
   end
 
   def survey_deployment_type

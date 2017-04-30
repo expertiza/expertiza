@@ -8,7 +8,7 @@ class SurveyDeploymentController < ApplicationController
 
   def survey_deployment_types
     %w(AssignmentSurveyDeployment
-     CourseSurveyDeployment)
+       CourseSurveyDeployment)
   end
 
   def survey_deployment_type
@@ -117,7 +117,7 @@ class SurveyDeploymentController < ApplicationController
     # @chart_data_table is passed to the JavaScript code in the view
     # Google Charts requires a 2-D Data Table to create a chart, @chart_data_table is 3-D because there are multiple charts
     @chart_data_table = []
-    responses_for_all_questions.each_with_index do |response, index|
+    responses_for_all_questions.each do |response|
       data_table_row = []
       data_table_row << %w(Label Number)
       response.each_with_index do |response_value, index|

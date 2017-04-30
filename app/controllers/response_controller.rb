@@ -175,8 +175,9 @@ class ResponseController < ApplicationController
       map_id: @map.id,
       additional_comment: params[:review][:comments], 
       round: @round, 
-      is_submitted: is_submitted)
-      # ,:version_num=>@version)
+      is_submitted: is_submitted
+      )
+    # ,:version_num=>@version)
 
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
@@ -279,12 +280,15 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
+              @surveys << 
+              [
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
                 'survey_deployment_id' => survey_deployment.id, 
                 'start_date' => survey_deployment.start_date, 
                 'end_date' => survey_deployment.end_date,
                 'parent_id' => cp.parent_id, 
-                'participant_id' => cp.id]
+                'participant_id' => cp.id
+              ]
             end
           end
         end
@@ -298,12 +302,15 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
+              @surveys << 
+              [
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
                 'survey_deployment_id' => survey_deployment.id,
                 'start_date' => survey_deployment.start_date, 
                 'end_date' => survey_deployment.end_date, 
                 'parent_id' => ap.parent_id, 
-                'participant_id' => ap.id]
+                'participant_id' => ap.id
+              ]
             end
           end
         end

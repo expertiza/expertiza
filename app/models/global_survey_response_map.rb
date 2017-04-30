@@ -4,7 +4,7 @@ class GlobalSurveyResponseMap < SurveyResponseMap
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
 
   def questionnaire
-    Questionnaire.find_by_id(self.reviewed_object_id)
+    Questionnaire.find_by(id: self.reviewed_object_id)
   end
 
   def contributor

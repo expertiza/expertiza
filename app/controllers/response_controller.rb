@@ -171,13 +171,19 @@ class ResponseController < ApplicationController
     else
       is_submitted = false
     end
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :is_submitted => is_submitted)#,:version_num=>@version)
+    @response = Response.create(
+      map_id: @map.id,
+      additional_comment: params[:review][:comments], 
+      round: @round, 
+      is_submitted: is_submitted
+      )
+    # ,:version_num=>@version)
 
-    #Change the order for displaying questions for editing response views.
-    questions=sort_questions(@questionnaire.questions)
+    # Change the order for displaying questions for editing response views.
+    questions = sort_questions(@questionnaire.questions)
 
     if params[:responses]
-       create_answers(params, questions)
+      create_answers(params, questions)
     end
 
     msg = "Your response was successfully saved."
@@ -198,7 +204,7 @@ class ResponseController < ApplicationController
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
-  
+
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
@@ -272,9 +278,18 @@ class ResponseController < ApplicationController
       course_participants.each do |cp|
         survey_deployments = CourseSurveyDeployment.where(parent_id: cp.parent_id)
         if survey_deployments
-          survey_deployments.each do|survey_deployment|
+          survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> cp.parent_id, 'participant_id'=> cp.id, 'global_survey_id'=> survey_deployment.global_survey_id]
+              @surveys << 
+              [
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
+                'survey_deployment_id' => survey_deployment.id, 
+                'start_date' => survey_deployment.start_date, 
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => cp.parent_id, 
+                'participant_id' => cp.id,
+                'global_survey_id' => survey_deployment.global_survey_id
+              ]
             end
           end
         end
@@ -288,7 +303,16 @@ class ResponseController < ApplicationController
         if survey_deployments
           survey_deployments.each do |survey_deployment|
             if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << ['survey'=> Questionnaire.find(survey_deployment.questionnaire_id), 'survey_deployment_id'=> survey_deployment.id, 'start_date'=> survey_deployment.start_date, 'end_date'=> survey_deployment.end_date, 'parent_id'=> ap.parent_id, 'participant_id'=> ap.id, 'global_survey_id'=> survey_deployment.global_survey_id]
+              @surveys << 
+              [
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date, 
+                'end_date' => survey_deployment.end_date, 
+                'parent_id' => ap.parent_id, 
+                'participant_id' => ap.id,
+                'global_survey_id'=> survey_deployment.global_survey_id
+              ]
             end
           end
         end
@@ -342,7 +366,13 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap", "CourseSurveyResponseMap", "AssignmentSurveyResponseMap", "GlobalSurveyResponseMap"
+    when 
+      "MetareviewResponseMap", 
+      "TeammateReviewResponseMap", 
+      "FeedbackResponseMap", 
+      "CourseSurveyResponseMap", 
+      "AssignmentSurveyResponseMap", 
+      "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end
@@ -355,7 +385,7 @@ class ResponseController < ApplicationController
   end
 
   def set_dropdown_or_scale
-    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id), 
+    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
                                           .first.try(:dropdown)
     @dropdown_or_scale = use_dropdown == true ? 'dropdown' : 'scale'

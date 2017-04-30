@@ -13,7 +13,7 @@ class SurveyDeployment < ActiveRecord::Base
       errors[:base] << "The Start Date should be in the future"
     end
     if !end_date.nil? && end_date < Time.now
-            errors[:base] << "The End Date should be in the future."
+      errors[:base] << "The End Date should be in the future."
     end
 
     if !num_of_students.nil? && num_of_students > User.where(role_id: Role.student.id).length

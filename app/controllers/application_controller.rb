@@ -14,9 +14,9 @@ class ApplicationController < ActionController::Base
   end
 
   helper_method :current_user_session, :current_user, :current_user_role?
-  # protect_from_forgery with: :exception
+  protect_from_forgery with: :exception
   before_action :set_time_zone
-  # before_action :authorize
+  before_action :authorize
 
   def self.verify(_args)
   end

@@ -1,8 +1,12 @@
-include Lti2Commons
-include Signer
-include MessageSupport
-include OAuth::OAuthProxy
 class LtiRegistrationWipsController < ApplicationController
+
+  def action_allowed?
+    case params[:action]
+      when 'index', 'create', 'update'
+        return true
+    end
+  end
+
   def index
     action = params[:action]
     registration_id = params[:registration_id]

@@ -48,6 +48,15 @@ module Expertiza
         'X-Content-Type-Options' => 'nosniff'
     }
 
+    #Facilitated decorator pattern
+    #Decorators can be added and "required" from app/decorators directory
+    config.to_prepare do
+      Dir.glob(Rails.root + "app/decorators/**/*_decorator*.rb").each do |c|
+        require_dependency(c)
+      end
+    end
+
+
     # Bower asset paths
     root.join('vendor', 'assets', 'components').to_s.tap do |bower_path|
       config.sass.load_paths << bower_path

@@ -1,0 +1,7 @@
+assignment participant added
+
+<% if activity.trackable %>
+    <%= link_to User.find(activity.trackable.user_id).name, activity.trackable %>
+<% else %>
+    which has since been removed
+<% end %>

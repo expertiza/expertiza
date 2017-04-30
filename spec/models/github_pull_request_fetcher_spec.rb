@@ -11,7 +11,7 @@ describe "GithubPullRequestFetcher" do
     params = {"url" => "https://github.com/totallybradical/simicheck-expertiza-sandbox/pull/3"}
     fetcher = GithubPullRequestFetcher.new(params)
     res = fetcher.fetch_content
-    expect(res.length > 0)
+    expect(!res.empty?)
   end
 
   it "fetch gives error and returns an empty string" do
@@ -20,6 +20,6 @@ describe "GithubPullRequestFetcher" do
     params = {"url" => "https://github.com/totallybradical/simicheck-expertiza-sandbox/pull/3"}
     fetcher = GithubPullRequestFetcher.new(params)
     res = fetcher.fetch_content
-    expect(res.length == 0)
+    expect(res.empty?)
   end
 end

@@ -1,12 +1,30 @@
 require 'rails_helper'
 
 describe "SimiCheckWebservice" do
+  def is_success(code)
+    code == 200
+  end
+
+  def poll
+    loop do
+      begin
+        response = SimiCheckWebService.get_similarity_nxn(comp_id)
+        if is_success
+          break
+        end
+      rescue
+        puts '   Waiting 30 seconds to check again for results...'
+        sleep(30)
+        next
+      end
+    end
+  end
 
   describe ".get_all_comparisons" do
     context "any time called" do
       it "returns a response with code 200 and body containing all comparisons" do
         puts "Testing SimiCheck get all comparisons"
-        response = SimiCheckWebService.get_all_comparisons()
+        response = SimiCheckWebService.get_all_comparisons
         json_response = JSON.parse(response.body)
         expect(response.code).to eql(200)
         expect(json_response["comparisons"]).to be_truthy
@@ -80,7 +98,7 @@ describe "SimiCheckWebservice" do
         comp_id = json_response["id"]
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         response = SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         expect(response.code).to eql(200)
@@ -100,7 +118,7 @@ describe "SimiCheckWebservice" do
         test_upload_text = 'This is some sample text.'
         filename = 'test_upload.txt'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         response = SimiCheckWebService.delete_files(comp_id, [filename])
@@ -119,27 +137,16 @@ describe "SimiCheckWebservice" do
         comp_id = json_response["id"]
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         test_upload_text = 'This is some more sample text.'
         filepath = '/tmp/test_upload2.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
-        while true
-          begin
-            response = SimiCheckWebService.get_similarity_nxn(comp_id)
-            if response.code == 200
-              break
-            end
-          rescue
-            puts '   Waiting 30 seconds to check again for results...'
-            sleep(30)
-            next
-          end
-        end
+        poll
         expect(response.code).to eql(200)
         json_response = JSON.parse(response.body)
         expect(json_response["similarities"]).to be_truthy
@@ -157,27 +164,16 @@ describe "SimiCheckWebservice" do
         comp_id = json_response["id"]
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         test_upload_text = 'This is some more sample text.'
         filepath = '/tmp/test_upload2.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         SimiCheckWebService.upload_file(comp_id, filepath)
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
-        while true
-          begin
-            response = SimiCheckWebService.get_similarity_nxn(comp_id)
-            if response.code == 200
-              break
-            end
-          rescue
-            puts '   Waiting 30 seconds to check again for results...'
-            sleep(30)
-            next
-          end
-        end
+        poll
         response = SimiCheckWebService.visualize_similarity(comp_id)
         expect(response.code).to eql(200)
         expect(response.body).to be_truthy
@@ -195,27 +191,16 @@ describe "SimiCheckWebservice" do
         comp_id = json_response["id"]
         test_upload_text = 'This is some sample text.'
         filepath = '/tmp/test_upload.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         file1_id = JSON.parse(SimiCheckWebService.upload_file(comp_id, filepath).body)["id"]
         File.delete(filepath) if File.exist?(filepath)
         test_upload_text = 'This is some more sample text.'
         filepath = '/tmp/test_upload2.txt'
-        File.open(filepath, "w") { |file| file.write(test_upload_text) }
+        File.open(filepath, "w") {|file| file.write(test_upload_text) }
         file2_id = JSON.parse(SimiCheckWebService.upload_file(comp_id, filepath).body)["id"]
         File.delete(filepath) if File.exist?(filepath)
         SimiCheckWebService.post_similarity_nxn(comp_id)
-        while true
-          begin
-            response = SimiCheckWebService.get_similarity_nxn(comp_id)
-            if response.code == 200
-              break
-            end
-          rescue
-            puts '   Waiting 30 seconds to check again for results...'
-            sleep(30)
-            next
-          end
-        end
+        poll
         response = SimiCheckWebService.visualize_comparison(comp_id, file1_id, file2_id)
         expect(response.code).to eql(200)
         expect(response.body).to be_truthy
@@ -223,6 +208,4 @@ describe "SimiCheckWebservice" do
       end
     end
   end
-
-
 end

@@ -441,7 +441,8 @@ class ReviewMappingController < ApplicationController
       @responses = Response.where(:map_id => @review_response_map_ids)
 
     when "PlagiarismCheckerReport"
-      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: PlagiarismCheckerAssignmentSubmission.where(assignment_id: params[:id]).pluck(:id))
+      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
+                                                                              PlagiarismCheckerAssignmentSubmission.where(assignment_id: params[:id]).pluck(:id))
     end
 
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user

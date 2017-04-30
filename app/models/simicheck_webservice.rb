@@ -9,7 +9,7 @@ class SimiCheckWebService
   #   <none>
   # Returns:
   #   response = RestClient::Response
-  def self.get_all_comparisons
+  def self.all_comparisons
     full_url = @@base_uri + '/comparisons'
     RestClient::Request.execute(method: :get,
                                            url: full_url,
@@ -156,11 +156,7 @@ class SimiCheckWebService
   #   response = RestClient::Response
   def self.post_similarity_nxn(comparison_id, callback_url = '')
     full_url = @@base_uri + '/similarity_nxn/' + comparison_id
-    if callback_url.empty?
-      json_body = {}.to_json
-    else
-      json_body = {"callback_url" => callback_url}.to_json
-    end
+    json_body = callback_url.empty? ? {}.to_json : {"callback_url" => callback_url}.to_json
     RestClient::Request.execute(method: :post,
                                            url: full_url,
                                            payload: json_body,
@@ -206,11 +202,7 @@ class SimiCheckWebService
   # Finds the files in a comparison that are most similar to a given file
   def self.post_similarity_1xn(comparison_id, filename, callback_url = '')
     full_url = @@base_uri + '/similarity_1xn/' + comparison_id
-    if callback_url.empty?
-      json_body = {"filename" => filename}.to_json
-    else
-      json_body = {"filename" => filename, "callback_url" => callback_url}.to_json
-    end
+    json_body = callback_url.empty? ? {"filename" => filename}.to_json: {"filename" => filename, "callback_url" => callback_url}.to_json
     RestClient::Request.execute(method: :post,
                                            url: full_url,
                                            payload: json_body,

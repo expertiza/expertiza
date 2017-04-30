@@ -15,6 +15,9 @@ class Response < ActiveRecord::Base
 
   delegate :questionnaire, :reviewee, :reviewer, to: :map
 
+  include PublicActivity::Model
+  tracked owner: ->(controller, model) { controller && controller.current_user }
+  
   def response_id
     id
   end

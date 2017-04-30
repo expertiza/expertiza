@@ -7,9 +7,6 @@ class AssignmentNode < Node
   belongs_to :assignment, class_name: "Assignment", foreign_key: "node_object_id"
   belongs_to :node_object, class_name: 'Assignment'
 
-  include PublicActivity::Model
-  tracked owner: ->(controller, model) { controller && controller.current_user }
-
   # Returns the table in which to locate Assignments
   def self.table
     "assignments"

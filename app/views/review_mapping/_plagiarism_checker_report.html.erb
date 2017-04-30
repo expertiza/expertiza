@@ -5,7 +5,7 @@ else show records
 -->
 
 
-<% if @PlagiarismCheckerComparisons.nil? %>
+<% if @plagiarism_checker_comparisons.nil? %>
     <div class="text-center">
       <h4>There are no cheaters in this assignment! Hooray!</h4>
     </div>
@@ -22,7 +22,7 @@ else show records
           <th>Team 2</th>
         </tr>
         </thead>
-        <% @PlagiarismCheckerComparisons.each do |pcc| %>
+        <% @plagiarism_checker_comparisons.each do |pcc| %>
             <tr>
 
               <td><%= link_to (pcc.similarity_percentage).to_s + "%", pcc.similarity_link %></td>

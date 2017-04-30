@@ -39,6 +39,7 @@ class AssignmentForm
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
+    delete_from_delayed_queue
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
@@ -240,8 +241,6 @@ class AssignmentForm
   end
 
   def add_simicheck_to_delayed_queue(simicheck_delay)
-    delete_from_delayed_queue
-
     if simicheck_delay.to_i >= 0
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|

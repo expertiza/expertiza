@@ -17,7 +17,7 @@ class ActivitiesController < ApplicationController
       users = User.where("name like ?", "%#{params[:user]}%")
       @activities = @activities.where(owner_id: users)
     end
-    if activity_time
+    unless activity_time.to_s.strip.empty?
       @activities = @activities.where("Date(created_at) = ?", activity_time)
     end
   end

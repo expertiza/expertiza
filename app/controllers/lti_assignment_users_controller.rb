@@ -3,31 +3,57 @@ include Signer
 include MessageSupport
 include OAuth::OAuthProxy
 class LtiAssignmentUsersController < ApplicationController
+  protect_from_forgery :except => :create
+
+  def action_allowed?
+    case params[:action]
+      when 'create', 'back_to_lms'
+        return true
+    end
+  end
 
   def create
     (@error_code, @message) = pre_process_tenant
-    if @error_code == 200
-      (user,@error_code,@message) = lti_login();
+    if @error_code == 200 #200 means pre processing was successful
+      (user,@error_code,@message) = lti_login()
       if(user)
-        assignment_id = params['custom_assignment_id']
-        assignment_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment_id);
-        if assignment_participant
-          lis_result_sourcedid = params["lis_result_sourcedid"];
+        assignment_id = params['custom_assignment_id'] #assignment_id needs to be passed as a
+        assignment = Assignment.find(assignment_id)
+        if assignment
+          #Assignment number passed in the request is valid.
+          assignment_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment_id)
+          lis_result_sourcedid = params["lis_result_sourcedid"]; #sourcedid is used to send grades back
           @tenant.lis_outcome_service_url = params['lis_outcome_service_url'];
-          user_assignment = LtiAssignmentUser.new
-          user_assignment.assignment_id = assignment_id;
-          user_assignment.user_id=user.id;
-          user_assignment.participant_id=assignment_participant.id;
-          user_assignment.lis_result_source_did=lis_result_sourcedid;
-          user_assignment.tenant_id=@tenant.id;
-          user_assignment.save;
-          redirect_to "/student_task/view?id=#{assignment_participant.id}"
+          unless assignment_participant
+            #Assignment_Participant not found in participant table and assignment exists. So add user to participant table.
+            assignment.add_participant_by_user(user,true,true,true) #By default, set can_review, can_quiz, can_submit as true
+            assignment_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(user.id,assignment_id)
+          end
+          if lis_result_sourcedid and @tenant.lis_outcome_service_url
+            #Add participant, assignment to LtiAssignmentUser table for enabling "grade passback" feature
+            #LtiAssignmentUser is a mapping of the sourcedid's with Expertiza assignment and user
+            ua = LtiAssignmentUser.find_by_participant_id assignment_participant #LtiAssignmentUser already exist for participant, so just update.
+            if ua == nil
+              ua = LtiAssignmentUser.new
+            end
+            ua.assignment_id = assignment_id;
+            ua.user_id = user.id;
+            ua.participant_id = assignment_participant.id;
+            ua.lis_result_source_did = lis_result_sourcedid;
+            ua.tenant_id = @tenant.id;
+            ua.save; #Will be used later to post grades back.
+            @tenant.save;
+          end
+          redirect_to "/student_task/view?id=#{assignment_participant.id}" #Redirect to the assignment viewing page for the user
+        else
+          @message = "Assignment number in the request is invalid"
+          @error_code = "LTI_CUSTOM_PARAMETER_INVALID"
         end
       end
     end
     if(@error_code != 200)
       @url = params['launch_presentation_return_url'];
-      flash[:error] = @message;
+      flash[:notice] = @message
     end
   end
 
@@ -35,10 +61,39 @@ class LtiAssignmentUsersController < ApplicationController
     (redirect_to (params['url']))
   end
 
+  private
+
+  def define_attributes
+    attributes = {}
+    attributes["role_id"] = Role.student.id
+    attributes["email"] = params['lis_person_contact_email_primary']
+    #The user's name is set as the initial part of the email address.
+    attributes["name"] =  attributes["email"].split("@")[0] if attributes["email"] != nil?
+    attributes["fullname"] = params['lis_person_name_given']
+    attributes["email_on_submission"] = 1
+    attributes["email_on_review"] = 1
+    attributes["email_on_review_of_review"] = 1
+    attributes
+  end
+
+  def create_new_user(attributes)
+    user = User.new(attributes)
+    user.parent_id = 2 #Set super-admin id as parent for now
+    user.timezonepref = User.find(user.parent_id).timezonepref
+    user.save!
+    user
+  end
+
+  #Authenticates the user who has requested the Expertiza resource.
+  #Since user is coming from an authentic source like Moodle, user is auto-created if does not already exist.
   def lti_login
     error_code = nil;
     message = nil;
     user = User.find_by_login(params['lis_person_contact_email_primary'])
+    if user == nil
+      attributes = define_attributes();
+      user = create_new_user(attributes);
+    end
     if user
       if(current_user!=nil && current_user.id!=user.id) #Clear session if different user's session is going on
         AuthController.clear_session(session)
@@ -59,6 +114,7 @@ class LtiAssignmentUsersController < ApplicationController
     return [user,error_code,message]
   end # def login
 
+  #Checks the authenticity of the tenant, i.e. LMS like moodle, using the request data
   def pre_process_tenant
     error_code, message = nil;
     oauth_params = OAuth::OAuthProxy::OAuthRequest.parse_authorization_header request.authorization
@@ -129,10 +185,10 @@ class LtiAssignmentUsersController < ApplicationController
     return [200, nil, nil]
   end
 
-  private
-    def lti_assignment_user_params
+
+  def lti_assignment_user_params
       params.require(:lti_assignment_user).permit(:user_id, :assignment_id, :participant_id, :lis_result_source_did, :tenant_id, :grade)
-    end
+  end
 
   def normalize_role(roles_string)
     roles_string ||= 'learner'
@@ -163,4 +219,3 @@ class LtiAssignmentUsersController < ApplicationController
   end
 
 end
-

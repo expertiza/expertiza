@@ -10,13 +10,17 @@ class LtiRegistrationWipsController < ApplicationController
   def index
     registration_id = params[:registration_id]
     registration = Lti2Tp::Registration.find(registration_id)
-    @lti_registration_wip = LtiRegistrationWip.new
 
-    # On orig registration, first assume tenant_name == name
-    timeref = Time.now.strftime('%I%M.%S')
-    @lti_registration_wip.tenant_name = registration.message_type == 'registration' \
-            ? "#{registration.tenant_basename}-#{timeref}" : registration.tenant_name
+    # # On orig registration, first assume tenant_name == name
+    # timeref = Time.now.strftime('%I%M.%S')
+    # @lti_registration_wip.tenant_name = registration.message_type == 'registration' \
+    #         ? "#{registration.tenant_basename}-#{timeref}" : registration.tenant_name
 
+    @lti_registration_wip = LtiRegistrationWip.find_by_tenant_name(registration.tenant_name);
+    unless @lti_registration_wip #If Registration_Wip does not exist then create else update.
+      @lti_registration_wip = LtiRegistrationWip.new
+      @lti_registration_wip.tenant_name = registration.tenant_name
+    end
     @lti_registration_wip.registration_id = registration_id
     @lti_registration_wip.registration_return_url = params[:return_url]
 
@@ -39,12 +43,15 @@ class LtiRegistrationWipsController < ApplicationController
   end
 
   def show_registration
-    tenant = Tenant.new
-    tenant.tenant_name = @lti_registration_wip.tenant_name
-    begin
-      tenant.save!
-    rescue Exception => exc
-      (@lti_registration_wip.errors[:tenant_name] << "Institution name is already in database") and return
+    tenant = Tenant.find_by_tenant_name(@lti_registration_wip.tenant_name)
+    unless tenant
+      tenant = Tenant.new
+      tenant.tenant_name = @lti_registration_wip.tenant_name
+      begin
+        tenant.save!
+      rescue Exception => exc
+        (@lti_registration_wip.errors[:tenant_name] << "Institution name is already in database") and return
+      end
     end
 
     disposition = @registration.prepare_tool_proxy('register')

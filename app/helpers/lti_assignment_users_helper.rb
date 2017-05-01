@@ -1,3 +1,7 @@
+include Lti2Commons
+include Signer
+include MessageSupport
+include OAuth::OAuthProxy
 module LtiAssignmentUsersHelper
   def self.push_grade_to_lms_per_user lis_result_source_did, grade, lis_outcome_url, tenant
     # pre_process_tenant
@@ -15,21 +19,19 @@ module LtiAssignmentUsersHelper
           'application/xml'
 
       response = invoke_service(signed_request, Rails.application.config.wire_log, "Submit Result to ToolConsumer")
-
       puts response
     end
   rescue Exception => e
-    @iresource.errors[:score] << "Score must be a real number from 0.0 to 1.0"
+    flash[:notice] = "Could not post score to LMS."
+    puts e;
   end
 
   def self.post_grades_to_lms assignment_participants, grade
     assignment_participants.each do |assignment_participant|
       user_assignment = LtiAssignmentUser.find_by_participant_id assignment_participant.id;
       if user_assignment
-        tenant = Tenant.find 31;
-        puts "Hello"
+        tenant = Tenant.find user_assignment.tenant_id
         outcome_url = tenant.lis_outcome_service_url;
-        puts outcome_url
         push_grade_to_lms_per_user user_assignment.lis_result_source_did, grade, outcome_url, tenant;
       end
     end

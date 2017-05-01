@@ -1,5 +1,14 @@
 <h1>Activity Log </h1>
-<table style="width:100%">
+<div class="search_bar">
+  <%= form_tag({controller: "activities/index"}, :method => 'get') do %>
+      <p>
+        <%= text_field_tag :user, params[:user] %>
+        <%= date_field(:activity_time, params[:created_at]) %>
+        <%= submit_tag "Search", :user => nil, :created_at => nil %>
+      </p>
+  <% end %>
+</div>
+<table style="width:100%" id="table">
   <tr>
     <th>User</th>
     <th>Action On</th>
@@ -13,7 +22,7 @@
         <td><%= (activity.key).split(".")[0] %></td>
         <td><%= (activity.key).split(".")[1] %></td>
         <td><%= render_activity activity %></td>
-        <td><%= activity.created_at.strftime("%H:%M:%S") %></td>
+        <td><%= activity.created_at.strftime("%m/%d/%Y %H:%M:%S") %></td>
       </tr>
   <% end %>
 </table>

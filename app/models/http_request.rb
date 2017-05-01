@@ -8,7 +8,6 @@ class HttpRequest
       /^#{URI.regexp}$/.match(url)
     end
 
-    # http://ruby-doc.org/stdlib-2.4.1/libdoc/net/http/rdoc/Net/HTTP.html
     def get(url, limit = 5)
       if limit <= 0
         return ""

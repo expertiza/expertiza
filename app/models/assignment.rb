@@ -145,7 +145,7 @@ class Assignment < ActiveRecord::Base
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
-  def scores(questions)
+  def scores(questions, search_string  = nil, assignment_id = nil)
     scores = {}
 
     scores[:participants] = {}
@@ -155,7 +155,14 @@ class Assignment < ActiveRecord::Base
 
     scores[:teams] = {}
     index = 0
-    self.teams.each do |team|
+    #search by team or user name within this assignment
+    if search_string.present?
+      filtered_teams = Team.find_by_sql(["select sub.* from (select t1.* from teams t1, teams_users tu, users u where t1.id = tu.team_id and tu.user_id = u.id and u.name like ? union select t2.* from teams t2 where t2.name like ? ) as sub where sub.parent_id = ?", "%#{search_string}", "%#{search_string}", assignment_id])
+    else
+      #list all teams for this assignment
+      filtered_teams = self.teams
+    end
+    filtered_teams.each do |team|
       scores[:teams][index.to_s.to_sym] = {}
       scores[:teams][index.to_s.to_sym][:team] = team
 

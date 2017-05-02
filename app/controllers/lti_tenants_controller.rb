@@ -1,4 +1,4 @@
-class TenantsController < ApplicationController
+class LtiTenantsController < ApplicationController
 
   private
 

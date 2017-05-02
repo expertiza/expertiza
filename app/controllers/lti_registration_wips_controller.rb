@@ -43,9 +43,9 @@ class LtiRegistrationWipsController < ApplicationController
   end
 
   def show_registration
-    tenant = Tenant.find_by_tenant_name(@lti_registration_wip.tenant_name)
+    tenant = Lti_Tenant.find_by_tenant_name(@lti_registration_wip.tenant_name)
     unless tenant
-      tenant = Tenant.new
+      tenant = Lti_Tenant.new
       tenant.tenant_name = @lti_registration_wip.tenant_name
       begin
         tenant.save!

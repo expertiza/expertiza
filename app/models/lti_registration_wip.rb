@@ -2,13 +2,13 @@ class LtiRegistrationWip < ActiveRecord::Base
   validates :tenant_name, :uniqueness => true
 
   def self.change_tenant_secret(tenant_id, new_secret)
-    tenant = Tenant.find(tenant_id)
+    tenant = Lti_Tenant.find(tenant_id)
     tenant.secret = new_secret
     tenant.save
   end
 
   def self.get_tenant_credentials(tenant_id)
-    tenant = Tenant.find(tenant_id)
+    tenant = Lti_Tenant.find(tenant_id)
     [tenant.tenant_key, tenant.secret]
   end
 
@@ -27,7 +27,7 @@ class LtiRegistrationWip < ActiveRecord::Base
   def self.complete_reregistration(registration_id)
     @registration = Lti2Tp::Registration.find(registration_id)
     tenant_id = @registration.tenant_id
-    tenant = Tenant.find(tenant_id)
+    tenant = Lti_Tenant.find(tenant_id)
     tool_proxy_wrapper = JsonWrapper.new(@registration.tool_proxy_json)
     tool_proxy_response_wrapper = JsonWrapper.new(@registration.tool_proxy_response)
 

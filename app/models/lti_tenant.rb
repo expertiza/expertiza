@@ -1,4 +1,4 @@
-class Tenant < ActiveRecord::Base
+class Lti_Tenant < ActiveRecord::Base
   validates :tenant_name, :uniqueness => true
 
   def to_s

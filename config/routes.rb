@@ -2,7 +2,6 @@ Expertiza::Application.routes.draw do
 
   #lti start
   resources :lti_assignment_users
-  resources :tenants
   mount Lti2Tp::Engine, :at => '/lti2_tp'
   resources :lti_registration_wips
   get 'complete_reregistration' => 'lti_registration_wips#complete_reregistration'

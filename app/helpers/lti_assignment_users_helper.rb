@@ -30,7 +30,7 @@ module LtiAssignmentUsersHelper
     assignment_participants.each do |assignment_participant|
       user_assignment = LtiAssignmentUser.find_by_participant_id assignment_participant.id;
       if user_assignment
-        tenant = Tenant.find user_assignment.tenant_id
+        tenant = Lti_Tenant.find user_assignment.tenant_id
         outcome_url = tenant.lis_outcome_service_url;
         push_grade_to_lms_per_user user_assignment.lis_result_source_did, grade, outcome_url, tenant;
       end

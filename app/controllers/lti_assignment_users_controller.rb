@@ -129,7 +129,7 @@ class LtiAssignmentUsersController < ApplicationController
       message = "Improper LTI context: LTI Consumer key is missing or not valid!"
       return [error_code, message];
     end
-    @tenant = Tenant.where(:tenant_key => key).first
+    @tenant = Lti_Tenant.where(:tenant_key => key).first
     @registration = Lti2Tp::Registration.where(:tenant_id => @tenant.id).first
     unless @registration
       error_code = "LTI_INVALID_CONSUMER"

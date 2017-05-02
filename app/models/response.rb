@@ -36,7 +36,7 @@ class Response < ActiveRecord::Base
       identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
       identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
       str = prefix + '_' + self.id.to_s
-      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' +
+      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' \
           "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
     else # in student end
       # identifier += '<B>Review ' + count.to_s + ' Round ' + self.round.to_s + '</B>'

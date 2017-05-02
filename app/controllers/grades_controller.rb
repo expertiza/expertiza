@@ -38,9 +38,7 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires
-    if :nameString != nil
-      filter :nameString
-    end
+    filter :nameString unless :nameString.nil?
 
     if @assignment.varying_rubrics_by_round?
       retrieve_questions questionnaires
@@ -375,5 +373,4 @@ class GradesController < ApplicationController
     variance = array.inject(0) {|variance, x| variance += (x - m)**2 }
     [m, Math.sqrt(variance/(array.size-1))]
   end
-
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170421194857) do
+ActiveRecord::Schema.define(version: 20170502194520) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -230,21 +230,21 @@ ActiveRecord::Schema.define(version: 20170421194857) do
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
   create_table "github_contributors", force: :cascade do |t|
-    t.string   "user_name",             limit: 255
-    t.string   "github_id",             limit: 255
-    t.integer  "total_commits",         limit: 4
-    t.integer  "files_changed",         limit: 4
-    t.integer  "lines_changed",         limit: 4
-    t.integer  "lines_added",           limit: 4
-    t.integer  "lines_removed",         limit: 4
-    t.integer  "lines_persisted",       limit: 4
-    t.integer  "submission_records_id", limit: 4
+    t.string   "user_name",            limit: 255
+    t.string   "github_id",            limit: 255
+    t.integer  "total_commits",        limit: 4
+    t.integer  "files_changed",        limit: 4
+    t.integer  "lines_changed",        limit: 4
+    t.integer  "lines_added",          limit: 4
+    t.integer  "lines_removed",        limit: 4
+    t.integer  "lines_persisted",      limit: 4
+    t.integer  "submission_record_id", limit: 4
     t.datetime "week_timestamp"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
-  add_index "github_contributors", ["submission_records_id"], name: "index_github_contributors_on_submission_records_id", using: :btree
+  add_index "github_contributors", ["submission_record_id"], name: "index_github_contributors_on_submission_record_id", using: :btree
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false

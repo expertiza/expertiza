@@ -42,7 +42,7 @@ class GithubContributorsController < ApplicationController
   end
 
   def parse_submissions(submission, github_content)
-    github_contributors = GithubContributor.where(submission_records_id: submission.id).order('created_at DESC')
+    github_contributors = GithubContributor.where(submission_record_id: submission.id).order('created_at DESC')
     return github_contributors if !github_contributors.empty? &&
         github_contributors.length == github_contributors.where('created_at > ?', Time.current - 1.hour).length
     github_contributors.delete_all
@@ -60,7 +60,7 @@ class GithubContributorsController < ApplicationController
         contribution.lines_added = week['a']
         contribution.lines_removed = week['d']
         contribution.week_timestamp = Time.zone.at(week['w']).to_s(:db)
-        contribution.submission_records_id = submission.id
+        contribution.submission_record_id = submission.id
         github_contributors << contribution
       end
     end

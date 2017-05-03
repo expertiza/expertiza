@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170425004605) do
+ActiveRecord::Schema.define(version: 20170503194813) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -83,7 +83,7 @@ ActiveRecord::Schema.define(version: 20170425004605) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
-    t.boolean  "local_scores_calculated",                  default: false
+    t.boolean  "local_scores_stored",                      default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

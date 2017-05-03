@@ -39,7 +39,7 @@ class LocalDbCalc
         end
       end
     end
-    assignment.update_attribute(:local_scores_calculated, true)
+    assignment.update_attribute(:local_scores_stored, true)
   end
 end
 

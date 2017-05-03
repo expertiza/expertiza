@@ -131,7 +131,7 @@ class AssignmentParticipant < Participant
     end
 
     # E1731 changes: Calling either LocalDbCalc or OnTheFlyCalc based on assignment status
-    scores[:total_score] = if self.assignment.local_scores_calculated?
+    scores[:total_score] = if self.assignment.local_scores_stored?
                              LocalDbCalc.compute_total_score(self.assignment)
                            else
                              OnTheFlyCalc.compute_total_score(self.assignment, scores)
@@ -196,7 +196,7 @@ class AssignmentParticipant < Participant
     # scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
 
     # E1731 changes: Calling either LocalDbCalc or OnTheFlyCalc based on assignment status
-    scores[:total_score] = if self.assignment.local_scores_calculated?
+    scores[:total_score] = if self.assignment.local_scores_stored?
                              LocalDbCalc.compute_total_score(assignment)
                            else
                              OnTheFlyCalc.compute_total_score(assignment, scores)

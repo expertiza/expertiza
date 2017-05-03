@@ -12,7 +12,7 @@
 <% end %>
 
   <% if @sign_up_topics.size != 0 %>
-    <table class="general" id="topics">
+    <table id="myTable1" class="general tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
       <% i=1 %>
       <% for topic in @sign_up_topics %>

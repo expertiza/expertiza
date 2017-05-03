@@ -1,21 +1,82 @@
-<th width="5%">Topic #</th>
-<th width="50%">Topic name(s)</th>
+<!--Edited for making changes to make table sortable on columns-->
+<thead>
+<th width="5%" class="sorter-true">Topic #</th>
+<th width="50%" class="sorter-true">Topic name(s)</th>
 <% if @assignment.is_microtask? %>
-  <th width="5%">Micro- payment</th>
+  <th width="5%" class="sorter-true">Micro- payment</th>
 <% end %>
 <% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
-  <th width="5%">Num. of slots</th>
-  <th width="5%">Available slots</th>
-  <th width="5%">Num. on waitlist</th>
-  <th width="10%">Bookmarks</th>
+  <th width="5%" class="sorter-true">Num. of slots</th>
+  <th width="5%" class="sorter-true">Available slots</th>
+  <th width="5%" class="sorter-true">Num. on waitlist</th>
+  <th width="10%" class="sorter-false">Bookmarks</th>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
-      <th width="10%">Actions</th>
+      <th width="10%" class="sorter-false">Actions</th>
   <% end %>
-  <th width="5%">Advertise- ment(s)</th>
+  <th width="5%" class="sorter-false">Advertise- ment(s)</th>
 <% end %>
+</thead>
+
+<style>
+  /*TableSorter CSS styles */
+  th.tablesorter-headerAsc{
+    /* Style for Up Arrow */
+    background-image: url(<%= asset_path("up-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  th.tablesorter-headerDesc{
+    /* Style for down arrow */
+    background-image: url(<%= asset_path("down-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  /* Style for no-sort*/
+  th.sorter-true.tablesorter-headerUnSorted{
+    /* Style for default view  */
+    background-image: url(<%= asset_path("sort.png") %>);
+    background-size: 15px 7px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+
+  }
+</style>
 
 
+<script>
+    $(function () {
+      /*Function for sorting the table */
+        $("#myTable1").tablesorter({
+            sortList: [[0,0]], //sort First Column by default when page loads
+            headers: {
+                4: {
+                    sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
+                }
+            }
+        });
+    });
 
+    $.tablesorter.addParser({
+        id: "customParser",                                       //customParser for sorting by volume
+        is: function (stringValue) {
+            return false;
+        },
+        format: function (stringValue) {
+            var stringNumericPart = stringValue.split(" ");         //split the data by spaces
+            var numericValue = parseInt(stringNumericPart[2],10);   //extract the numeric data
+            return numericValue ;
+        },
+        type: 'numeric'
+    });
+
+</script>
 
 
 

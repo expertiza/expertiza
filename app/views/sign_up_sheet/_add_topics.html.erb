@@ -1,7 +1,142 @@
 <% if @sign_up_topics.count == 0%>
-<%= link_to 'New topic',{:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]}, :confirm => "You are adding a topic to this assignment.  Students will now have to select a topic before they submit their work.", :topic => @topics, :method => :get%> |
-<%= link_to 'Import topics', {:controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id]}, :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category', :confirm => "You are adding topics to this assignment.  Students will now have to select a topic before they submit their work.", :topic => @topics, :method => :get %>|
+    <%= link_to 'New topic',{:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]}, :confirm => "You are adding a topic to this assignment.  Students will now have to select a topic before they submit their work.", :topic => @topics, :method => :get%> |
+    <%= link_to 'Import topics', {:controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id]}, :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category', :confirm => "You are adding topics to this assignment.  Students will now have to select a topic before they submit their work.", :topic => @topics, :method => :get %>|
 <% else %>
-<%= link_to 'New topic',:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]%> |
-<%= link_to 'Import topics', :controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id], :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category' %>|
+    <%= link_to 'New topic',:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]%> |
+    <%= link_to 'Import topics', :controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id], :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category' %>|
 <% end %>
+
+<script src="https://cdnjsd.cloudflare.com/ajax/libs/react/15.0.2/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+
+
+
+<script type="text/jsx">
+    var React = require('react');
+    var ReactDOM = require('react-dom');
+
+    class Topic extends React.Component {
+        constructor(props) {
+            super(props)
+            this.state = { isPopupOpen: true }
+        }
+
+        render() {
+
+            return (
+                <div id = "topic" >
+                  <Popup isOpen={this.state.isPopupOpen} onClose={() => this.closePopup()}>
+                    <%= form_tag :action => 'create' do %>
+                    <table>
+                      <tr>
+                        <td><label for="topic_identifier">Topic id</label></td>
+                        <td><%= text_field 'topic', 'topic_identifier', size: 4 %></td>
+                      </tr>
+                      <tr>
+                        <td><label for="topic_name">Topic name</label></td>
+                        <td><%= text_field 'topic', 'topic_name', size: 42 %></td>
+                      </tr>
+                      <tr>
+                        <td><label for="topic_identifier">Topic category</label></td>
+                        <td><%= text_field 'topic', 'category', size: 10 %></td>
+                      </tr>
+                      <tr>
+                        <td><label for="max_choosers">Number of slots</label></td>
+                        <td><%= text_field 'topic', 'max_choosers', size: 1 %></td>
+                      </tr>
+                      <tr>
+                        <td><label for="category">Topic link</label></td>
+                        <td><%= text_field 'topic', 'link', :size => 42 %></td>
+                      </tr>
+                      <tr>
+                        <td valign="top"><label for="topic_name">Topic description</label></td>
+                        <td><%= text_area 'topic', 'description', cols: 40, rows: 5 %></td>
+                      </tr>
+                    </table>
+                    <%= hidden_field_tag('id', @id) %>
+                    <%= submit_tag "Create", id: 'createTopic', :onclick  => 'showZeroSlotWarning();'%>
+                    <% end %>
+                    <p><button onClick={() => this.closePopup()}>Close</button></p>
+                  </Popup>
+                </div>
+            )
+        }
+
+        openPopup() {
+            this.setState({ isPopupOpen: true })
+            ReactDOM.render(<Topic/>, document.getElementById('topic'))
+
+        }
+
+        closePopup() {
+            this.setState({ isPopupOpen: false })
+        }
+    }
+
+    class Popup extends React.Component {
+        render() {
+            if (this.props.isOpen === false)
+                return null
+
+            let popupStyle = {
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: '9999',
+                background: '#fff'
+            }
+
+            if (this.props.width && this.props.height) {
+                popupStyle.width = this.props.width + 'px'
+                popupStyle.height = this.props.height + 'px'
+                popupStyle.marginLeft = '-' + (this.props.width/2) + 'px',
+                    popupStyle.marginTop = '-' + (this.props.height/2) + 'px',
+                    popupStyle.transform = null
+            }
+
+            if (this.props.style) {
+                for (let a in this.props.style) {
+                    popupStyle[a] = this.props.style[a]
+                }
+            }
+
+            let backendStyle = {
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                top: '0px',
+                left: '0px',
+                zIndex: '9998',
+                background: 'rgba(0, 0, 0, 0.3)'
+            }
+
+            if (this.props.backendStyle) {
+                for (let a in this.props.backendStyle) {
+                    backendStyle[a] = this.props.backendStyle[a]
+                }
+            }
+
+            return (
+                <div className={this.props.containerClassName}>
+                  <div className={this.props.className} style={popupStyle}>
+                      {this.props.children}
+                  </div>
+                    {!this.props.noBackend &&
+                    <div className={this.props.backendClassName} style={backendStyle}
+                         onClick={e => this.close(e)}/>}
+                </div>
+            )
+        }
+
+        close(e) {
+            e.preventDefault()
+
+            if (this.props.onClose) {
+                this.props.onClose()
+            }
+        }
+    }
+</script>
+<button onClick= "openPopup()">New Topic</button>

@@ -64,7 +64,7 @@ describe "assignment function" do
     page.should_have_content "Name cannot be empty! and no special characters are allowed. Please check the format"
   end
 
-  it "should show error message for directory" do
+  it "should show error message for empty directory" do
     login_as("instructor6")
     visit "/assignments/new?private=0"
 

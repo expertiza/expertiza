@@ -922,8 +922,7 @@ var NewAssignmentForm = React.createClass({
         var that = this;
         var n = 0;
         var d = 0;
-        console.log('Entering');
-        console.log(that.state.assignment_form.assignment.name);
+        
         document.getElementById("name_span").innerHTML = " ";
         document.getElementById("directory_span").innerHTML = " ";
         if(this.nameValidate(that.state.assignment_form.assignment.name)) {
@@ -1247,32 +1246,53 @@ getInitialState: function() {
         this.setState({assignment: newAssignment});
       },
 
+      nameValidate: function(e){
+        var regex_valid = /^[a-zA-Z0-9]*$/;
+        var regex=/^(?=\s*\S).*$/;
+        if(regex.test(e) && regex_valid.test(e))
+            return true;
+        else{
+            document.getElementById("name_span").innerHTML = " &#x2716 Name cannot be empty! and no special characters are allowed. Please check the format";
+                      //alert('Name cannot be empty!!!');
+            return false;
+              }
+            },
+
+
       directoryValidate: function(e){
         var regex=/^[a-zA-Z0-9]*$/;
         var regex_empty=/^(?=\s*\S).*$/;
         if(regex.test(e) && regex_empty.test(e))
           return true;
         else {
-          document.getElementById("directory_span").innerHTML = "    &#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
+          //document.getElementById("name_span").innerHTML = " ";
+
+          document.getElementById("directory_span").innerHTML = "&#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
           //alert('');
-          return false;
-        }
-      },
-
-      nameValidate: function(e){
-        var regex=/^(?=\s*\S).*$/;
-        if(regex.test(e))
-          return true;
-        else{
-
-          document.getElementById("name_span").innerHTML = "    &#x2716 Name cannot be empty!";
-          //alert('Name cannot be empty!!!');
           return false;
         }
       },
 
 handleEditAssignment: function(e){
 var that = this;
+var n = 0;
+        var d = 0;
+        
+        document.getElementById("name_span").innerHTML = " ";
+        document.getElementById("directory_span").innerHTML = " ";
+        if(this.nameValidate(that.state.assignment_form.assignment.name)) {
+            n=1;
+
+        }
+
+
+        if(this.directoryValidate(that.state.assignment_form.assignment.directory_path)){
+            d =1;
+        }
+
+
+        //if(this.nameValidate(that.state.assignment_form.assignment.name) && this.directoryValidate(that.state.assignment_form.assignment.directory_path) ){
+        if(n==1 && d==1){
 console.log('It worked');
 $.ajax({
             method: 'PUT',
@@ -1280,7 +1300,7 @@ $.ajax({
 dataType: 'json',
             url: '/assignments/'+(parseInt(that.state.assignment_id)/2).toString()
         })
-WindowReload();
+WindowReload();}
 },
 
       handleGetCourses: function() {

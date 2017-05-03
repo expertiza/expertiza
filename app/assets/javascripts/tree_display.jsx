@@ -842,10 +842,10 @@ var NewAssignmentForm = React.createClass({
       nameValidate: function(e){
         var regex_valid = /^[a-zA-Z0-9]*$/;
         var regex=/^(?=\s*\S).*$/;
-        if(regex.test(e) && regex_valid.text(e))
+        if(regex.test(e) && regex_valid.test(e))
             return true;
         else{
-            document.getElementById("name_span").innerHTML = "    &#x2716 Name cannot be empty! and no special characters are allowed. Please check the format";
+            document.getElementById("name_span").innerHTML = " &#x2716 Name cannot be empty! and no special characters are allowed. Please check the format";
                       //alert('Name cannot be empty!!!');
             return false;
               }
@@ -858,7 +858,9 @@ var NewAssignmentForm = React.createClass({
         if(regex.test(e) && regex_empty.test(e))
           return true;
         else {
-          document.getElementById("directory_span").innerHTML = "    &#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
+          //document.getElementById("name_span").innerHTML = " ";
+
+          document.getElementById("directory_span").innerHTML = "&#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
           //alert('');
           return false;
         }

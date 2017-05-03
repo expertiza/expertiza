@@ -1,3 +1,4 @@
+
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
@@ -17,9 +18,13 @@ jQuery(document).ready(function() {
   var RowAction = React.createClass({
     getInitialState: function() {
       return {
-        showDetails: true
+        showDetails: true,
+	showForm: false
       }
     },
+      onClick: function(){
+        this.state.showForm ? this.setState({showForm: false}) : this.setState({showForm : true});
+      },
     handleButtonClick: function(e) {
       e.stopPropagation()
       if (e.target.type === 'button') {
@@ -76,9 +81,16 @@ jQuery(document).ready(function() {
           newNodeType = this.props.nodeType + "s"
         }
         if (this.props.is_available || newNodeType == 'questionnaires') {
-          moreContent.push(
-            <span>
-              <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
+if (this.props.dataType === 'assignment') {
+moreContent.push(
+<span>
+<a title="Quick Edit" onClick ={this.onClick} ><img src="/assets/tree_view/edit-icon-24.png" /></a>{this.state.showForm ? <EditAssignmentForm assignmentId={this.props.id} name={this.props.parent_name} directory_path={this.props.directory} spec_location={this.props.spec_location} course_id={this.props.course_id} require_quiz={this.props.require_quiz} is_available={this.props.availability} max_team_size={this.props.max_team_size} staggered_deadline={this.props.staggered_deadline} microtask={this.props.microtask} review_visible={this.props.review_visible} calibration={this.props.calibration} reputation={this.props.reputation} quiz_questions={this.props.quiz_questions} teammate_review={this.props.teammate_review} /> : null}
+</span>
+)  }
+
+moreContent.push(
+<span>
+<a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
               <a title={this.props.private? "Make public" : "Make private"} href={"/"+newNodeType+"/toggle_access?id="+(parseInt(this.props.id)/2).toString()}><img src={"/assets/tree_view/lock-"+(this.props.private? "off-" : "")+"disabled-icon-24.png"} /></a>
             </span>
@@ -304,6 +316,9 @@ jQuery(document).ready(function() {
                             allow_suggestions={this.props.allow_suggestions}
                             has_topic={this.props.has_topic}
                             id={id}
+			    instructor={this.props.instructor}
+			    directory={this.props.directory}
+			    spec_location={this.props.spec_location}
                         />
                     </td>
                 </tr>
@@ -332,6 +347,17 @@ jQuery(document).ready(function() {
                             allow_suggestions={this.props.allow_suggestions}
                             has_topic={this.props.has_topic}
                             id={id}
+			    instructor={this.props.instructor}
+			    directory={this.props.directory}
+			    spec_location={this.props.spec_location}
+                            staggered_deadline={this.props.staggered_deadline}
+                            microtask={this.props.microtask}
+                            review_visible={this.props.review_visible}
+                            calibration={this.props.calibration}
+                            reputation={this.props.reputation}
+                            teammate_review={this.props.teammate_review}
+                            availability={this.props.availability}
+			    quiz_questions={this.props.quiz_questions}
                         />
                     </td>
                 </tr>
@@ -377,6 +403,7 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
+		      spec_location={entry.spec_location}
                   />)
               })
           }
@@ -400,6 +427,15 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
+                      spec_location={entry.spec_location}
+                      staggered_deadline={entry.staggered_deadline}
+                      microtask={entry.microtask}
+                      review_visible={entry.review_visible}
+                      calibration={entry.calibration}
+                      reputation={entry.reputation}
+                      teammate_review={entry.teammate_review}
+                      availability={entry.availability}
+                      quiz_questions={entry.quiz_questions}
                   />)
               })
           }
@@ -533,6 +569,8 @@ jQuery(document).ready(function() {
                           has_topic={this.props.has_topic}
                           dataType={this.props.dataType}
                           id={id}
+			  instructor={this.props.instructor}
+			  directory={this.props.directory}
                       />
                   </td>
               </tr>
@@ -562,6 +600,17 @@ jQuery(document).ready(function() {
                           has_topic={this.props.has_topic}
                           dataType={this.props.dataType}
                           id={id}
+			  instructor={this.props.instructor}
+			  directory={this.props.directory}
+			  spec_location={this.props.spec_location}
+                          staggered_deadline={this.props.staggered_deadline}
+                          microtask={this.props.microtask}
+                          review_visible={this.props.review_visible}
+                          calibration={this.props.calibration}
+                          reputation={this.props.reputation}
+                          teammate_review={this.props.teammate_review}
+                          availability={this.props.availability}
+                          quiz_questions={this.props.quiz_questions}
                       />
                   </td>
               </tr>
@@ -661,6 +710,13 @@ jQuery(document).ready(function() {
   })
 
   var NewItemButton = React.createClass({
+getInitialState: function() {
+          return {showForm: false};
+      },
+
+      onClick: function(){
+        this.state.showForm ? this.setState({showForm: false}) : this.setState({showForm : true});
+      },
     render: function() {
       var renderContent = []
       var formStyle = {
@@ -669,31 +725,812 @@ jQuery(document).ready(function() {
         display: 'inline'
       }
       if (this.props.dataType.length > 0) {
-        if (this.props.dataType != 'questionnaire') {
-          renderContent.push(
-            <form
-              style={formStyle}
-              action={"/"+(this.props.dataType === 'assignment' ? this.props.dataType+"s" : this.props.dataType)+"/new"}
-              method="GET"
-              key={this.props.dataType+"_new"+this.props.private.toString()}>
-              <input type="hidden" name="private" value={this.props.private ? 1 : 0} />
-              <button type="submit"
-                      className="btn btn-primary pull-right new-button">
-                      New {this.props.private ? "private" : "public"} {this.props.dataType}
-              </button>
-            </form>
+              if (this.props.dataType != 'questionnaire') {
+if (this.props.dataType === 'assignment') {
+                      renderContent.push(
+                          <span>
+                              <button className="btn btn-primary pull-right new-button" onClick ={this.onClick} >
+                                  New {this.props.private ? "private" : "public"} {this.props.dataType}
+                              </button>
+                          {this.state.showForm ? <NewAssignmentForm private={this.props.private}/> : null}
+                          </span>
+                      )
+                  }else{
+                  
+                      renderContent.push(
+                          <form
+                           style={formStyle}
+                           action={"/"+(this.props.dataType === 'assignment' ? this.props.dataType+"s" : this.props.dataType)+"/new"}
+                           method="GET"
+                           key={this.props.dataType+"_new"+this.props.private.toString()}>
+                           <input type="hidden" name="private" value={this.props.private ? 1 : 0} />
+                           <button type="submit"
+                               className="btn btn-primary pull-right new-button">
+                               New {this.props.private ? "private" : "public"} {this.props.dataType}
+                           </button>
+                          </form>
+                      )
+                  }
+		}
+
+              
+          }
+          return (
+               <span>
+                   {renderContent}
+               </span>
           )
-        }
       }
-      return (
-        <span>
-          {renderContent}
-        </span>
-      )
-    }
+
   })
 
-  var SortToggle = React.createClass({
+
+var NewAssignmentForm = React.createClass({
+
+     getInitialState: function() {
+       return{
+         assignment_form:{
+         assignment: {
+           private: this.props.private,
+           name: '',
+           course_id: '0',
+           directory_path: '',
+           spec_location: '',
+           require_quiz: '',
+           staggered_deadline: '',
+           microtask: '',
+           reviews_visible_to_all: '',
+           is_calibrated: '',
+           availability_flag: '',
+           reputation_algorithm: '',
+           max_team_size: '1',
+           instructor_id: '0',
+           num_quiz_questions: '0',
+           max_team_size: '0',
+           show_teammate_reviews: ''
+         }},
+         team_assignment: '',
+         commit: 'Create',
+         listCourses:[] 
+       }
+
+     },
+
+
+      handleNameChange: function(e){
+          var newAssignment = this.state.assignment_form;
+          newAssignment.assignment.name = e.target.value;
+          this.setState({assignment: newAssignment});
+      },
+
+      handleCourseChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.course_id = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleSubChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.directory_path = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleDescChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.spec_location = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleTeamChange: function(e){
+        var newAssignment = this.state.team_assignment;
+        newAssignment = e.target.checked;
+        this.setState({team_assignment: newAssignment});
+
+      },
+
+      handleQuizChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.require_quiz = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleDeadlineChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.staggered_deadline = e.target.checked;
+        this.setState({assignment: newAssignment});
+        StaggeredMessage();
+      },
+
+      handleMicrotaskChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.microtask = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleReviewsChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reviews_visible_to_all = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleCalibrationChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.is_calibrated = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleAvailabilityChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.availability_flag = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleReputationChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reputation_algorithm = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleNumQuizQuestions: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.num_quiz_questions = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleMaxTeamSize: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.max_team_size = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleShowTeammateReviews: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.show_teammate_reviews = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      nameValidate: function(e){
+        var regex_valid = /^[a-zA-Z0-9]*$/;
+        var regex=/^(?=\s*\S).*$/;
+        if(regex.test(e) && regex_valid.test(e))
+            return true;
+        else{
+            document.getElementById("name_span").innerHTML = " &#x2716 Name cannot be empty! and no special characters are allowed. Please check the format";
+                      //alert('Name cannot be empty!!!');
+            return false;
+              }
+            },
+
+
+      directoryValidate: function(e){
+        var regex=/^[a-zA-Z0-9]*$/;
+        var regex_empty=/^(?=\s*\S).*$/;
+        if(regex.test(e) && regex_empty.test(e))
+          return true;
+        else {
+          document.getElementById("name_span").innerHTML = " ";
+
+          document.getElementById("directory_span").innerHTML = "&#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
+          //alert('');
+          return false;
+        }
+      },
+
+
+
+      handleCreateAssignment: function(e) {
+        var that = this;
+        console.log('in createassignment');
+        if(this.nameValidate(that.state.assignment_form.assignment.name) && this.directoryValidate(that.state.assignment_form.assignment.directory_path) ){
+          console.log('It worked');
+        $.ajax({
+          method: 'POST',
+          data: {
+            assignment_form: that.state.assignment_form
+          },
+          url: '/assignments'
+        });
+        window.location.reload();
+        }
+      },
+
+      handleGetCourses: function() {
+        var source="/tree_display/get_courses_node_ng";
+        this.serverRequest = $.get(source, function (response) {
+        var result = JSON.parse(response);
+        var arrTen = [];
+        for (var k = 0; k < result.length; k++) {
+          arrTen.push(<option key={result[k].id} value={result[k].id}> {result[k].name} </option>);
+        }
+        this.setState({
+          listCourses: arrTen
+        });
+        }.bind(this));
+      },
+
+    render: function(){
+        const divStyle = {
+            backgroundColor: '#eaeded',
+            color: 'black',
+            padding: 10,
+            border: 'red',
+            marginTop: 10
+        }
+
+        const selectDivStyle = {
+          backgroundColor: '#aed6f1',
+          padding: 20
+        }
+
+        const spanStyle = {
+          color: '#ff0000'
+        }
+
+        var partial_team;
+        if(this.state.team_assignment){
+          partial_team = (
+              <div style={selectDivStyle}>
+                <p>
+                  Max Team Size: <input type="number" id="max_team_size" onChange={this.handleMaxTeamSize}></input>
+                </p>
+
+
+                <p>
+                  <input type="checkbox" id="show_teammate_reviews" onChange={this.handleShowTeammateReviews}> Show Teammate Reviews</input>
+                </p>
+              </div>
+          );
+        }
+        else{
+          partial_team = <p></p>
+        }
+
+        var partial_quiz;
+        if(this.state.assignment_form.assignment.require_quiz){
+          partial_quiz = (
+              <div style={selectDivStyle}>
+                <p>
+                  Number of Quiz Questions: <input type="number" id="num_quiz_questions"  onChange={this.handleNumQuizQuestions}></input>
+                </p>
+              </div>
+          );
+        }
+        else{
+          partial_quiz = <p></p>
+        }
+
+
+
+        return(
+
+              <div style={divStyle}>
+                  <h2> Create {this.props.private ? "Private" : "Public"} Assignment </h2>
+
+                  <p>
+                     Assignment Name: <input type="text" id="name" onChange={this.handleNameChange} required={true}/>
+                    <span style={spanStyle} id="name_span"></span>
+                  </p>
+                  <p>
+                     Course: <select id="course_id" onChange={this.handleCourseChange} onClick={this.handleGetCourses}>
+                       <option selected hidden>-----------</option>
+                       {this.state.listCourses}
+                     </select>
+                  </p>
+                  <p>
+                    Submission Directory: <input type="text"  id="directory_path" onChange={this.handleSubChange} required={true}
+                  errorMessage="Directory field cannot contain Special characters or spaces" emptyMessage="Directroy is required."/>
+                    <span style={spanStyle} id="directory_span"></span>
+                  </p>
+                  <p>
+                    Description URL: <input type="text" id="spec_location" onChange={this.handleDescChange}/>
+                  </p>
+
+                  <p>
+                    <input type="checkbox" id="team_assignment" onChange={this.handleTeamChange}> Has Teams </input>
+                  </p>
+
+
+                  {partial_team}
+
+
+                  <p>
+                    <input type="checkbox" id="require_quiz" onChange={this.handleQuizChange}> Has Quiz </input>
+                  </p>
+                  {partial_quiz}
+
+                  <p>
+                    <input type="checkbox" id="staggered_deadline" onChange={this.handleDeadlineChange}> Staggered Deadline Assignment </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="microtask" onChange={this.handleMicrotaskChange}> Microtask Assignment </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="reviews_visible_to_all" onChange={this.handleReviewsChange}> Reviews Visible to all other Reviewers </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="is_calibrated" onChange={this.handleCalibrationChange}> Calibration for Training </input>
+                  </p>
+                  <p>
+                    <input type="checkbox" id="availability_flag" onChange={this.handleAvailabilityChange}> Available to Students </input>
+                  </p>
+                  <p>
+                    Reputation Algorithm: &nbsp;<select id="reputation_algorithm" onChange={this.handleReputationChange}>
+                    <option value="">--</option>
+                      <option value="Hamer">Hamer</option>
+                      <option value="Lauw">Simpson</option>
+                    </select>
+                  </p>
+                  <p>
+                  <button onClick={this.handleCreateAssignment}>
+                  Create
+                  </button>
+                    </p>
+                </div>
+
+
+            )
+        }
+
+    })
+
+  function StaggeredMessage()
+  {
+    window.alert('Warning! Unchecking all topics for this assignment will now have the same deadline.');
+  }
+
+function WindowReload()
+{
+window.location.reload();
+}
+
+var EditAssignmentForm = React.createClass({
+
+     componentWillReceiveProps(nextProps){
+        var updatedAssignment = this.state.assignment_form;
+        updatedAssignment.assignment.name = nextProps.name;
+updatedAssignment.assignment.course_id = nextProps.course_id;
+updatedAssignment.assignment.directory_path = nextProps.directory_path;
+updatedAssignment.assignment.spec_location = nextProps.spec_location;
+updatedAssignment.assignment.require_quiz = nextProps.require_quiz;
+updatedAssignment.assignment.staggered_deadline = nextProps.staggered_deadline;
+updatedAssignment.assignment.microtask = nextProps.microtask;
+updatedAssignment.assignment.reviews_visible_to_all = nextProps.reviews_visible_to_all;
+updatedAssignment.assignment.is_calibrated = nextProps.is_calibrated;
+updatedAssignment.assignment.availability_flag = nextProps.availability_flag;
+updatedAssignment.assignment.reputation_algorithm = nextProps.reputation_algorithm;
+updatedAssignment.assignment.max_team_size = nextProps.max_team_size;
+updatedAssignment.assignment.instructor_id = nextProps.instructor_id;
+updatedAssignment.assignment.num_quiz_questions = nextProps.num_quiz_questions;
+updatedAssignment.assignment.show_teammate_reviews = nextProps.show_teammate_reviews;
+        this.setState({assignment: updatedAssignment});
+this.setState({team_assignment: nextProps.team_assignment});
+this.setState({listCourses: nextProps.listCourses});
+            },
+
+getInitialState: function() {
+       return{
+         assignment_form:{
+         assignment: {
+           private: this.props.private,
+           name: this.props.name,
+           course_id: this.props.course_id,
+           directory_path: this.props.directory_path,
+           spec_location: this.props.spec_location,
+           require_quiz: this.props.require_quiz,
+           staggered_deadline: this.props.staggered_deadline,
+           microtask: this.props.microtask,
+           reviews_visible_to_all: this.props.review_visible,
+           is_calibrated: this.props.calibration,
+           availability_flag: this.props.is_available,
+           reputation_algorithm: this.props.reputation,
+           max_team_size: this.props.max_team_size,
+           instructor_id: '6',
+           num_quiz_questions: this.props.quiz_questions,
+           show_teammate_reviews: this.props.teammate_review
+         }},
+         team_assignment: '',
+         assignment_id: this.props.assignmentId,
+	 commit: 'update',
+         listCourses:[] 
+       }
+
+     },
+
+
+      handleNameChange: function(e){
+          var newAssignment = this.state.assignment_form;
+          newAssignment.assignment.name = e.target.value;
+          this.setState({assignment: newAssignment});
+      },
+
+      handleCourseChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.course_id = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleSubChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.directory_path = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleDescChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.spec_location = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleTeamChange: function(e){
+        var newAssignment = this.state.team_assignment;
+        newAssignment = e.target.checked;
+        this.setState({team_assignment: newAssignment});
+
+      },
+
+      handleQuizChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.require_quiz = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleDeadlineChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.staggered_deadline = e.target.checked;
+        this.setState({assignment: newAssignment});
+        StaggeredMessage();
+      },
+
+      handleMicrotaskChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.microtask = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleReviewsChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reviews_visible_to_all = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleCalibrationChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.is_calibrated = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleAvailabilityChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.availability_flag = e.target.checked;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleReputationChange: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.reputation_algorithm = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleNumQuizQuestions: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.num_quiz_questions = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleMaxTeamSize: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.max_team_size = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      handleShowTeammateReviews: function(e){
+        var newAssignment = this.state.assignment_form;
+        newAssignment.assignment.show_teammate_reviews = e.target.value;
+        this.setState({assignment: newAssignment});
+      },
+
+      directoryValidate: function(e){
+        var regex=/^[a-zA-Z0-9]*$/;
+        var regex_empty=/^(?=\s*\S).*$/;
+        if(regex.test(e) && regex_empty.test(e))
+          return true;
+        else {
+          document.getElementById("directory_span").innerHTML = "    &#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
+          //alert('');
+          return false;
+        }
+      },
+
+      nameValidate: function(e){
+        var regex=/^(?=\s*\S).*$/;
+        if(regex.test(e))
+          return true;
+        else{
+
+          document.getElementById("name_span").innerHTML = "    &#x2716 Name cannot be empty!";
+          //alert('Name cannot be empty!!!');
+          return false;
+        }
+      },
+
+handleEditAssignment: function(e){
+var that = this;
+console.log('It worked');
+$.ajax({
+            method: 'PUT',
+            data: {assignment_form: that.state.assignment_form},
+dataType: 'json',
+            url: '/assignments/'+(parseInt(that.state.assignment_id)/2).toString()
+        })
+WindowReload();
+},
+
+      handleGetCourses: function() {
+        var source="/tree_display/get_courses_node_ng";
+        this.serverRequest = $.get(source, function (response) {
+        var result = JSON.parse(response);
+        var arrTen = [];
+
+        for (var k = 0; k < result.length; k++) {
+          arrTen.push(<option key={result[k].id} value={result[k].id}> {result[k].name} </option>);
+        }
+
+        this.setState({
+          listCourses: arrTen
+        });
+        }.bind(this));
+      },
+
+    render: function(){
+        const divStyle = {
+            backgroundColor: '#eaeded',
+            color: 'black',
+            padding: 10,
+            border: 'red',
+            marginTop: 10
+        }
+
+        const selectDivStyle = {
+          backgroundColor: '#aed6f1',
+          padding: 20
+        }
+
+        const spanStyle = {
+          color: '#ff0000'
+        }
+
+var teammate_review_form;
+if(this.state.assignment_form.assignment.show_teammate_reviews){
+teammate_review_form=(
+ <p>
+                  <input type="checkbox" id="show_teammate_reviews" onChange={this.handleShowTeammateReviews} checked> Show Teammate Reviews</input>
+                </p>
+);
+}
+else{
+teammate_review_form=(
+ <p>
+                  <input type="checkbox" id="show_teammate_reviews" onChange={this.handleShowTeammateReviews}> Show Teammate Reviews</input>
+                </p>
+);
+}
+
+        var partial_team;
+        if(this.state.assignment_form.assignment.max_team_size){
+          partial_team = (
+              <div style={selectDivStyle}>
+                <p>
+                  Max Team Size: <input type="number" id="max_team_size" value={this.state.assignment_form.assignment.max_team_size} onChange={this.handleMaxTeamSize}></input>
+                </p>
+
+		{teammate_review_form}
+               
+              </div>
+          );
+        }
+        else{
+          partial_team = <p></p>
+        }
+
+
+        var partial_quiz;
+        if(this.state.assignment_form.assignment.require_quiz){
+          partial_quiz = (
+              <div style={selectDivStyle}>
+                <p>
+                  Number of Quiz Questions: <input type="number" id="num_quiz_questions" value={this.state.assignment_form.assignment.num_quiz_questions} onChange={this.handleNumQuizQuestions}></input>
+                </p>
+              </div>
+          );
+        }
+        else{
+          partial_quiz = <p></p>
+        }
+
+var has_quiz_form;
+if(this.state.assignment_form.assignment.require_quiz){
+has_quiz_form=(
+		  <p>
+                    <input type="checkbox" id="require_quiz" onChange={this.handleQuizChange} checked> Has Quiz </input>
+                  </p>
+                  
+);
+}
+else{
+has_quiz_form=(
+		  <p>
+                    <input type="checkbox" id="require_quiz" onChange={this.handleQuizChange}> Has Quiz </input>
+                  </p>
+                
+);
+}
+
+var is_available_form;
+if(this.state.assignment_form.assignment.availability_flag){
+is_available_form=(
+		  <p>
+                    <input type="checkbox" id="availability_flag" onChange={this.handleAvailabilityChange} checked> Available to Students </input>
+                  </p>
+                  
+);
+}
+else{
+is_available_form=(
+<p>
+                    <input type="checkbox" id="availability_flag" onChange={this.handleAvailabilityChange}> Available to Students </input>
+                  </p>
+);
+}
+
+var is_calibrated_form;
+if(this.state.assignment_form.assignment.is_calibrated){
+is_calibrated_form=(
+<p>
+                    <input type="checkbox" id="is_calibrated" onChange={this.handleCalibrationChange} checked> Calibration for Training </input>
+                  </p>
+);
+}
+else{
+is_calibrated_form=(
+<p>
+                    <input type="checkbox" id="is_calibrated" onChange={this.handleCalibrationChange}> Calibration for Training </input>
+                  </p>
+);
+}
+
+var is_review_visible_form;
+if(this.state.assignment_form.assignment.reviews_visible_to_all){
+is_review_visible_form=(
+<p>
+                    <input type="checkbox" id="reviews_visible_to_all" onChange={this.handleReviewsChange} checked> Reviews Visible to all other Reviewers </input>
+                  </p>
+);
+}
+else{
+is_review_visible_form=(
+<p>
+                    <input type="checkbox" id="reviews_visible_to_all" onChange={this.handleReviewsChange}> Reviews Visible to all other Reviewers </input>
+                  </p>
+);
+}
+
+var is_microtask_form;
+if(this.state.assignment_form.assignment.microtask){
+is_microtask_form=(
+<p>
+<input type="checkbox" id="microtask" onChange={this.handleMicrotaskChange} checked> Microtask Assignment </input>
+                  </p>
+);
+}
+else{
+is_microtask_form=(
+<p
+><input type="checkbox" id="microtask" onChange={this.handleMicrotaskChange}> Microtask Assignment </input>
+                  </p>
+);
+}
+
+var is_stag_form;
+if(this.state.assignment_form.assignment.staggered_deadline){
+is_stag_form=(
+ <p>
+                    <input type="checkbox" id="staggered_deadline" onChange={this.handleDeadlineChange} checked> Staggered Deadline Assignment </input>
+                  </p>
+);
+}
+else{
+is_stag_form=(
+ <p>
+                    <input type="checkbox" id="staggered_deadline" onChange={this.handleDeadlineChange}> Staggered Deadline Assignment </input>
+                  </p>
+);
+}
+
+var is_team_assignment_form;
+if(this.state.assignment_form.assignment.max_team_size){
+is_team_assignment_form=(
+<p>
+                    <input type="checkbox" id="team_assignment" onChange={this.handleTeamChange} checked> Has Teams </input>
+                  </p>
+);
+}
+else{
+is_team_assignment_form=(
+<p>
+                    <input type="checkbox" id="team_assignment" onChange={this.handleTeamChange}> Has Teams </input>
+                  </p>
+);
+}
+
+
+var optionstate=this.state.assignment_form.assignment.reputation_algorithm;
+var coursedefault=this.state.assignment_form.assignment.course_id;
+
+
+        return(
+
+              <div style={divStyle}>
+                  <h2> Edit Assignment </h2>
+
+                  <p>
+                     Assignment Name: <input type="text" id="name" value={this.state.assignment_form.assignment.name} onChange={this.handleNameChange} required={true}/>
+                    <span style={spanStyle} id="name_span"></span>
+                  </p>
+                  <p>
+                     Course: <select id="course_id" defaultValue={coursedefault} onChange={this.handleCourseChange} onClick={this.handleGetCourses}>
+                       <option value="">-----------</option>
+                       {this.state.listCourses}
+                     </select>
+                  </p>
+                  <p>
+                    Submission Directory: <input type="text"  id="directory_path" value={this.state.assignment_form.assignment.directory_path} onChange={this.handleSubChange} required={true}
+                  errorMessage="Directory field cannot contain Special characters or spaces" emptyMessage="Directroy is required."/>
+                    <span style={spanStyle} id="directory_span"></span>
+                  </p>
+                  <p>
+                    Description URL: <input type="text" id="spec_location" value={this.state.assignment_form.assignment.spec_location} onChange={this.handleDescChange}/>
+                  </p>
+
+                  
+		  {is_team_assignment_form}
+
+                  {partial_team}
+		
+		  {has_quiz_form}
+
+                  {partial_quiz}
+                
+                  {is_stag_form}
+  
+                  {is_microtask_form}
+
+                  {is_review_visible_form}
+
+                  {is_calibrated_form}
+
+                  {is_available_form}
+
+                  <p>
+                    Reputation Algorithm: &nbsp;<select id="reputation_algorithm" defaultValue={optionstate} onChange={this.handleReputationChange}>
+                    <option value="">--</option>
+                      <option value="Hamer">Hamer</option>
+                      <option value="Lauw">Simpson</option>
+                    </select>
+                  </p>
+                  <p>
+                  <button onClick={this.handleEditAssignment}>
+                  Update
+                  </button>
+                    </p>
+                </div>
+
+
+            )
+        }
+
+    })
+
+var SortToggle = React.createClass({
     getInitialState: function() {
       return {
         order: this.props.order
@@ -799,9 +1636,18 @@ jQuery(document).ready(function() {
                       actions={entry.actions}
                       is_available={entry.is_available}
                       course_id={entry.course_id}
+                      spec_location={entry.spec_location}
                       max_team_size={entry.max_team_size}
                       is_intelligent={entry.is_intelligent}
                       require_quiz={entry.require_quiz}
+                      staggered_deadline={entry.staggered_deadline}
+                      microtask={entry.microtask}
+                      review_visible={entry.review_visible}
+                      calibration={entry.calibration}
+                      reputation={entry.reputation}
+                      quiz_questions={entry.quiz_questions}
+		      teammate_review={entry.teammate_review}
+		      availability={entry.availability}
                       dataType={_this.props.dataType}
                       //this is just a hack. All current users courses are marked as private during fetch for display purpose.
                       private={entry.private}
@@ -853,6 +1699,8 @@ jQuery(document).ready(function() {
                               private={entry.private}
                               allow_suggestions={entry.allow_suggestions}
                               has_topic={entry.has_topic}
+                              spec_location={entry.spec_location}
+
                               rowClicked={_this.handleExpandClick}
                               newParams={entry.newParams}
                           />)
@@ -895,8 +1743,17 @@ jQuery(document).ready(function() {
                               require_quiz={entry.require_quiz}
                               dataType={_this.props.dataType}
                               private={entry.private}
+                              spec_location={entry.spec_location}
                               allow_suggestions={entry.allow_suggestions}
                               has_topic={entry.has_topic}
+                              staggered_deadline={entry.staggered_deadline}
+                              microtask={entry.microtask}
+                              review_visible={entry.review_visible}
+                              calibration={entry.calibration}
+                              quiz_questions={entry.quiz_questions}
+                              reputation={entry.reputation}
+                              teammate_review={entry.teammate_review}
+			      availability={entry.availability}
                               rowClicked={_this.handleExpandClick}
                               newParams={entry.newParams}
                           />)
@@ -1132,6 +1989,7 @@ jQuery(document).ready(function() {
           Courses: {},
           Assignments: {},
           Questionnaires: {}
+
         },
         activeTab: "1"
       }
@@ -1236,3 +2094,6 @@ jQuery(document).ready(function() {
   }
 
 })
+
+
+

@@ -34,15 +34,15 @@ class AssignmentsController < ApplicationController
 
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
-
-    if @assignment_form.save
-      @assignment_form.create_assignment_node
-
-      redirect_to edit_assignment_path @assignment_form.assignment.id
-      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-    else
-      render 'new'
-    end
+    @assignment_form.assignment.instructor_id = current_user.id
+      if @assignment_form.save
+        @assignment_form.create_assignment_node
+        flash[:success] = "Assignment Successfully created"
+        render 'tree_display/list'
+      else
+        flash[:error] = "Failed to Create Assignment"
+        render 'tree_display/list'
+      end
   end
 
   def edit
@@ -121,32 +121,25 @@ class AssignmentsController < ApplicationController
       @assignment.course_id = params[:course_id]
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
-        redirect_to list_tree_display_index_path
+        render 'tree_display/list'
       else
         flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
-        redirect_to edit_assignment_path @assignment.id
+        render 'tree_display/list'
       end
       return
     end
 
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
-      q[:questionnaire_id].empty?
-    end
-
-    if current_user.timezonepref.nil?
-      parent_id = current_user.parent_id
-      parent_timezone = User.find(parent_id).timezonepref
-      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
-      current_user.timezonepref = parent_timezone
-    end
+   
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved.'
+      render 'tree_display/list'
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors}"
+      render 'tree_display/list'
     end
-    redirect_to edit_assignment_path @assignment_form.assignment.id
+    
   end
 
   def show

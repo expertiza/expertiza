@@ -135,7 +135,16 @@ def get_courses_node_ng
       "max_team_size" => node.get_max_team_size,
       "is_intelligent" => node.get_is_intelligent,
       "require_quiz" => node.get_require_quiz,
+      "quiz_questions" => node.get_quiz_questions,
       "allow_suggestions" => node.get_allow_suggestions,
+      "spec_location" => node.get_spec_location,
+      "staggered_deadline" =>node.get_staggered_deadline,
+      "microtask" => node.get_microtask,
+      "review_visible" => node.get_review_visible,
+      "calibration" => node.get_calibration,
+      "reputation" => node.get_reputation_algorithm,
+      "teammate_review" => node.get_teammate_review,
+      "availability" => node.get_availability,
       "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
     )
   end

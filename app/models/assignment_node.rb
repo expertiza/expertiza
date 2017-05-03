@@ -133,12 +133,66 @@ class AssignmentNode < Node
     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
     @assign_node.require_quiz
   end
+  
+  # Get the number of quiz questions for the associated object
+  def get_quiz_questions
+    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+    @assign_node.num_quiz_questions
+  end
 
   # Gets the require_quiz from the associated object
   def get_allow_suggestions
     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
     @assign_node.allow_suggestions
   end
+
+   # Get the description for the associated object
+  def get_spec_location
+    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+    @assign_node.spec_location
+  end
+
+  # Get the staggered deadline for the associated object
+   def get_staggered_deadline
+     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+     @assign_node.staggered_deadline
+   end
+
+   #Get the microtask boolean for the associated object
+   def get_microtask
+     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+     @assign_node.microtask
+   end
+
+   #Get the review_visible_to_all boolean for the associated object
+   def get_review_visible
+     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+     @assign_node.reviews_visible_to_all
+   end
+
+   #Get the calibration flag for the associated object
+   def get_calibration
+     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+     @assign_node.is_calibrated
+   end
+
+   #Get the reputation_algorithm for the associated object
+   def get_reputation_algorithm
+     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+     @assign_node.reputation_algorithm
+   end
+
+   #Get the show_teammate_review flag for the associated object
+   def get_teammate_review
+     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+     @assign_node.show_teammate_reviews
+   end
+
+   #Get the availibility flag for the associated object
+   def get_availability
+     @assign_node = Assignment.find(self.node_object_id) unless @assign_node
+     @assign_node.availability_flag
+   end
 
   # Gets any TeamNodes associated with this object
   def get_teams

@@ -9,8 +9,11 @@
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id)  %>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
+<br>
+<br>
 <% if @sign_up_topics.size != 0 %>
-    <table class="general">
+    <!--E1737: Added table id and class for making it sortable.-->
+    <table id="myTable1" class="general tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
       <% i=1 %>
@@ -35,3 +38,4 @@
 
 <%= render :partial => '/sign_up_sheet/add_topics.html.erb' %>
 <a href="javascript:history.back()">Back</a>
+

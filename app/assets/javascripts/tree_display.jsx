@@ -858,7 +858,7 @@ var NewAssignmentForm = React.createClass({
         if(regex.test(e) && regex_empty.test(e))
           return true;
         else {
-          //document.getElementById("name_span").innerHTML = " ";
+          document.getElementById("name_span").innerHTML = " ";
 
           document.getElementById("directory_span").innerHTML = "&#x2716 Submission Directory cannot have special characters or spaces. It cannot be empty!";
           //alert('');
@@ -870,7 +870,8 @@ var NewAssignmentForm = React.createClass({
 
       handleCreateAssignment: function(e) {
         var that = this;
-        if(this.nameValidate(that.state.assignment_form.assignment.name && this.directoryValidate(that.state.assignment_form.assignment.directory_path)) ){
+        console.log('in createassignment');
+        if(this.nameValidate(that.state.assignment_form.assignment.name) && this.directoryValidate(that.state.assignment_form.assignment.directory_path) ){
           console.log('It worked');
         $.ajax({
           method: 'POST',
@@ -879,7 +880,8 @@ var NewAssignmentForm = React.createClass({
           },
           url: '/assignments'
         });
-        window.location.reload();}
+        window.location.reload();
+        }
       },
 
       handleGetCourses: function() {

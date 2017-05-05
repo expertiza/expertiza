@@ -1,10 +1,10 @@
 <table class="participants" width="100%">
   <% tscore[:team].participants.each_with_index do |participant, index| %>
     <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
-    <tr style="background-color: #F7DC6F">
+    <tr style="background-color: white">
       <td>
         <b> <%=participant.fullname %></b>
-        <a href="#" id="<%=prefix%>_<%=index.to_s%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_feedback','author feedbacks');return false;">show author feedbacks</a> (<%= pscore[:feedback][:assessments].size %>)
+        <FONT SIZE="-1"><a href="../grades/view_team?id=<%= participant.id%>"  >view heatgrid</a></FONT>
       </td>
     <tr id="<%=prefix%>_<%=index.to_s%>_feedback" style="display:none">
       <td>
@@ -13,3 +13,4 @@
     </tr>
   <% end %>
 </table>
+

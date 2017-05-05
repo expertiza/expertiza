@@ -52,7 +52,7 @@ class Dropdown < UnscoredQuestion
 
   def view_completed_question(count, answer)
     html = '<b>' + count.to_s + ". " + self.txt + "</b>"
-    html += '<BR>&nbsp&nbsp&nbsp&nbsp' + answer.comments.to_s + '<BR/><BR/>'
+    html += '<BR>&nbsp&nbsp&nbsp&nbsp' + answer.comments.to_s
 
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end

@@ -1,33 +1,34 @@
-module OnTheFlyCalc
+# E1731 changes: this module changed to class and its methods changed to static
+class OnTheFlyCalc
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
-  def compute_total_score(scores)
+  def self.compute_total_score(assignment, scores)
     total = 0
-    self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
+    assignment.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(assignment, scores) }
     total
   end
 
-  def compute_reviews_hash
+  def self.compute_reviews_hash(assignment)
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
-    if self.varying_rubrics_by_round?
-      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      scores_varying_rubrics
+    if assignment.varying_rubrics_by_round?
+      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', assignment.id, @response_type])
+      scores_varying_rubrics(assignment)
     else
-      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      scores_non_varying_rubrics
+      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', assignment.id, @response_type])
+      scores_non_varying_rubrics(assignment)
     end
     @review_scores
   end
 
   # calculate the avg score and score range for each reviewee(team), only for peer-review
-  def compute_avg_and_ranges_hash
+  def self.compute_avg_and_ranges_hash(assignment)
     scores = {}
-    contributors = self.contributors # assignment_teams
-    if self.varying_rubrics_by_round?
-      rounds = self.rounds_of_reviews
+    contributors = assignment.contributors # assignment_teams
+    if assignment.varying_rubrics_by_round?
+      rounds = assignment.rounds_of_reviews
       (1..rounds).each do |round|
-        review_questionnaire_id = review_questionnaire_id(round)
+        review_questionnaire_id = assignment.review_questionnaire_id(round)
         questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
         contributors.each do |contributor|
           assessments = ReviewResponseMap.get_assessments_for(contributor)
@@ -38,7 +39,7 @@ module OnTheFlyCalc
         end
       end
     else
-      review_questionnaire_id = review_questionnaire_id()
+      review_questionnaire_id = assignment.review_questionnaire_id()
       questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
       contributors.each do |contributor|
         assessments = ReviewResponseMap.get_assessments_for(contributor)
@@ -49,14 +50,15 @@ module OnTheFlyCalc
     scores
   end
 
-  def scores(questions)
-    score_assignment
-    self.teams.each do |team|
+  # While making changes for E1731, it was noticed that below method is not used anywhere and can be removed
+  def self.scores(assignment, questions)
+    score_assignment(assignment)
+    assignment.teams.each do |team|
       score_team = {}
       score_team[:team] = team
-      if self.varying_rubrics_by_round?
-        calculate_rounds
-        calculate_score
+      if assignment.varying_rubrics_by_round?
+        calculate_rounds(assignment)
+        calculate_score(assignment)
         calculate_assessment
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
@@ -70,17 +72,17 @@ end
 
 private
 
-def score_assignment
+def score_assignment(assignment)
   scores = {}
   score_team = scores[:teams][index.to_s.to_sym]
   scores[:participants] = {}
-  participant_score
+  participant_score(assignment)
   scores[:teams] = {}
   index = 0
 end
 
-def calculate_rounds
-  self.num_review_rounds.each do |i|
+def calculate_rounds(assignment)
+  assignment.num_review_rounds.each do |i|
     total_score = 0
     total_num_of_assessments = 0 # calculate grades for each rounds
     grades_by_rounds = {}
@@ -92,13 +94,13 @@ def calculate_rounds
   end
 end
 
-def calculate_score
+def calculate_score(assignment)
   score = {}
   score[:max] = -999_999_999
   score[:min] = 999_999_999
   score[:avg] = 0
   grades_by_rounds = {}
-  self.num_review_rounds.each do |i|
+  assignment.num_review_rounds.each do |i|
     round_sym = ("review" + i.to_s).to_sym
     grades_by_rounds = {}
     score[:max] = grades_by_rounds[round_sym][:max] if max_condition
@@ -114,8 +116,8 @@ def min_condition
   !round[:min].nil? && score[:min] > round[:min]
 end
 
-def participant_score
-  self.participants.each do |participant|
+def participant_score(assignment)
+  assignment.participants.each do |participant|
     scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
   end
 end
@@ -141,10 +143,10 @@ def calc_review_score
   end
 end
 
-def scores_varying_rubrics
-  rounds = self.rounds_of_reviews
+def scores_varying_rubrics(assignment)
+  rounds = assignment.rounds_of_reviews
   (1..rounds).each do |round|
-    review_questionnaire_id = review_questionnaire_id(round)
+    review_questionnaire_id = assignment.review_questionnaire_id(round)
     @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
     @response_maps.each do |response_map|
       reviewer = @review_scores[response_map.reviewer_id]
@@ -161,8 +163,8 @@ def scores_varying_rubrics
   end
 end
 
-def scores_non_varying_rubrics
-  review_questionnaire_id = review_questionnaire_id()
+def scores_non_varying_rubrics(assignment)
+  review_questionnaire_id = assignment.review_questionnaire_id()
   @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
   @response_maps.each do |response_map|
     reviewer = @review_scores[response_map.reviewer_id]

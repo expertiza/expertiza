@@ -220,6 +220,14 @@ jQuery(document).ready(function() {
                 </a>
               </span>
             )
+            // E1731: Improve Score Calculation - Adding a button which, when clicked, stores scores of that assignment in DB
+            moreContent.push(
+              <span>
+                <a title="Save scores in DB" href={"/assignments/store_scores_to_db?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/save-scores-in-db-24.png" />
+                </a>
+              </span>
+            )
             if (this.props.has_topic) {
                 // Moved content out of this to the block outside this containing "if" statement
             }

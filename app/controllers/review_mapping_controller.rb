@@ -415,8 +415,9 @@ class ReviewMappingController < ApplicationController
       @review_user = params[:user]
       # If review response is required call review_response_report method in review_response_map model
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
-      @review_scores = @assignment.compute_reviews_hash
-      @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+      # E1731 changes: compute_reviews_hash and compute_avg_and_ranges_hash are changed into static methods
+      @review_scores = OnTheFlyCalc.compute_reviews_hash(@assignment)
+      @avg_and_ranges = OnTheFlyCalc.compute_avg_and_ranges_hash(@assignment)
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?

@@ -165,7 +165,14 @@ class AssignmentTeam < Team
       scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
       scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
-    scores[:total_score] = assignment.compute_total_score(scores)
+
+    # E1731 changes: Calling either LocalDbCalc or OnTheFlyCalc based on assignment status
+    scores[:total_score] = if self.assignment.local_scores_stored?
+                             LocalDbCalc.compute_total_score(assignment)
+                           else
+                             OnTheFlyCalc.compute_total_score(assignment, scores)
+                           end
+
     scores
   end
 

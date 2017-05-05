@@ -3,13 +3,13 @@
     border: 1px solid black;
     text-align: center;
 }
-</style><div>
+</style>
   <table border="1">
     <tr>
-      <th rowspan=2 width="320">cps</th>
+      <th rowspan=2 width="320">Students</th>
       <th rowspan=2 width="30">Teammate Count</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=2 width="300"> <%= assignment.id %> </th>
+        <th colspan=2 width="300"> <%= assignment.name %> </th>
       <% end %>
       <th colspan="2" width="300">Aggregate Score</th>
     </tr>
@@ -29,8 +29,8 @@
                 <td><%= @meta_review[cp.id][assignment.id] %></td>
                 <td><%= @teammate_review[cp.id][assignment.id] %></td>
             <% end%>
-            <td><%=  @meta_review[cp.id][:avg_grade_for_assgt] %></td>
-            <td><%=  @teammate_review[cp.id][:avg_grade_for_assgt] %></td>
+            <td><%= @meta_review[cp.id][:avg_grade_for_assgt] %></td>
+            <td><%= @teammate_review[cp.id][:avg_grade_for_assgt] %></td>
         </tr>
     <%end%>
         <tr>

@@ -2,7 +2,10 @@ class Assessment360Controller < ApplicationController
   # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
 
   def action_allowed?
-    true
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
   end
 
   def index
@@ -52,117 +55,86 @@ class Assessment360Controller < ApplicationController
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated)
     @course_participants = course.get_participants
-
+    # hashes for view
     @meta_review = {}
     @teammate_review = {}
     @teamed_count = {}
-
     # for course
-    @overall_teammate_review_grades = {}
-    @overall_teammate_review_count = {}
-    @overall_meta_review_grades = {}
-    @overall_meta_review_count = {}
-
-    @assignments.each do |assignment|
-      @overall_teammate_review_grades[assignment.id] = 0
-      @overall_teammate_review_count[assignment.id] = 0
-      @overall_meta_review_grades[assignment.id] = 0
-      @overall_meta_review_count[assignment.id] = 0
+    # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
+    # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
+    %w(teammate meta).each do |type|
+      instance_variable_set("@overall_#{type}_review_grades", {})
+      instance_variable_set("@overall_#{type}_review_count", {})
     end
-
     @course_participants.each do |cp|
       # for each assignment
-      aggregrate_teammate_review_grades_per_stu = 0
-      aggregrate_meta_review_grades_per_stu = 0
-      teammate_review_count_per_stu = 0
-      meta_review_count_per_stu = 0
-
+      # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
+      %w(teammate meta).each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
-
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
         next if assignment_participant.nil?
         teammate_reviews = assignment_participant.teammate_reviews
         meta_reviews = assignment_participant.metareviews
-
-        teammate_review_grades = 0
-        if teammate_reviews.count > 0
-          teammate_reviews.each {|teammate_review| teammate_review_grades += teammate_review.get_average_score }
-          teammate_review_avg_grades = (teammate_review_grades * 1.0 / teammate_reviews.count).round
-          @teammate_review[cp.id][assignment.id] = teammate_review_avg_grades.to_s + '%'
-        end
-
-        if teammate_review_grades > 0
-          # for each assignment
-          aggregrate_teammate_review_grades_per_stu += teammate_review_avg_grades
-          teammate_review_count_per_stu += 1
-        end
-
-        meta_review_grades = 0
-        if meta_reviews.count > 0
-          meta_reviews.each {|meta_review| meta_review_grades += meta_review.get_average_score }
-          meta_review_avg_grades = (meta_review_grades * 1.0 / meta_reviews.count).round
-          @meta_review[cp.id][assignment.id] = meta_review_avg_grades.to_s + '%'
-        end
-
-        if meta_review_grades > 0
-          # for each assignment
-          aggregrate_meta_review_grades_per_stu += meta_review_avg_grades
-          meta_review_count_per_stu += 1
-        end
-        # for course
-        if teammate_review_avg_grades
-          @overall_teammate_review_grades[assignment.id] += teammate_review_avg_grades
-          @overall_teammate_review_count[assignment.id] += 1
-        end
-        if meta_review_avg_grades
-          @overall_meta_review_grades[assignment.id] += meta_review_avg_grades
-          @overall_meta_review_count[assignment.id] += 1
-        end
+        populate_hash_for_all_students_all_reviews(assignment,
+                                                   cp,
+                                                   teammate_reviews,
+                                                   @teammate_review,
+                                                   @overall_teammate_review_grades,
+                                                   @overall_teammate_review_count,
+                                                   @teammate_review_info_per_stu)
+        populate_hash_for_all_students_all_reviews(assignment,
+                                                   cp,
+                                                   meta_reviews,
+                                                   @meta_review,
+                                                   @overall_meta_review_grades,
+                                                   @overall_meta_review_count,
+                                                   @meta_review_info_per_stu)
       end
-      if meta_review_count_per_stu > 0
-        temp_avg_grade = aggregrate_meta_review_grades_per_stu * 1.0 / meta_review_count_per_stu
-        @meta_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
-      end
-      if teammate_review_count_per_stu > 0
-        temp_avg_grade = aggregrate_teammate_review_grades_per_stu * 1.0 / teammate_review_count_per_stu
+      # calculate average grade for each student on all assignments in this course
+      if @teammate_review_info_per_stu[1] > 0
+        temp_avg_grade = @teammate_review_info_per_stu[0] * 1.0 / @teammate_review_info_per_stu[1]
         @teammate_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
       end
+      if @meta_review_info_per_stu[1] > 0
+        temp_avg_grade = @meta_review_info_per_stu[0] * 1.0 / @meta_review_info_per_stu[1]
+        @meta_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
+      end
     end
-
     # avoid divide by zero error
     @assignments.each do |assignment|
-      @overall_teammate_review_count[assignment.id] = 1 if @overall_teammate_review_count[assignment.id].zero?
-      @overall_meta_review_count[assignment.id] = 1 if @overall_meta_review_count[assignment.id].zero?
+      temp_count = @overall_teammate_review_count[assignment.id]
+      @overall_teammate_review_count[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
+      temp_count = @overall_meta_review_count[assignment.id]
+      @overall_meta_review_count[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
     end
   end
 
-  def one_assignment_one_student
-    @assignment = Assignment.find(params[:assignment_id])
-    @participant = AssignmentParticipant.find_by_user_id(params[:user_id])
-    @questionnaires = @assignment.questionnaires
-    bar_1_data = [@participant.average_score]
-    bar_2_data = [@assignment.get_average_score]
-    color_1 = 'c53711'
-    color_2 = '0000ff'
-    min = 0
-    max = 100
-
-    GoogleChart::BarChart.new("500x100", " ", :horizontal, false) do |bc|
-      bc.data " ", [100], 'ffffff'
-      bc.data "Student", bar_1_data, color_1
-      bc.data "Class Average", bar_2_data, color_2
-      bc.axis :x, range: [min, max]
-      bc.show_legend = true
-      bc.stacked = false
-      bc.data_encoding = :extended
-      @bc = bc.to_url
+  def populate_hash_for_all_students_all_reviews(assignment,
+                                                 course_participant,
+                                                 reviews,
+                                                 hash_per_stu,
+                                                 overall_review_grade_hash,
+                                                 overall_review_count_hash,
+                                                 review_info_per_stu)
+    overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
+    overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
+    grades = 0
+    if reviews.count > 0
+      reviews.each {|review| grades += review.get_average_score }
+      avg_grades = (grades * 1.0 / reviews.count).round
+      hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end
-  end
-
-  def all_assignments_one_student
+    if avg_grades and grades > 0
+      # for each assignment
+      review_info_per_stu[0] += avg_grades
+      review_info_per_stu[1] += 1
+      # for course
+      overall_review_grade_hash[assignment.id] += avg_grades
+      overall_review_count_hash[assignment.id] += 1
+    end
   end
 end

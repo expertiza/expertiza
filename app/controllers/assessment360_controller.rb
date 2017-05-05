@@ -53,8 +53,12 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated)
+    @assignments = course.assignments.reject(&:is_calibrated).select{|a| a.participants.size > 0}
     @course_participants = course.get_participants
+    if @course_participants.empty?
+      flash[:error] = "There is no course participant in course #{course.name}"
+      redirect_to(:back) 
+    end
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
@@ -124,7 +128,7 @@ class Assessment360Controller < ApplicationController
     overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
     grades = 0
     if reviews.count > 0
-      reviews.each {|review| grades += review.get_average_score }
+      reviews.each {|review| grades += review.get_average_score.to_i }
       avg_grades = (grades * 1.0 / reviews.count).round
       hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end

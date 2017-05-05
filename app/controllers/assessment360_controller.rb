@@ -8,56 +8,15 @@ class Assessment360Controller < ApplicationController
      'Teaching Assistant'].include? current_role_name
   end
 
-  def index
-    @courses = Course.where(instructor_id: session[:user].id)
-    @instructor_id = session[:user].id
-    @instructor = User.find(@instructor_id)
-  end
-
-  def one_course_all_assignments
-    @review_types = %w(TeamReviewResponseMap FeedbackResponseMap TeammateReviewResponseMap MetareviewResponseMap)
-    @course = Course.find(params[:course_id])
-    @assignments = @course.assignments.reject(&:is_calibrated)
-  end
-
-  def all_assignments_all_students
-    @course = Course.find(params[:course_id])
-    @assignments = Assignment.where(course_id: @course)
-  end
-
-  def one_assignment_all_students
-    @assignment = Assignment.find(params[:assignment_id])
-    @participants = @assignment.participants
-
-    @bc = {}
-    @participants.each do |participant|
-      @questionnaires = @assignment.questionnaires
-      bar_1_data = [participant.average_score * 20]
-      color_1 = 'c53711'
-      min = 0
-      max = 100
-
-      GoogleChart::BarChart.new("300x40", " ", :horizontal, false) do |bc|
-        bc.data " ", [100], 'ffffff'
-        bc.data "Student", bar_1_data, color_1
-        bc.axis :x, range: [min, max]
-        bc.show_legend = false
-        bc.stacked = false
-        bc.data_encoding = :extended
-        @bc[participant.user.id] = bc.to_url
-      end
-    end
-  end
-
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).select{|a| a.participants.size > 0}
+    @assignments = course.assignments.reject(&:is_calibrated).select {|a| !a.participants.empty? }
     @course_participants = course.get_participants
     if @course_participants.empty?
       flash[:error] = "There is no course participant in course #{course.name}"
-      redirect_to(:back) 
+      redirect_to(:back)
     end
     # hashes for view
     @meta_review = {}

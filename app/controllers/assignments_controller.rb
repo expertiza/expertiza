@@ -142,9 +142,9 @@ class AssignmentsController < ApplicationController
       current_user.timezonepref = parent_timezone
     end
     if @assignment_form.update_attributes(assignment_form_params, current_user)
-      flash[:note] = 'The assignment was successfully saved.'
+      flash[:note] = 'The assignment was successfully saved....'
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
@@ -230,7 +230,7 @@ class AssignmentsController < ApplicationController
     #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
 
-  def scheduled_tasks
+  def delayed_mailer
     @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
   end
@@ -251,10 +251,10 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
-  def delete_scheduled_task
+  def delete_delayed_mailer
     @delayed_job = DelayedJob.find(params[:delayed_job_id])
     @delayed_job.delete
-    redirect_to scheduled_tasks_assignments_index_path params[:id]
+    redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
   # check whether rubrics are set before save assignment

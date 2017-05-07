@@ -13,6 +13,7 @@ class AssignmentForm
       @assignment.instructor = @assignment.course.instructor if @assignment.course
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
+    @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
   end
@@ -36,8 +37,8 @@ class AssignmentForm
       attributes[:assignment][:late_policy_id] = nil
     end
     update_assignment(attributes[:assignment])
-    update_assignment_questionnaires(attributes[:assignment_questionnaire])
-    update_due_dates(attributes[:due_date], user)
+    update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
+    update_due_dates(attributes[:due_date], user) unless @has_errors
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
@@ -51,9 +52,11 @@ class AssignmentForm
   # Code to update values of assignment
   def update_assignment(attributes)
     unless @assignment.update_attributes(attributes)
-      @errors += @assignment.errors
+      @errors = @assignment.errors
       @has_errors = true
     end
+    @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
+    @assignment.num_reviews = @assignment.num_reviews_allowed
   end
 
   # code to save assignment questionnaires
@@ -65,13 +68,13 @@ class AssignmentForm
       if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
         aq = AssignmentQuestionnaire.new(assignment_questionnaire)
         unless aq.save
-          @errors += @assignment.errors
+          @errors = @assignment.errors
           @has_errors = true
         end
       else
         aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
         unless aq.update_attributes(assignment_questionnaire)
-          @errors += @assignment.errors
+          @errors = @assignment.errors
           @has_errors = true
         end
       end
@@ -119,20 +122,20 @@ class AssignmentForm
       # diff = 1
       # mi = 2
       next unless diff > 0
-      dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
+      dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                               1, diff.minutes.from_now)
       change_item_type(dj.id)
       due_date.update_attribute(:delayed_job_id, dj.id)
 
       # If the deadline type is review, add a delayed job to drop outstanding review
       if deadline_type == "review"
-        dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
+        dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
                                 1, mi.minutes.from_now)
         change_item_type(dj.id)
       end
       # If the deadline type is team_formation, add a delayed job to drop one member team
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
-      dj = DelayedJob.enqueue(ScheduledTask.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
+      dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
                               1, mi.minutes.from_now)
       change_item_type(dj.id)
     end
@@ -149,7 +152,7 @@ class AssignmentForm
   # Change the item_type displayed in the log
   def change_item_type(delayed_job_id)
     log = Version.where(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: delayed_job_id).first
-    log.update_attribute(:item_type, "ScheduledTask") # Change the item type in the log
+    log.update_attribute(:item_type, "DelayedMailer") # Change the item type in the log
   end
 
   def delete(force = nil)

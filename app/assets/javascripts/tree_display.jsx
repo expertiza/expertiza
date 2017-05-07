@@ -108,9 +108,6 @@ jQuery(document).ready(function() {
                 <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
                   <img src="/assets/tree_view/create-teams-24.png" />
                 </a>
-                <a title="360 degree assessment dashboad" href={"/assessment360/one_course_all_assignments?course_id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/360-dashboard-24.png" />
-                </a>
                 <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
                 </a>
@@ -218,8 +215,8 @@ jQuery(document).ready(function() {
             // if ends
             moreContent.push(
               <span>
-                <a title="View delayed jobs" href={"/assignments/scheduled_tasks?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-scheduled-tasks.png" />
+                <a title="View delayed jobs" href={"/assignments/delayed_mailer?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/view-delayed-mailer.png" />
                 </a>
               </span>
             )
@@ -1159,7 +1156,7 @@ jQuery(document).ready(function() {
                     '/assets/tree_view/view-scores-24.png',
                     '/assets/tree_view/view-review-report-24.png',
                     '/assets/tree_view/view-suggestion-24.png',
-                    '/assets/tree_view/view-scheduled-tasks.png',
+                    '/assets/tree_view/view-delayed-mailer.png',
                     '/assets/tree_view/view-publish-rights-24.png'
                     )
       jQuery.get("/tree_display/session_last_open_tab", function(data) {

@@ -75,7 +75,6 @@ describe User do
       create(:admin)
       allow(instructor).to receive(:can_impersonate?) { true }
       allow(instructor).to receive(:can_impersonate?).with(admin) { false }
-
       @users = instructor.get_user_list(1, nil)
       expect(@users.size).to eq(2)
     end
@@ -86,10 +85,8 @@ describe User do
       create(:student)
       create(:admin)
       allow(super_admin).to receive(:can_impersonate?) { true }
-
       @users = super_admin.get_user_list(1, 25)
       expect(@users.size).to eq(4)
     end
-
   end
 end

@@ -79,19 +79,17 @@ class User < ActiveRecord::Base
     # If the user is an instructor, fetch all users in his course/assignment
     elsif self.role.instructor? || self.role.ta? || self.role.admin?
       User.find_each do |user|
-        if self.can_impersonate?(user)
-          user_list << user
-        end
+        user_list << user if self.can_impersonate?(user)
       end
     end
 
-    #If per-page option is not defined display default 25 per page
+    # If per-page option is not defined display default 25 per page
     if per_page.nil?
       user_list = user_list.paginate(page: page_num, per_page: 25)
-    #If per-page option is All, then do not paginate
+    # If per-page option is All, then do not paginate
     elsif per_page == "All"
       user_list
-    #else paginate as per paer-page option
+    # else paginate as per paer-page option
     else
       user_list = user_list.paginate(page: page_num, per_page: per_page)
     end

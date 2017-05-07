@@ -65,18 +65,16 @@ describe User do
       user.email = 'a@x.com'
       expect(user).to be_valid
     end
-
   end
 
-  #These methods test get_user_list
+  # These methods test get_user_list
   describe "#get_user_list" do
-
     it "returns the list of all users for an instructor" do
       instructor = create(:instructor)
-      student = create(:student)
-      admin = create(:admin)
-      allow(instructor).to receive(:can_impersonate?) {true}
-      allow(instructor).to receive(:can_impersonate?).with(admin) {false}
+      create(:student)
+      create(:admin)
+      allow(instructor).to receive(:can_impersonate?) { true }
+      allow(instructor).to receive(:can_impersonate?).with(admin) { false }
 
       @users = instructor.get_user_list(1, nil)
       expect(@users.size).to eq(2)
@@ -84,10 +82,10 @@ describe User do
 
     it "returns the list of all users for a super-admin" do
       super_admin = create(:super_admin)
-      instructor = create(:instructor)
-      student = create(:student)
-      admin = create(:admin)
-      allow(super_admin).to receive(:can_impersonate?) {true}
+      create(:instructor)
+      create(:student)
+      create(:admin)
+      allow(super_admin).to receive(:can_impersonate?) { true }
 
       @users = super_admin.get_user_list(1, 25)
       expect(@users.size).to eq(4)

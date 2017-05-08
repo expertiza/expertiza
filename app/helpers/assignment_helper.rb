@@ -136,12 +136,12 @@ module AssignmentHelper
     topic = SignedUpTeam.where(team_id: team.id).first.try :topic
     topic_identifier = topic.try :topic_identifier 
     topic_name = topic.try :topic_name
-    users_for_curr_team = "" 
+    users_for_curr_team = []
     participants = []
     teams_users.each do |teams_user| 
-      user = User.find(teams_user.user_id) 
-      users_for_curr_team += user.name + ' (' + user.fullname + ')' + '<br/>' 
-      participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first 
+      user = User.find(teams_user.user_id)
+      users_for_curr_team << user
+      participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first
     end 
     [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
   end

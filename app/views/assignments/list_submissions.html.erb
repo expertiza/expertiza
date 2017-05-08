@@ -31,7 +31,12 @@
       	<% end %>
 
         <!--Team member(s) / Participant name-->
-      	<td bgcolor= <%= bgcolor %>><%= users_for_curr_team.html_safe %></td>
+          <td bgcolor= <%= bgcolor %>>
+              <% users_for_curr_team.each do |user| %>
+                  <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
+                                (<%= link_to user.fullname, :controller => :users, :action => 'show', :id => user.id %>) <br>
+              <% end %>
+          </td>
 
         <!--Submitted item(s)-->
       	<td bgcolor= <%= bgcolor %>>

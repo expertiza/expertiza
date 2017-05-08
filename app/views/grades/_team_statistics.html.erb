@@ -5,7 +5,7 @@
     </td>
   </tr>
 <% participant = tscore[:team].participants.first %>
-  <%= render :partial => 'grades/team_review_statistics_table',
+  <%= render :partial => 'grades/team_review_statistics',
              :locals => {:prefix => prefix+"_1",
                          :team => true,
                          :participant_id => participant.id,

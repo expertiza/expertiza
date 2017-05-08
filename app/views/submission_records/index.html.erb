@@ -20,7 +20,10 @@
         <td><%= record.user %></td>
 
         <% if record.operation == "Submit Hyperlink" %>
-        <td><a href="<%= record.content %>" target="_blank"><%= record.content %></a><br/></td>
+        <td>
+          <a href="<%= record.content %>" target="_blank"><%= record.content %></a><br/>
+          <a href="<%= github_contributors_show_path(id: record.id) %>">View Github Metrics</a>
+        </td>
 
         <% else %>
             <td><%= record.content %></td>

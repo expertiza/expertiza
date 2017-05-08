@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170404122028) do
+ActiveRecord::Schema.define(version: 20170508205852) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -643,6 +643,14 @@ ActiveRecord::Schema.define(version: 20170404122028) do
     t.string  "name",       limit: 255
     t.string  "child_type", limit: 255
     t.integer "parent_id",  limit: 4
+  end
+
+  create_table "user_pastebins", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "short_form", limit: 255
+    t.text     "long_form",  limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "users", force: :cascade do |t|

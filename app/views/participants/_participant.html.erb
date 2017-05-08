@@ -4,7 +4,7 @@
   <% if participant.instance_of? AssignmentParticipant%>
       <% team = Team.get_team(participant) %>
       <td>
-    <% if Team.first_sub(TeamsUser.team_id(participant.assignment.id, participant.user_id), participant.assignment.id) %>
+    <% if Team.first_submission(TeamsUser.team_id(participant.assignment.id, participant.user_id), participant.assignment.id) %>
       <img src="/assets/firstsubmissionrs.png" title="First Submission">
     <% end %>
 

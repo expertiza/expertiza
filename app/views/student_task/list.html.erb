@@ -110,7 +110,7 @@
 
           <% team = Team.get_team(participant) %>
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></br>
-            <% if Team.first_sub(teamid, participant.assignment.id) %>
+            <% if Team.first_submission(teamid, participant.assignment.id) %>
                 <img src="/assets/firstsubmissionrs.png" title="First Submission"></td>
             <% end %>
             <% if (!team.nil?) && team.t_rev_avg > 95 %>

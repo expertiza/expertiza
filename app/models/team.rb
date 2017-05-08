@@ -76,7 +76,7 @@ class Team < ActiveRecord::Base
   end
 
   # Check if team was first submitter on assignment
-  def self.first_sub(team_id, assignment_id)
+  def self.first_submission(team_id, assignment_id)
     team_id == Assignment.find(assignment_id).first_sub_teamid
   end
 

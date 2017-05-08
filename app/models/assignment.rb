@@ -622,8 +622,8 @@ class Assignment < ActiveRecord::Base
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
 
-  def self.first_submission_reward(ass_id, team_id)
-    assignment = Assignment.find(ass_id)
+  def self.first_submission_reward(assgt_id, team_id)
+    assignment = Assignment.find(assgt_id)
     if !assignment.nil? && assignment.first_sub_teamid == -1
       assignment.first_sub_teamid = team_id
       assignment.save

@@ -72,7 +72,7 @@ describe User do
     it "returns the list of all users for an instructor" do
       instructor = create(:instructor)
       create(:student)
-      create(:admin)
+      admin = create(:admin)
       allow(instructor).to receive(:can_impersonate?) { true }
       allow(instructor).to receive(:can_impersonate?).with(admin) { false }
       @users = instructor.get_user_list(1, nil)

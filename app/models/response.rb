@@ -34,19 +34,24 @@ class Response < ActiveRecord::Base
     end
     if prefix # has prefix means view_score page in instructor end
       identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
-      identifier += "<B>Reviewer: </B>" + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
-      str = prefix + "_" + self.id.to_s
+      identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
+      str = prefix + '_' + self.id.to_s
+      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' +
+          "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
     else # in student end
-      identifier += '<B>Review ' + count.to_s + '</B>'
+      # identifier += '<B>Review ' + count.to_s + ' Round ' + self.round.to_s + '</B>'
       str = self.id.to_s
+      identifier += '<table width="100%">'\
+                    '<tr>'\
+                    '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
+                    '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'\
+                    '</td>'\
+                    '<td align="left"><b>Last Reviewed:</b>'\
+                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+                    '</tr></table>'
+      code = identifier
     end
-    code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
-    code += "<B>Last reviewed: </B> "
-    code += if self.updated_at.nil?
-              "Not available"
-            else
-              self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
-            end
+
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
     count = 0
     answers = Answer.where(response_id: self.response_id)
@@ -79,9 +84,9 @@ class Response < ActiveRecord::Base
                 else
                   ''
                 end
-      code += "<tr><td><B>Additional Comment: </B>" + comment + '</td></tr>'
+      code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
     end
-    code += "</table>"
+    code += '</table>'
     code.html_safe
   end
 

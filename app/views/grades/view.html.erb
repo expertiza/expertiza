@@ -1,10 +1,10 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
 <% if @scores[:teams] %>
-	<a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
     <BR/><BR/>
 <% end %>
-<!-- If there are no teams, the Teammate Review column should not appear in the score report.
+<!-- If there are 1-member teams, the Teammate Review column should not appear in the score report.
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
 <TABLE class="grades" width="100%">
   <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
@@ -21,6 +21,3 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
             :model=>'Assignment',
             :id=>@assignment.id %> <BR/><BR/>
 <a href="javascript:window.history.back()">Back</a>
-
-
-

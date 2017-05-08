@@ -23,7 +23,7 @@ class Response < ActiveRecord::Base
     reviewer.team.has_user user
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil, feedback_html = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -41,26 +41,18 @@ class Response < ActiveRecord::Base
     else # in student end
       # identifier += '<B>Review ' + count.to_s + ' Round ' + self.round.to_s + '</B>'
       str = self.id.to_s
-      identifier += '<B>'
-      identifier += '<table width="100%">'
-      identifier += '<tr>'
-      identifier += '<td align="left" width="30%">' + 'Review ' + count.to_s + '</td>'
-      identifier += '<td align="center" width="30%">' + (self.round ? 'Round ' + self.round.to_s : '') + '</td>'
-      identifier += '<td align="right" width="30%">' + 'Last Reviewed: '
-      identifier += "<span style=\"font-weight:normal;\">#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span>"
-      identifier += '</td>'
-      identifier += '<td align="center" width="10%">'
-      identifier += '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'
-      identifier += '</td>'
-      identifier += '</tr>'
-      identifier += '</table>'
-      identifier += '</B>'
+      identifier += '<table width="100%">'\
+                    '<tr>'\
+                    '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
+                    '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'\
+                    '</td>'\
+                    '<td align="left"><b>Last Reviewed:</b>'\
+                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+                    '</tr></table>'
       code = identifier
     end
 
-    code += '<div id="review_' + str + '" style="display: none;">'
-    code += feedback_html if feedback_html
-    code += '<table class="table table-bordered" style="margin-bottom: 1px;">'
+    code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
     count = 0
     answers = Answer.where(response_id: self.response_id)
 
@@ -92,11 +84,9 @@ class Response < ActiveRecord::Base
                 else
                   ''
                 end
-      code += '<tr><td><B>Additional Comment: </B>' + comment + '</td></tr>'
+      code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
     end
     code += '</table>'
-    code += feedback_html if feedback_html
-    code += '</div>'
     code.html_safe
   end
 

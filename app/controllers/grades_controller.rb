@@ -38,9 +38,6 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires
-    if :nameString != nil
-      filter :nameString
-    end
 
     if @assignment.varying_rubrics_by_round?
       retrieve_questions questionnaires
@@ -203,12 +200,6 @@ class GradesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'grades', action: 'view_team', id: params[:participant_id]
-  end
-
-  def filter(string)
-    #TODO: remove testing hard coded value
-    sql_query = "select sub.* from (select t1.* from teams t1, teams_users tu, users u where t1.id = tu.team_id and tu.user_id = u.id and u.name like '6370' union select t2.* from teams t2 where t2.name like '6370') as sub" #+ :nameString
-    @teams = Team.find_by_sql(sql_query)
   end
 
   private
@@ -375,5 +366,4 @@ class GradesController < ApplicationController
     variance = array.inject(0) {|variance, x| variance += (x - m)**2 }
     [m, Math.sqrt(variance/(array.size-1))]
   end
-
 end

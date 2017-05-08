@@ -49,7 +49,7 @@
                     <% feedback_html += link_to 'Give feedback', :controller => 'response', :action => 'new_feedback', :id => review.id %>
                     <% feedback_html += ' for Review ' + count.to_s %>
                 <% end %>
-                <%= review.display_as_html(prefix, index + 1, nil, feedback_html) %>
+                <%= review.display_as_html(prefix, index + 1, nil) %>
                 </td></tr>
             <% end %>
         </table><hr>

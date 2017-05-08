@@ -88,5 +88,14 @@ describe User do
       @users = super_admin.get_user_list(1, 25)
       expect(@users.size).to eq(4)
     end
+
+    it "returns the empty users list for an instructor" do
+      instructor = create(:instructor)
+      create(:student)
+      create(:admin)
+      allow(instructor).to receive(:can_impersonate?) { false }
+      @users = instructor.get_user_list(1, 100)
+      expect(@users.size).to eq(0)
+    end
   end
 end

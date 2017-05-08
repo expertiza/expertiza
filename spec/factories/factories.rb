@@ -93,23 +93,11 @@ FactoryGirl.define do
   factory :super_admin, class: User do
     sequence(:name) {|n| "super_admin#{n}" }
     role { Role.where(name: 'Super-Administrator').first || association(:role_of_super_admin) }
-    password "password"
-    password_confirmation "password"
+    password "passwordone"
+    password_confirmation "passwordone"
     sequence(:fullname) {|n| "#{n}, super_administrator" }
-    email "expertiza@mailinator.com"
-    parent_id 1
-    private_by_default  false
-    mru_directory_path  nil
-    email_on_review true
-    email_on_submission true
-    email_on_review_of_review true
-    is_new_user false
-    master_permission_granted 0
-    handle "handle"
-    digital_certificate nil
-    timezonepref nil
-    public_key nil
-    copy_of_emails  false
+    email "expertizaone@mailinator.com"
+    parent_id 2
   end
 
   factory :course, class: Course do

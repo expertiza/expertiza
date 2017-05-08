@@ -1,4 +1,5 @@
 class StudentReviewController < ApplicationController
+  before_action: calculate_percentages(record_id), only:[:show, :edit, :update]
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -65,8 +66,10 @@ class StudentReviewController < ApplicationController
     suggestive_count = [0, 0, 0, 0, 0, 0]
     problem_count = [0, 0, 0, 0, 0, 0]
     offensive_count = [0, 0, 0, 0, 0, 0]
+    end
 
-    review_maps.each do |my_assignment|
+    def calculate(review_maps)
+      review_maps.each do |my_assignment|
       my_responses = Response.where(map_id: my_assignment.id)
       my_responses.each do |each_response|
         response_count[each_response.round - 1] += 1

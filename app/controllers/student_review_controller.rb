@@ -88,7 +88,5 @@ class StudentReviewController < ApplicationController
         keys[i][3] = (offensive_count[i] / response_count[i]) * 100
       end
     end
-
-    return keys
   end
 end

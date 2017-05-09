@@ -1,11 +1,12 @@
 Expertiza::Application.routes.draw do
 
-  resources :popup
+  resources :user_pastebins
   resources :track_notifications
   resources :notifications
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
+  post 'impersonate/impersonate', to: 'impersonate#impersonate'
 
   resources :bookmarks do
     collection do
@@ -58,9 +59,9 @@ Expertiza::Application.routes.draw do
       get :associate_assignment_with_course
       get :copy
       get :toggle_access
-      get :scheduled_tasks
+      get :delayed_mailer
       get :list_submissions
-      get :delete_scheduled_task
+      get :delete_delayed_mailer
       get :remove_assignment_from_course
     end
   end

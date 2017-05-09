@@ -1,0 +1,35 @@
+<% [:metrics].each do |type| %>
+
+    <%# if (flash_message type) != nil %>
+      <%= "This is in student_review/flash_metric_messages.html.erb.  We can setup the display for review metrics here." %><br><br>
+        <%= @responses.count %>
+      <% @record.each do |records| %>
+        <% my_review_record = @review_record.where(responses_id: records.id) %>
+        <table border = "2">
+          <tr>
+            <th align = 'center' > <%= " Map ID " %> </th>
+            <th align = 'center' > <%= " Response ID " %> </th>
+            <th align = 'center' > <%= " Assignment " %> </th>
+            <th align = 'center' > <%= " Round " %> </th>
+            <% my_review_record.each do |review| %>
+                <th align = 'center' > <%= @review_metrics[review.review_metrics_id.to_int-1].metric %> </th>
+            <% end %>
+          </tr>
+
+          <tr>
+            <td align = 'center' > <%= records.map_id %> </td>
+            <td align = 'center' > <%= records.id %> </td>
+            <% assignment = @map.where(id: records.map_id) %>
+            <td align = 'center' > <%= assignment[0].reviewed_object_id %> </td>
+            <td align = 'center' > <%= records.round %> </td>
+            <% unless my_review_record[0].nil? %>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[0].value %> <%= '/' %> <%= number_with_precision(@percentages[records.round-1][0]) %> </td>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[1].value %> <%= '/' %> <%= number_to_percentage(@percentages[records.round-1][1]) %> </td>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[2].value %> <%= '/' %> <%= number_to_percentage(@percentages[records.round-1][2]) %> </td>
+              <td align = 'center' > <%= 'Total' %> <%= '/' %> <%= 'Average' %> <br> <%= my_review_record[3].value %> <%= '/' %> <%= number_to_percentage(@percentages[records.round-1][3]) %> </td>
+            <% end %>
+          </tr>
+        </table><br>
+      <% end %>
+    <%# end %>
+<% end %>

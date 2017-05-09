@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :popup
   resources :track_notifications
   resources :notifications
   resources :submission_records

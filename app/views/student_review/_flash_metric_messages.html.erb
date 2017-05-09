@@ -1,6 +1,8 @@
 <% [:metrics].each do |type| %>
 
     <% if (flash_message type) != nil %>
+      <%= "This is in student_review/flash_metric_messages.html.erb.  We can setup the display for review metrics here." %><br><br>
+
       <% @record.each do |records| %>
         <% my_review_record = @review_record.where(responses_id: records.id) %>
         <table border = "2">

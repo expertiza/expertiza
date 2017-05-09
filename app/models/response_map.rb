@@ -3,7 +3,7 @@ class ResponseMap < ActiveRecord::Base
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
 
   include PublicActivity::Model
-  tracked owner: ->(controller, model) { controller && controller.current_user }
+  tracked owner: ->(controller, _model) { controller && controller.current_user }
   
   def map_id
     id

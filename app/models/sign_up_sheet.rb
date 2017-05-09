@@ -1,7 +1,7 @@
 class SignUpSheet < ActiveRecord::Base
   # Team lazy initialization method [zhewei, 06/27/2015]
   include PublicActivity::Model
-  tracked owner: ->(controller, model) { controller && controller.current_user }
+  tracked owner: ->(controller, _model) { controller && controller.current_user }
   
   def self.signup_team(assignment_id, user_id, topic_id = nil)
     users_team = SignedUpTeam.find_team_users(assignment_id, user_id)

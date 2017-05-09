@@ -3,7 +3,7 @@ class Invitation < ActiveRecord::Base
   belongs_to :from_user, class_name: "User", foreign_key: "from_id"
 
   include PublicActivity::Model
-  tracked owner: ->(controller, model) { controller && controller.current_user }
+  tracked owner: ->(controller, _model) { controller && controller.current_user }
 
   def self.remove_waitlists_for_team(topic_id, _assignment_id)
     first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted:  true).first

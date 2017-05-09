@@ -11,7 +11,7 @@ class Participant < ActiveRecord::Base
   has_one :review_grade
 
   include PublicActivity::Model
-  tracked except: :update, owner: ->(controller, model) { controller && controller.current_user }
+  tracked except: :update, owner: ->(controller, _model) { controller && controller.current_user }
 
   PARTICIPANT_TYPES = ['Course', 'Assignment']
 

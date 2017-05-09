@@ -6,7 +6,8 @@ class PopupController < ApplicationController
      'Teaching Assistant'].include? current_role_name
   end
 
-  def index
+  # this can be called from "response_report" by clicking on the View Metrics.
+  def view_review_metrics_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     #@metrics = ReviewMetric.calculate_metrics_for_instructor(@assignment_id, @reviewerid)

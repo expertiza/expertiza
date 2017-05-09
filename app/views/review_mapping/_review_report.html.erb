@@ -69,7 +69,7 @@
                 <% if index == 0 %>
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-                    <%= link_to "View Review Metrics", popup_index_path(:reviewer_id => r.id, :assignment_id=>@id) %>
+                    <%= link_to "View Review Metrics", :controller => 'popup', :action => 'view_review_metrics_popup', :reviewer_id => r.id, :assignment_id=>@id %>
                   </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

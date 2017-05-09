@@ -441,6 +441,20 @@ ActiveRecord::Schema.define(version: 20170508205852) do
 
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
+  create_table "review_metric_mappings", force: :cascade do |t|
+    t.integer  "value",             limit: 4
+    t.integer  "review_metrics_id", limit: 4
+    t.integer  "responses_id",      limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  create_table "review_metrics", force: :cascade do |t|
+    t.string   "metric",     limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255, default: "", null: false
     t.integer  "parent_id",       limit: 4

@@ -70,7 +70,7 @@
                 <% if index == 0 %>
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
-                    <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                    <%= link_to "View Review Metrics", :controller => 'popup', :action => 'view_review_metrics_popup', :reviewer_id => r.id, :assignment_id=>@id %>
                   </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

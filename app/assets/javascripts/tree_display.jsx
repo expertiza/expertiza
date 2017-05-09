@@ -108,9 +108,6 @@ jQuery(document).ready(function() {
                 <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
                   <img src="/assets/tree_view/create-teams-24.png" />
                 </a>
-                <a title="360 degree assessment dashboad" href={"/assessment360/one_course_all_assignments?course_id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/360-dashboard-24.png" />
-                </a>
                 <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
                 </a>

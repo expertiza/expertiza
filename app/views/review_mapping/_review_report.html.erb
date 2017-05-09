@@ -26,10 +26,11 @@
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
         <%if r.id != -1 %>
-          <% username = Participant.find(r.id).user.fullname %>
+          <% user = Participant.find(r.id).user %>
             <!--reviewer-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%>>
-              <%= link_to username, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id%>
+              <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
+              (<%= user.fullname %>)
             </td>
             <!--# reviews done-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

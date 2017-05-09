@@ -17,12 +17,6 @@ FactoryGirl.define do
     description ""
   end
 
-  factory :role_of_super_admin, class: Role do
-    name "Super-Administrator"
-    parent_id nil
-    description ""
-  end
-
   factory :admin, class: User do
     sequence(:name) {|n| "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
@@ -88,16 +82,6 @@ FactoryGirl.define do
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails  false
-  end
-
-  factory :super_admin, class: User do
-    sequence(:name) {|n| "super_admin#{n}" }
-    role { Role.where(name: 'Super-Administrator').first || association(:role_of_super_admin) }
-    password "passwordone"
-    password_confirmation "passwordone"
-    sequence(:fullname) {|n| "#{n}, super_administrator" }
-    email "expertizaone@mailinator.com"
-    parent_id 2
   end
 
   factory :course, class: Course do

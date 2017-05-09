@@ -1,9 +1,9 @@
 <% userid << participant.user_id %>
 <tr class= "exp">
   <td ><%= link_to User.find(participant.user_id).name, impersonate_impersonate_path(:user => {:name => User.find(participant.user_id).name}), :method => :post %></td>
-  <td ><%= link_to User.find(participant.user_id).fullname, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
-  <td><a href="mailto: <%= User.find(participant.user_id).email %>"><%= User.find(participant.user_id).email %></a></td>
-  <td ><%= link_to User.find(participant.user_id).role.name, :controller => 'roles', :action => 'show', :id => User.find(participant.user_id).role.id %></td>
+  <td ><%= User.find(participant.user_id).fullname %></td>
+  <td><%= User.find(participant.user_id).email %></td>
+  <td ><%= User.find(participant.user_id).role.name %></td>
   <td  align="center"><%= (User.find(User.find(participant.user_id).parent_id)).name %></td>
   <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_review) %></td>
   <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_submission) %></td>

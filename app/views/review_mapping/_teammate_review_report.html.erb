@@ -1,7 +1,6 @@
 <%= create_report_table_header("Reviewer" => "16%",
                                "# teammate reviews done" => "14%",
-                               "Teammate reviewed (userid)" => "20%",
-                               "Teammate reviewed (user name)" => "20%",
+                               "Teammate reviewed" => "20%",
                                "Last reviewed at" => "20%") %>
     <%@l = -1 %>
     <% @reviewers.each do |r| %>
@@ -44,15 +43,11 @@
             <% map_id = rm.id %>
             <% @teammate_review_response = Response.where(map_id: map_id).first %>
             <% if !@teammate_review_response.blank? %>
-              <% @reviewee = Participant.find(rm.reviewee_id) %>
-              <% @reviewee_id = User.find(@reviewee.user_id).name%>
-              <% @reviewee_name = User.find(@reviewee.user_id).fullname %>
+              <% @reviewee = rm.reviewee.user %>
                 <!--Teammate reviewed-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
-                  <%= link_to @reviewee_id, impersonate_impersonate_path(:user => {:name => @reviewee_id}), :method => :post, :title => "Click here to impersonate this user" %>
-                </td>
-                <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
-                  <%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => @teammate_review_response.id, :reviewee_id => @reviewee.id, :source => 'teammate_review' %>
+                  <%= link_to @reviewee.name, impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
+                  (<%= @reviewee.fullname %>)
                 </td>
                 <!--Last reviewed at-->
                 <td bgcolor=<%= @bgcolor %> align = 'left'>
@@ -64,19 +59,9 @@
                 <% if @team_member_count == 1 %>
                   <%= 'N/A' %>
                 <% else %>
-                  <% @reviewee = Participant.find(rm.reviewee_id) %>
-                  <% @reviewee_id = User.find(@reviewee.user_id).name%>
-                  <%= link_to @reviewee_id, impersonate_impersonate_path(:user => {:name => @reviewee_id}), :method => :post, :title => "Click here to impersonate this user" %>
-                <% end %>
-              </td>
-
-              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-                <% if @team_member_count == 1 %>
-                  <%= 'N/A' %>
-                <% else %>
-                  <% @reviewee = Participant.find(rm.reviewee_id) %>
-                    <% @reviewee_name = User.find(@reviewee.user_id).fullname %>
-                  <%= @reviewee_name %>
+                  <% @reviewee = rm.reviewee.user %>
+                  <%= link_to @reviewee.name, impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
+                  (<%= @reviewee.fullname %>)
                 <% end %>
               </td>
               <!--Last reviewed at-->

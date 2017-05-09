@@ -30,7 +30,7 @@
             <!--reviewer-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%>>
               <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
-              (<%= link_to user.fullname, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id%>)
+              (<%= user.fullname %>)
             </td>
             <!--# reviews done-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

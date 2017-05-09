@@ -10,11 +10,8 @@
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
 <%= create_report_table_header(headers) %>
-  
     <% @l = -1 %>
     <% @teams.each do |team| %>
-
-
     	<% @l = @l+1 %>
     	<tr>
         <% bgcolor = @l.even? ? "#ffffff" : "#DDDDBB" %>
@@ -34,7 +31,7 @@
           <td bgcolor= <%= bgcolor %>>
               <% users_for_curr_team.each do |user| %>
                   <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
-                                (<%= link_to user.fullname, :controller => :users, :action => 'show', :id => user.id %>) <br>
+                  (<%= user.fullname%>)<br>
               <% end %>
           </td>
 

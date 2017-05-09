@@ -21,7 +21,7 @@
     <% for user in @users %>
       <% if ((params[:show] != 'true' && !user.name.include?("_hidden")) || params[:show] == 'true')%>
         <tr class="exp">
-          <td><%= link_to user.name, :action => 'show', :id => user.id %></td>
+          <td><%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %></td>
           <td><%= user.fullname %></td>
           <td><%= user.email %></td>
           <td><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>

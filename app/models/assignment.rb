@@ -460,12 +460,12 @@ class Assignment < ActiveRecord::Base
   def self.export_details_fields(detail_options)
     fields = []
     fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
-    fields << 'Team Name / Author Name' if detail_options['team_name'] == 'true' 
+    fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
     fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
-    fields << 'Question / Dimension Name' if detail_options['question'] == 'true'
-    fields << 'Question ID / Dimension' if detail_options['question_id'] == 'true'
-    fields << 'Comment ID' if detail_options['comment_id'] == 'true'   
-    fields << 'Comments' if detail_options['comments'] == 'true'      
+    fields << 'Question / Criterion' if detail_options['question'] == 'true'
+    fields << 'Question ID' if detail_options['question_id'] == 'true'
+    fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
+    fields << 'Answer / Comment' if detail_options['comments'] == 'true'
     fields << 'Score' if detail_options['score'] == 'true'  
     fields
   end
@@ -478,14 +478,13 @@ class Assignment < ActiveRecord::Base
   # Generates a single row based on the detail_options selected
   def self.csv_row(detail_options, answer)
     tcsv = []
-    @response = Response.find_by(answer.response_id)
-    ans = ResponseMap.find_by(@response.map_id)
+    @response = Response.find(answer.response_id)
+    map = ResponseMap.find(@response.map_id)
 
-    @reviewee = Team.find_by(ans.reviewee_id)
-    @reviewee = Participant.find_by(ans.reviewee_id).user if @reviewee.nil?
+    @reviewee = Team.find_by id: map.reviewee_id
+    @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
 
-    reviewer = Participant.find_by(ans.reviewer_id).user
-
+    reviewer = Participant.find(map.reviewer_id).user
     tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
     tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
     tcsv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
@@ -506,11 +505,11 @@ class Assignment < ActiveRecord::Base
     @response_maps_for_assignment.each do |map|
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
-      @response_for_this_map.each do |res_map|
-        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{res_map.id}"])
+      @response_for_this_map.each do |resp|
+        @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
         
         @answer.each do |ans|
-          answers[res_map.round][map.type].push(ans)
+          answers[resp.round][map.type].push(ans)
         end
       end
     end

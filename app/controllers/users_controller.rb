@@ -46,10 +46,6 @@ class UsersController < ApplicationController
     user = session[:user]
     role = user.role
     all_users = user.get_user_list
-    # Deprecated
-    # all_users = User.order('name').where( ['role_id in (?) or id = ?', role.get_available_roles, user.id])
-
-    # Get the users list to show on current page
     @users = all_users
   end
 

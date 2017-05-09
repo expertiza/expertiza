@@ -5,6 +5,7 @@
     </td>
   </tr>
 <% participant = tscore[:team].participants.first %>
+<% if participant %>
   <%= render :partial => 'grades/team_review_statistics',
              :locals => {:prefix => prefix+"_1",
                          :team => true,
@@ -12,5 +13,6 @@
                          :participant => participant,
                          :index => 1,
                          :team_size => tscore[:team].participants.size,
-                         :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  
+                         :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>
+<% end %>  
 </table>

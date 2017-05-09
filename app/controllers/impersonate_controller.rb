@@ -30,9 +30,7 @@ class ImpersonateController < ApplicationController
         user = User.find_by_name(params[:user][:name])
         if user
           unless original_user.can_impersonate? user
-            flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-            user.create_activity :cannot_impersonate, owner: current_user
-            redirect_back
+            cannot_impersonate user
             return
           end
 
@@ -50,9 +48,7 @@ class ImpersonateController < ApplicationController
           user = User.find_by_name(params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user
-              flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-              user.create_activity :cannot_impersonate, owner: current_user
-              redirect_back
+              cannot_impersonate user
               return
             end
 
@@ -86,5 +82,13 @@ class ImpersonateController < ApplicationController
       flash[:error] = e.message
       redirect_to :back
     end
+  end
+
+  private
+
+  def cannot_impersonate(user)
+    flash[:error] = "You cannot impersonate #{params[:user][:name]}."
+    user.create_activity :cannot_impersonate, owner: current_user
+    redirect_back
   end
 end

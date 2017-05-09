@@ -4,7 +4,7 @@ class ResponseMap < ActiveRecord::Base
 
   include PublicActivity::Model
   tracked owner: ->(controller, _model) { controller && controller.current_user }
-  
+
   def map_id
     id
   end

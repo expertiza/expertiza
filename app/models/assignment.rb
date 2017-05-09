@@ -43,7 +43,7 @@ class Assignment < ActiveRecord::Base
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
   include PublicActivity::Model
-  tracked owner: ->(controller, model) { controller && controller.current_user }
+  tracked owner: ->(controller, _model) { controller && controller.current_user }
 
   def self.max_outstanding_reviews
     DEFAULT_MAX_OUTSTANDING_REVIEWS

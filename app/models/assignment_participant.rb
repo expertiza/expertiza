@@ -25,7 +25,7 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_3
 
   include PublicActivity::Model
-  tracked except: :update, owner: ->(controller, model) { controller && controller.current_user }
+  tracked except: :update, owner: ->(controller, _model) { controller && controller.current_user }
 
   # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
   # Params: question - The Question object to retrieve the scores from

@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20170424090200) do
     t.integer  "course_id",                  limit: 4,     default: 0
     t.integer  "instructor_id",              limit: 4,     default: 0
     t.boolean  "private",                                  default: false,  null: false
-    t.integer  "num_reviews",                limit: 4,     default: 0,      null: false
+    t.integer  "num_reviews",                limit: 4,     default: 3,      null: false
     t.integer  "num_review_of_reviews",      limit: 4,     default: 0,      null: false
     t.integer  "num_review_of_reviewers",    limit: 4,     default: 0,      null: false
     t.boolean  "reviews_visible_to_all"
@@ -79,6 +79,10 @@ ActiveRecord::Schema.define(version: 20170424090200) do
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true
+    t.integer  "num_reviews_required",       limit: 4,     default: 3
+    t.integer  "num_metareviews_required",   limit: 4,     default: 3
+    t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
+    t.integer  "num_reviews_allowed",        limit: 4,     default: 3
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -653,6 +657,14 @@ ActiveRecord::Schema.define(version: 20170424090200) do
     t.string  "name",       limit: 255
     t.string  "child_type", limit: 255
     t.integer "parent_id",  limit: 4
+  end
+
+  create_table "user_pastebins", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "short_form", limit: 255
+    t.text     "long_form",  limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "users", force: :cascade do |t|

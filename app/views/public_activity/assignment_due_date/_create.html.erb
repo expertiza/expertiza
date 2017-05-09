@@ -1,7 +1,8 @@
-Created Assignment:
+Updated Due Date in:
 
 <% if activity.trackable %>
-    <%= Assignment.find(DueDate.find(activity.trackable_id).parent_id).name %>
+    <%=link_to Assignment.find(DueDate.find(activity.trackable_id).parent_id).name %>
+    in course <%=link_to Course.find(Assignment.find(DueDate.find(activity.trackable_id).parent_id).course_id).name %>
 <% else %>
     which has since been removed
 <% end %>

@@ -1,7 +1,8 @@
 Created Questionnaire for Assignment:
 
 <% if activity.trackable %>
-    <%= Assignment.find(AssignmentQuestionnaire.find(activity.trackable_id).assignment_id).name %>
+    <%=link_to Assignment.find(AssignmentQuestionnaire.find(activity.trackable_id).assignment_id).name %>
+    in course <%=link_to Course.find(Assignment.find(AssignmentQuestionnaire.find(activity.trackable_id).assignment_id).course_id).name %>
 <% else %>
     which has since been removed
 <% end %>

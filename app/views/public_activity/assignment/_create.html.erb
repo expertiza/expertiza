@@ -2,6 +2,7 @@ Created Assignment:
 
 <% if activity.trackable %>
     <%= link_to activity.trackable.name, activity.trackable %>
+    in course <%= link_to Course.find((activity.trackable_id).course_id).name %>
 <% else %>
     which has since been removed
 <% end %>

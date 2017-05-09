@@ -1,5 +1,4 @@
 class ActivitiesController < ApplicationController
-
   def action_allowed?
     ['Administrator',
      'Instructor',
@@ -17,13 +16,9 @@ class ActivitiesController < ApplicationController
       users = User.where("name like ?", "%#{params[:user]}%")
       @activities = @activities.where(owner_id: users)
     end
-    unless activity_time.to_s.strip.empty?
-      @activities = @activities.where("Date(created_at) = ?", activity_time)
-    end
+    @activities = @activities.where("Date(created_at) = ?", activity_time) unless activity_time.to_s.strip.empty?
   end
 
   def search_by_time
-
   end
-
 end

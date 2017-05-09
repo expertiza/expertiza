@@ -65,7 +65,7 @@ class StudentReviewController < ApplicationController
     suggestive_count = [0, 0, 0, 0, 0, 0]
     problem_count = [0, 0, 0, 0, 0, 0]
     offensive_count = [0, 0, 0, 0, 0, 0]
-    
+
     review_maps.each do |my_assignment|
       my_responses = Response.where(map_id: my_assignment.id)
       my_responses.each do |each_response|
@@ -88,5 +88,7 @@ class StudentReviewController < ApplicationController
         keys[i][3] = (offensive_count[i] / response_count[i]) * 100
       end
     end
+
+    return keys
   end
 end

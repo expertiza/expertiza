@@ -9,8 +9,11 @@ if ActiveRecord::Base.connection.table_exists? 'lti2_tp_registries'
   Rails.application.config.tool_provider_registry = Lti2Tp::ToolProviderRegistry.new
 end
 
-wirelog_filename = Rails.application.config.tool_provider_registry.registry['wirelog_filename']
-if wirelog_filename.present?
+if Rails.application.config.tool_provider_registry
+  wirelog_filename = Rails.application.config.tool_provider_registry.registry['wirelog_filename']
+end
+
+if wirelog_filename && wirelog_filename.present?
   Rails.application.config.wire_log = WireLog.new "ToolProvider", File.expand_path(wirelog_filename)
 else
   Rails.application.config.wire_log = nil

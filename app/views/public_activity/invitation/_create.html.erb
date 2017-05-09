@@ -2,6 +2,7 @@ Sent an Invitation to
 
 <% if activity.trackable %>
     <%= link_to User.find(activity.trackable.to_id).name, activity.trackable %>
+    for Assignment <%= link_to Assignment.find(activity.trackable.assignment_id).name, activity.trackable %>
 <% else %>
     which has since been removed
 <% end %>

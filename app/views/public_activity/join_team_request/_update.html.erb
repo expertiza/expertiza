@@ -2,6 +2,7 @@ Updated Join Team Request for
 
 <% if activity.trackable %>
     <%= link_to User.find(Participant.find(activity.trackable.participant_id).user_id).name, activity.trackable %>
+    for Assignment <%= link_to Assignment.find(Team.find(activity.trackable.team_id).parent_id).name, activity.trackable %>
 <% else %>
     which has since been removed
 <% end %>

@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :popup
   resources :user_pastebins
   resources :track_notifications
   resources :notifications

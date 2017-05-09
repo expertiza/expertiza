@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170424090200) do
+ActiveRecord::Schema.define(version: 20170508205852) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(version: 20170424090200) do
     t.integer  "course_id",                  limit: 4,     default: 0
     t.integer  "instructor_id",              limit: 4,     default: 0
     t.boolean  "private",                                  default: false,  null: false
-    t.integer  "num_reviews",                limit: 4,     default: 0,      null: false
+    t.integer  "num_reviews",                limit: 4,     default: 3,      null: false
     t.integer  "num_review_of_reviews",      limit: 4,     default: 0,      null: false
     t.integer  "num_review_of_reviewers",    limit: 4,     default: 0,      null: false
     t.boolean  "reviews_visible_to_all"
@@ -79,6 +79,10 @@ ActiveRecord::Schema.define(version: 20170424090200) do
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true
+    t.integer  "num_reviews_required",       limit: 4,     default: 3
+    t.integer  "num_metareviews_required",   limit: 4,     default: 3
+    t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
+    t.integer  "num_reviews_allowed",        limit: 4,     default: 3
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -437,20 +441,6 @@ ActiveRecord::Schema.define(version: 20170424090200) do
 
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
-  create_table "review_metric_mappings", force: :cascade do |t|
-    t.integer  "value",             limit: 4
-    t.integer  "review_metrics_id", limit: 4
-    t.integer  "responses_id",      limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-  end
-
-  create_table "review_metrics", force: :cascade do |t|
-    t.string   "metric",     limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255, default: "", null: false
     t.integer  "parent_id",       limit: 4
@@ -655,27 +645,35 @@ ActiveRecord::Schema.define(version: 20170424090200) do
     t.integer "parent_id",  limit: 4
   end
 
+  create_table "user_pastebins", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.string   "short_form", limit: 255
+    t.text     "long_form",  limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,   default: "",    null: false
-    t.string  "crypted_password",          limit: 40,    default: "",    null: false
-    t.integer "role_id",                   limit: 4,     default: 0,     null: false
+    t.string  "name",                      limit: 255,      default: "",    null: false
+    t.string  "crypted_password",          limit: 40,       default: "",    null: false
+    t.integer "role_id",                   limit: 4,        default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                      default: false
+    t.boolean "private_by_default",                         default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                             default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,     default: 0
+    t.boolean "is_new_user",                                default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,        default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 65535
+    t.text    "digital_certificate",       limit: 16777215
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 65535
-    t.boolean "copy_of_emails",                          default: false
+    t.text    "public_key",                limit: 16777215
+    t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
   end
 

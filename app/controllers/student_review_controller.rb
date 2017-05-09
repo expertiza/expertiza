@@ -65,7 +65,7 @@ class StudentReviewController < ApplicationController
     suggestive_count = [0, 0, 0, 0, 0, 0]
     problem_count = [0, 0, 0, 0, 0, 0]
     offensive_count = [0, 0, 0, 0, 0, 0]
-
+    
     review_maps.each do |my_assignment|
       my_responses = Response.where(map_id: my_assignment.id)
       my_responses.each do |each_response|
@@ -81,14 +81,12 @@ class StudentReviewController < ApplicationController
     end
 
     (0..5).each do |i|
-      unless response_count[i] == 0
+      unless response_count[i].zero?
         keys[i][0] = word_counter[i] / response_count[i]
         keys[i][1] = (suggestive_count[i] / response_count[i]) * 100
         keys[i][2] = (problem_count[i] / response_count[i]) * 100
         keys[i][3] = (offensive_count[i] / response_count[i]) * 100
       end
     end
-
-    return keys
   end
 end

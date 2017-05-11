@@ -53,6 +53,9 @@ class DelayedMailer
       if self.deadline_type == "drop_outstanding_reviews"
         drop_outstanding_reviews
       end
+      if self.deadline_type == "compare_files_with_simicheck"
+        perform_simicheck_comparisons(self.assignment_id)
+      end
     end
   end
 
@@ -169,5 +172,9 @@ class DelayedMailer
         review_to_drop.first.destroy
       end
     end
+  end
+
+  def perform_simicheck_comparisons(assignment_id)
+    PlagiarismCheckerHelper.run(assignment_id)
   end
 end

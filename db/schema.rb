@@ -12,7 +12,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20170508205852) do
-
+  
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
     t.integer "answer",      limit: 4
@@ -83,6 +83,8 @@ ActiveRecord::Schema.define(version: 20170508205852) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
+    t.integer  "simicheck",                  limit: 4,     default: -1
+    t.integer  "simicheck_threshold",        limit: 4,     default: 100
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -330,6 +332,32 @@ ActiveRecord::Schema.define(version: 20170508205852) do
   create_table "permissions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
+
+  create_table "plagiarism_checker_assignment_submissions", force: :cascade do |t|
+    t.string   "name",          limit: 255
+    t.string   "simicheck_id",  limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "assignment_id", limit: 4
+  end
+
+  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assignment_submissions_on_assignment_id", using: :btree
+
+  create_table "plagiarism_checker_comparisons", force: :cascade do |t|
+    t.integer  "plagiarism_checker_assignment_submission_id", limit: 4
+    t.string   "similarity_link",                             limit: 255
+    t.decimal  "similarity_percentage",                                   precision: 10
+    t.string   "file1_name",                                  limit: 255
+    t.string   "file1_id",                                    limit: 255
+    t.string   "file1_team",                                  limit: 255
+    t.string   "file2_name",                                  limit: 255
+    t.string   "file2_id",                                    limit: 255
+    t.string   "file2_team",                                  limit: 255
+    t.datetime "created_at",                                                             null: false
+    t.datetime "updated_at",                                                             null: false
+  end
+
+  add_index "plagiarism_checker_comparisons", ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index", using: :btree
 
   create_table "plugin_schema_info", id: false, force: :cascade do |t|
     t.string  "plugin_name", limit: 255
@@ -654,26 +682,26 @@ ActiveRecord::Schema.define(version: 20170508205852) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,      default: "",    null: false
-    t.string  "crypted_password",          limit: 40,       default: "",    null: false
-    t.integer "role_id",                   limit: 4,        default: 0,     null: false
+    t.string  "name",                      limit: 255,   default: "",    null: false
+    t.string  "crypted_password",          limit: 40,    default: "",    null: false
+    t.integer "role_id",                   limit: 4,     default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                         default: false
+    t.boolean "private_by_default",                      default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                                default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,        default: 0
+    t.boolean "is_new_user",                             default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 16777215
+    t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 16777215
-    t.boolean "copy_of_emails",                             default: false
+    t.text    "public_key",                limit: 65535
+    t.boolean "copy_of_emails",                          default: false
     t.integer "institution_id",            limit: 4
   end
 
@@ -707,6 +735,8 @@ ActiveRecord::Schema.define(version: 20170508205852) do
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
   add_foreign_key "participants", "users", name: "fk_participant_users"
+  add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
+  add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"

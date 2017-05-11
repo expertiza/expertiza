@@ -232,6 +232,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
+
   resources :profile do
     collection do
       get :edit

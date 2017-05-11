@@ -39,6 +39,7 @@ class AssignmentForm
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
+    add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
@@ -236,6 +237,22 @@ class AssignmentForm
     reviews_visible_to_all
     review_assignment_strategy
     require_quiz
+  end
+
+  def add_simicheck_to_delayed_queue(simicheck_delay)
+    delete_from_delayed_queue
+    if simicheck_delay.to_i >= 0
+      duedates = AssignmentDueDate.where(parent_id: @assignment.id)
+      duedates.each do |due_date|
+        next if DeadlineType.find(due_date.deadline_type_id).name != "submission"
+        change_item_type(enqueue_simicheck_task(due_date, simicheck_delay).id)
+      end
+    end
+  end
+
+  def enqueue_simicheck_task(due_date, simicheck_delay)
+    DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
+                       1, find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now)
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

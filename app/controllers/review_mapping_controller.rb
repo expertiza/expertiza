@@ -439,7 +439,13 @@ class ReviewMappingController < ApplicationController
       @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id:params[:id], calibrate_to:1)
       @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id:params[:id], calibrate_to:0)
       @responses = Response.where(:map_id => @review_response_map_ids)
+
+    when "PlagiarismCheckerReport"
+      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
+                                                                              PlagiarismCheckerAssignmentSubmission.where(assignment_id:
+                                                                                                                              params[:id]).pluck(:id))
     end
+
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 

@@ -3,13 +3,14 @@ require 'rails_helper'
 describe "SimiCheckWebservice" do
   def poll(comp_id)
     is_success = false
+    print 'Waiting'
     until is_success
       begin
         response = SimiCheckWebService.get_similarity_nxn(comp_id)
         is_success = (response.code == 200)
       rescue
-        puts '   Waiting 30 seconds to check again for results...'
-        sleep(30)
+        print '.'
+        sleep(2)
         next
       end
     end
@@ -18,7 +19,6 @@ describe "SimiCheckWebservice" do
   describe ".get_all_comparisons" do
     context "any time called" do
       it "returns a response with code 200 and body containing all comparisons" do
-        puts "Testing SimiCheck get all comparisons"
         response = SimiCheckWebService.all_comparisons
         json_response = JSON.parse(response.body)
         expect(response.code).to eql(200)
@@ -30,7 +30,6 @@ describe "SimiCheckWebservice" do
   describe ".new_comparison" do
     context "called with a comparison_name" do
       it "returns a response with code 200, and body containing the name and new id for this comparison" do
-        puts "Testing SimiCheck new comparison"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -44,7 +43,6 @@ describe "SimiCheckWebservice" do
   describe ".delete_comparison" do
     context "called with a comparison id" do
       it "returns a response with code 200" do
-        puts "Testing SimiCheck delete comparison"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -57,7 +55,6 @@ describe "SimiCheckWebservice" do
   describe ".get_comparison_details" do
     context "called with a comparison id" do
       it "returns a response with code 200 and body containing info about the comparison" do
-        puts "Testing SimiCheck get comparison details"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -73,7 +70,6 @@ describe "SimiCheckWebservice" do
   describe ".update_comparison" do
     context "called with a new comparison name" do
       it "returns a response with code 200 and body containing info about the comparison" do
-        puts "Testing SimiCheck update comparison"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -87,7 +83,6 @@ describe "SimiCheckWebservice" do
   describe ".upload_file" do
     context "called with a comparison id and filepath" do
       it "returns a response with code 200 and body containing info about the file" do
-        puts "Testing SimiCheck upload file to comparison"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -106,7 +101,6 @@ describe "SimiCheckWebservice" do
   describe ".delete_files" do
     context "called with a comparison id and filenames to delete" do
       it "returns a response with code 200" do
-        puts "Testing SimiCheck delete file from comparison"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -126,7 +120,6 @@ describe "SimiCheckWebservice" do
   describe ".get_similarity_nxn" do
     context "called with a comparison id" do
       it "returns a response with code 200 and body containing info about the results" do
-        puts "Testing SimiCheck get comparison results"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -154,7 +147,6 @@ describe "SimiCheckWebservice" do
   describe ".visualize_similarity" do
     context "called with a comparison id" do
       it "returns a response with code 200 and body containing the visualize url path" do
-        puts "Testing SimiCheck get visualize similarity link"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]
@@ -181,7 +173,6 @@ describe "SimiCheckWebservice" do
   describe ".visualize_comparison" do
     context "called with a comparison id and two filenames" do
       it "returns a response with code 200 and body containing the visualize url path" do
-        puts "Testing SimiCheck get visualize similarity link"
         response = SimiCheckWebService.new_comparison('test new comparison')
         json_response = JSON.parse(response.body)
         comp_id = json_response["id"]

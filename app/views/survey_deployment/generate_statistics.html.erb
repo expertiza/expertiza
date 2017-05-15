@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+	    /*
+	    	The JS code renders the Google Chart and Ruby variables contain the chart data
+	    */
+	    <% @questions.count.times do |i| %>
+	    	<% @r = get_responses_for_question_in_a_survey_deployment(@questions[i].id, @sd.id)%>
+	    	<% if @r.sum > 0 %> /* If at least one response exists for the question */
+		    		var j_i = <%= i %>
+		    		var my_data = <%= raw @chart_data_table[i].to_json %>;
+		    		var title = '<%= @questions[i].txt %>';
+		    		var div_element_id = "piechart_" + j_i;
+		    		chart(my_data, div_element_id);		    	
+		    <% end %>
+		<% end %>
+	</script>
+	<style >
+		body
+		{
+			text-align: center;
+		}
+		div, p
+		{
+			margin: 0 auto;
+			display: block;
+			margin-bottom: 20px;
+		}
+	</style>
+  </head>
+  	<body>
+  		<% @questions.count.times do |i| %>
+			<% if allowed_question_type?(@questions[i]) %>
+				<% @t = get_responses_for_question_in_a_survey_deployment(@questions[i].id, @sd.id)%>
+   				<p><b>Q - <%= @questions[i].txt %></b></p>
+  				<% if @t.sum > 0 %>
+   					<!-- Create chart div if there's at least one response -->
+   					<div id = "piechart_<%= i %>" style = "width: 900px; height: 500px;"></div> 		
+  				<% else %>
+  					<p>No responses for this question</p>
+  				<% end %>
+			<% end %>
+  		<% end %>
+	</body>
+</html>

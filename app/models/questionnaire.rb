@@ -34,10 +34,12 @@ class Questionnaire < ActiveRecord::Base
                          'Teammate ReviewQuestionnaire',
                          'TeammateReviewQuestionnaire',
                          'SurveyQuestionnaire',
+                         'AssignmentSurveyQuestionnaire',
+                         'Assignment SurveyQuestionnaire',
                          'Global SurveyQuestionnaire',
                          'GlobalSurveyQuestionnaire',
-                         'Course EvaluationQuestionnaire',
-                         'CourseEvaluationQuestionnaire',
+                         'Course SurveyQuestionnaire',
+                         'CourseSurveyQuestionnaire',
                          'BookmarkratingQuestionnaire',
                          'QuizQuestionnaire'
                         ].freeze # zhewei: for some historical reasons, some question types have white space, others are not

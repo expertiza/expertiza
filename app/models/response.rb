@@ -145,11 +145,17 @@ class Response < ActiveRecord::Base
 
     reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)
-    assignment = Assignment.find(participant.parent_id)
 
-    defn[:subject] = "A new submission is available for " + assignment.name
+    # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
+    if response_map.survey?
+      parent = response_map.survey_parent
+    else
+      parent = Assignment.find(participant.parent_id)
+    end
 
-    response_map.email(defn,participant,assignment)
+    defn[:subject] = "A new submission is available for " + parent.name
+
+    response_map.email(defn,participant,parent)
 
   end
 

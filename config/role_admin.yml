@@ -282,7 +282,7 @@ development:
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/course_evaluation/list"
+        url: "/tree_display/goto_surveys"
       27: &6 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -447,8 +447,8 @@ development:
         content_page_id:
         controller_action_id: 64
         id: 42
-        label: Surveys
-        name: manage/questionnaires/surveys
+        label: Assignment surveys
+        name: manage/questionnaires/assignment surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -457,8 +457,8 @@ development:
         content_page_id:
         controller_action_id: 64
         id: 43
-        label: Course evaluations
-        name: manage/questionnaires/course evaluations
+        label: Course surveys
+        name: manage/questionnaires/course surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -484,8 +484,8 @@ development:
       manage/questionnaires/teammate review rubrics: *19
       manage/questionnaires/author feedbacks: *20
       manage/questionnaires/global survey: *21
-      manage/questionnaires/surveys: *22
-      manage/questionnaires/course evaluations: *23
+      manage/questionnaires/assignment surveys: *22
+      manage/questionnaires/course surveys: *23
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node
@@ -913,9 +913,9 @@ test:
       29: &21 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/surveys
+        name: manage/questionnaires/assignment surveys
         id: 29
-        label: Surveys
+        label: Assignment surveys
         site_controller_id: 33
         controller_action_id: 57
         content_page_id:
@@ -923,9 +923,9 @@ test:
       30: &22 !ruby/object:Menu::Node
         parent:
         parent_id: 20
-        name: manage/questionnaires/course evaluations
+        name: manage/questionnaires/course surveys
         id: 30
-        label: Course evaluations
+        label: Course surveys
         site_controller_id: 33
         controller_action_id: 57
         content_page_id:
@@ -950,8 +950,8 @@ test:
       manage/questionnaires/teammate review rubrics: *18
       manage/questionnaires/author feedbacks: *19
       manage/questionnaires/global survey: *20
-      manage/questionnaires/surveys: *21
-      manage/questionnaires/course evaluations: *22
+      manage/questionnaires/assignment surveys: *21
+      manage/questionnaires/course surveys: *22
     selected:
       1: *1
     vector:
@@ -1243,7 +1243,7 @@ production:
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/course_evaluation/list"
+        url: "/tree_display/goto_surveys"
       27: &6 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -1408,8 +1408,8 @@ production:
         content_page_id:
         controller_action_id: 64
         id: 42
-        label: Surveys
-        name: manage/questionnaires/surveys
+        label: Assignment surveys
+        name: manage/questionnaires/assignment surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1418,8 +1418,8 @@ production:
         content_page_id:
         controller_action_id: 64
         id: 43
-        label: Course evaluations
-        name: manage/questionnaires/course evaluations
+        label: Course surveys
+        name: manage/questionnaires/course surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1445,8 +1445,8 @@ production:
       manage/questionnaires/teammate review rubrics: *19
       manage/questionnaires/author feedbacks: *20
       manage/questionnaires/global survey: *21
-      manage/questionnaires/surveys: *22
-      manage/questionnaires/course evaluations: *23
+      manage/questionnaires/assignment surveys: *22
+      manage/questionnaires/course surveys: *23
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

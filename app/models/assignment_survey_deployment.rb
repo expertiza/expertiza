@@ -1,0 +1,2 @@
+class AssignmentSurveyDeployment < SurveyDeployment
+end

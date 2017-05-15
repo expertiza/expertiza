@@ -6,7 +6,7 @@ class StatisticsController < ApplicationController
   end
 
   def list_surveys
-    @surveys = SurveyQuestionnaire.all
+    @surveys = AssignmentSurveyQuestionnaire.all
   end
 
   def list # list deployments for the survey

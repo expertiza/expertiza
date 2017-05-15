@@ -1,0 +1,2 @@
+class CourseSurveyDeployment < SurveyDeployment
+end

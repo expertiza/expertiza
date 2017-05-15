@@ -129,6 +129,7 @@ development:
         save_advice: false
       response:
         delete: false
+        pending_surveys: true
       analytic:
         assignment_list: false
         course_list: false
@@ -243,12 +244,12 @@ development:
         content_page_id:
         controller_action_id: 42
         id: 30
-        label: Course Evaluation
-        name: Course Evaluation
+        label: Pending Surveys
+        name: pending_surveys
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/course_evaluation/list"
+        url: "/response/pending_surveys"
       27: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -284,7 +285,7 @@ development:
     by_name:
       home: *1
       student_task: *2
-      Course Evaluation: *3
+      pending_surveys: *3
       profile: *4
       contact_us: *5
       credits: *7
@@ -691,6 +692,7 @@ production:
         save_advice: false
       response:
         delete: false
+        pending_surveys: true
       analytic:
         assignment_list: false
         course_list: false
@@ -805,12 +807,12 @@ production:
         content_page_id:
         controller_action_id: 42
         id: 30
-        label: Course Evaluation
-        name: Course Evaluation
+        label: Pending Surveys
+        name: pending_surveys
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/course_evaluation/list"
+        url: "/response/pending_surveys"
       27: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
@@ -846,7 +848,7 @@ production:
     by_name:
       home: *1
       student_task: *2
-      Course Evaluation: *3
+      pending_surveys: *3
       profile: *4
       contact_us: *5
       credits: *7

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170430013201) do
+ActiveRecord::Schema.define(version: 20170516034804) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -612,16 +612,6 @@ ActiveRecord::Schema.define(version: 20170430013201) do
   end
 
   add_index "survey_deployments", ["questionnaire_id"], name: "fk_rails_7c62b6ef2b", using: :btree
-
-  create_table "survey_responses", force: :cascade do |t|
-    t.integer "score",                limit: 4
-    t.text    "comments",             limit: 65535
-    t.integer "assignment_id",        limit: 4,     default: 0, null: false
-    t.integer "question_id",          limit: 4,     default: 0, null: false
-    t.integer "survey_id",            limit: 4,     default: 0, null: false
-    t.string  "email",                limit: 255
-    t.integer "survey_deployment_id", limit: 4
-  end
 
   create_table "system_settings", force: :cascade do |t|
     t.string  "site_name",                 limit: 255, default: "", null: false

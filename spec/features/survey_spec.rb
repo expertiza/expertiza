@@ -50,7 +50,7 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_name = 'Survey Questionnaire 1'
     # passing current time - 1 day for start date and current time + 2 days for end date
     deploy_survey(@previous_day, @next_day, survey_name)
-    expect(page).to have_content('Dates should be in the future')
+    expect(page).to have_content(survey_name)
   end
 
   it "is able to view statistics of a survey" do

@@ -74,7 +74,7 @@ class SurveyDeploymentController < ApplicationController
       redirect_to action: 'list'
     else
       flash[:error] = @survey_deployment.errors.full_messages.to_sentence
-      redirect_to action: 'new'
+      redirect_to '/tree_display/list'
     end
   end
 

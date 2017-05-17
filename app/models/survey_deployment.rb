@@ -3,9 +3,9 @@ class SurveyDeployment < ActiveRecord::Base
   validates_presence_of :num_of_students
   validates_presence_of :start_date
   validates_presence_of :end_date
-  validate :valid?
+  validate :valid_start_end_time?
 
-  def valid?
+  def valid_start_end_time?
     if end_date.nil? || start_date.nil?
       errors[:base] << "The start and end time should be specified."
       return false

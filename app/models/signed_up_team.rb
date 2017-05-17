@@ -31,7 +31,6 @@ class SignedUpTeam < ActiveRecord::Base
       @participants[i].name = names
       i += 1
     end
-
     @participants
   end
 

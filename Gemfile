@@ -1,5 +1,6 @@
 source 'http://rubygems.org'
-
+java_home = '/usr/lib/jvm/java-6-openjdk'
+ENV['JAVA_HOME'] = java_home if Dir.exist?(java_home)
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order

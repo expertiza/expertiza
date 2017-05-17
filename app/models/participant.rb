@@ -16,6 +16,7 @@ class Participant < ActiveRecord::Base
     TeamsUser.where(user: user).first.try :team
   end
 
+
   def responses
     response_maps.map(&:response)
   end

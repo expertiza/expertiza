@@ -54,7 +54,7 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def param_test
-    params.require(:survey_deployment).permit(:questionnaire_id, :start_date, :end_date, :validate_survey_deployment, :parent_id, :num_of_students)
+    params.require(:survey_deployment).permit(:questionnaire_id, :start_date, :end_date, :parent_id)
   end
 
   def create
@@ -91,17 +91,6 @@ class SurveyDeploymentController < ApplicationController
     SurveyDeployment.find(params[:id]).destroy
     SurveyResponse.where(survey_deployment_id: params[:id]).each(&:destroy)
     redirect_to action: 'list'
-  end
-
-  def add_participants(num_of_participants, survey_deployment_id) # Add participants
-    users = User.where(role_id: Role.student.id)
-    users_rand = users.sort_by { rand } # randomize user list
-    num_of_participants.times do |i|
-      survey_participant = SurveyParticipant.new
-      survey_participant.user_id = users_rand[i].id
-      survey_participant.survey_deployment_id = survey_deployment_id
-      survey_participant.save
-    end
   end
 
   # Creates pie charts for visualizing survey responses to Criterion and Checkbox questions

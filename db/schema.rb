@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170516034804) do
+ActiveRecord::Schema.define(version: 20170518033740) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -604,7 +604,6 @@ ActiveRecord::Schema.define(version: 20170516034804) do
     t.integer  "questionnaire_id", limit: 4
     t.datetime "start_date"
     t.datetime "end_date"
-    t.integer  "num_of_students",  limit: 4
     t.datetime "last_reminder"
     t.integer  "parent_id",        limit: 4,   default: 0, null: false
     t.integer  "global_survey_id", limit: 4

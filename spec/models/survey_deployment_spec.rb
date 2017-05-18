@@ -7,12 +7,17 @@ describe 'SurveyDeployment' do
   let(:next_day) {(Time.now.getlocal + 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")}
 
   it 'should do check the start and end time' do
-    survey_deployment = CourseSurveyDeployment.new questionnaire_id: 985, start_date: previous_day, end_date: next_day, parent_id: "12345678", type: "CourseSurveyDeployment", num_of_students: 0
+    survey_deployment = CourseSurveyDeployment.new questionnaire_id: 985, start_date: previous_day, end_date: next_day, parent_id: "12345678", type: "CourseSurveyDeployment"
     expect(survey_deployment).to be_valid
   end
 
   it 'should not be valid if start time is missing' do
-    survey_deployment = CourseSurveyDeployment.new questionnaire_id: 985, start_date: nil, end_date: next_day, parent_id: "12345678", type: "CourseSurveyDeployment", num_of_students: 0
+    survey_deployment = CourseSurveyDeployment.new questionnaire_id: 985, start_date: nil, end_date: next_day, parent_id: "12345678", type: "CourseSurveyDeployment"
+    expect(survey_deployment).not_to be_valid
+  end
+
+  it 'should not be valid if end time is missing' do
+    survey_deployment = CourseSurveyDeployment.new questionnaire_id: 985, start_date: previous_day, end_date: nil, parent_id: "12345678", type: "CourseSurveyDeployment"
     expect(survey_deployment).not_to be_valid
   end
 end

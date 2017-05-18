@@ -6,7 +6,6 @@
       <th> Survey Name&nbsp;&nbsp;</th>
       <th> Start Date&nbsp;&nbsp;</th>
       <th> End Date&nbsp;&nbsp;</th>
-      <th> Number of Students&nbsp;&nbsp;</th>
       <th> Actions&nbsp;&nbsp;</th>
       <th> Global Survey Actions</th>
     </tr>
@@ -16,7 +15,6 @@
       <td align=center><%= @surveys[survey_deployment.id] %></td>
       <td align=center><%= survey_deployment.start_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
       <td align=center><%= survey_deployment.end_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
-      <td align=center><%= survey_deployment.num_of_students %></td>
       <td align=center><%= link_to "View Responses", {:controller=>'response',:action=>'view_responses',:id=>survey_deployment.id} %> 
       <%= link_to "Statistics", {:action => "generate_statistics", :id => survey_deployment.id, :global_survey => 'false'} %>
       <%= link_to "Delete", {:action=>"delete", :id=>survey_deployment.id}, :confirm=>"Are You Sure?", :method=>"post" %>

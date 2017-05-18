@@ -1,6 +1,4 @@
 class SurveyDeployment < ActiveRecord::Base
-  validates_numericality_of :num_of_students
-  validates_presence_of :num_of_students
   validates_presence_of :start_date
   validates_presence_of :end_date
   validate :valid_start_end_time?

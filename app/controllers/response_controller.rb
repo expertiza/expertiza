@@ -274,6 +274,7 @@ class ResponseController < ApplicationController
     end
   end
 
+  # This method should be moved to survey_deployment_contoller.rb
   def pending_surveys
     unless session[:user] # Check for a valid user
       redirect_to '/'

@@ -89,7 +89,7 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
 
     # after adding a response:
-    visit '/response/view_responses/' + survey_deployment.id.to_s
+    visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s
     expect(page).to have_content(survey_name)
   end
 end

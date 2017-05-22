@@ -49,7 +49,6 @@ class SurveyDeploymentController < ApplicationController
 
   def new_course_deployment
     @parent = Course.find(params[:id])
-    # puts @parent.id
     @total_students = CourseParticipant.where(parent_id: @parent.id).count
   end
 
@@ -87,6 +86,8 @@ class SurveyDeploymentController < ApplicationController
     end
   end
 
+  # This delete does not test if any response_map or response has been created.
+  # Therefore it may bring in dirty data.
   def delete
     SurveyDeployment.find(params[:id]).destroy
     SurveyResponse.where(survey_deployment_id: params[:id]).each(&:destroy)

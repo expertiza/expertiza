@@ -133,6 +133,28 @@ class SurveyDeploymentController < ApplicationController
     super
   end
 
+  # This method should be moved to survey_deployment_contoller.rb
+  def view_responses
+    sd = SurveyDeployment.find(params[:id])
+    @questionnaire = Questionnaire.find(sd.questionnaire_id)
+    @questions = Question.where(questionnaire_id: @questionnaire.id)
+    response_map_list = ResponseMap.where(reviewee_id: sd.id)
+    # retrieve all the answers on this survey based on survey_response_maps and questions
+    @all_answers = list_answers(@questions, response_map_list)
+    @global_survey_present = false
+
+    if sd.global_survey_id
+      @global_survey_present = true
+      @global_questionnaire = Questionnaire.find(sd.global_survey_id)
+      @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
+      # retrieve all the answers on the global survey based on this survey deploment.
+      # Please note that, for a survey deployment which requires taking a global survey,
+      # there will be two different response_maps.
+      @global_answers = list_answers(@global_questions, response_map_list)
+    end
+  end
+
+  private
   # this method should be moved to another place with view_responses.
   def list_answers(questions, response_map_list)
     all_answers = []
@@ -152,22 +174,5 @@ class SurveyDeploymentController < ApplicationController
       end
     end
     all_answers
-  end
-
-  # This method should be moved to survey_deployment_contoller.rb
-  def view_responses
-    sd = SurveyDeployment.find(params[:id])
-    @questionnaire = Questionnaire.find(sd.questionnaire_id)
-    @questions = Question.where(questionnaire_id: @questionnaire.id)
-    response_map_list = ResponseMap.where(reviewee_id: sd.id)
-    @all_answers = list_answers(@questions, response_map_list)
-    @global_survey_present = false
-
-    if sd.global_survey_id
-      @global_survey_present = true
-      @global_questionnaire = Questionnaire.find(sd.global_survey_id)
-      @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
-      @global_answers = list_answers(@global_questions, response_map_list)
-    end
   end
 end

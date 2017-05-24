@@ -18,4 +18,8 @@ class SurveyDeployment < ActiveRecord::Base
     end
     true
   end
+
+  # implemented in both AssignmentSurveyDeployment and CourseSurveyDeployment models
+  def parent_name
+  end
 end

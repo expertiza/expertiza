@@ -4,6 +4,7 @@
   <% if @survey_deployments.size > 0 %>
     <tr>
       <th> Survey questionnaire&nbsp;&nbsp;</th>
+      <th> Associated to&nbsp;&nbsp;</th>
       <th> Start date&nbsp;&nbsp;</th>
       <th> End date&nbsp;&nbsp;</th>
       <th> Actions&nbsp;&nbsp;</th>
@@ -13,6 +14,7 @@
   <% @survey_deployments.each do |survey_deployment| %>
     <tr>
       <td align=center><%= @survey_questionnaires[survey_deployment.id] %></td>
+      <td align=center><%= survey_deployment.parent_name %></td>
       <td align=center><%= survey_deployment.start_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
       <td align=center><%= survey_deployment.end_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
       <td align=center><%= link_to "View Responses", {:action=>'view_responses',:id=>survey_deployment.id} %>

@@ -79,10 +79,10 @@ class SurveyDeploymentController < ApplicationController
 
   def list
     @survey_deployments = SurveyDeployment.all
-    @surveys = {}
+    @survey_questionnaires = {}
     @survey_deployments.each do |sd|
       corresp_questionnaire_name = Questionnaire.find(sd.questionnaire_id).name
-      @surveys[sd.id] = corresp_questionnaire_name
+      @survey_questionnaires[sd.id] = corresp_questionnaire_name
     end
   end
 

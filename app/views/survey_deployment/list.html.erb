@@ -12,7 +12,7 @@
   <% end %>
   <% @survey_deployments.each do |survey_deployment| %>
     <tr>
-      <td align=center><%= @surveys[survey_deployment.id] %></td>
+      <td align=center><%= @survey_questionnaires[survey_deployment.id] %></td>
       <td align=center><%= survey_deployment.start_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
       <td align=center><%= survey_deployment.end_date.strftime('%A %B %d %Y, %I:%M%p') %></td>
       <td align=center><%= link_to "View Responses", {:action=>'view_responses',:id=>survey_deployment.id} %>

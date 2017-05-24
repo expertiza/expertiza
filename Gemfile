@@ -1,5 +1,6 @@
 source 'http://rubygems.org'
-
+#heroku_java_home = '/usr/lib/jvm/java-7-openjdk-amd64'
+#ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order

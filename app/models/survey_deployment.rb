@@ -22,4 +22,8 @@ class SurveyDeployment < ActiveRecord::Base
   # implemented in both AssignmentSurveyDeployment and CourseSurveyDeployment models
   def parent_name
   end
+
+  # implemented in both AssignmentSurveyDeployment and CourseSurveyDeployment models
+  def response_maps
+  end
 end

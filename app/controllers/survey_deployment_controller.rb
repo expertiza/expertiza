@@ -89,8 +89,10 @@ class SurveyDeploymentController < ApplicationController
   # This delete does not test if any response_map or response has been created.
   # Therefore it may bring in dirty data.
   def delete
-    SurveyDeployment.find(params[:id]).destroy
-    SurveyResponse.where(survey_deployment_id: params[:id]).each(&:destroy)
+    survey_deployment = SurveyDeployment.find(params[:id])
+    survey_deployment.response_maps.each(&:destroy)
+    GlobalSurveyResponseMap.where(reviewee_id:params[:id]).each(&:destroy)
+    survey_deployment.destroy
     redirect_to action: 'list'
   end
 

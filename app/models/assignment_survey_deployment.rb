@@ -4,4 +4,8 @@ class AssignmentSurveyDeployment < SurveyDeployment
   def parent_name
     assignment.name
   end
+
+  def response_maps
+    AssignmentSurveyResponseMap.where(reviewee_id: id)
+  end
 end

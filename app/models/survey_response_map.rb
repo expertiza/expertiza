@@ -2,6 +2,7 @@
 # The reviewed_object id is either assignment or course id;
 # The reviewer_id is either assignment participant id or course participant id;
 # The reviewee_id is survey_deployment id.
+# (if global survey is required, the reviewee_id will also be survey_deployment id)
 class SurveyResponseMap < ResponseMap
   def survey?
     true

@@ -71,6 +71,11 @@ class TreeDisplayController < ApplicationController
     goto_controller('Assignments')
   end
 
+  # direct access to notifications
+  def goto_notifications
+    goto_controller('Notifications')
+  end
+
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list

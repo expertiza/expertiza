@@ -1,4 +1,7 @@
- <%@l = -1 %>
+<div style="margin-bottom: 15px;">
+  <%= link_to "Overall Sentiment analysis Report", {:controller => 'popup', :action => 'assignment_sentiment_analysis_popup', :assignment_id=>@id } %>
+</div>
+<%@l = -1 %>
       <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
       <div class = 'reviewreport'>
   <!-- Added headers for tablesorter -->
@@ -21,8 +24,7 @@
     </tr>
     </thead>
 <tbody>
-
-      <% sort_reviewer_by_review_volume_desc.each do |r| %>
+<% sort_reviewer_by_review_volume_desc.each do |r| %>
         <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
         <tr>
         <%if r.id != -1 %>
@@ -71,6 +73,9 @@
                   <!--Metrics-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
                     <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                    <!-- Sentiment Analysis for individual reviewer-->
+                    <%= link_to "Sentiment analysis", :controller => 'popup', :action => 'reviewer_sentiment_analysis_popup', :id => r.id, :assignment_id=>@id %>
+
                   </td>
                   <!--Assign grade and write comments-->
                   <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

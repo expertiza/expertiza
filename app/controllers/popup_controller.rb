@@ -1,4 +1,12 @@
+require 'httparty'
+require 'json'
 class PopupController < ApplicationController
+  include HTTParty
+
+  @@sentimentAnalysis={}
+  @@dataToAnalyze = {}
+  @@review_comments = {} #set by assignment_sentiment_analysis_popup to be used in createQuestionWiseStructure
+  @@assignment_sentiment_view = false # Flag to indicate whether its overall sentiment analysis or per reviewer sentiment analysis
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -33,6 +41,7 @@ class PopupController < ApplicationController
   # this can be called from "response_report" by clicking team names from instructor end.
   def team_users_popup
     @sum = 0
+    logger.info params[:id]
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
     @team_users = TeamsUser.where(team_id: params[:id])
@@ -106,7 +115,6 @@ class PopupController < ApplicationController
 
     end
   end
-
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
@@ -119,4 +127,342 @@ class PopupController < ApplicationController
     @user = User.find(@userid)
     @id = params[:assignment_id]
   end
+
+  # @author: Rushi.Bhatt (Independent study)
+  # Def: To create the Heatmap data structure
+  # input - takes class variable @@sentimentAnalysis
+  # output - Structure to create the heatmap chart
+  def covertToHeatmapData
+    #we need to convert for each reviewee i.e for each keys
+    # here we dont have round data and user has clicked on individual reviewer, so
+    #v_labels are all the reviewees
+    #h_labels are all the questions,
+    @v_label_array =[]
+    @h_label_array =[]
+    @h_label_array_length=[]
+    if @@assignment_sentiment_view==false
+      #individual reviewer view, when clicked on individual reviewer
+      @@sentimentAnalysis.each do |key,value|
+        #map the reviewee id to the user id, using the participants table
+        @reviewee_id =   TeamsUser.find_by(:team_id=>key).user_id
+        @reviewee_name = User.find_by(:id => @reviewee_id).name
+        @v_label_array.push(@reviewee_name)
+        @h_label_array_length.push(value["sentiments"].length) #number of questions/answers in the data for each reviewer
+      end
+      @max_hlabel_length = @h_label_array_length.min #ideally all the values in the @h_label_array_length will be same
+      for i in 0..@max_hlabel_length-2         # -2 because last data is for additionalComments,and index starts from 0
+        @h_label_array.push("Q"+(i+1).to_s)
+      end
+      @h_label_array.push("AdditionalComments")
+
+    else
+      #assignment overall view, when clicked on sentiment_analysis link
+      @@sentimentAnalysis.each do |key,value|
+        #map the reviewer id to the user id, using the participants table
+        @reviewer_id =   Participant.find_by(:id=>key).user_id
+        @reviewer_name = User.find_by(:id=>@reviewer_id).name
+        @v_label_array.push(@reviewer_name)
+        @h_label_array_length=[]
+        @h_label_array = []
+        value["sentiments"].each do|cell|
+          @h_label_array.push(cell["id"])
+        end
+        @h_label_array_length.push(@h_label_array.length)
+      end
+
+      @h_label_array = []
+      for i in 1..@h_label_array_length.min   #for now, I have used min, but we can use max and use dummy data where data is not found
+        @h_label_array.push("Reviewee"+i.to_s) #Dummy label creation. actual reviewee id will be in the comment
+      end
+    end
+
+    @jsonHeatmapDataArray = []
+    @jsonHeatmapData = {
+        "v_labels"=> @v_label_array,
+        "h_labels"=> @h_label_array,
+        "showTextInsideBoxes"=> true,
+        "showCustomColorScheme"=> false,
+        "tooltipColorScheme"=> "black",
+        "font-size"=> 11,
+        "font-face"=> "Arial",
+        "custom_color_scheme"=> {"minimum_value"=> -1, "maximum_value"=> 1, "minimum_color"=> "#FFFF00", "maximum_color"=> "#FF0000", "total_intervals"=> 5},
+        "color_scheme"=>
+            { "ranges"=> [
+                {"minimum"=> -1, "maximum"=> -0.5, "color"=> "#E74C3C"},
+                {"minimum"=> -0.5, "maximum"=> 0, "color"=> "#F1948A"},
+                {"minimum"=> 0, "maximum"=> 0.5, "color"=> "#82E0AA"},
+                {"minimum"=> 0.5, "maximum"=> 1, "color"=> "#229954"}
+            ]
+            },
+        "content"=> []
+    }
+    content_array=[]   #To set the content of above structure
+    @@sentimentAnalysis.each do |key,value|
+      #Outer loop for each key
+      eachRow = []
+      for j in 0..@jsonHeatmapData["h_labels"].length-1
+        eachCell={}
+        eachCell["value"] = value["sentiments"][j]["sentiment"]
+        if @@assignment_sentiment_view==true
+          @reviewee_id =   TeamsUser.find_by(:team_id=>value["sentiments"][j]["id"].to_i).user_id
+          @reviewee_name = User.find_by(:id=>@reviewee_id).name
+          eachCell["text"] = @reviewee_name+" - "+ value["sentiments"][j]["text"]  #adding the reviewee name to the data
+        else
+          eachCell["text"] = value["sentiments"][j]["text"]
+        end
+        eachRow.push(eachCell)
+      end
+      content_array.push(eachRow)
+    end
+    @jsonHeatmapData["content"] = content_array
+    @jsonHeatmapData.to_json
+  end
+
+  # @author: Rushi.Bhatt (Independent study)
+  # Def: To generate sentiment analysis for individual reviewer
+  # input - takes class variable @@review_comments
+  def reviewer_sentiment_analysis_popup
+    @@assignment_sentiment_view=false  #Set the assignment flag to false, since its for individual reviewer
+    @userid = Participant.find(params[:id]).user_id
+    @user = User.find(@userid)
+    @id = params[:assignment_id]
+    @assignment = Assignment.find(params[:assignment_id])
+    @review_comments = ReviewMappingController.class_variable_get(:@@review_comments)
+    @rounds = @assignment.num_review_rounds
+    @reviewer_id = AssignmentParticipant.find_by_user_id_and_assignment_id(@userid, @id).id
+
+
+    #check if the assignment has rounds with varying rubrics or not
+    if not @assignment.varying_rubrics_by_round?
+      #Structure of the data - [reviewer_id][reviewee_id] = comments
+
+      @w=0 #widht of the heatmap chart div
+      @h=0 #height of the heatmap chart div
+      @heatmapData={} #data for the heatmap chart
+
+      #Get only the data for particular reviewer
+      @@dataToAnalyze = @review_comments[@reviewer_id] #Since we want to use that data in another function, we are storing it in class variable
+      @analysis = analyze_review_comments()
+      @@sentimentAnalysis = @analysis  #To use it in another function
+      @heatmapData = covertToHeatmapData()
+      @w = (@heatmapData['h_labels'].length) * 200
+      @h = (@heatmapData['v_labels'].length) * 60
+
+    else
+      #Multiple rounds
+      #Structure of the data - [reviewer_id][round][reviewee_id] = comments
+      #Do the same process above but for each round
+
+      @heatmapData={} #data for the heatmap chart
+      @w={} #widht of the heatmap chart div for each round
+      @h={} #height of the heatmap chart div for each round
+
+      for round in 1..@rounds do
+        #[reviewer_id][reviewee_id] = comments
+        #only the data for particular reviewer:
+
+        @@dataToAnalyze = @review_comments[@reviewer_id][round]
+        @analysis = analyze_review_comments()
+        @@sentimentAnalysis = @analysis
+        @heatmapDataForEachRound = covertToHeatmapData()
+        @heatmapData[round]=@heatmapDataForEachRound
+        @wForEachRound = (@heatmapDataForEachRound['h_labels'].length) * 200
+        @hForEachRound = (@heatmapDataForEachRound['v_labels'].length) * 60
+        @w[round]=@wForEachRound
+        @h[round]=@hForEachRound
+      end #for loop
+    end #if else
+  end #def
+
+
+  #@author - Rushi.Bhatt.
+  #def - Creating question wise structure for assignment sentiment analysis report
+  #structure: [questionX][reviewer_id]["reviews"]=>[ {id=reviewee_id, text= CommentforquestionX},{..}]
+  #input - takes @@review_comments class variable as an input
+  def createQuestionwiseStructure
+    @assignment = Assignment.find(params[:assignment_id])
+    @rounds = @assignment.num_review_rounds
+    if not @assignment.varying_rubrics_by_round?
+      #if the assignment doesnt have any round wise structure
+      @questionwiseStructure={}
+      @num_of_questions_array=[]
+      @@review_comments.each do |key,value|
+        value.each do |key1,value1|
+          @num_of_questions_array.push(value1["reviews"].length)
+        end
+      end
+      @num_of_questions = @num_of_questions_array.max
+
+      for @question_num in 0..@num_of_questions-1
+        @eachQuestion={}
+        @@review_comments.each do |reviewer,reviewee|
+          @eachReviewer={}
+          @eachRow = []
+          reviewee.each do |key,value|
+            @eachCell = {}
+            @eachCell = value["reviews"][@question_num]
+            @eachCell["id"] = key.to_s
+            @eachRow.push(@eachCell)
+          end
+          @eachReviewer["reviews"] = @eachRow
+          @eachQuestion[reviewer.to_s]=@eachReviewer
+          if @question_num+1 == @num_of_questions     #last question is additional comment
+            @key = "AdditionalComments"
+          else
+            @key = "Q"+(@question_num+1).to_s
+          end
+          @questionwiseStructure[@key] = @eachQuestion
+        end
+      end
+      @questionwiseStructure
+    else
+      #assignment has rounds, each round might have different number of questions
+      #[round][questionX][reviewer_id]["reviews"]=>[ {id=reviewee_id, text= CommentforquestionX},{..}]
+      @questionwiseStructure={}
+      @num_of_questions={}
+      @@review_comments.each do |key,value|
+        value.each do |key1,value1|
+          value1.each do |key2,value2|
+            @num_of_questions[key1]=(value2["reviews"].length)
+          end
+        end
+      end
+
+      for @round_num in 1..@rounds
+        @eachRound = {}
+        for @question_num in 0..@num_of_questions[@round_num]-1
+          @eachQuestion={}
+          @@review_comments.each do |reviewer,reviewer_value|
+            @eachReviewer={}
+            @eachRow = []
+            reviewer_value[@round_num].each do |reviewee,reviewee_value|
+              @eachCell = {}
+              @eachCell = reviewee_value["reviews"][@question_num]
+              @eachCell["id"] = reviewee.to_s
+              @eachRow.push(@eachCell)
+            end #for each reviewee
+            @eachReviewer["reviews"] = @eachRow
+            @eachQuestion[reviewer.to_s]=@eachReviewer
+          end  #for each reviewer
+
+          if @question_num+1 == @num_of_questions[@round_num] then    #last question is additional comment
+            @key = "AdditionalComments"
+          else
+            @key = "Q"+(@question_num+1).to_s
+          end
+          @eachRound[@key] = @eachQuestion
+        end #for each question
+        @questionwiseStructure[@round_num] = @eachRound
+      end #for each round
+      @questionwiseStructure
+    end #if else
+  end #def
+
+  # @author: Rushi.Bhatt (Independent study)
+  # Def: To generate sentiment analysis for overall assignment
+  # input - takes class variable @@review_comments
+  def assignment_sentiment_analysis_popup
+    @@assignment_sentiment_view=true  #set the assignment sentiment analysis flag to true
+    @assignment = Assignment.find(params[:assignment_id])
+    @review_comments = ReviewMappingController.class_variable_get(:@@review_comments)
+    @rounds = @assignment.num_review_rounds
+    @@review_comments = @review_comments #to be used in createQuestionWiseStructure
+    @num_of_questions={}
+    if not @assignment.varying_rubrics_by_round?
+      @@review_comments.each do |key,value|
+        value.each do |key2,value2|
+          @num_of_questions[key]=(value2["reviews"].length)
+        end
+      end
+    else
+      @@review_comments.each do |key,value|
+        value.each do |key1,value1|
+          value1.each do |key2,value2|
+            @num_of_questions[key1]=(value2["reviews"].length)
+          end
+        end
+      end
+    end
+
+    @review_comments = createQuestionwiseStructure()
+    if not @assignment.varying_rubrics_by_round?
+      @w={}
+      @h={}
+      @heatmapData={}
+      for question in 1..@num_of_questions
+        #[reviewer_id][reviewee_id] = comments
+        #only the data for particular reviewer:
+        if question == @num_of_questions  #last question is addditionalComment
+          @@dataToAnalyze = @review_comments["AdditionalComments"]
+        else
+          @@dataToAnalyze = @review_comments["Q"+question.to_s]
+        end
+        @analysis = analyze_review_comments()
+        @@sentimentAnalysis = @analysis
+        @heatmapDataForEach = covertToHeatmapData()
+        @wForEach = (@heatmapDataForEach['h_labels'].length) * 200
+        @hForEach = (@heatmapDataForEach['v_labels'].length) * 60
+
+        if question == @num_of_questions
+          @heatmapData["AdditionalComments"]=@heatmapDataForEach
+          @w["AdditionalComments"]=@wForEach
+          @h["AdditionalComments"]=@hForEach
+        else
+          @heatmapData[question]=@heatmapDataForEach
+          @w[question]=@wForEach
+          @h[question]=@hForEach
+        end
+      end
+    else
+      #multiple rounds
+      @heatmapData={}
+      @w={}
+      @h={}
+      for round in 1..@rounds do
+        @heatmapData[round]={}
+        @w[round]={}
+        @h[round]={}
+        for question in 1..@num_of_questions[round]
+          #[reviewer_id][reviewee_id] = comments
+          #only the data for particular reviewer:
+          if question == @num_of_questions[round]  #last question is addditionalComment
+            @@dataToAnalyze = @review_comments[round]["AdditionalComments"]
+          else
+            @@dataToAnalyze = @review_comments[round]["Q"+question.to_s]
+          end
+
+          @analysis = analyze_review_comments()
+          @@sentimentAnalysis = @analysis
+          @heatmapDataForEach = covertToHeatmapData()
+          @wForEach = (@heatmapDataForEach['h_labels'].length) * 200
+          @hForEach = (@heatmapDataForEach['v_labels'].length) * 60
+
+          if question == @num_of_questions[round]
+            @heatmapData[round]["AdditionalComments"]=@heatmapDataForEach
+            @w[round]["AdditionalComments"]=@wForEach
+            @h[round]["AdditionalComments"]=@hForEach
+          else
+            @heatmapData[round][question]=@heatmapDataForEach
+            @w[round][question]=@wForEach
+            @h[round][question]=@hForEach
+          end
+        end # for loop for question
+      end #for loop for round
+    end #for if else
+  end #def
+
+  # @author: Rushi.Bhatt (Independent study)
+  # Def: To analyze the review coomments using the sentiment analysis service - peer logic
+  # input - takes class variable @@dataToAnalyze
+  def analyze_review_comments
+    @analyzedData = {}
+    @@dataToAnalyze.each do |key,value|
+      @result = HTTParty.post("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk",
+                              :body => value.to_json,
+                              :headers => { 'Content-Type' => 'application/json' })
+      @analyzedData[key]=@result
+    end
+    @analyzedData
+  end
+
 end

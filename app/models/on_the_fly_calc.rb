@@ -2,9 +2,13 @@ module OnTheFlyCalc
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
   def compute_total_score(scores)
-    total = 0
-    self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
-    total
+    if self.get_current_stage != 'Finished'
+      total = 0
+      self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
+      total
+    else
+      defined?(super) && super
+    end
   end
 
   def compute_reviews_hash

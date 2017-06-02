@@ -49,7 +49,6 @@ class SurveyDeploymentController < ApplicationController
 
   def new_course_deployment
     @parent = Course.find(params[:id])
-    # puts @parent.id
     @total_students = CourseParticipant.where(parent_id: @parent.id).count
   end
 
@@ -80,16 +79,20 @@ class SurveyDeploymentController < ApplicationController
 
   def list
     @survey_deployments = SurveyDeployment.all
-    @surveys = {}
+    @survey_questionnaires = {}
     @survey_deployments.each do |sd|
       corresp_questionnaire_name = Questionnaire.find(sd.questionnaire_id).name
-      @surveys[sd.id] = corresp_questionnaire_name
+      @survey_questionnaires[sd.id] = corresp_questionnaire_name
     end
   end
 
+  # This delete does not test if any response_map or response has been created.
+  # Therefore it may bring in dirty data.
   def delete
-    SurveyDeployment.find(params[:id]).destroy
-    SurveyResponse.where(survey_deployment_id: params[:id]).each(&:destroy)
+    survey_deployment = SurveyDeployment.find(params[:id])
+    survey_deployment.response_maps.each(&:destroy)
+    GlobalSurveyResponseMap.where(reviewee_id:params[:id]).each(&:destroy)
+    survey_deployment.destroy
     redirect_to action: 'list'
   end
 
@@ -130,5 +133,48 @@ class SurveyDeploymentController < ApplicationController
       end
     end
     super
+  end
+
+  # This method should be moved to survey_deployment_contoller.rb
+  def view_responses
+    sd = SurveyDeployment.find(params[:id])
+    @questionnaire = Questionnaire.find(sd.questionnaire_id)
+    @questions = Question.where(questionnaire_id: @questionnaire.id)
+    response_map_list = ResponseMap.where(reviewee_id: sd.id)
+    # retrieve all the answers on this survey based on survey_response_maps and questions
+    @all_answers = list_answers(@questions, response_map_list)
+    @global_survey_present = false
+
+    if sd.global_survey_id
+      @global_survey_present = true
+      @global_questionnaire = Questionnaire.find(sd.global_survey_id)
+      @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
+      # retrieve all the answers on the global survey based on this survey deploment.
+      # Please note that, for a survey deployment which requires taking a global survey,
+      # there will be two different response_maps.
+      @global_answers = list_answers(@global_questions, response_map_list)
+    end
+  end
+
+  private
+  # this method should be moved to another place with view_responses.
+  def list_answers(questions, response_map_list)
+    all_answers = []
+    questions.each do |question|
+      answers = []
+      response_map_list.each do |response_map|
+        response_list = Response.where(map_id: response_map.id)
+        response_list.each do |response|
+          an_answer = Answer.where(question_id: question.id, response_id: response.id).first
+          unless an_answer.blank?
+            answers << an_answer
+          end
+        end
+      end
+      if !answers.empty?
+        all_answers << answers
+      end
+    end
+    all_answers
   end
 end

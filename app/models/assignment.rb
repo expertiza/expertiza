@@ -8,6 +8,7 @@ class Assignment < ActiveRecord::Base
   include AssignmentAnalytic
   include ReviewAssignment
   include QuizAssignment
+  include LocalDBCalc
   include OnTheFlyCalc
   belongs_to :course
   has_paper_trail
@@ -610,5 +611,42 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
+  end
+
+
+  # Calculates and stores scores in local_db_scores table for each response map for each round
+  def store_total_scores
+    contributors = self.contributors
+    rounds = self.rounds_of_reviews
+    (1..rounds).each do |round|
+      questions = fetch_questions(self, round)
+      contributors.each do |contributor|
+        next unless contributor
+        maps = ReviewResponseMap.where(reviewee_id: contributor.id)
+        maps.each do |map|
+          next if map.response.empty?
+          response = Response.where(map_id: map.map_id).last
+          if map.type.eql?('ReviewResponseMap')
+            # If its ReviewResponseMap only then consider those responses which are submitted.
+            response = nil unless response.is_submitted
+          end
+          score = Answer.get_total_score(response: [response], questions: questions)
+          if score == -1
+            LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: 0, response_map_id: map.map_id)
+          else
+            LocalDbScore.create(score_type: "ReviewLocalDBScore", round: round, score: score, response_map_id: map.map_id)
+          end
+        end
+      end
+    end
+  end
+
+
+  private
+
+  def fetch_questions(assignment, round)
+    review_questionnaire_id = assignment.review_questionnaire_id(round)
+    questions = Question.where(questionnaire_id: review_questionnaire_id)
+    questions
   end
 end

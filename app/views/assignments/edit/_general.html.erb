@@ -163,17 +163,25 @@ function microtaskChanged() {
 
     </td>
   </tr>
-  <tr>
-    <td style='padding:5px' id='assignment_simicheck_field'>
+  <tr colspan="3">
+    <td style='padding:5px'>
+      <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" value="false" onclick="useSimicheckChanged()"></input>
+      <%= label_tag('toggle_simicheck_setting', 'Use simicheck?') %>
+    </td>
+    <td style='padding:5px' id='assignment_simicheck_field' hidden>
       <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
       <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, :selected => @assignment_form.assignment.simicheck) %><b> hours</b>
-    </td>
-  </tr>
-  <tr>
-    <td style='padding:5px' id='assignment_simicheck_threshold'>
+      <br></br>
       <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
       <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, :selected => @assignment_form.assignment.simicheck_threshold) %><b> %</b>
       <br>(Filter that refers to % text same between 2 docs)</br>
+    </td>
+  </tr>
+  <tr>
+    <td style='padding:5px'>
+      <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
+      <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
+      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow tagging feedback comments?') %>
     </td>
   </tr>
 
@@ -229,7 +237,7 @@ function microtaskChanged() {
       }
     }
 
-   function reviewStrategyChanged() {
+    function reviewStrategyChanged() {
      var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
         if (val == 'Auto-Selected') {
           jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
@@ -240,13 +248,26 @@ function microtaskChanged() {
         }
    }
 
-
     function hasQuizChanged() {
       if (jQuery('#assignment_form[assignment][require_quiz]').is(':checked')) {
         jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
       } else {
         jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
       }
+    }
+
+    function useSimicheckChanged(){
+      if (jQuery('#toggle_simicheck_setting').is(':checked')) {
+        jQuery('#assignment_simicheck_field').show();
+        jQuery('#assignment_simicheck_threshold').show();
+      } else {
+        jQuery('#assignment_simicheck_field').hide();
+        jQuery('#assignment_simicheck_threshold').hide();
+      }
+    }
+
+    function useAnswerTagChanged(){
+
     }
 
     jQuery(document).ready(function() {

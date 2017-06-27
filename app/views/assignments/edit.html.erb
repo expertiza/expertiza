@@ -69,7 +69,7 @@
       <%end%>
       <%if @assignment_form.assignment.is_answer_tagging_allowed%>
         <div id="tabs-7">
-          <%= render 'assignments/edit/answer_tag_setting' %>
+          <%= render 'assignments/edit/tag_prompt_deployment' %>
         </div>
       <%end%>
       <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>

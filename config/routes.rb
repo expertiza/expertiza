@@ -8,6 +8,12 @@ Expertiza::Application.routes.draw do
   get 'auth/failure', to: 'content_pages#view'
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
 
+  resources :answer_tags do
+    collection do
+      post :create_edit
+    end
+  end
+
   resources :bookmarks do
     collection do
       post :save_bookmark_rating_score

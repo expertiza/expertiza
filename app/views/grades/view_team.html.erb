@@ -146,7 +146,15 @@ th.sorter-true.tablesorter-headerUnSorted{
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td><%= row.score_row[index].comment %></td>
+                              <td>
+                                <%= row.score_row[index].comment %>
+                                <% if row.score_row[index].tags.count > 0 %>
+                                  <br>
+                                  <% row.score_row[index].tags.each do |tag| %>
+                                    <%= tag.get_tag_prompt_control(@participant.user) %> &nbsp;
+                                  <% end %>
+                                <% end %>
+                              </td>
                             </tr>
                         <% end %>
                       </table>

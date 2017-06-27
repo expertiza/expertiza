@@ -169,7 +169,7 @@ class Criterion < ScoredQuestion
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
-  def view_completed_question(count, answer, questionnaire_max, tag_settings = nil)
+  def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
     score = !answer.answer.nil? ? answer.answer.to_s : "-"
     score_percent = if score != "-"
@@ -202,32 +202,27 @@ class Criterion < ScoredQuestion
       html += '<td style="padding-left:10px">'
       html += answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
       html += '</td>'
-      unless tag_settings.nil?
+      #### start code to show tag prompts ####
+      unless tag_prompt_deployments.nil?
         # show check boxes for answer tagging
         resp = Response.find(answer.response_id)
         map = ResponseMap.find(resp.map_id)
         question = Question.find(answer.question_id)
-        if tag_settings.count > 0
+        if tag_prompt_deployments.count > 0
           html += '<tr><td colspan="2">'
-          tag_settings.each do |tag|
-            if tag.question_type == question.type and answer.comments.length > tag.answer_len_threshold.to_i
-              #<input type="range" id="RangeFilter" name="points" onchange="filterme(this.value);" min="1" class="rangeAll" max="3" value="2">
-              html += '<div class="toggle-container" title="' + tag.desc.to_s + '">'
-              html += ' <div class="toggle-false-msg">No</div>'
-	            html += ' <div class="range-field" style=" width:60px">'
-              html += '   <input type="range" name="tag_checkboxes[]" id="cb_' + answer.id.to_s + '_'+ tag.id.to_s + '" min="-1" class="rangeAll" max="1" value="0" onChange="save_tag(' + map.reviewee_id.to_s + ', ' + answer.id.to_s + ', ' + tag.id.to_s + ')"></input>'
-              html += ' </div>'
-              html += ' <div class="toggle-neutral-msg">Neutral</div>'
-              html += ' <div class="toggle-true-msg">Yes</div>'
-              html += ' <div class="toggle-caption">' + tag.prompt.to_s + '</div>'
-              html += '</div>&nbsp;&nbsp;&nbsp;'
+          tag_prompt_deployments.each do |tag_dep|
+            tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
+            if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
+              html += tag_prompt.get_html_control(tag_dep, answer, User.find(map.reviewee_id))
             end
           end
           html += '</td></tr>'
         end
       end
+      #### end code to show tag prompts ####
     end
     html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
+
 end

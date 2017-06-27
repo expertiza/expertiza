@@ -144,10 +144,11 @@ class VmQuestionResponse
         # Color code c0 is reserved for null spaces in the table which will be gray.
         color_code_number = 1 if color_code_number == 0
       end
-
+      tags = AnswerTag.where(answer_id: answer.id)
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments))
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, tags))
+      a  = 1
     end
   end
 

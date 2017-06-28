@@ -208,12 +208,13 @@ class Criterion < ScoredQuestion
         resp = Response.find(answer.response_id)
         map = ResponseMap.find(resp.map_id)
         question = Question.find(answer.question_id)
+
         if tag_prompt_deployments.count > 0
           html += '<tr><td colspan="2">'
           tag_prompt_deployments.each do |tag_dep|
             tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
             if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
-              html += tag_prompt.get_html_control(tag_dep, answer, User.find(map.reviewee_id))
+              html += tag_prompt.get_html_control(tag_dep, answer)
             end
           end
           html += '</td></tr>'

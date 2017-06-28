@@ -151,7 +151,7 @@ th.sorter-true.tablesorter-headerUnSorted{
                                 <% if row.score_row[index].tags.count > 0 %>
                                   <br>
                                   <% row.score_row[index].tags.each do |tag| %>
-                                    <%= tag.get_tag_prompt_control(@participant.user) %> &nbsp;
+                                    <%= tag.get_tag_prompt_control() %> &nbsp;
                                   <% end %>
                                 <% end %>
                               </td>

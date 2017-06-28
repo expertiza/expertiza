@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    function addQuestionnaireTableRow(questionnaire_type,round_no,questionnaire, assignment_questionnaire, questionnaire_options) {
+    function addQuestionnaireTableRow(questionnaire_type, round_no, questionnaire, assignment_questionnaire, questionnaire_options, tag_prompt_options) {
         var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
         var row_id = 'questionnaire_table_' + questionnaire_type;
         var i = 0;
@@ -43,8 +43,51 @@
         else{
             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
         }
+        html += "</tr>"
+
+        //insert menu for adding & selecting tag prompts
+        <%if @assignment_form.assignment.is_answer_tagging_allowed %>
+          tag_dropdown_index = 0
+          placeholder_id = 'tag_prompt_placeholder_' + questionnaire.id
+          html += "<tr>"
+          html += "<td>Add tag prompts</td>"
+          html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
+          html += "<button type='button' onClick='addTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\", " + questionnaire.id + ", " + tag_dropdown_index++ + ")'>Add tag prompt</button>"
+          html += "<button type='button' onClick='removeLastTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\")'>Remove the last tag prompt</button>"
+          html += "</td></tr>"
+        <% end %>
         questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
+    }
+
+    function addTagPromptDropdown(placeholder_id, q_id, tag_prompt_id){
+      $.ajax({
+        dataType: "json",
+        url: "../../tag_prompts/json",
+        data: "",
+        success: function(tag_prompts){
+          var dropdown_placeholder = document.getElementById(placeholder_id);
+          var select_id = 'prompt_' + q_id + '_' + tag_prompt_id
+          var html = "<div id='container_" + select_id + "'>"
+          html += "<select id='" + select_id + "'  onChange='if (this.selectedIndex == 1)openAddNewTagForm()'>"
+          html += "<option value='none'>---</option>"
+          html += "<option value='new'>add new..</option>"
+          for (i=0; i<tag_prompts.length; i++)
+            html += "<option value=" + tag_prompts[i].id + ">" + tag_prompts[i].prompt + "</option>"
+          html += "<select>"
+          html += "&nbsp;Apply to:<input type='text' id='qtype_" + select_id +"'/>"
+          html += "&nbsp;Length threshold:<input type='text' id='threshold_" + select_id +"'/>"
+          html += "</div>"
+          $( "#" + placeholder_id ).append(html)
+        }});
+    }
+
+    function removeLastTagPromptDropdown(placeholder_id){
+      $("#"+placeholder_id+" div:last-child").remove()
+    }
+
+    function openAddNewTagForm(){
+      alert("render add new tag form")
     }
 
     function removeQuestionnaireTableRow(questionnaire_type) {

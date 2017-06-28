@@ -14,6 +14,12 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :tag_prompts do
+    collection do
+      get :json
+    end
+  end
+
   resources :bookmarks do
     collection do
       post :save_bookmark_rating_score

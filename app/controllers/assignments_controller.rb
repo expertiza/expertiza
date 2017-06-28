@@ -115,7 +115,7 @@ class AssignmentsController < ApplicationController
     end
 
     if @assignment_form.assignment.is_answer_tagging_allowed
-      @answer_tag_settings = AnswerTagSetting.where(assignment_id: params[:id])
+      @tag_prompts_deployments = TagPromptsDeployment.where(assignment_id: params[:id])
     end
   end
 

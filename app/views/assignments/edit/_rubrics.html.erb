@@ -52,8 +52,8 @@
           html += "<tr>"
           html += "<td>Add tag prompts</td>"
           html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
-          html += "<button type='button' onClick='addTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\", " + questionnaire.id + ", " + tag_dropdown_index++ + ")'>Add tag prompt</button>"
-          html += "<button type='button' onClick='removeLastTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\")'>Remove the last tag prompt</button>"
+          html += "<button type='button' onClick='addTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\", " + questionnaire.id + ", " + tag_dropdown_index++ + ")'>+Tag prompt+</button>"
+          html += "<button type='button' onClick='removeLastTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\")'>-Tag prompt-</button>"
           html += "</td></tr>"
         <% end %>
         questionnaire_table.last().after(html);
@@ -61,13 +61,23 @@
     }
 
     function addTagPromptDropdown(placeholder_id, q_id, tag_prompt_id){
+      q_types=[]
+      $.ajax({
+        dataType: "json",
+        url: "../../questions/types",
+        data: "",
+        success: function(types){
+          q_types = types
+        }
+      });
+
       $.ajax({
         dataType: "json",
         url: "../../tag_prompts/json",
         data: "",
         success: function(tag_prompts){
           var dropdown_placeholder = document.getElementById(placeholder_id);
-          var select_id = 'prompt_' + q_id + '_' + tag_prompt_id
+          var select_id = 'prompt[' + q_id + '][]' //+ tag_prompt_id
           var html = "<div id='container_" + select_id + "'>"
           html += "<select id='" + select_id + "'  onChange='if (this.selectedIndex == 1)openAddNewTagForm()'>"
           html += "<option value='none'>---</option>"
@@ -75,8 +85,11 @@
           for (i=0; i<tag_prompts.length; i++)
             html += "<option value=" + tag_prompts[i].id + ">" + tag_prompts[i].prompt + "</option>"
           html += "<select>"
-          html += "&nbsp;Apply to:<input type='text' id='qtype_" + select_id +"'/>"
-          html += "&nbsp;Length threshold:<input type='text' id='threshold_" + select_id +"'/>"
+          html += "&nbsp;Apply to question type:<select id='qtype_" + select_id +"'>"
+          for (i=0; i<q_types.length; i++)
+            html += "<option value=" + q_types[i] + ">" + q_types[i] + "</option>"
+          html += "<select>"
+          html += "&nbsp;Length threshold (if applicable):<input type='text' id='threshold_" + select_id +"' size='4'/>"
           html += "</div>"
           $( "#" + placeholder_id ).append(html)
         }});

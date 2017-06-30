@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
       end
     end
 
-    user_list.uniq!
+    user_list.uniq
   end
 
   def first_name

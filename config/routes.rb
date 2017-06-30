@@ -282,8 +282,9 @@ Expertiza::Application.routes.draw do
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
   resources :survey_questionnaires, controller: :questionnaires
+  resources :assignment_survey_questionnaires, controller: :questionnaires
   resources :global_survey_questionnaires, controller: :questionnaires
-  resources :course_evaluation_questionnaires, controller: :questionnaires
+  resources :course_survey_questionnaires, controller: :questionnaires
   resources :bookmarkrating_questionnaires, controller: :questionnaires
 
   resources :questions do
@@ -302,6 +303,7 @@ Expertiza::Application.routes.draw do
       get :redirection
       get :show_calibration_results_for_student
       post :custom_create
+      get :pending_surveys
     end
   end
 
@@ -458,6 +460,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       get :delete
+      post :delete # change
       get :reminder_thread
     end
   end

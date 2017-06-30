@@ -44,9 +44,7 @@ class UsersController < ApplicationController
   # for displaying the list of users
   def list
     user = session[:user]
-    role = user.role
-    all_users = user.get_user_list
-    @users = all_users
+    @users = user.get_user_list
   end
 
   def list_pending_requested

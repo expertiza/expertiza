@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+
+<head>
+  <style>
+      rect.bordered {
+          stroke: #E6E6E6;
+          stroke-width: 2px;
+      }
+
+      text.mono {
+          font-size: 11pt;
+          font-family: Consolas, courier;
+          fill: #000;
+      }
+
+      text.monoInside {
+          font-size: 12pt;
+          font-family: Consolas, courier;
+          fill: #000;
+      }
+
+      text.axis-workweek {
+          fill: #000;
+      }
+
+      text.axis-worktime {
+          fill: #000;
+      }
+
+
+
+      div.tooltip {
+          position: absolute;
+          text-align: center;
+          width: 100px;
+          height: 56px;
+          padding: 10px 2px 2px 2px;
+          font: 16px sans-serif;
+          background: black;
+          border: 0px;
+          border-radius: 8px;
+          pointer-events: none;
+          color: #fff;
+          font-weight: bold;
+      }
+
+      .title {
+          font: 22px sans-serif;
+          font-weight: bold;
+      }
+
+      .transparent {
+          fill: transparent;
+      }
+
+      .class_h_labels {
+          font-size: 14pt;!important;
+          font-family: Verdana,Tahoma,Arial,sans-serif;
+          /* transform:rotate(0deg); !important;*/
+          fill: #000;
+          /* y:"0"; !important;*/
+
+
+      }
+
+
+      .clipped {
+          overflow: hidden;
+      }
+
+      .protip-skin-default {
+          background-color: #000000;
+          color: #ffffff;
+      }
+
+  </style>
+  <link rel="stylesheet" href="/assets/protip.css">
+
+</head>
+
+<body>
+<div id="rdetails">
+
+  <h3> Overall sentiment analysis report for all the reviews of all the reviewers of assignment <%= @assignment.name %> </h3>
+
+
+</div>
+<% if @assignment.varying_rubrics_by_round? %>
+    <span style="margin-right: 10px">Select the round: </span><select id="round"> </select>
+    <span style="margin-right: 10px ; margin-left: 10px; ">Select the question:</span> <select id="question"> </select>
+<% else %>
+    <span style="margin-right: 10px ; ">Select the question:</span> <select id="question"> </select>
+<% end%>
+
+
+<% if @assignment.varying_rubrics_by_round? %>
+    <div id="parent" style="min-height:<%= @h[1][1] %>px; width: 100%;">
+      <div id="chart"></div>
+    </div>
+<% else %>
+    <div id="parent" style=" min-height: <%= @h[1] %>px; width: 100%;">
+      <div id="chart"></div>
+    </div>
+<% end%>
+<script src="/assets/protip.js"></script>
+<script type=text/javascript src="/assets/bundle.js"></script>
+<script type="text/javascript">
+
+    <% if @assignment.varying_rubrics_by_round? %>
+    var varying_rubric = true;
+    <% else %>
+    var varying_rubric = false;
+    <% end%>
+    if(varying_rubric){
+        /*multiple rounds*/
+        console.log("Rushi");
+        var totalRounds = <%= @rounds.to_i %>
+        for(i=0;i<totalRounds;i++){
+            var select = document.getElementById("round");
+            select.options[select.options.length] = new Option('Round'+(i+1),(i+1) );
+        }
+
+        var num_of_questions = <%= @num_of_questions.to_json.html_safe %> ;
+        var totalQuestions = num_of_questions[1]; //Initially populate for round 1
+        for (i = 0; i < totalQuestions; i++) {
+            var select = document.getElementById("question");
+            if(i==totalQuestions-1){
+                select.options[select.options.length] = new Option('Additional Comments', "AdditionalComments");
+            }else{
+                select.options[select.options.length] = new Option('Q' + (i + 1), (i + 1));
+            }
+        }
+
+        function drawChart(round,question) {
+            var heatmapDataForRound = <%= @heatmapData.to_json.html_safe%>;
+            var height = <%= @h.to_json.html_safe %>;
+
+            //<![CDATA[
+            var jsonData = JSON.parse(heatmapDataForRound[round][question]);
+            // ]]>
+            console.log(jsonData);
+            visualizeJsonData (jsonData);
+            $.protip();
+        }
+
+        $("#round").change(function(){
+            var current_round =  parseInt($("#round").val());
+            $('#question').empty();
+            var num_of_questions = <%= @num_of_questions.to_json.html_safe %>;
+            var totalQuestions = num_of_questions[current_round];
+            for (i = 0; i < totalQuestions; i++) {
+                var select = document.getElementById("question");
+                if(i==totalQuestions-1){
+                    select.options[select.options.length] = new Option('Additional Comments', "AdditionalComments");
+                }else{
+                    select.options[select.options.length] = new Option('Q' + (i + 1), (i + 1));
+                }
+            }
+            drawChart(current_round,1); //dar chart for 1st question of that round
+
+        });
+        $("#question").change(function(){
+            var current_round =  parseInt($("#round").val());
+            var current_question =  $("#question").val();
+            drawChart(current_round,current_question);
+        });
+    }
+    else{
+        /*No round structure*/
+        var num_of_questions = <%= @num_of_questions.to_json.html_safe %>;
+        var totalQuestions = num_of_questions;
+        for (i = 0; i < totalQuestions; i++) {
+            var select = document.getElementById("question");
+            if(i==totalQuestions-1){
+                select.options[select.options.length] = new Option('Additional Comments', "AdditionalComments");
+            }else{
+                select.options[select.options.length] = new Option('Q' + (i + 1), (i + 1));
+            }
+        }
+
+        function drawChart(round,question) {
+            var heatmapDataForRound = <%= @heatmapData.to_json.html_safe%>;
+            var height = <%= @h.to_json.html_safe %>;
+
+            //<![CDATA[
+            var jsonData = JSON.parse(heatmapDataForRound[question]);
+            // ]]>
+            console.log(jsonData);
+            visualizeJsonData (jsonData);
+            $.protip();
+        }
+        $("#question").change(function(){
+            var current_question =  $("#question").val();
+            drawChart(1,current_question);
+        });
+
+    }
+
+    $(document).ready(drawChart(1,1)); //change  the round here
+</script>
+</body>
+
+</html>
+

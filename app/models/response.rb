@@ -273,7 +273,7 @@ class Response < ActiveRecord::Base
 
     assignment = Assignment.find(reviewer_participanat.parent_id)
 
-    Mailer.notify_grade_conflict_message(
+    Mailer.notify_grade_conflict_message({
       to: assignment.instructor.email,
        subject: "Expertiza Notification: A review score is outside the acceptable range",
        body: {
@@ -285,7 +285,7 @@ class Response < ActiveRecord::Base
            conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
            summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
            assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-       }}
-    ).deliver_now
+       }
+    }).deliver_now
   end
 end

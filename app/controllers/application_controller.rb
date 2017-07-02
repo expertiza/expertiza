@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   # You want to get exceptions in development, but not in production.
   unless Rails.application.config.consider_all_requests_local
-    rescue_from ActionView::MissingTemplate do |exception|
+    rescue_from ActionView::MissingTemplate do |_exception|
       redirect_to root_path
     end
   end

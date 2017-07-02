@@ -80,22 +80,22 @@ RSpec.configure do |config|
   #
   #   # rspec-mocks config goes here. You can use an alternate test double
   #   # library (such as bogus or mocha) by changing the `mock_with` option here.
-    config.mock_with :rspec do |mocks|
-      # Enable only the newer, non-monkey-patching expect syntax.
-      # For more details, see:
-      #   - http://teaisaweso.me/blog/2013/05/27/rspecs-new-message-expectation-syntax/
-      mocks.syntax = :expect
-  
-      # Prevents you from mocking or stubbing a method that does not exist on
-      # a real object. This is generally recommended.
-      mocks.verify_partial_doubles = false
-      
-      # This option should be set when all dependencies are being loaded
-      # before a spec run, as is the case in a typical spec helper. It will
-      # cause any verifying double instantiation for a class that does not
-      # exist to raise, protecting against incorrectly spelt names.
-      mocks.verify_doubled_constant_names = false
-    end
+  config.mock_with :rspec do |mocks|
+    # Enable only the newer, non-monkey-patching expect syntax.
+    # For more details, see:
+    #   - http://teaisaweso.me/blog/2013/05/27/rspecs-new-message-expectation-syntax/
+    mocks.syntax = :expect
+
+    # Prevents you from mocking or stubbing a method that does not exist on
+    # a real object. This is generally recommended.
+    mocks.verify_partial_doubles = false
+
+    # This option should be set when all dependencies are being loaded
+    # before a spec run, as is the case in a typical spec helper. It will
+    # cause any verifying double instantiation for a class that does not
+    # exist to raise, protecting against incorrectly spelt names.
+    mocks.verify_doubled_constant_names = false
+  end
 
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")

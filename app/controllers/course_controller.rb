@@ -151,7 +151,7 @@ class CourseController < ApplicationController
     @user = User.find_by_name(params[:user][:name])
     if @user.nil?
       flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
-    elsif TaMapping.where(ta_id: @user.id, course_id: @course.id).size > 0
+    elsif !TaMapping.where(ta_id: @user.id, course_id: @course.id).empty?
       flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" is already a TA for this course."
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)

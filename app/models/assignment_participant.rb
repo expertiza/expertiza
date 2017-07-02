@@ -23,7 +23,7 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
- 
+
   # Returns the average score of one question from all reviews for this user on this assignment as an floating point number
   # Params: question - The Question object to retrieve the scores from
   def average_question_score(question)
@@ -319,7 +319,7 @@ class AssignmentParticipant < Participant
     self.handle = if self.user.handle.nil? or self.user.handle == ""
                     self.user.name
                   elsif !AssignmentParticipant.where(parent_id: self.assignment.id, handle: self.user.handle).empty?
-                   self.user.name
+                    self.user.name
                   else
                     self.user.handle
                   end

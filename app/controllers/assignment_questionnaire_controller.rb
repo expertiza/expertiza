@@ -23,10 +23,9 @@ class AssignmentQuestionnaireController < ApplicationController
       flash[:error] = "Missing assignment:" + params[:assignment_id]
       return
     elsif params[:questionnaire_id].nil?
-           flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
-           return
+      flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
+      return
     end
-
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?

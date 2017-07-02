@@ -72,8 +72,8 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select{|due_date| due_date.deadline_type_id == 1}
-      @assignment_review_due_dates = @due_date_all.select{|due_date| due_date.deadline_type_id == 2}
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 1 }
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 2 }
     end
 
     # Check if name and url in database is empty before webpage displays

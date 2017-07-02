@@ -1,6 +1,6 @@
 class SignUpTopic < ActiveRecord::Base
   has_many :signed_up_teams, foreign_key: 'topic_id', dependent: :destroy
-  has_many :due_dates, :class_name => 'TopicDueDate', :foreign_key => 'parent_id', :dependent => :destroy
+  has_many :due_dates, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 

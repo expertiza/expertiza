@@ -51,7 +51,7 @@ module FileHelper
       entries = Dir.entries(in_object.path)
       FileUtils.remove_dir(in_object.path) if entries and entries.size == 2
     rescue => e
-      raise "An error occurred while deleting the directory: "+ e.message
+      raise "An error occurred while deleting the directory: " + e.message
     end
   end
 
@@ -59,7 +59,7 @@ module FileHelper
     begin
       FileUtils.mkdir_p(in_object.path) unless File.exist? in_object.path
     rescue => e
-      raise "An error occurred while creating this directory: "+ e.message
+      raise "An error occurred while creating this directory: " + e.message
     end
   end
 
@@ -67,7 +67,7 @@ module FileHelper
     begin
       FileUtils.mkdir_p(path) unless File.exist? path
     rescue => e
-      raise "An error occurred while creating this directory: "+ e.message
+      raise "An error occurred while creating this directory: " + e.message
     end
   end
 end

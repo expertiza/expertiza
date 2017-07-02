@@ -1,5 +1,4 @@
 module ReviewAssignment
-
   def contributors
     # ACS Contributors are just teams, so removed check to see if it is a team assignment
     @contributors ||= teams # ACS
@@ -203,5 +202,4 @@ module ReviewAssignment
     # they were picked.
     contributor_set.sample
   end
-
 end

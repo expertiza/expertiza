@@ -565,7 +565,7 @@ describe "assignment function" do
       fill_in 'user_name', with: student.name
       choose 'user_role_participant'
 
-      expect{click_button 'Add'; sleep(1)}.to change { Participant.count }.by 1
+      expect { click_button 'Add'; sleep(1) }.to change { Participant.count }.by 1
     end
 
     it "should display newly created assignment" do

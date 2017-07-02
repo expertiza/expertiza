@@ -19,7 +19,7 @@ module MailerHelper
       body: {
         super_user: super_user,
         user: user,
-        first_name: ApplicationHelper.get_user_first_name(super_user),
+        first_name: ApplicationHelper.get_user_first_name(super_user)
       }
     })
   end

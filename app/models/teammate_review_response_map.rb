@@ -20,8 +20,8 @@ class TeammateReviewResponseMap < ResponseMap
     @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", id, 'TeammateReviewResponseMap'])
   end
 
-  #Send Teammate Review Emails
-  #Refactored from email method in response.rb
+  # Send Teammate Review Emails
+  # Refactored from email method in response.rb
   def email(defn, participant, assignment)
     defn[:body][:type] = "Teammate Review"
     participant = AssignmentParticipant.find(reviewee_id)

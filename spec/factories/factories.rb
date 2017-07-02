@@ -149,7 +149,6 @@ FactoryGirl.define do
     reply_status 'W'
   end
 
-
   factory :course_team, class: CourseTeam do
     sequence(:name) {|n| "team#{n}" }
     course { Course.first || association(:course) }

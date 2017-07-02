@@ -434,9 +434,7 @@ class Assignment < ActiveRecord::Base
 
     # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
-      
       @uniq_response_type.each do |res_type|
-        
         round_type = check_empty_rounds(@answers, round_num, res_type)
 
         unless round_type.nil?
@@ -453,14 +451,14 @@ class Assignment < ActiveRecord::Base
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.export_details_fields(detail_options)
     fields = []
-    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
+    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'
     fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
-    fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
+    fields << 'Reviewer' if detail_options['reviewer'] == 'true'
     fields << 'Question / Criterion' if detail_options['question'] == 'true'
     fields << 'Question ID' if detail_options['question_id'] == 'true'
     fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
     fields << 'Answer / Comment' if detail_options['comments'] == 'true'
-    fields << 'Score' if detail_options['score'] == 'true'  
+    fields << 'Score' if detail_options['score'] == 'true'
     fields
   end
 
@@ -494,14 +492,14 @@ class Assignment < ActiveRecord::Base
   def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
-    
+
     # for each map, get the response & answer associated with it
     @response_maps_for_assignment.each do |map|
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
       @response_for_this_map.each do |resp|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
-        
+
         @answer.each do |ans|
           answers[resp.round][map.type].push(ans)
         end

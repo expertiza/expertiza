@@ -39,7 +39,7 @@ class PasswordRetrievalController < ApplicationController
         # URL expires after 1 day
         expired_url = password_reset.updated_at + 1.day
         if Time.now < expired_url
-          #redirect_to action: 'reset_password', email: password_reset.user_email
+          # redirect_to action: 'reset_password', email: password_reset.user_email
           @email = password_reset.user_email
           render template: "password_retrieval/reset_password"
         else
@@ -62,11 +62,11 @@ class PasswordRetrievalController < ApplicationController
   # called after entering password and repassword, checks for validation and updates the password of the email
   def update_password
     if params[:reset][:password] == params[:reset][:repassword]
-      user=User.find_by(:email => params[:reset][:email])
+      user = User.find_by(email: params[:reset][:email])
       user.password = params[:reset][:password]
       user.password_confirmation = params[:reset][:repassword]
       if user.save
-        PasswordReset.delete_all(:user_email => user.email)
+        PasswordReset.delete_all(user_email: user.email)
         flash[:success] = "Reset password success"
         redirect_to "/"
       else
@@ -79,5 +79,4 @@ class PasswordRetrievalController < ApplicationController
       render template: "password_retrieval/reset_password"
     end
   end
-
 end

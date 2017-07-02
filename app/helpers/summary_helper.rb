@@ -125,9 +125,9 @@ module SummaryHelper
             summary[reviewee.name][round][q.txt] = ""
             self.avg_scores_by_criterion[reviewee.name][round][q.txt] = 0.0
 
-            #get all answers to this question
-            question_answers = Answer.answers_by_question_for_reviewee_in_round(assignment.id, reviewee.id, q.id, round+1)
-            #get max score of this rubric
+            # get all answers to this question
+            question_answers = Answer.answers_by_question_for_reviewee_in_round(assignment.id, reviewee.id, q.id, round + 1)
+            # get max score of this rubric
             q_max_score = get_max_score_for_question(q)
 
             comments = break_up_comments_to_sentences(question_answers)
@@ -182,7 +182,7 @@ module SummaryHelper
           sentences.map!(&:strip)
         end
         # add the comment to an array to be converted as a json request
-        comments.concat(sentences) if !sentences.nil?
+        comments.concat(sentences) unless sentences.nil?
       end
       comments
     end

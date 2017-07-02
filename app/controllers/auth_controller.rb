@@ -9,10 +9,10 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'login', 'logout', 'login_failed', 'google_login'
-        true
-      else
-        current_role_name.eql?("Super-Administrator")
+    when 'login', 'logout', 'login_failed', 'google_login'
+      true
+    else
+      current_role_name.eql?("Super-Administrator")
     end
   end
 
@@ -39,11 +39,11 @@ class AuthController < ApplicationController
             flash[:error] = "We can't find this username in our database, please try with other username"
           else
             # keep track of login attempts per valid username, and reset this when (s)he has succesfully login
-            if @@attempts.key?(params[:login][:name])
-              @@attempts[params[:login][:name]] = @@attempts[params[:login][:name]] + 1
-            else
-              @@attempts[params[:login][:name]] = 1
-            end
+            @@attempts[params[:login][:name]] = if @@attempts.key?(params[:login][:name])
+                                                  @@attempts[params[:login][:name]] + 1
+                                                else
+                                                  1
+                                                end
             logger.warn "Failed login attempt."
             flash[:error] = "Incorrect password, please try again or click \'Forgot password?\' [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
             # force them to go to password retrieval after 5x (they can still try logging in when they press back button)

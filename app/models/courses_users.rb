@@ -8,7 +8,7 @@ class CoursesUsers < ActiveRecord::Base
       attributes = ImportFileHelper.define_attributes(row)
       user = ImportFileHelper.create_new_user(attributes, session)
     end
-    raise MissingObjectIDError if id == nil
+    raise MissingObjectIDError if id.nil?
     course = Course.find(id)
     if course.nil?
       raise ImportError, "The course with the id \"" + id.to_s + "\" was not found."
@@ -23,14 +23,14 @@ class CoursesUsers < ActiveRecord::Base
     course = Course.find(self.course_id)
     Mailer.sync_message(
       recipients: user.email,
-       subject: "You have been registered as a participant in #{course.title}",
-       body: {
-         home_page: home_page,
-         user_name: ApplicationHelper.get_user_first_name(user),
-         name: user.name,
-         password: pw,
-         partial_name: "register"
-       }
+      subject: "You have been registered as a participant in #{course.title}",
+      body: {
+        home_page: home_page,
+        user_name: ApplicationHelper.get_user_first_name(user),
+        name: user.name,
+        password: pw,
+        partial_name: "register"
+      }
     ).deliver
   end
 end

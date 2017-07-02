@@ -4,7 +4,7 @@ class StudentReviewController < ApplicationController
      'Teaching Assistant',
      'Administrator',
      'Super-Administrator',
-     'Student'].include? current_role_name and 
+     'Student'].include? current_role_name and
     ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
   end
 
@@ -28,7 +28,7 @@ class StudentReviewController < ApplicationController
     # Add the reviews which are requested and not began.
     @num_reviews_completed = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if (!map.response.empty? && map.response.last.is_submitted)
+      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
     end
 
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed

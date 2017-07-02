@@ -14,7 +14,6 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end
@@ -22,7 +21,6 @@ class Mailer < ActionMailer::Base
          to: defn[:to],
          bcc: defn[:bcc])
   end
-
 
   def request_user_message(defn)
     @user = defn[:body][:user]
@@ -80,7 +78,7 @@ class Mailer < ActionMailer::Base
     @body = defn[:body]
 
     @assignment = @body[:assignment]
-    @reviewer_name = @body[:reviewer_name ]
+    @reviewer_name = @body[:reviewer_name]
     @type = @body[:type]
     @reviewee_name = @body[:reviewee_name]
     @new_score = @body[:new_score]

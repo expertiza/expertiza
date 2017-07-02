@@ -10,8 +10,8 @@ class CourseTeam < Team
     "Course"
   end
 
-  def self.parent_model (id)
-    Course.find(id) 
+  def self.parent_model(id)
+    Course.find(id)
   end
 
   # Get team node type

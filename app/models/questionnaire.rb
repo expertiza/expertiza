@@ -41,9 +41,8 @@ class Questionnaire < ActiveRecord::Base
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
                          'BookmarkratingQuestionnaire',
-                         'QuizQuestionnaire'
-                        ].freeze # zhewei: for some historical reasons, some question types have white space, others are not
-                                 # need fix them in the future.
+                         'QuizQuestionnaire'].freeze # zhewei: for some historical reasons, some question types have white space, others are not
+  # need fix them in the future.
   has_paper_trail
 
   def compute_weighted_score(symbol, assignment, scores)

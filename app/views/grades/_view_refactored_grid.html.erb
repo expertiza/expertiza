@@ -22,10 +22,33 @@ th.sorter-true.tablesorter-headerUnSorted{
   background-position: center right;
   padding-right: 15px;
 }
+/*.hidden {
+    display: none;
+}
 </style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
-<h1>Summary Report for assignment: <%= @assignment.name %></h1>
+<script type = "text/javascript" language = "javascript">
+
+function toggleFunction(elementId) {
+    var target = document.getElementById(elementId);
+    if (target.style.display === 'none') {
+        target.style.display = 'block';
+    } else {
+        target.style.display = 'none';
+    }
+}
+      
+      </script>
+<h1>Review Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
+<button onclick="toggleFunction('<%= @participant.id.to_s.to_sym%>')">Show Submission</button>
+
+
+     <div id="<%= @participant.id.to_s.to_sym%>" style="display:none;">
+<% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @assignment.get_current_stage(topic_id)} %>
+
+      </div><br>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>

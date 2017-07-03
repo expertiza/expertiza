@@ -1,0 +1,203 @@
+<style>
+th.tablesorter-headerAsc{
+  background-image: url(<%= asset_path("up-arrow.png") %>);
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
+
+th.tablesorter-headerDesc{
+  background-image: url(<%= asset_path("down-arrow.png") %>);
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
+
+th.sorter-true.tablesorter-headerUnSorted{
+  background-image: url(<%= asset_path("sort.png") %>);
+  background-size: 15px 7px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
+</style>
+<script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
+<h1>Summary Report for assignment: <%= @assignment.name %></h1>
+<h4>Team: <%= @team.name %></h4>
+
+<!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
+<% table_count = 0 %>
+<% @vmlist.each do |vm| %>
+
+    <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
+    <% else %>
+        <% if vm.list_of_reviewers.length > 0 %>
+
+          <!-- display the list of questions for this questionnaire -->
+          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
+            <table class="tbl_questlist" >
+              <thead>
+              <th>#</th>
+              <th>Question</th>
+              </thead>
+              <% count = 0 %>
+              <% vm.list_of_rows.each do |row| %>
+                  <% if row.score_row.count > 0  %>
+                      <tr style="background-color: #ffffff;">
+                        <td><%= count += 1 %></td>
+                        <td><%= row.questionText %></td>
+                      </tr>
+                  <% end %>
+              <% end %>
+            </table>
+          </div>
+
+          <!-- display the table title and tooltips -->
+          <span style="width:100%;">
+              <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
+                <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                    (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+                <%end %>
+              </h4>
+              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
+            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
+
+          </span>
+
+          <table id="scoresTable" class="tbl_heat tablesorter">
+            <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
+            <thead>
+            <tr>
+              <th class="sorter-true">Criterion<span></span></th>
+              <th class="sorter-false">Max</th>
+
+              <% i = 1 %>
+              <% vm.list_of_reviews.each do |review| %>
+                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
+                  <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
+                  <% else %>
+                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                  <% end %>
+                  <% i += 1 %>
+              <% end %>
+
+              <th class="sorter-true" align="right" >
+                Avg<span></span>
+              </th>
+              <th class="sorter-false">
+                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
+              </th>
+
+            </tr>
+            </thead>
+
+
+            <% score_row_count = vm.list_of_rows.first.score_row.count %>
+            <% j = 1 %>
+            <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
+            <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
+            <% vm.list_of_rows.each do |row| %>
+
+                <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
+                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
+                  <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <%= j.to_s %>   </td>
+                  <td class = 'cf' > <%= row.question_max_score %>   </td>
+
+                  <!-- actual cells with scores and colored background. -->
+                  <% row.score_row.each do |score| %>
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+                        <%= score.score_value.to_s %>
+                      </td>
+                  <% end %>
+
+
+                  <% if row.score_row.count == 0 %>
+                      <% for index in 0 .. score_row_count - 1 %>
+                          <td align="center">
+                            <%= "" %>
+                          </td>
+                      <% end %>
+                  <% end %>
+
+                  <td  class = 'cf' align="right">
+                    <%= row.average_score_for_row.to_s %>
+                  </td>
+                  <td  class = 'cf' align="center">
+                    <%= row.countofcomments.to_s %>
+                  </td>
+                </tr>
+                <!--loop that creates the collapsed-by-default row, which lists all comments. -->
+                <tr class="tablesorter-childRow">
+                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
+                    <div style="background-color:lightblue;padding:4px;"><%= row.questionText %></div>
+                    <div>
+                      <table class="tbl_questlist">
+                        <thead>
+                        <th>Review </th>
+                        <th>Score</th>
+                        <th>Comment</th>
+                        </thead>
+                        <% for index in 0 .. row.score_row.length - 1 %>
+                            <tr>
+                              <td>Review <%=index + 1%></td>
+                              <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
+                              <td><%= row.score_row[index].comment %></td>
+                            </tr>
+                        <% end %>
+                      </table>
+                    </div>
+                  </div>
+                  </td>
+                </tr>
+                <% j += 1 %>
+            <% end %>
+
+            <!--displays the row for the add'l comments, by default: collapsed. -->
+            <tr>
+              <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
+                <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
+                  <div style="background-color:#A9A9F5;padding:4px;">
+                    <table class="tbl_addlcmt">
+                      <thead>
+                      <th>Review</th>
+                      <th >Additional Comments</th>
+                      </thead>
+                      <tbody>
+                      <%k = 1%>
+                      <% vm.list_of_reviews.each do |review| %>
+                          <tr><td ><%= k %></td>
+                            <td ><%= Response.find(review.id)["additional_comment"] %></td></tr>
+                          <%k += 1%>
+                      <% end %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+          </table>
+          <!-- Display the list of team members, for Peer Reviews. -->
+          <div style="margin-top:5px"></div>
+          <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
+          <br>
+          <% table_count += 1%>
+          <span> <%= vm.display_team_members %></span>
+          <!-- this elsif terminates the heatgrid code.  -->
+        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
+            <div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
+        <% end %>
+        <br/>  
+    <% end %>
+<% end %>
+
+
+<h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
+Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
+<!-- termination of the main outer loop. -->

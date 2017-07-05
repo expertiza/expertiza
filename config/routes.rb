@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :tag_prompts
   resources :user_pastebins
   resources :track_notifications
   resources :notifications
@@ -11,12 +12,6 @@ Expertiza::Application.routes.draw do
   resources :answer_tags do
     collection do
       post :create_edit
-    end
-  end
-
-  resources :tag_prompts do
-    collection do
-      get :json
     end
   end
 

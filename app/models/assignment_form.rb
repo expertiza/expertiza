@@ -1,7 +1,7 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompts_deployments
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -25,6 +25,7 @@ class AssignmentForm
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
+    assignment_form.tag_prompts_deployments = TagPromptsDeployment.where(assignment_id: assignment_id)
     assignment_form
   end
 
@@ -45,6 +46,9 @@ class AssignmentForm
       delete_from_delayed_queue
       add_to_delayed_queue
     end
+
+    update_tag_prompts_deployments(attributes[:tag_prompts_deployments])
+
     !@has_errors
   end
 
@@ -77,6 +81,32 @@ class AssignmentForm
         unless aq.update_attributes(assignment_questionnaire)
           @errors = @assignment.errors
           @has_errors = true
+        end
+      end
+    end
+  end
+
+  def update_tag_prompts_deployments(attributes)
+    if not attributes.nil?
+      attributes.each do |key, value|
+        TagPromptsDeployment.where(questionnaire_id: key).where.not(id: value['id']).delete_all
+        for i in 0..value['tag_prompt'].count-1
+          if not(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
+            tag_dep = TagPromptsDeployment.find(value['id'][i])
+            if tag_dep
+              tag_dep.update(assignment_id: @assignment.id,
+                            questionnaire_id: key,
+                            tag_prompt_id: value['tag_prompt'][i],
+                            question_type: value['question_type'][i],
+                            answer_length_threshold: value['answer_length_threshold'][i])
+            end
+          else
+            TagPromptsDeployment.new(assignment_id: @assignment.id,
+                                     questionnaire_id: key,
+                                     tag_prompt_id: value['tag_prompt'][i],
+                                     question_type: value['question_type'][i],
+                                     answer_length_threshold: value['answer_length_threshold'][i]).save
+          end
         end
       end
     end

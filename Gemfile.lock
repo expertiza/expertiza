@@ -183,6 +183,8 @@ GEM
     httparty (0.14.0)
       multi_xml (>= 0.5.2)
     i18n (0.7.0)
+    jquery-colorbox-rails (1.7.0)
+      railties (>= 3.1)
     jquery-datetimepicker-rails (2.4.1.0)
     jquery-rails (4.0.4)
       rails-dom-testing (~> 1.0)
@@ -468,6 +470,7 @@ DEPENDENCIES
   guard-rspec
   haml-rails
   httparty
+  jquery-colorbox-rails
   jquery-datetimepicker-rails
   jquery-rails
   jquery-tablesorter
@@ -516,3 +519,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.11.2

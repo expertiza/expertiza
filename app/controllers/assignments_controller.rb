@@ -115,7 +115,7 @@ class AssignmentsController < ApplicationController
     end
 
     if @assignment_form.assignment.is_answer_tagging_allowed
-      @tag_prompts_deployments = TagPromptsDeployment.where(assignment_id: params[:id])
+      @assignment_form.tag_prompts_deployments = TagPromptsDeployment.where(assignment_id: params[:id])
     end
   end
 
@@ -150,6 +150,12 @@ class AssignmentsController < ApplicationController
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
+
+    if @assignment_form.assignment.is_answer_tagging_allowed?
+      @assignment_form.update_tag_prompts_deployments(params['assignment_form']['tag_prompts_deployments'])
+
+    end
+
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 

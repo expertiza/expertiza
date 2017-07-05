@@ -12,9 +12,6 @@
         <%if @assignment_form.assignment.is_calibrated%>
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <%end%>
-        <%if @assignment_form.assignment.is_answer_tagging_allowed%>
-          <li><a href="#tabs-7" id="AnswerTagSetting">Setup Feedback Tagging</a></li>
-        <%end%>
       </ul>
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
@@ -65,11 +62,6 @@
       <%if @assignment_form.assignment.is_calibrated%>
         <div id="tabs-6">
           <%= render 'assignments/edit/calibration' %>
-        </div>
-      <%end%>
-      <%if @assignment_form.assignment.is_answer_tagging_allowed%>
-        <div id="tabs-7">
-          <%= render 'assignments/edit/tag_prompt_deployment' %>
         </div>
       <%end%>
       <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>

@@ -1,5 +1,6 @@
+
 <script type="text/javascript">
-    function addQuestionnaireTableRow(questionnaire_type, round_no, questionnaire, assignment_questionnaire, questionnaire_options, tag_prompt_options) {
+    function addQuestionnaireTableRow(questionnaire_type, round_no, questionnaire, assignment_questionnaire, questionnaire_options) {
         var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
         var row_id = 'questionnaire_table_' + questionnaire_type;
         var i = 0;
@@ -52,47 +53,80 @@
           html += "<tr>"
           html += "<td>Add tag prompts</td>"
           html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
-          html += "<button type='button' onClick='addTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\", " + questionnaire.id + ", " + tag_dropdown_index++ + ")'>+Tag prompt+</button>"
-          html += "<button type='button' onClick='removeLastTagPromptDropdown(\"tag_prompt_placeholder_" + questionnaire.id + "\")'>-Tag prompt-</button>"
+          html += "<button type='button' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + questionnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
+          html += "<button type='button' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\")'>-Tag prompt-</button>"
           html += "</td></tr>"
         <% end %>
+
         questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
 
-    function addTagPromptDropdown(placeholder_id, q_id, tag_prompt_id){
-      q_types=[]
-      $.ajax({
-        dataType: "json",
-        url: "../../questions/types",
-        data: "",
-        success: function(types){
-          q_types = types
-        }
-      });
+    var tag_prompts = null
+    var q_types = null
 
-      $.ajax({
-        dataType: "json",
-        url: "../../tag_prompts/json",
-        data: "",
-        success: function(tag_prompts){
-          var dropdown_placeholder = document.getElementById(placeholder_id);
-          var select_id = 'prompt[' + q_id + '][]' //+ tag_prompt_id
-          var html = "<div id='container_" + select_id + "'>"
-          html += "<select id='" + select_id + "'  onChange='if (this.selectedIndex == 1)openAddNewTagForm()'>"
-          html += "<option value='none'>---</option>"
-          html += "<option value='new'>add new..</option>"
-          for (i=0; i<tag_prompts.length; i++)
-            html += "<option value=" + tag_prompts[i].id + ">" + tag_prompts[i].prompt + "</option>"
-          html += "<select>"
-          html += "&nbsp;Apply to question type:<select id='qtype_" + select_id +"'>"
-          for (i=0; i<q_types.length; i++)
-            html += "<option value=" + q_types[i] + ">" + q_types[i] + "</option>"
-          html += "<select>"
-          html += "&nbsp;Length threshold (if applicable):<input type='text' id='threshold_" + select_id +"' size='4'/>"
-          html += "</div>"
-          $( "#" + placeholder_id ).append(html)
-        }});
+    async function addTagPromptDropdown(placeholder_id, tag_dep_id, questionnaire_id, tag_prompt_id, question_type, text_len){
+      is_q_types_filled = false
+      is_tag_prompts_filled = false
+
+      if(!q_types){
+        $.ajax({
+          dataType: "json",
+          url: "../../questions/types",
+          data: "",
+          success: function(types){
+            q_types = types
+            is_q_types_filled = true
+          }
+        });
+      }else
+        is_q_types_filled = true
+
+      if(!tag_prompts){
+        $.ajax({
+          dataType: "json",
+          url: "../../tag_prompts",
+          data: "",
+          success: function(tp){
+            tag_prompts = tp
+            is_tag_prompts_filled = true
+          }});
+      }else
+        is_tag_prompts_filled = true
+
+      while(!(is_tag_prompts_filled || is_q_types_filled))
+        await sleep(2000);
+
+      var id_prefix = 'assignment_form[tag_prompts_deployments][' + questionnaire_id + ']'
+      //var select_name = 'assignment_form[tag_prompt_deployment][' + questionnaire_id + '][]'
+
+      var html = "<div id='container_" + id_prefix + "'>"
+      html += "<input type='hidden' name='" + id_prefix + "[id][]' value='" + tag_dep_id + "'>"
+      html += "<select name='" + id_prefix + "[tag_prompt][]' onchange='if (this.selectedIndex == 1)openAddNewTagForm()' onfocus='this.selectedIndex=0;this.blur();'>"
+      html += "<option value='none'>---</option>"
+      html += "<option value='new'>add new..</option>"
+      for (i=0; i<tag_prompts.length; i++) {
+        html += "<option value=" + tag_prompts[i].id
+        if (tag_prompt_id == tag_prompts[i].id)
+          html += " selected "
+        html += ">" + tag_prompts[i].prompt + "</option>"
+      }
+      html += "</select>"
+      html += "&nbsp;&nbsp; apply to question type:<select name='" + id_prefix + "[question_type][]'>"
+      for (i=0; i<q_types.length; i++) {
+        html += "<option value=" + q_types[i]
+        if (q_types[i] == question_type)
+          html += " selected "
+        html += ">" + q_types[i] + "</option>"
+      }
+      html += "<select>"
+      html += "&nbsp;&nbsp; length threshold (if applicable):<input type='text' name='" + id_prefix + "[answer_length_threshold][]' size='4' value='" + text_len + "'/>"
+      html += "</div>"
+      $( "#" + placeholder_id ).append(html)
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     function removeLastTagPromptDropdown(placeholder_id){
@@ -100,17 +134,43 @@
     }
 
     function openAddNewTagForm(){
-      alert("render add new tag form")
+      $.colorbox({
+        iframe: true,
+        href: "../../tag_prompts/view?popup=true",
+        opacity: 0.8,
+        innerWidth: 800,
+        innerHeight: 500,
+        transition:"fade",
+        onClosed:function(){
+          $.ajax({
+            dataType: "json",
+            url: "../../tag_prompts",
+            data: "",
+            success: function(tag_prompts){
+              option = "<option value='none'>---</option><option value='new'>add new..</option>";
+
+              for(i=0; i<tag_prompts.length; i++)
+                option+= "<option value='" + tag_prompts[i].id + "'>" + tag_prompts[i].prompt + "</option>";
+
+              $('select[id^="prompt"]').each( function() {
+                 jQuery(this).empty().append(option);
+              });
+            }});
+        }
+      });
     }
 
     function removeQuestionnaireTableRow(questionnaire_type) {
       var row_id = 'questionnaire_table_' + questionnaire_type;
       jQuery('#' + row_id).remove();
     }
+    <% @assignment_form.tag_prompts_deployments.each do |tag_dep| %>
+    addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.questionnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.questionnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.question_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
+    <% end %>
 
-  </script>
+</script>
 
-  <script type="text/javascript">
+<script type="text/javascript">
     function metareview_due_date() {
 
       var metareview = document.getElementById("metareview_due_date_label");

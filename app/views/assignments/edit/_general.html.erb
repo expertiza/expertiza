@@ -181,7 +181,7 @@ function microtaskChanged() {
     <td style='padding:5px'>
       <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
       <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
-      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow tagging feedback comments?') %>
+      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow feedback comments to be tagged by the author?') %>
     </td>
   </tr>
 

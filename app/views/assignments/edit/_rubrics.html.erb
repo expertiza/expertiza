@@ -50,11 +50,12 @@
         <%if @assignment_form.assignment.is_answer_tagging_allowed %>
           tag_dropdown_index = 0
           placeholder_id = 'tag_prompt_placeholder_' + questionnaire.id
+          deleted_input_id = getIdPrefix(questionnaire.id) + '[deleted][]'
           html += "<tr>"
           html += "<td>Add tag prompts</td>"
           html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
           html += "<button type='button' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + questionnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
-          html += "<button type='button' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\")'>-Tag prompt-</button>"
+          html += "<button type='button' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\",\"" + deleted_input_id + "\")'>-Tag prompt-</button>"
           html += "</td></tr>"
         <% end %>
 
@@ -65,9 +66,19 @@
     var tag_prompts = null
     var q_types = null
 
+    function getIdPrefix(qs_id){
+      prefix = 'assignment_form[tag_prompts_deployments]['
+
+      if(qs_id!=null)
+        return prefix + qs_id + ']'
+      else
+        return prefix + ']'
+    }
+
     async function addTagPromptDropdown(placeholder_id, tag_dep_id, questionnaire_id, tag_prompt_id, question_type, text_len){
-      is_q_types_filled = false
-      is_tag_prompts_filled = false
+      $( "#" + placeholder_id ).append("<div id='loading_image'><img src='/assets/loading.gif' /></div>")
+      q_types_filled = false
+      tag_prompts_filled = false
 
       if(!q_types){
         $.ajax({
@@ -76,11 +87,11 @@
           data: "",
           success: function(types){
             q_types = types
-            is_q_types_filled = true
+            q_types_filled = true
           }
         });
       }else
-        is_q_types_filled = true
+        q_types_filled = true
 
       if(!tag_prompts){
         $.ajax({
@@ -89,38 +100,49 @@
           data: "",
           success: function(tp){
             tag_prompts = tp
-            is_tag_prompts_filled = true
+            tag_prompts_filled = true
           }});
       }else
-        is_tag_prompts_filled = true
+        tag_prompts_filled = true
 
-      while(!(is_tag_prompts_filled || is_q_types_filled))
+      while(!(tag_prompts_filled || q_types_filled)){
         await sleep(2000);
+      }
+      $('#loading_image').remove()
 
-      var id_prefix = 'assignment_form[tag_prompts_deployments][' + questionnaire_id + ']'
-      //var select_name = 'assignment_form[tag_prompt_deployment][' + questionnaire_id + '][]'
+      var id_prefix = getIdPrefix(questionnaire_id)
 
       var html = "<div id='container_" + id_prefix + "'>"
       html += "<input type='hidden' name='" + id_prefix + "[id][]' value='" + tag_dep_id + "'>"
-      html += "<select name='" + id_prefix + "[tag_prompt][]' onchange='if (this.selectedIndex == 1)openAddNewTagForm()' onfocus='this.selectedIndex=0;this.blur();'>"
+      html += "Tag prompt "
+      html += "<img src='/assets/info.png' title='Tag label that will be shown below the feedback' />"
+      html += ": <select name='" + id_prefix + "[tag_prompt][]' onchange='if (this.selectedIndex == 1)openAddNewTagForm()'>"
       html += "<option value='none'>---</option>"
       html += "<option value='new'>add new..</option>"
+
       for (i=0; i<tag_prompts.length; i++) {
         html += "<option value=" + tag_prompts[i].id
         if (tag_prompt_id == tag_prompts[i].id)
           html += " selected "
         html += ">" + tag_prompts[i].prompt + "</option>"
       }
+
       html += "</select>"
-      html += "&nbsp;&nbsp; apply to question type:<select name='" + id_prefix + "[question_type][]'>"
+      html += "&nbsp;&nbsp; apply to question type "
+      html += "<img src='/assets/info.png' title='The tag prompt will only be shown below the answers of this particular question type. It is useful to exclude types of question that the tags are not relevant to' />"
+      html += ": <select name='" + id_prefix + "[question_type][]'>"
+
       for (i=0; i<q_types.length; i++) {
         html += "<option value=" + q_types[i]
         if (q_types[i] == question_type)
           html += " selected "
         html += ">" + q_types[i] + "</option>"
       }
+
       html += "<select>"
-      html += "&nbsp;&nbsp; length threshold (if applicable):<input type='text' name='" + id_prefix + "[answer_length_threshold][]' size='4' value='" + text_len + "'/>"
+      html += "&nbsp;&nbsp; comment length threshold "
+      html += "<img src='/assets/info.png' title='This is only applicable to textual comments. The tag prompt will only be shown below textual comments whose length exceed the threshold. it is useful to exclude short comments that are not relevant' />"
+      html += ": <input type='text' name='" + id_prefix + "[answer_length_threshold][]' size='4' value='" + text_len + "'/>"
       html += "</div>"
       $( "#" + placeholder_id ).append(html)
     }
@@ -129,8 +151,12 @@
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function removeLastTagPromptDropdown(placeholder_id){
-      $("#"+placeholder_id+" div:last-child").remove()
+    function removeLastTagPromptDropdown(placeholder_id, deleted_input_id){
+      //var id_prefix = 'assignment_form[tag_prompts_deployments]'
+      deleted_tag_dep_id = $("#"+placeholder_id+" div:last").find('input[type="hidden"]')[0].value
+      html = "<input type='hidden' name='" + deleted_input_id +"' value='"+ deleted_tag_dep_id +"' />"
+      $("#" + placeholder_id + " div:last").remove()
+      $("#" + placeholder_id).append(html)
     }
 
     function openAddNewTagForm(){
@@ -151,8 +177,7 @@
 
               for(i=0; i<tag_prompts.length; i++)
                 option+= "<option value='" + tag_prompts[i].id + "'>" + tag_prompts[i].prompt + "</option>";
-
-              $('select[id^="prompt"]').each( function() {
+              $('select[name*="\\[tag_prompt\\]"]').each( function() {
                  jQuery(this).empty().append(option);
               });
             }});

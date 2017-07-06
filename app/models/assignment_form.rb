@@ -89,27 +89,33 @@ class AssignmentForm
   def update_tag_prompts_deployments(attributes)
     if not attributes.nil?
       attributes.each do |key, value|
-        TagPromptsDeployment.where(questionnaire_id: key).where.not(id: value['id']).delete_all
-        for i in 0..value['tag_prompt'].count-1
-          if not(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
-            tag_dep = TagPromptsDeployment.find(value['id'][i])
-            if tag_dep
-              tag_dep.update(assignment_id: @assignment.id,
-                            questionnaire_id: key,
-                            tag_prompt_id: value['tag_prompt'][i],
-                            question_type: value['question_type'][i],
-                            answer_length_threshold: value['answer_length_threshold'][i])
+        if value.key?('deleted')
+          TagPromptsDeployment.where(id: value['deleted']).delete_all
+        end
+        if value.key?('tag_prompt') # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
+          for i in 0..value['tag_prompt'].count-1
+            tag_dep = nil
+            if not(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
+              tag_dep = TagPromptsDeployment.find(value['id'][i])
+              if tag_dep
+                tag_dep.update(assignment_id: @assignment.id,
+                               questionnaire_id: key,
+                               tag_prompt_id: value['tag_prompt'][i],
+                               question_type: value['question_type'][i],
+                               answer_length_threshold: value['answer_length_threshold'][i])
+              end
+            else
+              tag_dep = TagPromptsDeployment.new(assignment_id: @assignment.id,
+                                       questionnaire_id: key,
+                                       tag_prompt_id: value['tag_prompt'][i],
+                                       question_type: value['question_type'][i],
+                                       answer_length_threshold: value['answer_length_threshold'][i]).save
             end
-          else
-            TagPromptsDeployment.new(assignment_id: @assignment.id,
-                                     questionnaire_id: key,
-                                     tag_prompt_id: value['tag_prompt'][i],
-                                     question_type: value['question_type'][i],
-                                     answer_length_threshold: value['answer_length_threshold'][i]).save
           end
         end
       end
     end
+
   end
 
   # code to save due dates

@@ -165,10 +165,10 @@ function microtaskChanged() {
   </tr>
   <tr colspan="3">
     <td style='padding:5px'>
-      <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" value="false" onclick="useSimicheckChanged()"></input>
+      <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" <%= "checked" if @assignment_form.assignment.simicheck != -1 %> onclick="useSimicheckChanged()"></input>
       <%= label_tag('toggle_simicheck_setting', 'Use simicheck?') %>
     </td>
-    <td style='padding:5px' id='assignment_simicheck_field' hidden>
+    <td style='padding:5px' id='assignment_simicheck_field' <%= "hidden" if @assignment_form.assignment.simicheck == -1 %> >
       <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
       <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, :selected => @assignment_form.assignment.simicheck) %><b> hours</b>
       <br></br>
@@ -264,10 +264,6 @@ function microtaskChanged() {
         jQuery('#assignment_simicheck_field').hide();
         jQuery('#assignment_simicheck_threshold').hide();
       }
-    }
-
-    function useAnswerTagChanged(){
-
     }
 
     jQuery(document).ready(function() {

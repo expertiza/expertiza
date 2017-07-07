@@ -36,7 +36,7 @@ class AuthController < ApplicationController
           after_login(user)
         else
           if user.nil?
-            flash[:error] = "We can't find this username in our database, please try with other username"
+            flash[:error] = "We can't find this username in our database, please try with another username"
           else
             # keep track of login attempts per valid username, and reset this when (s)he has succesfully login
             @@attempts[params[:login][:name]] = if @@attempts.key?(params[:login][:name])

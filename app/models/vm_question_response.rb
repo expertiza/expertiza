@@ -2,7 +2,16 @@
 # represents each table in the view_team view.
 # the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
-  def initialize(questionnaire, round, rounds)
+  @questionnaire = nil
+  @assignment = nil
+  def initialize(questionnaire, assignment=nil)
+    @assignment = assignment
+    @round = @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire" ?
+        AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round :
+        nil
+    @rounds = @assignment.rounds_of_reviews
+    @questionnaire = questionnaire
+
     @list_of_rows = []
     @list_of_reviewers = []
     @list_of_reviews = []
@@ -10,8 +19,7 @@ class VmQuestionResponse
     @max_score = questionnaire.max_question_score
     @questionnaire_type = questionnaire.type
     @questionnaire_display_type = questionnaire.display_type
-    @rounds = rounds
-    @round = round
+
     @name  = questionnaire.name
   end
 
@@ -144,10 +152,22 @@ class VmQuestionResponse
         # Color code c0 is reserved for null spaces in the table which will be gray.
         color_code_number = 1 if color_code_number == 0
       end
-      tags = AnswerTag.where(answer_id: answer.id)
+
+      #tags = AnswerTag.where(answer_id: answer.id)
+      tag_deps = TagPromptsDeployment.where(questionnaire_id: @questionnaire.id, assignment_id:@assignment.id)
+      vm_tag_prompts = []
+
+      question = Question.find(answer.question_id)
+
+      tag_deps.each do |tag_dep|
+        if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold
+          vm_tag_prompts.append(VmTagPromptAnswer.new(answer, TagPrompt.find(tag_dep.tag_prompt_id),tag_dep))
+        end
+      end
+
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, tags))
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
       a  = 1
     end
   end

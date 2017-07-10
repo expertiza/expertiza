@@ -83,7 +83,6 @@ ActiveRecord::Schema.define(version: 20170518033740) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
-    t.boolean  "local_scores_calculated",                  default: false
     t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
   end
@@ -271,17 +270,6 @@ ActiveRecord::Schema.define(version: 20170518033740) do
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
-  create_table "local_db_scores", force: :cascade do |t|
-    t.string   "score_type",      limit: 255
-    t.integer  "round",           limit: 4
-    t.integer  "score",           limit: 4
-    t.integer  "response_map_id", limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-  end
-
-  add_index "local_db_scores", ["response_map_id"], name: "index_local_db_scores_on_response_map_id", using: :btree
-
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -353,7 +341,7 @@ ActiveRecord::Schema.define(version: 20170518033740) do
     t.integer  "assignment_id", limit: 4
   end
 
-  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assignment_submissions_on_assignment_id", using: :btree
+  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id", using: :btree
 
   create_table "plagiarism_checker_comparisons", force: :cascade do |t|
     t.integer  "plagiarism_checker_assignment_submission_id", limit: 4
@@ -734,7 +722,6 @@ ActiveRecord::Schema.define(version: 20170518033740) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
-  add_foreign_key "local_db_scores", "response_maps"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170518033740) do
+ActiveRecord::Schema.define(version: 20170710031449) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -358,11 +358,6 @@ ActiveRecord::Schema.define(version: 20170518033740) do
   end
 
   add_index "plagiarism_checker_comparisons", ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index", using: :btree
-
-  create_table "plugin_schema_info", id: false, force: :cascade do |t|
-    t.string  "plugin_name", limit: 255
-    t.integer "version",     limit: 4
-  end
 
   create_table "question_advices", force: :cascade do |t|
     t.integer "question_id", limit: 4

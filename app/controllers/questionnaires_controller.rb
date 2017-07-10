@@ -184,7 +184,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
     @access = @questionnaire.private == true ? "private" : "public"
-    undo_link("teh questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
+    undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
     redirect_to controller: 'tree_display', action: 'list'
   end
 
@@ -306,7 +306,7 @@ class QuestionnairesController < ApplicationController
     if !@questionnaire.taken_by_anyone?
       render :edit
     else
-      flash[:error] = "Your quiz has been taken by some other students, editing cannot be done any more."
+      flash[:error] = "Your quiz has been taken by some other students, you cannot edit it anymore."
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
   end

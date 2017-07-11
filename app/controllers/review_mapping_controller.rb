@@ -448,9 +448,17 @@ class ReviewMappingController < ApplicationController
       @responses = Response.where(:map_id => @review_response_map_ids)
 
     when "PlagiarismCheckerReport"
-      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
-                                                                              PlagiarismCheckerAssignmentSubmission.where(assignment_id:
-                                                                                                                              params[:id]).pluck(:id))
+      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.
+          where(plagiarism_checker_assignment_submission_id: PlagiarismCheckerAssignmentSubmission.where(assignment_id: params[:id]).pluck(:id))
+
+    when "AnswerTaggingReport"
+      tag_prompt_deployments = TagPromptsDeployment.where(assignment_id: params[:id])
+
+      @questionnaire_tagging_report = {}
+
+      tag_prompt_deployments.each do |tag_dep|
+        @questionnaire_tagging_report[tag_dep] = tag_dep.get_assignment_tagging_progress()
+      end
     end
 
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user

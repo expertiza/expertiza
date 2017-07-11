@@ -1,0 +1,101 @@
+<!--
+if plagiarism_checker_assignment_submission doesn't exist, you won't be able to come to this page
+else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
+else show records
+-->
+
+<style>
+  /*TableSorter CSS styles */
+  th.tablesorter-headerAsc{
+    /* Style for Up Arrow */
+    background-image: url(<%= asset_path("up-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  th.tablesorter-headerDesc{
+    /* Style for down arrow */
+    background-image: url(<%= asset_path("down-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  /* Style for no-sort*/
+  th.sorter-true.tablesorter-headerUnSorted{
+    /* Style for default view  */
+    background-image: url(<%= asset_path("sort.png") %>);
+    background-size: 15px 7px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+
+  }
+</style>
+
+<script>
+  $(function () {
+    /*Function for sorting the table */
+    $(".sortable").tablesorter({
+      sortList: [[0,0]], //sort First Column by default when page loads
+      headers: {
+        4: {
+          sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
+        }
+      }
+    });
+  });
+
+
+  $.tablesorter.addParser({
+    id: "customParser",                                       //customParser for sorting by volume
+    is: function (stringValue) {
+      return false;
+    },
+    format: function (stringValue) {
+      var stringNumericPart = stringValue.split(" ");         //split the data by spaces
+      var numericValue = parseInt(stringNumericPart[2],10);   //extract the numeric data
+      return numericValue ;
+    },
+    type: 'numeric'
+  });
+</script>
+
+<% if @questionnaire_tagging_report.nil? or @questionnaire_tagging_report.count < 1 %>
+    <div class="text-center">
+      <h4>No answer tags are found for this assignment</h4>
+    </div>
+<% else %>
+    <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+        <p>
+        <div class="container tablesorter">
+          <h4  align="center">Tagging Report for questionnaire "<%= tag_dep.questionnaire.name %>" and Tag "<%= tag_dep.tag_prompt.prompt %>"</h4>
+          <table class="table table-striped sortable">
+            <thead>
+            <tr>
+              <th class="sorter-true">Username</th>
+              <th class="sorter-true">Name</th>
+              <th class="sorter-true">Percentage of answers tagged</th>
+              <th class="sorter-true"># answers tagged</th>
+              <th class="sorter-true"># answers not tagged</th>
+              <th class="sorter-true"># taggable answers</th>
+            </tr>
+            </thead>
+            <% report_lines.each do |report_line| %>
+                <tr>
+                  <td><%= report_line.user.name %></td>
+                  <td><%= report_line.user.fullname %></td>
+                  <td><%= report_line.percentage.to_s %>%</td>
+                  <td><%= report_line.no_tagged.to_s %></td>
+                  <td><%= report_line.no_not_tagged.to_s %></td>
+                  <td><%= report_line.no_tagable %></td>
+                </tr>
+            <% end %>
+          </table>
+        </div>
+        </p>
+    <% end %>
+<% end %>

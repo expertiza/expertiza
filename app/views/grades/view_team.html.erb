@@ -140,21 +140,22 @@ th.sorter-true.tablesorter-headerUnSorted{
                         <thead>
                         <th>Review </th>
                         <th>Score</th>
-                        <th>Comment</th>
+                        <th colspan="2">Comment</th>
                         </thead>
-                        <% for index in 0 .. row.score_row.length - 1 %>
+                        <% for index in 0 .. row.score_row.length - 1
+                              colspan_val = ((index<row.score_row.length-1) and (row.score_row[index].vm_prompts.count < row.score_row[index+1].vm_prompts.count) ? 2 : 1)
+                        %>
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td>
-                                <%= row.score_row[index].comment %>
-                                <% if row.score_row[index].vm_prompts.count > 0 %>
-                                  <br>
-                                  <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
-                                    <%= vm_tag_prompt.tag_prompt.get_html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
-                                  <% end %>
+                              <td width="55%"colspan="<%= colspan_val.to_s %>"><%= row.score_row[index].comment %></td>
+                              <% if row.score_row[index].vm_prompts.count > 0 %>
+                              <td width="35%">
+                                <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
+                                  <%= vm_tag_prompt.tag_prompt.get_html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
                                 <% end %>
                               </td>
+                              <% end %>
                             </tr>
                         <% end %>
                       </table>

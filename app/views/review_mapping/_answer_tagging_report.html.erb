@@ -5,6 +5,10 @@
       sortList: [[0,0]] //sort First Column by default when page loads
     });
   });
+
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
 </script>
 
 <% if @questionnaire_tagging_report.nil? or @questionnaire_tagging_report.count < 1 %>
@@ -13,9 +17,16 @@
     <div class="text-center">
       <h4>Tagging report for assignment "<%= @assignment.name %>"</h4>
     </div>
-    <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+
+    <div class= "chart-table" id="tabs">
+      <ul>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+        <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.questionnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
+      <% end %>
+      </ul>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
         <p>
-        <div class="container tablesorter">
+        <div id="tab-<%= tag_dep.id %>">
           <h4  align="center">Tagging Report for questionnaire "<%= tag_dep.questionnaire.name %>" and Tag "<%= tag_dep.tag_prompt.prompt %>"</h4>
           <table class="table table-striped sortable">
             <thead>
@@ -41,5 +52,6 @@
           </table>
         </div>
         </p>
-    <% end %>
+      <% end %>
+    </div>
 <% end %>

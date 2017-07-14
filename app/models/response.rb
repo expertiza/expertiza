@@ -55,7 +55,7 @@ class Response < ActiveRecord::Base
 
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
     count = 0
-    answers = Answer.where(response_id: self.response_id)
+    answers = Answer.where(response_id: self.id)
 
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)

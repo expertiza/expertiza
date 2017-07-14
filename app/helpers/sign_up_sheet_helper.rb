@@ -30,7 +30,7 @@ module SignUpSheetHelper
   end
 
   # Render topic row for intelligent topic selection.
-  def get_intelligent_topic_row(topic, selected_topics, max_team_size)
+  def get_intelligent_topic_row(topic, selected_topics, max_team_size = 3)
     row_html = ''
     if !selected_topics.nil? && !selected_topics.empty?
       selected_topics.each do |selected_topic|
@@ -50,8 +50,9 @@ module SignUpSheetHelper
 
   # Compute background colour for a topic with respect to maximum team size.
   def get_topic_bg_color(topic, max_team_size)
-    calculation = (400 * (1 - (Math.tanh(2 * [max_team_size.to_f / Bid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2)).to_i.to_s
-    'rgb(' + calculation + ',' + calculation + ',0)'
+    red = (400 * (1 - (Math.tanh(2 * [max_team_size.to_f / Bid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2)).to_i.to_s
+    green = (400 * (Math.tanh(2 * [max_team_size.to_f / Bid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2).to_i.to_s
+    'rgb(' + red + ',' + green + ',0)'
   end
 
   # Render the participant info for a topic and assignment.

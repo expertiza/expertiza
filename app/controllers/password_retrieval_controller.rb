@@ -67,7 +67,7 @@ class PasswordRetrievalController < ApplicationController
       user.password_confirmation = params[:reset][:repassword]
       if user.save
         PasswordReset.delete_all(user_email: user.email)
-        flash[:success] = "Reset password success"
+        flash[:success] = "Password was successfully reset"
         redirect_to "/"
       else
         flash[:error] = "Password cannot be updated. Please try again"

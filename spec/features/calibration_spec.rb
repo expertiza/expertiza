@@ -487,7 +487,7 @@ describe 'calibration' do
       click_on "Request a new submission to review"
 
       # Do not have any artifacts to review
-      expect(page).to have_content("No artifact are available to review at this time. Please try later.")
+      expect(page).to have_content("No artifacts are available to review at this time. Please try later.")
     end
   end
 end

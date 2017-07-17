@@ -91,4 +91,14 @@ module GradesHelper
     render "grades/view_refactored_grid.html.erb"
   end
 
+def type_and_max(row)
+  question=Question.find(row.question_id) 
+   if question.type == "Checkbox"
+    return 9745
+  elsif question.is_a? ScoredQuestion 
+    return 9311+(row.question_max_score)
+  else return 9237
+  end
+end
+
 end

@@ -9,9 +9,7 @@ class HttpRequest
     end
 
     def get(url, limit = 5)
-      if limit <= 0
-        return ""
-      end
+      return "" if limit <= 0
 
       uri = URI.parse(url)
       req = Net::HTTP::Get.new(uri.to_s)

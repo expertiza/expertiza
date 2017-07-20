@@ -135,7 +135,7 @@ class QuestionnairesController < ApplicationController
       begin
         name = @questionnaire.name
         # if this rubric is used by some assignment, flash error
-        if @questionnaire.assignments.length > 0
+        unless @questionnaire.assignments.empty?
           raise "The assignment <b>#{@questionnaire.assignments.first.try(:name)}</b> uses this questionnaire. Are sure you want to delete the assignment?"
         end
         questions = @questionnaire.questions
@@ -184,7 +184,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
     @access = @questionnaire.private == true ? "private" : "public"
-    undo_link("teh questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
+    undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
     redirect_to controller: 'tree_display', action: 'list'
   end
 
@@ -224,7 +224,7 @@ class QuestionnairesController < ApplicationController
           v.each_pair do |key, value|
             @question.send(key + '=', value) if @question.send(key) != value
           end
-          
+
           @question.save
           flash[:success] = 'All questions has been successfully saved!'
         end
@@ -306,7 +306,7 @@ class QuestionnairesController < ApplicationController
     if !@questionnaire.taken_by_anyone?
       render :edit
     else
-      flash[:error] = "Your quiz has been taken by some other students, editing cannot be done any more."
+      flash[:error] = "Your quiz has been taken by some other students, you cannot edit it anymore."
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
   end
@@ -368,7 +368,6 @@ class QuestionnairesController < ApplicationController
     valid = "valid"
 
     (1..num_quiz_questions).each do |i|
-      
       if params[:questionnaire][:name] == ""
         # questionnaire name is not specified
         valid = "Please specify quiz name (please do not use your name or id)."
@@ -381,15 +380,13 @@ class QuestionnairesController < ApplicationController
         @new_question = Object.const_get(params[:question_type][i.to_s][:type]).create(txt: '', type: params[:question_type][i.to_s][:type], break_before: true)
         @new_question.update_attributes(txt: params[:new_question][i.to_s])
         type = params[:question_type][i.to_s][:type]
-        choice_info = params[:new_choices][i.to_s][type]    #choice info for one question of its type 
-        if choice_info == nil
+        choice_info = params[:new_choices][i.to_s][type] # choice info for one question of its type
+        if choice_info.nil?
           valid = "Please select a correct answer for all questions"
           break
         else
           valid = @new_question.isvalid(choice_info)
-          if(valid != "valid")
-            break
-          end
+          break if valid != "valid"
         end
       end
     end
@@ -582,12 +579,12 @@ class QuestionnairesController < ApplicationController
         end
         new_question.save!
         advices = QuestionAdvice.where(question_id: question.id)
-        next unless !advices.empty?
+        next if advices.empty?
         advices.each do |advice|
           new_advice = advice.dup
           new_advice.question_id = new_question.id
           new_advice.save!
-          end
+        end
       end
 
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)

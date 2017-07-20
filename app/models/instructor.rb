@@ -1,5 +1,6 @@
-
 class Instructor < User
+  has_many :questionnaires
+  
   QUESTIONNAIRE = [['My questionnaires', 'list_mine'],
                    ['All public questionnaires', 'list_all']].freeze
 

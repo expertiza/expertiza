@@ -6,7 +6,7 @@ class AssignmentQuestionnaireController < ApplicationController
   def delete_all
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
+      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
       return
     end
 
@@ -23,20 +23,19 @@ class AssignmentQuestionnaireController < ApplicationController
       flash[:error] = "Missing assignment:" + params[:assignment_id]
       return
     elsif params[:questionnaire_id].nil?
-           flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
-           return
+      flash[:error] = "Missing questionnaire:" + params[:questionnaire_id]
+      return
     end
-
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
+      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
       return
     end
 
     questionnaire = Questionnaire.find(params[:questionnaire_id])
     if questionnaire.nil?
-      flash[:error] = "Questionaire #" + questionnaire.id + "does not currently exist."
+      flash[:error] = "Questionaire #" + questionnaire.id + " does not currently exist."
       return
     end
 

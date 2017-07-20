@@ -44,10 +44,10 @@ class Answer < ActiveRecord::Base
     scores
   end
 
-    # Computes the total score for an assessment
-    # params
-    #  assessment - specifies the assessment for which the total score is being calculated
-    #  questions  - specifies the list of questions being evaluated in the assessment
+  # Computes the total score for an assessment
+  # params
+  #  assessment - specifies the assessment for which the total score is being calculated
+  #  questions  - specifies the list of questions being evaluated in the assessment
 
   def self.get_total_score(params)
     @response = params[:response].last
@@ -65,10 +65,8 @@ class Answer < ActiveRecord::Base
       # which means student did not assign any score before save the peer review.
       # If we do not check here, to_f method will convert nil to 0, at that time, we cannot figure out the reason behind 0 point,
       # whether is reviewer assign all questions 0 or reviewer did not finish any thing and save directly.
-      weighted_score = if !questionnaireData[0].weighted_score.nil?
-        questionnaireData[0].weighted_score.to_f
-      else
-        nil
+      weighted_score = unless questionnaireData[0].weighted_score.nil?
+                         questionnaireData[0].weighted_score.to_f
                        end
       sum_of_weights = questionnaireData[0].sum_of_weights.to_f
       # Zhewei: we need add questions' weights only their answers are not nil in DB.
@@ -92,6 +90,7 @@ class Answer < ActiveRecord::Base
     end
   end
 
+<<<<<<< HEAD
     #added by Rushi:
     # Find all the comments of the review
     # params
@@ -163,38 +162,40 @@ class Answer < ActiveRecord::Base
   end
 
   #start added by ferry, required for the summarization (refactored by Yang on June 22, 2016)
+=======
+  # start added by ferry, required for the summarization (refactored by Yang on June 22, 2016)
+>>>>>>> master-upstream
   def self.answers_by_question_for_reviewee_in_round(assignment_id, reviewee_id, q_id, round)
     #  get all answers to this question
     question_answer = Answer.select(:answer, :comments)
-                          .joins("join responses on responses.id = answers.response_id")
-                          .joins("join response_maps on responses.map_id = response_maps.id")
-                          .joins("join questions on questions.id = answers.question_id")
-                          .where("response_maps.reviewed_object_id = ? and
+                            .joins("join responses on responses.id = answers.response_id")
+                            .joins("join response_maps on responses.map_id = response_maps.id")
+                            .joins("join questions on questions.id = answers.question_id")
+                            .where("response_maps.reviewed_object_id = ? and
                                            response_maps.reviewee_id = ? and
                                            answers.question_id = ? and
                                            responses.round = ?", assignment_id, reviewee_id, q_id, round)
-    return question_answer
+    question_answer
   end
 
   def self.answers_by_question(assignment_id, q_id)
     question_answer = Answer.select("DISTINCT answers.comments,  answers.answer")
-                          .joins("JOIN questions ON answers.question_id = questions.id")
-                          .joins("JOIN responses ON responses.id = answers.response_id")
-                          .joins("JOIN response_maps ON responses.map_id = response_maps.id")
-                          .where("answers.question_id = ? and response_maps.reviewed_object_id = ?", q_id, assignment_id)
-    return question_answer
+                            .joins("JOIN questions ON answers.question_id = questions.id")
+                            .joins("JOIN responses ON responses.id = answers.response_id")
+                            .joins("JOIN response_maps ON responses.map_id = response_maps.id")
+                            .where("answers.question_id = ? and response_maps.reviewed_object_id = ?", q_id, assignment_id)
+    question_answer
   end
 
   def self.answers_by_question_for_reviewee(assignment_id, reviewee_id, q_id)
     question_answers = Answer.select(:answer, :comments)
-                           .joins("join responses on responses.id = answers.response_id")
-                           .joins("join response_maps on responses.map_id = response_maps.id")
-                           .joins("join questions on questions.id = answers.question_id")
-                           .where("response_maps.reviewed_object_id = ? and
+                             .joins("join responses on responses.id = answers.response_id")
+                             .joins("join response_maps on responses.map_id = response_maps.id")
+                             .joins("join questions on questions.id = answers.question_id")
+                             .where("response_maps.reviewed_object_id = ? and
                                                  response_maps.reviewee_id = ? and
-                                                 answers.question_id = ? ", assignment_id, reviewee_id, q_id )
-    return question_answers
+                                                 answers.question_id = ? ", assignment_id, reviewee_id, q_id)
+    question_answers
   end
   # end added by ferry, required for the summarization
-
 end

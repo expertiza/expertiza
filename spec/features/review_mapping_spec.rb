@@ -23,7 +23,6 @@ def add_matareviewer(student_name)
   expect(page).to have_content student_name
 end
 
-
 describe "review mapping", js: true do
   before(:each) do
     @assignment = create(:assignment, name: "automatic review mapping test", max_team_size: 4)

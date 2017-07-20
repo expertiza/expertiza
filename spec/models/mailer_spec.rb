@@ -5,14 +5,14 @@ describe 'Tests mailer' do
     # Send the email, then test that it got queued
     email = Mailer.sync_message(
       to: 'tluo@ncsu.edu',
-       subject: "Test",
-       body: {
-         obj_name: 'assignment',
-           type: 'submission',
-           location: '1',
-           first_name: 'User',
-           partial_name: 'update'
-       }
+      subject: "Test",
+      body: {
+        obj_name: 'assignment',
+        type: 'submission',
+        location: '1',
+        first_name: 'User',
+        partial_name: 'update'
+      }
     ).deliver_now
 
     expect(email.from[0]).to eq("expertiza.development@gmail.com")

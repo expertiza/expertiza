@@ -55,9 +55,9 @@ class SuggestionController < ApplicationController
   end
 
   def update_suggestion
-    Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title], 
-                                description: params[:suggestion][:description],
-                                signup_preference: params[:suggestion][:signup_preference])
+    Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title],
+                                                   description: params[:suggestion][:description],
+                                                   signup_preference: params[:suggestion][:signup_preference])
     redirect_to action: 'new', id: Suggestion.find(params[:id]).assignment_id
   end
 
@@ -74,9 +74,9 @@ class SuggestionController < ApplicationController
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
     @suggestion.unityID = if params[:suggestion_anonymous].nil?
-      session[:user].name
-    else
-      ""
+                            session[:user].name
+                          else
+                            ""
     end
 
     if @suggestion.save
@@ -100,7 +100,7 @@ class SuggestionController < ApplicationController
   # should be refactored into a static method in AssignmentTeam class. --Yang
   def create_new_team
     new_team = AssignmentTeam.create(name: 'Team' + @user_id.to_s + '_' + rand(1000).to_s,
-               parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
+                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
     t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
     SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
     parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
@@ -118,12 +118,12 @@ class SuggestionController < ApplicationController
     end
     Mailer.suggested_topic_approved_message(
       to: proposer.email,
-        cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has been approved",
-        body: {
-          approved_topic_name: @suggestion.title,
-            proposer: proposer.name
-        }
+      cc: cc_mail_list,
+      subject: "Suggested topic '#{@suggestion.title}' has been approved",
+      body: {
+        approved_topic_name: @suggestion.title,
+        proposer: proposer.name
+      }
     ).deliver_now!
   end
 
@@ -182,8 +182,8 @@ class SuggestionController < ApplicationController
   private
 
   def suggestion_params
-    params.require(:suggestion).permit(:assignment_id, :title, :description, 
-                                        :status, :unityID, :signup_preference)
+    params.require(:suggestion).permit(:assignment_id, :title, :description,
+                                       :status, :unityID, :signup_preference)
   end
 
   def approve

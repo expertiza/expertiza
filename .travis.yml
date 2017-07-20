@@ -1,4 +1,5 @@
 language: ruby
+dist: trusty
 cache:
     bundler: true
     timeout: 1000

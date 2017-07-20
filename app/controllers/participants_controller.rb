@@ -28,7 +28,7 @@ class ParticipantsController < ApplicationController
       @authorization = params[:authorization]
       # E726 Fall2012 Changes End
     rescue
-      flash[:error] = $!
+      flash[:error] = $ERROR_INFO
     end
   end
 

@@ -1,3 +1,3 @@
 class ReviewGrade < ActiveRecord::Base
-	belongs_to :participant
+  belongs_to :participant
 end

@@ -30,14 +30,14 @@ class MultipleChoiceCheckbox < QuizQuestion
 
   def complete
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
-    html = "<label for=\""+self.id.to_s+"\">"+self.txt+"</label><br>"
+    html = "<label for=\"" + self.id.to_s + "\">" + self.txt + "</label><br>"
     for i in 0..3
       txt = quiz_question_choices[i].txt
       html += "<input name = " + "\"#{self.id}[]\" "
       html += "id = " + "\"#{self.id}" + "_" + "#{i + 1}\" "
       html += "value = " + "\"#{quiz_question_choices[i].txt}\" "
       html += "type=\"checkbox\"/>"
-      html += "#{quiz_question_choices[i].txt}"
+      html += quiz_question_choices[i].txt.to_s
       html += "</br>"
     end
     html
@@ -47,42 +47,35 @@ class MultipleChoiceCheckbox < QuizQuestion
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
     html = ''
     quiz_question_choices.each do |answer|
-      if(answer.iscorrect)
-          html += '<b>' + answer.txt + '</b> -- Correct <br>'
-      end
+      html += '<b>' + answer.txt + '</b> -- Correct <br>' if answer.iscorrect
     end
     html += '<br>Your answer is:'
-    if user_answer[0].answer == 1
-      html += '<img src="/assets/Check-icon.png"/><br>'
-    else
-      html += '<img src="/assets/delete_icon.png"/><br>'
-    end
+    html += if user_answer[0].answer == 1
+              '<img src="/assets/Check-icon.png"/><br>'
+            else
+              '<img src="/assets/delete_icon.png"/><br>'
+            end
     user_answer.each do |answer|
       html += '<b>' + answer.comments.to_s + '</b><br>'
     end
     html += '<br><hr>'
     html.html_safe
-
   end
 
   def isvalid(choice_info)
     valid = "valid"
-    if(self.txt == '')
-      valid = "Please make sure all questions have text"
-    end
+    valid = "Please make sure all questions have text" if self.txt == ''
     correct_count = 0
-    choice_info.each do |idx, value|
+    choice_info.each do |_idx, value|
       if value[:txt] == ''
         valid = "Please make sure every question has text for all options"
         break
       end
-      if value[:iscorrect] == 1.to_s
-        correct_count+=1
-      end
+      correct_count += 1 if value[:iscorrect] == 1.to_s
     end
-    if correct_count == 0  
+    if correct_count == 0
       valid = "Please select a correct answer for all questions"
-    elsif correct_count ==1
+    elsif correct_count == 1
       valid = "A multiple-choice checkbox question should have more than one correct answer."
     end
     valid

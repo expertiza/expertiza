@@ -1,5 +1,5 @@
 class Ta < User
-  has_many :ta_mappings
+  has_many :ta_mappings, dependent: :destroy
 
   QUESTIONNAIRE = [['My questionnaires', 'list_mine'],
                    ['All public questionnaires', 'list_all']].freeze

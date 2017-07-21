@@ -62,7 +62,7 @@ FactoryGirl.define do
     copy_of_emails  false
   end
 
-  factory :instructor, class: User do
+  factory :instructor, class: Instructor do
     sequence(:name, 6) {|n| n = 6; "instructor#{n}" }
     role { Role.where(name: 'Instructor').first || association(:role_of_instructor) }
     password "password"
@@ -86,7 +86,7 @@ FactoryGirl.define do
 
   factory :course, class: Course do
     sequence(:name) {|n| "CSC517, test#{n}" }
-    instructor { User.where(role_id: 1).first || association(:instructor) }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     directory_path "csc517/test"
     info "Object-Oriented Languages and Systems"
     private true
@@ -98,7 +98,7 @@ FactoryGirl.define do
     directory_path "final_test"
     submitter_count 0
     course { Course.first || association(:course) }
-    instructor { User.first || association(:instructor) }
+    instructor { Instructor.first || association(:instructor) }
     private false
     num_reviews 1
     num_review_of_reviews 1
@@ -275,7 +275,7 @@ FactoryGirl.define do
 
   factory :questionnaire, class: ReviewQuestionnaire do
     name 'Test questionaire'
-    instructor { User.where(role_id: 1).first || association(:instructor) }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
     max_question_score 5
@@ -286,7 +286,7 @@ FactoryGirl.define do
 
   factory :metareview_questionnaire, class: MetareviewQuestionnaire do
     name 'Test questionaire'
-    instructor { User.where(role_id: 1).first || association(:instructor) }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
     max_question_score 5
@@ -297,7 +297,7 @@ FactoryGirl.define do
 
   factory :author_feedback_questionnaire, class: AuthorFeedbackQuestionnaire do
     name 'Test questionaire'
-    instructor { User.where(role_id: 1).first || association(:instructor) }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
     max_question_score 5
@@ -308,7 +308,7 @@ FactoryGirl.define do
 
   factory :teammate_review_questionnaire, class: TeammateReviewQuestionnaire do
     name 'Test questionaire'
-    instructor { User.where(role_id: 1).first || association(:instructor) }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
     max_question_score 5

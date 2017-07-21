@@ -1,9 +1,9 @@
 class Team < ActiveRecord::Base
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
-  has_many :join_team_requests
+  has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
-  has_many :signed_up_teams
+  has_many :signed_up_teams, dependent: :destroy
   has_paper_trail
 
   # Get the participants of the given team

@@ -4,7 +4,7 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if params[:action] == 'edit' || params[:action] == 'update'
+    if ['edit','update', 'list_submissions'].include? params[:action]
       assignment = Assignment.find(params[:id])
       return true if ['Super-Administrator', 'Administrator'].include? current_role_name
       return true if assignment.instructor_id == current_user.try(:id)

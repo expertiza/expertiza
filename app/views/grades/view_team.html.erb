@@ -1,29 +1,9 @@
-<style>
-th.tablesorter-headerAsc{
-  background-image: url(<%= asset_path("up-arrow.png") %>);
-  background-size: 15px 15px;
-  background-repeat: no-repeat;
-  background-position: center right;
-  padding-right: 15px;
-}
-
-th.tablesorter-headerDesc{
-  background-image: url(<%= asset_path("down-arrow.png") %>);
-  background-size: 15px 15px;
-  background-repeat: no-repeat;
-  background-position: center right;
-  padding-right: 15px;
-}
-
-th.sorter-true.tablesorter-headerUnSorted{
-  background-image: url(<%= asset_path("sort.png") %>);
-  background-size: 15px 7px;
-  background-repeat: no-repeat;
-  background-position: center right;
-  padding-right: 15px;
-}
-</style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
+<script type="text/javascript">
+ toggle_tag_prompt = function() {
+    $('.tag_prompt_container').toggle();
+  };
+</script>
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
 
@@ -61,7 +41,8 @@ th.sorter-true.tablesorter-headerUnSorted{
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+            <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+            <span class="spn_qsttog" title="Click to display/hide tags" onclick="toggle_tag_prompt()">toggle tags</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
@@ -140,22 +121,22 @@ th.sorter-true.tablesorter-headerUnSorted{
                         <thead>
                         <th>Review </th>
                         <th>Score</th>
-                        <th colspan="2">Comment</th>
+                        <th>Comment</th>
                         </thead>
-                        <% for index in 0 .. row.score_row.length - 1
-                              colspan_val = ((index<row.score_row.length-1) and (row.score_row[index].vm_prompts.count < row.score_row[index+1].vm_prompts.count) ? 2 : 1)
-                        %>
+                        <% for index in 0 .. row.score_row.length - 1%>
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td width="55%"colspan="<%= colspan_val.to_s %>"><%= row.score_row[index].comment %></td>
-                              <% if row.score_row[index].vm_prompts.count > 0 %>
-                              <td width="35%">
-                                <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
-                                  <%= vm_tag_prompt.tag_prompt.get_html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
+                              <td>
+                                <%= row.score_row[index].comment %>
+                                <% if row.score_row[index].vm_prompts.count > 0 %>
+                                    <div id="tag_prompt_container" class="tag_prompt_container">
+                                    <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
+                                      <%= vm_tag_prompt.tag_prompt.get_html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
+                                    <% end %>
+                                    </div>
                                 <% end %>
                               </td>
-                              <% end %>
                             </tr>
                         <% end %>
                       </table>

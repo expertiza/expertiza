@@ -41,6 +41,11 @@ class UsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
+ def set_anonymous_mode
+    session[:mode]= !session[:mode]
+  redirect_to :back
+  end
+
   # for displaying the list of users
   def list
     user = session[:user]

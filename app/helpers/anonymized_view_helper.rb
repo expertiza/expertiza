@@ -7,7 +7,7 @@ module AnonymizedViewHelper
   end
   def display_anon_fullname(name)
     name_array=name.split(',')
-    return AnonymizedFirstName.find(anonymize(name_array[0])).name+", "+AnonymizedLastName.find(anonymize(name_array[-1])).name if is_anonymous_mode?
+    return AnonymizedLastName.find(anonymize(name_array[-1])).name + ", "+ AnonymizedFirstName.find(anonymize(name_array[0])).name if is_anonymous_mode?
     return name
   end
   def display_anon_name(name)

@@ -3,7 +3,7 @@ module AnonymizedViewHelper
     session[:anonymous_mode]
   end
   def anonymize(name)
-    ((name.sum)%5)+1
+    ((name.sum)%50)+1
   end
   def display_anon_fullname(name)
     name_array=name.split(',')

@@ -14,7 +14,7 @@
 %>
 
 <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
-    <TD><%= participant.fullname %><BR/>
+    <TD><%= display_anon_fullname(participant.fullname) %><BR/>
         <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
             <% if @topic_id %> (<%= SignUpTopic.find(@topic_id).topic_identifier %>)<% end %>
             </FONT>

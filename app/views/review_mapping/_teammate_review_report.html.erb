@@ -3,6 +3,9 @@
                                "Teammate reviewed" => "20%",
                                "Last reviewed at" => "20%") %>
     <%@l = -1 %>
+
+  <%=link_to "Anonymize", :controller => :users, :action => :set_anonymous_mode%></br>
+
     <% @reviewers.each do |r| %>
       <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
       <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
@@ -27,7 +30,7 @@
           <% @reviewer_name = @user.fullname %>
           <!--Reviewer-->
           <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
-            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
+            <%= link_to display_anon_fullname(@reviewer_name), :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
           </td>
           <!--# teammate reviews done-->
           <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>
@@ -46,8 +49,8 @@
               <% @reviewee = rm.reviewee.user %>
                 <!--Teammate reviewed-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
-                  <%= link_to @reviewee.name, impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
-                  (<%= @reviewee.fullname %>)
+                  <%= link_to display_anon_handle(@reviewee.name), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
+                  (<%= display_anon_fullname(@reviewee.fullname) %>)
                 </td>
                 <!--Last reviewed at-->
                 <td bgcolor=<%= @bgcolor %> align = 'left'>

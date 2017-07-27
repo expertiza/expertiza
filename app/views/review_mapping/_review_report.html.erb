@@ -1,5 +1,7 @@
+  <%=link_to "Anonymize", :controller => :users, :action => :set_anonymous_mode%></br></br>
  <%@l = -1 %>
       <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
+     
       <div class = 'reviewreport'>
   <!-- Added headers for tablesorter -->
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
@@ -29,8 +31,8 @@
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%>>
-              <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
-              (<%= user.fullname %>)
+              <%= link_to display_anon_name(user.name), impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
+              (<%= display_anon_fullname(user.fullname) %>)
             </td>
             <!--# reviews done-->
             <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>

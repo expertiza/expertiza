@@ -88,15 +88,6 @@ class Menu
       unless items.empty?
         # Build hashes of items by name and id
         for item in items do
-          # Convert keys to integers (for braindead DB backends)
-          #           item.menu_item_id         &&= item.menu_item_id.to_i
-          #           item.menu_item_seq        &&= item.menu_item_seq.to_i
-          #           item.menu_item_parent_id  &&= item.menu_item_parent_id.to_i
-          #           item.site_controller_id   &&= item.site_controller_id.to_i
-          #           item.controller_action_id &&= item.controller_action_id.to_i
-          #           item.content_page_id      &&= item.content_page_id.to_i
-          #           item.permission_id        &&= item.permission_id.to_i
-
           node = Node.new
           node.setup(item)
           @by_id[item.id] = node

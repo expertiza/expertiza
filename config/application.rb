@@ -41,6 +41,22 @@ module Expertiza
 
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
 
+    #Allow application to be opened in an i-frame
+    config.action_dispatch.default_headers = {
+        'X-Frame-Options' => 'ALLOWALL',
+        'X-XSS-Protection' => '1; mode=block',
+        'X-Content-Type-Options' => 'nosniff'
+    }
+
+    #Facilitated decorator pattern
+    #Decorators can be added and "required" from app/decorators directory
+    config.to_prepare do
+      Dir.glob(Rails.root + "app/decorators/**/*_decorator*.rb").each do |c|
+        require_dependency(c)
+      end
+    end
+
+
     # Bower asset paths
     root.join('vendor', 'assets', 'components').to_s.tap do |bower_path|
       config.sass.load_paths << bower_path

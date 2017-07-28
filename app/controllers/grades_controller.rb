@@ -192,10 +192,17 @@ class GradesController < ApplicationController
     @team = participant.team
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
+    successful = false;
     begin
       @team.save
+      successful = true;
     rescue
+      successful = false;
       flash[:error] = $ERROR_INFO
+    end
+    #if saving of grades is succesful, post grades to LMS like Moodle automatically
+    if successful
+      LtiAssignmentUsersHelper.post_grades_to_lms @team.participants, @team.grade_for_submission;
     end
     redirect_to controller: 'grades', action: 'view_team', id: params[:participant_id]
   end

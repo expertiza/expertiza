@@ -1,0 +1,30 @@
+
+#deployment
+  %h2
+    Expertiza Registration
+
+  = form_for(@lti_registration_wip) do |f|
+    .label-column
+      &nbsp;
+
+      .form-box
+        %table
+          %tr
+            %td
+              %label Product Name:
+            %td
+              &nbsp;
+              = f.text_field :product_name, :label => "Product name", :size => 30, :readonly => true
+          %tr
+            %td
+              %br
+          %tr
+            %td
+              %label Institution Name:
+            %td
+              &nbsp;
+              = f.text_field :tenant_name, :label => "Institution name", :size => 30
+      .buttons
+        %br
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        %input{:type => "submit", :value => "Add Provider", :size => 30, :class => "button"}

@@ -89,3 +89,7 @@ group :development, :test do
   gem 'capybara'
   gem 'simplecov', require: false
 end
+
+#lti start
+gem 'lti2', :github => 'joshio1/LTI2-Reference'
+#lti end

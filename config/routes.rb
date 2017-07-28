@@ -1,8 +1,28 @@
 Expertiza::Application.routes.draw do
 
+  #lti start
+  resources :lti_assignment_users
+  mount Lti2Tp::Engine, :at => '/lti2_tp'
+  resources :lti_registration_wips
+  get 'complete_reregistration' => 'lti_registration_wips#complete_reregistration'
+  get 'tool_profile' => 'tool_profiles#get_first'
+  get 'lti_assignment_users_controller/back_to_lms', to: 'lti_assignment_users#back_to_lms'
+
+  resources :impersonate do
+    collection do
+      get :start
+      post :impersonate
+    end
+  end
+
+  post 'lti_registrations' => 'lti_registrations#create', as: 'lti_registration'
+  resources :lti_assignments
+  #lti end
+
   resources :user_pastebins
   resources :track_notifications
   resources :notifications
+
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'

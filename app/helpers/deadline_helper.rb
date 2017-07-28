@@ -17,7 +17,6 @@ module DeadlineHelper
     topic_deadline.deadline_type_id = due_date.deadline_type_id
     # select count(*) from topic_deadlines where late_policy_id IS NULL;
     # all 'late_policy_id' in 'topic_deadlines' table is NULL
-    # topic_deadline.late_policy_id = nil
     topic_deadline.submission_allowed_id = due_date.submission_allowed_id
     topic_deadline.review_allowed_id = due_date.review_allowed_id
     topic_deadline.review_of_review_allowed_id = due_date.review_of_review_allowed_id

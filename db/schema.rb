@@ -13,21 +13,6 @@
 
 ActiveRecord::Schema.define(version: 20170710031449) do
 
-  create_table "tag_prompt_deployments", force: :cascade do |t|
-    t.string   "prompt",               limit: 255
-    t.string   "desc",                 limit: 255
-    t.string   "type",                 limit: 255
-    t.integer  "questionnaire_id",     limit: 4
-    t.string   "question_type",        limit: 255
-    t.string   "answer_len_threshold", limit: 255
-    t.integer  "assignment_id",        limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "tag_prompt_deployments", ["assignment_id"], name: "index_tag_prompt_deployments_on_assignment_id", using: :btree
-  add_index "tag_prompt_deployments", ["questionnaire_id"], name: "index_tag_prompt_deployments_on_questionnaire_id", using: :btree
-
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
     t.integer  "tag_prompt_deployment_id", limit: 4
@@ -38,7 +23,7 @@ ActiveRecord::Schema.define(version: 20170710031449) do
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
-  add_index "answer_tags", ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id", using: :btree
+  add_index "answer_tags", ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deploymemnt_id", using: :btree
   add_index "answer_tags", ["user_id"], name: "index_answer_tags_on_user_id", using: :btree
 
   create_table "answers", force: :cascade do |t|
@@ -376,7 +361,7 @@ ActiveRecord::Schema.define(version: 20170710031449) do
     t.integer  "assignment_id", limit: 4
   end
 
-  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id", using: :btree
+  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assignment_submissions_on_assignment_id", using: :btree
 
   create_table "plagiarism_checker_comparisons", force: :cascade do |t|
     t.integer  "plagiarism_checker_assignment_submission_id", limit: 4
@@ -781,10 +766,8 @@ ActiveRecord::Schema.define(version: 20170710031449) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
-  add_foreign_key "answer_tag_settings", "assignments"
-  add_foreign_key "answer_tag_settings", "questionnaires"
-  add_foreign_key "answer_tags", "answer_tag_settings", column: "tag_prompt_deployment_id"
   add_foreign_key "answer_tags", "answers"
+  add_foreign_key "answer_tags", "tag_prompts_deployments", column: "tag_prompt_deployment_id"
   add_foreign_key "answer_tags", "users"
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"

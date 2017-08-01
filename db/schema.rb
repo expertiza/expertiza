@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 20170710031449) do
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
-  add_index "answer_tags", ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deploymemnt_id", using: :btree
+  add_index "answer_tags", ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id", using: :btree
   add_index "answer_tags", ["user_id"], name: "index_answer_tags_on_user_id", using: :btree
 
   create_table "answers", force: :cascade do |t|

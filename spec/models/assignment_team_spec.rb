@@ -54,7 +54,7 @@ describe 'AssignmentTeam' do
 
   describe "copy assignment team to course team" do
     it "should allow assignment team to be copied to course team" do
-      course_team = CourseTeam.new()
+      course_team = CourseTeam.new
       course_team.save!
       assign_team = build(:assignment_team)
       assign_team.copy(course_team.id)

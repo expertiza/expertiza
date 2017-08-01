@@ -9,27 +9,26 @@ class Assignment < ActiveRecord::Base
   include ReviewAssignment
   include QuizAssignment
   include OnTheFlyCalc
-  belongs_to :course
   has_paper_trail
 
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
-  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id'
+  belongs_to :course
+  belongs_to :instructor, class_name: 'User'
+  has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy
+  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :users, through: :participants
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy
-  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id'
-  has_many :team_review_mappings, class_name: 'ReviewResponseMap', through: :teams, source: :review_mappings
+  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy
   has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :questionnaires, through: :assignment_questionnaires
-  belongs_to :instructor, class_name: 'User', foreign_key: 'instructor_id'
   has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy
-  has_many :response_maps, foreign_key: 'reviewed_object_id', class_name: 'ResponseMap'
-  has_one :assignment_node, foreign_key: :node_object_id, dependent: :destroy
-  has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id'
-  has_many :plagiarism_checker_assignment_submissions
+  has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
+  has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
+  has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
 
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
@@ -434,9 +433,7 @@ class Assignment < ActiveRecord::Base
 
     # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
-      
       @uniq_response_type.each do |res_type|
-        
         round_type = check_empty_rounds(@answers, round_num, res_type)
 
         unless round_type.nil?
@@ -453,14 +450,14 @@ class Assignment < ActiveRecord::Base
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.export_details_fields(detail_options)
     fields = []
-    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'       
+    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'
     fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
-    fields << 'Reviewer' if detail_options['reviewer'] == 'true'    
+    fields << 'Reviewer' if detail_options['reviewer'] == 'true'
     fields << 'Question / Criterion' if detail_options['question'] == 'true'
     fields << 'Question ID' if detail_options['question_id'] == 'true'
     fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
     fields << 'Answer / Comment' if detail_options['comments'] == 'true'
-    fields << 'Score' if detail_options['score'] == 'true'  
+    fields << 'Score' if detail_options['score'] == 'true'
     fields
   end
 
@@ -494,14 +491,14 @@ class Assignment < ActiveRecord::Base
   def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
-    
+
     # for each map, get the response & answer associated with it
     @response_maps_for_assignment.each do |map|
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
       @response_for_this_map.each do |resp|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
-        
+
         @answer.each do |ans|
           answers[resp.round][map.type].push(ans)
         end
@@ -611,6 +608,4 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
   end
-
-  #
 end

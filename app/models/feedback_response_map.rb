@@ -74,8 +74,8 @@ class FeedbackResponseMap < ResponseMap
     end
   end
 
-  #Send emails for author feedback
-  #Refactored from email method in response.rb
+  # Send emails for author feedback
+  # Refactored from email method in response.rb
   def email(defn, participant, assignment)
     defn[:body][:type] = "Author Feedback"
     # reviewee is a response, reviewer is a participant

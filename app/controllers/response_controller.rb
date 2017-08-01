@@ -92,11 +92,9 @@ class ResponseController < ApplicationController
 
       questions = sort_questions(@questionnaire.questions)
 
-      unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-        create_answers(params, questions)
-      end
+      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
 
-      if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
+      if params['isSubmit'] && (params['isSubmit'].eql?'Yes')
         # Update the submission flag.
         @response.update_attribute('is_submitted', true)
       else
@@ -166,24 +164,23 @@ class ResponseController < ApplicationController
     end
 
     # create the response
-    if params[:isSubmit].eql?('Yes')
-      is_submitted = true
-    else
-      is_submitted = false
-    end
+    is_submitted = if params[:isSubmit].eql?('Yes')
+                     true
+                   else
+                     false
+                   end
     @response = Response.create(
       map_id: @map.id,
-      additional_comment: params[:review][:comments], 
-      round: @round, 
-      is_submitted: is_submitted)
+      additional_comment: params[:review][:comments],
+      round: @round,
+      is_submitted: is_submitted
+    )
     # ,:version_num=>@version)
 
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
 
-    if params[:responses]
-      create_answers(params, questions)
-    end
+    create_answers(params, questions) if params[:responses]
 
     msg = "Your response was successfully saved."
     error_msg = ""
@@ -238,8 +235,6 @@ class ResponseController < ApplicationController
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
-
-
   # This method should be moved to survey_deployment_contoller.rb
   def pending_surveys
     unless session[:user] # Check for a valid user
@@ -256,21 +251,19 @@ class ResponseController < ApplicationController
     if course_participants
       course_participants.each do |cp|
         survey_deployments = CourseSurveyDeployment.where(parent_id: cp.parent_id)
-        if survey_deployments
-          survey_deployments.each do |survey_deployment|
-            if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << 
-              [
-                'survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
-                'survey_deployment_id' => survey_deployment.id, 
-                'start_date' => survey_deployment.start_date, 
-                'end_date' => survey_deployment.end_date,
-                'parent_id' => cp.parent_id, 
-                'participant_id' => cp.id,
-                'global_survey_id' => survey_deployment.global_survey_id
-              ]
-            end
-          end
+        next unless survey_deployments
+        survey_deployments.each do |survey_deployment|
+          next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+          @surveys <<
+          [
+            'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+            'survey_deployment_id' => survey_deployment.id,
+            'start_date' => survey_deployment.start_date,
+            'end_date' => survey_deployment.end_date,
+            'parent_id' => cp.parent_id,
+            'participant_id' => cp.id,
+            'global_survey_id' => survey_deployment.global_survey_id
+          ]
         end
       end
     end
@@ -279,21 +272,19 @@ class ResponseController < ApplicationController
     if assignment_participants
       assignment_participants.each do |ap|
         survey_deployments = AssignmentSurveyDeployment.where(parent_id: ap.parent_id)
-        if survey_deployments
-          survey_deployments.each do |survey_deployment|
-            if survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-              @surveys << 
-              [
-                'survey' => Questionnaire.find(survey_deployment.questionnaire_id), 
-                'survey_deployment_id' => survey_deployment.id,
-                'start_date' => survey_deployment.start_date, 
-                'end_date' => survey_deployment.end_date, 
-                'parent_id' => ap.parent_id, 
-                'participant_id' => ap.id,
-                'global_survey_id' => survey_deployment.global_survey_id
-              ]
-            end
-          end
+        next unless survey_deployments
+        survey_deployments.each do |survey_deployment|
+          next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+          @surveys <<
+          [
+            'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+            'survey_deployment_id' => survey_deployment.id,
+            'start_date' => survey_deployment.start_date,
+            'end_date' => survey_deployment.end_date,
+            'parent_id' => ap.parent_id,
+            'participant_id' => ap.id,
+            'global_survey_id' => survey_deployment.global_survey_id
+          ]
         end
       end
     end
@@ -345,12 +336,12 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when 
-      "MetareviewResponseMap", 
-      "TeammateReviewResponseMap", 
-      "FeedbackResponseMap", 
-      "CourseSurveyResponseMap", 
-      "AssignmentSurveyResponseMap", 
+    when
+      "MetareviewResponseMap",
+      "TeammateReviewResponseMap",
+      "FeedbackResponseMap",
+      "CourseSurveyResponseMap",
+      "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end

@@ -63,7 +63,7 @@ class ImportFileController < ApplicationController
         end
       end
     rescue
-        errors << $ERROR_INFO
+      errors << $ERROR_INFO
     end
     errors
   end

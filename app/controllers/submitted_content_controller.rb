@@ -54,7 +54,7 @@ class SubmittedContentController < ApplicationController
                                                   operation: "Submit Hyperlink")
         @submission_record.save
       rescue
-        flash[:error] = "The URL or URI is not valid. Reason: #{$ERROR_INFO}"
+        flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
       undo_link("The link has been successfully submitted.")
     end

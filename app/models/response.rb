@@ -3,7 +3,7 @@ require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
   include ResponseAnalytic
-  
+
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
   # TODO: change metareview_response_map relationship to belongs_to
@@ -29,7 +29,6 @@ class Response < ActiveRecord::Base
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
     # a ReviewResponseMap.
-
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
@@ -37,7 +36,7 @@ class Response < ActiveRecord::Base
       identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
       identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
       str = prefix + '_' + self.id.to_s
-      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' +
+      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' \
           "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
     else # in student end
       # identifier += '<B>Review ' + count.to_s + ' Round ' + self.round.to_s + '</B>'
@@ -151,16 +150,15 @@ class Response < ActiveRecord::Base
     participant = Participant.find(reviewer_participant_id)
 
     # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
-    if response_map.survey?
-      parent = response_map.survey_parent
+    parent = if response_map.survey?
+      response_map.survey_parent
     else
-      parent = Assignment.find(participant.parent_id)
-    end
+      Assignment.find(participant.parent_id)
+             end
 
     defn[:subject] = "A new submission is available for " + parent.name
 
-    response_map.email(defn,participant,parent)
-
+    response_map.email(defn, participant, parent)
   end
 
   def questionnaire_by_answer(answer)
@@ -178,29 +176,32 @@ class Response < ActiveRecord::Base
     end
     questionnaire
   end
-  
+
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
     counter = 0
-    @comments_in_round_1, @comments_in_round_2, @comments_in_round_3 = '', '', ''
-    @counter_in_round_1, @counter_in_round_2, @counter_in_round_3 = 0, 0, 0
+    @comments_in_round_1 = ''
+    @comments_in_round_2 = ''
+    @comments_in_round_3 = ''
+    @counter_in_round_1 = 0
+    @counter_in_round_2 = 0
+    @counter_in_round_3 = 0
     assignment = Assignment.find(assignment_id)
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
-    
-    ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).each do |response_map|
+
+    ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).find_each do |response_map|
       (1..assignment.num_review_rounds).each do |round|
-        last_response_in_current_round = response_map.response.select{|r| r.round == round }.last
-        unless last_response_in_current_round.nil?
-          last_response_in_current_round.scores.each do |answer| 
-            comments += answer.comments if question_ids.include? answer.question_id
-            instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments ||= '')
-          end
-          additional_comment = last_response_in_current_round.additional_comment
-          comments += additional_comment
-          counter += 1
-          instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
-          instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
+        last_response_in_current_round = response_map.response.select {|r| r.round == round }.last
+        next if last_response_in_current_round.nil?
+        last_response_in_current_round.scores.each do |answer|
+          comments += answer.comments if question_ids.include? answer.question_id
+          instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments ||= '')
         end
+        additional_comment = last_response_in_current_round.additional_comment
+        comments += additional_comment
+        counter += 1
+        instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
+        instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
       end
     end
     [comments, counter,
@@ -250,17 +251,17 @@ class Response < ActiveRecord::Base
     end
   end
 
-  def self.avg_scores_and_count_for_prev_reviews (existing_responses, current_response)
+  def self.avg_scores_and_count_for_prev_reviews(existing_responses, current_response)
     scores_assigned = []
     count = 0
     existing_responses.each do |existing_response|
       if existing_response.id != current_response.id # the current_response is also in existing_responses array
         count += 1
-        scores_assigned << existing_response.get_total_score.to_f/existing_response.get_maximum_score
+        scores_assigned << existing_response.get_total_score.to_f / existing_response.get_maximum_score
       end
     end
 
-    return scores_assigned.sum/scores_assigned.size.to_f, count
+    [scores_assigned.sum / scores_assigned.size.to_f, count]
   end
 
   def notify_instructor_on_difference
@@ -275,20 +276,19 @@ class Response < ActiveRecord::Base
 
     assignment = Assignment.find(reviewer_participanat.parent_id)
 
-    Mailer.notify_grade_conflict_message(
-        {:to => assignment.instructor.email,
-         :subject => "Expertiza Notification: A review score is outside the acceptable range",
-         :body => {
-             :reviewer_name => reviewer_name,
-             :type => "review",
-             :reviewee_name => reviewee_name,
-             :new_score => get_total_score.to_f / get_maximum_score,
-             :assignment => assignment,
-             :conflicting_response_url => 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,  #'https://expertiza.ncsu.edu/response/view?id='
-             :summary_url => 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-             :assignment_edit_url => 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-         }
-        }
-    ).deliver_now
+    Mailer.notify_grade_conflict_message({
+      to: assignment.instructor.email,
+       subject: "Expertiza Notification: A review score is outside the acceptable range",
+       body: {
+         reviewer_name: reviewer_name,
+           type: "review",
+           reviewee_name: reviewee_name,
+           new_score: get_total_score.to_f / get_maximum_score,
+           assignment: assignment,
+           conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
+           summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+           assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+       }
+    }).deliver_now
   end
 end

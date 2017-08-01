@@ -62,7 +62,7 @@ describe SignUpSheetController do
       get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
       expect(response).to redirect_to(redirect_to(action: 'add_signup_topics', id: @assignment.id))
       expect(flash[:error]).to eq('The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.')
-  end
+    end
 
     it "is able to update a topic with a microtask" do
       @assignment.microtask = true

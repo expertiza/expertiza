@@ -27,7 +27,7 @@
 
       <% for topic in @sign_up_topics %>
 
-          <%= get_intelligent_topic_row(topic, @selected_topics) %>
+          <%= get_intelligent_topic_row(topic, @selected_topics, @max_team_size) %>
           <% is_suggested_topic = false %>
           <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
           </tr>

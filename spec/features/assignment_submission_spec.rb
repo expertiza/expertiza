@@ -43,7 +43,7 @@ describe "assignment submisstion test" do
     # invalid format url1
     fill_in 'submission', with: "wolfpack"
     click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid"
+    expect(page).to have_content "The URL or URI is invalid"
   end
 
   it "is able to submit multiple valid links" do
@@ -74,11 +74,11 @@ describe "assignment submisstion test" do
     # hyperlink is empty
     fill_in 'submission', with: ""
     click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid. Reason: The hyperlink cannot be empty!"
+    expect(page).to have_content "The URL or URI is invalid. Reason: The hyperlink cannot be empty!"
     # hyperlink is "http://"
     fill_in 'submission', with: "http://"
     click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is not valid."
+    expect(page).to have_content "The URL or URI is invalid."
   end
 
   it "is able to submit single valid file" do

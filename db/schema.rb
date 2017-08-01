@@ -11,9 +11,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170627152901) do
+ActiveRecord::Schema.define(version: 20170710031449) do
 
-  create_table "answer_tag_settings", force: :cascade do |t|
+  create_table "tag_prompt_deployments", force: :cascade do |t|
     t.string   "prompt",               limit: 255
     t.string   "desc",                 limit: 255
     t.string   "type",                 limit: 255
@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(version: 20170627152901) do
     t.datetime "updated_at",                       null: false
   end
 
-  add_index "answer_tag_settings", ["assignment_id"], name: "index_answer_tag_settings_on_assignment_id", using: :btree
-  add_index "answer_tag_settings", ["questionnaire_id"], name: "index_answer_tag_settings_on_questionnaire_id", using: :btree
+  add_index "tag_prompt_deployments", ["assignment_id"], name: "index_tag_prompt_deployments_on_assignment_id", using: :btree
+  add_index "tag_prompt_deployments", ["questionnaire_id"], name: "index_tag_prompt_deployments_on_questionnaire_id", using: :btree
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -376,7 +376,7 @@ ActiveRecord::Schema.define(version: 20170627152901) do
     t.integer  "assignment_id", limit: 4
   end
 
-  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assignment_submissions_on_assignment_id", using: :btree
+  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id", using: :btree
 
   create_table "plagiarism_checker_comparisons", force: :cascade do |t|
     t.integer  "plagiarism_checker_assignment_submission_id", limit: 4
@@ -393,11 +393,6 @@ ActiveRecord::Schema.define(version: 20170627152901) do
   end
 
   add_index "plagiarism_checker_comparisons", ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index", using: :btree
-
-  create_table "plugin_schema_info", id: false, force: :cascade do |t|
-    t.string  "plugin_name", limit: 255
-    t.integer "version",     limit: 4
-  end
 
   create_table "question_advices", force: :cascade do |t|
     t.integer "question_id", limit: 4

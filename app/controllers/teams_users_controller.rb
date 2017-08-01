@@ -44,7 +44,7 @@ class TeamsUsersController < ApplicationController
         @teams_user = TeamsUser.last
         undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
       end
-    else #CourseTeam
+    else # CourseTeam
       course = Course.find(team.parent_id)
       if CourseParticipant.find_by_user_id_and_parent_id(user.id, course.id).nil?
         urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'

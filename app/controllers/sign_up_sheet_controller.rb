@@ -20,7 +20,7 @@ class SignUpSheetController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name and 
+       'Student'].include? current_role_name and
       ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
       ['Instructor',
@@ -84,7 +84,7 @@ class SignUpSheetController < ApplicationController
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
     @topic = SignUpTopic.find(params[:id])
-    
+
     if @topic
       @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
@@ -172,12 +172,10 @@ class SignUpSheetController < ApplicationController
       signed_up_topics = []
       @bids.each do |bid|
         sign_up_topic = SignUpTopic.where(id: bid.topic_id)
-        unless sign_up_topic.empty?
-          signed_up_topics << sign_up_topic.first
-        end
+        signed_up_topics << sign_up_topic.first unless sign_up_topic.empty?
       end
-      signed_up_topics = signed_up_topics & @sign_up_topics
-      @sign_up_topics = @sign_up_topics - signed_up_topics
+      signed_up_topics &= @sign_up_topics
+      @sign_up_topics -= signed_up_topics
       @bids = signed_up_topics
     end
 
@@ -285,7 +283,10 @@ class SignUpSheetController < ApplicationController
   def set_priority
     @user_id = session[:user].id
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-    unless params[:topic].nil?
+    if params[:topic].nil?
+      # All topics are deselected by user
+      Bid.where(user_id: @user_id).destroy_all
+    else
       team_ids = AssignmentTeam.where(parent_id: assignment_id).map(&:id)
       team_user = TeamsUser.where("user_id = ? AND team_id IN (?)", @user_id, team_ids)
       user_ids = []
@@ -295,28 +296,25 @@ class SignUpSheetController < ApplicationController
       end
       user_ids = user_ids.flatten!.uniq
       user_ids.each do |user_id|
-        @bids = Bid.where("user_id = ?", user_id )
-        signed_up_topics = @bids.map {|bid| bid.topic_id}
+        @bids = Bid.where("user_id = ?", user_id)
+        signed_up_topics = @bids.map(&:topic_id)
 
-        #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
-        #This step is necessary to avoid duplicate priorities in Bids table
-        signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
+        # Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
+        # This step is necessary to avoid duplicate priorities in Bids table
+        signed_up_topics -= params[:topic].map(&:to_i)
         signed_up_topics.each do |topic|
           Bid.where(topic_id: topic, user_id: user_id).destroy_all
         end
 
-        params[:topic].each_with_index do |topic_id,index|
+        params[:topic].each_with_index do |topic_id, index|
           check = @bids.where(topic_id: topic_id)
           if check.empty?
             Bid.create(topic_id: topic_id, user_id: user_id, priority: index + 1)
           else
-            Bid.where("topic_id = ? AND user_id = ?",topic_id, user_id).update_all({priority: index + 1})
+            Bid.where("topic_id = ? AND user_id = ?", topic_id, user_id).update_all(priority: index + 1)
           end
         end
       end
-    else
-      #All topics are deselected by user
-      Bid.where(user_id: @user_id).destroy_all
     end
 
     redirect_to action: 'list', assignment_id: params[:assignment_id]

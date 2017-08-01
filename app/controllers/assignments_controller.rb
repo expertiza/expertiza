@@ -4,7 +4,7 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if params[:action] == 'edit' || params[:action] == 'update'
+    if ['edit','update', 'list_submissions'].include? params[:action]
       assignment = Assignment.find(params[:id])
       return true if ['Super-Administrator', 'Administrator'].include? current_role_name
       return true if assignment.instructor_id == current_user.try(:id)
@@ -72,8 +72,8 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select{|due_date| due_date.deadline_type_id == 1}
-      @assignment_review_due_dates = @due_date_all.select{|due_date| due_date.deadline_type_id == 2}
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 1 }
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 2 }
     end
 
     # Check if name and url in database is empty before webpage displays

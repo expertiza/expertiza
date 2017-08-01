@@ -3,7 +3,7 @@
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
 
 <% else %>
-    <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %> </h4>
+    <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 

@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'pry'
 
-describe TeamsController do 
+describe TeamsController do
   # Airbrake-1807465099223895248
   describe '#delete', type: :controller do
     before(:each) do
@@ -23,7 +23,7 @@ describe TeamsController do
       signed_up_teams = [double('SignedUpTeam', topic_id: 1, is_waitlisted: true)]
       controller.session[:team_type] = 'Assignment'
       controller.session[:user] = double('User', id: 1)
-    
+
       allow(Team).to receive(:find).with(any_args).and_return(team)
       allow(Team).to receive(:find_by).with(any_args).and_return(team)
       allow(Assignment).to receive(:find).with(any_args).and_return(double('Course'))
@@ -120,10 +120,10 @@ describe ReviewMappingController do
     end
 
     it 'will delete reviewer if current reviewer did not do any reviews' do
-      review_response_map = double('ReviewResponseMap', 
-                                  id: 1,
-                                  reviewee: double('Participant', name: 'stu1'),
-                                  reviewer: double('Participant', name: 'stu2'))
+      review_response_map = double('ReviewResponseMap',
+                                   id: 1,
+                                   reviewee: double('Participant', name: 'stu1'),
+                                   reviewer: double('Participant', name: 'stu2'))
       allow(ReviewResponseMap).to receive(:find).with(any_args).and_return(review_response_map)
       allow(ReviewResponseMap).to receive(:find_by).with(any_args).and_return(review_response_map)
       allow(Response).to receive(:exists?).with(any_args).and_return(false)

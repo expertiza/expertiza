@@ -91,7 +91,7 @@ class SurveyDeploymentController < ApplicationController
   def delete
     survey_deployment = SurveyDeployment.find(params[:id])
     survey_deployment.response_maps.each(&:destroy)
-    GlobalSurveyResponseMap.where(reviewee_id:params[:id]).each(&:destroy)
+    GlobalSurveyResponseMap.where(reviewee_id: params[:id]).each(&:destroy)
     survey_deployment.destroy
     redirect_to action: 'list'
   end
@@ -99,11 +99,11 @@ class SurveyDeploymentController < ApplicationController
   # Creates pie charts for visualizing survey responses to Criterion and Checkbox questions
   def generate_statistics
     @sd = SurveyDeployment.find(params[:id])
-    if params[:global_survey] == 'true'
-      questionnaire = Questionnaire.find(@sd.global_survey_id)
-    else
-      questionnaire = Questionnaire.find(@sd.questionnaire_id)
-    end
+    questionnaire = if params[:global_survey] == 'true'
+                      Questionnaire.find(@sd.global_survey_id)
+                    else
+                      Questionnaire.find(@sd.questionnaire_id)
+                    end
     @range_of_scores = (questionnaire.min_question_score..questionnaire.max_question_score).to_a
     @questions = Question.where(questionnaire_id: questionnaire.id)
     responses_for_all_questions = []
@@ -117,7 +117,7 @@ class SurveyDeploymentController < ApplicationController
       data_table_row = []
       data_table_row << %w(Label Number)
       label_value = @range_of_scores.first
-      response.each_with_index do |response_value, index|
+      response.each_with_index do |response_value, _index|
         data_table_row << [label_value.to_s, response_value]
         label_value += 1
       end
@@ -157,6 +157,7 @@ class SurveyDeploymentController < ApplicationController
   end
 
   private
+
   # this method should be moved to another place with view_responses.
   def list_answers(questions, response_map_list)
     all_answers = []
@@ -166,14 +167,10 @@ class SurveyDeploymentController < ApplicationController
         response_list = Response.where(map_id: response_map.id)
         response_list.each do |response|
           an_answer = Answer.where(question_id: question.id, response_id: response.id).first
-          unless an_answer.blank?
-            answers << an_answer
-          end
+          answers << an_answer unless an_answer.blank?
         end
       end
-      if !answers.empty?
-        all_answers << answers
-      end
+      all_answers << answers unless answers.empty?
     end
     all_answers
   end

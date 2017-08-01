@@ -2,8 +2,8 @@ class StudentQuizzesController < ApplicationController
   def action_allowed?
     ['Administrator',
      'Instructor',
-     'Teaching Assistant'].include? current_role_name or 
-    (current_role_name.eql?("Student") and 
+     'Teaching Assistant'].include? current_role_name or
+    (current_role_name.eql?("Student") and
       ((%w(index).include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
   end
 

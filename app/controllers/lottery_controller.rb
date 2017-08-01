@@ -74,7 +74,7 @@ class LotteryController < ApplicationController
   # to strongest contenders (team strength, priority of bids)
   def run_intelligent_bid
     unless Assignment.find_by(id: params[:id]).is_intelligent # if the assignment is intelligent then redirect to the tree display list
-      flash[:error] = "This action not allowed. The assignment " + Assignment.find_by(id: params[:id]).name + " does not enabled intelligent assignments."
+      flash[:error] = "This action is not allowed. The assignment " + Assignment.find_by(id: params[:id]).name + " does not enable intelligent assignments."
       redirect_to controller: 'tree_display', action: 'list'
       return
     end

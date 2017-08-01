@@ -8,25 +8,25 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-        ['Instructor',
-         'Teaching Assistant',
-         'Administrator',
-         'Super-Administrator',
-         'Student'].include? current_role_name and 
-        are_needed_authorizations_present?(params[:id], "reader", "reviewer") and 
-        check_self_review_status
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+      check_self_review_status
     when 'view_team'
-        if ['Student'].include? current_role_name # students can only see the head map for their own team
-          participant = AssignmentParticipant.find(params[:id])
-          session[:user].id == participant.user_id
-        else
-          true
-        end
+      if ['Student'].include? current_role_name # students can only see the head map for their own team
+        participant = AssignmentParticipant.find(params[:id])
+        session[:user].id == participant.user_id
       else
-        ['Instructor',
-         'Teaching Assistant',
-         'Administrator',
-         'Super-Administrator'].include? current_role_name
+        true
+      end
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -58,10 +58,10 @@ class GradesController < ApplicationController
   def retrieve_questions(questionnaires)
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if (!round.nil?)
-        (questionnaire.symbol.to_s+round.to_s).to_sym
-      else
-        questionnaire.symbol
+      questionnaire_symbol = if !round.nil?
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             else
+                               questionnaire.symbol
                              end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
@@ -106,6 +106,11 @@ class GradesController < ApplicationController
     # to render the html tables.
 
     questionnaires.each do |questionnaire|
+      @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+                 AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+               end
+
+    questionnaires.each do |questionnaire|
       vm = VmQuestionResponse.new(questionnaire, @assignment)
       questions = questionnaire.questions
       vm.add_questions(questions)
@@ -148,10 +153,10 @@ class GradesController < ApplicationController
         review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
         review = Response.find_by_map_id(review_mapping.map_id)
 
-        unless review_exists
-          redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
-        else
+        if review_exists
           redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
+        else
+          redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
         end
       end
     end
@@ -176,9 +181,9 @@ class GradesController < ApplicationController
     if sprintf("%.2f", total_score) != params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
-        "The computed score will be used for "+participant.user.name+"."
-      else
-        "A score of "+params[:participant][:grade]+"% has been saved for "+participant.user.name+"."
+                  "The computed score will be used for " + participant.user.name + "."
+                else
+                  "A score of " + params[:participant][:grade] + "% has been saved for " + participant.user.name + "."
                 end
     end
     flash[:note] = message
@@ -242,11 +247,11 @@ class GradesController < ApplicationController
       penalties = calculate_penalty(participant.id)
       @total_penalty = 0
 
-      unless (penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?)
+      unless penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?
 
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
-        if (@total_penalty > l_policy.max_penalty)
+        if @total_penalty > l_policy.max_penalty
           @total_penalty = l_policy.max_penalty
         end
         calculate_penatly_attributes(@participant) if calculate_for_participants
@@ -360,6 +365,6 @@ class GradesController < ApplicationController
   def mean_and_standard_deviation(array)
     m = mean(array)
     variance = array.inject(0) {|variance, x| variance += (x - m)**2 }
-    [m, Math.sqrt(variance/(array.size-1))]
+    [m, Math.sqrt(variance / (array.size - 1))]
   end
 end

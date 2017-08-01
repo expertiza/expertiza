@@ -37,7 +37,7 @@ class ExportFileController < ApplicationController
       filename = params[:model] + params[:id] + suffix + ".csv"
       delimiter = other_char
     end
-    return filename, delimiter
+    [filename, delimiter]
   end
 
   def exportdetails
@@ -63,16 +63,15 @@ class ExportFileController < ApplicationController
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
 
-    allowed_models = ['Assignment',
-                      'AssignmentParticipant',
-                      'AssignmentTeam',
-                      'CourseParticipant',
-                      'CourseTeam',
-                      'MetareviewResponseMap',
-                      'ReviewResponseMap',
-                      'User',
-                      'Team'
-                      ]
+    allowed_models = %w(Assignment
+                        AssignmentParticipant
+                        AssignmentTeam
+                        CourseParticipant
+                        CourseTeam
+                        MetareviewResponseMap
+                        ReviewResponseMap
+                        User
+                        Team)
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
         csv << Object.const_get(params[:model]).export_fields(params[:options])

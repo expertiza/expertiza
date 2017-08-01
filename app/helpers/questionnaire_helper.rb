@@ -18,7 +18,6 @@ module QuestionnaireHelper
         row << question.txt
         row << question.type
 
-
         row << question.alternatives || ''
         row << question.size || ''
 

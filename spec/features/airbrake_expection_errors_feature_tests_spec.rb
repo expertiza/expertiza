@@ -166,4 +166,3 @@ describe "airbrake-1804043391875943089" do
     expect(page).to have_content('Inherit Teams From Course')
   end
 end
-

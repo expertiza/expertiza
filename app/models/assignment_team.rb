@@ -1,8 +1,8 @@
 class AssignmentTeam < Team
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
-  has_many :review_response_maps, foreign_key: :reviewee_id
-  has_many :responses, through: :review_response_maps, foreign_key: :map_id
+  has_many :review_response_maps, foreign_key: 'reviewee_id'
+  has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
 
   # START of contributor methods, shared with AssignmentParticipant
 
@@ -16,8 +16,8 @@ class AssignmentTeam < Team
     "Assignment"
   end
 
-  def self.parent_model (id)
-    Assignment.find(id) 
+  def self.parent_model(id)
+    Assignment.find(id)
   end
 
   # Get the name of the class

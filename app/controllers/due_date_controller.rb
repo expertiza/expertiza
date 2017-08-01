@@ -15,7 +15,7 @@ class DueDateController < ApplicationController
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
+      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
       return
     end
 
@@ -35,7 +35,7 @@ class DueDateController < ApplicationController
 
     assignment = Assignment.find(params[:assignment_id])
     if assignment.nil?
-      flash[:error] = "Assignment #" + assignment.id + "does not currently exist."
+      flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
       return
     end
 

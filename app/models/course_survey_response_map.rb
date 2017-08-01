@@ -1,6 +1,6 @@
 class CourseSurveyResponseMap < SurveyResponseMap
-  belongs_to :survey_deployment, class_name: 'SurveyDeployment', foreign_key: 'reviewee_id'
-  belongs_to :course, class_name: 'Course', foreign_key: 'reviewed_object_id'
+  belongs_to :survey_deployment, foreign_key: 'reviewee_id'
+  belongs_to :course, foreign_key: 'reviewed_object_id'
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
 
   def questionnaire

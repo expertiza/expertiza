@@ -104,13 +104,11 @@ class GradesController < ApplicationController
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
-
     questionnaires.each do |questionnaire|
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
                end
 
-    questionnaires.each do |questionnaire|
       vm = VmQuestionResponse.new(questionnaire, @assignment)
       questions = questionnaire.questions
       vm.add_questions(questions)
@@ -122,6 +120,7 @@ class GradesController < ApplicationController
       @vmlist << vm
     end
     @current_role_name = current_role_name
+
   end
 
   def edit
@@ -367,4 +366,5 @@ class GradesController < ApplicationController
     variance = array.inject(0) {|variance, x| variance += (x - m)**2 }
     [m, Math.sqrt(variance / (array.size - 1))]
   end
+
 end

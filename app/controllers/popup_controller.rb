@@ -156,7 +156,7 @@ class PopupController < ApplicationController
       sentiment_analysis.each do |key,value|
         #map the reviewee id to the user id, using the participants table
         reviewee_id =   TeamsUser.find_by(:team_id=>key).user_id
-        reviewee_name = User.find_by(:id => @reviewee_id).name
+        reviewee_name = User.find_by(:id => reviewee_id).name
         v_label_array.push(reviewee_name)
         h_label_array_length.push(value["sentiments"].length) #number of questions/answers in the data for each reviewer
       end
@@ -257,6 +257,7 @@ class PopupController < ApplicationController
       @analysis = analyze_review_comments_tone(data_to_analyze)
       @heatmapData = convert_to_heatmap_data(@analysis)
       @w = (@heatmapData['h_labels'].length ) * 200 + 100
+      @w = (@w < 1000) ? @w : 1000
       @h = (@heatmapData['v_labels'].length + 1) * 80
 
     else

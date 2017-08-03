@@ -89,7 +89,7 @@
 </head>
 
 <body>
-<div id="rdetails">
+<div id="rdetails">heatmapDataForRound
 
   <h3> Reviewer details</h3>
 
@@ -144,8 +144,31 @@
 
     <% if @assignment.varying_rubrics_by_round? %>
     var varying_rubric = true;
+    function drawChart(round) {
+      var heatmapDataForRound = <%= @heatmapData.to_json.html_safe%>;
+      $("#parent")[0].height  = "<%= @h[0] %>px";
+      $("#parent")[0].width  = "<%= @w[0] %>px";
+      //<![CDATA[
+      var jsonData = heatmapDataForRound[round];
+      // ]]>
+      console.log(jsonData);
+      visualizeJsonData (jsonData);
+      $.protip();
+    }
     <% else %>
     var varying_rubric = false;
+    //just one last response to be displayed
+    function drawChart(round) {
+      var heatmapData = <%= @heatmapData.to_json.html_safe%>;
+      $("#parent")[0].height  = "<%= @h %>px";
+      $("#parent")[0].width  = "<%= @w %>px";
+      //<![CDATA[
+      var jsonData = heatmapData;
+      // ]]>
+      console.log(jsonData);
+      visualizeJsonData (jsonData);
+      $.protip();
+    }
     <% end%>
     if(varying_rubric){
         //multilple rounds _ Varying rubric
@@ -155,39 +178,11 @@
             select.options[select.options.length] = new Option('Round'+(i+1),(i+1) );
         }
 
-        function drawChart(round) {
-            var heatmapDataForRound = <%= @heatmapData.to_json.html_safe%>;
-            $("#parent")[0].height  = "<%= @h[1] %>px";
-            $("#parent")[0].width  = "<%= @w[1] %>px";
-            //<![CDATA[
-            var jsonData = heatmapDataForRound[round];
-            // ]]>
-            console.log(jsonData);
-            visualizeJsonData (jsonData);
-            $.protip();
-        }
-
         $("#round").change(function(){
             var current_round =  parseInt($("#round").val());
             drawChart(current_round);
         });
     }
-    else{
-        //just one last response to be displayed
-        function drawChart(round) {
-            var heatmapData = <%= @heatmapData.to_json.html_safe%>;
-            $("#parent")[0].height  = "<%= @h %>px";
-            $("#parent")[0].width  = "<%= @w %>px";
-            //<![CDATA[
-            var jsonData = heatmapData;
-            // ]]>
-            console.log(jsonData);
-            visualizeJsonData (jsonData);
-            $.protip();
-        }
-
-    }
-
     $(document).ready(drawChart(1)); //change  the round here
 </script>
 </body>

@@ -257,7 +257,7 @@ class PopupController < ApplicationController
       @analysis = analyze_review_comments_tone(data_to_analyze)
       @heatmapData = convert_to_heatmap_data(@analysis)
       @w = (@heatmapData['h_labels'].length ) * 200 + 100
-      @w = (@w < 1000) ? @w : 1000
+      @w = (@w < 1800) ? @w : 1800
       @h = (@heatmapData['v_labels'].length + 1) * 80
 
     else

@@ -8,10 +8,9 @@ var kolor = require('kolor')
 var margin = {
         //top: $("#chart").parent().height() / 6.5,
         top: 100,
-        right: 0
-        , bottom: 0
-        , left: $("#chart").parent().width() / 6
-            //left: 0
+        right: 0,
+        bottom: 0,
+        left: 0
     }
     , width = $("#chart").parent().width()
     , height = $("#chart").parent().height()

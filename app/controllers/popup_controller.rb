@@ -3,10 +3,10 @@ require 'json'
 class PopupController < ApplicationController
   include HTTParty
 
-  @@sentimentAnalysis={}
-  @@dataToAnalyze = {}
-  @@review_comments = {} #set by assignment_sentiment_analysis_popup to be used in createQuestionWiseStructure
-  @@assignment_sentiment_view = false # Flag to indicate whether its overall sentiment analysis or per reviewer sentiment analysis
+  @sentiment_analysis={}
+  @data_to_analyze = {}
+  @review_comments_g = {} #set by assignment_sentiment_analysis_popup to be used in createQuestionWiseStructure
+  @assignment_sentiment_view = false # Flag to indicate whether its overall sentiment analysis or per reviewer sentiment analysis
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -115,6 +115,7 @@ class PopupController < ApplicationController
 
     end
   end
+
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
@@ -128,58 +129,64 @@ class PopupController < ApplicationController
     @id = params[:assignment_id]
   end
 
+  def get_review_comments_from_assignment(assignment)
+    #Added by Rushi: for each reviewer's comment and total assignment comments
+    if @assignment != assignment or @review_comments.nil?
+      review_comments = @assignment.compute_reviews_comments
+      @assignment = assignment
+    end
+    return review_comments
+  end
+
+
   # @author: Rushi.Bhatt (Independent study)
   # Def: To create the Heatmap data structure
-  # input - takes class variable @@sentimentAnalysis
+  # input - takes class variable @sentiment_analysis
   # output - Structure to create the heatmap chart
-  def covertToHeatmapData
+  def convert_to_heatmap_data(sentiment_analysis)
     #we need to convert for each reviewee i.e for each keys
     # here we dont have round data and user has clicked on individual reviewer, so
     #v_labels are all the reviewees
     #h_labels are all the questions,
-    @v_label_array =[]
-    @h_label_array =[]
-    @h_label_array_length=[]
-    if @@assignment_sentiment_view==false
+    v_label_array =[]
+    h_label_array =[]
+    h_label_array_length=[]
+    if @assignment_sentiment_view==false
       #individual reviewer view, when clicked on individual reviewer
-      @@sentimentAnalysis.each do |key,value|
+      sentiment_analysis.each do |key,value|
         #map the reviewee id to the user id, using the participants table
-        @reviewee_id =   TeamsUser.find_by(:team_id=>key).user_id
-        @reviewee_name = User.find_by(:id => @reviewee_id).name
-        @v_label_array.push(@reviewee_name)
-        @h_label_array_length.push(value["sentiments"].length) #number of questions/answers in the data for each reviewer
+        reviewee_id =   TeamsUser.find_by(:team_id=>key).user_id
+        reviewee_name = User.find_by(:id => @reviewee_id).name
+        v_label_array.push(reviewee_name)
+        h_label_array_length.push(value["sentiments"].length) #number of questions/answers in the data for each reviewer
       end
-      @max_hlabel_length = @h_label_array_length.min #ideally all the values in the @h_label_array_length will be same
-      for i in 0..@max_hlabel_length-2         # -2 because last data is for additionalComments,and index starts from 0
-        @h_label_array.push("Q"+(i+1).to_s)
+      max_hlabel_length = h_label_array_length.min #ideally all the values in the @h_label_array_length will be same
+      for i in 0..max_hlabel_length-2         # -2 because last data is for additionalComments,and index starts from 0
+        h_label_array.push("Q"+(i+1).to_s)
       end
-      @h_label_array.push("AdditionalComments")
+      h_label_array.push("AdditionalComments")
 
     else
       #assignment overall view, when clicked on sentiment_analysis link
-      @@sentimentAnalysis.each do |key,value|
+      sentiment_analysis.each do |key,value|
         #map the reviewer id to the user id, using the participants table
-        @reviewer_id =   Participant.find_by(:id=>key).user_id
-        @reviewer_name = User.find_by(:id=>@reviewer_id).name
-        @v_label_array.push(@reviewer_name)
-        @h_label_array_length=[]
-        @h_label_array = []
-        value["sentiments"].each do|cell|
-          @h_label_array.push(cell["id"])
-        end
-        @h_label_array_length.push(@h_label_array.length)
+        reviewer_id =   Participant.find_by(:id => key).user_id
+        reviewer_name = User.find_by(:id => reviewer_id).name
+        v_label_array.push(reviewer_name)
+        h_label_array = []
+        h_label_array_length.push(value["sentiments"].length) if value.key?("sentiments")
       end
 
-      @h_label_array = []
-      for i in 1..@h_label_array_length.min   #for now, I have used min, but we can use max and use dummy data where data is not found
-        @h_label_array.push("Reviewee"+i.to_s) #Dummy label creation. actual reviewee id will be in the comment
+      h_label_array = []
+      for i in 1..h_label_array_length.max   #for now, I have used min, but we can use max and use dummy data where data is not found
+        h_label_array.push("Reviewee"+i.to_s) #Dummy label creation. actual reviewee id will be in the comment
       end
     end
 
     @jsonHeatmapDataArray = []
     @jsonHeatmapData = {
-        "v_labels"=> @v_label_array,
-        "h_labels"=> @h_label_array,
+        "v_labels"=> v_label_array,
+        "h_labels"=> h_label_array,
         "showTextInsideBoxes"=> true,
         "showCustomColorScheme"=> false,
         "tooltipColorScheme"=> "black",
@@ -197,40 +204,45 @@ class PopupController < ApplicationController
         "content"=> []
     }
     content_array=[]   #To set the content of above structure
-    @@sentimentAnalysis.each do |key,value|
+    sentiment_analysis.each do |key,value|
       #Outer loop for each key
       eachRow = []
       for j in 0..@jsonHeatmapData["h_labels"].length-1
         eachCell={}
-        eachCell["value"] = value["sentiments"][j]["sentiment"]
-        if @@assignment_sentiment_view==true
-          @reviewee_id =   TeamsUser.find_by(:team_id=>value["sentiments"][j]["id"].to_i).user_id
-          @reviewee_name = User.find_by(:id=>@reviewee_id).name
-          eachCell["text"] = @reviewee_name+" - "+ value["sentiments"][j]["text"]  #adding the reviewee name to the data
+        if j < value["sentiments"].length
+            eachCell["value"] = value["sentiments"][j]["sentiment"]
+          if @assignment_sentiment_view==true
+            reviewee_id =   TeamsUser.find_by(:team_id=>value["sentiments"][j]["id"].to_i).user_id
+            reviewee_name = User.find_by(:id=>reviewee_id).name
+            eachCell["text"] = "(" + reviewee_name + ") <= "+ value["sentiments"][j]["text"]  #adding the reviewee name to the data
+          else
+            eachCell["text"] = value["sentiments"][j]["text"]
+          end
         else
-          eachCell["text"] = value["sentiments"][j]["text"]
+          eachCell["text"] = "N/A"
+          eachCell["value"] = 0
         end
         eachRow.push(eachCell)
       end
       content_array.push(eachRow)
     end
     @jsonHeatmapData["content"] = content_array
-    @jsonHeatmapData.to_json
+    return @jsonHeatmapData
   end
 
   # @author: Rushi.Bhatt (Independent study)
   # Def: To generate sentiment analysis for individual reviewer
-  # input - takes class variable @@review_comments
+  # input - takes class variable @review_comments_g
   def reviewer_sentiment_analysis_popup
-    @@assignment_sentiment_view=false  #Set the assignment flag to false, since its for individual reviewer
+    @assignment_sentiment_view=false  #Set the assignment flag to false, since its for individual reviewer
     @userid = Participant.find(params[:id]).user_id
     @user = User.find(@userid)
     @id = params[:assignment_id]
     @assignment = Assignment.find(params[:assignment_id])
-    @review_comments = ReviewMappingController.class_variable_get(:@@review_comments)
     @rounds = @assignment.num_review_rounds
     @reviewer_id = AssignmentParticipant.find_by_user_id_and_assignment_id(@userid, @id).id
 
+    @review_comments = get_review_comments_from_assignment(@assignment)
 
     #check if the assignment has rounds with varying rubrics or not
     if not @assignment.varying_rubrics_by_round?
@@ -241,12 +253,11 @@ class PopupController < ApplicationController
       @heatmapData={} #data for the heatmap chart
 
       #Get only the data for particular reviewer
-      @@dataToAnalyze = @review_comments[@reviewer_id] #Since we want to use that data in another function, we are storing it in class variable
-      @analysis = analyze_review_comments()
-      @@sentimentAnalysis = @analysis  #To use it in another function
-      @heatmapData = covertToHeatmapData()
-      @w = (@heatmapData['h_labels'].length) * 200
-      @h = (@heatmapData['v_labels'].length) * 60
+      data_to_analyze = @review_comments[@reviewer_id] #Since we want to use that data in another function, we are storing it in class variable
+      @analysis = analyze_review_comments_tone(data_to_analyze)
+      @heatmapData = convert_to_heatmap_data(@analysis)
+      @w = (@heatmapData['h_labels'].length ) * 200 + 100
+      @h = (@heatmapData['v_labels'].length + 1) * 80
 
     else
       #Multiple rounds
@@ -260,14 +271,12 @@ class PopupController < ApplicationController
       for round in 1..@rounds do
         #[reviewer_id][reviewee_id] = comments
         #only the data for particular reviewer:
-
-        @@dataToAnalyze = @review_comments[@reviewer_id][round]
-        @analysis = analyze_review_comments()
-        @@sentimentAnalysis = @analysis
-        @heatmapDataForEachRound = covertToHeatmapData()
+        data_to_analyze = @review_comments[@reviewer_id][round]
+        @analysis = analyze_review_comments_tone(data_to_analyze)
+        @heatmapDataForEachRound = convert_to_heatmap_data(@analysis)
         @heatmapData[round]=@heatmapDataForEachRound
-        @wForEachRound = (@heatmapDataForEachRound['h_labels'].length) * 200
-        @hForEachRound = (@heatmapDataForEachRound['v_labels'].length) * 60
+        @wForEachRound = (@heatmapDataForEachRound['h_labels'].length ) * 200 + 100
+        @hForEachRound = (@heatmapDataForEachRound['v_labels'].length + 1) * 80
         @w[round]=@wForEachRound
         @h[round]=@hForEachRound
       end #for loop
@@ -278,15 +287,15 @@ class PopupController < ApplicationController
   #@author - Rushi.Bhatt.
   #def - Creating question wise structure for assignment sentiment analysis report
   #structure: [questionX][reviewer_id]["reviews"]=>[ {id=reviewee_id, text= CommentforquestionX},{..}]
-  #input - takes @@review_comments class variable as an input
-  def createQuestionwiseStructure
+  #input - takes @review_comments_g class variable as an input
+  def create_questionwise_structure(review_comments)
     @assignment = Assignment.find(params[:assignment_id])
     @rounds = @assignment.num_review_rounds
     if not @assignment.varying_rubrics_by_round?
       #if the assignment doesnt have any round wise structure
       @questionwiseStructure={}
       @num_of_questions_array=[]
-      @@review_comments.each do |key,value|
+      review_comments.each do |key,value|
         value.each do |key1,value1|
           @num_of_questions_array.push(value1["reviews"].length)
         end
@@ -295,13 +304,14 @@ class PopupController < ApplicationController
 
       for @question_num in 0..@num_of_questions-1
         @eachQuestion={}
-        @@review_comments.each do |reviewer,reviewee|
+        review_comments.each do |reviewer,reviewee|
           @eachReviewer={}
           @eachRow = []
           reviewee.each do |key,value|
             @eachCell = {}
             @eachCell = value["reviews"][@question_num]
             @eachCell["id"] = key.to_s
+            @eachCell["text"] = "-" if @eachCell["text"].nil?
             @eachRow.push(@eachCell)
           end
           @eachReviewer["reviews"] = @eachRow
@@ -320,7 +330,7 @@ class PopupController < ApplicationController
       #[round][questionX][reviewer_id]["reviews"]=>[ {id=reviewee_id, text= CommentforquestionX},{..}]
       @questionwiseStructure={}
       @num_of_questions={}
-      @@review_comments.each do |key,value|
+      review_comments.each do |key,value|
         value.each do |key1,value1|
           value1.each do |key2,value2|
             @num_of_questions[key1]=(value2["reviews"].length)
@@ -332,13 +342,14 @@ class PopupController < ApplicationController
         @eachRound = {}
         for @question_num in 0..@num_of_questions[@round_num]-1
           @eachQuestion={}
-          @@review_comments.each do |reviewer,reviewer_value|
+          review_comments.each do |reviewer,reviewer_value|
             @eachReviewer={}
             @eachRow = []
             reviewer_value[@round_num].each do |reviewee,reviewee_value|
               @eachCell = {}
               @eachCell = reviewee_value["reviews"][@question_num]
               @eachCell["id"] = reviewee.to_s
+              @eachCell["text"] = "-" if @eachCell["text"].nil?
               @eachRow.push(@eachCell)
             end #for each reviewee
             @eachReviewer["reviews"] = @eachRow
@@ -360,22 +371,21 @@ class PopupController < ApplicationController
 
   # @author: Rushi.Bhatt (Independent study)
   # Def: To generate sentiment analysis for overall assignment
-  # input - takes class variable @@review_comments
+  # input - takes class variable @review_comments_g
   def assignment_sentiment_analysis_popup
-    @@assignment_sentiment_view=true  #set the assignment sentiment analysis flag to true
+    @assignment_sentiment_view=true  #set the assignment sentiment analysis flag to true
     @assignment = Assignment.find(params[:assignment_id])
-    @review_comments = ReviewMappingController.class_variable_get(:@@review_comments)
+    @review_comments = get_review_comments_from_assignment(@assignment)
     @rounds = @assignment.num_review_rounds
-    @@review_comments = @review_comments #to be used in createQuestionWiseStructure
     @num_of_questions={}
     if not @assignment.varying_rubrics_by_round?
-      @@review_comments.each do |key,value|
+      @review_comments.each do |key,value|
         value.each do |key2,value2|
           @num_of_questions[key]=(value2["reviews"].length)
         end
       end
     else
-      @@review_comments.each do |key,value|
+      @review_comments.each do |key,value|
         value.each do |key1,value1|
           value1.each do |key2,value2|
             @num_of_questions[key1]=(value2["reviews"].length)
@@ -384,7 +394,7 @@ class PopupController < ApplicationController
       end
     end
 
-    @review_comments = createQuestionwiseStructure()
+    @review_comments = create_questionwise_structure(@review_comments)
     if not @assignment.varying_rubrics_by_round?
       @w={}
       @h={}
@@ -393,15 +403,14 @@ class PopupController < ApplicationController
         #[reviewer_id][reviewee_id] = comments
         #only the data for particular reviewer:
         if question == @num_of_questions  #last question is addditionalComment
-          @@dataToAnalyze = @review_comments["AdditionalComments"]
+          data_to_analyze = @review_comments["AdditionalComments"]
         else
-          @@dataToAnalyze = @review_comments["Q"+question.to_s]
+          data_to_analyze = @review_comments["Q"+question.to_s]
         end
-        @analysis = analyze_review_comments()
-        @@sentimentAnalysis = @analysis
-        @heatmapDataForEach = covertToHeatmapData()
-        @wForEach = (@heatmapDataForEach['h_labels'].length) * 200
-        @hForEach = (@heatmapDataForEach['v_labels'].length) * 60
+        @analysis = analyze_review_comments_tone(data_to_analyze)
+        @heatmapDataForEach = convert_to_heatmap_data(@analysis)
+        @wForEach = (@heatmapDataForEach['h_labels'].length ) * 200 + 100
+        @hForEach = (@heatmapDataForEach['v_labels'].length + 1) * 80
 
         if question == @num_of_questions
           @heatmapData["AdditionalComments"]=@heatmapDataForEach
@@ -426,16 +435,15 @@ class PopupController < ApplicationController
           #[reviewer_id][reviewee_id] = comments
           #only the data for particular reviewer:
           if question == @num_of_questions[round]  #last question is addditionalComment
-            @@dataToAnalyze = @review_comments[round]["AdditionalComments"]
+            data_to_analyze = @review_comments[round]["AdditionalComments"]
           else
-            @@dataToAnalyze = @review_comments[round]["Q"+question.to_s]
+            data_to_analyze = @review_comments[round]["Q"+question.to_s]
           end
 
-          @analysis = analyze_review_comments()
-          @@sentimentAnalysis = @analysis
-          @heatmapDataForEach = covertToHeatmapData()
-          @wForEach = (@heatmapDataForEach['h_labels'].length) * 200
-          @hForEach = (@heatmapDataForEach['v_labels'].length) * 60
+          @analysis = analyze_review_comments_tone(data_to_analyze)
+          @heatmapDataForEach = convert_to_heatmap_data(@analysis)
+          @wForEach = (@heatmapDataForEach['h_labels'].length ) * 200 + 100
+          @hForEach = (@heatmapDataForEach['v_labels'].length + 1) * 80
 
           if question == @num_of_questions[round]
             @heatmapData[round]["AdditionalComments"]=@heatmapDataForEach
@@ -453,16 +461,16 @@ class PopupController < ApplicationController
 
   # @author: Rushi.Bhatt (Independent study)
   # Def: To analyze the review coomments using the sentiment analysis service - peer logic
-  # input - takes class variable @@dataToAnalyze
-  def analyze_review_comments
-    @analyzedData = {}
-    @@dataToAnalyze.each do |key,value|
-      @result = HTTParty.post("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk",
+  # input - takes class variable data_to_analyze
+  def analyze_review_comments_tone (data_to_analyze)
+    analyzedData = {}
+    data_to_analyze.each do |key,value|
+      result = HTTParty.post("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk",
                               :body => value.to_json,
                               :headers => { 'Content-Type' => 'application/json' })
-      @analyzedData[key]=@result
+      analyzedData[key]=result
     end
-    @analyzedData
+    return analyzedData
   end
 
 end

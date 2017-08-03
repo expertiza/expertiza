@@ -96,11 +96,11 @@
 
 
 <% if @assignment.varying_rubrics_by_round? %>
-    <div id="parent" style="min-height:<%= @h[1][1] %>px; width: 100%;">
+    <div id="parent" style="height:<%= @h[1][1] %>px; width: <%= @w[1][1] %>px;">
       <div id="chart"></div>
     </div>
 <% else %>
-    <div id="parent" style=" min-height: <%= @h[1] %>px; width: 100%;">
+    <div id="parent" style="height: <%= @h[1] %>px; width: <%= @w[1] %>px;">
       <div id="chart"></div>
     </div>
 <% end%>
@@ -115,7 +115,6 @@
     <% end%>
     if(varying_rubric){
         /*multiple rounds*/
-        console.log("Rushi");
         var totalRounds = <%= @rounds.to_i %>
         for(i=0;i<totalRounds;i++){
             var select = document.getElementById("round");
@@ -138,7 +137,7 @@
             var height = <%= @h.to_json.html_safe %>;
 
             //<![CDATA[
-            var jsonData = JSON.parse(heatmapDataForRound[round][question]);
+            var jsonData = heatmapDataForRound[round][question];
             // ]]>
             console.log(jsonData);
             visualizeJsonData (jsonData);
@@ -185,7 +184,7 @@
             var height = <%= @h.to_json.html_safe %>;
 
             //<![CDATA[
-            var jsonData = JSON.parse(heatmapDataForRound[question]);
+            var jsonData = heatmapDataForRound[question];
             // ]]>
             console.log(jsonData);
             visualizeJsonData (jsonData);

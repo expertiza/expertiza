@@ -129,11 +129,11 @@
   <% end%>
 </div>
 <% if @assignment.varying_rubrics_by_round? %>
-    <div id="parent" style="min-height:<%= @h[1] %>px; width: 100%;">
+    <div id="parent" style="height:<%= @h[1] %>px; width:<%= @w[1] %>px;">
       <div id="chart"></div>
     </div>
 <% else %>
-    <div id="parent" style="min-height:<%= @h %>px; width: 100%;">
+    <div id="parent" style="height:<%= @h %>px; width:<%= @w %>px;">
       <div id="chart"></div>
     </div>
 <% end%>
@@ -158,8 +158,9 @@
         function drawChart(round) {
             var heatmapDataForRound = <%= @heatmapData.to_json.html_safe%>;
             $("#parent")[0].height  = "<%= @h[1] %>px";
+            $("#parent")[0].width  = "<%= @w[1] %>px";
             //<![CDATA[
-            var jsonData = JSON.parse(heatmapDataForRound[round]);
+            var jsonData = heatmapDataForRound[round];
             // ]]>
             console.log(jsonData);
             visualizeJsonData (jsonData);
@@ -176,8 +177,9 @@
         function drawChart(round) {
             var heatmapData = <%= @heatmapData.to_json.html_safe%>;
             $("#parent")[0].height  = "<%= @h %>px";
+            $("#parent")[0].width  = "<%= @w %>px";
             //<![CDATA[
-            var jsonData = JSON.parse(heatmapData);
+            var jsonData = heatmapData;
             // ]]>
             console.log(jsonData);
             visualizeJsonData (jsonData);

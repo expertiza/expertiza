@@ -417,11 +417,6 @@ class ReviewMappingController < ApplicationController
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
       logger.info @review_scores
 
-      #Added by Rushi: for each reviewer's comment and total assignment comments
-      @review_comments = @assignment.compute_reviews_comments
-      @@review_comments = @review_comments
-      logger.info @@review_comments
-
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?

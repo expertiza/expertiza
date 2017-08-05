@@ -19,7 +19,11 @@ class SuperAdministrator < User
                 ['All private assignments', 'list_all_private']].freeze
 
   def get(object_type, id, _user_id)
-    object_type.where(["id = ?", id]).first
+    if !id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      object_type.where(["id = ?", id]).first
+    end
   end
 
   def list_all(object_type, _user_id)

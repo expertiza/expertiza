@@ -32,7 +32,7 @@ class TeamsUser < ActiveRecord::Base
   # Returns the first entry in the TeamUsers table for a given team id
   def self.first_by_team_id(team_id)
     if !team_id.is_a? Integer
-      flash[:error] = "Illegal parameter."
+      flash[:error] = "Illegal parameter.
     else
       TeamsUser.where("team_id = ?", team_id).first
     end

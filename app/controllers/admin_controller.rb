@@ -9,7 +9,11 @@ class AdminController < ApplicationController
   end
 
   def list_instructors
-    @users = User.instructors.order(:name).where("parent_id = ?", current_user.id).paginate(page: params[:page], per_page: 50)
+    if !current_user.id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      @users = User.instructors.order(:name).where("parent_id = ?", current_user.id).paginate(page: params[:page], per_page: 50)
+    end
   end
 
   def add_administrator
@@ -27,7 +31,11 @@ class AdminController < ApplicationController
   end
 
   def list_administrators
-    @users = User.admins.order(:name).where("parent_id = ?", current_user.id).paginate(page: params[:page], per_page: 50)
+    if !current_user.id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      @users = User.admins.order(:name).where("parent_id = ?", current_user.id).paginate(page: params[:page], per_page: 50)
+    end
   end
 
   def list_users(conditions)

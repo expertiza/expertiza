@@ -19,12 +19,16 @@ class Team < ActiveRecord::Base
 
   # Delete the given team
   def delete
-    for teamsuser in TeamsUser.where(["team_id =?", self.id])
-      teamsuser.delete
+    if !id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      for teamsuser in TeamsUser.where(["team_id =?", self.id])
+        teamsuser.delete
+      end
+      node = TeamNode.find_by_node_object_id(self.id)
+      node.destroy if node
+      self.destroy
     end
-    node = TeamNode.find_by_node_object_id(self.id)
-    node.destroy if node
-    self.destroy
   end
 
   # Get the node type of the tree structure

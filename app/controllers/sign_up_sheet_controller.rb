@@ -413,8 +413,12 @@ class SignUpSheetController < ApplicationController
   end
 
   def publish_approved_suggested_topic
-    SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
-    redirect_to action: 'list', id: params[:id]
+    if !params[:topic_id].is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
+      redirect_to action: 'list', id: params[:id]
+    emd
   end
 
   private

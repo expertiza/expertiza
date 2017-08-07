@@ -161,7 +161,11 @@ class MenuItemsController < ApplicationController
 
   def foreign
     @parents = if self.respond_to?(:id)
+    if !id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
                  MenuItem.where('id != ?', self.id).order(:name)
+    end
                else
                  MenuItem.order(:name)
                end

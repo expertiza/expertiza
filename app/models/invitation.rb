@@ -15,9 +15,13 @@ class Invitation < ActiveRecord::Base
 
   # Remove all invites sent by a user for an assignment.
   def self.remove_users_sent_invites_for_assignment(user_id, assignment_id)
-    invites = Invitation.where(['from_id = ? and assignment_id = ?', user_id, assignment_id])
-    for invite in invites
-      invite.destroy
+    if !(user_id.is_a? Integer and assignment_id.is_a? Integer)
+      flash[:error] = "Illegal parameter."
+    else
+      invites = Invitation.where(['from_id = ? and assignment_id = ?', user_id, assignment_id])
+      for invite in invites
+        invite.destroy
+      end
     end
   end
 

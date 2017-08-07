@@ -28,9 +28,13 @@ class InvitationsController < ApplicationController
     # participant information of invitee and assignment
     participant = AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
     return unless participant
-    old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
-    # Status code A for accepted
-    old_entry.update_attribute("status", 'A') if old_entry
+    if !(participant.id.is_a? Integer and params[:team_id].is_a? Integer)
+      flash[:error] = "Illegal parameter."
+    else
+      old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
+      # Status code A for accepted
+      old_entry.update_attribute("status", 'A') if old_entry
+    end
   end
 
   def auto_complete_for_user_name

@@ -20,7 +20,11 @@ class SiteControllersController < ApplicationController
   def show
     @site_controller = SiteController.find(params[:id])
     @actions = ControllerAction
+    if !params[:id].is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
                .where(['site_controller_id = ?', params[:id]], order: 'name')
+    end
   end
 
   def new

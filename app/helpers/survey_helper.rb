@@ -1,12 +1,16 @@
 module SurveyHelper
   def self.get_assigned_surveys(assignment_id)
-    joiners = AssignmentQuestionnaire.where(["assignment_id = ?", assignment_id])
-    assigned_surveys = []
-    for joiner in joiners
-      survey = Questionnaire.find(joiner.questionnaire_id)
-      assigned_surveys << survey if survey.type == 'AssignmentSurveyQuestionnaire'
+    if !assignment_id.is_a? Integer
+       flash[:error] = "Illegal parameter."
+    else
+      joiners = AssignmentQuestionnaire.where(["assignment_id = ?", assignment_id])
+      assigned_surveys = []
+      for joiner in joiners
+        survey = Questionnaire.find(joiner.questionnaire_id)
+        assigned_surveys << survey if survey.type == 'AssignmentSurveyQuestionnaire'
+      end
+      assigned_surveys.sort {|a, b| a.name <=> b.name }
     end
-    assigned_surveys.sort {|a, b| a.name <=> b.name }
   end
 
   def self.get_global_surveys

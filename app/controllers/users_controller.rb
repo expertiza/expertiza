@@ -37,8 +37,12 @@ class UsersController < ApplicationController
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
-    @users = User.where(['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id])
-    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+    if !user.id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      @users = User.where(['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id])
+      render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+    end
   end
 
   # for displaying the list of users

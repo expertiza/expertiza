@@ -21,13 +21,21 @@ class TeamsUser < ActiveRecord::Base
 
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
-    team_user = TeamsUser.where(['user_id = ? and team_id = ?', user_id, team_id]).first
-    team_user.destroy unless team_user.nil?
+    if !(user_id.is_a? Integer and team_id.is_a? Integer)
+      flash[:error] = "Illegal parameter."
+    else
+      team_user = TeamsUser.where(['user_id = ? and team_id = ?', user_id, team_id]).first
+      team_user.destroy unless team_user.nil?
+    end
   end
 
   # Returns the first entry in the TeamUsers table for a given team id
   def self.first_by_team_id(team_id)
-    TeamsUser.where("team_id = ?", team_id).first
+    if !team_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      TeamsUser.where("team_id = ?", team_id).first
+    end
   end
 
   # Determines whether a team is empty of not

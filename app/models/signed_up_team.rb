@@ -4,8 +4,12 @@ class SignedUpTeam < ActiveRecord::Base
 
   # the below has been added to make is consistent with the database schema
   validates_presence_of :topic_id, :team_id
-
-  scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
+  
+  if !team_id.is_a? Integer
+    flash[:error] = "Illegal parameter."
+  else
+    scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
+  end
 
   def self.find_team_participants(assignment_id)
     # @participants = SignedUpTeam.find_by_sql("SELECT s.id as id, t.id as topic_id, t.topic_name as name , s.is_waitlisted as is_waitlisted, s.team_id, s.team_id as team_id FROM signed_up_teams s, sign_up_topics t where s.topic_id = t.id and t.assignment_id = " + assignment_id)

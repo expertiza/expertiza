@@ -7,6 +7,10 @@ class TaMapping < ActiveRecord::Base
   end
 
   def self.get_courses(user_id)
-    Course.where(["id=?", TaMapping.find_by_ta_id(user_id).course_id])
+    if !user_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      Course.where(["id=?", TaMapping.find_by_ta_id(user_id).course_id])
+    end
   end
 end

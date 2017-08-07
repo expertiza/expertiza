@@ -89,8 +89,12 @@ class Questionnaire < ActiveRecord::Base
     if min_question_score >= max_question_score
       errors.add(:min_question_score, "The minimum question score must be less than the maximum")
     end
-
-    results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
-    errors.add(:name, "Questionnaire names must be unique.") if !results.nil? and !results.empty?
+    
+    if !(id.is_a? Integer and instructor_id.is_a? Integer)
+      flash[:error] = "Illegal parameter."
+    else
+      results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
+      errors.add(:name, "Questionnaire names must be unique.") if !results.nil? and !results.empty?
+    end
   end
 end

@@ -9,9 +9,13 @@ class MenuItem < ActiveRecord::Base
   end
 
   def delete
-    children = MenuItem.where(['parent_id = ?', self.id])
-    children.each(&:delete)
-    self.destroy
+    if !id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      children = MenuItem.where(['parent_id = ?', self.id])
+      children.each(&:delete)
+      self.destroy
+    end
   end
 
   def above

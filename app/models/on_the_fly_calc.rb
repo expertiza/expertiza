@@ -11,11 +11,19 @@ module OnTheFlyCalc
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
     if self.varying_rubrics_by_round?
-      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      scores_varying_rubrics
+      if !id.is_a? Integer
+        flash[:error] = "Illegal parameter."
+      else
+        @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
+        scores_varying_rubrics
+      end
     else
-      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
-      scores_non_varying_rubrics
+      if !id.is_a? Integer
+        flash[:error] = "Illegal parameter."
+      else
+        @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
+        scores_non_varying_rubrics
+      end
     end
     @review_scores
   end
@@ -28,22 +36,30 @@ module OnTheFlyCalc
       rounds = self.rounds_of_reviews
       (1..rounds).each do |round|
         review_questionnaire_id = review_questionnaire_id(round)
-        questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
-        contributors.each do |contributor|
-          assessments = ReviewResponseMap.get_assessments_for(contributor)
-          assessments = assessments.reject {|assessment| assessment.round != round }
-          scores[contributor.id] = {} if round == 1
-          scores[contributor.id][round] = {}
-          scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
+        if !review_questionnaire_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+        else
+          questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+          contributors.each do |contributor|
+            assessments = ReviewResponseMap.get_assessments_for(contributor)
+            assessments = assessments.reject {|assessment| assessment.round != round }
+            scores[contributor.id] = {} if round == 1
+            scores[contributor.id][round] = {}
+            scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
+          end
         end
       end
     else
       review_questionnaire_id = review_questionnaire_id()
-      questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
-      contributors.each do |contributor|
-        assessments = ReviewResponseMap.get_assessments_for(contributor)
-        scores[contributor.id] = {}
-        scores[contributor.id] = Answer.compute_scores(assessments, questions)
+      if !review_questionnaire_id.is_a? Integer
+        flash[:error] = "Illegal parameter."
+      else
+        questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+        contributors.each do |contributor|
+          assessments = ReviewResponseMap.get_assessments_for(contributor)
+          scores[contributor.id] = {}
+          scores[contributor.id] = Answer.compute_scores(assessments, questions)
+        end
       end
     end
     scores

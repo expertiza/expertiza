@@ -5,7 +5,11 @@ class ProfileController < ApplicationController
 
   def edit
     @user = session[:user]
-    @assignment_questionnaire = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
+    if !user_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      @assignment_questionnaire = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
+    end
   end
 
   def update

@@ -11,11 +11,19 @@ class Instructor < User
                 ['All public assignments', 'list_all']].freeze
 
   def list_all(object_type, user_id)
-    object_type.where(["instructor_id = ? OR private = 0", user_id])
+    if !user_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      object_type.where(["instructor_id = ? OR private = 0", user_id])
+    end
   end
 
   def list_mine(object_type, user_id)
-    object_type.where(["instructor_id = ?", user_id])
+    if !user_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      object_type.where(["instructor_id = ?", user_id])
+    end
   end
 
   def get(object_type, id, user_id)

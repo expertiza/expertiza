@@ -44,7 +44,11 @@ class Participant < ActiveRecord::Base
 
   def delete(force = nil)
     # TODO: How do we test this code?  #need a controller test_oss808
-    maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?', self.id, self.id])
+    if !id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?', self.id, self.id])
+    end
 
     if force or ((maps.nil? or maps.empty?) and
                  self.team.nil?)

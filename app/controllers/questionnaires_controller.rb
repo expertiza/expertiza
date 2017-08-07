@@ -443,23 +443,27 @@ class QuestionnairesController < ApplicationController
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where("questionnaire_id = " + questionnaire_id.to_s)
-    @deleted_questions = []
-    for question in questions
-      should_delete = true
-      unless question_params.nil?
-        for question_key in params[:question].keys
-          should_delete = false if question_key.to_s === question.id.to_s
+    if !questionnaire_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      questions = Question.where("questionnaire_id = " + questionnaire_id.to_s)
+      @deleted_questions = []
+      for question in questions
+        should_delete = true
+        unless question_params.nil?
+          for question_key in params[:question].keys
+            should_delete = false if question_key.to_s === question.id.to_s
+          end
         end
-      end
 
-      next unless should_delete
-      for advice in question.question_advices
-        advice.destroy
+        next unless should_delete
+        for advice in question.question_advices
+          advice.destroy
+        end
+        # keep track of the deleted questions
+        @deleted_questions.push(question)
+        question.destroy
       end
-      # keep track of the deleted questions
-      @deleted_questions.push(question)
-      question.destroy
     end
   end
 

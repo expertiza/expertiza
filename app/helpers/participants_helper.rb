@@ -47,8 +47,12 @@ module ParticipantsHelper
 
   def self.add_user_to_assignment(params, user)
     assignment = Assignment.find params[:assignment_id]
-    if AssignmentParticipant.where(['user_id=? AND parent_id=?', user.id, assignment.id]).empty?
-      return AssignmentParticipant.create(parent_id: assignment.id, user_id: user.id)
+    if !(user.id.is_a? Integer and assignment.id.is_a? Integer)
+      flash[:error] = "Illegal parameter."
+    else
+      if AssignmentParticipant.where(['user_id=? AND parent_id=?', user.id, assignment.id]).empty?
+        return AssignmentParticipant.create(parent_id: assignment.id, user_id: user.id)
+      end
     end
   end
 

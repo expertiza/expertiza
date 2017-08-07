@@ -1,12 +1,16 @@
 require 'rails_helper'
 
 def questionnaire_options(assignment, type, _round = 0)
-  questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
-  options = []
-  questionnaires.select {|x| x.type == type }.each do |questionnaire|
-    options << [questionnaire.name, questionnaire.id]
+  if !assignment.instructor_id.is_a? Integer
+    flash[:error] = "Illegal parameter."
+  else
+    questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
+    options = []
+    questionnaires.select {|x| x.type == type }.each do |questionnaire|
+      options << [questionnaire.name, questionnaire.id]
+    end
+    options
   end
-  options
 end
 
 def get_questionnaire(finder_var = nil)

@@ -25,6 +25,9 @@ th.sorter-true.tablesorter-headerUnSorted{
 /*.hidden {
     display: none;
 }
+.underlined{
+    text-decoration: underline;
+  }
 </style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <script type = "text/javascript" language = "javascript">
@@ -41,10 +44,10 @@ function toggleFunction(elementId) {
       </script>
 <h1>Review Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
-<button onclick="toggleFunction('<%= @participant.id.to_s.to_sym%>')">Show Submission</button>
+<button onclick="toggleFunction('<%= @team.id.to_s.to_sym%>')">Show Submission</button>
 
 
-     <div id="<%= @participant.id.to_s.to_sym%>" style="display:none;">
+     <div id="<%= @team.id.to_s.to_sym%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
   <% else %>
@@ -57,7 +60,7 @@ function toggleFunction(elementId) {
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
 
-    <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") %>
+    <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
 
@@ -130,13 +133,13 @@ function toggleFunction(elementId) {
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                 <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
-                  <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <%= j.to_s %> -&#<%= type_and_max(row) %>;  </td>
+                  <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
       
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-                        <%= score.score_value.to_s %>
+                        <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
 

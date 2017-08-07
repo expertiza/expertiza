@@ -28,7 +28,7 @@ class Administrator < User
 
   # This method gets a questionnaire or an assignment, making sure that current user is allowed to see it.
   def get(object_type, id, user_id)
-    if !(id.is_a? Integer or user_id.is_a? Integer)
+    if !(id.is_a? Integer and user_id.is_a? Integer)
       flash[:error] = "Illegal parameter."
     else
       object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]) # You are allowed to get it if it is public, or if your id is the one that created it.

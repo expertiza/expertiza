@@ -40,10 +40,14 @@ class ApplicationController < ActionController::Base
   end
 
   def undo_link(message)
-    @version = Version.where(['whodunnit = ?', session[:user].id]).last
-    if @version.try(:created_at) && Time.now - @version.created_at < 5.0
-      @link_name = params[:redo] == "true" ? "redo" : "undo"
-      message += "<a href = #{url_for(controller: :versions, action: :revert, id: @version.id, redo: !params[:redo])}>#{@link_name}</a>"
+    if !session[:user].id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      @version = Version.where(['whodunnit = ?', session[:user].id]).last
+      if @version.try(:created_at) && Time.now - @version.created_at < 5.0
+        @link_name = params[:redo] == "true" ? "redo" : "undo"
+        message += "<a href = #{url_for(controller: :versions, action: :revert, id: @version.id, redo: !params[:redo])}>#{@link_name}</a>"
+      end
     end
   end
 

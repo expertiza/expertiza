@@ -82,7 +82,11 @@ class Role < ActiveRecord::Base
   end
 
   def other_roles
-    Role.where('id != ?', id).order(:name)
+    if !id.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
+      Role.where('id != ?', id).order(:name)
+    end
   end
 
   def rebuild_credentials

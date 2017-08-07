@@ -59,7 +59,11 @@ module QuizAssignment
 
   def quiz_taken_by?(contributor, reviewer)
     quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id).id
-    QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
-                           contributor.id, reviewer.id, quiz_id]).count > 0
+    if !(contributor.id.is_a? Integer and reviewer.id.is_a? Integer and quiz_id.is_a? Integer)
+      flash[:error] = "Illegal parameter."
+    else
+      QuizResponseMap.where(['reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
+                            contributor.id, reviewer.id, quiz_id]).count > 0
+    end
   end
 end

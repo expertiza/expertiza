@@ -52,6 +52,9 @@ class ReputationWebServiceController < ApplicationController
     assignment_ids = []
     assignment_ids << assignment_id
     assignment_ids << another_assignment_id unless another_assignment_id == 0
+    if !assignment_ids.is_a? Integer
+      flash[:error] = "Illegal parameter."
+    else
     ReviewResponseMap.where(['reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false]).each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
@@ -76,6 +79,7 @@ class ReputationWebServiceController < ApplicationController
       end
     end
     raw_data_array
+    end
   end
 
   # special db query, return quiz scores

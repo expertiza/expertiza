@@ -57,8 +57,12 @@ module ParticipantsHelper
   end
 
   def self.add_user_to_course(params, user)
-    if CourseParticipant.where(['user_id=? AND parent_id=?', user.id, params[:course_id]]).empty?
-      CourseParticipant.create(user_id: user.id, parent_id: params[:course_id])
+    if !(user.id.is_a? Integer and params[:course_id].is_a? Integer)
+      flash[:error] = "Illegal parameter."
+    else
+      if CourseParticipant.where(['user_id=? AND parent_id=?', user.id, params[:course_id]]).empty?
+        CourseParticipant.create(user_id: user.id, parent_id: params[:course_id])
+      end
     end
   end
 

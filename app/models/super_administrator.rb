@@ -35,18 +35,26 @@ class SuperAdministrator < User
   end
 
   def list_admins(object_type, user_id)
-    if object_type != SignUpSheet
-      object_type.joins("inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+    if !user_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
     else
-      object_type.joins("inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      if object_type != SignUpSheet
+        object_type.joins("inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      else
+        object_type.joins("inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      end
     end
   end
 
   def list_instructors(object_type, user_id)
-    if object_type != SignUpSheet
-      object_type.joins("inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+    if !user_id.is_a? Integer
+      flash[:error] = "Illegal parameter."
     else
-      object_type.joins("inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      if object_type != SignUpSheet
+        object_type.joins("inner join users on " + object_type.to_s.pluralize + ".instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      else
+        object_type.joins("inner join users on instructor_id = users.id AND users.parent_id = " + user_id.to_s)
+      end
     end
   end
 

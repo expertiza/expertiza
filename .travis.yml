@@ -12,10 +12,16 @@ before_install:
     - uname -a
     - lsb_release -a
     - sudo apt-get update
+    - sudo apt-get install firefox
+    - firefox -v
     - unset RAILS_ENV
     - rvm rubygems current
     - npm install -g bower
     - bower install
+    - wget https://github.com/mozilla/geckodriver/releases/download/v0.18.0/geckodriver-v0.18.0-linux64.tar.gz
+    - tar -xf geckodriver-v0.18.0-linux64.tar.gz
+    - sudo mv geckodriver /usr/local/bin/geckodriver
+    - geckodriver --version
 before_script:
     - mysql -u root < db/grant_expertiza.sql
     - cp config/database.yml.example config/database.yml

@@ -180,7 +180,7 @@ class AssignmentTeam < Team
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
     raise 'The hyperlink cannot be empty!' if hyperlink.empty?
-    hyperlink += 'http://' unless hyperlink.start_with? 'http://' or hyperlink.start_with? 'https://'
+    hyperlink += 'http://' unless hyperlink.start_with?('http://', 'https://')
     # If not a valid URL, it will throw an exception
     response_code = Net::HTTP.get_response(URI(hyperlink))
     raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/

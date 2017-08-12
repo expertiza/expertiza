@@ -70,7 +70,7 @@ group :development do
   gem 'pry-remote'
   gem 'pry-nav'
   gem 'rubocop'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 3.4', '>= 3.4.4'
   gem 'quiet_assets'
 end
 

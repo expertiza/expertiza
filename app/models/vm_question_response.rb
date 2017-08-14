@@ -153,12 +153,14 @@ class VmQuestionResponse
         color_code_number = 1 if color_code_number == 0
       end
 
-      #tags = AnswerTag.where(answer_id: answer.id)
-      tag_deps = TagPromptsDeployment.where(questionnaire_id: @questionnaire.id, assignment_id:@assignment.id)
+      # Find out the tag prompts assosiated with the question
+      tag_deps = TagPromptsDeployment.where(questionnaire_id: @questionnaire.id, assignment_id: @assignment.id)
       vm_tag_prompts = []
 
       question = Question.find(answer.question_id)
 
+      # check if the tag prompt applies for thsi question type and if the comment length is above the threshold
+      # if it does, then associate this answer with the tag_prompt and tag deployment (the setting)
       tag_deps.each do |tag_dep|
         if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold
           vm_tag_prompts.append(VmTagPromptAnswer.new(answer, TagPrompt.find(tag_dep.tag_prompt_id),tag_dep))
@@ -168,7 +170,6 @@ class VmQuestionResponse
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
       row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
-      a  = 1
     end
   end
 

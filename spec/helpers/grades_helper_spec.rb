@@ -37,7 +37,7 @@ end
 #########################
 # Functional Cases
 #########################
-describe GradesHelper, type: :feature do
+xdescribe GradesHelper, type: :feature do
   before(:each) do
     @assignment = create(:assignment)
     @assignment_team = create(:assignment_team, assignment: @assignment)

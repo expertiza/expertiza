@@ -235,6 +235,7 @@ describe 'calibration' do
       # submit expert review
       click_on 'Submit Review'
       page.driver.browser.switch_to.alert.accept
+      sleep(2)
       # expect result
       # If the review was uploaded, there will be a edit link
       expect(page).to have_content('Editing Assignment: final2')

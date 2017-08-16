@@ -226,7 +226,7 @@ describe "Staggered deadline test" do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     # it should not able to choose topic for review
-    expect { choose "topic_id_2" }.to raise_error('Unable to find radio button "topic_id_2"')
+    expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
 
     user = User.find_by_name('student2065')
     stub_current_user(user, user.role.name, user.role)
@@ -236,6 +236,6 @@ describe "Staggered deadline test" do
     expect(page).to have_content "Others' work"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
-    expect { choose "topic_id_2" }.to raise_error('Unable to find radio button "topic_id_2"')
+    expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
   end
 end

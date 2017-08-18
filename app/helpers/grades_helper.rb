@@ -59,7 +59,7 @@ module GradesHelper
     css_class
   end
 
-   def view_heatgrid(participant_id)
+   def view_heatgrid(participant_id,type)
     # get participant, team, questionnaires for assignment.
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
@@ -88,7 +88,11 @@ module GradesHelper
       @vmlist << vm
     end
     #@current_role_name = current_role_name/
-    render "grades/view_refactored_grid.html.erb"
+    if type == 1 
+      render "grades/view_refactored_grid.html.erb"
+    elsif type == 2
+      render "grades/view_refactored_grid_af.html.erb"
+    end
   end
 
 def type_and_max(row)
@@ -101,11 +105,8 @@ def type_and_max(row)
   end
 end
 
-def underlined?(score)
- if score.comment.present? 
-  return "underlined"
-else return "none"
- end
+def underlined?(score) 
+  return "underlined" unless score.comment.blank?
 end
 
 

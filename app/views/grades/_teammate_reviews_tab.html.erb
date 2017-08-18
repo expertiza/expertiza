@@ -11,9 +11,9 @@
           </td>
         </tr>
         <tr id="<%=prefix%>_<%=index.to_s%>_teammate_reviews" style="display:none">
-          <td>
-            <%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %>
-          </td>
+           <td>
+        <%= view_heatgrid(participant.id,3) %>
+      </td>
         </tr>
       <% end %>
     </table>

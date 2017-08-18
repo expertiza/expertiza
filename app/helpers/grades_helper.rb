@@ -92,6 +92,8 @@ module GradesHelper
       render "grades/view_refactored_grid.html.erb"
     elsif type == 2
       render "grades/view_refactored_grid_af.html.erb"
+    elsif type == 3
+      render "grades/view_refactored_grid_tr.html.erb"
     end
   end
 

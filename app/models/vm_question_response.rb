@@ -61,8 +61,8 @@ class VmQuestionResponse
         participant = Participant.find(review_mapping.reviewer_id)
         # commenting out teamreviews. I just realized that teammate reviews are hidden during the current semester,
         # and I don't know how to implement the logic, so I'm being safe.
-        # @listofreviewers << participant
-        # @listofreviews << review
+        @list_of_reviewers << participant
+         @list_of_reviews << review
       end
     elsif @questionnaire_type == "MetareviewQuestionnaire"
       reviews = participant.metareviews

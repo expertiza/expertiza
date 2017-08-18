@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "HttpRequest" do
   it "cannot be instantiated" do
     expect { HttpRequest.new }.to raise_error(NoMethodError)

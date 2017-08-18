@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-describe "peer review testing", type: :feature do
+describe "peer review testing" do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
     create_list(:participant, 3)

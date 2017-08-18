@@ -1,4 +1,3 @@
-require 'rails_helper'
 include InstructorInterfaceHelperSpec
 
 question_type = %w(Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader)

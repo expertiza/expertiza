@@ -1,13 +1,5 @@
-require 'rails_helper'
-
 describe User do
   let(:user) { User.new name: "abc", fullname: "abc xyz", email: "abcxyz@gmail.com", password: "12345678", password_confirmation: "12345678" }
-
-  describe "#new" do
-    it "Validate user instance creation with valid parameters" do
-      expect(user.class).to be(User)
-    end
-  end
 
   describe "#name" do
     it "returns the name of the user" do

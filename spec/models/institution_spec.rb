@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-RSpec.describe Institution, type: :model do
+describe Institution do
   subject do
     described_class.new(name: "NC State University")
   end

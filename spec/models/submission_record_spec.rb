@@ -1,4 +1,3 @@
-require 'rails_helper'
 # These rpec will test the validity of the SubmissionRecord model. It tests for
 # valid team_id, opeartion, user, assignment id.
 describe SubmissionRecord do

@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "Staggered deadline test" do
   before(:each) do
     # assignment and topic

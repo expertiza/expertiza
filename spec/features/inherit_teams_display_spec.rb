@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe 'displaying inherit teams section' do
   it 'should display inherit teams option while creating an assignment team' do
     create(:assignment)

@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe 'add TA', js: true do
   before(:each) do
     @course = create(:course, name: 'TA course')

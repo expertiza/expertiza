@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "assignment submisstion test" do
   before(:each) do
     # create assignment and topic

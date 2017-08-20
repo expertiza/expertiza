@@ -1,8 +1,10 @@
 describe User do
-  let(:user) { User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
-               email_on_submission: 1, email_on_review: 1, email_on_review_of_review: 0, copy_of_emails: 1, handle: 'handle' }
-  let(:user1){ User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:user2){ User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user) do
+    User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
+             email_on_submission: 1, email_on_review: 1, email_on_review_of_review: 0, copy_of_emails: 1, handle: 'handle'
+  end
+  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user2) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
 
   describe '#name' do
     it 'returns the name of the user' do
@@ -187,7 +189,7 @@ describe User do
 
     it 'returns user by user name fetching from params'
 
-     it 'raises an error when Expertiza cannot find user'
+    it 'raises an error when Expertiza cannot find user'
   end
 
   describe '#is_teaching_assistant_for?' do

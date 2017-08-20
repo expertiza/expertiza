@@ -65,7 +65,7 @@ module GradesHelper
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-
+    @type = type
     questionnaires = @assignment.questionnaires
     @vmlist = []
 

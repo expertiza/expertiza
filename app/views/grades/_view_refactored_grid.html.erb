@@ -45,10 +45,10 @@ function toggleFunction(elementId) {
       </script>
 <h1>Review Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
-<button onclick="toggleFunction('<%= @team.id.to_s.to_sym%>')">Show Submission</button>
+<button onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
 
 
-     <div id="<%= @team.id.to_s.to_sym%>" style="display:none;">
+     <div id="<%= @type + @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
   <% else %>

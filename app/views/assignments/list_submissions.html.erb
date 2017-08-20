@@ -30,8 +30,8 @@
         <!--Team member(s) / Participant name-->
           <td bgcolor= <%= bgcolor %>>
               <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
-                  (<%= user.fullname%>)<br>
+                  <%= link_to display_anon_handle(user.name), impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
+                  (<%= display_anon_fullname(user.fullname)%>)<br>
               <% end %>
           </td>
 

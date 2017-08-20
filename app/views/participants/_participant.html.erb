@@ -1,6 +1,6 @@
 <% userid << participant.user_id %>
 <tr class= "exp">
-  <td ><%= link_to display_anon_name(User.find(participant.user_id).name), impersonate_impersonate_path(:user => {:name => User.find(participant.user_id).name}), :method => :post %></td>
+  <td ><%= link_to display_anon_handle(User.find(participant.user_id).name), impersonate_impersonate_path(:user => {:name => User.find(participant.user_id).name}), :method => :post %></td>
   <td ><%= link_to display_anon_fullname(User.find(participant.user_id).fullname), :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
   <td><a href="mailto: <%= User.find(participant.user_id).email %>"><%= display_anon_mail(User.find(participant.user_id).email) %></a></td>
   <td ><%= User.find(participant.user_id).role.name %></td>

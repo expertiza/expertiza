@@ -23,7 +23,7 @@
 
     <% @course_participants.each do |cp|%>
         <tr>
-            <td align="center"><%= "#{cp.name} (#{cp.fullname})" %> </td>
+            <td align="center"><%= display_anon_handle(cp.name) %> (<%=display_anon_fullname(cp.fullname) %>)</td>
             <td><%= @teamed_count[cp.id] %></td>
             <% @assignments.each do |assignment|%>
                 <td><%= @meta_review[cp.id][assignment.id] %></td>

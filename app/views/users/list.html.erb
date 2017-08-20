@@ -21,9 +21,9 @@
     <% for user in @users %>
       <% if ((params[:show] != 'true' && !user.name.include?("_hidden")) || params[:show] == 'true')%>
         <tr class="exp">
-          <td><%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %></td>
-          <td><%= link_to user.fullname, :controller=> 'users', :action => 'show', :id => user.id %></td>
-          <td><%= user.email %></td>
+          <td><%= link_to display_anon_handle(user.name), impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %></td>
+          <td><%= link_to display_anon_fullname(user.fullname), :controller=> 'users', :action => 'show', :id => user.id %></td>
+          <td><%= display_anon_mail(user.email) %></td>
           <td><%= link_to user.role.name, :controller => 'roles', :action => 'show', :id => user.role.id %></td>
           <td align="center"><%= user.parent.try :name %></td>
           <td><%= User.yesorno(user.email_on_review) %></td>

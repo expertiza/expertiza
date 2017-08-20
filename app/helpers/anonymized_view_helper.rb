@@ -15,7 +15,8 @@ module AnonymizedViewHelper
     return name
   end
   def display_anon_mail(name)
-    return display_anon_handle(name) + "@address.com" if is_anonymous_mode?
+    name_array=name.split('@')
+    return display_anon_handle(name_array[0]) + "@address.com" if is_anonymous_mode?
     return name
   end
   def display_anon_handle(name)

@@ -77,7 +77,7 @@ module GradesHelper
       else
         nil
                end
-
+if questionnaire.type == type
       vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
       questions = questionnaire.questions
       vm.add_questions(questions)
@@ -87,14 +87,10 @@ module GradesHelper
 
       @vmlist << vm
     end
-    #@current_role_name = current_role_name/
-    if type == 1 
-      render "grades/view_refactored_grid.html.erb"
-    elsif type == 2
-      render "grades/view_refactored_grid_af.html.erb"
-    elsif type == 3
-      render "grades/view_refactored_grid_tr.html.erb"
     end
+    #@current_role_name = current_role_name/
+    render "grades/view_refactored_grid.html.erb"
+  
   end
 
 def type_and_max(row)

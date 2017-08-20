@@ -9,9 +9,12 @@
       </td>
     <tr id="<%=prefix%>_<%=index.to_s%>_mreviews" style="display:none">
       <td>
-        <%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %>
+        <%= view_heatgrid(participant.id,"MetaReviewQuestionnaire") %>
       </td>
     </tr>
   <% end %>
 </table>
+
+<% else %>
+<span style="color:red">There are no metareviews for this assignment.</span>
 <% end %>

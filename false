@@ -1,0 +1,2 @@
+      invoke  active_record
+      create    db/migrate/20170615202940_add_is_answer_tagging_allowed_to_assignments.rb

@@ -26,8 +26,107 @@ th.sorter-true.tablesorter-headerUnSorted{
     text-decoration: underline;
     font-weight:bold;
   }
-/*.hidden {
-    display: none;
+/* These are the colors used for coloring
+ * score cells within the heatgrid for the
+ * grades view.
+ */
+
+/* This is a null space in the table. Just leave
+
+ * it the way it is for now.
+ */
+.c0 {
+background-color: #d3d3d3;
+}
+
+/* This is a red, indicative of a poor score. */
+.c1 {
+  background-color: #ff8080;
+}
+
+/* This is an orange. */
+.c2 {
+  background-color: #FD992D;
+}
+
+/* This is a yellow, indicative of a median score. */
+.c3 {
+  background-color: #FFEC8B;
+}
+
+/* This is a light green. */
+.c4 {
+  background-color: #BCED91;
+}
+
+/* This is a green, indicative of a good score. */
+.c5 {
+  background-color: #2DE636;
+}
+
+.cf {
+  background-color: #FFFFFF;
+}
+
+.tbl_heat {
+  border: 1px solid black;
+  margin-top: -9px;
+
+}
+.tbl_heat td {
+  cursor: pointer;
+  padding: 0px 2px 0px 2px;
+  border: 1px black solid;
+
+}
+
+.tbl_heat th {
+  border: 1px black solid;
+  padding: 5px 5px 5px 5px;
+
+}
+
+.hiddenRow {padding:0 !important;}
+
+.tbl_questlist
+{
+  border: 1px solid grey;
+}
+
+.tbl_addlcmt
+{
+  border: 1px solid grey;
+}
+
+.tbl_questlist th{
+  border: 1px solid grey;
+  padding: 5px 5px 5px 5px;
+}
+
+.tbl_addlcmt td{
+  border: 1px solid grey;
+  padding: 2px 5px 2px 5px;
+  background-color: #ffffff;
+
+}
+
+.tbl_questlist th{
+  border: 1px solid grey;
+  padding: 5px 5px 5px 5px;
+}
+
+.tbl_addlcmt td{
+  border: 1px solid grey;
+  padding: 2px 5px 2px 5px;
+
+}
+
+.spn_tooltip {
+  padding-left:30px;color:grey;font-size:small;
+}
+
+.spn_qsttog {
+  padding-left:30px;cursor: pointer;text-decoration:underline;color:blue;font-size:small;
 }
 </style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
@@ -66,7 +165,7 @@ function toggleFunction(elementId) {
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
-          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
+          <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
             <table class="tbl_questlist" >
               <thead>
               <th>#</th>
@@ -91,13 +190,13 @@ function toggleFunction(elementId) {
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
           </span>
 
-          <table id="scoresTable" class="tbl_heat tablesorter">
+          <table id='<%="scoresTable"+@type + @participant.id.to_s%>' class="tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr>
@@ -133,7 +232,7 @@ function toggleFunction(elementId) {
             <% vm.list_of_rows.each do |row| %>
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
-                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
+                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + row.question_id.to_s + vm.round.to_s %>">
                   <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
       
 
@@ -162,7 +261,7 @@ function toggleFunction(elementId) {
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
-                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
+                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= @type + @participant.id.to_s + row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
                     <div style="background-color:lightblue;padding:4px;"><%= row.questionText %></div>
                     <div>
                       <table class="tbl_questlist">
@@ -189,7 +288,7 @@ function toggleFunction(elementId) {
             <!--displays the row for the add'l comments, by default: collapsed. -->
             <tr>
               <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
-                <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
+                <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                   <div style="background-color:#A9A9F5;padding:4px;">
                     <table class="tbl_addlcmt">
                       <thead>

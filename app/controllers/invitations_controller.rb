@@ -28,13 +28,9 @@ class InvitationsController < ApplicationController
     # participant information of invitee and assignment
     participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', user.id, student.parent_id).first
     return unless participant
-    if params[:team_id].is_a? Integer
-      old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
-      # Status code A for accepted
-      old_entry.update_attribute("status", 'A') if old_entry
-    else
-      flash[:error] = "Illegal parameter."
-    end
+    old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
+     # Status code A for accepted
+    old_entry.update_attribute("status", 'A') if old_entry
   end
 
   def auto_complete_for_user_name
@@ -92,7 +88,7 @@ class InvitationsController < ApplicationController
   end
 
   def check_participant_before_invitation
-    @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
+    @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant
       flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
@@ -113,7 +109,7 @@ class InvitationsController < ApplicationController
     end
 
     # participant information about student you are trying to invite to the team
-    team_member = TeamsUser.where(['team_id =? and user_id =?', @team.id, @user.id])
+    team_member = TeamsUser.where('team_id = ? and user_id = ?', @team.id, @user.id)
     # check if invited user is already in the team
 
     return if team_member.empty?

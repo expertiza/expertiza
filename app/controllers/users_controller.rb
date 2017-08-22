@@ -37,12 +37,8 @@ class UsersController < ApplicationController
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
-    if !user.id.is_a? Integer
-      flash[:error] = "Illegal parameter."
-    else
-      @users = User.where(['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id])
-      render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
-    end
+    @users = User.where('name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id)
+    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
   # for displaying the list of users
@@ -84,7 +80,7 @@ class UsersController < ApplicationController
       @assignment_participant_num = 0
       AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
       # judge whether this user become reviewer or reviewee
-      @maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?', params[:id], params[:id]])
+      @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
       # count the number of users in DB
       @total_user_num = User.count
     end
@@ -199,7 +195,7 @@ class UsersController < ApplicationController
 
     # The super admin receives a mail about a new user request with the user name
     if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil? && @user.save
-      @super_users = User.joins(:role).where('roles.name' => 'Super-Administrator')
+      @super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
       @super_users.each do |super_user|
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, @user, "New account Request")
         prepared_mail.deliver
@@ -265,7 +261,7 @@ class UsersController < ApplicationController
 
   def foreign
     role = Role.find(session[:user].role_id)
-    @all_roles = Role.where(['id in (?) or id = ?', role.get_available_roles, role.id])
+    @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
   end
 
   protected

@@ -1,6 +1,3 @@
-require 'rails_helper'
-require 'pry'
-
 describe 'Airbrake-1781551925379466692' do
   before(:each) do
     questionnaire = Questionnaire.new

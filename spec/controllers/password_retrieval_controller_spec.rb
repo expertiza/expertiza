@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe PasswordRetrievalController do
   describe "password reset" do
     it "create new entry in password_resets table" do

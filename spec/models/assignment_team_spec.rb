@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe 'AssignmentTeam' do
   let(:assignment) { create(:assignment) }
   let(:team) { create(:assignment_team) }

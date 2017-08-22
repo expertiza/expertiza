@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "validations" do
   before(:each) do
     @assignment = build(:assignment)

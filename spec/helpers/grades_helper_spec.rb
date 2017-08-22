@@ -1,6 +1,3 @@
-require 'rails_helper'
-require 'selenium-webdriver'
-
 describe GradesHelper, type: :helper do
   describe 'get_accordion_title' do
     it 'should render is_first:true if last_topic is nil' do

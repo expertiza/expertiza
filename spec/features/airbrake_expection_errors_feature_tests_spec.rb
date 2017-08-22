@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "Airbrake expection errors" do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')

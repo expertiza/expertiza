@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe Checkbox do
   let!(:checkbox) { Checkbox.new id: 10, type: "Checkbox", seq: 1.0, txt: "test txt", weight: 11 }
   let!(:answer) { Answer.new answer: 1 }

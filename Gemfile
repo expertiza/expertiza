@@ -78,7 +78,6 @@ group :test do
   gem 'launchy'
   gem 'rspec-rails'
   gem 'shoulda'
-  gem 'test-unit'
 end
 
 group :assets do

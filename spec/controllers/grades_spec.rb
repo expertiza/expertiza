@@ -1,6 +1,3 @@
-require 'rails_helper'
-# include GradesHelper
-
 describe GradesController do
   before :each do
     controller.class.skip_before_filter :authorize

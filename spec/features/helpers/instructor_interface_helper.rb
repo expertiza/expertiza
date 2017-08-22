@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 module InstructorInterfaceHelperSpec
   def set_deadline_type
     create(:deadline_type, name: "submission")

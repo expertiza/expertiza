@@ -1,3 +1,4 @@
 --color
---require spec_helper
---seed 14719
+--profile
+--fail-fast
+--require rails_helper

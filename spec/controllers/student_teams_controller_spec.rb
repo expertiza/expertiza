@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe StudentTeamsController do
   let (:student_teams_controller) { StudentTeamsController.new }
   let(:student) { double "student" }

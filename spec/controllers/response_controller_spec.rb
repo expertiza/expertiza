@@ -1,7 +1,6 @@
-require 'rails_helper'
 include LogInHelper
 
-RSpec.describe ResponseController, type: :controller do
+RSpec.describe ResponseController do
   context "user not logged in" do
     let(:response) do
       Response.create(map_id: 1, additional_comment: 'hello', round: 1)

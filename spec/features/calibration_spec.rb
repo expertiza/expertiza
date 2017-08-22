@@ -1,6 +1,3 @@
-require 'rails_helper'
-require 'selenium-webdriver'
-
 describe 'calibration' do
   # Before testing create needed state
   before :each do

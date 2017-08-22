@@ -3,7 +3,7 @@ class Participant < ActiveRecord::Base
   belongs_to :user
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :assignment, foreign_key: 'parent_id'
-
+  has_many   :join_team_requests, dependent: :destroy
   has_many   :comments, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
@@ -43,9 +43,7 @@ class Participant < ActiveRecord::Base
   end
 
   def delete(force = nil)
-    # TODO: How do we test this code?  #need a controller test_oss808
-    maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?', self.id, self.id])
-
+    maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', self.id, self.id)
     if force or ((maps.nil? or maps.empty?) and
                  self.team.nil?)
       force_delete(maps)

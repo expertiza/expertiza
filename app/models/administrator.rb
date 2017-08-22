@@ -19,11 +19,12 @@ class Administrator < User
   end
 
   def list_all(object_type, user_id)
-    object_type.where(["instructor_id = ? OR private = 0", user_id])
+    object_type.where("instructor_id = ? OR private = 0", user_id)
   end
 
   # This method gets a questionnaire or an assignment, making sure that current user is allowed to see it.
   def get(object_type, id, user_id)
-    object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]) # You are allowed to get it if it is public, or if your id is the one that created it.
+    # You are allowed to get it if it is public, or if your id is the one that created it.
+    object_type.where("id = ? AND (instructor_id = ? OR private = 0)", id, user_id)
   end
 end

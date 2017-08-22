@@ -443,20 +443,18 @@ class QuestionnairesController < ApplicationController
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where("questionnaire_id = " + questionnaire_id.to_s)
+    questions = Question.where("questionnaire_id = ?", questionnaire_id)
     @deleted_questions = []
-    for question in questions
+    questions.each do |question|
       should_delete = true
       unless question_params.nil?
-        for question_key in params[:question].keys
-          should_delete = false if question_key.to_s === question.id.to_s
+        params[:question].keys.each do |question_key|
+          should_delete = false if question_key.to_s == question.id.to_s
         end
       end
 
       next unless should_delete
-      for advice in question.question_advices
-        advice.destroy
-      end
+      question.question_advices.each{ |advice| advice.destroy }
       # keep track of the deleted questions
       @deleted_questions.push(question)
       question.destroy

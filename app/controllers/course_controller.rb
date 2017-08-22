@@ -117,12 +117,6 @@ class CourseController < ApplicationController
     rescue
       flash[:error] = $ERROR_INFO
     end
-
-    # already taken care of in association declaration
-    # @course.ta_mappings.each{
-    #  | map |
-    #  map.destroy
-    # }
     @course.destroy
     undo_link("The course \"#{@course.name}\" has been successfully deleted.")
     redirect_to controller: 'tree_display', action: 'list'
@@ -181,9 +175,4 @@ class CourseController < ApplicationController
 
     render action: 'remove_ta.js.erb', layout: false
   end
-
-  # generate the undo link
-  # def undo_link
-  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
-  # end
 end

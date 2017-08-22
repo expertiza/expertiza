@@ -4,7 +4,6 @@ class SignedUpTeam < ActiveRecord::Base
 
   # the below has been added to make is consistent with the database schema
   validates_presence_of :topic_id, :team_id
-
   scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
 
   def self.find_team_participants(assignment_id)

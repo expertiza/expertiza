@@ -9,7 +9,7 @@ class MenuItem < ActiveRecord::Base
   end
 
   def delete
-    children = MenuItem.where(['parent_id = ?', self.id])
+    children = MenuItem.where('parent_id = ?', self.id)
     children.each(&:delete)
     self.destroy
   end
@@ -36,7 +36,7 @@ class MenuItem < ActiveRecord::Base
 
   def self.repack(repack_id)
     items = if repack_id
-              MenuItem.where("parent_id = #{repack_id}").order('seq')
+              MenuItem.where("parent_id = ?", repack_id).order('seq')
             else
               MenuItem.where("parent_id is null").order('seq')
             end

@@ -1,25 +1,14 @@
 class Questionnaire < ActiveRecord::Base
-  validate :validate_questionnaire
-
-  def get_weighted_score(assignment, scores)
-    # create symbol for "varying rubrics" feature -Yang
-    round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, self.id).used_in_round
-    questionnaire_symbol = if !round.nil?
-                             (self.symbol.to_s + round.to_s).to_sym
-                           else
-                             self.symbol
-                           end
-    compute_weighted_score(questionnaire_symbol, assignment, scores)
-  end
 
   # for doc on why we do it this way,
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
   has_many :questions, dependent: :destroy # the collection of questions associated with this Questionnaire
-  belongs_to :instructor, class_name: "User", foreign_key: "instructor_id" # the creator of this questionnaire
+  belongs_to :instructor # the creator of this questionnaire
   has_many :assignment_questionnaires, class_name: 'AssignmentQuestionnaire', foreign_key: 'questionnaire_id', dependent: :destroy
   has_many :assignments, through: :assignment_questionnaires
-  has_one :questionnaire_node, foreign_key: :node_object_id, dependent: :destroy
+  has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy
 
+  validate :validate_questionnaire
   validates_presence_of :name
   validates_numericality_of :max_question_score
   validates_numericality_of :min_question_score
@@ -41,9 +30,21 @@ class Questionnaire < ActiveRecord::Base
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
                          'BookmarkratingQuestionnaire',
-                         'QuizQuestionnaire'].freeze # zhewei: for some historical reasons, some question types have white space, others are not
+                         'QuizQuestionnaire'].freeze 
+  # zhewei: for some historical reasons, some question types have white space, others are not
   # need fix them in the future.
   has_paper_trail
+
+  def get_weighted_score(assignment, scores)
+    # create symbol for "varying rubrics" feature -Yang
+    round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, self.id).used_in_round
+    questionnaire_symbol = if !round.nil?
+                             (self.symbol.to_s + round.to_s).to_sym
+                           else
+                             self.symbol
+                           end
+    compute_weighted_score(questionnaire_symbol, assignment, scores)
+  end
 
   def compute_weighted_score(symbol, assignment, scores)
     aq = self.assignment_questionnaires.find_by_assignment_id(assignment.id)
@@ -90,7 +91,7 @@ class Questionnaire < ActiveRecord::Base
       errors.add(:min_question_score, "The minimum question score must be less than the maximum")
     end
 
-    results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
+    results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if !results.nil? and !results.empty?
   end
 end

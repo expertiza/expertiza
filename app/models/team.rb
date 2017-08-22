@@ -1,9 +1,9 @@
 class Team < ActiveRecord::Base
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
-  has_many :join_team_requests
+  has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
-  has_many :signed_up_teams
+  has_many :signed_up_teams, dependent: :destroy
   has_paper_trail
 
   # Get the participants of the given team
@@ -19,10 +19,8 @@ class Team < ActiveRecord::Base
 
   # Delete the given team
   def delete
-    for teamsuser in TeamsUser.where(["team_id =?", self.id])
-      teamsuser.delete
-    end
-    node = TeamNode.find_by_node_object_id(self.id)
+    TeamsUser.where("team_id = ?", self.id).each{ |teams_user| teams_user.destroy }
+    node = TeamNode.find_by(node_object_id: self.id)
     node.destroy if node
     self.destroy
   end

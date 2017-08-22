@@ -5,7 +5,7 @@ class ProfileController < ApplicationController
 
   def edit
     @user = session[:user]
-    @assignment_questionnaire = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
+    @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first
   end
 
   def update

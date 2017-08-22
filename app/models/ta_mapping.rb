@@ -7,6 +7,6 @@ class TaMapping < ActiveRecord::Base
   end
 
   def self.get_courses(user_id)
-    Course.where(["id=?", TaMapping.find_by_ta_id(user_id).course_id])
+    Course.where("id = ?", TaMapping.find_by(ta_id: user_id).course_id)
   end
 end

@@ -148,10 +148,7 @@ class SubmittedContentController < ApplicationController
 
   def download
     begin
-      # folder_name = FileHelper::sanitize_folder(@current_folder.name)
       folder_name = params['current_folder']['name']
-      # This code removed on 4/10/09 was breaking downloads of files with hyphens in them
-      # file_name = FileHelper::sanitize_filename(params['download'])
       file_name = params['download']
       raise "Folder_name is nil." if folder_name.nil?
       raise "File_name is nil." if file_name.nil?

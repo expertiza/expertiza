@@ -172,8 +172,6 @@ class ParticipantsController < ApplicationController
       else
         flash[:note] = 'All assignment participants are already part of the course'
       end
-
-      # flash[:note] = "All participants were successfully copied to \""+course.name+"\""
     else
       flash[:error] = "This assignment is not associated with a course."
     end

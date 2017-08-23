@@ -70,7 +70,9 @@ class CourseController < ApplicationController
         CourseNode.create(node_object_id: new_course.id)
       end
 
-      undo_link("The course \"#{orig_course.name}\" has been successfully copied. The copy is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
+      undo_link("The course \"#{orig_course.name}\" has been successfully copied. 
+        The copy is currently associated with an existing location from the original course. 
+        This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
       redirect_to controller: 'course', action: 'edit', id: new_course.id
 
     rescue

@@ -82,56 +82,39 @@ class CourseNode < Node
     AssignmentNode.get(sortvar, sortorder, user_id, show, self.node_object_id, search)
   end
 
-  # Gets the name from the associated object
   def get_name
-    @course = Course.find(self.node_object_id) unless @course
-    @course.name
+    Course.find_by(id: self.node_object_id).try(:name)
   end
 
-  # Gets the directory_path from the associated object
   def get_directory
-    @course = Course.find(self.node_object_id) unless @course
-    @course.directory_path
+    Course.find_by(id: self.node_object_id).try(:directory_path)
   end
 
-  # Gets the created_at from the associated object
   def get_creation_date
-    @course = Course.find(self.node_object_id) unless @course
-    @course.created_at
+    Course.find_by(id: self.node_object_id).try(:created_at)
   end
 
-  # Gets the updated_at from the associated object
   def get_modified_date
-    @course = Course.find(self.node_object_id) unless @course
-    @course.updated_at
+    Course.find_by(id: self.node_object_id).try(:updated_at)
   end
 
-  # Gets the private attribute from the associated object
   def get_private
-    @course = Course.find(self.node_object_id) unless @course
-    @course.private
+    Course.find_by(id: self.node_object_id).try(:private)
   end
 
-  # Gets the instructor_id from the associated object
   def get_instructor_id
-    # Course.find(self.node_object_id).course_id
-    @course = Course.find(self.node_object_id) unless @course
-    @course.instructor_id
+    Course.find_by(id: self.node_object_id).try(:instructor_id)
   end
 
-  # Gets the institution_id from the associated object
   def retrieve_institution_id
-    # Course.find(self.node_object_id).course_id
-    @course = Course.find(self.node_object_id) unless @course
-    @course.institutions_id
+    Course.find_by(id: self.node_object_id).try(:institutions_id)
   end
 
-  # Gets any TeamNodes associated with this object
   def get_teams
     TeamNode.get(self.node_object_id)
   end
 
   def get_survey_distribution_id
-    Course.find(self.node_object_id).survey_distribution_id
+    Course.find_by(id: self.node_object_id).try(:survey_distribution_id)
   end
 end

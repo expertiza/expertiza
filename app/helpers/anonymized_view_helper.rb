@@ -1,5 +1,4 @@
 module AnonymizedViewHelper
-  
   def anonymous_mode?
     session[:anonymous_mode]
   end
@@ -30,5 +29,4 @@ module AnonymizedViewHelper
     return AnonymizedFirstName.find(anonymize(name)).name.downcase if anonymous_mode?
     name
   end
-
 end

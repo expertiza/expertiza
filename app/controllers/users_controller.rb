@@ -42,9 +42,9 @@ class UsersController < ApplicationController
   end
 
  # for anonymized view for demo purposes
- def set_anonymous_mode
-    session[:anonymous_mode]= !session[:anonymous_mode]
-  redirect_to :back
+  def set_anonymous_mode
+    session[:anonymous_mode] = !session[:anonymous_mode]
+    redirect_to :back
   end
 
   # for displaying the list of users

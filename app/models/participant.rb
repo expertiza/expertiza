@@ -4,7 +4,6 @@ class Participant < ActiveRecord::Base
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :assignment, foreign_key: 'parent_id'
   has_many   :join_team_requests, dependent: :destroy
-  has_many   :comments, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy

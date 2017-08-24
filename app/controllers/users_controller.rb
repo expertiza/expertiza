@@ -40,7 +40,8 @@ class UsersController < ApplicationController
     @users = User.where('name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id)
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
-#for anonymized view for demo purposes
+
+ # for anonymized view for demo purposes
  def set_anonymous_mode
     session[:anonymous_mode]= !session[:anonymous_mode]
   redirect_to :back

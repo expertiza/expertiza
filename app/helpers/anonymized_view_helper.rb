@@ -8,7 +8,7 @@ module AnonymizedViewHelper
     ((name.sum)%50)+1
   end
   
-  #All the below functions will return anonmized names if mode is sset or  else just return name as is.
+  # All the below functions will return anonmized names if mode is sset or  else just return name as is.
   def display_anon_fullname(name)
     name_array=name.split(',')
     return AnonymizedLastName.find(anonymize(name_array[-1])).name + ", "+ AnonymizedFirstName.find(anonymize(name_array[0])).name if is_anonymous_mode?

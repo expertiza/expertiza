@@ -1,5 +1,3 @@
-# require 'assignment_helper'
-require 'rails_helper'
 include AssignmentHelper
 
 describe LotteryController do

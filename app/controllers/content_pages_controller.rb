@@ -105,7 +105,7 @@ class ContentPagesController < ApplicationController
     if @content_page.id
       @menu_items = MenuItem
                     .order('label')
-                    .where(['content_page_id=?', @content_page.id])
+                    .where('content_page_id=?', @content_page.id)
       @system_pages = @settings.system_pages @content_page.id
     end
   end

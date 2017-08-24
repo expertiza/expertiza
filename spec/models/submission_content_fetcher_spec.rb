@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "SubmissionContentFetcher" do
   it "cannot be instantiated" do
     expect { SubmissionContentFetcher.new }.to raise_error(NoMethodError)

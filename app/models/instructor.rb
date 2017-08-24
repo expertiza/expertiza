@@ -11,15 +11,15 @@ class Instructor < User
                 ['All public assignments', 'list_all']].freeze
 
   def list_all(object_type, user_id)
-    object_type.where(["instructor_id = ? OR private = 0", user_id])
+    object_type.where("instructor_id = ? OR private = 0", user_id)
   end
 
   def list_mine(object_type, user_id)
-    object_type.where(["instructor_id = ?", user_id])
+    object_type.where("instructor_id = ?", user_id)
   end
 
   def get(object_type, id, user_id)
-    object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]).first
+    object_type.where("id = ? AND (instructor_id = ? OR private = 0)", id, user_id).first
   end
 
   def self.get_my_tas(instructor_id)

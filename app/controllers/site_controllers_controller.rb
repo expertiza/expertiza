@@ -19,8 +19,7 @@ class SiteControllersController < ApplicationController
 
   def show
     @site_controller = SiteController.find(params[:id])
-    @actions = ControllerAction
-               .where(['site_controller_id = ?', params[:id]], order: 'name')
+    @actions = ControllerAction.where('site_controller_id = ?', params[:id]).order(:name)
   end
 
   def new

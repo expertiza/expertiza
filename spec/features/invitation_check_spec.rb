@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 xdescribe "Invitations Check" do
   before(:each) do
     create(:assignment)

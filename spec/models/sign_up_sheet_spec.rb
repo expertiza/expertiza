@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe SignUpSheet do
   describe '.add_signup_topic' do
     it 'will return an empty Hash when there are no topics' do

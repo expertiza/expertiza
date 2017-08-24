@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "WebsiteFetcher" do
   it "supports any valid URL" do
     expect(WebsiteFetcher.supports_url?("http://www.google.com")).to be_truthy

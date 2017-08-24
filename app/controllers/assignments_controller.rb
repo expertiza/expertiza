@@ -4,11 +4,11 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if ['edit','update', 'list_submissions'].include? params[:action]
+    if %w(edit update list_submissions).include? params[:action]
       assignment = Assignment.find(params[:id])
       return true if ['Super-Administrator', 'Administrator'].include? current_role_name
       return true if assignment.instructor_id == current_user.try(:id)
-      return true if TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) && (TaMapping.where(course_id: assignment.course_id).include?TaMapping.where(ta_id: current_user.try(:id), course_id: assignment.course_id).first)
+      return true if TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) && (TaMapping.where(course_id: assignment.course_id).include? TaMapping.where(ta_id: current_user.try(:id), course_id: assignment.course_id).first)
       return true if assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
       return false
     else

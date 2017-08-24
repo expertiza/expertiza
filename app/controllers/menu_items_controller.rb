@@ -3,8 +3,8 @@ require 'menu'
 class MenuItemsController < ApplicationController
   def action_allowed?
     case params[:action]
-      when 'link'
-        true
+    when 'link'
+      true
     end
   end
 

@@ -1,4 +1,3 @@
-require 'rails_helper'
 include DelayedTaskHelper
 
 describe 'Submission deadline reminder email' do

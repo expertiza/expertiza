@@ -118,7 +118,7 @@ class SignUpSheetController < ApplicationController
   # retrieves all the data associated with the given assignment. Includes all topics,
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
-    @sign_up_topics = SignUpTopic.where(['assignment_id = ?', assignment_id])
+    @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 

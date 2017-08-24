@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "GoogleDocFetcher" do
   it "supports any valid URL" do
     expect(GoogleDocFetcher.supports_url?("https://drive.google.com/open?id=1Ngds9Fr4vas8n0cA-uvZDOU7VMarMfGytbC9VLc0IYI")).to be_truthy

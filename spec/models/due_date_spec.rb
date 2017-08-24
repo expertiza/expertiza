@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "due_date_functions" do
   before(:each) do
     @deadline_type = build(:deadline_type)

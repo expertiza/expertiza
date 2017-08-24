@@ -1,5 +1,4 @@
 class Questionnaire < ActiveRecord::Base
-
   # for doc on why we do it this way,
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
   has_many :questions, dependent: :destroy # the collection of questions associated with this Questionnaire
@@ -9,9 +8,8 @@ class Questionnaire < ActiveRecord::Base
   has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy
 
   validate :validate_questionnaire
-  validates_presence_of :name
-  validates_numericality_of :max_question_score
-  validates_numericality_of :min_question_score
+  validates :name, presence: true
+  validates :max_question_score, :min_question_score, numericality: true
 
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
@@ -30,13 +28,14 @@ class Questionnaire < ActiveRecord::Base
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
                          'BookmarkratingQuestionnaire',
-                         'QuizQuestionnaire'].freeze # zhewei: for some historical reasons, some question types have white space, others are not
+                         'QuizQuestionnaire'].freeze
+  # zhewei: for some historical reasons, some question types have white space, others are not
   # need fix them in the future.
   has_paper_trail
 
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
-    round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(assignment.id, self.id).used_in_round
+    round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: self.id).used_in_round
     questionnaire_symbol = if !round.nil?
                              (self.symbol.to_s + round.to_s).to_sym
                            else
@@ -46,7 +45,7 @@ class Questionnaire < ActiveRecord::Base
   end
 
   def compute_weighted_score(symbol, assignment, scores)
-    aq = self.assignment_questionnaires.find_by_assignment_id(assignment.id)
+    aq = self.assignment_questionnaires.find_by(assignment_id: assignment.id)
     if !scores[symbol][:scores][:avg].nil?
       scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
     else
@@ -56,28 +55,28 @@ class Questionnaire < ActiveRecord::Base
 
   # Does this questionnaire contain true/false questions?
   def true_false_questions?
-    for question in questions
-      return true if question.type == "Checkbox"
-    end
-
+    questions.each {|question| return true if question.type == "Checkbox" }
     false
   end
 
   def delete
     self.assignments.each do |assignment|
-      raise "The assignment #{assignment.name} uses this questionnaire. Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
+      raise "The assignment #{assignment.name} uses this questionnaire.
+            Do you want to <A href='../assignment/delete/#{assignment.id}'>delete</A> the assignment?"
     end
 
-    self.questions.each &:delete
+    self.questions.each(&:delete)
 
-    node = QuestionnaireNode.find_by_node_object_id(self.id)
+    node = QuestionnaireNode.find_by(node_object_id: self.id)
     node.destroy if node
 
     self.destroy
   end
 
   def max_possible_score
-    results = Questionnaire.find_by_sql("SELECT (SUM(q.weight)*rs.max_question_score) as max_score FROM  questions q, questionnaires rs WHERE q.questionnaire_id = rs.id AND rs.id = #{self.id}")
+    results = Questionnaire.joins('INNER JOIN questions ON questions.questionnaire_id = questionnaires.id')
+                           .select('SUM(questions.weight) * questionnaires.max_question_score as max_score')
+                           .where('questionnaires.id = ?', self.id)
     results[0].max_score
   end
 
@@ -90,7 +89,7 @@ class Questionnaire < ActiveRecord::Base
       errors.add(:min_question_score, "The minimum question score must be less than the maximum")
     end
 
-    results = Questionnaire.where(["id <> ? and name = ? and instructor_id = ?", id, name, instructor_id])
+    results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if !results.nil? and !results.empty?
   end
 end

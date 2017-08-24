@@ -65,7 +65,7 @@ group :development do
   gem 'pry-remote'
   gem 'pry-nav'
   gem 'rubocop'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 3.4', '>= 3.4.4'
   gem 'quiet_assets'
 end
 
@@ -78,7 +78,6 @@ group :test do
   gem 'launchy'
   gem 'rspec-rails'
   gem 'shoulda'
-  gem 'test-unit'
 end
 
 group :assets do
@@ -86,6 +85,6 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'capybara'
+  gem 'capybara', '~> 2.7', '>= 2.7.1'
   gem 'simplecov', require: false
 end

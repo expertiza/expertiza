@@ -197,8 +197,8 @@ class User < ActiveRecord::Base
     user
   end
 
-  def set_instructor(new_assign)
-    new_assign.instructor_id = self.id
+  def set_instructor(new_assignment)
+    new_assignment.instructor_id = self.id
   end
 
   def get_instructor
@@ -211,7 +211,7 @@ class User < ActiveRecord::Base
     when 'Administrator' then id
     when 'Instructor' then id
     when 'Teaching Assistant' then Ta.get_my_instructor(id)
-    else raise NotImplementedError.new "for role #{role.name}"
+    else raise NotImplementedError, "for role #{role.name}"
     end
   end
 

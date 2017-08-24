@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe StudentTask do
   let(:participant) { Participant.new }
   let(:user) { User.new }

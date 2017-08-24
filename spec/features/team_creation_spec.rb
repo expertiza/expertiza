@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 xdescribe "Team Creation" do
   before(:each) do
     create(:assignment)

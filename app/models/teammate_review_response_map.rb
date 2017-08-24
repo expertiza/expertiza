@@ -17,7 +17,8 @@ class TeammateReviewResponseMap < ResponseMap
   def self.teammate_response_report(id)
     # Example query
     # SELECT distinct reviewer_id FROM response_maps where type = 'TeammateReviewResponseMap' and reviewed_object_id = 711
-    @reviewers = ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ?", id, 'TeammateReviewResponseMap'])
+      @reviewers = TeammateReviewResponseMap.select("DISTINCT reviewer_id").where("reviewed_object_id = ?", id)
+    end
   end
 
   # Send Teammate Review Emails

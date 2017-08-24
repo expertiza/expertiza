@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-describe "SimiCheckWebservice" do
+xdescribe "SimiCheckWebservice" do
   def poll(comp_id)
     is_success = false
     print 'Waiting'

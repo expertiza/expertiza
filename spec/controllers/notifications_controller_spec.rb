@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe NotificationsController do
   it "#run_get_notification" do
     get "run_get_notification"

@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 def questionnaire_options(assignment, type, _round = 0)
   questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
   options = []

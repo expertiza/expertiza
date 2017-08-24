@@ -1,5 +1,3 @@
-require 'rails_helper'
-require 'spec_helper'
 include InstructorInterfaceHelperSpec
 
 describe "Integration tests for instructor interface" do

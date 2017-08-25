@@ -81,11 +81,13 @@ describe "review mapping", js: true do
   end
 
   it "show error when assign both 2" do
+    skip('skip test on automated review mapping, too time consuming')
     login_and_assign_reviewer("instructor6", @assignment.id, 2, 2)
     expect(page).to have_content('Please choose either the number of reviews per student or the number of reviewers per team (student), not both')
   end
 
   it "show error when assign both 0" do
+    skip('skip test on automated review mapping, too time consuming')
     login_and_assign_reviewer("instructor6", @assignment.id, 0, 0)
     expect(page).to have_content('Please choose either the number of reviews per student or the number of reviewers per team (student)')
   end
@@ -98,6 +100,7 @@ describe "review mapping", js: true do
   end
 
   it "calculate reviewmapping from given review number per submission" do
+    skip('skip test on automated review mapping, too time consuming')
     login_and_assign_reviewer("instructor6", @assignment.id, 0, 7)
     num = ReviewResponseMap.where(reviewer_id: 1, reviewed_object_id: 1).count
     expect(num).to eq(2)

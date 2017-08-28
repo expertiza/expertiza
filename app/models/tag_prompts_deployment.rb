@@ -43,7 +43,7 @@ class TagPromptsDeployment < ActiveRecord::Base
 
         answers = Answer.where(question_id:questions_ids, response_id: responses_ids)
         if not self.answer_length_threshold.nil?
-          answers =  answers.where("length(comments) > " + self.answer_length_threshold.to_s)
+          answers =  answers.where("length(comments) > ?", self.answer_length_threshold.to_s)
         end
 
         users = TeamsUser.where(team_id: team.id).map { |tu| tu.user }

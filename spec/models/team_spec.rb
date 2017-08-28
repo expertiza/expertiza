@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe 'Team' do
   it "verify create team and node for Course Team" do
     course = build(Course)

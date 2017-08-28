@@ -258,7 +258,6 @@ GEM
       ast (~> 2.2)
     pg (0.18.2)
     pkg-config (1.1.7)
-    power_assert (0.2.4)
     powerpack (0.1.1)
     protected_attributes (1.1.3)
       activemodel (>= 4.0.1, < 5.0)
@@ -406,8 +405,6 @@ GEM
     superfish-rails (1.6.0.1)
     term-ansicolor (1.3.2)
       tins (~> 1.0)
-    test-unit (3.1.3)
-      power_assert
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
@@ -511,7 +508,6 @@ DEPENDENCIES
   sprockets
   stanford-core-nlp
   superfish-rails
-  test-unit
   therubyracer
   thin
   timecop (= 0.8.1)

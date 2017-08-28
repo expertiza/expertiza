@@ -23,7 +23,7 @@
   </tr>
   <!--E1721 changes begin-->
   <% @user_id = [] %>
-  <%= render partial: 'participant', collection: user_list, :locals => {:userid => @user_id, :controller => 'participants'}%>
+  <%= render partial: 'participants/participant', collection: user_list, :locals => {:userid => @user_id, :controller => 'participants'}%>
   <!--E1721 changes End-->
 </table>
 

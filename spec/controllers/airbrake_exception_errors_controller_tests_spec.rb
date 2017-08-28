@@ -1,9 +1,6 @@
-require 'rails_helper'
-require 'pry'
-
 describe TeamsController do
   # Airbrake-1807465099223895248
-  describe '#delete', type: :controller do
+  describe '#delete' do
     before(:each) do
       user = build(:instructor)
       stub_current_user(user, user.role.name, user.role)
@@ -41,7 +38,7 @@ end
 
 describe ImportFileController do
   # Airbrake-1774360945974838307
-  describe '#importFile', type: :controller do
+  describe '#importFile' do
     it 'will catch the error info if the tempfile cannot be obtained from params[:file]' do
       controller.params = {
         id: 1,
@@ -60,7 +57,7 @@ end
 
 describe MenuItemsController do
   # Airbrake-1766139777878852159
-  describe '#link', type: :controller do
+  describe '#link' do
     it "can handle the situation (redirect_to '/') when the session[:menu] is nil" do
       controller.params[:name] = "manage/courses"
       controller.session[:menu] = nil
@@ -79,7 +76,7 @@ end
 
 describe GradesController do
   # Airbrake-1784274870078015831
-  describe '#redirect_when_disallowed', type: :controller do
+  describe '#redirect_when_disallowed' do
     before(:each) do
       controller.instance_variable_set(:@participant, double('Participant',
                                                              team: build(:assignment_team),

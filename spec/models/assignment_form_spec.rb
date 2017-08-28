@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe AssignmentForm do
   let(:assignment) { Assignment.new }
   let(:assignment_questionnaire) { AssignmentQuestionnaire.new }

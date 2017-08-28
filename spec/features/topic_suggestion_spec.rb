@@ -1,5 +1,3 @@
-require 'rails_helper'
-require 'selenium-webdriver'
 ########################################
 
 #   Case 1: One team is on the waitlist. They sent a suggestion for new topic and they want to choose their suggested topic. After their suggested topic is approved, they should leave the waitlist and hold their suggested topic;

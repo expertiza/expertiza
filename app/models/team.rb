@@ -19,10 +19,8 @@ class Team < ActiveRecord::Base
 
   # Delete the given team
   def delete
-    for teamsuser in TeamsUser.where(["team_id =?", self.id])
-      teamsuser.delete
-    end
-    node = TeamNode.find_by_node_object_id(self.id)
+    TeamsUser.where("team_id = ?", self.id).each{ |teams_user| teams_user.destroy }
+    node = TeamNode.find_by(node_object_id: self.id)
     node.destroy if node
     self.destroy
   end

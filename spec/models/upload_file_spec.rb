@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "UploadFile" do
   let(:uf) { UploadFile.new id: 1, type: "UploadFile", seq: 1.0, txt: "test txt", weight: 1 }
 

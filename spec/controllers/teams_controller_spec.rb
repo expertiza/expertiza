@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe TeamsController do
   describe "POST #create" do
     context "with an assignment team" do

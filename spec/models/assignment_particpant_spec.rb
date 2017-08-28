@@ -1,4 +1,3 @@
-require 'rails_helper'
 describe "AssignmentParticipant" do
   describe "validations" do
     it "assignment participant is valid" do

@@ -1,4 +1,3 @@
-require 'rails_helper'
 include LogInHelper
 
 describe SignUpSheetController do

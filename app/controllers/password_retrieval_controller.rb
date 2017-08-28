@@ -17,7 +17,7 @@ class PasswordRetrievalController < ApplicationController
         token = SecureRandom.urlsafe_base64
         PasswordReset.save_token(user, token)
         url = self.request.base_url + url_format + token
-        MailerHelper.send_mail_to_user(user, "Expertiza password reset", "send_password", url).deliver
+        MailerHelper.send_mail_to_user(user, "Expertiza password reset", "send_password", url).deliver_now
         flash[:success] = "A link to reset your password has been sent to your e-mail address."
         redirect_to "/"
       else

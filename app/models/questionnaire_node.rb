@@ -65,20 +65,19 @@ class QuestionnaireNode < Node
   end
 
   def get_name
-    Questionnaire.find(self.node_object_id).name
+    Questionnaire.find_by(id: self.node_object_id).try(:name)
   end
 
   def get_private
-    Questionnaire.find(self.node_object_id).private
+    Questionnaire.find_by(id: self.node_object_id).try(:private)
   end
 
   def get_creation_date
-    Questionnaire.find(self.node_object_id).created_at
+    Questionnaire.find_by(id: self.node_object_id).try(:created_at)
   end
 
-  # Gets the updated_at from the associated Questionnaire
   def get_modified_date
-    Questionnaire.find(self.node_object_id).updated_at
+    Questionnaire.find_by(id: self.node_object_id).try(:updated_at)
   end
 
   def is_leaf

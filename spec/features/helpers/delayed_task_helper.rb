@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 module DelayedTaskHelper
   def due_time(delayed_time)
     due_at = DateTime.now.in_time_zone + delayed_time

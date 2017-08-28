@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 xdescribe "SimiCheckWebservice" do
   def poll(comp_id)
     is_success = false

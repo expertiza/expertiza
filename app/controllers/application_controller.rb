@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  helper AnonymizedViewHelper
   include AccessHelper
 
   # You want to get exceptions in development, but not in production.

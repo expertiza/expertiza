@@ -2,6 +2,7 @@
 <h1><%= @model %> Participants: <%= @parent.name %></h1>
 
 <br/>
+<%=link_to "Anonymize", :controller => :users, :action => :set_anonymous_mode%></br>
 <div id="part_list" >
 <%= render :partial => '/shared_scripts/user_list',
            :locals => {:controller => 'participants', 

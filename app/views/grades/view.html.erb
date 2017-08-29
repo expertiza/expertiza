@@ -1,5 +1,6 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
+<%=link_to "Anonymize", :controller => :users, :action => :set_anonymous_mode%></br>.
 <% if @scores[:teams] %>
     <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
     <BR/><BR/>

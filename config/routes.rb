@@ -73,9 +73,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :author_feedback_questionnaires, controller: 'questionnaires'
-
-
   resources :content_pages do
     collection do
       get :list
@@ -255,6 +252,7 @@ Expertiza::Application.routes.draw do
   resources :questionnaires do
     collection do
       get :copy
+      get :new
       get :edit
       get :list
       post :list_questionnaires
@@ -263,6 +261,7 @@ Expertiza::Application.routes.draw do
       get :toggle_access
       get :view
       get :delete
+      post :create
       post :create_quiz_questionnaire
       post :update_quiz
       post :add_new_questions
@@ -277,6 +276,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires

@@ -42,7 +42,7 @@ class Participant < ActiveRecord::Base
   end
 
   def handle
-    self.user.anonymous_mode ? 'handle' : self[:handle]
+    $redis.get('anonymous_mode') == 'true' ? 'handle' : self[:handle]
   end
 
   def delete(force = nil)

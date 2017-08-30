@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.6'
 
@@ -40,6 +40,8 @@ gem 'rb-readline'
 gem "recaptcha", require: "recaptcha/rails"
 gem 'rest-client', '~> 1.8'
 gem 'RedCloth'
+gem 'redis-rails'
+gem 'redis-namespace'
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'

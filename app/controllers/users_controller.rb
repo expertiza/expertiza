@@ -43,8 +43,16 @@ class UsersController < ApplicationController
 
   # for anonymized view for demo purposes
   def set_anonymous_mode
-    binding.pry
-    current_user.anonymous_mode = true
+    anonymous_mode = $redis.get('anonymous_mode')
+    anonymous_mode = case anonymous_mode
+                     when 'true'
+                      'false'
+                     when 'false'
+                       'true'
+                     else
+                       'false'
+                     end
+    $redis.set('anonymous_mode', anonymous_mode)
     redirect_to :back
   end
 

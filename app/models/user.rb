@@ -121,19 +121,19 @@ class User < ActiveRecord::Base
   end
 
   def name
-    self.anonymous_mode ? self.role.name + ' ' + self.id.to_s : self[:name]
+    $redis.get('anonymous_mode') == 'true' ? self.role.name + ' ' + self.id.to_s : self[:name]
   end
 
   def fullname
-    self.anonymous_mode ? self.role.name + ', ' + self.id.to_s : self[:fullname]
+    $redis.get('anonymous_mode') == 'true' ? self.role.name + ', ' + self.id.to_s : self[:fullname]
   end
 
   def first_name
-    self.anonymous_mode ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+    $redis.get('anonymous_mode') == 'true' ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
   def email
-    self.anonymous_mode ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
+    $redis.get('anonymous_mode') == 'true' ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
   end
 
   def super_admin?

@@ -8,7 +8,7 @@
       - @team_users.each do |t|
         %tr
           %td
-            \- #{display_anon_fullname(User.find(t.user_id).fullname)}
+            \- #{User.find(t.user_id).fullname}
   - (1..@assignment.num_review_rounds).each do |round|
     - next if instance_variable_get('@response_round_' + round.to_s).nil?
     - if instance_variable_get('@scores_round_' + round.to_s).nil?

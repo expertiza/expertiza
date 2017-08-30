@@ -43,7 +43,8 @@ class UsersController < ApplicationController
 
   # for anonymized view for demo purposes
   def set_anonymous_mode
-    session[:anonymous_mode] = !session[:anonymous_mode]
+    binding.pry
+    current_user.anonymous_mode = true
     redirect_to :back
   end
 

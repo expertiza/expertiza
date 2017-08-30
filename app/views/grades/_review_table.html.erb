@@ -14,7 +14,7 @@
 		<% for review in reviews %>
        <td align="center">
        <% if controller.action_name != "view_my_scores"%>
-         &nbsp;<%= display_anon_fullname(review.map.reviewer.fullname) %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
+         &nbsp;<%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
 		   <% else %>
          &nbsp;<%= review.map.reviewer.fullname%>&nbsp;
 		   <% end %>

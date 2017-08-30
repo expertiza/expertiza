@@ -34,11 +34,15 @@ class Participant < ActiveRecord::Base
   end
 
   def name
-    User.find(self.user_id).name
+    self.user.name
   end
 
   def fullname
-    User.find(self.user_id).fullname
+    self.user.fullname
+  end
+
+  def handle
+    $redis.get('anonymous_mode') == 'true' ? 'handle' : self[:handle]
   end
 
   def delete(force = nil)
@@ -49,7 +53,7 @@ class Participant < ActiveRecord::Base
     else
       raise "Associations exist for this participant."
     end
-    end
+  end
 
   def force_delete(maps)
     maps.each {|map| map.delete(true) } if maps

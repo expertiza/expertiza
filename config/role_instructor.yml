@@ -249,6 +249,7 @@ development:
         - 44
         - 45
         - 33
+        - 50
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -461,6 +462,16 @@ development:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_surveys"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymous View
+        name: anonymous_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymous_mode"
     by_name:
       home: *1
       manage instructor content: *2
@@ -484,6 +495,7 @@ development:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
+      anonymous_view: *24
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node
@@ -724,6 +736,7 @@ test:
         - 21
         - 22
         - 23
+        - 50
       4: &3 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -926,6 +939,16 @@ test:
         controller_action_id: 57
         content_page_id:
         url: "/tree_display/goto_surveys"
+      50: &23 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymous View
+        name: anonymous_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymous_mode"
     by_name:
       home: *1
       manage instructor content: *2
@@ -948,6 +971,7 @@ test:
       manage/questionnaires/global survey: *20
       manage/questionnaires/assignment surveys: *21
       manage/questionnaires/course course: *22
+      anonymous_view: *23
     selected:
       1: *1
     vector:
@@ -1206,6 +1230,7 @@ production:
         - 44
         - 45
         - 33
+        - 50
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -1418,6 +1443,16 @@ production:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_surveys"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymous View
+        name: anonymous_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymous_mode"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1441,6 +1476,7 @@ production:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
+      anonymous_view: *24
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

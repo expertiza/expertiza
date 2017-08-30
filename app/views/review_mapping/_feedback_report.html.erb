@@ -3,7 +3,6 @@
                                "Review response rejoined" => "20%",
                                "Last rejoined at" => "20%") %>
     <%@l = -1 %>
-     <%=link_to "Anonymize", :controller => :users, :action => :set_anonymous_mode%></br>
 
     <% @authors.each do |r| %>
       <% if @assignment.varying_rubrics_by_round? %>

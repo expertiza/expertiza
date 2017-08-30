@@ -26,7 +26,6 @@ th.sorter-true.tablesorter-headerUnSorted{
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
-<%=link_to "Anonymize", :controller => :users, :action => :set_anonymous_mode%></br>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>

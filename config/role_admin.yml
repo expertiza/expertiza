@@ -468,8 +468,8 @@ development:
         content_page_id:
         controller_action_id: 15
         id: 50
-        label: Anonymous View
-        name: anonymous_view
+        label: Anonymized view
+        name: anonymized_view
         parent:
         parent_id: 37
         site_controller_id: 35
@@ -497,7 +497,7 @@ development:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
-      anonymous_view: *24
+      anonymized_view: *24
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node
@@ -1441,8 +1441,8 @@ production:
         content_page_id:
         controller_action_id: 15
         id: 50
-        label: Anonymous View
-        name: anonymous_view
+        label: Anonymized view
+        name: anonymized_view
         parent:
         parent_id: 37
         site_controller_id: 35
@@ -1470,7 +1470,7 @@ production:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
-      anonymous_view: *24
+      anonymized_view: *24
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

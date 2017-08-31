@@ -607,8 +607,8 @@ development:
         content_page_id:
         controller_action_id: 15
         id: 50
-        label: Anonymous View
-        name: anonymous_view
+        label: Anonymized view
+        name: anonymized_view
         parent:
         parent_id: 37
         site_controller_id: 35
@@ -648,7 +648,7 @@ development:
       show/super-administrators: *33
       show/administrators: *34
       show/instructors: *35
-      anonymous_view: *36
+      anonymized_view: *36
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node
@@ -1885,8 +1885,8 @@ production:
         content_page_id:
         controller_action_id: 15
         id: 50
-        label: Anonymous View
-        name: anonymous_view
+        label: Anonymized view
+        name: anonymized_view
         parent:
         parent_id: 37
         site_controller_id: 35
@@ -1926,7 +1926,7 @@ production:
       show/super-administrators: *33
       show/administrators: *34
       show/instructors: *35
-      anonymous_view: *36
+      anonymized_view: *36
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node

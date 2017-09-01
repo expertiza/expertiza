@@ -803,7 +803,4 @@ ActiveRecord::Schema.define(version: 20170710031449) do
   add_foreign_key "tag_prompts_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "topic_deadlines", "deadline_types", name: "fk_topic_deadlines_deadline_type"
-  add_foreign_key "topic_deadlines", "late_policies", name: "fk_topic_deadlines_late_policies"
-  add_foreign_key "topic_deadlines", "sign_up_topics", column: "topic_id", name: "fk_topic_deadlines_sign_up_topic"
 end

@@ -3,6 +3,7 @@
                                "Review response rejoined" => "20%",
                                "Last rejoined at" => "20%") %>
     <%@l = -1 %>
+
     <% @authors.each do |r| %>
       <% if @assignment.varying_rubrics_by_round? %>
         <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 

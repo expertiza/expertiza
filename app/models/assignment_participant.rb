@@ -99,14 +99,6 @@ class AssignmentParticipant < Participant
     (Answer.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
   end
 
-  def fullname
-    self.user.fullname
-  end
-
-  def name
-    self.user.name
-  end
-
   # Return scores that this participant has been given
   def scores(questions)
     scores = {}

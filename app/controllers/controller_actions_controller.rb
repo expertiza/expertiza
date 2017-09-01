@@ -40,7 +40,7 @@ class ControllerActionsController < ApplicationController
       params[:controller_action][:name] =
         params[:controller_action][:specific_name]
     end
-    @controller_action = ControllerAction.new(params[:controller_action])
+    @controller_action = ControllerAction.new(controller_action_params)
     if @controller_action.save
       flash[:notice] = 'The controller action was successfully created.'
       Role.rebuild_cache
@@ -59,7 +59,7 @@ class ControllerActionsController < ApplicationController
 
   def update
     @controller_action = ControllerAction.find(params[:id])
-    if @controller_action.update_attributes(params[:controller_action])
+    if @controller_action.update_attributes(controller_action_params)
       flash[:notice] = 'The controller action was successfully updated.'
       Role.rebuild_cache
       redirect_to controller: 'site_controllers', action: 'show',
@@ -76,6 +76,12 @@ class ControllerActionsController < ApplicationController
     @controller_action.destroy
     Role.rebuild_cache
     redirect_to @controller_action.site_controller
+  end
+
+  private
+
+  def controller_action_params
+    params.require(:controller_action).permit(:id, :site_controller_id, :name, :permission_id, :url_to_use)
   end
 
   protected

@@ -268,6 +268,7 @@ development:
         - 44
         - 45
         - 33
+        - 50
       35: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -602,6 +603,16 @@ development:
         parent_id: 46
         site_controller_id: 12
         url: "/admin/list_instructors"
+      50: &36 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymous_mode"
     by_name:
       home: *1
       admin: *2
@@ -637,6 +648,7 @@ development:
       show/super-administrators: *33
       show/administrators: *34
       show/instructors: *35
+      anonymized_view: *36
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node
@@ -1534,6 +1546,7 @@ production:
         - 44
         - 45
         - 33
+        - 50
       35: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -1868,6 +1881,16 @@ production:
         parent_id: 46
         site_controller_id: 12
         url: "/admin/list_instructors"
+      50: &36 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymous_mode"
     by_name:
       home: *1
       admin: *2
@@ -1903,6 +1926,7 @@ production:
       show/super-administrators: *33
       show/administrators: *34
       show/instructors: *35
+      anonymized_view: *36
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node

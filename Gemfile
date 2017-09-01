@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.6'
 
@@ -16,7 +16,7 @@ gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
-gem 'expertiza-authlogic', github: 'expertiza/authlogic', require: 'authlogic'
+gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', require: 'authlogic'
 gem 'fastercsv'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
@@ -43,6 +43,8 @@ gem 'rb-readline'
 gem "recaptcha", require: "recaptcha/rails"
 gem 'rest-client', '~> 1.8'
 gem 'RedCloth'
+gem 'redis-rails'
+gem 'redis-namespace'
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'

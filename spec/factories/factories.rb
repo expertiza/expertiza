@@ -273,8 +273,8 @@ FactoryGirl.define do
     type "CourseNode"
   end
 
-  factory :questionnaire, class: ReviewQuestionnaire do
-    name 'Test questionaire'
+  factory :questionnaire, class: Questionnaire do
+    name 'Test questionnaire'
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
@@ -284,43 +284,10 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
-  factory :metareview_questionnaire, class: MetareviewQuestionnaire do
-    name 'Test questionaire'
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
-    private 0
-    min_question_score 0
-    max_question_score 5
-    type 'MetareviewQuestionnaire'
-    display_type 'Review'
-    instruction_loc nil
-  end
-
-  factory :author_feedback_questionnaire, class: AuthorFeedbackQuestionnaire do
-    name 'Test questionaire'
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
-    private 0
-    min_question_score 0
-    max_question_score 5
-    type 'AuthorFeedbackQuestionnaire'
-    display_type 'Review'
-    instruction_loc nil
-  end
-
-  factory :teammate_review_questionnaire, class: TeammateReviewQuestionnaire do
-    name 'Test questionaire'
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
-    private 0
-    min_question_score 0
-    max_question_score 5
-    type 'TeammateReviewQuestionnaire'
-    display_type 'Review'
-    instruction_loc nil
-  end
-
   factory :question, class: Question do
     txt 'Test question:'
     weight 1
-    questionnaire { ReviewQuestionnaire.first || association(:questionnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'Criterion'
     size "70,1"
@@ -328,6 +295,12 @@ FactoryGirl.define do
     break_before 1
     max_label nil
     min_label nil
+  end
+
+  factory :question_advice, class: QuestionAdvice do
+    question { Question.first || association(:question) }
+    score 5
+    advice 'LGTM'
   end
 
   factory :assignment_questionnaire, class: AssignmentQuestionnaire do

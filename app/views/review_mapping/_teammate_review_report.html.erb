@@ -3,6 +3,7 @@
                                "Teammate reviewed" => "20%",
                                "Last reviewed at" => "20%") %>
     <%@l = -1 %>
+
     <% @reviewers.each do |r| %>
       <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
       <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>

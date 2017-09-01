@@ -436,8 +436,8 @@ describe "assignment function" do
       create(:assignment_questionnaire)
       (1..3).each do |i|
         create(:questionnaire, name: "ReviewQuestionnaire#{i}")
-        create(:author_feedback_questionnaire, name: "AuthorFeedbackQuestionnaire#{i}")
-        create(:teammate_review_questionnaire, name: "TeammateReviewQuestionnaire#{i}")
+        create(:questionnaire, name: "AuthorFeedbackQuestionnaire#{i}", type: 'AuthorFeedbackQuestionnaire')
+        create(:questionnaire, name: "TeammateReviewQuestionnaire#{i}", type: 'TeammateReviewQuestionnaire')
       end
       login_as("instructor6")
       visit "/assignments/#{@assignment.id}/edit"

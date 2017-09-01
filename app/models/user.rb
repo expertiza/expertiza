@@ -5,7 +5,6 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
-
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants
@@ -17,7 +16,7 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-
+  attr_accessor :anonymous_mode 
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -121,8 +120,20 @@ class User < ActiveRecord::Base
     user_list.uniq
   end
 
+  def name
+    $redis.get('anonymous_mode') == 'true' ? self.role.name + ' ' + self.id.to_s : self[:name]
+  end
+
+  def fullname
+    $redis.get('anonymous_mode') == 'true' ? self.role.name + ', ' + self.id.to_s : self[:fullname]
+  end
+
   def first_name
-    fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+    $redis.get('anonymous_mode') == 'true' ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+  end
+
+  def email
+    $redis.get('anonymous_mode') == 'true' ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
   end
 
   def super_admin?

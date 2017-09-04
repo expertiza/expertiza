@@ -11,10 +11,10 @@ class TeamUserNode < Node
   end
 
   def self.get(parent_id)
-    nodes = Node.joins("INNER JOIN #{self.table} ON nodes.node_object_id = #{self.table}.id")
+    nodes = Node.joins("INNER JOIN teams_users ON nodes.node_object_id = teams_users.id")
                 .select('nodes.*')
-                .where('nodes.type = ?', self)
-    nodes.where("#{self.table}.team_id = ?", parent_id) if parent_id
+                .where('nodes.type = teams_users')
+    nodes.where("teams_users.team_id = ?", parent_id) if parent_id
   end
 
   def is_leaf

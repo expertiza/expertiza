@@ -6,10 +6,10 @@ class TeamNode < Node
   end
 
   def self.get(parent_id)
-    nodes = Node.joins("INNER JOIN #{self.table} ON nodes.node_object_id = #{self.table}.id")
+    nodes = Node.joins("INNER JOIN teams ON nodes.node_object_id = teams.id")
                 .select('nodes.*')
-                .where('nodes.type = ?', self)
-    nodes.where("#{self.table}.parent_id = ?", parent_id) if parent_id
+                .where('nodes.type = TeamNode')
+    nodes.where("teams.parent_id = ?", parent_id) if parent_id
   end
 
   def get_name

@@ -8,7 +8,7 @@ class TeamNode < Node
   def self.get(parent_id)
     nodes = Node.joins("INNER JOIN teams ON nodes.node_object_id = teams.id")
                 .select('nodes.*')
-                .where('nodes.type = TeamNode')
+                .where("nodes.type = 'TeamNode'")
     nodes.where("teams.parent_id = ?", parent_id) if parent_id
   end
 

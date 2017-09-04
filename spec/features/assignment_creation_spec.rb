@@ -416,7 +416,7 @@ describe "assignment function" do
       all(:xpath, '//img[@title="Delete Topic"]')[0].click
       click_button 'OK'
 
-      topics_exist = SignUpTopic.count(:all, assignment_id: assignment.id)
+      topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0
     end
   end

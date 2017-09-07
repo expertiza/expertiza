@@ -212,9 +212,11 @@ FactoryGirl.define do
   end
 
   factory :review_grade, class: ReviewGrade do
+    participant { Participant.first || association(:participant) }
     grade_for_reviewer 100
-    comment_for_reviewer "Good job!"
-    review_graded_at "2011-11-11 11:11:11"
+    comment_for_reviewer 'Good job!'
+    review_graded_at '2011-11-11 11:11:11'
+    reviewer_id 1
   end
 
   factory :assignment_due_date, class: AssignmentDueDate do

@@ -384,7 +384,7 @@ class QuestionnairesController < ApplicationController
     if @questionnaire.type != "QuizQuestionnaire"
       pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
       parent = FolderNode.find_by_node_object_id(pFolder.id)
-      create_new_node_if_necessary(parent)
+      # create_new_node_if_necessary(parent)
     end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
@@ -394,9 +394,7 @@ class QuestionnairesController < ApplicationController
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
-
       for question_key in params[:new_question].keys
-
         q = Question.new
         q.txt = params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id

@@ -21,7 +21,7 @@
   <% if same_team_flag && stage != "Finished" %>
     <b>Submit a file:</b><br/>
     <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
-      <input type="checkbox" name="unzip" value=""/> Unzip submission
+      <!--<input type="checkbox" name="unzip" value=""/> Unzip submission-->
       <div class="form-group">
         <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
       </div>
@@ -36,14 +36,15 @@
 
       <% if same_team_flag && stage != "Finished" %>
 
-        <!--<div style="background-color:#EEEEEE; padding-bottom:0.6em"><strong>File and folder actions</strong><br>
-          <input type="button" onclick="createNewFolder()"     value="Create new folder"    />
+        <div style="padding-bottom:0.6em"><strong>File actions</strong>
+        <!--<input type="button" onclick="createNewFolder()"     value="Create new folder"    />
           <input type="button" onclick="copySelectedFile()"    value="Copy selected file"   />
           <input type="button" onclick="moveSelectedFile()"    value="Move selected file"   />
-          <input type="button" onclick="renameFile()"          value="Rename selected file" />
+          <input type="button" onclick="renameFile()"          value="Rename selected file" />-->
           <input type="button" onclick="deleteSelectedFile();" value="Delete selected file" />
-          <input type="reset" value="Reset"></div><br>
-      <% end %>-->
+        <!--<input type="reset" value="Reset">-->
+        </div>
+      <% end %>
 
       <table>
         <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, !same_team_flag).html_safe %> </div></td></tr>

@@ -146,65 +146,80 @@ class Assignment < ActiveRecord::Base
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
   def scores(questions)
-    scores = {}
-
-    scores[:participants] = {}
-    self.participants.each do |participant|
-      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
-    end
-
-    scores[:teams] = {}
-    index = 0
-    self.teams.each do |team|
-      scores[:teams][index.to_s.to_sym] = {}
-      scores[:teams][index.to_s.to_sym][:team] = team
-
-      if self.varying_rubrics_by_round?
-        grades_by_rounds = {}
-
-        total_score = 0
-        total_num_of_assessments = 0 # calculate grades for each rounds
-        (1..self.num_review_rounds).each do |i|
-          assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
-          round_sym = ("review" + i.to_s).to_sym
-          grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
-          total_num_of_assessments += assessments.size
-          unless grades_by_rounds[round_sym][:avg].nil?
-            total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
+    if $redis.keys.include? "assgt_#{self.id}_team_scores"
+      scores = RedisHelper.fetch_hash_data("assgt_#{self.id}_team_scores")
+      # Zhewei: fetch teams and participants objects
+      # redis can only store strings instead of objects
+      scores[:teams].each {|k, v| scores[:teams][k][:team] = AssignmentTeam.find(v[:team][:id]) }
+      scores[:participants].each do |key, value|
+        value.each do |k, v|
+          if k == :participant
+            scores[:participants][key][k] = AssignmentParticipant.find_by(id: v[:id])
+          elsif v.is_a? Hash and v.has_key? :assessments and v[:assessments]
+            v[:assessments].each_with_index do |assessment, i|
+              scores[:participants][key][k][:assessments][i] = Response.find_by(id: v[:assessments][i][:id])
+            end
           end
         end
-
-        # merge the grades from multiple rounds
-        scores[:teams][index.to_s.to_sym][:scores] = {}
-        scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        (1..self.num_review_rounds).each do |i|
-          round_sym = ("review" + i.to_s).to_sym
-          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
-            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
-          end
-          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
-            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
-          end
-        end
-
-        if total_num_of_assessments != 0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
-        else
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
-          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
-          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
-        end
-
-      else
-        assessments = ReviewResponseMap.get_assessments_for(team)
-        scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
       end
-
-      index += 1
+    else
+      scores = {}
+      scores[:participants] = {}
+      self.participants.each do |participant|
+        scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
+      end
+      scores[:teams] = {}
+      index = 0
+      self.teams.each do |team|
+        scores[:teams][index.to_s.to_sym] = {}
+        scores[:teams][index.to_s.to_sym][:team] = team
+        if self.varying_rubrics_by_round?
+          calculate_scores_in_varying_rubric_by_round_assignment(questions, scores, team, index)
+        else
+          assessments = ReviewResponseMap.get_assessments_for(team)
+          scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
+        end
+        RedisHelper.store_hash_data("assgt_#{self.id}_team_scores", scores)
+        index += 1
+      end
     end
     scores
+  end
+
+  def calculate_scores_in_varying_rubric_by_round_assignment(questions, scores, team, index)
+    grades_by_rounds = {}
+    total_score = 0
+    total_num_of_assessments = 0 # calculate grades for each rounds
+    (1..self.num_review_rounds).each do |i|
+      assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
+      round_sym = ("review" + i.to_s).to_sym
+      grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+      total_num_of_assessments += assessments.size
+      unless grades_by_rounds[round_sym][:avg].nil?
+        total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
+      end
+    end
+    # merge the grades from multiple rounds
+    scores[:teams][index.to_s.to_sym][:scores] = {}
+    scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
+    scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
+    scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
+    (1..self.num_review_rounds).each do |i|
+      round_sym = ("review" + i.to_s).to_sym
+      if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
+        scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
+      end
+      if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
+        scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
+      end
+    end
+    if total_num_of_assessments != 0
+      scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
+    else
+      scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
+      scores[:teams][index.to_s.to_sym][:scores][:max] = 0
+      scores[:teams][index.to_s.to_sym][:scores][:min] = 0
+    end
   end
 
   def path

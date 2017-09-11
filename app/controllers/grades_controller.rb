@@ -48,7 +48,7 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
-    averages = calculate_average_vector(@assignment.scores(@questions))
+    averages = calculate_average_vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)

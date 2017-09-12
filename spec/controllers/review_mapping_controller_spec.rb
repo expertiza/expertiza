@@ -6,13 +6,13 @@ describe ReviewMappingController do
                                 reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:metareview_response_map) do
-    double('MetareivewResponseMap', id: 1, map_id: 1, assignment: assignment,
+    double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
                                     reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
-  let(:participant1) { double('AssignmentParticipant', id: 1, can_review: true, user: double('User', id: 2)) }
+  let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
   let(:user) { double('User', id: 3) }
-  let(:participant2) { double('AssignmentParticipant', id: 1, can_review: true, user: user) }
+  let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
 
@@ -32,12 +32,12 @@ describe ReviewMappingController do
     end
   end
 
-  describe '#add_reviewer' do
+  describe '#add_reviewer and #get_reviewer' do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page'
     end
 
-    context 'when team_user exists' do
+    context 'when team_user exists and get_reviewer method returns a reviewer' do
       it 'creates a whole bunch of objects and redirects to review_mapping#list_mappings page'
     end
   end
@@ -84,6 +84,16 @@ describe ReviewMappingController do
     end
   end
 
+  describe '#delete_all_metareviewers' do
+    context 'when failed times are bigger than 0' do
+      it 'shows an error flash message and redirects to review_mapping#list_mappings page'
+    end
+
+    context 'when failed time is equal to 0' do
+      it 'shows a note flash message and redirects to review_mapping#list_mappings page'
+    end
+  end
+
   describe '#unsubmit_review' do
     context 'when attributes of response are updated successfully' do
       it 'shows a success flash.now message and renders a .js.erb file'
@@ -114,6 +124,14 @@ describe ReviewMappingController do
     end
   end
 
+  describe '#delete_metareview' do
+    it 'redirects to review_mapping#list_mappings page after deletion'
+  end
+
+  describe '#list_mappings' do
+    it 'renders review_mapping#list_mappings page'
+  end
+
   describe '#automatic_review_mapping' do
     context 'when teams is not empty' do
       context 'when all nums in params are 0' do
@@ -136,6 +154,42 @@ describe ReviewMappingController do
 
   describe '#automatic_review_mapping_staggered' do
     it 'shows a note flash message and redirects to review_mapping#list_mappings page'
+  end
+
+  describe 'response_report' do
+    context 'when type is SummaryByRevieweeAndCriteria' do
+      it 'renders response_report page with corresponding data'
+    end
+
+    context 'when type is SummaryByCriteria' do
+      it 'renders response_report page with corresponding data'
+    end
+
+    context 'when type is ReviewResponseMap' do
+      it 'renders response_report page with corresponding data'
+    end
+
+    context 'when type is FeedbackResponseMap' do
+      context 'when assignment has varying_rubrics_by_round feature' do
+        it 'renders response_report page with corresponding data'
+      end
+
+      context 'when assignment does not have varying_rubrics_by_round feature' do
+        it 'renders response_report page with corresponding data'
+      end
+    end
+
+    context 'when type is TeammateReviewResponseMap' do
+      it 'renders response_report page with corresponding data'
+    end
+
+    context 'when type is Calibration and participant variable is nil' do
+      it 'renders response_report page with corresponding data'
+    end
+
+    context 'when type is PlagiarismCheckerReport' do
+      it 'renders response_report page with corresponding data'
+    end
   end
 
   describe '#save_grade_and_comment_for_reviewer' do

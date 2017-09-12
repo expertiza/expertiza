@@ -8,6 +8,7 @@ class Assignment < ActiveRecord::Base
   include AssignmentAnalytic
   include ReviewAssignment
   include QuizAssignment
+  include LocalDBCalc
   include OnTheFlyCalc
   has_paper_trail
 

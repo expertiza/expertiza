@@ -7,7 +7,7 @@ class ReviewMappingController < ApplicationController
   helper :submitted_content
 
   @@time_create_last_review_mapping_record = nil
-
+  @@review_comments={}
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
@@ -394,6 +394,13 @@ class ReviewMappingController < ApplicationController
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+      logger.info @review_scores
+
+      #Added by Rushi: for each reviewer's comment and total assignment comments
+      @review_comments = @assignment.compute_reviews_comments
+      @@review_comments = @review_comments
+      logger.info @@review_comments
+
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?

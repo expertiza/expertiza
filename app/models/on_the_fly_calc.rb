@@ -2,9 +2,61 @@ module OnTheFlyCalc
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
   def compute_total_score(scores)
-    total = 0
-    self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
-    total
+    if self.get_current_stage != 'Finished'
+      total = 0
+      self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
+      total
+    else
+      defined?(super) && super
+    end
+  end
+
+  # @author - Rushi.Bhatt
+  # Returns hash of @review_comments[reviewer_id][reviewee_id] = comments
+  def compute_reviews_comments
+    rounds = self.rounds_of_reviews
+    @review_comments={}
+    @response_type = 'ReviewResponseMap'
+    # @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
+
+    # if this assignment uses vary rubric by rounds feature, load @questions for each round
+    if self.varying_rubrics_by_round? # [reviewer_id][round][reviewee_id] = comments
+      rounds = self.rounds_of_reviews
+      for round in 1..rounds
+        @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
+        review_questionnaire_id = review_questionnaire_id(round)
+
+        @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+        @response_maps.each do |response_map|
+          # Check if response is there
+          @corresponding_response = Response.where(['map_id = ?', response_map.id])
+          unless @corresponding_response.empty?
+            @corresponding_response = @corresponding_response.reject {|response| response.round != round }
+          end
+          @respective_comments = {}
+          @respective_comments = @review_comments[response_map.reviewer_id][round] if !@review_comments[response_map.reviewer_id].nil? && !@review_comments[response_map.reviewer_id][round].nil?
+          @this_review_comments = Answer.get_all_comments(response: @corresponding_response, questions: @questions)
+          @respective_comments[response_map.reviewee_id] = @this_review_comments
+          @review_comments[response_map.reviewer_id] = {} if @review_comments[response_map.reviewer_id].nil?
+          @review_comments[response_map.reviewer_id][round] = {} if @review_comments[response_map.reviewer_id][round].nil?
+          @review_comments[response_map.reviewer_id][round] = @respective_comments
+        end
+      end
+    else # [reviewer_id][reviewee_id] = comments
+      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
+      review_questionnaire_id = review_questionnaire_id()
+      @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+      @response_maps.each do |response_map|
+        # Check if response is there
+        @corresponding_response = Response.where(['map_id = ?', response_map.id])
+        @respective_comments = {}
+        @respective_comments = @review_comments[response_map.reviewer_id] unless @review_comments[response_map.reviewer_id].nil?
+        @this_review_comments = Answer.get_all_comments(response: @corresponding_response, questions: @questions)
+        @respective_comments[response_map.reviewee_id] = @this_review_comments
+        @review_comments[response_map.reviewer_id] = @respective_comments
+      end
+    end
+    @review_comments
   end
 
   def compute_reviews_hash

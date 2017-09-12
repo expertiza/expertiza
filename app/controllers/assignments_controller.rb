@@ -203,6 +203,18 @@ class AssignmentsController < ApplicationController
     end
   end
 
+
+  #--------------------------------------------------------------------------------------------------------------------
+  # STORE_SCORES_To_DB
+  # TODO: stores
+  #--------------------------------------------------------------------------------------------------------------------
+
+  def store_scores_to_db
+    assignment = Assignment.find_by(id: params[:id])
+    assignment.store_total_scores
+    redirect_to list_tree_display_index_path
+  end
+
   #--------------------------------------------------------------------------------------------------------------------
   # DELETE
   # TODO: not been cleanup yep

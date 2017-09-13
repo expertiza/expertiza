@@ -6,11 +6,10 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if %w(edit update list_submissions).include? params[:action]
       assignment = Assignment.find(params[:id])
-      return true if ['Super-Administrator', 'Administrator'].include? current_role_name
-      return true if assignment.instructor_id == current_user.try(:id)
-      return true if TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) && (TaMapping.where(course_id: assignment.course_id).include? TaMapping.where(ta_id: current_user.try(:id), course_id: assignment.course_id).first)
-      return true if assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
-      return false
+      ['Super-Administrator', 'Administrator'].include? current_role_name or
+      assignment.instructor_id == current_user.try(:id) or
+      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+      assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
     else
       ['Super-Administrator',
        'Administrator',
@@ -153,11 +152,6 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # GET_PATH (Helper function for CREATE and UPDATE)
-  #  return the file location if there is any for the assignment
-  # TODO: to be depreicated
-  #--------------------------------------------------------------------------------------------------------------------
   def path
     begin
       file_path = @assignment.path
@@ -167,26 +161,6 @@ class AssignmentsController < ApplicationController
     file_path
   end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # COPY_PARTICIPANTS_FROM_COURSE
-  #  if assignment and course are given copy the course participants to assignment
-  # TODO: to be tested
-  #--------------------------------------------------------------------------------------------------------------------
-  def copy_participants_from_course
-    if params[:assignment][:course_id]
-      begin
-        Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
-      rescue
-        flash[:error] = $ERROR_INFO
-      end
-    end
-  end
-
-  #-------------------------------------------------------------------------------------------------------------------
-  # COPY
-  # Creates a copy of an assignment along with dates and submission directory
-  # TODO: need to be tested
-  #-------------------------------------------------------------------------------------------------------------------
   def copy
     @user = current_user
     session[:copy_flag] = true
@@ -195,7 +169,11 @@ class AssignmentsController < ApplicationController
     new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
       new_assign = Assignment.find(new_assign_id)
-      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.' if old_assign.directory_path == new_assign.directory_path
+      if old_assign.directory_path == new_assign.directory_path
+        flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
+          "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
+          "If you do not want this to happen, change the submission directory in the new copy of the assignment."
+      end
       redirect_to edit_assignment_path new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
@@ -203,10 +181,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # DELETE
-  # TODO: not been cleanup yep
-  #--------------------------------------------------------------------------------------------------------------------
   def delete
     begin
       @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -227,7 +201,7 @@ class AssignmentsController < ApplicationController
   def index
     set_up_display_options("ASSIGNMENT")
     @assignments = super(Assignment)
-    #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
+    # @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
 
   def delayed_mailer
@@ -293,33 +267,19 @@ class AssignmentsController < ApplicationController
   end
 
   def is_meta_review_allowed?(dd)
-    status = false
-    if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_METAREVIEW
-      status = true
-    end
-    status
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_METAREVIEW
   end
 
   def is_drop_topic_allowed?(dd)
-    status = false
-    if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC
-      status = true
-    end
-    status
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC
   end
 
   def is_signup_allowed?(dd)
-    status = false
-    status = true if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SIGN_UP
-    status
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SIGN_UP
   end
 
   def is_team_formation_allowed?(dd)
-    status = false
-    if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
-      status = true
-    end
-    status
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
 
   def update_nil_dd_deadline_name(due_date_all)

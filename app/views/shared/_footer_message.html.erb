@@ -1,2 +1,66 @@
-<a href="http://wiki.expertiza.ncsu.edu/index.php/Expertiza_documentation" target='_blank'>Help</a> | <a href="http://research.csc.ncsu.edu/efg/expertiza/papers" target='_blank'>Papers on Expertiza</a>
+<style>
+  footer, .footer {
+    position: fixed;
+    height: 60px;
+    bottom: 0;
+    width:100%;
+    background-color: #900;
+    padding:0px !important;
+  }
+
+  h1 {
+    color: maroon;
+    margin-left: 40px;
+  }
+
+    .container{
+      width : 100% !important;
+      background : none !important;
+    }
+
+    .container-fluid{
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+
+    body{
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+
+    ul#mobile-footer{
+    list-style-type: none !important;
+    }
+
+  ul#mobile-footer > li{
+    float : left;
+    margin: .5em 1em;
+  }
+    .footer a{
+      color: white !important;
+    }
+
+    .right{
+      float : right;
+    }
+</style>
+
+<footer class="footer">
+  <div class="container">
+    <p>
+    <ul id="mobile-footer"  >
+      <li><a href="/home">Home</a></li>
+      <li><a href="http://research.csc.ncsu.edu/efg/expertiza/papers" target='_blank'>Papers on Expertiza</a></li>
+      <li><a href="http://wiki.expertiza.ncsu.edu/index.php/Expertiza_documentation" target='_blank'>Help</a></li>
+      <li><a href="">Send Feedback</a></li>
+      <li><a href="">Log Out</a></li>
+    </ul>
+    </p>
+    <br>
+    <p class="right">
+      <a href="https://expertiza.ncsu.edu/">Powered by Expertiza</a>
+      © 2017 Expertiza
+    </p>
+  </div>
+</footer>
 <%#= params.inspect.html_safe if Rails.env.development? %>

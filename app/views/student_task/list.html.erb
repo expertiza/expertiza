@@ -1,9 +1,9 @@
 <h1>Assignments</h1>
 <%= render 'publishing_rights' %>
 
-<div style="width: 1024px">
+<div style="width: 100%">
   <div class="taskbox">
-    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
+    <strong>&nbsp;&nbsp;<span class="badge">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
 
     <% @tasknotstarted.each do |student_task|
       participant = student_task.participant
@@ -41,10 +41,10 @@
     <span>&nbsp; &raquo;
       <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => participant.id %>
       (<%= student_task.relative_deadline %> left)
-    </span><br/>
+    </span>
   <% end %>
 
-  <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
+   <strong> &nbsp;&nbsp;<span class="badge">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
   <% @taskrevisions.each do |student_task|
     participant = student_task.participant
     stage = student_task.current_stage
@@ -65,12 +65,11 @@
   stage, :controller => controller, :action => action, :id => participant.id %>
 (<%= time_ago_in_words(duedate) %> left) </span><br/>
 <% end %>
-<br/>
 
 <strong>Students who have teamed with you<br></strong><br>
 
 <% @students_teamed_with.keys.each do |course_id| %>
-    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
+    <strong>&nbsp;&nbsp;<span class="badge">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
       <%if course_id.nil?%>
         assignments not associated with any course
       <%else%>

@@ -5,6 +5,8 @@
     else
       document.getElementById("revert_button").value = "Revert";
   }
+
+
 </script>
 
 <style>
@@ -13,9 +15,17 @@
     background-color: #F2F2F2;
     padding: 1.5em;
     margin-bottom: 30px;
-    width:440px;
+    width:30%;
     float: left;
     line-height: 40px;
+  }
+
+  .wikidata{
+    width : 70%;
+    float : left;
+    padding: 2em;
+    line-height: 30px;
+    font-size: 20px;
   }
 
     .red{
@@ -26,6 +36,18 @@
       color: #fff;
       background-color: #c00;
     }
+
+  @media screen and (max-width: 699px)  {
+    .login-form{
+      width:100% !important;
+      float: left;
+      line-height: 40px;
+    }
+
+    .wikidata{
+      visibility: hidden;
+    }
+  }
 </style>
 
 <% if current_user %>
@@ -56,7 +78,7 @@
 <% else %>
 <div class="login-form">
   <%= form_tag :controller => 'auth', :action => 'login' do %>
-      <h3 class="form-heading">Enter your Username and Password</h3>
+      <h3 class="form-heading">Login to expertiza</h3>
       <p><label for="login_name">User Name<span class="red"> *</span></label><br/>
     <%= text_field 'login', 'name', :size => 12, :class => 'form-control' %></p>
 
@@ -80,4 +102,8 @@
   </p>
   <br/>
 </div>
+    <div class="wikidata">
+      <p>The Expertiza project is software to create reusable learning objects through peer review. It also supports team projects, and the submission of almost any document type, including URLs and wiki pages.
+      </p>
+    </div>
 <% end %>

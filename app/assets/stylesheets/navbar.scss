@@ -78,6 +78,16 @@ ul.navbar-right > li.right-most > a:hover {
 
 
 
+li.first-level > a {
+  line-height: 30px;
+  padding: 0px 10px;
+}
+
+ul.nav li.first-level {
+  font-size: 100%;
+  letter-spacing: 1px;
+}
+
 .impersonate-box .input-group {
   width: 170px;
 }
@@ -138,6 +148,11 @@ ul.navbar-right > li.right-most > a:hover {
 
 .dropdown-submenu:hover>.dropdown-menu {
   display: block;
+}
+
+
+.navbar-nav > li > .dropdown-menu {
+  letter-spacing: 0px;
 }
 
 .dropdown-submenu:hover>a:after {

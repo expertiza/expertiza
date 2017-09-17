@@ -350,11 +350,27 @@ FactoryGirl.define do
     calibrate_to 0
   end
 
+  factory :meta_review_response_map, class: MetareviewResponseMap do
+    review_mapping { ReviewResponseMap.first || association(:review_response_map) }
+    reviewee { AssignmentParticipant.first || association(:participant) }
+    reviewer_id 1
+    type 'MetareviewResponseMap'
+    calibrate_to 0
+  end
+
   factory :response, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
     round 1
     is_submitted false
+  end
+
+  factory :submission_record, class: SubmissionRecord do
+    team_id 666
+    operation 'create'
+    user 'student1234'
+    content 'www.wolfware.edu'
+    created_at Time.now
   end
 end

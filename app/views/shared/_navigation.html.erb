@@ -1,7 +1,7 @@
 <nav role="navigation" class="navbar navbar-default navbar-static-top navbarposition">
   <div class="container-fluid">
     <div class="navbar-header">
-      <%= image_tag "logo.jpg", height: '65'%>
+      <a href="/home" class="img-link"> <%= image_tag "logo_wolf.png", height: '65'%> </a>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
@@ -18,10 +18,22 @@
         <% end %>
       </ul>
 
-      <ul class="nav navbar-nav navbar-right">
+      <ul class="nav navbar-nav navbar-right userdropdown">
         <% if current_user %>
-            <li class="impersonate-box">
-              <span id="impersonate-user-info">User: <%= current_user.name %></span>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User: <%= current_user.name %><span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %></li>
+                  <li><a href="#">View Profile</a></li>
+                  <li><a href="#">More Actions</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li class="dropdown-header">Header Sub Columns</li>
+                  <li><a href="#">Separated link</a></li>
+                  <li><a href="#">One more separated link</a></li>
+                </ul>
+
+
+              <span id="impersonate-user-info"></span>
               <% if session[:super_user] %>
                   <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
                       <div class="input-group">
@@ -33,15 +45,15 @@
                   <% end %>
               <% end %>
             </li>
-            <li class="divider-vertical"></li>
-            <li class="right-most logout-box">
-              <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>
-            </li>
+
+
         <% end %>
       </ul>
     </div>
   </div>
 </nav>
+
+
 
 <script type="text/javascript">
     jQuery("#impersonate-button").click(function(event) {
@@ -58,3 +70,26 @@
         });
     });
 </script>
+
+<style>
+  .userdropdown{
+    margin-right : 0px;
+    margin-top: 15px;
+  }
+
+    ul.userdropdown > li > a{
+      padding-bottom: 0px;
+    }
+
+    .menuposition{
+      margin-top: 35px;
+    }
+
+    .navbar-collapse{
+      font-size:18px;
+    }
+
+    .img-link{
+      margin-right:30px;
+    }
+</style>

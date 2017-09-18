@@ -2,15 +2,17 @@ describe Assignment do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
-  let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team))}
+  let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
   let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
   let(:participant) { build(:participant, id: 1) }
   let(:question) { double('Question') }
   let(:team) { build(:assignment_team, id: 1, name: 'no team') }
   let(:response) { build(:response) }
   let(:course) { build(:course) }
-  let(:assignment_due_date) { build(:assignment_due_date, due_at: '2011-11-11 11:11:11 UTC', deadline_name: 'Review',
-    description_url: 'https://expertiza.ncsu.edu/', round: 1) }
+  let(:assignment_due_date) do
+    build(:assignment_due_date, due_at: '2011-11-11 11:11:11 UTC', deadline_name: 'Review',
+                                description_url: 'https://expertiza.ncsu.edu/', round: 1)
+  end
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
 
   describe '.max_outstanding_reviews' do
@@ -257,7 +259,7 @@ describe Assignment do
 
   describe 'has correct csv values?' do
     before(:each) do
-      assignment = create(:assignment)
+      create(:assignment)
       create(:assignment_team, name: 'team1')
       @student = create(:student, name: 'student1')
       create(:participant, user: @student)
@@ -313,5 +315,5 @@ describe Assignment do
       expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_options_csv.txt')
       expect(generated_csv(assignment, @options)).to eq(expected_csv)
     end
-  end  
+  end
 end

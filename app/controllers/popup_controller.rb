@@ -1,7 +1,5 @@
-require 'httparty'
 require 'json'
 class PopupController < ApplicationController
-  include HTTParty
 
   @sentiment_analysis={}
   @data_to_analyze = {}

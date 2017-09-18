@@ -1,4 +1,4 @@
-<%= form_for(@notification) do |f| %>
+<%= form_for @notification, :html => {:class => "form-horizontal"} do |f| %>
   <% if @notification.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@notification.errors.count, "error") %> prohibited this notification from being saved:</h2>
@@ -11,23 +11,23 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :subject %><br>
+  <div class="form-group">
+    <%= f.label :subject, class: "col-md-2 control-label" %><br>
     <%= f.text_field :subject %>
   </div>
-  <div class="field">
-    <%= f.label :description %><br>
+  <div class="form-group">
+    <%= f.label :description, class: "col-md-2 control-label" %><br>
     <%= f.text_area :description %>
   </div>
-  <div class="field">
-    <%= f.label :expiration_date %><br>
+  <div class="form-group">
+    <%= f.label :expiration_date, class: "col-md-2 control-label" %><br>
     <%= f.date_select :expiration_date %>
   </div>
-  <div class="field">
-    <%= f.label :active_flag %><br>
+  <div class="form-group">
+    <%= f.label :active_flag, class: "col-md-2 control-label" %><br>
     <%= f.check_box :active_flag %>
   </div>
-  <div class="actions">
-    <%= f.submit %>
+  <div class="form-group">
+    <%= f.submit "Creat Notification", class: "col-md-2 btn btn-default btn-primary" %>
   </div>
 <% end %>

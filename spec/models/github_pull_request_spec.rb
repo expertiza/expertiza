@@ -1,8 +1,9 @@
 describe "GithubPullRequest" do
   it "fetches a pull request from github" do
     params = {"url" => "https://github.com/totallybradical/simicheck-expertiza-sandbox/pull/3"}
-    pr = GithubPullRequest.new(params)
+    pr = GithubPullRequestFetcher.new(params)
     pr.fetch_content
-    expect(! pr.data.empty?)
+    expect( pr.is_loaded? == true )
+    expect( pr.repo == "simicheck-expertiza-sandbox")
   end
 end

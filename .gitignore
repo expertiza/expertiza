@@ -205,3 +205,4 @@ pg_data
 .ruby-version
 mysql2psql.yml
 *.pem
+mariadb

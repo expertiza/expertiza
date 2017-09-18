@@ -1,15 +1,14 @@
 describe AssignmentParticipant do
-  let(:response) { build(:response)}
+  let(:response) { build(:response) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:team2) { build(:assignment_team, id: 2) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response]) }
-  let(:participant) { build(:participant, id: 1) }
+  let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
-  let(:question) {double('Question')}
+  let(:question) { double('Question') }
   before(:each) do
-    allow(participant).to receive(:assignment).and_return(assignment)
     allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
     allow(participant).to receive(:team).and_return(team)
   end
@@ -28,7 +27,7 @@ describe AssignmentParticipant do
   describe '#review_score' do
     it 'returns the review score'
   end
-  
+
   describe '#scores' do
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given'

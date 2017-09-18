@@ -73,8 +73,10 @@ class Response < ActiveRecord::Base
 
         code += '<tr class="' + row_class + '"><td>'
         if !answer.nil? or question.is_a? QuestionnaireHeader
-          code += if question.instance_of? Criterion or question.instance_of? Scale
+          code += if question.instance_of? Criterion
                     question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
+                  elsif question.instance_of? Scale
+                    question.view_completed_question(count, answer, questionnaire_max)
                   else
                     question.view_completed_question(count, answer)
                   end

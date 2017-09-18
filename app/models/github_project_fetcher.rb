@@ -1,4 +1,4 @@
-class GithubPullRequestFetcher
+class GithubProjectFetcher
   require 'rest-client'
   require 'json'
 
@@ -14,9 +14,9 @@ class GithubPullRequestFetcher
 
   class << self
     def supports_url?(url)
-      if ! url.nil?
+      if not url.nil?
         lower_case_url = url.downcase
-        !PR_REGEX.match(lower_case_url).nil?
+        PR_REGEX.match(lower_case_url).nil?
       else 
         false
       end
@@ -25,7 +25,7 @@ class GithubPullRequestFetcher
 
   def initialize(params)
     @url = params["url"]
-    @token = ""
+    @token = "160f081f56892c7950299bdb0223af83a20c132d"
     @loaded = false
   end
 
@@ -39,31 +39,8 @@ class GithubPullRequestFetcher
     @user = url_parsed['username']
     @repo = url_parsed['reponame']
     @number = url_parsed['prnum']
-    @commits = fetch_pr_commits_data
+    @commits = fetch_pr_commits_data()
     @loaded = true
-  end
-
-  def reduce_commits_to_user_stats 
-    if ! @commits.empty? 
-      default = {:count => 0, :total => 0}
-      @commits.reduce(Hash.new(default)) { | total, commit |
-        oldrow = total[commit[:username]]
-        newrow = { 
-          :count => oldrow[:count] + 1, 
-          :total => oldrow[:total] + commit[:stats][:total] }
-        total.update(commit[:username] => newrow)
-    }
-    end
-  end
-
-  def to_bar_graph 
-    data = reduce_commits_to_user_stats
-    if ! data.nil? && ! data.empty?
-      result = data.map { | k, v | [k, v[:total]]}
-      result.unshift(["Name", "Total Changes"])
-    else 
-      ["Name", "Total Changes"]
-    end
   end
 
   private
@@ -71,6 +48,7 @@ class GithubPullRequestFetcher
   def fetch_pr_commits_data(page_info = {}, commits_list = Array.new)
     after_query = build_after_query(page_info) 
     query = build_github_pr_query(@user, @repo, @number, after_query)
+
     RestClient.post(GRAPHQL_URL, query, :authorization => "Bearer #{@token}") { |response, request, result|
       case response.code
       when 200
@@ -81,32 +59,27 @@ class GithubPullRequestFetcher
           commits = get_data(pull_request, ["commits", "nodes"])
 
           for commit in commits
-            user = get_data(commit, ["commit", "committer", "user"])
+            oid = get_data(commit, ["commit", "oid"])
+            name = get_data(commit, ["commit", "committer", "name"])
+            email = get_data(commit, ["commit", "committer", "email"])
+            date = get_data(commit, ["commit", "committedDate"])
+            stats = fetch_commit_stats_data(@user, @repo, oid, @token)
 
-            if ! user.nil?
-              oid = get_data(commit, ["commit", "oid"])
-              name = get_data(commit, ["commit", "committer", "name"])
-              email = get_data(commit, ["commit", "committer", "email"])
-              username = get_data(commit, ["commit", "committer", "user", "login"])
-              date = get_data(commit, ["commit", "committedDate"])
-              stats = fetch_commit_stats_data(@user, @repo, oid, @token)
-
-              commits_list.push({ 
-                :date => date, 
-                :username => username,
-                :name => name, 
-                :email => email, 
-                :stats => stats })
-            end
+            commits_list.push({ 
+              :date => date, 
+              :name => name, 
+              :email => email, 
+              :stats => stats })
           end
+          puts commits_list
           if page_info["hasNextPage"] == "true"
             fetch_pr_data(page_info, commits_list) 
           else
-            commits_list
+            { :data => commits_list }
           end
         end
       else
-        commits_list
+        { :error => "Error loading commits list", :data => commits_list }
       end
     }
   end
@@ -118,12 +91,9 @@ class GithubPullRequestFetcher
       case response.code
       when 200
         json = JSON.parse(response.body)
-        stats = get_data(json, ["stats"])
-        {:total => stats["total"], 
-         :additions => stats["additions"], 
-         :deletions => stats["deletions"]}
+        get_data(json, ["stats"])
       else
-        {}
+        { :error => "Error loading commit stats" }
       end
     }
   end
@@ -143,12 +113,9 @@ class GithubPullRequestFetcher
                 nodes 
                 { 
                   commit { 
-                    oid commitUrl committedDate 
-                    committer { 
+                    oid commitUrl committedDate committer 
+                    { 
                       avatarUrl date email name 
-                      user {
-                        login
-                      }
                     } 
                 } 
               }
@@ -175,13 +142,8 @@ class GithubPullRequestFetcher
     pointer = tree
 
     for a in array
-      if !a.nil? && !pointer.nil?
-        if pointer.has_key?(a)
-          pointer = pointer.fetch(a)
-        else
-          pointer = nil
-          break
-        end
+      if pointer.has_key?(a)
+        pointer = pointer.fetch(a)
       else
         pointer = nil
         break

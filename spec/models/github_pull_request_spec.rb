@@ -5,5 +5,6 @@ describe "GithubPullRequest" do
     pr.fetch_content
     expect( pr.is_loaded? == true )
     expect( pr.repo == "simicheck-expertiza-sandbox")
+    print pr.to_bar_graph
   end
 end

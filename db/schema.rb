@@ -287,6 +287,31 @@ ActiveRecord::Schema.define(version: 20170925225438) do
   add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
 
+  create_table "metric_data_point_types", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.string   "value_type",  limit: 255
+    t.string   "description", limit: 255
+    t.string   "dimension",   limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "metric_data_points", force: :cascade do |t|
+    t.integer  "metric_id",           limit: 4
+    t.integer  "metric_data_type_id", limit: 4
+    t.string   "value",               limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  create_table "metrics", force: :cascade do |t|
+    t.integer  "team_id",     limit: 4
+    t.string   "name",        limit: 255
+    t.string   "description", limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
   create_table "nodes", force: :cascade do |t|
     t.integer "parent_id",      limit: 4
     t.integer "node_object_id", limit: 4

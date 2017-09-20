@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+
+<head>
+  <style>
+      rect.bordered {
+          stroke: #E6E6E6;
+          stroke-width: 2px;
+      }
+
+      text.mono {
+          font-size: 11pt;
+          font-family: Consolas, courier;
+          fill: #000;
+      }
+
+      text.monoInside {
+          font-size: 12pt;
+          font-family: Consolas, courier;
+          fill: #000;
+      }
+
+      text.axis-workweek {
+          fill: #000;
+      }
+
+      text.axis-worktime {
+          fill: #000;
+      }
+
+
+
+      div.tooltip {
+          position: absolute;
+          text-align: center;
+          width: 100px;
+          height: 56px;
+          padding: 10px 2px 2px 2px;
+          font: 16px sans-serif;
+          background: black;
+          border: 0px;
+          border-radius: 8px;
+          pointer-events: none;
+          color: #fff;
+          font-weight: bold;
+      }
+
+      .title {
+          font: 22px sans-serif;
+          font-weight: bold;
+      }
+
+      .transparent {
+          fill: transparent;
+      }
+
+      .class_h_labels {
+          font-size: 11pt;
+          font-family: Consolas, courier;
+          fill: #000;
+      }
+
+      .clipped {
+          overflow: hidden;
+      }
+
+      .protip-skin-default {
+          background-color: #000000;
+          color: #ffffff;
+      }
+      /*
+      .clipped {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+      }
+
+      .tooltip {
+          font-size: 20px;
+          color: black;
+      }
+*/
+  </style>
+  <link rel="stylesheet" href="/assets/protip.css">
+
+</head>
+
+<body>
+<div id="rdetails">heatmapDataForRound
+
+  <h3> Reviewer details</h3>
+
+  <table width="100%">
+    <tr>
+      <th align = "right" width="15%"> Full name:</th>
+      <td width="35%"> <%= @user.fullname %></td>
+      <td rowspan=4 width="50%" align="center"><%= image_tag "blank_profile_pic.jpg", :width=>"100px", :height=>"100px", :border=>1%></td>
+    </tr>
+    <tr>
+      <th align = "right"> User id:</th>
+      <td> <%= @user.name %></td>
+    </tr>
+    <tr>
+      <th align = "right"> email:</th>
+      <td> <%= @user.email %></td>
+    </tr>
+    <tr>
+      <th align = "right"> Handle:</th>
+      <td> <%= @user.handle %></td>
+    </tr>
+
+  </table>
+
+</div>
+<br>
+<div>
+  <span id="title"><h4>Visualization of Sentiment analysis of all reviews for reviewer <%= @user.fullname%>  </h4></span>
+
+  <% if @assignment.varying_rubrics_by_round? %>
+      <div style="display: inline-flex">
+        <span style="margin-right: 10px">Select the round : </span>
+        <select id="round"> </select>
+      </div>
+  <% else %>
+      <!--nothing-->
+  <% end%>
+</div>
+<% if @assignment.varying_rubrics_by_round? %>
+    <div id="parent" style="height:<%= @h[1] %>px; width:<%= @w[1] %>px;">
+      <div id="chart"></div>
+    </div>
+<% else %>
+    <div id="parent" style="height:<%= @h %>px; width:<%= @w %>px;">
+      <div id="chart"></div>
+    </div>
+<% end%>
+
+<script src="/assets/protip.js"></script>
+<script type=text/javascript src="/assets/bundle.js"></script>
+<script type="text/javascript">
+
+    <% if @assignment.varying_rubrics_by_round? %>
+    var varying_rubric = true;
+    function drawChart(round) {
+      var heatmapDataForRound = <%= @heatmapData.to_json.html_safe%>;
+      $("#parent")[0].height  = "<%= @h[0] %>px";
+      $("#parent")[0].width  = "<%= @w[0] %>px";
+      //<![CDATA[
+      var jsonData = heatmapDataForRound[round];
+      // ]]>
+      console.log(jsonData);
+      visualizeJsonData (jsonData);
+      $.protip();
+    }
+    <% else %>
+    var varying_rubric = false;
+    //just one last response to be displayed
+    function drawChart(round) {
+      var heatmapData = <%= @heatmapData.to_json.html_safe%>;
+      $("#parent")[0].height  = "<%= @h %>px";
+      $("#parent")[0].width  = "<%= @w %>px";
+      //<![CDATA[
+      var jsonData = heatmapData;
+      // ]]>
+      console.log(jsonData);
+      visualizeJsonData (jsonData);
+      $.protip();
+    }
+    <% end%>
+    if(varying_rubric){
+        //multilple rounds _ Varying rubric
+        var totalRounds = <%= @rounds.to_i %>
+        for(i=0;i<totalRounds;i++){
+            var select = document.getElementById("round");
+            select.options[select.options.length] = new Option('Round'+(i+1),(i+1) );
+        }
+
+        $("#round").change(function(){
+            var current_round =  parseInt($("#round").val());
+            drawChart(current_round);
+        });
+    }
+    $(document).ready(drawChart(1)); //change  the round here
+</script>
+</body>
+
+</html>
+

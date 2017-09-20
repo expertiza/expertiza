@@ -93,7 +93,7 @@ class GradesController < ApplicationController
   end
 
   def view_team
-    # get participant, team, questionnaires for assignment.
+    # get participant, team, questionnaires, tag prompts for assignment.
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
@@ -109,16 +109,18 @@ class GradesController < ApplicationController
                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
                end
 
-      vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
+      vm = VmQuestionResponse.new(questionnaire, @assignment)
       questions = questionnaire.questions
       vm.add_questions(questions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words
 
+
       @vmlist << vm
     end
     @current_role_name = current_role_name
+
   end
 
   def edit
@@ -364,4 +366,5 @@ class GradesController < ApplicationController
     variance = array.inject(0) {|variance, x| variance += (x - m)**2 }
     [m, Math.sqrt(variance / (array.size - 1))]
   end
+
 end

@@ -7,7 +7,7 @@ class ReviewMappingController < ApplicationController
   helper :submitted_content
 
   @@time_create_last_review_mapping_record = nil
-
+  @@review_comments={}
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
@@ -394,6 +394,8 @@ class ReviewMappingController < ApplicationController
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
+      logger.info @review_scores
+
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if @assignment.varying_rubrics_by_round?
@@ -418,9 +420,17 @@ class ReviewMappingController < ApplicationController
       @responses = Response.where(map_id: @review_response_map_ids)
 
     when "PlagiarismCheckerReport"
-      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
-                                                                              PlagiarismCheckerAssignmentSubmission.where(assignment_id:
-                                                                                                                              params[:id]).pluck(:id))
+      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.
+          where(plagiarism_checker_assignment_submission_id: PlagiarismCheckerAssignmentSubmission.where(assignment_id: params[:id]).pluck(:id))
+
+    when "AnswerTaggingReport"
+      tag_prompt_deployments = TagPromptsDeployment.where(assignment_id: params[:id])
+
+      @questionnaire_tagging_report = {}
+
+      tag_prompt_deployments.each do |tag_dep|
+        @questionnaire_tagging_report[tag_dep] = tag_dep.get_assignment_tagging_progress()
+      end
     end
 
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user

@@ -54,10 +54,13 @@ class Response < ActiveRecord::Base
 
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
     count = 0
-    answers = Answer.where(response_id: self.response_id)
+    answers = Answer.where(response_id: self.id)
 
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
+
+      # get the tag settings this questionnaire
+      tag_prompt_deployments = TagPromptsDeployment.where({ questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id })
 
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
@@ -70,7 +73,9 @@ class Response < ActiveRecord::Base
 
         code += '<tr class="' + row_class + '"><td>'
         if !answer.nil? or question.is_a? QuestionnaireHeader
-          code += if question.instance_of? Criterion or question.instance_of? Scale
+          code += if question.instance_of? Criterion
+                    question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
+                  elsif question.instance_of? Scale
                     question.view_completed_question(count, answer, questionnaire_max)
                   else
                     question.view_completed_question(count, answer)

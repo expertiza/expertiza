@@ -7,6 +7,48 @@ module OnTheFlyCalc
     total
   end
 
+  # @author - Rushi.Bhatt
+  # Returns hash of @review_comments[reviewer_id][reviewee_id] = comments
+  def compute_reviews_comments
+    rounds = self.rounds_of_reviews
+    review_comments={}
+    response_type = 'ReviewResponseMap'
+    # @myreviewers = ResponseMap.select('DISTINCT reviewer_id').where(['reviewed_object_id = ? && type = ? ', self.id, @response_type])
+
+    response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, response_type ])
+
+    # if this assignment uses vary rubric by rounds feature, load @questions for each round
+    if self.varying_rubrics_by_round? # [reviewer_id][round][reviewee_id] = comments
+      rounds = self.rounds_of_reviews
+      for round in 1..rounds
+        review_questionnaire_id = review_questionnaire_id(round)
+
+        questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+        response_maps.each do |response_map|
+          # Check if response is there
+          response_of_this_round = Response.where(['map_id = ?', response_map.id])
+          unless response_of_this_round.empty?
+            response_of_this_round = response_of_this_round.reject {|response| response.round != round }
+          end
+          respective_comments = {}
+          respective_comments[response_map.reviewee_id] = Answer.get_all_comments_by_response_and_questions(response_of_this_round.last, questions)
+          review_comments[response_map.reviewer_id] = {} if review_comments[response_map.reviewer_id].nil?
+          review_comments[response_map.reviewer_id][round] = respective_comments
+        end
+      end
+    else # [reviewer_id][reviewee_id] = comments
+      review_questionnaire_id = review_questionnaire_id()
+      questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+      response_maps.each do |response_map|
+        # Check if response is there
+        response_of_this_round = Response.where(['map_id = ?', response_map.id])
+        review_comments[response_map.reviewer_id] = {} if review_comments[response_map.reviewer_id].nil?
+        review_comments[response_map.reviewer_id][response_map.reviewee_id] = Answer.get_all_comments_by_response_and_questions(response_of_this_round.last, questions)
+      end
+    end
+    return review_comments
+  end
+
   def compute_reviews_hash
     @review_scores = {}
     @response_type = 'ReviewResponseMap'

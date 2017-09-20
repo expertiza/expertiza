@@ -91,7 +91,72 @@ class Answer < ActiveRecord::Base
     end
   end
 
-  # start added by ferry, required for the summarization (refactored by Yang on June 22, 2016)
+    #added by Rushi:
+    # Find all the comments of the review
+    # params
+    #  response - specifies the response for which the comments are fetched
+    #  questions  - specifies the list of questions being evaluated in the assessment
+    #returns object with keys: question texts, and values: Comments
+  def self.get_all_comments_by_response_and_questions(response, questions)
+    if response
+      questionnaire = Questionnaire.find(questions[0].questionnaire_id)
+      questionsAndComments={}
+      questionsAndCommentsArray=[]
+      all_answers_for_curr_response = Answer.where(response_id: response.id)
+      questions.each do |question|
+        foundResponse = false
+        eachTouple={}
+        eachTouple["id"] = question.txt
+        all_answers_for_curr_response.each do |answer|
+          if question.id == answer.question_id
+            #answer is present for that question
+            foundResponse = true
+            if answer.comments.blank? or answer.comments.nil? #To avoid error of sentiment analysis of blank space or nil
+              eachTouple["text"]= "N/A"
+            else
+              eachTouple["text"]= answer.comments.gsub("\"", "\\\"").gsub("\'", "\\\'")
+            end
+            questionsAndCommentsArray.push(eachTouple)
+            break
+          end
+        end
+        if foundResponse==false
+          eachTouple["text"]= "N/A"
+          questionsAndCommentsArray.push(eachTouple)
+        end
+      end
+
+      #added to get the additional comments for each review
+      eachTouple={}
+      eachTouple["id"] = "AdditionalComments"
+      if response.additional_comment.blank? or response.additional_comment.nil?   #To avoid error of sentiment analysis of blank space
+        eachTouple["text"]= "N/A"
+      else
+        eachTouple["text"]= response.additional_comment.gsub("\"", "&#34;")
+      end
+      questionsAndCommentsArray.push(eachTouple)
+      #Store array in hash with key as "reviews"
+      questionsAndComments["reviews"]=questionsAndCommentsArray
+      return questionsAndComments
+    else #if no response is available for these questions, fill the answers with dashes
+      questionsAndComments={}
+      questionsAndCommentsArray=[]
+      questions.each do |question|
+        eachTouple={}
+        eachTouple["id"] = question.txt
+        eachTouple["text"]= "N/A"
+        questionsAndCommentsArray.push(eachTouple)
+      end
+      eachTouple={}
+      eachTouple["id"] = "AdditionalComments"
+      eachTouple["text"]= "N/A"
+      questionsAndCommentsArray.push(eachTouple)
+      questionsAndComments["reviews"]=questionsAndCommentsArray
+      return questionsAndComments
+    end
+  end
+
+  #start added by ferry, required for the summarization (refactored by Yang on June 22, 2016)
   def self.answers_by_question_for_reviewee_in_round(assignment_id, reviewee_id, q_id, round)
     #  get all answers to this question
     question_answer = Answer.select(:answer, :comments)
@@ -125,4 +190,13 @@ class Answer < ActiveRecord::Base
     question_answers
   end
   # end added by ferry, required for the summarization
+
+  # start added by ferry for answer tagging
+  def get_reviewee_from_answer(answer)
+    resp = Response.find(answer.response_id)
+    map = ResponseMap find(resp.map_id)
+    return map.reviewee_id
+  end
+  # end added by ferry for answer tagging
+
 end

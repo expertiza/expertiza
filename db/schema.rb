@@ -13,6 +13,19 @@
 
 ActiveRecord::Schema.define(version: 20170710031449) do
 
+  create_table "answer_tags", force: :cascade do |t|
+    t.integer  "answer_id",                limit: 4
+    t.integer  "tag_prompt_deployment_id", limit: 4
+    t.string   "value",                    limit: 255
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+    t.integer  "user_id",                  limit: 4
+  end
+
+  add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
+  add_index "answer_tags", ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id", using: :btree
+  add_index "answer_tags", ["user_id"], name: "index_answer_tags_on_user_id", using: :btree
+
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
     t.integer "answer",      limit: 4
@@ -85,6 +98,7 @@ ActiveRecord::Schema.define(version: 20170710031449) do
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
+    t.boolean  "is_answer_tagging_allowed",                default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -270,6 +284,12 @@ ActiveRecord::Schema.define(version: 20170710031449) do
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
+  create_table "leaderboards", force: :cascade do |t|
+    t.integer "questionnaire_type_id", limit: 4
+    t.string  "name",                  limit: 255
+    t.string  "qtype",                 limit: 255
+  end
+
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -341,7 +361,7 @@ ActiveRecord::Schema.define(version: 20170710031449) do
     t.integer  "assignment_id", limit: 4
   end
 
-  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assgt_subm_on_assignment_id", using: :btree
+  add_index "plagiarism_checker_assignment_submissions", ["assignment_id"], name: "index_plagiarism_checker_assignment_submissions_on_assignment_id", using: :btree
 
   create_table "plagiarism_checker_comparisons", force: :cascade do |t|
     t.integer  "plagiarism_checker_assignment_submission_id", limit: 4
@@ -623,6 +643,28 @@ ActiveRecord::Schema.define(version: 20170710031449) do
   add_index "ta_mappings", ["course_id"], name: "fk_ta_mappings_course_id", using: :btree
   add_index "ta_mappings", ["ta_id"], name: "fk_ta_mappings_ta_id", using: :btree
 
+  create_table "tag_prompts", force: :cascade do |t|
+    t.string   "prompt",       limit: 255
+    t.string   "desc",         limit: 255
+    t.string   "control_type", limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  create_table "tag_prompts_deployments", force: :cascade do |t|
+    t.integer  "tag_prompt_id",           limit: 4
+    t.integer  "assignment_id",           limit: 4
+    t.integer  "questionnaire_id",        limit: 4
+    t.string   "question_type",           limit: 255
+    t.integer  "answer_length_threshold", limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "tag_prompts_deployments", ["assignment_id"], name: "index_tag_prompts_deployments_on_assignment_id", using: :btree
+  add_index "tag_prompts_deployments", ["questionnaire_id"], name: "index_tag_prompts_deployments_on_questionnaire_id", using: :btree
+  add_index "tag_prompts_deployments", ["tag_prompt_id"], name: "index_tag_prompts_deployments_on_tag_prompt_id", using: :btree
+
   create_table "teams", force: :cascade do |t|
     t.string  "name",                       limit: 255
     t.integer "parent_id",                  limit: 4
@@ -642,6 +684,29 @@ ActiveRecord::Schema.define(version: 20170710031449) do
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
+
+  create_table "topic_deadlines", force: :cascade do |t|
+    t.datetime "due_at"
+    t.integer  "deadline_type_id",            limit: 4
+    t.integer  "topic_id",                    limit: 4
+    t.integer  "late_policy_id",              limit: 4
+    t.integer  "submission_allowed_id",       limit: 4
+    t.integer  "review_allowed_id",           limit: 4
+    t.integer  "review_of_review_allowed_id", limit: 4
+    t.integer  "round",                       limit: 4
+  end
+
+  add_index "topic_deadlines", ["deadline_type_id"], name: "fk_deadline_type_topic_deadlines", using: :btree
+  add_index "topic_deadlines", ["late_policy_id"], name: "fk_topic_deadlines_late_policies", using: :btree
+  add_index "topic_deadlines", ["review_allowed_id"], name: "idx_review_allowed", using: :btree
+  add_index "topic_deadlines", ["review_of_review_allowed_id"], name: "idx_review_of_review_allowed", using: :btree
+  add_index "topic_deadlines", ["submission_allowed_id"], name: "idx_submission_allowed", using: :btree
+  add_index "topic_deadlines", ["topic_id"], name: "fk_topic_deadlines_topics", using: :btree
+
+  create_table "topic_dependencies", force: :cascade do |t|
+    t.integer "topic_id",     limit: 4,   default: 0,  null: false
+    t.string  "dependent_on", limit: 255, default: "", null: false
+  end
 
   create_table "track_notifications", force: :cascade do |t|
     t.integer  "notification", limit: 4
@@ -701,6 +766,9 @@ ActiveRecord::Schema.define(version: 20170710031449) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
+  add_foreign_key "answer_tags", "answers"
+  add_foreign_key "answer_tags", "tag_prompts_deployments", column: "tag_prompt_deployment_id"
+  add_foreign_key "answer_tags", "users"
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
@@ -730,6 +798,9 @@ ActiveRecord::Schema.define(version: 20170710031449) do
   add_foreign_key "survey_deployments", "questionnaires"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
+  add_foreign_key "tag_prompts_deployments", "assignments"
+  add_foreign_key "tag_prompts_deployments", "questionnaires"
+  add_foreign_key "tag_prompts_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
 end

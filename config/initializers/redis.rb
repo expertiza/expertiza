@@ -1,1 +1,1 @@
-$redis = Redis::Namespace.new("expertiza", :redis => Redis.new)
+$redis = Redis::Namespace.new("expertiza", :redis => Redis.new(host: ENV.fetch('REDIS_HOST', 'localhost')))

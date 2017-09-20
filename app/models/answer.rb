@@ -3,6 +3,7 @@ require 'analytic/score_analytic'
 class Answer < ActiveRecord::Base
   include ScoreAnalytic
   belongs_to :question
+  belongs_to :response
 
   # Computes the total score for a *list of assessments*
   # parameters

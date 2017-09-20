@@ -34,7 +34,6 @@ class ReviewMappingController < ApplicationController
   end
 
   def select_reviewer
-    assignment = Assignment.find(params[:id])
     @contributor = AssignmentTeam.find(params[:contributor_id])
     session[:contributor] = @contributor
   end
@@ -81,7 +80,8 @@ class ReviewMappingController < ApplicationController
 
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.
-  # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller' and is used for instructor assigning reviewers in instructor-selected assignment.
+  # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller'
+  # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
@@ -93,7 +93,7 @@ class ReviewMappingController < ApplicationController
       # begin
       if assignment.has_topics? # assignment with topics
         topic = if params[:topic_id]
-                  params[:topic_id].nil? ? nil : SignUpTopic.find(params[:topic_id])
+                  SignUpTopic.find(params[:topic_id])
                 else
                   assignment.candidate_topics_to_review(reviewer).to_a.sample rescue nil
                 end
@@ -251,7 +251,7 @@ class ReviewMappingController < ApplicationController
     begin
       mapping.delete
     rescue
-      flash[:error] = "A delete action failed:<br/>" + $ERROR_INFO + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
+      flash[:error] = "A delete action failed:<br/>" + $ERROR_INFO.to_s + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
     end
 
     redirect_to action: 'list_mappings', id: assignment_id
@@ -264,27 +264,6 @@ class ReviewMappingController < ApplicationController
     # metareview.delete
     mapping.delete
     redirect_to action: 'list_mappings', id: assignment_id
-  end
-
-  # I suspect this methos is not used anywhere --Yang
-  def list
-    all_assignments = Assignment.order('name').where(["instructor_id = ?", session[:user].id])
-
-    letter = params[:letter]
-    letter = all_assignments.first.name[0, 1].downcase if letter.nil?
-
-    @letters = []
-    @assignments = Assignment
-                   .where(instructor_id: session[:user].id)
-                   .where("substring(name,1,1) = :letter", letter: letter)
-                   .order('name')
-                   .page(params[:page])
-                   .per_page(10)
-
-    all_assignments.each do |assignObj|
-      first = assignObj.name[0, 1].downcase
-      @letters << first unless @letters.include?(first)
-    end
   end
 
   def list_mappings

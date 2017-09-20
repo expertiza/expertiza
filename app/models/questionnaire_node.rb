@@ -6,7 +6,7 @@ class QuestionnaireNode < Node
     "questionnaires"
   end
 
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
     if show
       conditions = if User.find(user_id).role.name != "Teaching Assistant"
                      'questionnaires.instructor_id = ?'
@@ -32,34 +32,9 @@ class QuestionnaireNode < Node
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
-
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
-
-    if search
-      splitsearch = search.split("+")
-      if splitsearch[0] == "filter" && splitsearch.length > 1
-        splitsearch.delete_at(0)
-        conditions += " and questionnaires.id in "
-        if splitsearch.length == 1
-          conditions += splitsearch[0]
-        else
-          conditions += "(" + splitsearch[0]
-          i = 1
-          while i < splitsearch.length
-            conditions += ',' + splitsearch[i]
-            i += 1
-          end
-          conditions += ')'
-        end
-        all.includes(:questionnaire).conditions([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}")
-      else
-        conditions += " and questionnaires.name LIKE ?"
-        search = "%" + search + "%"
-        self.includes(:questionnaire).where([conditions, values, search]).order("questionnaires.#{sortvar} #{sortorder}")
-        end
-
-    else
+    if Questionnaire.column_names.include? sortvar and %w(ASC DESC asc desc).include? sortorder
       self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}")
     end
   end

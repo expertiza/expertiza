@@ -29,7 +29,7 @@ module Expertiza
     config.autoload_paths += Dir[Rails.root.join('lib', '{**}')]
     config.react.addons = true
     config.assets.paths << Rails.root.join('vendor', 'assets', 'components')
-    config.cache_store = :redis_store, 'redis://localhost:6379/0/cache', { raise_errors: false }
+    config.cache_store = :redis_store, "redis://#{ENV.fetch('REDIS_HOST', 'localhost')}:6379/0/cache", { raise_errors: false }
     # Bower asset paths
     root.join('vendor', 'assets', 'components').to_s.tap do |bower_path|
       config.sass.load_paths << bower_path

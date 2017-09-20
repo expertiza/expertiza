@@ -398,7 +398,9 @@ class SignUpSheetController < ApplicationController
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
     SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
-    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+    if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+      SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
+    end
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
     waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
     unless waitlisted_teams.blank?

@@ -1,6 +1,7 @@
 describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
+  let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
   before(:each) do
     instructor = build(:instructor)
@@ -30,8 +31,14 @@ describe QuestionnairesController do
   end
 
   describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
-    context 'when quiz is valid and questionnaire type is QuizQuestionnaire' do
-      it 'redirects to submitted_content#edit page'
+    context 'when quiz is valid' do
+      context 'when questionnaire type is QuizQuestionnaire' do
+        it 'redirects to submitted_content#edit page'
+      end
+
+      context 'when questionnaire type is not QuizQuestionnaire' do
+        it 'redirects to submitted_content#edit page'
+      end
     end
 
     context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
@@ -50,7 +57,6 @@ describe QuestionnairesController do
   end
 
   describe '#update' do
-    
     context 'successfully updates the attributes of questionnaire' do
       it 'redirects to questionnaires#edit page after updating'
     end
@@ -90,7 +96,7 @@ describe QuestionnairesController do
 
   describe '#save_all_questions' do
     context 'when params[:save] is not nil, params[:view_advice] is nil' do
-      it 'redirects to questionnaires#edit page after saving all questions' do
+      it 'redirects to questionnaires#edit page after saving all questions'
         # params = {
         #   id: 1,
         #   save: true,
@@ -105,7 +111,6 @@ describe QuestionnairesController do
         #     }
         #   }
         # }
-      end
     end
 
     context 'when params[:save] is nil, params[:view_advice] is not nil' do
@@ -119,7 +124,6 @@ describe QuestionnairesController do
 
   describe '#new_quiz' do
     context 'when an assignment requires quiz' do
-
       it 'renders questionnaires#new_quiz if current participant has a team'
 
       it 'shows error message and redirects to submitted_content#view if current participant does not have a team'
@@ -133,7 +137,6 @@ describe QuestionnairesController do
   end
 
   describe '#edit_quiz' do
-
     context 'when current questionnaire is not taken by anyone' do
       it 'renders questionnaires#edit page'
     end
@@ -149,7 +152,7 @@ describe QuestionnairesController do
     end
 
     context 'when @questionnaire is not nil' do
-      it 'updates all quiz questions and redirects to submitted_content#view page' do
+      it 'updates all quiz questions and redirects to submitted_content#view page'
         # params = {
         #   id: 1,
         #   pid: 1,
@@ -178,13 +181,10 @@ describe QuestionnairesController do
         #              '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
         #   }
         # }
-        
-      end
     end
   end
 
   describe '#valid_quiz' do
-
     context 'when user does not specify quiz name' do
       it 'returns message (Please specify quiz name (please do not use your name or id).)'
     end
@@ -198,7 +198,7 @@ describe QuestionnairesController do
     end
 
     context 'when user specifies all necessary information' do
-      it 'returns mesage (valid)' do
+      it 'returns mesage (valid)'
         # controller.params = {
         #   aid: 1,
         #   questionnaire: {name: 'test questionnaire'},
@@ -206,13 +206,11 @@ describe QuestionnairesController do
         #   new_question: {'1' => {iscorrect: 'True'}},
         #   new_choices: {'1' => {'TrueFalse' => 'sth'}}
         # }
-        
-      end
     end
   end
 
   describe '#save_choices' do
-    it 'is able to save different kinds of quiz questions' do
+    it 'is able to save different kinds of quiz questions'
       # controller.params = {
       #   new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
       #   new_choices:
@@ -228,7 +226,5 @@ describe QuestionnairesController do
       #        '4' => {iscorrect: '0', txt: 'a34'}}}},
       #   question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
       # }
-      
-    end
   end
 end

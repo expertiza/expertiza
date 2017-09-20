@@ -18,7 +18,7 @@ class AssignmentNode < Node
   #   parent_id: course_id if subset
 
   # returns: list of AssignmentNodes based on query
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
     if show
       conditions = if User.find(user_id).role.name != "Teaching Assistant"
                      'assignments.instructor_id = ?'
@@ -34,18 +34,10 @@ class AssignmentNode < Node
         values = Ta.get_mapped_courses(user_id)
       end
     end
-
     conditions += " and course_id = #{parent_id}" if parent_id
     sortvar ||= 'created_at'
     sortorder ||= 'desc'
-
-    if search
-      conditions += " and assignments.name LIKE ?"
-      search = "%#{search}%"
-      find_conditions = [conditions, values, search]
-    else
-      find_conditions = [conditions, values]
-    end
+    find_conditions = [conditions, values]
     self.includes(:assignment).where(find_conditions).order("assignments.#{sortvar} #{sortorder}")
   end
 
@@ -54,90 +46,56 @@ class AssignmentNode < Node
     true
   end
 
-  # Gets the name from the associated object
-  # Gets the name from the associated object
   def get_name
-    # Assignment.find(self.node_object_id).name
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.name
+    @assign_node ? @assign_node.name : Assignment.find_by(id: self.node_object_id).try(:name)
   end
 
-  # Gets the directory_path from the associated object
   def get_directory
-    # Assignment.find(self.node_object_id).directory_path
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.directory_path
+    @assign_node ? @assign_node.directory_path : Assignment.find_by(id: self.node_object_id).try(:directory_path)
   end
 
-  # Gets the created_at from the associated object
   def get_creation_date
-    # Assignment.find(self.node_object_id).created_at
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.created_at
+    @assign_node ? @assign_node.created_at : Assignment.find_by(id: self.node_object_id).try(:created_at)
   end
 
-  # Gets the updated_at from the associated object
   def get_modified_date
-    # Assignment.find(self.node_object_id).updated_at
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.updated_at
+    @assign_node ? @assign_node.updated_at : Assignment.find_by(id: self.node_object_id).try(:updated_at)
   end
 
-  # Gets the course_id from the associated object
   def get_course_id
-    # Assignment.find(self.node_object_id).course_id
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.course_id
+    @assign_node ? @assign_node.course_id : Assignment.find_by(id: self.node_object_id).try(:course_id)
   end
 
-  # Returns true if the assignment is inside a course
   def belongs_to_course?
     !get_course_id.nil?
   end
 
-  # Gets the instructor_id from the associated object
   def get_instructor_id
-    # Assignment.find(self.node_object_id).course_id
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.instructor_id
+    @assign_node ? @assign_node.instructor_id : Assignment.find_by(id: self.node_object_id).try(:instructor_id)
   end
 
-  # Gets the institution_id from the associated object
   def retrieve_institution_id
-    # Course.find(self.node_object_id).course_id
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.instructor_id # This is just so that assignment_node has a matching def... it's not used
+    Assignment.find_by(id: self.node_object_id).try(:institution_id)
   end
 
-  # Gets the private attribute from the associated object
   def get_private
-    # Assignment.find(self.node_object_id).private
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.private
+    Assignment.find_by(id: self.node_object_id).try(:private)
   end
 
-  # Gets the max_team_size from the associated object
   def get_max_team_size
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.max_team_size
+    Assignment.find_by(id: self.node_object_id).try(:max_team_size)
   end
 
-  # Gets the is_intelligent from the associated object
   def get_is_intelligent
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.is_intelligent
+    Assignment.find_by(id: self.node_object_id).try(:is_intelligent)
   end
 
-  # Gets the require_quiz from the associated object
   def get_require_quiz
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.require_quiz
+    Assignment.find_by(id: self.node_object_id).try(:require_quiz)
   end
 
-  # Gets the require_quiz from the associated object
   def get_allow_suggestions
-    @assign_node = Assignment.find(self.node_object_id) unless @assign_node
-    @assign_node.allow_suggestions
+    Assignment.find_by(id: self.node_object_id).try(:allow_suggestions)
   end
 
   # Gets any TeamNodes associated with this object

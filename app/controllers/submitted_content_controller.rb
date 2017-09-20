@@ -194,12 +194,13 @@ class SubmittedContentController < ApplicationController
   def delete_selected_files
     filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
     FileUtils.rm_r(filename)
-    assignment = Assignment.find(participant.parent_id)
-    team = participant.team
-    @submission_record = SubmissionRecord.new(team_id: team.id,
-                                              content: full_filename,
-                                              user: participant.name,
-                                              assignment_id: assignment.id,
+    participant = Participant.find_by(id: params[:id])
+    assignment = participant.try(:assignment)
+    team = participant.try(:team)
+    @submission_record = SubmissionRecord.new(team_id: team.try(:id),
+                                              content: filename,
+                                              user: participant.try(:name),
+                                              assignment_id: assignment.try(:id),
                                               operation: "Remove File")
     @submission_record.save
   end

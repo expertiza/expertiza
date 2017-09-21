@@ -92,8 +92,8 @@ class GradesController < ApplicationController
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
+  # method for alternative view
   def view_team
-    # get participant, team, questionnaires for assignment.
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
@@ -108,14 +108,12 @@ class GradesController < ApplicationController
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
                end
-
       vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
       questions = questionnaire.questions
       vm.add_questions(questions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words
-
       @vmlist << vm
     end
     @current_role_name = current_role_name
@@ -188,7 +186,7 @@ class GradesController < ApplicationController
   end
 
   def save_grade_and_comment_for_submission
-    participant = AssignmentParticipant.find(params[:participant_id])
+    participant = AssignmentParticipant.find_by(id: params[:participant_id])
     @team = participant.team
     @team.grade_for_submission = params[:grade_for_submission]
     @team.comment_for_submission = params[:comment_for_submission]
@@ -197,7 +195,7 @@ class GradesController < ApplicationController
     rescue
       flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'grades', action: 'view_team', id: params[:participant_id]
+    redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
   end
 
   private
@@ -212,7 +210,8 @@ class GradesController < ApplicationController
       team = @participant.team
       unless team.nil?
         unless team.has_user session[:user]
-          redirect_to '/denied?reason=You are not on the team that wrote this feedback'
+          flash[:error] = 'You are not on the team that wrote this feedback'
+          redirect_to '/'
           return true
         end
       end

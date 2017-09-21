@@ -54,7 +54,7 @@ class AssignmentParticipant < Participant
     scores = {}
     scores[:participant] = self
     self.assignment.questionnaires.each do |questionnaire|
-      round = questionnaire.assignment_questionnaires.used_in_round
+      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
       # create symbol for "varying rubrics" feature -Yang
       questionnaire_symbol = if round.nil?
                                questionnaire.symbol

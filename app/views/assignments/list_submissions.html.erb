@@ -24,7 +24,8 @@
 
         <!--Team name-->
         <% if @assignment.max_team_size > 1 %>
-          <td bgcolor= <%= bgcolor %>><%= team.name %></td>
+          <td bgcolor= <%= bgcolor %>><%= team.name %>
+          <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
         <% end %>
 
         <!--Team member(s) / Participant name-->

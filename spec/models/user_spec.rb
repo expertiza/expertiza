@@ -100,11 +100,11 @@ describe User do
     end
 
     context 'when current user is an instructor' do
-      it 'fetches all users in his course/assignment'
+      it 'fetches all users in his/her course/assignment'
     end
 
     context 'when current user is a TA' do
-      it 'fetches all users in his courses'
+      it 'fetches all users in his/her courses'
     end
   end
 

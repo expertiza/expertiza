@@ -43,8 +43,8 @@
         <td bgcolor= <%= bgcolor%>>
           <% if !team.hyperlinks.empty? %>
             <% team.hyperlinks.each do |link| %>
-              <% if GithubPullRequestFetcher.supports_url?(link) %>
-                <% metrics = GithubPullRequestFetcher.new({"url" => link})%>
+              <% if GithubMetricsFetcher.supports_url?(link) %>
+                <% metrics = GithubMetricsFetcher.new({"url" => link})%>
                 <% metrics.fetch_content %>
                 <% stats = metrics.to_bar_graph %>
                 <% if ! stats.nil? && ! stats.empty? %>

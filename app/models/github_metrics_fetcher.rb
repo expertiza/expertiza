@@ -27,13 +27,13 @@ class GithubMetricsFetcher
       GRAPHQL: "https://api.github.ncsu.edu/graphql",
       API: "https://api.github.ncsu.edu/repos",
       FUNCTION: :fetch_pr_commits_data,
-      TOKEN: "5f8debd4c7199535d2ef2a91cb9b46f41e84c5d0"
+      TOKEN: ""
     },
     { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
       GRAPHQL: "https://api.github.ncsu.edu/graphql",
       API: "https://api.github.ncsu.edu/repos",
       FUNCTION: :fetch_project_data,
-      TOKEN: "5f8debd4c7199535d2ef2a91cb9b46f41e84c5d0"
+      TOKEN: ""
     }
   ]
 
@@ -41,8 +41,8 @@ class GithubMetricsFetcher
     def supports_url?(url)
       if not url.nil?
         lower_case_url = url.downcase
-        params = SOURCES.find { | params | params[:REGEX].match(lower_case_url).nil? }
-        ! params.is_empty?
+        params = SOURCES.find { | params | ! params[:REGEX].match(lower_case_url).nil? }
+        ! params.nil?
       else 
         false
       end
@@ -61,16 +61,44 @@ class GithubMetricsFetcher
   def fetch_content
     lower_case_url = @url.downcase
     params = SOURCES.find { | params | ! params[:REGEX].match(lower_case_url).nil? }
-    url_parsed = params[:REGEX].match(lower_case_url)
-    @user = url_parsed['username']
-    @repo = url_parsed['reponame']
 
-    if url_parsed.names.include?('prnum')
-      @number = url_parsed['prnum']
+    if !params.nil?
+      url_parsed = params[:REGEX].match(lower_case_url)
+      @user = url_parsed['username']
+      @repo = url_parsed['reponame']
+
+      if url_parsed.names.include?('prnum')
+        @number = url_parsed['prnum']
+      end
+
+      @commits = self.send(params[:FUNCTION], params)
     end
-
-    @commits = self.send(params[:FUNCTION], params)
+    
     @loaded = true
+  end
+
+  def reduce_commits_to_user_stats 
+    if ! @commits.nil? and ! @commits[:data].nil?
+      default = {:count => 0, :total => 0}
+      puts @commits[:data]
+      @commits[:data].reduce(Hash.new(default)) { | total, commit |
+        oldrow = total[commit[:email]]
+        newrow = { 
+          :count => oldrow[:count] + 1, 
+          :total => oldrow[:total] + commit[:stats][:total] }
+        total.update(commit[:email] => newrow)
+    }
+    end
+  end
+
+  def to_bar_graph 
+    data = reduce_commits_to_user_stats
+    if ! data.nil? && ! data.empty?
+      result = data.map { | k, v | [k, v[:total]]}
+      result.unshift(["Name", "Total Changes"])
+    else 
+      ["Name", "Total Changes"]
+    end
   end
 
   private
@@ -178,7 +206,10 @@ class GithubMetricsFetcher
       case response.code
       when 200
         json = JSON.parse(response.body)
-        get_data(json, ["stats"])
+        total = get_data(json, ["stats", "total"])
+        additions = get_data(json, ["stats", "additions"])
+        deletions = get_data(json, ["stats", "deletions"])
+        { total: total, additions: additions, deletions: deletions}
       else
         { :error => "Error loading commit stats" }
       end

@@ -1,6 +1,4 @@
-<% @assignment = Participant.find(params[:id]).assignment %>
 <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
-
 <div style="display:block">
   <h3 style="width: 40%; float: left">Topics</h3>
   <h3 style="width: 40%; float:right">Selections</h3>
@@ -38,7 +36,7 @@
     <table style="width: 48%; display:block" class="general" align="right">
       <% i=1 %>
       <tr><%= render :partial => 'table_header' %></tr>
-      <tbody id="selections" data-update-url="/sign_up_sheet/set_priority" class="connectedSortable">
+      <tbody id="selections" data-update-url=<%= "/sign_up_sheet/set_priority?participant_id=#{@participant.id}" %> class="connectedSortable">
         <tr class="sort-disabled"><td></td><td></td></tr>
         <% for topic in @bids %>
           <tr style= "background-color:<%= get_topic_bg_color(topic, @max_team_size) %>" id="topic_<%= topic.id %>">

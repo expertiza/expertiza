@@ -164,9 +164,10 @@ class SignUpSheetController < ApplicationController
     @topic_id = params[:id]
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
+    team_id = @participant.team.try(:id)
 
     if @assignment.is_intelligent
-      @bids = Bid.where(user_id: session[:user].id).order(:priority)
+      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority) 
       signed_up_topics = []
       @bids.each do |bid|
         sign_up_topic = SignUpTopic.where(id: bid.topic_id)
@@ -180,7 +181,7 @@ class SignUpSheetController < ApplicationController
     @num_of_topics = @sign_up_topics.size
     @signup_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(6)
-    @student_bids = Bid.where(user_id: session[:user].id)
+    @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
     unless @assignment.due_dates.find_by_deadline_type_id(1).nil?
       if !@assignment.staggered_deadline? and @assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
@@ -277,41 +278,35 @@ class SignUpSheetController < ApplicationController
   end
 
   def set_priority
-    @user_id = session[:user].id
+    participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
+    team_id = participant.team.try(:id)
+    unless team_id
+      # Zhewei: team lazy initialization
+      SignUpSheet.signup_team(assignment_id, participant.user.id)
+      team_id = participant.team.try(:id)
+    end
     if params[:topic].nil?
-      # All topics are deselected by user
-      Bid.where(user_id: @user_id).destroy_all
+      # All topics are deselected by current team
+      Bid.where(team_id: team_id).destroy_all
     else
-      team_ids = AssignmentTeam.where(parent_id: assignment_id).map(&:id)
-      team_user = TeamsUser.where("user_id = ? AND team_id IN (?)", @user_id, team_ids)
-      user_ids = []
-      user_ids << @user_id
-      unless team_user.empty?
-        user_ids << TeamsUser.where(team_id: team_user.first.try(:team_id)).map(&:user_id)
+      @bids = Bid.where(team_id: team_id)
+      signed_up_topics = @bids.map(&:topic_id)
+      # Remove topics from bids table if the student moves data from Selection table to Topics table
+      # This step is necessary to avoid duplicate priorities in Bids table
+      signed_up_topics -= params[:topic].map(&:to_i)
+      signed_up_topics.each do |topic|
+        Bid.where(topic_id: topic, team_id: team_id).destroy_all
       end
-      user_ids = user_ids.flatten.uniq
-      user_ids.each do |user_id|
-        @bids = Bid.where("user_id = ?", user_id)
-        signed_up_topics = @bids.map(&:topic_id)
-
-        # Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
-        # This step is necessary to avoid duplicate priorities in Bids table
-        signed_up_topics -= params[:topic].map(&:to_i)
-        signed_up_topics.each do |topic|
-          Bid.where(topic_id: topic, user_id: user_id).destroy_all
-        end
-        params[:topic].each_with_index do |topic_id, index|
-          check = @bids.where(topic_id: topic_id)
-          if check.empty?
-            Bid.create(topic_id: topic_id, user_id: user_id, priority: index + 1)
-          else
-            Bid.where("topic_id = ? AND user_id = ?", topic_id, user_id).update_all(priority: index + 1)
-          end
+      params[:topic].each_with_index do |topic_id, index|
+        bid_existence = @bids.where(topic_id: topic_id)
+        if bid_existence.empty?
+          Bid.create(topic_id: topic_id, team_id: team_id, priority: index + 1)
+        else
+          Bid.where(topic_id: topic_id, team_id: team_id).update_all(priority: index + 1)
         end
       end
     end
-
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 

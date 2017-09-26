@@ -12,19 +12,19 @@ class LotteryController < ApplicationController
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   def run_intelligent_assignment
     priority_info = []
-    topic_ids = SignUpTopic.where(assignment_id: params[:id]).map(&:id)
-    user_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
-    user_ids.each do |user_id|
+    assignment = Assignment.find_by(id: params[:id])
+    topic_ids = assignment.sign_up_topics.map(&:id)
+    team_ids = assignment.teams.map(&:id)
+    team_ids.each do |team_id|
       # grab student id and list of bids
       bids = []
       topic_ids.each do |topic_id|
-        bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
+        bid_record = Bid.find_by(team_id: team_id, topic_id: topic_id)
         bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
-      priority_info << {pid: user_id, ranks: bids} if bids.uniq != [0]
+      priority_info << {pid: team_id, ranks: bids} if bids.uniq != [0]
     end
-    assignment = Assignment.find_by(id: params[:id])
-    data = {users: priority_info, max_team_size: assignment.max_team_size}
+    data = {teams: priority_info, max_team_size: assignment.max_team_size}
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
       response = RestClient.post url, data.to_json, content_type: :json, accept: :json
@@ -42,9 +42,8 @@ class LotteryController < ApplicationController
   def create_new_teams_for_bidding_response(teams, assignment)
     original_team_ids = assignment.teams.map(&:id)
     teams.each do |user_ids|
-      new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s,
-                                       parent_id: assignment.id,
-                                       type: 'AssignmentTeam')
+      new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(10000).to_s,
+                                       parent_id: assignment.id)
       parent = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
       user_ids.each do |user_id|
         # remove TeamsUser records on other teams

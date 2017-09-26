@@ -1,6 +1,4 @@
 <h1>Manage content</h1>
-<%#= render :partial => 'page_header' %>
-<%#= render :partial => 'bread_crumbs' %>
-<%#= render :partial => 'page_footer' %>
+
+<%= link_to 'Manage Notifications', notifications_url %>
 <div id="tree_display" params="#{@reactjsParams}"></div>
-<%#= react_component('TreeDisplay', params: '#{@reactjsParams}') %>

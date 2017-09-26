@@ -5,7 +5,7 @@ class SignUpSheet < ActiveRecord::Base
     if users_team.empty?
       # if team is not yet created, create new team.
       # create Team and TeamNode
-      team = AssignmentTeam.create_team_and_node(assignment_id, AssignmentTeam.name)
+      team = AssignmentTeam.create_team_and_node(assignment_id)
       user = User.find(user_id)
       # create TeamsUser and TeamUserNode
       teamuser = ApplicationController.helpers.create_team_users(user, team.id)
@@ -96,9 +96,6 @@ class SignUpSheet < ActiveRecord::Base
   def self.add_signup_topic(assignment_id)
     @review_rounds = Assignment.find(assignment_id).num_review_rounds
     @topics = SignUpTopic.where(assignment_id: assignment_id)
-
-    # Use this until you figure out how to initialize this array
-    # @duedates = SignUpTopic.find_by_sql("SELECT s.id as topic_id FROM sign_up_topics s WHERE s.assignment_id = " + assignment_id.to_s)
     @duedates = {}
     return @duedates if @topics.nil?
     @topics.each_with_index do |topic, i|
@@ -120,9 +117,9 @@ class SignUpSheet < ActiveRecord::Base
   end
 
   def self.has_teammate_ads?(topic_id)
-    teams = Team.find_by_sql("select t.* "\
-        "from teams t, signed_up_teams s "\
-        "where s.topic_id='" + topic_id.to_s + "' and s.team_id = t.id and t.advertise_for_partner = 1")
+    teams = Team.joins('INNER JOIN signed_up_teams ON signed_up_teams.team_id = teams.id')
+                .select('teams.*')
+                .where('teams.advertise_for_partner = 1 and signed_up_teams.topic_id = ?', topic_id).to_a
     teams.reject!(&:full?)
     !teams.empty?
   end

@@ -15,9 +15,9 @@
 <% end %>
 <ul>
   <%if @topics.size > 0 %>
-    <% if @authorization == 'participant' %>
+    <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li> 
-        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :assignment_id => @participant.parent_id%>
+        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>
     <% end %>
@@ -55,7 +55,8 @@ to display the label "Your team" in the student assignment tasks-->
       <% else %>
         <% @alias_name = "Your readings" %>
       <% end %>
-      <% if @assignment.can_review(@topic_id) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+      <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
+      <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
@@ -80,8 +81,13 @@ to display the label "Your team" in the student assignment tasks-->
   
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>
-      <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
-      (View feedback on your work)  &nbsp;  <%= link_to "Alternate View", :controller => 'grades', :action => 'view_team', :id => @participant.id %>
+      <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
+      <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
+        <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
+      <% else %>
+        <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %> 
+        (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
+      <% end %>
     </li>
   <% end %> 
     <%if @can_provide_suggestions == true %>

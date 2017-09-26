@@ -16,15 +16,20 @@
         Calibration report
       </option>
     <% end %>
-    <option value='SummaryByCriteria' selected>
+    <option value='SummaryByCriteria' >
       Summary by Criteria
     </option>
-    <option value='SummaryByRevieweeAndCriteria' selected>
+    <option value='SummaryByRevieweeAndCriteria' >
       Summary by Reviewee and Criteria
     </option>
-    <option value='Collusion' selected>
+    <option value='Collusion' >
       Potential collusion report
     </option>
+    <% if @assignment.simicheck > -1 %>
+        <option value='PlagiarismCheckerReport' >
+          Plagiarism Checker Report
+        </option>
+    <% end %>
   </select>
   <%= submit_tag("Submit") %>
 <% end %>
@@ -44,7 +49,7 @@
             <table>
               <tr>
                 <th>Reviewer's Name</th>
-                <td><%= n.text_field:fullname %></td>
+                <td><%= n.text_field :fullname %></td>
                 <td align = "right"><%= submit_tag "Search"%></td>
               </tr>
 
@@ -52,6 +57,7 @@
         <%end%>
 
       </div>
+      <br>
     </div>
 
 <% elsif @type == "FeedbackResponseMap" %>
@@ -68,6 +74,9 @@
 <!--End show summary reports-->
 <% elsif @type == "Collusion" %>
     <h1> Potential collusion report for <%= @assignment.name%> </h1>
+<% elsif @type == "PlagiarismCheckerReport" %>
+    <h1> Plagiarism Checker Report for <%= @assignment.name%> </h1>
+
 <% end %>
 
 

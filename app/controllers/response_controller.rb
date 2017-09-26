@@ -78,8 +78,6 @@ class ResponseController < ApplicationController
   end
 
   # Update the response and answers when student "edit" existing response
-  # E1600
-  # Added if - else condition for 'SelfReviewResponseMap'
   def update
     return unless action_allowed?
 
@@ -90,41 +88,23 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = if @map.type == "ReviewResponseMap" && @response.round
-                         @map.questionnaire(@response.round)
-                       elsif @map.type == "ReviewResponseMap"
-                         @map.questionnaire(nil)
-                       elsif @map.type == "SelfReviewResponseMap" && @response.round
-                         @map.questionnaire(@response.round)
-                       elsif @map.type == "SelfReviewResponseMap"
-                         @map.questionnaire(nil)
-                       else
-                         @map.questionnaire
-                       end
-      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+      @questionnaire = set_questionnaire
 
       questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions)
-      questions = @questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
 
-      unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-        params[:responses].each_pair do |k, v|
-          score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-          unless score
-            score = Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-          end
-          score.update_attribute('answer', v[:score])
-          score.update_attribute('comments', v[:comment])
-        end
-      end
+      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
 
-      if (params['isSubmit'] && (params['isSubmit'].eql?'Yes'))
-
+      if params['isSubmit'] && (params['isSubmit'].eql?'Yes')
         # Update the submission flag.
         @response.update_attribute('is_submitted', true)
       else
         @response.update_attribute('is_submitted', false)
       end
+
+      if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+        @response.notify_instructor_on_difference
+      end
+
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -142,7 +122,9 @@ class ResponseController < ApplicationController
     # set more handy variables for the view
     set_content(true)
 
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    if @assignment
+      @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    end
     render action: 'response'
   end
 
@@ -182,42 +164,43 @@ class ResponseController < ApplicationController
     end
 
     # create the response
-    if params[:isSubmit].eql?('Yes')
-      is_submitted = true
-    else
-      is_submitted = false
-    end
-    @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments],:round => @round, :is_submitted => is_submitted)#,:version_num=>@version)
+    is_submitted = if params[:isSubmit].eql?('Yes')
+                     true
+                   else
+                     false
+                   end
+    @response = Response.create(
+      map_id: @map.id,
+      additional_comment: params[:review][:comments],
+      round: @round,
+      is_submitted: is_submitted
+    )
+    # ,:version_num=>@version)
 
-    #Change the order for displaying questions for editing response views.
-    questions=sort_questions(@questionnaire.questions)
+    # Change the order for displaying questions for editing response views.
+    questions = sort_questions(@questionnaire.questions)
 
-    if params[:responses]
-       create_answers(params, questions)
-    end
-
-    #@map.save
+    create_answers(params, questions) if params[:responses]
 
     msg = "Your response was successfully saved."
     error_msg = ""
+
+    if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+      @response.notify_instructor_on_difference
+    end
+
     @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
-  # E1600
-  # Added paramps[:return] value for 'SelfReviewResponseMap' to ensure that this method is invoked from self-review operation
-  # this looks dirty to me. If other map type do not do this, there is no reason that we handle SelfReviewResponseMap here. There should be a elegant way.. --Yang
   def saving
     @map = ResponseMap.find(params[:id])
-    params[:return] = "selfreview" if @map.type == "SelfReviewResponseMap"
 
     @return = params[:return]
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  # E1600
-  # Added if - else for 'SelfReviewResponseMap' for proper redirection
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
@@ -233,6 +216,8 @@ class ResponseController < ApplicationController
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     elsif params[:return] == "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
+    elsif params[:return] == "survey"
+      redirect_to controller: 'response', action: 'pending_surveys'
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
 
@@ -250,6 +235,61 @@ class ResponseController < ApplicationController
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
+  # This method should be moved to survey_deployment_contoller.rb
+  def pending_surveys
+    unless session[:user] # Check for a valid user
+      redirect_to '/'
+      return
+    end
+
+    # Get all the participant(course or assignment) entries for this user
+    course_participants = CourseParticipant.where(user_id: session[:user].id)
+    assignment_participants = AssignmentParticipant.where(user_id: session[:user].id)
+
+    # Get all the course survey deployments for this user
+    @surveys = []
+    if course_participants
+      course_participants.each do |cp|
+        survey_deployments = CourseSurveyDeployment.where(parent_id: cp.parent_id)
+        next unless survey_deployments
+        survey_deployments.each do |survey_deployment|
+          next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+          @surveys <<
+          [
+            'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+            'survey_deployment_id' => survey_deployment.id,
+            'start_date' => survey_deployment.start_date,
+            'end_date' => survey_deployment.end_date,
+            'parent_id' => cp.parent_id,
+            'participant_id' => cp.id,
+            'global_survey_id' => survey_deployment.global_survey_id
+          ]
+        end
+      end
+    end
+
+    # Get all the assignment survey deployments for this user
+    if assignment_participants
+      assignment_participants.each do |ap|
+        survey_deployments = AssignmentSurveyDeployment.where(parent_id: ap.parent_id)
+        next unless survey_deployments
+        survey_deployments.each do |survey_deployment|
+          next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+          @surveys <<
+          [
+            'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+            'survey_deployment_id' => survey_deployment.id,
+            'start_date' => survey_deployment.start_date,
+            'end_date' => survey_deployment.end_date,
+            'parent_id' => ap.parent_id,
+            'participant_id' => ap.id,
+            'global_survey_id' => survey_deployment.global_survey_id
+          ]
+        end
+      end
+    end
+  end
+
   private
 
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
@@ -262,7 +302,12 @@ class ResponseController < ApplicationController
     @title = @map.get_title
 
     # handy reference to response assignment for ???
-    @assignment = @map.assignment
+
+    if @map.survey?
+      @survey_parent = @map.survey_parent
+    else
+      @assignment = @map.assignment
+    end
 
     # handy reference to the reviewer for ???
     @participant = @map.reviewer
@@ -285,15 +330,19 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # E1600
-  # Added 'SelfReviewResponseMap' to when condition
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when "MetareviewResponseMap", "TeammateReviewResponseMap", "FeedbackResponseMap"
+    when
+      "MetareviewResponseMap",
+      "TeammateReviewResponseMap",
+      "FeedbackResponseMap",
+      "CourseSurveyResponseMap",
+      "AssignmentSurveyResponseMap",
+      "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end
@@ -306,7 +355,9 @@ class ResponseController < ApplicationController
   end
 
   def set_dropdown_or_scale
-    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).first.dropdown
+    use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
+                                                 questionnaire_id: @questionnaire.try(:id))
+                                          .first.try(:dropdown)
     @dropdown_or_scale = use_dropdown == true ? 'dropdown' : 'scale'
   end
 

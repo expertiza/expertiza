@@ -163,6 +163,20 @@ function microtaskChanged() {
 
     </td>
   </tr>
+  <tr>
+    <td style='padding:5px' id='assignment_simicheck_field'>
+      <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
+      <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, :selected => @assignment_form.assignment.simicheck) %><b> hours</b>
+    </td>
+  </tr>
+  <tr>
+    <td style='padding:5px' id='assignment_simicheck_threshold'>
+      <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
+      <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, :selected => @assignment_form.assignment.simicheck_threshold) %><b> %</b>
+      <br>(Filter that refers to % text same between 2 docs)</br>
+    </td>
+  </tr>
+
 </table>
 
 

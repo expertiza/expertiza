@@ -23,10 +23,12 @@
 //= require jquery.ui.all
 //= require react-simpletabs
 //= require sisyphus
+//= require awesomplete
 //= require_self
 //= require_tree .
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
+//= require awesome_input
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();
@@ -242,3 +244,22 @@ dateFormat.i18n = {
 Date.prototype.format = function (mask, utc) {
   return dateFormat(this, mask, utc);
 };
+
+function show_alert(alertMessage){
+    $("#dialog-message").html(alertMessage);
+    $("#dialog-message").dialog({
+        modal: true,
+        draggable: true,
+        resizable: true,
+        position: ['center', 'center'],
+        show: 'blind',
+        hide: 'blind',
+        width: 400,
+        dialogClass: 'ui-dialog-osx',
+        buttons: {
+            "Ok": function() {
+                $(this).dialog("close");
+            }
+        }
+    });
+}

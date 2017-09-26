@@ -1,3 +1,4 @@
+dump.rdb
 .bundle
 db/*.sqlite3
 db/*.sql
@@ -6,11 +7,18 @@ log/*.log
 tmp/**/*
 vendor/assets/components/
 config/database.yml
+docker-compose.yml
 config/secrets.yml
 coverage
 app/controllers/auth_controller.rb
 nohup.out
 pg_data/*
+
+#################
+## npm & bower
+#################
+node_modules
+package.json
 
 #################
 ## Eclipse

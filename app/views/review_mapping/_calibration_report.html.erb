@@ -15,7 +15,7 @@ th, td {
 	<h3> <%= "Calibration #{index+1} (team name:  #{team.name})" %></h3>
 	<% @questions.each_with_index do |question, index| %>
 		<% instructor_answer = Answer.select('answer').where(["question_id = ? and response_id = ?", question.id, response_map.response[0].id]).first.answer ||= 0 %>
-		<b><%= "Question#{index+1}: " %></b><%= question.txt %>
+		<b><%= "Question #{index+1}: " %></b><%= question.txt %>
 		<table border="1">
 			<tr>
 				<th width = "20%"> Assigned Score </th>

@@ -24,7 +24,7 @@ class VmQuestionResponse
       corresponding_questionnaire = Questionnaire.find_by(id: question.questionnaire.id)
       question_max_score = corresponding_questionnaire.max_question_score
       # if this question is a header (table header, section header, column header), ignore this question
-      unless question.is_a?QuestionnaireHeader
+      unless question.is_a? QuestionnaireHeader
         row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score, question.seq)
         @list_of_rows << row
       end
@@ -34,7 +34,7 @@ class VmQuestionResponse
   def add_reviews(participant, team, vary)
     if @questionnaire_type == "ReviewQuestionnaire"
       reviews = if vary
-                  ReviewResponseMap.get_assessments_round_for(team, @round)
+                  ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
@@ -158,7 +158,7 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          if row.question_id == answer.question_id && answer.comments.split.size > 10
+          if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
             row.countofcomments = row.countofcomments + 1
           end
         end

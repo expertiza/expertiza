@@ -4,28 +4,21 @@ module GradesHelper
     if last_topic.eql? nil
       # this is the first accordion
       render partial: "response/accordion", locals: {title: new_topic, is_first: true}
-
     elsif !new_topic.eql? last_topic
       # render new accordion
       render partial: "response/accordion", locals: {title: new_topic, is_first: false}
-
     end
-  end
-
-  def render_ui(param1, param2)
-    render partial: param1, locals: param2
   end
 
   def has_team_and_metareview?
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])
       @assignment_id = @assignment.id
-    elsif params[:action] == "view_my_scores" or params[:action] == 'view_review'
+    elsif %w(view_my_scores view_review).include? params[:action]
       @assignment_id = Participant.find(params[:id]).parent_id
     end
     has_team = @assignment.max_team_size > 1
     has_metareview = AssignmentDueDate.exists?(parent_id: @assignment_id, deadline_type_id: 5)
-    true_num = 0
     true_num = if has_team && has_metareview
                  2
                elsif has_team || has_metareview

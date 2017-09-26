@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-describe "peer review testing", type: :feature do
+describe "peer review testing" do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
     create_list(:participant, 3)
@@ -14,7 +12,7 @@ describe "peer review testing", type: :feature do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now + (100 * 24 * 60 * 60))
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
     create(:topic)
     create(:topic, topic_name: "TestReview")
     create(:team_user, user: User.where(role_id: 2).first)

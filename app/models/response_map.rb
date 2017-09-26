@@ -88,4 +88,8 @@ class ResponseMap < ActiveRecord::Base
     end
     failedCount
   end
+
+  def survey?
+    false
+  end
 end

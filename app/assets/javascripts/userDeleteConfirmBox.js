@@ -12,7 +12,7 @@ $.rails.allowAction = function(link) {
       else{
         $.rails.showConfirmDialogNormal(link);
         return false;
-      }   
+      }
     }
     else{
       return true;
@@ -98,7 +98,7 @@ $.rails.showConfirmDialogSpecial = function(link) {
                   $( this ).dialog( "close" );
                   $(html3).modal();
                   $("#dialog-confirm3").dialog({
-                    width: 340,
+                    width: 340
                   });
               },
               "No, delete any way!": function() {

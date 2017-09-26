@@ -6,10 +6,20 @@ class Role < ActiveRecord::Base
   has_many :users
 
   serialize :cache
-  validates_presence_of :name
-  validates_uniqueness_of :name
+  validates :name, presence: true
+  validates :name, uniqueness: true
 
+  attr_accessor :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+
+  def cache
+    @cache = {}
+    unless self.nil?
+      @cache[:credentials] = CACHED_ROLES[self.id][:credentials]
+      @cache[:menu] = CACHED_ROLES[self.id][:menu]
+    end
+    @cache
+  end
 
   def self.find_or_create_by_name(params)
     Role.find_or_create_by(name: params)
@@ -65,13 +75,9 @@ class Role < ActiveRecord::Base
 
   def self.rebuild_cache
     Role.find_each do |role|
-      role.cache = nil
-      role.save # we have to do this to clear it
-
-      role.cache = Hash.new
+      role.cache = {}
       role.rebuild_credentials
       role.rebuild_menu
-      role.save
     end
   end
 
@@ -80,12 +86,11 @@ class Role < ActiveRecord::Base
   end
 
   def rebuild_credentials
-    self.cache[:credentials] = Credentials.new(self.id)
+    self.cache[:credentials] = CACHED_ROLES[self.id][:credentials]
   end
 
   def rebuild_menu
-    menu = Menu.new(self)
-    self.cache[:menu] = menu
+    self.cache[:menu] = CACHED_ROLES[self.id][:menu]
   end
 
   # return ids of roles that are below this role

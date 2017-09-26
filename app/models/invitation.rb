@@ -15,10 +15,8 @@ class Invitation < ActiveRecord::Base
 
   # Remove all invites sent by a user for an assignment.
   def self.remove_users_sent_invites_for_assignment(user_id, assignment_id)
-    invites = Invitation.where(['from_id = ? and assignment_id = ?', user_id, assignment_id])
-    for invite in invites
-      invite.destroy
-    end
+    invites = Invitation.where('from_id = ? and assignment_id = ?', user_id, assignment_id)
+    invites.each{ |invite| invite.destroy }
   end
 
   # After a users accepts an invite, the teams_users table needs to be updated.
@@ -69,7 +67,8 @@ class Invitation < ActiveRecord::Base
   end
 
   def self.is_invited?(invitee_user_id, invited_user_id, assignment_id)
-    sent_invitation = Invitation.where(['from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', invitee_user_id, invited_user_id, assignment_id])
+    sent_invitation = Invitation.where('from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', 
+                                       invitee_user_id, invited_user_id, assignment_id)
     return true if sent_invitation.empty?
     false
   end

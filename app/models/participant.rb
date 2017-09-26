@@ -3,14 +3,13 @@ class Participant < ActiveRecord::Base
   belongs_to :user
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :assignment, foreign_key: 'parent_id'
-
-  has_many   :comments, dependent: :destroy
-  has_many   :resubmission_times, dependent: :destroy
+  has_many   :join_team_requests, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
+  has_one :review_grade
 
-  PARTICIPANT_TYPES = ['Course', 'Assignment']
+  PARTICIPANT_TYPES = %w(Course Assignment).freeze
 
   def team
     TeamsUser.where(user: user).first.try :team
@@ -35,31 +34,29 @@ class Participant < ActiveRecord::Base
   end
 
   def name
-    User.find(self.user_id).name
+    self.user.name
   end
 
   def fullname
-    User.find(self.user_id).fullname
+    self.user.fullname
+  end
+
+  def handle
+    $redis.get('anonymous_mode') == 'true' ? 'handle' : self[:handle]
   end
 
   def delete(force = nil)
-    # TODO: How do we test this code?  #need a controller test_oss808
-    maps = ResponseMap.where(['reviewee_id = ? or reviewer_id = ?', self.id, self.id])
-
+    maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', self.id, self.id)
     if force or ((maps.nil? or maps.empty?) and
                  self.team.nil?)
       force_delete(maps)
     else
       raise "Associations exist for this participant."
     end
-    end
+  end
 
   def force_delete(maps)
-    times = ResubmissionTime.where(participant_id: self.id)
-
-    times.each { |time| time.destroy } if times
-
-    maps.each { |map| map.delete(true) } if maps
+    maps.each {|map| map.delete(true) } if maps
 
     if self.team
       if self.team.teams_users.length == 1
@@ -83,25 +80,25 @@ class Participant < ActiveRecord::Base
     false
   end
 
-    # email does not work. It should be made to work in the future
+  # email does not work. It should be made to work in the future
   def email(pw, home_page)
     user = User.find(self.user_id)
     assignment = Assignment.find(self.assignment_id)
 
     Mailer.sync_message(
       recipients: user.email,
-       subject: "You have been registered as a participant in the Assignment #{assignment.name}",
-       body: {
-         home_page: home_page,
-         first_name: ApplicationHelper.get_user_first_name(user),
-         name: user.name,
-         password: pw,
-         partial_name: "register"
-       }
+      subject: "You have been registered as a participant in the Assignment #{assignment.name}",
+      body: {
+        home_page: home_page,
+        first_name: ApplicationHelper.get_user_first_name(user),
+        name: user.name,
+        password: pw,
+        partial_name: "register"
+      }
     ).deliver
   end
 
-    # Return scores that this participant for the given questions
+  # Return scores that this participant for the given questions
   def scores(questions)
     scores = {}
     scores[:participant] = self
@@ -109,10 +106,10 @@ class Participant < ActiveRecord::Base
     if self.assignment.varying_rubrics_by_round? # for "vary rubric by rounds" feature -Yang
       self.assignment.questionnaires.each do |questionnaire|
         round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
-        questionnaire_symbol = if (!round.nil?)
-          (questionnaire.symbol.to_s+round.to_s).to_sym
-        else
-          questionnaire.symbol
+        questionnaire_symbol = if !round.nil?
+                                 (questionnaire.symbol.to_s + round.to_s).to_sym
+                               else
+                                 questionnaire.symbol
                                end
         scores[questionnaire_symbol] = {}
         scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
@@ -138,19 +135,19 @@ class Participant < ActiveRecord::Base
   # Get permissions form authorizations.
   def self.get_permissions(authorization)
     can_submit = true
-      can_review = true
-      can_take_quiz = true
-      case authorization
-      when 'reader'
-        can_submit = false
-      when 'reviewer'
-        can_submit = false
-        can_take_quiz = false
-      when 'submitter'
-        can_review = false
-        can_take_quiz = false
-      end
-      {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
+    can_review = true
+    can_take_quiz = true
+    case authorization
+    when 'reader'
+      can_submit = false
+    when 'reviewer'
+      can_submit = false
+      can_take_quiz = false
+    when 'submitter'
+      can_review = false
+      can_take_quiz = false
+    end
+    {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
   end
 
   # Get authorization from permissions.
@@ -179,7 +176,7 @@ class Participant < ActiveRecord::Base
     end
     users.sort! {|a, b| a.name.downcase <=> b.name.downcase } # Sort the users based on the name
 
-    sorted_user_ids = users.map {|u| u.id }
+    sorted_user_ids = users.map(&:id)
     sorted_participants = participants.sort_by {|x| sorted_user_ids.index x.user_id }
 
     sorted_participants

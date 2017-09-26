@@ -1,4 +1,4 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.6'
 
@@ -16,9 +16,8 @@ gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
 gem 'engtagger'
-gem 'expertiza-authlogic', github: 'expertiza/authlogic', require: 'authlogic'
+gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', require: 'authlogic'
 gem 'fastercsv'
-gem 'ffi-aspell'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
 gem "googlecharts", require: "gchart"
@@ -34,13 +33,15 @@ gem 'nokogiri', '~> 1.6.8'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
-gem 'pg', group: :production
 gem 'protected_attributes'
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
+gem "recaptcha", require: "recaptcha/rails"
 gem 'rest-client', '~> 1.8'
 gem 'RedCloth'
+gem 'redis-rails'
+gem 'redis-namespace'
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
@@ -58,6 +59,7 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
+gem 'timecop', '0.8.1'
 
 group :development do
   gem 'daemons'
@@ -65,9 +67,8 @@ group :development do
   gem 'pry-remote'
   gem 'pry-nav'
   gem 'rubocop'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 3.4', '>= 3.4.4'
   gem 'quiet_assets'
-  gem "factory_girl_rails", "~> 4.0"
 end
 
 group :test do
@@ -75,10 +76,10 @@ group :test do
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
+  gem "factory_girl_rails", "~> 4.0"
   gem 'launchy'
   gem 'rspec-rails'
   gem 'shoulda'
-  gem 'test-unit'
 end
 
 group :assets do
@@ -86,6 +87,6 @@ group :assets do
 end
 
 group :development, :test do
-  gem 'capybara'
+  gem 'capybara', '~> 2.7', '>= 2.7.1'
   gem 'simplecov', require: false
 end

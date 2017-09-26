@@ -39,8 +39,7 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    (current_stage == "submission") &&
-      (!participant.resubmission_times.empty? || hyperlinks.present?)
+    current_stage == "submission" && hyperlinks.present?
   end
 
   delegate :course, to: :assignment
@@ -107,14 +106,15 @@ class StudentTask
     @teams = user.teams
 
     @teams.each do |team|
+      next unless team.is_a?(AssignmentTeam)
       # Teammates in calibration assignment should not be counted in teaming requirement.
-      next unless Assignment.find(team.parent_id).is_calibrated == false
+      next if Assignment.find(team.parent_id).is_calibrated
       @teammates = []
       @course_id = Assignment.find(team.parent_id).course_id
       @team_participants = Team.find(team.id).participants
       @team_participants = @team_participants.select {|participant| participant.name != user.name }
       @team_participants.each do |t|
-        u = Student.find(t.user_id)
+        u = User.find(t.user_id)
         @teammates << u.fullname
       end
       next if @teammates.empty?

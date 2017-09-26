@@ -1,5 +1,6 @@
 class TeamUserNode < Node
   belongs_to :node_object, class_name: 'TeamsUser'
+  attr_accessible :parent_id, :node_object_id
 
   def self.table
     "teams_users"
@@ -10,11 +11,10 @@ class TeamUserNode < Node
   end
 
   def self.get(parent_id)
-    query = "select nodes.* from nodes, " + self.table
-    query = query + " where nodes.node_object_id = " + self.table + ".id"
-    query = query + " and nodes.type = '" + self.to_s + "'"
-    query = query + " and " + self.table + ".team_id = " + parent_id.to_s if parent_id
-    find_by_sql(query)
+    nodes = Node.joins("INNER JOIN teams_users ON nodes.node_object_id = teams_users.id")
+                .select('nodes.*')
+                .where("nodes.type = 'TeamUserNode'")
+    nodes.where("teams_users.team_id = ?", parent_id) if parent_id
   end
 
   def is_leaf

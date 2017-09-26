@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe 'AssignmentTeam' do
   let(:assignment) { create(:assignment) }
   let(:team) { create(:assignment_team) }
@@ -49,6 +47,17 @@ describe 'AssignmentTeam' do
       assign_team.submitted_hyperlinks << "\n- https://www.h2.ncsu.edu"
       assign_team.remove_hyperlink(@selected_hyperlink)
       expect(assign_team.submitted_hyperlinks.split("\n").include?(@assign_team)).to be false
+    end
+  end
+
+  describe "copy assignment team to course team" do
+    it "should allow assignment team to be copied to course team" do
+      course_team = CourseTeam.new
+      course_team.save!
+      assign_team = build(:assignment_team)
+      assign_team.copy(course_team.id)
+      expect(CourseTeam.create_team_and_node(course_team.id))
+      expect(course_team.copy_members(course_team.id))
     end
   end
 end

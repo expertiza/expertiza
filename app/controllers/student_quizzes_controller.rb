@@ -2,7 +2,9 @@ class StudentQuizzesController < ApplicationController
   def action_allowed?
     ['Administrator',
      'Instructor',
-     'Teaching Assistant'].include? current_role_name or (current_role_name.eql?("Student") and ((%w(index).include? action_name) ? are_needed_authorizations_present? : true))
+     'Teaching Assistant'].include? current_role_name or
+    (current_role_name.eql?("Student") and
+      ((%w(index).include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
   end
 
   def index
@@ -127,19 +129,6 @@ class StudentQuizzesController < ApplicationController
       Questionnaire.where(instructor_id: quiz_creator.id).each do |questionnaire|
         @quiz_questionnaires.push questionnaire
       end
-    end
-  end
-
-  private
-
-  # authorizations: reader,submitter, reviewer
-  def are_needed_authorizations_present?
-    @participant = Participant.find(params[:id])
-    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorization == 'reviewer' or authorization == 'submitter'
-      return false
-    else
-      return true
     end
   end
 end

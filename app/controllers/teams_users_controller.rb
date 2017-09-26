@@ -44,6 +44,20 @@ class TeamsUsersController < ApplicationController
         @teams_user = TeamsUser.last
         undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
       end
+    else # CourseTeam
+      course = Course.find(team.parent_id)
+      if CourseParticipant.find_by_user_id_and_parent_id(user.id, course.id).nil?
+        urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
+        flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
+      else
+        add_member_return = team.add_member(user)
+        if add_member_return == false
+          flash[:error] = "This team already has the maximum number of members."
+        end
+
+        @teams_user = TeamsUser.last
+        undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+      end
     end
 
     redirect_to controller: 'teams', action: 'list', id: team.parent_id

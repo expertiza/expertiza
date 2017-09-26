@@ -3,9 +3,10 @@ require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
   include ResponseAnalytic
-  
+
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
+  # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
 
   alias map response_map
@@ -27,60 +28,65 @@ class Response < ActiveRecord::Base
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
-    # a ReviewResponseMap.  Also, I'm not sure if that would have to be
-    # TeamResponseMap for a team assignment.  Someone who understands the
-    # situation better could add to the code later.
+    # a ReviewResponseMap.
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
     if prefix # has prefix means view_score page in instructor end
       identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
-      identifier += "<B>Reviewer: </B>" + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
-      str = prefix + "_" + self.id.to_s
+      identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
+      str = prefix + '_' + self.id.to_s
+      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' \
+          "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
     else # in student end
-      identifier += '<B>Review ' + count.to_s + '</B>'
+      # identifier += '<B>Review ' + count.to_s + ' Round ' + self.round.to_s + '</B>'
       str = self.id.to_s
+      identifier += '<table width="100%">'\
+                    '<tr>'\
+                    '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
+                    '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'\
+                    '</td>'\
+                    '<td align="left"><b>Last Reviewed:</b>'\
+                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+                    '</tr></table>'
+      code = identifier
     end
-    code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
-    code += "<B>Last reviewed: </B> "
-    code += if self.updated_at.nil?
-              "Not available"
-            else
-              self.updated_at.strftime('%A %B %d %Y, %I:%M%p')
-            end
+
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
     count = 0
     answers = Answer.where(response_id: self.response_id)
 
-    questionnaire = self.questionnaire_by_answer(answers.first)
+    unless answers.empty?
+      questionnaire = self.questionnaire_by_answer(answers.first)
 
-    questionnaire_max = questionnaire.max_question_score
-    questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
-    # loop through questions so the the questions are displayed in order based on seq (sequence number)
-    questions.each do |question|
-      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-      answer = answers.find {|a| a.question_id == question.id }
-      row_class = count.even? ? "info" : "warning"
-      row_class = "" if question.is_a? QuestionnaireHeader
+      questionnaire_max = questionnaire.max_question_score
+      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+      # loop through questions so the the questions are displayed in order based on seq (sequence number)
+      questions.each do |question|
+        count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
+        answer = answers.find {|a| a.question_id == question.id }
+        row_class = count.even? ? "info" : "warning"
+        row_class = "" if question.is_a? QuestionnaireHeader
 
-      code += '<tr class="' + row_class + '"><td>'
-      if !answer.nil? or question.is_a? QuestionnaireHeader
-        code += if question.instance_of? Criterion or question.instance_of? Scale
-                  question.view_completed_question(count, answer, questionnaire_max)
-                else
-                  question.view_completed_question(count, answer)
-                end
+        code += '<tr class="' + row_class + '"><td>'
+        if !answer.nil? or question.is_a? QuestionnaireHeader
+          code += if question.instance_of? Criterion or question.instance_of? Scale
+                    question.view_completed_question(count, answer, questionnaire_max)
+                  else
+                    question.view_completed_question(count, answer)
+                  end
+        end
+        code += '</td></tr>'
       end
-      code += '</td></tr>'
-    end
 
-    comment = if !self.additional_comment.nil?
-                self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
-              else
-                ''
-              end
-    code += "<tr><td><B>Additional Comment: </B>" + comment + '</td></tr>'
-    code += "</table>"
+      comment = if !self.additional_comment.nil?
+                  self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+                else
+                  ''
+                end
+      code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
+    end
+    code += '</table>'
     code.html_safe
   end
 
@@ -130,131 +136,33 @@ class Response < ActiveRecord::Base
     total_weight * questionnaire.max_question_score
   end
 
-  # Returns the total score from this response
-  def get_alternative_total_score
-    # TODO: The method get_total_score() above does not seem correct.  Replace with this method.
-    total_score = 0
-
-    self.scores.each {|score| total_score += score.score }
-
-    total_score
-  end
-
-  # Function which considers a given assignment
-  # and checks if a given review is still valid for score calculation
-  # The basic rule is that
-  # "A review is INVALID if there was new submission for the assignment
-  #  before the most recent review deadline AND THE review happened before that
-  #  submission"
-  # response - the response whose validity is being checked
-  # resubmission_times - submission times of the assignment is descending order
-  # latest_review_phase_start_time
-  # The function returns true if a review is valid for score calculation
-  # and false otherwise
-  def is_valid_for_score_calculation?(resubmission_times, latest_review_phase_start_time)
-    is_valid = true
-
-    # if there was not submission then the response is valid
-    if resubmission_times.nil? || latest_review_phase_start_time.nil?
-      return is_valid
-    end
-
-    resubmission_times.each do |resubmission_time|
-      # if the response is after a resubmission that is
-      # before the latest_review_phase_start_time (check second condition below)
-      # then we are good - the response is valid and we can break
-      break if self.updated_at > resubmission_time.resubmitted_at
-
-      # this means there was a re-submission before the
-      # latest_review_phase_start_time and we dont have a response after that
-      # so the response is invalid
-      if resubmission_time.resubmitted_at < latest_review_phase_start_time
-        is_valid = false
-        break
-      end
-    end
-
-    is_valid
-  end
-
   # only two types of responses more should be added
   def email(partial = "new_submission")
     defn = {}
     defn[:body] = {}
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-    assignment = nil
 
     reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)
-    assignment = Assignment.find(participant.parent_id)
 
-    if response_map.type == "ReviewResponseMap"
+    # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
+    parent = if response_map.survey?
+      response_map.survey_parent
+    else
+      Assignment.find(participant.parent_id)
+             end
 
-    end
+    defn[:subject] = "A new submission is available for " + parent.name
 
-    defn[:subject] = "A new submission is available for " + assignment.name
-    if response_map.type == "ReviewResponseMap"
-      defn[:body][:type] = "Author Feedback"
-      AssignmentTeam.find(response_map.reviewee_id).users.each do |user|
-        defn[:body][:obj_name] = if assignment.has_topics?
-                                   SignUpTopic.find(SignedUpTeam.topic_id(assignment.id, user.id)).topic_name
-                                 else
-                                   assignment.name
-                                 end
-        defn[:body][:first_name] = User.find(user.id).fullname
-        defn[:to] = User.find(user.id).email
-        Mailer.sync_message(defn).deliver_now
-      end
-    end
-    if response_map.type == "MetareviewResponseMap"
-      defn[:body][:type] = "Metareview"
-      reviewee_user = Participant.find(response_map.reviewee_id)
-      signup_topic_id = SignedUpTeam.topic_id(assignment.id, response_map.contributor.teams_users.first.user_id)
-
-      defn[:body][:obj_name] = SignUpTopic.find(signup_topic_id).topic_name
-      defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
-      defn[:to] = User.find(reviewee_user.user_id).email
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "FeedbackResponseMap" # This is authors' feedback from UI
-      defn[:body][:type] = "Review Feedback"
-      # reviewee is a response, reviewer is a participant
-      # we need to track back to find the original reviewer on whose work the author comments
-      response_id_for_original_feedback = response_map.reviewed_object_id
-      response_for_original_feedback = Response.find response_id_for_original_feedback
-      response_map_for_original_feedback = ResponseMap.find response_for_original_feedback.map_id
-      original_reviewer_participant_id = response_map_for_original_feedback.reviewer_id
-
-      participant = AssignmentParticipant.find(original_reviewer_participant_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = if topic_id.nil?
-                                 assignment.name
-                               else
-                                 SignUpTopic.find(topic_id).topic_name
-                               end
-
-      user = User.find(participant.user_id)
-
-      defn[:to] = user.email
-      defn[:body][:first_name] = user.fullname
-      Mailer.sync_message(defn).deliver
-    end
-    if response_map.type == "TeammateReviewResponseMap"
-      defn[:body][:type] = "Teammate Review"
-      participant = AssignmentParticipant.find(response_map.reviewee_id)
-      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-      defn[:body][:obj_name] = SignUpTopic.find(topic_id).topic_name rescue nil
-      user = User.find(participant.user_id)
-      defn[:body][:first_name] = user.fullname
-      defn[:to] = user.email
-      Mailer.sync_message(defn).deliver
-    end
+    response_map.email(defn, participant, parent)
   end
 
   def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
+      # I don't think this else is necessary. Checking the callers, it seems that answer cannot be nil should be a
+      # pre-condition of this method --Yang
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
@@ -265,29 +173,32 @@ class Response < ActiveRecord::Base
     end
     questionnaire
   end
-  
+
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
     counter = 0
-    @comments_in_round_1, @comments_in_round_2, @comments_in_round_3 = '', '', ''
-    @counter_in_round_1, @counter_in_round_2, @counter_in_round_3 = 0, 0, 0
+    @comments_in_round_1 = ''
+    @comments_in_round_2 = ''
+    @comments_in_round_3 = ''
+    @counter_in_round_1 = 0
+    @counter_in_round_2 = 0
+    @counter_in_round_3 = 0
     assignment = Assignment.find(assignment_id)
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
-    
-    ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).each do |response_map|
+
+    ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).find_each do |response_map|
       (1..assignment.num_review_rounds).each do |round|
-        last_response_in_current_round = response_map.response.select{|r| r.round == round }.last
-        unless last_response_in_current_round.nil?
-          last_response_in_current_round.scores.each do |answer| 
-            comments += answer.comments if question_ids.include? answer.question_id
-            instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments ||= '')
-          end
-          additional_comment = last_response_in_current_round.additional_comment
-          comments += additional_comment
-          counter += 1
-          instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
-          instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
+        last_response_in_current_round = response_map.response.select {|r| r.round == round }.last
+        next if last_response_in_current_round.nil?
+        last_response_in_current_round.scores.each do |answer|
+          comments += answer.comments if question_ids.include? answer.question_id
+          instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments ||= '')
         end
+        additional_comment = last_response_in_current_round.additional_comment
+        comments += additional_comment
+        counter += 1
+        instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
+        instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
       end
     end
     [comments, counter,
@@ -307,5 +218,74 @@ class Response < ActiveRecord::Base
     avg_vol_in_round_2 = (Lingua::EN::Readability.new(comments_in_round_2).num_words / (counter_in_round_2.zero? ? 1 : counter_in_round_2)).round(0)
     avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
     [overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
+  end
+
+  # compare the current response score with other scores on the same artifact, and test if the difference
+  # is significant enough to notify instructor.
+  # Precondition: the response object is associated with a ReviewResponseMap
+  def significant_difference?
+    map_class = self.map.class
+    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    # if this response is the first on this artifact, there's no grade conflict
+    return false if count == 0
+
+    # This score has already skipped the unfilled scorable question(s)
+    score = get_total_score.to_f / get_maximum_score
+    questionnaire = questionnaire_by_answer(self.scores.first)
+    assignment = self.map.assignment
+
+    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
+    # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
+    allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
+
+    # the range of average_score_on_same_artifact_from_others and score is [0,1]
+    # the range of allowed_difference_percentage is [0, 100]
+    if (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
+      true
+    else
+      false
+    end
+  end
+
+  def self.avg_scores_and_count_for_prev_reviews(existing_responses, current_response)
+    scores_assigned = []
+    count = 0
+    existing_responses.each do |existing_response|
+      if existing_response.id != current_response.id # the current_response is also in existing_responses array
+        count += 1
+        scores_assigned << existing_response.get_total_score.to_f / existing_response.get_maximum_score
+      end
+    end
+
+    [scores_assigned.sum / scores_assigned.size.to_f, count]
+  end
+
+  def notify_instructor_on_difference
+    response_map = self.map
+    reviewer_participant_id = response_map.reviewer_id
+    reviewer_participanat = AssignmentParticipant.find(reviewer_participant_id)
+    reviewer_name = User.find(reviewer_participanat.user_id).fullname
+
+    reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
+    reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
+    reviewee_name = User.find(reviewee_participant.user_id).fullname
+
+    assignment = Assignment.find(reviewer_participanat.parent_id)
+
+    Mailer.notify_grade_conflict_message({
+      to: assignment.instructor.email,
+       subject: "Expertiza Notification: A review score is outside the acceptable range",
+       body: {
+         reviewer_name: reviewer_name,
+           type: "review",
+           reviewee_name: reviewee_name,
+           new_score: get_total_score.to_f / get_maximum_score,
+           assignment: assignment,
+           conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
+           summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+           assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+       }
+    }).deliver_now
   end
 end

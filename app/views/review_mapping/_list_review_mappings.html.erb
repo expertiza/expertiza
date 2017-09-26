@@ -74,7 +74,7 @@
           <%= link_to 'delete', :controller=> 'participants', :action => 'delete_assignment_participant', :id => contributor.id %><br/>
         <% end %>
         <%= link_to 'add reviewer', :action => 'select_reviewer', :id => assignment.id, :contributor_id => contributor.id %><br/>
-        <%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id %>
+        <%= link_to 'delete outstanding reviewers', :action => 'delete_outstanding_reviewers', :id => assignment.id, :contributor_id => contributor.id %>
       </div>
 
     </td>
@@ -98,6 +98,16 @@
         <tr style="background-color:<%=bgcolor2%>">
           <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
             <div style="text-align:right">
+              <div id="review_status<%=map.map_id%>">
+                <% if(Response.where(map_id: map.map_id).last.nil?) %>
+                    Review Status: Assigned
+                <% elsif Response.where(map_id: map.map_id).last.is_submitted == true%>
+                    Review Status: Submitted
+                    (<%= link_to 'unsubmit', :action => 'unsubmit_review', :id => map.map_id, :remote => :true %>)
+                <% else%>
+                    Review Status: Saved
+                <% end %><br/>
+              </div>
               <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id %><br/>
               <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.map_id %><br/>
               <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.map_id %>
@@ -143,17 +153,15 @@
     session[:return_to] = request.url
   %>
 
-<% if !assignment.dynamic_reviewer_assignment? %>
-
-  <%= link_to 'Assign reviewers automatically', :controller => 'assignments', :action => :edit, :id => assignment.id, :tab => "tab3" %>
-  | <%= link_to 'Import reviewer mappings',
+  <%= link_to 'Import reviewer mappings',
     :controller=>'import_file',
     :action=>'start',
     :model => 'ReviewResponseMap',
     :title => 'Reviewer Mappings',
     :expected_fields =>  "Contributor, Reviewer1, Reviewer2, ... , ReviewerN",
     :id => assignment.id %>
-  | <%= link_to 'Import metareviewer mappings',
+  |
+  <%= link_to 'Import metareviewer mappings',
     :controller=>'import_file',
     :action=>'start',
     :model => 'MetareviewResponseMap',
@@ -161,7 +169,6 @@
     :expected_fields => 'Contributor, Reviewer, Metareviewer1, Metareviewer2, ... MetareviewerN',
     :id => assignment.id %>
   <BR/>
-<% end %>
 
 <%= link_to 'Export review mappings',
   :controller=>'export_file',

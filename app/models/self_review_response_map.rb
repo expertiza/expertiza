@@ -22,4 +22,8 @@ class SelfReviewResponseMap < ResponseMap
   def get_title
     "Self Review"
   end
+
+  # do not send any reminder for self review received.
+  def email(defn, participant, assignment)
+  end
 end

@@ -1,10 +1,9 @@
 class Team < ActiveRecord::Base
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
-  has_many :join_team_requests
+  has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
-  has_many :bids, dependent: :destroy
-  has_many :signed_up_teams
+  has_many :signed_up_teams, dependent: :destroy
   has_paper_trail
 
   # Get the participants of the given team
@@ -20,10 +19,8 @@ class Team < ActiveRecord::Base
 
   # Delete the given team
   def delete
-    for teamsuser in TeamsUser.where(["team_id =?", self.id])
-      teamsuser.delete
-    end
-    node = TeamNode.find_by_node_object_id(self.id)
+    TeamsUser.where("team_id = ?", self.id).each{ |teams_user| teams_user.destroy }
+    node = TeamNode.find_by(node_object_id: self.id)
     node.destroy if node
     self.destroy
   end
@@ -47,13 +44,13 @@ class Team < ActiveRecord::Base
     users.include? user
   end
 
- # Check if the current team is full?
- def full?
-  return false if self.parent_id == nil
-  max_team_members = Assignment.find(self.parent_id).max_team_size
-  curr_team_size = Team.size(self.id)
-  (curr_team_size >= max_team_members)
- end
+  # Check if the current team is full?
+  def full?
+    return false if self.parent_id.nil? # course team, does not max_team_size
+    max_team_members = Assignment.find(self.parent_id).max_team_size
+    curr_team_size = Team.size(self.id)
+    (curr_team_size >= max_team_members)
+  end
 
   # Add memeber to the team
   def add_member(user, _assignment_id)
@@ -89,7 +86,7 @@ class Team < ActiveRecord::Base
   # Check if the team exists
   def self.check_for_existing(parent, name, team_type)
     list = Object.const_get(team_type + 'Team').where(['parent_id = ? and name = ?', parent.id, name])
-    if !list.empty?
+    unless list.empty?
       raise TeamExistsError, 'The team name, "' + name + '", is already in use.'
     end
   end
@@ -132,11 +129,11 @@ class Team < ActiveRecord::Base
       end
     end
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
-    if !users.empty?
+    unless users.empty?
       num_of_teams = users.length.fdiv(min_team_size).ceil
       nextTeamMemberIndex = 0
       for i in (1..num_of_teams).to_a
-        team = Object.const_get(team_type + 'Team').create(name: "Team" + (rand(100) * rand(0.1)).round(0).to_s, parent_id: parent.id)
+        team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
         TeamNode.create(parent_id: parent.id, node_object_id: team.id)
         min_team_size.times do
           break if nextTeamMemberIndex >= users.length
@@ -151,9 +148,9 @@ class Team < ActiveRecord::Base
   # Generate the team name
   def self.generate_team_name(teamnameprefix)
     counter = 1
-    while true
+    loop do
       teamname = teamnameprefix + "_Team#{counter}"
-      return teamname if !Team.find_by_name(teamname)
+      return teamname unless Team.find_by_name(teamname)
       counter += 1
     end
   end
@@ -195,18 +192,18 @@ class Team < ActiveRecord::Base
     end
 
     if name
-      team = Team.create_team_and_node(id, teamtype)
+      team = Object.const_get(teamtype.class.to_s).create_team_and_node(id)
       team.name = name
       team.save
     end
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-    team.import_team_members(index, row) unless (team_exists && options[:handle_dups] == "ignore")
+    team.import_team_members(index, row) unless team_exists && options[:handle_dups] == "ignore"
   end
 
   # Handle existence of the duplicate team
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
-    return name if team.nil? #no duplicate
+    return name if team.nil? # no duplicate
     if handle_dups == "ignore" # ignore: do not create the new team
       p '>>>setting name to nil ...'
       return nil
@@ -248,18 +245,12 @@ class Team < ActiveRecord::Base
   end
 
   # Create the team with corresponding tree node
-  def self.create_team_and_node(id, teamtype = 'AssignmentTeam')
-    if teamtype == 'CourseTeam'
-      curr_course = Course.find(id)
-      team_name = Team.generate_team_name(curr_course.name)
-      team = CourseTeam.create(name: team_name, parent_id: id)
-      TeamNode.create(parent_id: id, node_object_id: team.id)
-    elsif teamtype == 'AssignmentTeam'
-      curr_assignment = Assignment.find(id)
-      team_name = Team.generate_team_name(curr_assignment.name)
-      team = AssignmentTeam.create(name: team_name, parent_id: id)
-      TeamNode.create(parent_id: id, node_object_id: team.id)
-    end
+  def self.create_team_and_node(id)
+    parent = parent_model id # current_task will be either a course object or an assignment object. # current_task will be either a course object or an assignment object.
+    team_name = Team.generate_team_name(parent.name)
+    team = self.create(name: team_name, parent_id: id)
+    # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
+    TeamNode.create(parent_id: id, node_object_id: team.id)
     team
   end
 

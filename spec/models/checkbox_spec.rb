@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe Checkbox do
   let!(:checkbox) { Checkbox.new id: 10, type: "Checkbox", seq: 1.0, txt: "test txt", weight: 11 }
   let!(:answer) { Answer.new answer: 1 }
@@ -31,7 +29,7 @@ describe Checkbox do
   describe "#view_completed_question" do
     it "returns the html " do
       html = checkbox2.view_completed_question(0, answer).to_s
-      expect(html).to eq("<b>0. &nbsp;&nbsp;<img src=\"/assets/Check-icon.png\">test txt3</b><BR/><BR/>")
+      expect(html).to eq("<b>0. &nbsp;&nbsp;<img src=\"/assets/Check-icon.png\">test txt3</b>")
     end
   end
 end

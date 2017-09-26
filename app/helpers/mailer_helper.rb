@@ -11,4 +11,16 @@ module MailerHelper
       }
     })
   end
+
+  def self.send_mail_to_all_super_users(super_user, user, subject)
+    Mailer.request_user_message ({
+      to: super_user.email,
+      subject: subject,
+      body: {
+        super_user: super_user,
+        user: user,
+        first_name: ApplicationHelper.get_user_first_name(super_user)
+      }
+    })
+  end
 end

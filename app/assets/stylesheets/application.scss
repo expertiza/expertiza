@@ -8,7 +8,6 @@
 @import "grades";
 @import "goldberg";
 @import "layout";
-@import "leaderboard";
 @import "redbox";
 @import "react-simpletabs/dist/react-simpletabs";
 @import "jquery.datetimepicker";
@@ -17,4 +16,6 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 @import "bootstrap-sass/assets/stylesheets/bootstrap";
 @import "navbar";
 @import "tree_display";
-@import "login_form"
+@import "awesomplete";
+@import "user_pastebins";
+@import "login_form";

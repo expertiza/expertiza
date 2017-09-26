@@ -15,7 +15,7 @@
         action = "edit"
 
         # check if the assignment has a sign-up sheet
-        if SignUpTopic.find_by_assignment_id(participant.assignment.id)
+        if Assignment.find(participant.assignment.id).has_topics?
           selected_topics = nil
 
           #ACS Get the topics selected by all teams
@@ -30,18 +30,16 @@
             # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
             controller = "sign_up_sheet"
             action = "list"
-            id = participant.parent_id
-            stage = "signup"
             end
           end
-        elsif stage == "review" or stage == "metareview"
-          controller = "student_review"
-          action = "list"
-        end
-      %>
+       elsif stage == "review" or stage == "metareview"
+         controller = "student_review"
+         action = "list"
+       end
+     %>
 
     <span>&nbsp; &raquo;
-      <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => id %>
+      <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => participant.id %>
       (<%= student_task.relative_deadline %> left)
     </span><br/>
   <% end %>
@@ -97,7 +95,8 @@
       <th>Course</th>
       <th>Topic</th>
       <th>Current Stage</th>
-      <th>Stage Deadline</th>
+      <th>Review Grade</th>
+      <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
 
@@ -106,31 +105,33 @@
       <% if student_task.assignment %>
         <tr class="listingRow">
           <td>&nbsp;</td>
+          <!--assignment-->
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+          <!--course-->
           <td><%= student_task.course.try :name %></td>
+          <!--topic-->
           <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
           <% if SignUpTopic.exists?(topic_id) %>
-            <td><%= SignUpTopic.find(topic_id).topic_name %></td>
+            <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
           <% else %>
             <td>-</td>
           <% end %>
+          <!--current stage-->
           <td>
           <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
               <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
               <% else %>
               <%= participant.assignment.current_stage_name(topic_id) %>
               <% end %>
-
           </td>
-
+          <!--review grade-->
+          <td><%= get_review_grade_info(participant) %></td>
+          <!--stage deadline-->
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
-          <td align=center>
-            <% if participant.permission_granted %>granted
-            <% else %>denied
-            <% end %></td>
+          <!--publish rights-->
+          <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
         </tr>
       <% end %>
     <% end %>
   </table>
 </div>
-

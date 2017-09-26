@@ -71,4 +71,62 @@ RSpec.configure do |config|
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
   end
+
+  def http_status_factory(status_code)
+    if status_code == 200
+      Net::HTTPSuccess.new(1.0, 200, "OK")
+    elsif status_code == 500
+      Net::HTTPServerError.new(1.0, 500, "Internal Server Error")
+    else
+      raise ArgumentError
+    end
+  end
+
+  def http_mock_wrap_text(text)
+    "<head></head><body>" + text + "</body>"
+  end
+
+  def http_mock_success_text(add_html)
+    text = "Success"
+    if add_html
+      http_mock_wrap_text(text)
+    else
+      text
+    end
+  end
+
+  def http_mock_error_text(add_html)
+    text = "Error"
+    if add_html
+      http_mock_wrap_text(text)
+    else
+      text
+    end
+  end
+
+  # Attempts to parameterize this function failed
+  def http_setup_get_request_mock_success
+    class << HttpRequest
+      define_method(:get) do |_url|
+        res = http_status_factory(200)
+        def res.body
+          http_mock_success_text(true)
+        end
+        res
+      end
+    end
+  end
+
+  # Attempts to parameterize this function failed
+  def http_setup_get_request_mock_error
+    class << HttpRequest
+      define_method(:get) do |_url|
+        res = http_status_factory(500)
+        def res.body
+          http_mock_error_text(false)
+        end
+        res
+      end
+    end
+  end
 end

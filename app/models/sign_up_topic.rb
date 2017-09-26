@@ -1,6 +1,7 @@
 class SignUpTopic < ActiveRecord::Base
   has_many :signed_up_teams, foreign_key: 'topic_id', dependent: :destroy
-  has_many :due_dates, :class_name => 'TopicDueDate', :foreign_key => 'parent_id', :dependent => :destroy
+  has_many :teams, through: :signed_up_teams # list all teams choose this topic, no matter in waitlist or not
+  has_many :due_dates, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
@@ -17,7 +18,8 @@ class SignUpTopic < ActiveRecord::Base
 
   def self.import(columns, session, _id = nil)
     if columns.length < 3
-      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional)."
+      raise ArgumentError, "The CSV File expects the format:
+ Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
     end
 
     topic = SignUpTopic.where(topic_name: columns[1], assignment_id: session[:assignment_id]).first
@@ -81,7 +83,7 @@ class SignUpTopic < ActiveRecord::Base
       assignment = Assignment.find(assignment_id)
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       unless assignment.is_intelligent?
-        if signup_record.is_waitlisted == false
+        if signup_record.try(:is_waitlisted) == false
           # find the first wait listed user if exists
           first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted:  true).first
 

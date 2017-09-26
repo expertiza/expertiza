@@ -79,7 +79,7 @@ jQuery(document).ready(function() {
           moreContent.push(
             <span>
               <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
-              <a title="Delete" href={"/"+newNodeType+"/delete?id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/delete-icon-24.png" /></a>
+              <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
               <a title={this.props.private? "Make public" : "Make private"} href={"/"+newNodeType+"/toggle_access?id="+(parseInt(this.props.id)/2).toString()}><img src={"/assets/tree_view/lock-"+(this.props.private? "off-" : "")+"disabled-icon-24.png"} /></a>
             </span>
           )
@@ -110,6 +110,9 @@ jQuery(document).ready(function() {
                 </a>
                 <a title="360 degree assessment dashboad" href={"/assessment360/one_course_all_assignments?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/360-dashboard-24.png" />
+                </a>
+                <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=CourseSurveyDeployment"}>
+                  <img src="/assets/tree_view/assign-survey-24.png" />
                 </a>
                 <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
@@ -163,7 +166,7 @@ jQuery(document).ready(function() {
                 <a title="Assign reviewers" href={"/review_mapping/list_mappings?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/assign-reviewers-24.png" />
                 </a>
-                <a title="Assign surveys" href={"/survey/assign?id="+(parseInt(this.props.id)/2).toString()}>
+                <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=AssignmentSurveyDeployment"}>
                   <img src="/assets/tree_view/assign-survey-24.png" />
                 </a>
               </span>
@@ -192,7 +195,7 @@ jQuery(document).ready(function() {
                 <a title="View review report" href={"/review_mapping/response_report?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-review-report-24.png" />
                 </a>
-                <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
+              <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-survey-24.png" />
                 </a>
               </span>
@@ -218,8 +221,8 @@ jQuery(document).ready(function() {
             // if ends
             moreContent.push(
               <span>
-                <a title="View delayed jobs" href={"/assignments/scheduled_tasks?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-scheduled-tasks.png" />
+                <a title="View delayed jobs" href={"/assignments/delayed_mailer?id="+(parseInt(this.props.id)/2).toString()}>
+                  <img src="/assets/tree_view/view-delayed-mailer.png" />
                 </a>
               </span>
             )
@@ -263,12 +266,12 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": ""
       }
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = ["30%", "0%", "0%", "20%", "20%", "30%"]
+        colWidthArray = ["30%", "0%", "0%", "0%", "20%", "20%", "30%"]
         colDisplayStyle = {
           "display": "none"
         }
@@ -280,32 +283,63 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-      return (
-          <tr id={this.props.id}>
-            <td width={colWidthArray[0]}>{this.props.name}</td>
-            <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-            <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
-            <td width={colWidthArray[3]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
-            <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
-            <td width={colWidthArray[5]}>
-              <RowAction
-                  actions={this.props.actions}
-                  key={"simpleTable_"+this.props.id}
-                  nodeType={nodeType}
-                  parent_name={this.props.name}
-                  private={this.props.private}
-                  is_available={this.props.is_available}
-                  course_id={this.props.course_id}
-                  max_team_size={this.props.max_team_size}
-                  is_intelligent={this.props.is_intelligent}
-                  require_quiz={this.props.require_quiz}
-                  allow_suggestions={this.props.allow_suggestions}
-                  has_topic={this.props.has_topic}
-                  id={id}
-              />
-            </td>
-          </tr>
-      )
+        if (this.props.dataType == 'course') {
+            return (
+                <tr id={this.props.id}>
+                    <td width={colWidthArray[0]}>{this.props.name}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+                    <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+                    <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+                    <td width={colWidthArray[6]}>
+                        <RowAction
+                            actions={this.props.actions}
+                            key={"simpleTable_"+this.props.id}
+                            nodeType={nodeType}
+                            parent_name={this.props.name}
+                            private={this.props.private}
+                            is_available={this.props.is_available}
+                            course_id={this.props.course_id}
+                            max_team_size={this.props.max_team_size}
+                            is_intelligent={this.props.is_intelligent}
+                            require_quiz={this.props.require_quiz}
+                            allow_suggestions={this.props.allow_suggestions}
+                            has_topic={this.props.has_topic}
+                            id={id}
+                        />
+                    </td>
+                </tr>
+            )
+        }
+        else{
+            return (
+                <tr id={this.props.id}>
+                    <td width={colWidthArray[0]}>{this.props.name}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
+                    <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+                    <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+                    <td width={colWidthArray[6]}>
+                        <RowAction
+                            actions={this.props.actions}
+                            key={"simpleTable_"+this.props.id}
+                            nodeType={nodeType}
+                            parent_name={this.props.name}
+                            private={this.props.private}
+                            is_available={this.props.is_available}
+                            course_id={this.props.course_id}
+                            max_team_size={this.props.max_team_size}
+                            is_intelligent={this.props.is_intelligent}
+                            require_quiz={this.props.require_quiz}
+                            allow_suggestions={this.props.allow_suggestions}
+                            has_topic={this.props.has_topic}
+                            id={id}
+                        />
+                    </td>
+                </tr>
+            )
+        }
     }
   })
 
@@ -313,22 +347,47 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["17%", "17%", "12%", "17%", "17%", "20%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": ""
       }
       var firstColText = (this.props.dataType === 'questionnaire' ? 'Item' : 'Assignment') + " name"
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = ["30%", "0%", "0%", "20%", "20%", "30%"]
+        colWidthArray = ["30%", "0%", "0%", "0%", "20%", "20%", "30%"]
         colDisplayStyle = {
           "display": "none"
         }
       }
       if (this.props.data) {
-        this.props.data.forEach(function(entry, i){
-          _rows.push(<SimpleTableRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+          if (this.props.dataType == 'course') {
+              this.props.data.forEach(function (entry, i) {
+                  _rows.push(<SimpleTableRow
+                      key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                      id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
+                      name={entry.name}
+                      instructor={entry.instructor}
+                      institution={entry.institution}
+                      directory={entry.directory}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      private={entry.private}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      allow_suggestions={entry.allow_suggestions}
+                      require_quiz={entry.require_quiz}
+                      has_topic={entry.has_topic}
+                      dataType={_this.props.dataType}
+                  />)
+              })
+          }
+          else{
+              this.props.data.forEach(function (entry, i) {
+                  _rows.push(<SimpleTableRow
+                      key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                      id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                       name={entry.name}
                       instructor={entry.instructor}
                       directory={entry.directory}
@@ -344,36 +403,71 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
-                      />)
-        })
+                  />)
+              })
+          }
       }
-      return (
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th width={colWidthArray[0]}>
+      if (this.props.dataType == 'course') {
+          return (
+              <table className="table table-hover">
+                  <thead>
+                      <tr>
+                          <th width={colWidthArray[0]}>
                 {firstColText}
-              </th>
-              <th style={colDisplayStyle} width={colWidthArray[1]}>
-                Directory
-              </th>
-              <th style={colDisplayStyle} width={colWidthArray[2]}>
-                Instructor
-              </th>
-              <th width={colWidthArray[3]}>
-                Creation Date
-              </th>
-              <th width={colWidthArray[4]}>
-                Updated Date
-              </th>
-              <th width={colWidthArray[5]}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[1]}>
+                              Directory
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[2]}>
+                              Instructor
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[3]}>
+                              Institution
+                          </th>
+                          <th width={colWidthArray[4]}>
+                              Creation Date
+                          </th>
+                          <th width={colWidthArray[5]}>
+                              Updated Date
+                          </th>
+                          <th width={colWidthArray[6]}>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
             {_rows}
-          </tbody>
-        </table>
-      )
+                  </tbody>
+              </table>
+          )
+      }
+      else{
+          return (
+              <table className="table table-hover">
+                  <thead>
+                      <tr>
+                          <th width={colWidthArray[0]}>
+                {firstColText}
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[1]}>
+                              Directory
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[2]}>
+                              Instructor
+                          </th>
+                          <th width={colWidthArray[4]}>
+                              Creation Date
+                          </th>
+                          <th width={colWidthArray[5]}>
+                              Updated Date
+                          </th>
+                          <th width={colWidthArray[6]}>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+            {_rows}
+                  </tbody>
+              </table>
+          )
+      }
     }
   })
 
@@ -399,13 +493,13 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
         "display": "",
         "word-wrap":"break-word"
       }
       if (this.props.dataType === 'questionnaire') {
-        colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
+        colWidthArray = ["70%", "0%", "0%", "0%", "0%", "0%", "30%"]
         colDisplayStyle = {
           "display": "none"
         }
@@ -417,33 +511,65 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-      return (
-          <tr onClick={this.handleClick} id={this.props.id}>
-            <td width={colWidthArray[0]}>{this.props.name}</td>
-            <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-            <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
-            <td style={colDisplayStyle} width={colWidthArray[3]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
-            <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
-            <td width={colWidthArray[5]}>
-              <RowAction
-                actions={this.props.actions}
-                key={this.props.id}
-                nodeType={nodeType}
-                parent_name={this.props.name}
-                private={this.props.private}
-                is_available={this.props.is_available}
-                course_id={this.props.course_id}
-                max_team_size={this.props.max_team_size}
-                is_intelligent={this.props.is_intelligent}
-                require_quiz={this.props.require_quiz}
-                allow_suggestions={this.props.allow_suggestions}
-                has_topic={this.props.has_topic}
-                dataType={this.props.dataType}
-                id={id}
-              />
-            </td>
-          </tr>
-      )
+      if (this.props.dataType == 'course') {
+          return (
+              <tr onClick={this.handleClick} id={this.props.id}>
+                  <td width={colWidthArray[0]}>{this.props.name}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+                  <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+                  <td width={colWidthArray[6]}>
+                      <RowAction
+                          actions={this.props.actions}
+                          key={this.props.id}
+                          nodeType={nodeType}
+                          parent_name={this.props.name}
+                          private={this.props.private}
+                          is_available={this.props.is_available}
+                          course_id={this.props.course_id}
+                          max_team_size={this.props.max_team_size}
+                          is_intelligent={this.props.is_intelligent}
+                          require_quiz={this.props.require_quiz}
+                          allow_suggestions={this.props.allow_suggestions}
+                          has_topic={this.props.has_topic}
+                          dataType={this.props.dataType}
+                          id={id}
+                      />
+                  </td>
+              </tr>
+          )
+      }
+      else{
+          return (
+              <tr onClick={this.handleClick} id={this.props.id}>
+                  <td width={colWidthArray[0]}>{this.props.name}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
+                  <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
+                  <td width={colWidthArray[6]}>
+                      <RowAction
+                          actions={this.props.actions}
+                          key={this.props.id}
+                          nodeType={nodeType}
+                          parent_name={this.props.name}
+                          private={this.props.private}
+                          is_available={this.props.is_available}
+                          course_id={this.props.course_id}
+                          max_team_size={this.props.max_team_size}
+                          is_intelligent={this.props.is_intelligent}
+                          require_quiz={this.props.require_quiz}
+                          allow_suggestions={this.props.allow_suggestions}
+                          has_topic={this.props.has_topic}
+                          dataType={this.props.dataType}
+                          id={id}
+                      />
+                  </td>
+              </tr>
+          )
+      }
     }
   })
 
@@ -611,7 +737,7 @@ jQuery(document).ready(function() {
         });
         if(this.props.dataType!='assignment') {
             _this = this;
-            jQuery.post('/tree_display/get_children_node_2_ng',
+            jQuery.post('/tree_display/children_node_2_ng',
                 {
                     reactParams2: newParams
                 },
@@ -635,13 +761,13 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["19%", "20%", "12%", "17%", "17%", "15%"]
+      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
       var colDisplayStyle = {
-        "display": "",
+        "display": ""
       }
       if (this.props) {
           if (this.props.dataType === 'questionnaire') {
-              colWidthArray = ["70%", "0%", "0%", "0%", "0%", "30%"]
+              colWidthArray = ["70%", "0%", "0%", "0%", "0%", "0%", "30%"]
               colDisplayStyle = {
                   "display": "none"
               }
@@ -661,6 +787,7 @@ jQuery(document).ready(function() {
                   (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
                   (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
                   (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                   (entry.private == true || entry.type == 'FolderNode')) {
                   _rows.push(<ContentTableRow
@@ -669,6 +796,7 @@ jQuery(document).ready(function() {
                       name={entry.name}
                       directory={entry.directory}
                       instructor={entry.instructor}
+                      institution={entry.institution}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       actions={entry.actions}
@@ -701,96 +829,201 @@ jQuery(document).ready(function() {
                   _rows.push(<TitleRow
                       title="Others' Public Courses"
                   />)
+                  jQuery.each(this.props.data, function (i, entry) {
+                      if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                          (entry.private == false)) {
+                          _rows.push(<ContentTableRow
+                              key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                              id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
+                              name={entry.name}
+                              directory={entry.directory}
+                              instructor={entry.instructor}
+                              institution={entry.institution}
+                              creation_date={entry.creation_date}
+                              updated_date={entry.updated_date}
+                              actions={entry.actions}
+                              is_available={entry.is_available}
+                              course_id={entry.course_id}
+                              max_team_size={entry.max_team_size}
+                              is_intelligent={entry.is_intelligent}
+                              require_quiz={entry.require_quiz}
+                              dataType={_this.props.dataType}
+                              private={entry.private}
+                              allow_suggestions={entry.allow_suggestions}
+                              has_topic={entry.has_topic}
+                              rowClicked={_this.handleExpandClick}
+                              newParams={entry.newParams}
+                          />)
+                          _rows.push(<ContentTableDetailsRow
+                              key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
+                              id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() + '_' + i}
+                              showElement={_this.state.expandedRow.indexOf(entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i) > -1 ? "" : "none"}
+                              dataType={_this.props.dataType}
+                              children={entry.children}
+                          />)
+                      } else {
+                          return;
+                      }
+                  })
               }
               else if(this.props.dataType=='assignment') {
                   _rows.push(<TitleRow
                       title="Others' Public Assignments"
                   />)
+                  jQuery.each(this.props.data, function (i, entry) {
+                      if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
+                          (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                          (entry.private == false)) {
+                          _rows.push(<ContentTableRow
+                              key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
+                              id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
+                              name={entry.name}
+                              directory={entry.directory}
+                              instructor={entry.instructor}
+                              creation_date={entry.creation_date}
+                              updated_date={entry.updated_date}
+                              actions={entry.actions}
+                              is_available={entry.is_available}
+                              course_id={entry.course_id}
+                              max_team_size={entry.max_team_size}
+                              is_intelligent={entry.is_intelligent}
+                              require_quiz={entry.require_quiz}
+                              dataType={_this.props.dataType}
+                              private={entry.private}
+                              allow_suggestions={entry.allow_suggestions}
+                              has_topic={entry.has_topic}
+                              rowClicked={_this.handleExpandClick}
+                              newParams={entry.newParams}
+                          />)
+                          _rows.push(<ContentTableDetailsRow
+                              key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2 + 1).toString() + '_' + i}
+                              id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2 + 1).toString() + '_' + i}
+                              showElement={_this.state.expandedRow.indexOf(entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i) > -1 ? "" : "none"}
+                              dataType={_this.props.dataType}
+                              children={entry.children}
+                          />)
+                      } else {
+                          return;
+                      }
+                  })
               }
-          jQuery.each(this.props.data, function (i, entry) {
-              if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-                  (entry.private == false)) {
-                  _rows.push(<ContentTableRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                      name={entry.name}
-                      directory={entry.directory}
-                      instructor={entry.instructor}
-                      creation_date={entry.creation_date}
-                      updated_date={entry.updated_date}
-                      actions={entry.actions}
-                      is_available={entry.is_available}
-                      course_id={entry.course_id}
-                      max_team_size={entry.max_team_size}
-                      is_intelligent={entry.is_intelligent}
-                      require_quiz={entry.require_quiz}
-                      dataType={_this.props.dataType}
-                      private={entry.private}
-                      allow_suggestions={entry.allow_suggestions}
-                      has_topic={entry.has_topic}
-                      rowClicked={_this.handleExpandClick}
-                      newParams={entry.newParams}
-                  />)
-                  _rows.push(<ContentTableDetailsRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                      dataType={_this.props.dataType}
-                      children={entry.children}
-                  />)
-              } else {
-                  return;
-              }
-          })
+
       }
 
       }
-      return (
-        <table className="table table-hover" style={{"table-layout":"fixed"}}>
-          <thead>
-            <tr>
-              <th width={colWidthArray[0]}>
-                Name <SortToggle
-                        colName="name"
-                        order="normal"
-                        handleUserClick={this.handleSortingClick} />
-              </th>
-              <th style={colDisplayStyle} width={colWidthArray[1]}>
-                Directory <SortToggle
-                        colName="directory"
-                        order="normal"
-                        handleUserClick={this.handleSortingClick} />
-              </th>
-              <th style={colDisplayStyle} width={colWidthArray[2]}>
-                Instructor <SortToggle
-                        colName="instructor"
-                        order="normal"
-                        handleUserClick={this.handleSortingClick} />
-              </th>
-              <th style={colDisplayStyle} width={colWidthArray[3]}>
-                Creation Date <SortToggle
-                        colName="creation_date"
-                        order="normal"
-                        handleUserClick={this.handleSortingClick} />
-              </th>
-              <th style={colDisplayStyle} width={colWidthArray[4]}>
-                Updated Date <SortToggle
-                        colName="updated_date"
-                        order="normal"
-                        handleUserClick={this.handleSortingClick} />
-              </th>
-              <th width={colWidthArray[5]}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      if (this.props.dataType == 'course') {
+          return (
+              <table className="table table-hover" style={{"table-layout": "fixed"}}>
+                  <thead>
+                      <tr>
+                          <th width={colWidthArray[0]}>
+                              Name
+                              <SortToggle
+                                  colName="name"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[1]}>
+                              Directory
+                              <SortToggle
+                                  colName="directory"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[2]}>
+                              Instructor
+                              <SortToggle
+                                  colName="instructor"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[3]}>
+                              Institution
+                              <SortToggle
+                                  colName="institution"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[4]}>
+                              Creation Date
+                              <SortToggle
+                                  colName="creation_date"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[5]}>
+                              Updated Date
+                              <SortToggle
+                                  colName="updated_date"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th width={colWidthArray[6]}>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
             {_rows}
-          </tbody>
-        </table>
-      )
+                  </tbody>
+              </table>
+          )
+      }
+       else{
+          return (
+              <table className="table table-hover" style={{"table-layout": "fixed"}}>
+                  <thead>
+                      <tr>
+                          <th width={colWidthArray[0]}>
+                              Name
+                              <SortToggle
+                                  colName="name"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[1]}>
+                              Directory
+                              <SortToggle
+                                  colName="directory"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[1]}>
+                              Instructor
+                              <SortToggle
+                                  colName="instructor"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[4]}>
+                              Creation Date
+                              <SortToggle
+                                  colName="creation_date"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th style={colDisplayStyle} width={colWidthArray[5]}>
+                              Updated Date
+                              <SortToggle
+                                  colName="updated_date"
+                                  order="normal"
+                                  handleUserClick={this.handleSortingClick} />
+                          </th>
+                          <th width={colWidthArray[6]}>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+            {_rows}
+                  </tbody>
+              </table>
+          )
+      }
     }
   })
 
@@ -929,16 +1162,16 @@ jQuery(document).ready(function() {
                     '/assets/tree_view/view-scores-24.png',
                     '/assets/tree_view/view-review-report-24.png',
                     '/assets/tree_view/view-suggestion-24.png',
-                    '/assets/tree_view/view-scheduled-tasks.png',
+                    '/assets/tree_view/view-delayed-mailer.png',
                     '/assets/tree_view/view-publish-rights-24.png'
                     )
-      jQuery.get("/tree_display/get_session_last_open_tab", function(data) {
+      jQuery.get("/tree_display/session_last_open_tab", function(data) {
         _this.setState({
           activeTab: data
         })
       })
-      jQuery.get("/tree_display/get_folder_node_ng", function(data) {
-        jQuery.post("/tree_display/get_children_node_ng",
+      jQuery.get("/tree_display/folder_node_ng_getter", function(data) {
+        jQuery.post("/tree_display/children_node_ng",
           {
             reactParams: {
               child_nodes: data,

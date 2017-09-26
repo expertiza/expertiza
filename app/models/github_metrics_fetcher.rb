@@ -1,6 +1,8 @@
 class GithubMetricsFetcher
   require 'rest-client'
   require 'json'
+  require 'concurrent'
+  require 'concurrent-edge'
 
   attr_accessor :url
   attr_accessor :number
@@ -13,13 +15,13 @@ class GithubMetricsFetcher
       GRAPHQL: "https://api.github.com/graphql",
       API: "https://api.github.com/repos",
       FUNCTION: :fetch_pr_commits_data,
-      TOKEN: "010c619b17d1fa8fd7d7991726cc47c89577b8dc"
+      TOKEN: ""
     },
     { REGEX: /http[s]{0,1}:\/\/github\.com\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
       GRAPHQL: "https://api.github.com/graphql",
       API: "https://api.github.com/repos",
       FUNCTION: :fetch_project_data,
-      TOKEN: "010c619b17d1fa8fd7d7991726cc47c89577b8dc"
+      TOKEN: ""
     },
     { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)\/pull\/(?'prnum'\d+)/,
       GRAPHQL: "https://api.github.ncsu.edu/graphql",
@@ -102,22 +104,24 @@ class GithubMetricsFetcher
         commits = get_data(json, ["data", "repository", "ref", "target", "history", "edges"])
         if not commits.nil?
           for commit in commits
-            oid = get_data(commit, ["node", "oid"])
-            name = get_data(commit, ["node", "author", "name"])
-            email = get_data(commit, ["node", "author", "email"])
-            date = get_data(commit, ["node", "committedDate"])
-            stats = fetch_commit_stats_data(params, @user, @repo, oid)
+            p = Concurrent::Promise.execute do
+              oid = get_data(commit, ["node", "oid"])
+              name = get_data(commit, ["node", "author", "name"])
+              email = get_data(commit, ["node", "author", "email"])
+              date = get_data(commit, ["node", "committedDate"])
+              stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
-            commits_list.push({ 
-              :date => date, 
-              :name => name, 
-              :email => email, 
-              :stats => stats })
+              { :date => date, 
+                :name => name, 
+                :email => email, 
+                :stats => stats }
+            end
+            commits_list.push(p)
           end
           if page_info["hasNextPage"] == "true"
             fetch_pr_data(params, page_info, commits_list) 
           else
-            { :data => commits_list }
+            { :data => Concurrent::Promise.zip(*commits_list).value! }
           end
         end
       else
@@ -140,22 +144,25 @@ class GithubMetricsFetcher
           commits = get_data(pull_request, ["commits", "nodes"])
 
           for commit in commits
-            oid = get_data(commit, ["commit", "oid"])
-            name = get_data(commit, ["commit", "author", "name"])
-            email = get_data(commit, ["commit", "author", "email"])
-            date = get_data(commit, ["commit", "committedDate"])
-            stats = fetch_commit_stats_data(params, @user, @repo, oid)
+            p = Concurrent::Promise.execute do
+              oid = get_data(commit, ["commit", "oid"])
+              name = get_data(commit, ["commit", "author", "name"])
+              email = get_data(commit, ["commit", "author", "email"])
+              date = get_data(commit, ["commit", "committedDate"])
+              stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
-            commits_list.push({ 
-              :date => date, 
+              { :date => date, 
               :name => name, 
               :email => email, 
-              :stats => stats })
+              :stats => stats }
+            end
+            
+            commits_list.push(p)
           end
           if page_info["hasNextPage"] == "true"
             fetch_pr_data(params, page_info, commits_list) 
           else
-            { :data => commits_list }
+            { :data => Concurrent::Promise.zip(*commits_list).value! }
           end
         end
       else

@@ -26,9 +26,9 @@ module AssignmentHelper
     courses.each do |course|
       options << [course.name, course.id]
     end
-    options
     options = options.uniq
     options.sort
+    options
   end
 
   # round=0 added by E1450

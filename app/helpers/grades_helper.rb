@@ -89,7 +89,7 @@ if questionnaire.type == type
     end
     end
     #@current_role_name = current_role_name/
-    render "grades/view_refactored_grid.html.erb"
+    render "grades/view_heatgrid.html.erb"
   
   end
 

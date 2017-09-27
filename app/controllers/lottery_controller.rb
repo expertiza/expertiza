@@ -13,18 +13,18 @@ class LotteryController < ApplicationController
   def run_intelligent_assignment
     priority_info = []
     assignment = Assignment.find_by(id: params[:id])
-    topic_ids = assignment.sign_up_topics.map(&:id)
-    team_ids = assignment.teams.map(&:id)
-    team_ids.each do |team_id|
+    topics = assignment.sign_up_topics
+    teams = assignment.teams
+    teams.each do |team|
       # grab student id and list of bids
       bids = []
-      topic_ids.each do |topic_id|
-        bid_record = Bid.find_by(team_id: team_id, topic_id: topic_id)
+      topics.each do |topic|
+        bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
         bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
-      priority_info << {pid: team_id, ranks: bids} if bids.uniq != [0]
+      team.users.each { |user| priority_info << { pid: user.id, ranks: bids } if bids.uniq != [0] }
     end
-    data = {teams: priority_info, max_team_size: assignment.max_team_size}
+    data = { users: priority_info, max_team_size: assignment.max_team_size }
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
       response = RestClient.post url, data.to_json, content_type: :json, accept: :json
@@ -35,7 +35,6 @@ class LotteryController < ApplicationController
     rescue => err
       flash[:error] = err.message
     end
-
     redirect_to controller: 'tree_display', action: 'list'
   end
 

@@ -27,6 +27,8 @@ module AssignmentHelper
       options << [course.name, course.id]
     end
     options
+    options = options.uniq
+    options.sort
   end
 
   # round=0 added by E1450

@@ -1,4 +1,8 @@
 #!/bin/bash
+
+###############
+### For Mac ###
+###############
 cp config/database.yml.example config/database.yml
 cp config/secrets.yml.example config/secrets.yml
 
@@ -53,14 +57,49 @@ then
       npm i -g npm
   fi
     sudo npm install -g bower && bower install
-    
+
+#################
+### For Linux ###
+#################
+cp config/database.yml.example config/database.yml
+cp config/secrets.yml.example config/secrets.yml
+
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]
 then
-  echo 'Install Third-party Javascript Libraries for Linux Platform'
-  sudo apt-get update  
-  sudo apt-get install -y nodejs && sudo apt-get install -y npm && sudo ln -s /usr/bin/nodejs /usr/bin/node
-  node -v && npm -v
-  sudo npm install -g bower && bower install
+echo 'Install Third-party Javascript Libraries for Linux Platform'
+sudo apt-get update  
+
+# Checking Node
+echo "Checking for Node"
+node --version
+if [[ $? != 0 ]] ; then
+    # Install Node
+    sudo apt-get install -y nodejs
+else
+  echo "NodeJS $(node -v) is already installed"
+fi
+
+# Checking NPM
+echo "Checking for NPM"
+npm --version
+if [[ $? != 0 ]] ; then
+    echo "Installing NPM"
+    sudo apt-get install -y npm
+else
+    echo "NPM was already installed"
+    echo "Looking for an update"
+    npm i -g npm
+fi
+
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+
+# Installing Bower
+sudo npm install -g bower && bower install
+
+######################
+### For Windows :( ###
+######################
+
 elif [ -n "$COMSPEC" -a -x "$COMSPEC" ]
 then 
   echo $0: this script does not support Windows \:\(

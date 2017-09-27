@@ -213,10 +213,10 @@ class Assignment < ActiveRecord::Base
     end
     path_text = ""
     if !self.course_id.nil? && self.course_id > 0
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' +
-        FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/'
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
+        FileHelper.clean_path(self.course.directory_path) + '/'
     else
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
     end
     path_text += FileHelper.clean_path(self.directory_path)
     path_text

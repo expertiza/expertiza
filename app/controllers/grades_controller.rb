@@ -122,9 +122,7 @@ class GradesController < ApplicationController
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-
-    list_questions @assignment
-
+    @questions = list_questions(@assignment)
     @scores = @participant.scores(@questions)
   end
 
@@ -163,11 +161,12 @@ class GradesController < ApplicationController
 
   # This method is used from edit methods
   def list_questions(assignment)
-    @questions = {}
+    questions = {}
     questionnaires = assignment.questionnaires
     questionnaires.each do |questionnaire|
-      @questions[questionnaire.symbol] = questionnaire.questions
+      questions[questionnaire.symbol] = questionnaire.questions
     end
+    questions
   end
 
   def update

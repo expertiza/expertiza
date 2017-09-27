@@ -6,13 +6,10 @@ class TeamNode < Node
   end
 
   def self.get(parent_id)
-    query = "select nodes.* from nodes, " + self.table
-    query = query + " where nodes.node_object_id = " + self.table + ".id"
-    query = query + " and nodes.type = '" + self.to_s + "'"
-    if parent_id
-      query = query + " and " + self.table + ".parent_id = " + parent_id.to_s
-    end
-    find_by_sql(query)
+    nodes = Node.joins("INNER JOIN teams ON nodes.node_object_id = teams.id")
+                .select('nodes.*')
+                .where("nodes.type = 'TeamNode'")
+    nodes.where("teams.parent_id = ?", parent_id) if parent_id
   end
 
   def get_name

@@ -24,10 +24,10 @@ module SubmittedContentHelper
           ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => file
         else
           ret += "\n      "
-          ret += link_to File.basename(file), :controller => 'submitted_content', 
-                                              :action => 'download', 
-                                              :id => participant.id, 
-                                              :download => File.basename(file), 
+          ret += link_to File.basename(file), :controller => 'submitted_content',
+                                              :action => 'download',
+                                              :id => participant.id,
+                                              :download => File.basename(file),
                                               "current_folder[name]" => File.dirname(file)
         end
         ret += "\n   </td>\n   <td valign = top>\n"
@@ -55,11 +55,11 @@ module SubmittedContentHelper
     for file in files
       begin
         if File.exist?(file)
-          html += link_to image_tag('/assets/tree_view/List-submisstions-24.png'), 
-                          :controller => 'submitted_content', 
-                          :action => 'download', 
-                          :id => participant.id, 
-                          :download => File.basename(file), 
+          html += link_to image_tag('/assets/tree_view/List-submisstions-24.png'),
+                          :controller => 'submitted_content',
+                          :action => 'download',
+                          :id => participant.id,
+                          :download => File.basename(file),
                           "current_folder[name]" => File.dirname(file)
         end
       rescue

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170518033740) do
+ActiveRecord::Schema.define(version: 20170925225438) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -84,6 +84,7 @@ ActiveRecord::Schema.define(version: 20170518033740) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
+    t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
   end
 
@@ -111,14 +112,14 @@ ActiveRecord::Schema.define(version: 20170518033740) do
 
   create_table "bids", force: :cascade do |t|
     t.integer  "topic_id",   limit: 4
-    t.integer  "user_id",    limit: 4
+    t.integer  "team_id",    limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "priority",   limit: 4
   end
 
+  add_index "bids", ["team_id"], name: "index_bids_on_team_id", using: :btree
   add_index "bids", ["topic_id"], name: "index_bids_on_topic_id", using: :btree
-  add_index "bids", ["user_id"], name: "index_bids_on_user_id", using: :btree
 
   create_table "bookmark_ratings", force: :cascade do |t|
     t.integer  "bookmark_id", limit: 4
@@ -358,11 +359,6 @@ ActiveRecord::Schema.define(version: 20170518033740) do
   end
 
   add_index "plagiarism_checker_comparisons", ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index", using: :btree
-
-  create_table "plugin_schema_info", id: false, force: :cascade do |t|
-    t.string  "plugin_name", limit: 255
-    t.integer "version",     limit: 4
-  end
 
   create_table "question_advices", force: :cascade do |t|
     t.integer "question_id", limit: 4

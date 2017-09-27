@@ -1,4 +1,3 @@
-require 'rails_helper'
 include InstructorInterfaceHelperSpec
 
 question_type = %w(Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader)
@@ -19,7 +18,7 @@ describe "Questionnaire tests for instructor interface" do
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'something'
       click_button 'SIGN IN'
-      expect(page).to have_text('Incorrect password')
+      expect(page).to have_text('Your username or password is incorrect.')
     end
   end
 

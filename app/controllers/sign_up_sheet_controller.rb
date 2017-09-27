@@ -20,7 +20,7 @@ class SignUpSheetController < ApplicationController
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
-       'Student'].include? current_role_name and 
+       'Student'].include? current_role_name and
       ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
       ['Instructor',
@@ -84,7 +84,7 @@ class SignUpSheetController < ApplicationController
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
     @topic = SignUpTopic.find(params[:id])
-    
+
     if @topic
       @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
@@ -118,7 +118,7 @@ class SignUpSheetController < ApplicationController
   # retrieves all the data associated with the given assignment. Includes all topics,
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
-    @sign_up_topics = SignUpTopic.where(['assignment_id = ?', assignment_id])
+    @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
@@ -156,55 +156,50 @@ class SignUpSheetController < ApplicationController
 
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
-    assignment = @participant.assignment
-    @assignment_id = assignment.id
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment_id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment_id)
+    @assignment = @participant.assignment
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
     @topic_id = params[:id]
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    @max_team_size = @assignment.max_team_size
+    team_id = @participant.team.try(:id)
 
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment_id, private_to: nil)
-    @max_team_size = assignment.max_team_size
-
-    if assignment.is_intelligent
-      @bids = Bid.where(user_id: session[:user].id).order(:priority)
+    if @assignment.is_intelligent
+      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority) 
       signed_up_topics = []
       @bids.each do |bid|
         sign_up_topic = SignUpTopic.where(id: bid.topic_id)
-        unless sign_up_topic.empty?
-          signed_up_topics << sign_up_topic.first
-        end
+        signed_up_topics << sign_up_topic.first unless sign_up_topic.empty?
       end
-      signed_up_topics = signed_up_topics & @sign_up_topics
-      @sign_up_topics = @sign_up_topics - signed_up_topics
+      signed_up_topics &= @sign_up_topics
+      @sign_up_topics -= signed_up_topics
       @bids = signed_up_topics
     end
 
     @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = assignment.due_dates.find_by_deadline_type_id(7)
-    @drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
-    @student_bids = Bid.where(user_id: session[:user].id)
+    @signup_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(7)
+    @drop_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(6)
+    @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
-    unless assignment.due_dates.find_by_deadline_type_id(1).nil?
-      if !assignment.staggered_deadline? and assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+    unless @assignment.due_dates.find_by_deadline_type_id(1).nil?
+      if !@assignment.staggered_deadline? and @assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
         @show_actions = false
       end
 
       # Find whether the user has signed up for any topics; if so the user won't be able to
       # sign up again unless the former was a waitlisted topic
       # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpTeam.find_team_users(@assignment_id, session[:user].id)
-
+      users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
       @selected_topics = if users_team.empty?
                            nil
                          else
                            # TODO: fix this; cant use 0
-                           SignedUpTeam.find_user_signup_topics(@assignment_id, users_team[0].t_id)
+                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
                          end
-
     end
-    if assignment.is_intelligent
+    if @assignment.is_intelligent
       render 'sign_up_sheet/intelligent_topic_selection' and return
     end
   end
@@ -283,42 +278,35 @@ class SignUpSheetController < ApplicationController
   end
 
   def set_priority
-    @user_id = session[:user].id
+    participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-    unless params[:topic].nil?
-      team_ids = AssignmentTeam.where(parent_id: assignment_id).map(&:id)
-      team_user = TeamsUser.where("user_id = ? AND team_id IN (?)", @user_id, team_ids)
-      user_ids = []
-      user_ids << @user_id
-      unless team_user.empty?
-        user_ids << TeamsUser.where(team_id: team_user.first.try(:team_id)).map(&:user_id)
-      end
-      user_ids = user_ids.flatten!.uniq
-      user_ids.each do |user_id|
-        @bids = Bid.where("user_id = ?", user_id )
-        signed_up_topics = @bids.map {|bid| bid.topic_id}
-
-        #Remove topics from bids table if the student moves data from Selection HTML table to Topics HTML table
-        #This step is necessary to avoid duplicate priorities in Bids table
-        signed_up_topics = signed_up_topics - params[:topic].map {|topic_id| topic_id.to_i}
-        signed_up_topics.each do |topic|
-          Bid.where(topic_id: topic, user_id: user_id).destroy_all
-        end
-
-        params[:topic].each_with_index do |topic_id,index|
-          check = @bids.where(topic_id: topic_id)
-          if check.empty?
-            Bid.create(topic_id: topic_id, user_id: user_id, priority: index + 1)
-          else
-            Bid.where("topic_id = ? AND user_id = ?",topic_id, user_id).update_all({priority: index + 1})
-          end
-        end
-      end
-    else
-      #All topics are deselected by user
-      Bid.where(user_id: @user_id).destroy_all
+    team_id = participant.team.try(:id)
+    unless team_id
+      # Zhewei: team lazy initialization
+      SignUpSheet.signup_team(assignment_id, participant.user.id)
+      team_id = participant.team.try(:id)
     end
-
+    if params[:topic].nil?
+      # All topics are deselected by current team
+      Bid.where(team_id: team_id).destroy_all
+    else
+      @bids = Bid.where(team_id: team_id)
+      signed_up_topics = @bids.map(&:topic_id)
+      # Remove topics from bids table if the student moves data from Selection table to Topics table
+      # This step is necessary to avoid duplicate priorities in Bids table
+      signed_up_topics -= params[:topic].map(&:to_i)
+      signed_up_topics.each do |topic|
+        Bid.where(topic_id: topic, team_id: team_id).destroy_all
+      end
+      params[:topic].each_with_index do |topic_id, index|
+        bid_existence = @bids.where(topic_id: topic_id)
+        if bid_existence.empty?
+          Bid.create(topic_id: topic_id, team_id: team_id, priority: index + 1)
+        else
+          Bid.where(topic_id: topic_id, team_id: team_id).update_all(priority: index + 1)
+        end
+      end
+    end
     redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 
@@ -400,7 +388,9 @@ class SignUpSheetController < ApplicationController
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
     SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
-    SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i) if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+    if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
+      SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
+    end
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
     waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
     unless waitlisted_teams.blank?

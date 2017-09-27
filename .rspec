@@ -1,2 +1,4 @@
 --color
---require spec_helper
+--profile
+--fail-fast
+--require rails_helper

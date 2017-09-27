@@ -1,4 +1,3 @@
-require 'rails_helper'
 include InstructorInterfaceHelperSpec
 
 def create_assignment_due_date

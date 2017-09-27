@@ -1,5 +1,3 @@
-require 'rails_helper'
-require 'selenium-webdriver'
 ########################################
 
 #   Case 1: One team is on the waitlist. They sent a suggestion for new topic and they want to choose their suggested topic. After their suggested topic is approved, they should leave the waitlist and hold their suggested topic;
@@ -21,7 +19,7 @@ describe "Assignment Topic Suggestion Test" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create :assignment_due_date
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: DateTime.now.in_time_zone + 2.day)
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: DateTime.now.in_time_zone + 2.days)
   end
 
   describe "case 1" do

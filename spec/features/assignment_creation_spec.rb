@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 def questionnaire_options(assignment, type, _round = 0)
   questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
   options = []
@@ -418,7 +416,7 @@ describe "assignment function" do
       all(:xpath, '//img[@title="Delete Topic"]')[0].click
       click_button 'OK'
 
-      topics_exist = SignUpTopic.count(:all, assignment_id: assignment.id)
+      topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0
     end
   end
@@ -438,8 +436,8 @@ describe "assignment function" do
       create(:assignment_questionnaire)
       (1..3).each do |i|
         create(:questionnaire, name: "ReviewQuestionnaire#{i}")
-        create(:author_feedback_questionnaire, name: "AuthorFeedbackQuestionnaire#{i}")
-        create(:teammate_review_questionnaire, name: "TeammateReviewQuestionnaire#{i}")
+        create(:questionnaire, name: "AuthorFeedbackQuestionnaire#{i}", type: 'AuthorFeedbackQuestionnaire')
+        create(:questionnaire, name: "TeammateReviewQuestionnaire#{i}", type: 'TeammateReviewQuestionnaire')
       end
       login_as("instructor6")
       visit "/assignments/#{@assignment.id}/edit"
@@ -565,7 +563,7 @@ describe "assignment function" do
       fill_in 'user_name', with: student.name
       choose 'user_role_participant'
 
-      expect{click_button 'Add'; sleep(1)}.to change { Participant.count }.by 1
+      expect { click_button 'Add'; sleep(1) }.to change { Participant.count }.by 1
     end
 
     it "should display newly created assignment" do

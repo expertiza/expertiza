@@ -70,7 +70,9 @@ class CourseController < ApplicationController
         CourseNode.create(node_object_id: new_course.id)
       end
 
-      undo_link("The course \"#{orig_course.name}\" has been successfully copied. The copy is currently associated with an existing location from the original course. This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
+      undo_link("The course \"#{orig_course.name}\" has been successfully copied. 
+        The copy is currently associated with an existing location from the original course. 
+        This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
       redirect_to controller: 'course', action: 'edit', id: new_course.id
 
     rescue
@@ -117,12 +119,6 @@ class CourseController < ApplicationController
     rescue
       flash[:error] = $ERROR_INFO
     end
-
-    # already taken care of in association declaration
-    # @course.ta_mappings.each{
-    #  | map |
-    #  map.destroy
-    # }
     @course.destroy
     undo_link("The course \"#{@course.name}\" has been successfully deleted.")
     redirect_to controller: 'tree_display', action: 'list'
@@ -151,7 +147,7 @@ class CourseController < ApplicationController
     @user = User.find_by_name(params[:user][:name])
     if @user.nil?
       flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
-    elsif TaMapping.where(ta_id: @user.id, course_id: @course.id).size > 0
+    elsif !TaMapping.where(ta_id: @user.id, course_id: @course.id).empty?
       flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" is already a TA for this course."
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
@@ -181,9 +177,4 @@ class CourseController < ApplicationController
 
     render action: 'remove_ta.js.erb', layout: false
   end
-
-  # generate the undo link
-  # def undo_link
-  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
-  # end
 end

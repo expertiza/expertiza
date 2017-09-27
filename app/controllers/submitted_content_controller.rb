@@ -47,14 +47,13 @@ class SubmittedContentController < ApplicationController
     else
       begin
         team.submit_hyperlink(params['submission'])
-        @submission_record = SubmissionRecord.new(team_id: team.id,
-                                                  content: params['submission'],
-                                                  user: @participant.name,
-                                                  assignment_id: @participant.assignment.id,
-                                                  operation: "Submit Hyperlink")
-        @submission_record.save
+        SubmissionRecord.create(team_id: team.id,
+                                content: params['submission'],
+                                user: @participant.name,
+                                assignment_id: @participant.assignment.id,
+                                operation: "Submit Hyperlink")
       rescue
-        flash[:error] = "The URL or URI is not valid. Reason: #{$ERROR_INFO}"
+        flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
       undo_link("The link has been successfully submitted.")
     end
@@ -72,13 +71,11 @@ class SubmittedContentController < ApplicationController
     # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
-    @submission_record = SubmissionRecord.new(team_id: team.id,
-                                              content: hyperlink_to_delete,
-                                              user: @participant.name,
-                                              assignment_id: assignment.id,
-                                              operation: "Remove Hyperlink")
-    @submission_record.save
-
+    SubmissionRecord.create(team_id: team.id,
+                          content: hyperlink_to_delete,
+                          user: @participant.name,
+                          assignment_id: assignment.id,
+                          operation: "Remove Hyperlink")
     action = (assignment.submission_allowed(topic_id) ? 'edit' : 'view')
     redirect_to action: action, id: @participant.id
   end
@@ -108,12 +105,11 @@ class SubmittedContentController < ApplicationController
     end
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
-    @submission_record = SubmissionRecord.new(team_id: team.id,
-                                              content: full_filename,
-                                              user: participant.name,
-                                              assignment_id: assignment.id,
-                                              operation: "Submit File")
-    @submission_record.save
+    SubmissionRecord.create(team_id: team.id,
+                          content: full_filename,
+                          user: participant.name,
+                          assignment_id: assignment.id,
+                          operation: "Submit File")
     # send message to reviewers when submission has been updated
     # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
     participant.assignment.email(participant.id) rescue nil
@@ -148,10 +144,7 @@ class SubmittedContentController < ApplicationController
 
   def download
     begin
-      # folder_name = FileHelper::sanitize_folder(@current_folder.name)
       folder_name = params['current_folder']['name']
-      # This code removed on 4/10/09 was breaking downloads of files with hyphens in them
-      # file_name = FileHelper::sanitize_filename(params['download'])
       file_name = params['download']
       raise "Folder_name is nil." if folder_name.nil?
       raise "File_name is nil." if file_name.nil?
@@ -197,14 +190,14 @@ class SubmittedContentController < ApplicationController
   def delete_selected_files
     filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
     FileUtils.rm_r(filename)
-    assignment = Assignment.find(participant.parent_id)
-    team = participant.team
-    @submission_record = SubmissionRecord.new(team_id: team.id,
-                                              content: full_filename,
-                                              user: participant.name,
-                                              assignment_id: assignment.id,
-                                              operation: "Remove File")
-    @submission_record.save
+    participant = Participant.find_by(id: params[:id])
+    assignment = participant.try(:assignment)
+    team = participant.try(:team)
+    SubmissionRecord.create(team_id: team.try(:id),
+                          content: filename,
+                          user: participant.try(:name),
+                          assignment_id: assignment.try(:id),
+                          operation: "Remove File")
   end
 
   def copy_selected_file

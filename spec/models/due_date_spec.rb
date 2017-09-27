@@ -1,21 +1,18 @@
-require 'rails_helper'
-
 describe "due_date_functions" do
-
   before(:each) do
     @deadline_type = build(:deadline_type)
     @deadline_right = build(:deadline_right)
     @assignment_due_date = build(:assignment_due_date, deadline_type: @deadline_type,
-      submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-      review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
+                                                       submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+                                                       review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
 
     @due_dates = []
     10.times.each do |n|
-      if n == 1 || n == 9
-        date = nil
-      else
-        date = Time.zone.now - 60*n
-      end
+      date = if n == 1 || n == 9
+               nil
+             else
+               Time.zone.now - 60 * n
+             end
       @due_dates << build(:assignment_due_date, due_at: date)
     end
   end
@@ -36,7 +33,6 @@ describe "due_date_functions" do
 
   it "due at is valid datetime" do
     expect(@assignment_due_date.due_at_is_valid_datetime).to be nil
-
   end
 
   it "copy due dates to new assignment" do
@@ -54,15 +50,14 @@ describe "due_date_functions" do
     expect(new_due_date.deadline_type_id).to eql @assignment_due_date.deadline_type_id
     expect(new_due_date.parent_id).to eql @assignment_due_date.parent_id
     expect(new_due_date.round).to eql @assignment_due_date.round
-
   end
 
   it "sort duedate records" do
     sorted_due_dates = @due_dates
-    expect(sorted_due_dates.each_cons(2).all?{|m1, m2| (m1.due_at <=> m2.due_at) != 1}).to eql false
+    expect(sorted_due_dates.each_cons(2).all? {|m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql false
 
     sorted_due_dates = DueDate.deadline_sort(@due_dates)
-    expect(sorted_due_dates.each_cons(2).all?{|m1, m2| (m1.due_at <=> m2.due_at) != 1}).to eql true
+    expect(sorted_due_dates.each_cons(2).all? {|m1, m2| (m1.due_at <=> m2.due_at) != 1 }).to eql true
   end
 
   describe "#done_in_assignment_round" do
@@ -90,40 +85,40 @@ describe "due_date_functions" do
 
     it "get next assignment due date" do
       due_date = create(:assignment_due_date, deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-        review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000)
+                                              submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+                                              review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000)
       expect(DueDate.get_next_due_date(due_date.parent_id)).to be_valid
     end
 
     it "get next due date from topic for staggered deadline" do
       assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-        review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000, parent_id: assignment_id)
+                                         submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
+                                         review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000, parent_id: assignment_id)
       expect(DueDate.get_next_due_date(assignment_id, due_date.parent_id)).to be_valid
     end
 
     it "next due date does not exist for staggered deadline" do
       assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
-        review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
+                                         submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
+                                         review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
       expect(DueDate.get_next_due_date(assignment_id)).to be nil
     end
 
     it "next due date is before Time.now for staggered deadline" do
       assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
-        review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now - 5000, parent_id: assignment_id)
+                                         submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
+                                         review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now - 5000, parent_id: assignment_id)
       expect(DueDate.get_next_due_date(assignment_id, due_date.parent_id)).to be nil
     end
 
     it "get next due date from assignment for staggered deadline" do
       assignment_id = create(:assignment, staggered_deadline: true, name: "testassignment").id
       due_date = create(:assignment_due_date, deadline_type: @deadline_type,
-        submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
-        review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
+                                              submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
+                                              review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
       expect(DueDate.get_next_due_date(assignment_id)).to be_valid
     end
   end

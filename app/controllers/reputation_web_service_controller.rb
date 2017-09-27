@@ -23,36 +23,36 @@ class ReputationWebServiceController < ApplicationController
 
   # normal db query, return peer review grades
   def db_query(assignment_id, another_assignment_id = 0, round_num, hasTopic)
-    # 	  query="SELECT U.id, RM.reviewee_id as submission_id, "+
-    # 		    "sum(A.answer * Q.weight) / sum(QN.max_question_score * Q.weight) * 100 as total_score "+
-    # 			# new way to calculate the grades of coding artifacts
-    # 			#"100 - SUM((QN.max_question_score-A.answer) * Q.weight) AS total_score "+
-    # 			"from answers A  "+
-    # 			"inner join questions Q on A.question_id = Q.id "+
-    # 			"inner join questionnaires QN on Q.questionnaire_id = QN.id "+
-    # 			"inner join responses R on A.response_id = R.id "+
-    # 			"inner join response_maps RM on R.map_id = RM.id "+
-    # 			"inner join participants P on P.id = RM.reviewer_id "+
-    # 			"inner join users U on U.id = P.user_id "+
-    # 			"inner join teams T on T.id = RM.reviewee_id "
-    # 			query += "inner join signed_up_teams SU_team on SU_team.team_id = T.id " if hasTopic == true
-    # 			query += "where RM.type='ReviewResponseMap' "+
-    # 			"and RM.reviewed_object_id = "+  assignment_id.to_s + " " +
-    # 			"and A.answer is not null "+
-    # 			"and Q.type ='Criterion' "+
-    # 			#If one assignment is varying rubric by round (724, 733, 736) or 2-round peer review with (735),
-    # 			#the round field in response records corresponding to ReviewResponseMap will be 1 or 2, will not be null.
-    # 			"and R.round = 2 "
-    # 			query+="and SU_team.is_waitlisted = 0 " if hasTopic == true
-    # 			query+="group by RM.id "+
-    # 			"order by RM.reviewee_id"
+    #     query="SELECT U.id, RM.reviewee_id as submission_id, "+
+    #         "sum(A.answer * Q.weight) / sum(QN.max_question_score * Q.weight) * 100 as total_score "+
+    #       # new way to calculate the grades of coding artifacts
+    #       #"100 - SUM((QN.max_question_score-A.answer) * Q.weight) AS total_score "+
+    #       "from answers A  "+
+    #       "inner join questions Q on A.question_id = Q.id "+
+    #       "inner join questionnaires QN on Q.questionnaire_id = QN.id "+
+    #       "inner join responses R on A.response_id = R.id "+
+    #       "inner join response_maps RM on R.map_id = RM.id "+
+    #       "inner join participants P on P.id = RM.reviewer_id "+
+    #       "inner join users U on U.id = P.user_id "+
+    #       "inner join teams T on T.id = RM.reviewee_id "
+    #       query += "inner join signed_up_teams SU_team on SU_team.team_id = T.id " if hasTopic == true
+    #       query += "where RM.type='ReviewResponseMap' "+
+    #       "and RM.reviewed_object_id = "+  assignment_id.to_s + " " +
+    #       "and A.answer is not null "+
+    #       "and Q.type ='Criterion' "+
+    #       #If one assignment is varying rubric by round (724, 733, 736) or 2-round peer review with (735),
+    #       #the round field in response records corresponding to ReviewResponseMap will be 1 or 2, will not be null.
+    #       "and R.round = 2 "
+    #       query+="and SU_team.is_waitlisted = 0 " if hasTopic == true
+    #       query+="group by RM.id "+
+    #       "order by RM.reviewee_id"
     #
     #         result = ActiveRecord::Base.connection.select_all(query)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
     assignment_ids << another_assignment_id unless another_assignment_id == 0
-    ReviewResponseMap.where(['reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false]).each do |response_map|
+    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((hasTopic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
@@ -84,13 +84,13 @@ class ReputationWebServiceController < ApplicationController
     assignment_ids = []
     assignment_ids << assignment_id
     assignment_ids << another_assignment_id unless another_assignment_id == 0
-    teams = AssignmentTeam.where(['parent_id in (?)', assignment_ids])
+    teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
     team_ids = []
     teams.each {|team| team_ids << team.id }
-    quiz_questionnnaires = QuizQuestionnaire.where(['instructor_id in (?)', team_ids])
+    quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnnaire_ids = []
     quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
-    QuizResponseMap.where(['reviewed_object_id in (?)', quiz_questionnnaire_ids]).each do |response_map|
+    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
       raw_data_array << [participant.user_id, response_map.reviewee_id, quiz_score]

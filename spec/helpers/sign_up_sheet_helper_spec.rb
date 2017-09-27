@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "SignUpSheetHelper" do
   describe "#check_topic_due_date_value" do
     before(:each) do

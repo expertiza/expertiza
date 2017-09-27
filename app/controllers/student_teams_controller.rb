@@ -22,7 +22,7 @@ class StudentTeamsController < ApplicationController
         'Teaching Assistant',
         'Administrator',
         'Super-Administrator',
-        'Student'].include? current_role_name and 
+        'Student'].include? current_role_name and
        ((%w(view).include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
       # make sure the student is the owner if they are trying to create it
       return current_user_id? student.user_id if %w(create).include? action_name

@@ -1,19 +1,18 @@
 class ApplicationController < ActionController::Base
+
   include AccessHelper
 
   # You want to get exceptions in development, but not in production.
   unless Rails.application.config.consider_all_requests_local
-    rescue_from ActionView::MissingTemplate do |exception|
+    rescue_from ActionView::MissingTemplate do |_exception|
       redirect_to root_path
     end
   end
+  
+  # forcing SSL only in the production mode
+  force_ssl if Rails.env.production?
 
-  if Rails.env.production?
-    # forcing SSL only in the production mode
-    force_ssl
-  end
-
-  helper_method :current_user_session, :current_user, :current_user_role?
+  helper_method :current_user, :current_user_role?, :anonymous_mode?
   protect_from_forgery with: :exception
   before_action :set_time_zone
   before_action :authorize
@@ -40,7 +39,7 @@ class ApplicationController < ActionController::Base
   end
 
   def undo_link(message)
-    @version = Version.where(['whodunnit = ?', session[:user].id]).last
+    @version = Version.where('whodunnit = ?', session[:user].id).last
     if @version.try(:created_at) && Time.now - @version.created_at < 5.0
       @link_name = params[:redo] == "true" ? "redo" : "undo"
       message += "<a href = #{url_for(controller: :versions, action: :revert, id: @version.id, redo: !params[:redo])}>#{@link_name}</a>"
@@ -111,7 +110,7 @@ class ApplicationController < ActionController::Base
     # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
     # Get the Instructor::QUESTIONNAIRE constant
     @display_options ||= eval "#{current_user_role.class}::#{object_type}"
-    end
+  end
 
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.

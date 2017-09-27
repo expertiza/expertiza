@@ -1,9 +1,7 @@
-require 'rails_helper'
-
-RSpec.describe Institution, :type => :model do
-  subject {
+describe Institution do
+  subject do
     described_class.new(name: "NC State University")
-  }
+  end
   it 'is valid with valid a name' do
     expect(subject).to be_valid
   end

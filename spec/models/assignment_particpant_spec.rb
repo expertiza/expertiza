@@ -1,64 +1,150 @@
-require 'rails_helper'
-describe "AssignmentParticipant" do
-  describe "validations" do
-    it "assignment participant is valid" do
-      assignment_participant = build(:participant)
-      expect(assignment_participant).to be_valid
+describe AssignmentParticipant do
+  let(:response) { build(:response) }
+  let(:team) { build(:assignment_team, id: 1) }
+  let(:team2) { build(:assignment_team, id: 2) }
+  let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response]) }
+  let(:participant) { build(:participant, id: 1, assignment: assignment) }
+  let(:participant2) { build(:participant, id: 2) }
+  let(:assignment) { build(:assignment, id: 1) }
+  let(:review_questionnaire) { build(:questionnaire, id: 1) }
+  let(:question) { double('Question') }
+  before(:each) do
+    allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
+    allow(participant).to receive(:team).and_return(team)
+  end
+  describe '#dir_path' do
+    it 'returns the directory path of current assignment'
+  end
+
+  describe '#assign_quiz' do
+    it 'creates a new QuizResponseMap record'
+  end
+
+  describe '#reviewers' do
+    it 'returns all the participants in this assignment who have reviewed the team where this participant belongs'
+  end
+
+  describe '#review_score' do
+    it 'returns the review score'
+  end
+
+  describe '#scores' do
+    context 'when assignment is not varying rubric by round and not an microtask' do
+      it 'calculates scores that this participant has been given'
+    end
+
+    context 'when assignment is varying rubric by round but not an microtask' do
+      it 'calculates scores that this participant has been given'
+    end
+
+    context 'when assignment is not varying rubric by round but an microtask' do
+      it 'calculates scores that this participant has been given'
     end
   end
 
-  describe "#type" do
-    it "checks if type is assignment participant" do
-      assignment_participant = build(:participant)
-      expect(assignment_participant.type).to eq("AssignmentParticipant")
+  describe '#copy' do
+    it 'copies assignment participants to a certain course'
+  end
+
+  describe '#feedback' do
+    it 'returns corrsponding author feedback responses given by current participant'
+  end
+
+  describe '#reviews' do
+    it 'returns corrsponding peer review responses given by current team'
+  end
+
+  describe '#reviews_by_reviewer' do
+    it 'returns corrsponding peer review responses given by certain reviewer'
+  end
+
+  describe '#quizzes_taken' do
+    it 'returns corrsponding quiz responses given by current participant'
+  end
+
+  describe '#metareviews' do
+    it 'returns corrsponding metareview responses given by current participant'
+  end
+
+  describe '#teammate_reviews' do
+    it 'returns corrsponding teammate review responses given by current participant'
+  end
+
+  describe '#bookmark_reviews' do
+    it 'returns corrsponding bookmark review responses given by current participant'
+  end
+
+  describe '#files' do
+    context 'when there is not subdirectory in current directory' do
+      it 'returns all files in current directory'
+    end
+
+    context 'when there is subdirectory in current directory' do
+      it 'recursively returns all files in current directory'
     end
   end
 
-  describe "#average_scores" do
-    it "returns 0 if self.response_maps is empty" do
-      assignment_participant = build(:participant)
-      sum_scores = assignment_participant.average_score
-      expect(sum_scores).to be_zero
+  describe ".import" do
+    context 'when record is empty' do
+      it 'raises an ArgumentError'
+    end
+
+    context 'when no user is found by offered username' do
+      context 'when the record has less than 4 items' do
+        it 'raises an ArgumentError'
+      end
+
+      context 'when the record has more than 4 items' do
+        context 'when certain assignment cannot be found' do
+          it 'creates a new user based on import information and raises an ImportError'
+        end
+
+        context 'when certain assignment can be found and assignment participant does not exists' do
+          it 'creates a new user, new participant and raises an ImportError'
+        end
+      end
     end
   end
 
-  describe "#copy" do
-    it "creates a copy if part is empty" do
-      assignment_participant = build(:participant)
-      course_part = assignment_participant.copy(0)
-      expect(course_part).to be_an_instance_of(CourseParticipant)
+  describe '.export' do
+    it 'exports all participants in current assignment'
+  end
+
+  describe '#set_handle' do
+    context 'when the user of current participant does not have handle' do
+      it 'sets the user name as the handle of current participant'
+    end
+
+    context 'when current assignment exists participants with same handle as the one of current user' do
+      it 'sets the user name as the name of current participant'
+    end
+
+    context 'when current assignment does not have participants with same handle as the one of current user' do
+      it 'sets the user name as the handle of current participant'
     end
   end
 
-  describe "#import" do
-    it "raise error if record is empty" do
-      row = []
-      expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error("No user id has been specified.")
+  describe '#review_file_path' do
+    it 'returns the file path for reviewer to upload files during peer review'
+  end
+
+  describe '#current_stage' do
+    it 'returns stage of current assignment'
+  end
+
+  describe '#stage_deadline' do
+    context 'when stage of current assignment is not Finished' do
+      it 'returns current stage'
     end
 
-    it "raise error if record does not have enough items " do
-      row = ["user_name", "user_fullname", "name@email.com"]
-      expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[0]} does not have enough items.")
-    end
+    context 'when stage of current assignment not Finished' do
+      context 'current assignment is not a staggered deadline assignment' do
+        it 'returns the due date of current assignment'
+      end
 
-    it "raise error if assignment with id not found" do
-      build(:assignment)
-      session = {}
-      row = []
-      allow(Assignment).to receive(:find).and_return(nil)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
-      expect { AssignmentParticipant.import(row, nil, session, 2) }.to raise_error("The assignment with id \"2\" was not found.")
-    end
-
-    it "creates assignment participant form record if it does not exist" do
-      assignment = build(:assignment)
-      session = {}
-      allow(Assignment).to receive(:find).and_return(assignment)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
-      assign_part = AssignmentParticipant.import(row, nil, session, 2)
-      expect(assign_part).to be_truthy
+      context 'current assignment is a staggered deadline assignment' do
+        it 'returns the due date of current topic'
+      end
     end
   end
 end

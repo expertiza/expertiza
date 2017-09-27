@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe Role do
   before :all do
     @student_role = build(:role_of_student, id: 1, name: "Student", description: '', parent_id: nil, default_page_id: nil)

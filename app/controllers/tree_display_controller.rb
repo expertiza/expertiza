@@ -5,7 +5,7 @@ class TreeDisplayController < ApplicationController
     true
   end
 
-#refactored method to provide direct access to parameters
+  # refactored method to provide direct access to parameters
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
@@ -82,14 +82,14 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: :notifications, action: :list if current_user.try(:student?)
   end
 
-  #renders FolderNode json
+  # renders FolderNode json
   def folder_node_ng_getter
     respond_to do |format|
       format.html { render json: FolderNode.get }
     end
   end
 
-  #finding out child_nodes from params
+  # finding out child_nodes from params
   def child_nodes_from_params(child_nodes)
     if child_nodes.is_a? String
       JSON.parse(child_nodes)
@@ -98,7 +98,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  #getting all attributes of assignment node
+  # getting all attributes of assignment node
   def assignments_method(node, tmp_object)
     tmp_object.merge!(
       "course_id" => node.get_course_id,
@@ -121,7 +121,7 @@ class TreeDisplayController < ApplicationController
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
   end
 
-#updating instructor value for tmp_object
+  # updating instructor value for tmp_object
   def update_instructor(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
     tmp_object["instructor"] = nil
@@ -129,14 +129,14 @@ class TreeDisplayController < ApplicationController
   end
 
   def update_tmp_obj(tmp_object, node)
-    tmp={
+    tmp = {
       "directory" => node.get_directory,
       "creation_date" => node.get_creation_date,
       "updated_date" => node.get_modified_date,
       "institution" => Institution.where(id: node.retrieve_institution_id),
       "private" => node.get_instructor_id == session[:user].id ? true : false
-       }
-   tmp_object.merge!(tmp)
+    }
+    tmp_object.merge!(tmp)
   end
 
   def courses_assignments_obj(node_type, tmp_object, node)
@@ -150,7 +150,7 @@ class TreeDisplayController < ApplicationController
     assignments_method(node, tmp_object) if node_type == "Assignments"
   end
 
-#getting result nodes for child
+  # getting result nodes for child
   def res_node_for_child(tmp_res)
     res = {}
     tmp_res.keys.each do |node_type|
@@ -178,7 +178,7 @@ class TreeDisplayController < ApplicationController
     tmp_res[fnode.get_name] = ch_nodes
   end
 
-#initialize parent node and update child nodes for it
+  # initialize parent node and update child nodes for it
   def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
     node.each do |a|
@@ -200,14 +200,14 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  #check if nodetype is coursenode
+  # check if nodetype is coursenode
   def is_type_coursenode?(ta_mappings, node)
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == node.node_object_id
     end
   end
 
-  #check if nodetype is assignmentnode
+  # check if nodetype is assignmentnode
   def is_type_assignmentnode?(ta_mappings, node)
     course_id = Assignment.find(node.node_object_id).course_id
     ta_mappings.each do |ta_mapping|
@@ -215,7 +215,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  #check if user is ta for current course
+  # check if user is ta for current course
   def ta_for_current_course?(node)
     ta_mappings = TaMapping.where(ta_id: session[:user].id)
     if node.type == "CourseNode"
@@ -226,14 +226,14 @@ class TreeDisplayController < ApplicationController
     false
   end
 
-#check if current user is ta for instructor
+  # check if current user is ta for instructor
   def is_user_ta?(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
-#check if current user is instructor
+  # check if current user is instructor
   def is_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
@@ -248,7 +248,7 @@ class TreeDisplayController < ApplicationController
         is_user_instructor?(instructor_id)
   end
 
-  #attaches assignment nodes to course node of instructor
+  # attaches assignment nodes to course node of instructor
   def coursenode_assignmentnode(res2, child)
     res2["directory"] = child.get_directory
     instructor_id = child.get_instructor_id
@@ -257,7 +257,7 @@ class TreeDisplayController < ApplicationController
     assignments_method(child, res2) if child.type == "AssignmentNode"
   end
 
-  #getting result nodes for child2. res[] contains all the resultant nodes.
+  # getting result nodes for child2. res[] contains all the resultant nodes.
   def res_node_for_child_2(ch_nodes)
     res = []
 
@@ -279,16 +279,15 @@ class TreeDisplayController < ApplicationController
         res << res2
       end
     end
-   res
+    res
   end
 
-  #initialising folder node 2
+  # initialising folder node 2
   def initialize_fnode_2(fnode, child_nodes)
     child_nodes.each do |key, value|
       fnode[key] = value
     end
   end
-
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new
@@ -312,7 +311,7 @@ class TreeDisplayController < ApplicationController
     is_available(user, owner_id)
   end
 
-  #gets and renders last open tab from session
+  # gets and renders last open tab from session
   def session_last_open_tab
     res = session[:last_open_tab]
     respond_to do |format|
@@ -320,7 +319,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-#sets the last open tab from params
+  # sets the last open tab from params
   def set_session_last_open_tab
     session[:last_open_tab] = params[:tab]
     res = session[:last_open_tab]
@@ -334,8 +333,8 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-#if filter node is 'QAN', get the corresponding assignment questionnaires
- def filter_node_is_qan(search, qid)
+  # if filter node is 'QAN', get the corresponding assignment questionnaires
+  def filter_node_is_qan(search, qid)
     assignment = Assignment.find_by(name: search)
     if assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
@@ -345,7 +344,7 @@ class TreeDisplayController < ApplicationController
       end
     end
     qid
-  end
+   end
 
   def filter
     qid = 'filter+'

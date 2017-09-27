@@ -1,8 +1,8 @@
 class AssignmentTeam < Team
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
-  has_many :review_response_maps, foreign_key: :reviewee_id
-  has_many :responses, through: :review_response_maps, foreign_key: :map_id
+  has_many :review_response_maps, foreign_key: 'reviewee_id'
+  has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
 
   # START of contributor methods, shared with AssignmentParticipant
 
@@ -16,8 +16,8 @@ class AssignmentTeam < Team
     "Assignment"
   end
 
-  def self.parent_model (id)
-    Assignment.find(id) 
+  def self.parent_model(id)
+    Assignment.find(id)
   end
 
   # Get the name of the class
@@ -47,7 +47,6 @@ class AssignmentTeam < Team
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    # ReviewResponseMap.count(conditions: ['reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',  self.id, reviewer.id, assignment.id]) > 0
     ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
   end
 
@@ -179,10 +178,11 @@ class AssignmentTeam < Team
 
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
-    raise "The hyperlink cannot be empty!" if hyperlink.empty?
-    url = URI.parse(hyperlink)
+    raise 'The hyperlink cannot be empty!' if hyperlink.empty?
+    hyperlink += 'http://' unless hyperlink.start_with?('http://', 'https://')
     # If not a valid URL, it will throw an exception
-    Net::HTTP.start(url.host, url.port)
+    response_code = Net::HTTP.get_response(URI(hyperlink))
+    raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/
     hyperlinks = self.hyperlinks
     hyperlinks << hyperlink
     self.submitted_hyperlinks = YAML.dump(hyperlinks)

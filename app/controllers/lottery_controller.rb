@@ -12,53 +12,58 @@ class LotteryController < ApplicationController
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   def run_intelligent_assignment
     priority_info = []
-    topic_ids = SignUpTopic.where(assignment_id: params[:id]).map(&:id)
-    user_ids = Participant.where(parent_id: params[:id]).map(&:user_id)
-    user_ids.each do |user_id|
+    assignment = Assignment.find_by(id: params[:id])
+    topics = assignment.sign_up_topics
+    teams = assignment.teams
+    teams.each do |team|
       # grab student id and list of bids
       bids = []
-      topic_ids.each do |topic_id|
-        bid_record = Bid.where(user_id: user_id, topic_id: topic_id).first rescue nil
+      topics.each do |topic|
+        bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
         bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
-      priority_info << {pid: user_id, ranks: bids} if bids.uniq != [0]
+      team.users.each { |user| priority_info << { pid: user.id, ranks: bids } if bids.uniq != [0] }
     end
-    assignment = Assignment.find_by(id: params[:id])
-    data = {users: priority_info, max_team_size: assignment.max_team_size}
+    data = { users: priority_info, max_team_size: assignment.max_team_size }
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
       response = RestClient.post url, data.to_json, content_type: :json, accept: :json
       # store each summary in a hashmap and use the question as the key
       teams = JSON.parse(response)["teams"]
       create_new_teams_for_bidding_response(teams, assignment)
-      run_intelligent_bid
+      run_intelligent_bid(assignment)
     rescue => err
       flash[:error] = err.message
     end
-
     redirect_to controller: 'tree_display', action: 'list'
   end
 
   def create_new_teams_for_bidding_response(teams, assignment)
     original_team_ids = assignment.teams.map(&:id)
     teams.each do |user_ids|
-      new_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(1000).to_s,
-                                       parent_id: assignment.id,
-                                       type: 'AssignmentTeam')
-      parent = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
-      user_ids.each do |user_id|
-        # remove TeamsUser records on other teams
-        original_team_ids.each do |id|
-          team_users = TeamsUser.where(user_id: user_id, team_id: id) rescue nil
-          next unless team_users
-          team_users.each do |team_user|
-            team_user.team_user_node.destroy
-            team_user.destroy
+      current_team, parent = nil, nil
+      user_ids.each_with_index do |user_id, index|
+        original_team_ids.each do |original_team_id|
+          team_user = TeamsUser.find_by(user_id: user_id, team_id: original_team_id)
+          next unless team_user
+          if index.zero?
+            # keep the original team of 1st user if exists and ask later students join in this team
+            current_team = AssignmentTeam.find_by(id: team_user.team_id)
+            parent = TeamNode.find_by(parent_id: assignment.id, node_object_id: current_team.id)
+            break if current_team and parent
+            current_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(10000).to_s, parent_id: assignment.id)
+            parent = TeamNode.create(parent_id: assignment.id, node_object_id: current_team.id)
           end
+          team_user.team_user_node.destroy
+          team_user.destroy
+          # transfer biddings from old team to new team
+          Bid.where(team_id: original_team_id).update_all(team_id: current_team.id)
         end
-        team_user = TeamsUser.where(user_id: user_id, team_id: new_team.id).first rescue nil
-        team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id) if team_user.nil?
-        TeamUserNode.create(parent_id: parent.id, node_object_id: team_user.id)
+        team_user = TeamsUser.find_by(user_id: user_id, team_id: current_team.id)
+        unless team_user
+          team_user = TeamsUser.create(user_id: user_id, team_id: current_team.id)
+          TeamUserNode.create(parent_id: parent.id, node_object_id: team_user.id)
+        end
       end
     end
     # remove empty teams
@@ -72,32 +77,25 @@ class LotteryController < ApplicationController
 
   # This method is called for assignments which have their is_intelligent property set to 1. It runs a stable match algorithm and assigns topics
   # to strongest contenders (team strength, priority of bids)
-  def run_intelligent_bid
-    unless Assignment.find_by(id: params[:id]).is_intelligent # if the assignment is intelligent then redirect to the tree display list
-      flash[:error] = "This action not allowed. The assignment " + Assignment.find_by(id: params[:id]).name + " does not enabled intelligent assignments."
+  def run_intelligent_bid(assignment)
+    unless assignment.is_intelligent # if the assignment is intelligent then redirect to the tree display list
+      flash[:error] = "This action is not allowed. The assignment #{assignment.name} does not enable intelligent assignments."
       redirect_to controller: 'tree_display', action: 'list'
       return
     end
     # Getting signuptopics with max_choosers > 0
-    sign_up_topics = SignUpTopic.where("assignment_id = ? and max_choosers > 0", params[:id])
-    unassigned_teams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| !SignedUpTeam.where(team_id: t.id).empty? }
-    unassigned_teams.sort! {|t1, t2| TeamsUser.where(team_id: t2.id).size <=> TeamsUser.where(team_id: t1.id).size }
+    sign_up_topics = SignUpTopic.where('assignment_id = ? and max_choosers > 0', params[:id])
+    unassigned_teams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).any? }
+    unassigned_teams.sort! do |t1, t2| 
+      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=> 
+      [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
+    end
     team_bids = []
     unassigned_teams.each do |team|
       topic_bids = []
       sign_up_topics.each do |topic|
-        student_bids = []
-        TeamsUser.where(team_id: team.id).each do |s|
-          student_bid = Bid.where(user_id: s.user_id, topic_id: topic.id).first rescue nil
-          if !student_bid.nil? and !student_bid.priority.nil?
-            student_bids << student_bid.priority
-          end
-        end
-        # takes the most frequent priority as the team priority
-        freq = student_bids.each_with_object(Hash.new(0)) do |v, h|
-          h[v] += 1
-        end
-        topic_bids << {topic_id: topic.id, priority: student_bids.max_by {|v| freq[v] }} unless freq.empty?
+        bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
+        topic_bids << { topic_id: topic.id, priority: bid.priority } if bid
       end
       topic_bids.sort! {|b| b[:priority] }
       team_bids << {team_id: team.id, bids: topic_bids}
@@ -105,8 +103,8 @@ class LotteryController < ApplicationController
 
     team_bids.each do |tb|
       tb[:bids].each do |bid|
-        signed_up_team = SignedUpTeam.where(topic_id: bid[:topic_id]).first rescue nil
-        if signed_up_team.nil?
+        signed_up_team = SignedUpTeam.find_by(topic_id: bid[:topic_id])
+        unless signed_up_team
           SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
           break
         end
@@ -129,7 +127,6 @@ class LotteryController < ApplicationController
     unassigned_teams.each do |team|
       sorted_bids = Bid.where(user_id: team.id).sort_by(&:priority) # Get priority for each unassignmed team
       sorted_bids.each do |b|
-        # SignedUpTeam.where(:topic=>b.topic_id).first.team_id
         winning_team = SignedUpTeam.where(topic: b.topic_id).first.team_id
         next unless TeamsUser.where(team_id: winning_team).size + team.users.size <= assignment.max_team_size # If the team can be merged to a bigger team
         TeamsUser.where(team_id: team.id).update_all(team_id: winning_team)

@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-describe "DeadlineHelper" do
+describe DeadlineHelper do
   before(:each) do
     @deadline_type = create(:deadline_type)
     @deadline_right = create(:deadline_right)
@@ -11,37 +9,37 @@ describe "DeadlineHelper" do
 
   describe "#create_topic_deadline" do
     it "should fail because of invalid due_date" do
-      expect { DeadlineHelper.create_topic_deadline(nil, 0, 0) }.to raise_exception(NoMethodError)
+      expect { helper.create_topic_deadline(nil, 0, 0) }.to raise_exception(NoMethodError)
     end
 
     it "new due_date object created" do
-      DeadlineHelper.create_topic_deadline(@topic_due_date, 0, 1)
+      helper.create_topic_deadline(@topic_due_date, 0, 1)
       expect(TopicDueDate.count).to be == 2
     end
 
     it "due_at should be same for 0 offset" do
-      DeadlineHelper.create_topic_deadline(@topic_due_date, 0, 10)
+      helper.create_topic_deadline(@topic_due_date, 0, 10)
       new_due_date = TopicDueDate.find_by(parent_id: 10)
       expect(new_due_date).to be_valid
       expect(new_due_date.due_at.to_s).to be == @topic_due_date.due_at.to_s
     end
 
     it "due_at calculated correctly for positive offset" do
-      DeadlineHelper.create_topic_deadline(@topic_due_date, 5000, 10)
+      helper.create_topic_deadline(@topic_due_date, 5000, 10)
       new_due_date = TopicDueDate.find_by(parent_id: 10)
       expect(new_due_date).to be_valid
       expect(new_due_date.due_at.to_s).to be == (Time.zone.parse(@topic_due_date.due_at.to_s) + 5000).to_s
     end
 
     it "due_at calculated correctly for negative offset" do
-      DeadlineHelper.create_topic_deadline(@topic_due_date, -5000, 10)
+      helper.create_topic_deadline(@topic_due_date, -5000, 10)
       new_due_date = TopicDueDate.find_by(parent_id: 10)
       expect(new_due_date).to be_valid
       expect(new_due_date.due_at.to_s).to be == (Time.zone.parse(@topic_due_date.due_at.to_s) - 5000).to_s
     end
 
     it "offset converted to integer correctly" do
-      DeadlineHelper.create_topic_deadline(@topic_due_date, 5000.15, 10)
+      helper.create_topic_deadline(@topic_due_date, 5000.15, 10)
       new_due_date = TopicDueDate.find_by(parent_id: 10)
       expect(new_due_date).to be_valid
       expect(new_due_date.due_at.to_s).to be == (Time.zone.parse(@topic_due_date.due_at.to_s) + 5000).to_s
@@ -49,7 +47,7 @@ describe "DeadlineHelper" do
   end
 
   it "has a valid factory" do
-    factory = FactoryGirl.build(:topic_due_date)
+    factory = build(:topic_due_date)
     expect(factory).to be_valid
   end
 end

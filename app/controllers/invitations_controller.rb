@@ -26,10 +26,10 @@ class InvitationsController < ApplicationController
     # update the status in the join_team_request to A
     return unless user && student
     # participant information of invitee and assignment
-    participant = AssignmentParticipant.where(['user_id =? and parent_id =?', user.id, student.parent_id]).first
+    participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', user.id, student.parent_id).first
     return unless participant
-    old_entry = JoinTeamRequest.where(['participant_id =? and team_id =?', participant.id, params[:team_id]]).first
-    # Status code A for accepted
+    old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
+     # Status code A for accepted
     old_entry.update_attribute("status", 'A') if old_entry
   end
 
@@ -62,7 +62,7 @@ class InvitationsController < ApplicationController
   end
 
   private
-  
+
   def create_utility
     @invitation = Invitation.new(to_id: @user.id, from_id: @student.user_id)
     @invitation.assignment_id = @student.parent_id
@@ -88,7 +88,7 @@ class InvitationsController < ApplicationController
   end
 
   def check_participant_before_invitation
-    @participant = AssignmentParticipant.where('user_id =? and parent_id =?', @user.id, @student.parent_id).first
+    @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant
       flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
@@ -109,7 +109,7 @@ class InvitationsController < ApplicationController
     end
 
     # participant information about student you are trying to invite to the team
-    team_member = TeamsUser.where(['team_id =? and user_id =?', @team.id, @user.id])
+    team_member = TeamsUser.where('team_id = ? and user_id = ?', @team.id, @user.id)
     # check if invited user is already in the team
 
     return if team_member.empty?

@@ -1,6 +1,4 @@
-require 'rails_helper'
-
-describe "peer review testing", type: :feature do
+describe "peer review testing" do
   before(:each) do
     # create assignment and topic
     create(:assignment, name: "TestAssignment", directory_path: "TestAssignment")

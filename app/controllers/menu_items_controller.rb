@@ -45,10 +45,10 @@ class MenuItemsController < ApplicationController
     # Flash an error if neither an action nor a page has been selected
     if (params[:menu_item][:controller_action_id].nil? or
         params[:menu_item][:controller_action_id].empty?) and
-      (params[:menu_item][:content_page_id].nil? or
-       params[:menu_item][:content_page_id].empty?)
+        (params[:menu_item][:content_page_id].nil? or
+            params[:menu_item][:content_page_id].empty?)
       flash[:error] = "You must specify either an action or a page!"
-      @menu_item = MenuItem.new(params[:menu_item])
+      @menu_item = MenuItem.new(menu_item_params)
       @parent_item = MenuItem.find(params[:menu_item][:parent_id])
       foreign
       @can_change_parent = false
@@ -56,7 +56,7 @@ class MenuItemsController < ApplicationController
       return
     end
 
-    @menu_item = MenuItem.new(params[:menu_item])
+    @menu_item = MenuItem.new(menu_item_params)
     @menu_item.seq = MenuItem.next_seq(@menu_item.parent_id)
 
     if @menu_item.save
@@ -81,8 +81,8 @@ class MenuItemsController < ApplicationController
     # Flash an error if neither an action nor a page has been selected
     if (params[:menu_item][:controller_action_id].nil? or
         params[:menu_item][:controller_action_id].empty?) and
-      (params[:menu_item][:content_page_id].nil? or
-       params[:menu_item][:content_page_id].empty?)
+        (params[:menu_item][:content_page_id].nil? or
+            params[:menu_item][:content_page_id].empty?)
       flash[:error] = "You must specify either an action or a page!"
       edit
       render action: 'edit'
@@ -99,9 +99,9 @@ class MenuItemsController < ApplicationController
       params[:menu_item][:seq] = MenuItem.next_seq(params[:menu_item][:parent_id])
     else
       do_repack = false
-  end
+    end
 
-    if @menu_item.update_attributes(params[:menu_item])
+    if @menu_item.update_attributes(menu_item_params)
       flash[:notice] = 'The menu item was successfully updated.'
       MenuItem.repack(repack_for) if do_repack
       Role.rebuild_cache
@@ -111,7 +111,7 @@ class MenuItemsController < ApplicationController
       foreign
       render action: 'edit'
     end
-end
+  end
 
   def move_up
     @menu_item = MenuItem.find(params[:id])
@@ -155,6 +155,12 @@ end
       logger.error "(error in menu)"
       redirect_to "/"
     end
+  end
+
+  private
+
+  def menu_item_params
+    params.require(:menu_item).permit(:id, :parent_id, :name, :label, :seq, :controller_action_id, :content_page_id)
   end
 
   protected

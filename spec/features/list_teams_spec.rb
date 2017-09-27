@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe 'List Team' do
   it 'should list all team nodes' do
     create(:assignment)

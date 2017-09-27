@@ -1,7 +1,7 @@
 module StudentTaskHelper
   def get_review_grade_info(participant)
     info = ''
-    if participant.try(:review_grade).try(:grade_for_reviewer).nil? || 
+    if participant.try(:review_grade).try(:grade_for_reviewer).nil? ||
        participant.try(:review_grade).try(:comment_for_reviewer).nil?
       result = "N/A"
     else

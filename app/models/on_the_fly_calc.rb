@@ -11,10 +11,10 @@ module OnTheFlyCalc
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
     if self.varying_rubrics_by_round?
-      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
+      @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
       scores_varying_rubrics
     else
-      @response_maps = ResponseMap.where(['reviewed_object_id = ? && type = ?', self.id, @response_type])
+      @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
       scores_non_varying_rubrics
     end
     @review_scores
@@ -28,7 +28,7 @@ module OnTheFlyCalc
       rounds = self.rounds_of_reviews
       (1..rounds).each do |round|
         review_questionnaire_id = review_questionnaire_id(round)
-        questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+        questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
         contributors.each do |contributor|
           assessments = ReviewResponseMap.get_assessments_for(contributor)
           assessments = assessments.reject {|assessment| assessment.round != round }
@@ -39,7 +39,7 @@ module OnTheFlyCalc
       end
     else
       review_questionnaire_id = review_questionnaire_id()
-      questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+      questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
       contributors.each do |contributor|
         assessments = ReviewResponseMap.get_assessments_for(contributor)
         scores[contributor.id] = {}
@@ -145,10 +145,10 @@ def scores_varying_rubrics
   rounds = self.rounds_of_reviews
   (1..rounds).each do |round|
     review_questionnaire_id = review_questionnaire_id(round)
-    @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+    @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
     @response_maps.each do |response_map|
       reviewer = @review_scores[response_map.reviewer_id]
-      @corresponding_response = Response.where(['map_id = ?', response_map.id])
+      @corresponding_response = Response.where('map_id = ?', response_map.id)
       @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
       @respective_scores = {}
       @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
@@ -163,10 +163,10 @@ end
 
 def scores_non_varying_rubrics
   review_questionnaire_id = review_questionnaire_id()
-  @questions = Question.where(['questionnaire_id = ?', review_questionnaire_id])
+  @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
   @response_maps.each do |response_map|
     reviewer = @review_scores[response_map.reviewer_id]
-    @corresponding_response = Response.where(['map_id = ?', response_map.id])
+    @corresponding_response = Response.where('map_id = ?', response_map.id)
     @respective_scores = {}
     @respective_scores = reviewer unless reviewer.nil?
     calc_review_score

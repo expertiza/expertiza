@@ -47,13 +47,13 @@ module ParticipantsHelper
 
   def self.add_user_to_assignment(params, user)
     assignment = Assignment.find params[:assignment_id]
-    if AssignmentParticipant.where(['user_id=? AND parent_id=?', user.id, assignment.id]).empty?
+    if AssignmentParticipant.where('user_id = ? AND parent_id = ?', user.id, assignment.id).empty?
       return AssignmentParticipant.create(parent_id: assignment.id, user_id: user.id)
     end
   end
 
   def self.add_user_to_course(params, user)
-    if CourseParticipant.where(['user_id=? AND parent_id=?', user.id, params[:course_id]]).empty?
+    if CourseParticipant.where('user_id = ? AND parent_id = ?', user.id, params[:course_id]).empty?
       CourseParticipant.create(user_id: user.id, parent_id: params[:course_id])
     end
   end

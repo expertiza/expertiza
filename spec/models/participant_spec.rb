@@ -1,6 +1,3 @@
-require 'rails_helper'
-require 'pry'
-
 describe Participant do
   before(:each) do
     @student = double('User', name: "Student", fullname: "Student Test")

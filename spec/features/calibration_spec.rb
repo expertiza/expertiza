@@ -1,6 +1,3 @@
-require 'rails_helper'
-require 'selenium-webdriver'
-
 describe 'calibration' do
   # Before testing create needed state
   before :each do
@@ -235,6 +232,7 @@ describe 'calibration' do
       # submit expert review
       click_on 'Submit Review'
       page.driver.browser.switch_to.alert.accept
+      sleep(2)
       # expect result
       # If the review was uploaded, there will be a edit link
       expect(page).to have_content('Editing Assignment: final2')
@@ -487,7 +485,7 @@ describe 'calibration' do
       click_on "Request a new submission to review"
 
       # Do not have any artifacts to review
-      expect(page).to have_content("No artifact are available to review at this time. Please try later.")
+      expect(page).to have_content("No artifacts are available to review at this time. Please try later.")
     end
   end
 end

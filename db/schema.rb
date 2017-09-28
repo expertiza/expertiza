@@ -84,7 +84,6 @@ ActiveRecord::Schema.define(version: 20170925225438) do
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
-    t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
   end
 

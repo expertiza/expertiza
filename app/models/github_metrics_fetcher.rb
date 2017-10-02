@@ -11,33 +11,7 @@ class GithubMetricsFetcher
   attr_accessor :repo
   attr_accessor :commits
 
-  SOURCES = [ 
-    { REGEX: /http[s]{0,1}:\/\/github\.com\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)\/pull\/(?'prnum'\d+)/,
-      GRAPHQL: "https://api.github.com/graphql",
-      API: "https://api.github.com/repos",
-      FUNCTION: :fetch_pr_commits_data,
-      TOKEN: Rails.configuration.github[:github_token]
-    },
-    { REGEX: /http[s]{0,1}:\/\/github\.com\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
-      GRAPHQL: "https://api.github.com/graphql",
-      API: "https://api.github.com/repos",
-      FUNCTION: :fetch_project_data,
-      TOKEN: Rails.configuration.github[:github_token]
-    },
-    { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)\/pull\/(?'prnum'\d+)/,
-      GRAPHQL: "https://github.ncsu.edu/api/graphql",
-      API: "https://github.ncsu.edu/api/v3/repos",
-      FUNCTION: :fetch_pr_commits_data,
-      TOKEN: Rails.configuration.github[:ncsu_token]
-    },
-    { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
-      GRAPHQL: "https://github.ncsu.edu/api/graphql",
-      API: "https://github.ncsu.edu/api/v3/repos",
-      FUNCTION: :fetch_project_data,
-      TOKEN: Rails.configuration.github[:ncsu_token]
-    }
-  ]
-
+  SOURCES = Rails.configuration.github_sources 
 
   class << self
     def supports_url?(url)
@@ -73,7 +47,7 @@ class GithubMetricsFetcher
         @number = url_parsed['prnum']
       end
 
-      params[:throttle] = Concurrent::Throttle.new 5
+      params[:throttle] = Concurrent::Throttle.new Rails.configuration.github_throttle
 
       @commits = self.send(params[:FUNCTION], params)
     end
@@ -105,17 +79,6 @@ class GithubMetricsFetcher
   end
 
   private
-
-  def post_with_redirect(url, payload, headers={}, &block)
-    RestClient.post(url, payload, headers) { |response, request, result|
-      case response.code
-      when 301, 302, 307
-        response.follow_redirection(&block)
-      else
-        block.call(response, request, result) 
-      end
-    }
-  end
 
   def fetch_project_data(params)
     query = build_github_project_query(@user, @repo)
@@ -221,7 +184,6 @@ class GithubMetricsFetcher
 
   def fetch_commit_stats_data(params, user_name, repo_name, commit_hash) 
     query = "#{params[:API]}/#{user_name}/#{repo_name}/commits/#{commit_hash}"
-    puts query
     RestClient.get(
       query, 
       :authorization  => "Bearer #{params[:TOKEN]}") { | response, request, result|

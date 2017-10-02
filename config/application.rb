@@ -40,10 +40,39 @@ module Expertiza
     # Minimum Sass number precision required by bootstrap-sass
     ::Sass::Script::Value::Number.precision = [8, ::Sass::Script::Value::Number.precision].max
 
-    config.github = {
+    config.github_tokens = {
       github_token: ENV["GITHUB_TOKEN"],
       ncsu_token: ENV["NCSU_TOKEN"]
     }
+
+    config.github_throttle = 5
+
+    config.github_sources = [ 
+      { REGEX: /http[s]{0,1}:\/\/github\.com\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)\/pull\/(?'prnum'\d+)/,
+        GRAPHQL: "https://api.github.com/graphql",
+        API: "https://api.github.com/repos",
+        FUNCTION: :fetch_pr_commits_data,
+        TOKEN: config.github_tokens[:github_token]
+      },
+      { REGEX: /http[s]{0,1}:\/\/github\.com\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
+        GRAPHQL: "https://api.github.com/graphql",
+        API: "https://api.github.com/repos",
+        FUNCTION: :fetch_project_data,
+        TOKEN: config.github_tokens[:github_token]
+      },
+      { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)\/pull\/(?'prnum'\d+)/,
+        GRAPHQL: "https://github.ncsu.edu/api/graphql",
+        API: "https://github.ncsu.edu/api/v3/repos",
+        FUNCTION: :fetch_pr_commits_data,
+        TOKEN: config.github_tokens[:ncsu_token]
+      },
+      { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
+        GRAPHQL: "https://github.ncsu.edu/api/graphql",
+        API: "https://github.ncsu.edu/api/v3/repos",
+        FUNCTION: :fetch_project_data,
+        TOKEN: config.github_tokens[:ncsu_token]
+      }
+    ]
   end
 
   module Recaptcha

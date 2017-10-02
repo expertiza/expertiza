@@ -97,9 +97,9 @@ GEM
       execjs
     coffee-script-source (1.9.1.1)
     colorize (0.7.7)
-    concurrent-ruby (1.0.2)
-    concurrent-ruby-edge (0.2.2)
-      concurrent-ruby (~> 1.0.2)
+    concurrent-ruby (1.0.5)
+    concurrent-ruby-edge (0.3.1)
+      concurrent-ruby (= 1.0.5)
     connection_pool (2.2.0)
     coveralls (0.8.2)
       json (~> 1.8)
@@ -457,8 +457,8 @@ DEPENDENCIES
   capistrano-rails
   capybara (~> 2.7, >= 2.7.1)
   coffee-rails
-  concurrent-ruby
-  concurrent-ruby-edge
+  concurrent-ruby (~> 1.0.5)
+  concurrent-ruby-edge (~> 0.3.1)
   coveralls
   daemons
   database_cleaner

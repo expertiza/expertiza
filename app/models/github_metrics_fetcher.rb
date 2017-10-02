@@ -3,6 +3,7 @@ class GithubMetricsFetcher
   require 'json'
   require 'concurrent'
   require 'concurrent-edge'
+  require 'concurrent/edge/throttle'
 
   attr_accessor :url
   attr_accessor :number
@@ -72,6 +73,8 @@ class GithubMetricsFetcher
         @number = url_parsed['prnum']
       end
 
+      params[:throttle] = Concurrent::Throttle.new 5
+
       @commits = self.send(params[:FUNCTION], params)
     end
     
@@ -117,7 +120,7 @@ class GithubMetricsFetcher
   def fetch_project_data(params)
     query = build_github_project_query(@user, @repo)
 
-    post_with_redirect(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
+    RestClient.post(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
       case response.code
       when 200
         json = JSON.parse(response.body)
@@ -136,33 +139,35 @@ class GithubMetricsFetcher
     after_query = build_after_query(page_info) 
     query = build_github_project_commits_query(@user, @repo, since, after_query)
 
-    post_with_redirect(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
+    RestClient.post(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
       case response.code
       when 200
         json = JSON.parse(response.body)
         page_info = get_data(json, ["data", "repository", "ref", "target", "history", "pageInfo"])
         commits = get_data(json, ["data", "repository", "ref", "target", "history", "edges"])
-        if not commits.nil?
-          for commit in commits
-            p = Concurrent::Promise.execute do
-              oid = get_data(commit, ["node", "oid"])
-              name = get_data(commit, ["node", "author", "name"])
-              email = get_data(commit, ["node", "author", "email"])
-              date = get_data(commit, ["node", "committedDate"])
-              stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
-              { :date => date, 
-                :name => name, 
-                :email => email, 
-                :stats => stats }
-            end
-            commits_list.push(p)
+        p = commits.map { | commit | 
+          params[:throttle].throttled_future(1) do 
+            oid = get_data(commit, ["node", "oid"])
+            name = get_data(commit, ["node", "author", "name"])
+            email = get_data(commit, ["node", "author", "email"])
+            date = get_data(commit, ["node", "committedDate"])
+            stats = fetch_commit_stats_data(params, @user, @repo, oid)
+
+            { :id  => oid,
+              :date => date, 
+              :name => name, 
+              :email => email, 
+              :stats => stats }
           end
-          if page_info["hasNextPage"] == "true"
-            fetch_pr_data(params, page_info, commits_list) 
-          else
-            { :data => Concurrent::Promise.zip(*commits_list).value! }
-          end
+        }
+
+        commits_list = commits_list + p
+
+        if page_info["hasNextPage"] == "true"
+          fetch_pr_data(params, page_info, commits_list) 
+        else
+          { :data => Concurrent::Promises.zip_futures(*commits_list).value! }
         end
       else
         { :error => "Error loading commits list #{response.code}", :msg => response.body, :data => commits_list }
@@ -174,7 +179,7 @@ class GithubMetricsFetcher
     after_query = build_after_query(page_info) 
     query = build_github_pr_query(@user, @repo, @number, after_query)
 
-    post_with_redirect(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
+    RestClient.post(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
       case response.code
       when 200
         json = JSON.parse(response.body)
@@ -183,26 +188,29 @@ class GithubMetricsFetcher
           page_info = get_data(pull_request, ["commits", "pageInfo"])
           commits = get_data(pull_request, ["commits", "nodes"])
 
-          for commit in commits
-            p = Concurrent::Promise.execute do
+          p = commits.map { | commit | 
+            params[:throttle].throttled_future(1) do
               oid = get_data(commit, ["commit", "oid"])
               name = get_data(commit, ["commit", "author", "name"])
               email = get_data(commit, ["commit", "author", "email"])
               date = get_data(commit, ["commit", "committedDate"])
               stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
-              { :date => date, 
+              {
+              :id => oid,
+              :date => date, 
               :name => name, 
               :email => email, 
               :stats => stats }
             end
-            
-            commits_list.push(p)
-          end
+          } 
+
+          commits_list = commits_list + p
+
           if page_info["hasNextPage"] == "true"
             fetch_pr_data(params, page_info, commits_list) 
           else
-            { :data => Concurrent::Promise.zip(*commits_list).value! }
+            { :data => Concurrent::Promises.zip_futures(*commits_list).value! }
           end
         end
       else
@@ -212,8 +220,10 @@ class GithubMetricsFetcher
   end
 
   def fetch_commit_stats_data(params, user_name, repo_name, commit_hash) 
+    query = "#{params[:API]}/#{user_name}/#{repo_name}/commits/#{commit_hash}"
+    puts query
     RestClient.get(
-      "#{params[:API]}/#{user_name}/#{repo_name}/commits/#{commit_hash}", 
+      query, 
       :authorization  => "Bearer #{params[:TOKEN]}") { | response, request, result|
       case response.code
       when 200

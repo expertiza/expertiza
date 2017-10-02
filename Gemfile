@@ -11,8 +11,8 @@ gem 'bind-it'
 gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
-gem 'concurrent-ruby', require: 'concurrent'
-gem 'concurrent-ruby-edge', require: 'concurrent-edge'
+gem 'concurrent-ruby', '~> 1.0.5', require: 'concurrent'
+gem 'concurrent-ruby-edge', '~> 0.3.1', require: 'concurrent-edge'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'

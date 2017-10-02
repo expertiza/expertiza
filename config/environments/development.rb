@@ -40,6 +40,5 @@ Expertiza::Application.configure do
   # number of complex assets.
   config.assets.debug = true
   config.react.variant = :development
-
 end
 

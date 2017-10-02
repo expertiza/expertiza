@@ -15,27 +15,28 @@ class GithubMetricsFetcher
       GRAPHQL: "https://api.github.com/graphql",
       API: "https://api.github.com/repos",
       FUNCTION: :fetch_pr_commits_data,
-      TOKEN: ""
+      TOKEN: Rails.configuration.github[:github_token]
     },
     { REGEX: /http[s]{0,1}:\/\/github\.com\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
       GRAPHQL: "https://api.github.com/graphql",
       API: "https://api.github.com/repos",
       FUNCTION: :fetch_project_data,
-      TOKEN: ""
+      TOKEN: Rails.configuration.github[:github_token]
     },
     { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)\/pull\/(?'prnum'\d+)/,
-      GRAPHQL: "https://api.github.ncsu.edu/graphql",
-      API: "https://api.github.ncsu.edu/repos",
+      GRAPHQL: "https://github.ncsu.edu/api/graphql",
+      API: "https://github.ncsu.edu/api/v3/repos",
       FUNCTION: :fetch_pr_commits_data,
-      TOKEN: ""
+      TOKEN: Rails.configuration.github[:ncsu_token]
     },
     { REGEX: /http[s]{0,1}:\/\/github\.ncsu\.edu\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)/,
-      GRAPHQL: "https://api.github.ncsu.edu/graphql",
-      API: "https://api.github.ncsu.edu/repos",
+      GRAPHQL: "https://github.ncsu.edu/api/graphql",
+      API: "https://github.ncsu.edu/api/v3/repos",
       FUNCTION: :fetch_project_data,
-      TOKEN: ""
+      TOKEN: Rails.configuration.github[:ncsu_token]
     }
   ]
+
 
   class << self
     def supports_url?(url)
@@ -80,7 +81,6 @@ class GithubMetricsFetcher
   def reduce_commits_to_user_stats 
     if ! @commits.nil? and ! @commits[:data].nil?
       default = {:count => 0, :total => 0}
-      puts @commits[:data]
       @commits[:data].reduce(Hash.new(default)) { | total, commit |
         oldrow = total[commit[:email]]
         newrow = { 
@@ -103,9 +103,21 @@ class GithubMetricsFetcher
 
   private
 
+  def post_with_redirect(url, payload, headers={}, &block)
+    RestClient.post(url, payload, headers) { |response, request, result|
+      case response.code
+      when 301, 302, 307
+        response.follow_redirection(&block)
+      else
+        block.call(response, request, result) 
+      end
+    }
+  end
+
   def fetch_project_data(params)
     query = build_github_project_query(@user, @repo)
-    RestClient.post(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
+
+    post_with_redirect(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
       case response.code
       when 200
         json = JSON.parse(response.body)
@@ -115,7 +127,7 @@ class GithubMetricsFetcher
 
         fetch_project_commits_data(params, since)
       else
-        { :error => "Error loading project #{response.code}", :data => [] }
+        { :error => "Error loading project #{response.code}", :msg => response.body }
       end
     }
   end
@@ -124,7 +136,7 @@ class GithubMetricsFetcher
     after_query = build_after_query(page_info) 
     query = build_github_project_commits_query(@user, @repo, since, after_query)
 
-    RestClient.post(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
+    post_with_redirect(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
       case response.code
       when 200
         json = JSON.parse(response.body)
@@ -162,7 +174,7 @@ class GithubMetricsFetcher
     after_query = build_after_query(page_info) 
     query = build_github_pr_query(@user, @repo, @number, after_query)
 
-    RestClient.post(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
+    post_with_redirect(params[:GRAPHQL], query, :authorization => "Bearer #{params[:TOKEN]}") { |response, request, result|
       case response.code
       when 200
         json = JSON.parse(response.body)
@@ -211,7 +223,7 @@ class GithubMetricsFetcher
         deletions = get_data(json, ["stats", "deletions"])
         { total: total, additions: additions, deletions: deletions}
       else
-        { :error => "Error loading commit stats" }
+        { :error => "Error loading stats #{response.code}", :msg => response.body }
       end
     }
   end

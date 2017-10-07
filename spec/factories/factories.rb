@@ -314,7 +314,7 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
-  factory :question, class: Question do
+  factory :question, class: Criterion do
     txt 'Test question:'
     weight 1
     questionnaire { Questionnaire.first || association(:questionnaire) }

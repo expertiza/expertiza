@@ -8,19 +8,12 @@ class Response < ActiveRecord::Base
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
-
   alias map response_map
-
   attr_accessor :difficulty_rating
-
   delegate :questionnaire, :reviewee, :reviewer, to: :map
 
   def response_id
     id
-  end
-
-  def team_has_user?(user)
-    reviewer.team.has_user user
   end
 
   def display_as_html(prefix = nil, count = nil, _file_url = nil)
@@ -67,7 +60,6 @@ class Response < ActiveRecord::Base
         answer = answers.find {|a| a.question_id == question.id }
         row_class = count.even? ? "info" : "warning"
         row_class = "" if question.is_a? QuestionnaireHeader
-
         code += '<tr class="' + row_class + '"><td>'
         if !answer.nil? or question.is_a? QuestionnaireHeader
           code += if question.instance_of? Criterion or question.instance_of? Scale
@@ -142,33 +134,25 @@ class Response < ActiveRecord::Base
     defn[:body] = {}
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-
-    reviewer_participant_id = response_map.reviewer_id
-    participant = Participant.find(reviewer_participant_id)
-
+    participant = Participant.find(response_map.reviewer_id)
     # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
     parent = if response_map.survey?
-      response_map.survey_parent
-    else
-      Assignment.find(participant.parent_id)
-             end
-
+              response_map.survey_parent
+            else
+              Assignment.find(participant.parent_id)
+            end
     defn[:subject] = "A new submission is available for " + parent.name
-
     response_map.email(defn, participant, parent)
   end
 
   def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
-      # I don't think this else is necessary. Checking the callers, it seems that answer cannot be nil should be a
-      # pre-condition of this method --Yang
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
-      reviewer_participant = Participant.find(map.reviewer_id)
-      assignment = Assignment.find(reviewer_participant.parent_id)
+      assignment = Participant.find(map.reviewer_id).assignment
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire
@@ -177,12 +161,8 @@ class Response < ActiveRecord::Base
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
     counter = 0
-    @comments_in_round_1 = ''
-    @comments_in_round_2 = ''
-    @comments_in_round_3 = ''
-    @counter_in_round_1 = 0
-    @counter_in_round_2 = 0
-    @counter_in_round_3 = 0
+    @comments_in_round_1 = @comments_in_round_2 = @comments_in_round_3 = ''
+    @counter_in_round_1 = @counter_in_round_2 = @counter_in_round_3 = 0
     assignment = Assignment.find(assignment_id)
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
 
@@ -229,23 +209,16 @@ class Response < ActiveRecord::Base
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     # if this response is the first on this artifact, there's no grade conflict
     return false if count == 0
-
     # This score has already skipped the unfilled scorable question(s)
     score = get_total_score.to_f / get_maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
     assignment = self.map.assignment
-
     assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
     # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
     allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
-
     # the range of average_score_on_same_artifact_from_others and score is [0,1]
     # the range of allowed_difference_percentage is [0, 100]
-    if (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
-      true
-    else
-      false
-    end
+    (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
   end
 
   def self.avg_scores_and_count_for_prev_reviews(existing_responses, current_response)

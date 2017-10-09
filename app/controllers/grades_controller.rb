@@ -195,8 +195,7 @@ class GradesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
-  end
- 
+  end 
 
   private
 

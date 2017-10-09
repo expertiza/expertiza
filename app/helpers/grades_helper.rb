@@ -58,4 +58,54 @@ module GradesHelper
                 end
     css_class
   end
+
+   def view_heatgrid(participant_id,type)
+    # get participant, team, questionnaires for assignment.
+    @participant = AssignmentParticipant.find(participant_id)
+    @assignment = @participant.assignment
+    @team = @participant.team
+    @team_id = @team.id
+    @type = type
+    questionnaires = @assignment.questionnaires
+    @vmlist = []
+
+    # loop through each questionnaire, and populate the view model for all data necessary
+    # to render the html tables.
+    questionnaires.each do |questionnaire|
+      @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+      else
+        nil
+               end
+if questionnaire.type == type
+      vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
+      questions = questionnaire.questions
+      vm.add_questions(questions)
+      vm.add_team_members(@team)
+      vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+      vm.get_number_of_comments_greater_than_10_words
+
+      @vmlist << vm
+    end
+    end
+    #@current_role_name = current_role_name/
+    render "grades/view_heatgrid.html.erb"
+  
+  end
+
+def type_and_max(row)
+  question=Question.find(row.question_id) 
+   if question.type == "Checkbox"
+    return 10003
+  elsif question.is_a? ScoredQuestion 
+    return 9311+(row.question_max_score)
+  else return 9998
+  end
+end
+
+def underlined?(score) 
+  return "underlined" unless score.comment.blank?
+end
+
+
 end

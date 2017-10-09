@@ -196,6 +196,7 @@ class GradesController < ApplicationController
     end
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
   end
+ 
 
   private
 

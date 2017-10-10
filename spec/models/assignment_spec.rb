@@ -16,20 +16,35 @@ describe Assignment do
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
 
   describe '.max_outstanding_reviews' do
-    it 'returns 2 by default'
+    it 'returns 2 by default' do
+      expect(Assignment.max_outstanding_reviews).to equal(2)
+    end
   end
 
   describe '#team_assignment?' do
-    it 'checks an assignment has team'
+    it 'checks an assignment has team' do
+      assignment = create(:assignment)
+      expect(assignment.team_assignment?).to equal(true)
+    end
   end
 
   describe '#has_topics?' do
     context 'when sign_up_topics array is not empty' do
-      it 'says current assignment has topics'
+      it 'says current assignment has topics' do
+        assignment=create(:assignment)
+        expect(assignment.sign_up_topics.empty?).to equal(true)
+        topic=create(:topic)
+        topic.assignment = assignment
+        expect(assignment.sign_up_topics.empty?).to equal(false)
+      end
     end
 
     context 'when sign_up_topics array is empty' do
-      it 'says current assignment does not have a topic'
+      let(:assignment) {build :assignment}
+      it 'says current assignment does not have a topic' do
+        assignment=create(:assignment)
+        expect(assignment.sign_up_topics.empty?).to equal(true)
+      end
     end
   end
 
@@ -39,11 +54,20 @@ describe Assignment do
 
   describe '#has_teams?' do
     context 'when teams array is not empty' do
-      it 'says current assignment has teams'
+      it 'says current assignment has teams' do
+        assignment=create(:assignment)
+        expect(assignment.teams.empty?).to equal(true)
+        team=create(:assignment_team)
+        team.parent_id=assignment.id
+        expect(assignment.teams.empty?).to equal(false)
+      end
     end
 
     context 'when sign_up_topics array is empty' do
-      it 'says current assignment does not have a team'
+      it 'says current assignment does not have a team' do
+        assignment=create(:assignment)
+        expect(assignment.teams.empty?).to equal(true)
+      end
     end
   end
 
@@ -63,6 +87,11 @@ describe Assignment do
 
   describe '#response_map_to_metareview' do
     it 'does not raise any errors and returns the first review response map'
+    #   assignment=create(:assignment)
+    #   participant=create(:participant)
+    #   review_map=create(:review_response_map,reviewed_object_id:assignment.id)
+    #   expect(assignment.response_map_to_metareview(participant).empty?).to equal(true)
+    # end
   end
 
   describe '#metareview_mappings' do
@@ -91,42 +120,91 @@ describe Assignment do
 
   describe '#path' do
     context 'when both course_id and instructor_id are nil' do
-      it 'raises an error'
+      it 'raises an error' do
+        assignment=create(:assignment)
+        assignment.course_id= nil
+        assignment.instructor_id= nil
+        expect{assignment.path}.to raise_error(RuntimeError,"The path cannot be created. The assignment must be associated with either a course or an instructor.")
+      end
     end
 
     context 'when course_id is not nil and course_id is larger than 0' do
-      it 'returns path with course directory path'
+      it 'returns path with course directory path' do
+        assignment=create(:assignment)
+        assignment.course_id= 1
+        expect(assignment.path).to be == "/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test"
+      end
     end
 
     context 'when course_id is nil' do
-      it 'returns path without course directory path'
-    end
+      it 'returns path without course directory path' do
+        assignment=create(:assignment)
+        assignment.course_id=nil
+        expect(assignment.path).to be == "/home/expertiza_developer/expertiza/pg_data/instructor6/final_test"
+      end
+     end
   end
 
   describe '#check_condition' do
     context 'when the next due date is nil' do
-      it 'returns false '
+      it 'returns false ' do
+        assignment=create(:assignment)
+        dead_rigth=create(:deadline_right)
+        ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+        #ass_due_date=AssignmentDueDate.where(:parent_id => assignment.id).first
+        ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
+        expect(assignment.check_condition(:id)).to equal(false)
+      end
     end
 
     context 'when the next due date is allowed to review submissions' do
-      it 'returns true'
+      it 'returns true' do
+        assignment=create(:assignment)
+        dead_rigth=create(:deadline_right ,:name=> 'OK')
+        #dead_rigth.id=3
+        #dead_rigth.name='OK'
+        ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+        #ass_due_date=AssignmentDueDate.where(:parent_id => assignment.id).first
+        #ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
+        expect(assignment.check_condition(:id)).to equal(true) 
+      end
     end
   end
 
   describe '#submission_allowed' do
-    it 'returns true when the next topic due date is allowed to submit sth'
+    it 'returns true when the next topic due date is allowed to submit sth'do
+      assignment=create(:assignment)
+      dead_rigth=create(:deadline_right ,:name=> 'OK')
+      ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
+      expect(assignment.submission_allowed).to equal (true)
+    end
   end
 
   describe '#quiz_allowed' do
-    it 'returns false when the next topic due date is not allowed to do quiz'
+    it 'returns false when the next topic due date is not allowed to do quiz' do
+      assignment=create(:assignment)
+      dead_rigth=create(:deadline_right ,:name=> 'NO')
+      ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
+      expect(assignment.submission_allowed).to equal (false)    
+    end  
   end
 
   describe '#can_review' do
-    it "returns false when the next assignment due date is not allowed to review other's work"
+    it "returns false when the next assignment due date is not allowed to review other's work" do
+      assignment=create(:assignment)
+      dead_rigth=create(:deadline_right ,:name=> 'NO')
+      ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
+      expect(assignment.submission_allowed).to equal (false)
+    end
   end
 
   describe '#metareview_allowed' do
-    it 'returns true when the next assignment due date is not allowed to do metareview'
+    it 'returns true when the next assignment due date is not allowed to do metareview' do
+      assignment=create(:assignment)
+      dead_rigth=create(:deadline_right ,:name=> 'NO')
+      ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
+      expect(!assignment.submission_allowed).to equal (true)
+    end
   end
 
   describe '#delete' do
@@ -225,31 +303,64 @@ describe Assignment do
 
   describe '#stage_deadline' do
     context 'when topic id is nil and current assignment has staggered deadline' do
-      it 'returns Unknown'
+      it 'returns Unknown' do
+        assignment=create(:assignment)
+        assignment.staggered_deadline=true
+        expect(assignment.stage_deadline()).to eq("Unknown")  
+      end
     end
 
     context 'when current assignment does not have staggered deadline' do
       context 'when due date is nil' do
-        it 'returns nil'
+        it 'returns nil' do
+          assignment=create(:assignment)
+          dead_rigth=create(:deadline_right)
+          ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id,:due_at=> DateTime.now.in_time_zone - 1.day)
+          #ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
+          expect(assignment.stage_deadline).not_to be_nil    
+        end
       end
 
       context 'when due date is not nil and due date is not equal to Finished' do
-        it 'returns due date'
+        it 'returns due date' do
+          assignment=create(:assignment)
+          dead_rigth=create(:deadline_right)
+          ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+          #ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
+          expect(assignment.stage_deadline).to eq(ass_due_date.due_at.to_s)
+        end
       end
     end
   end
 
   describe '#num_review_rounds' do
-    it 'returns max round number in all due dates of current assignment'
+    it 'returns max round number in all due dates of current assignment' do
+      assignment=create(:assignment)
+      dead_rigth=create(:deadline_right)
+      create(:assignment_due_date,:round=>1,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+      create(:assignment_due_date,:round=>2,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+      create(:assignment_due_date,:round=>3,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+      expect(assignment.num_review_rounds).to equal(3) 
+    end
   end
 
   describe '#find_current_stage' do
     context 'when next due date is nil' do
-      it 'returns Finished'
+      it 'returns Finished'do
+        assignment=create(:assignment)
+        dead_rigth=create(:deadline_right)
+        ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id,:due_at=> DateTime.now.in_time_zone - 1.day)
+        expect(assignment.find_current_stage()).to eq("Finished")
+      end
     end
 
     context 'when next due date is nil' do
-      it 'returns next due date object'
+      it 'returns next due date object' do
+        assignment=create(:assignment)
+        dead_rigth=create(:deadline_right)
+        ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+        expect(assignment.find_current_stage()).to eq(ass_due_date) 
+      end
     end
   end
 

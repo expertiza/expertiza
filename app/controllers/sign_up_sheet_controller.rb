@@ -53,8 +53,6 @@ class SignUpSheetController < ApplicationController
   # that every assignment will have only one signup sheet
   def create
     topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
-
-    # if the topic already exists then update
     if topic.nil?
       setup_new_topic
     else
@@ -84,11 +82,9 @@ class SignUpSheetController < ApplicationController
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
     @topic = SignUpTopic.find(params[:id])
-
     if @topic
       @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
-      # update tables
       @topic.category = params[:topic][:category]
       @topic.topic_name = params[:topic][:topic_name]
       @topic.micropayment = params[:topic][:micropayment]
@@ -98,10 +94,10 @@ class SignUpSheetController < ApplicationController
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = "The topic could not be updated."
-      end
+    end
     # changing the redirection url to topics tab in edit assignment view.
     redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
-    end
+  end
 
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
@@ -161,7 +157,6 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
-    @topic_id = params[:id]
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
@@ -170,8 +165,8 @@ class SignUpSheetController < ApplicationController
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority) 
       signed_up_topics = []
       @bids.each do |bid|
-        sign_up_topic = SignUpTopic.where(id: bid.topic_id)
-        signed_up_topics << sign_up_topic.first unless sign_up_topic.empty?
+        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+        signed_up_topics << sign_up_topic if sign_up_topic
       end
       signed_up_topics &= @sign_up_topics
       @sign_up_topics -= signed_up_topics
@@ -205,7 +200,6 @@ class SignUpSheetController < ApplicationController
   end
 
   def sign_up
-    # find the assignment to which user is signing up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
     # Always use team_id ACS
@@ -262,8 +256,7 @@ class SignUpSheetController < ApplicationController
     # find participant using assignment using team and topic ids
     team = Team.find(params[:id])
     assignment = Assignment.find(team.parent_id)
-    team_user = TeamsUser.find_by(team_id: team.id)
-    user = User.find(team_user.user_id)
+    user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
@@ -291,7 +284,7 @@ class SignUpSheetController < ApplicationController
       Bid.where(team_id: team_id).destroy_all
     else
       @bids = Bid.where(team_id: team_id)
-      signed_up_topics = @bids.map(&:topic_id)
+      signed_up_topics = Bid.where(team_id: team_id).map(&:topic_id)
       # Remove topics from bids table if the student moves data from Selection table to Topics table
       # This step is necessary to avoid duplicate priorities in Bids table
       signed_up_topics -= params[:topic].map(&:to_i)
@@ -299,7 +292,7 @@ class SignUpSheetController < ApplicationController
         Bid.where(topic_id: topic, team_id: team_id).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = @bids.where(topic_id: topic_id)
+        bid_existence = Bid.where(topic_id: topic_id, team_id: team_id)
         if bid_existence.empty?
           Bid.create(topic_id: topic_id, team_id: team_id, priority: index + 1)
         else
@@ -333,7 +326,7 @@ class SignUpSheetController < ApplicationController
           if topic_due_date.nil? # create a new record
             TopicDueDate.create(
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
-              deadline_type_id:            DeadlineType.find_by_name(deadline_type).id,
+              deadline_type_id:            deadline_type_id,
               parent_id:                   topic.id,
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
@@ -409,19 +402,15 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-
     if @assignment.is_microtask?
       @sign_up_topic.micropayment = params[:topic][:micropayment]
     end
-
     if @assignment.staggered_deadline?
       topic_set = []
       topic = @sign_up_topic.id
     end
-
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      # changing the redirection url to topics tab in edit assignment view.
       redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
     else
       render action: 'new', id: params[:id]
@@ -430,9 +419,7 @@ class SignUpSheetController < ApplicationController
 
   def update_existing_topic(topic)
     topic.topic_identifier = params[:topic][:topic_identifier]
-
     update_max_choosers topic
-
     topic.category = params[:topic][:category]
     # topic.assignment_id = params[:id]
     topic.save

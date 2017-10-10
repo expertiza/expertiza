@@ -206,7 +206,7 @@ FactoryGirl.define do
   factory :signed_up_team, class: SignedUpTeam do
     topic { SignUpTopic.first || association(:topic) }
     team_id 1
-    is_waitlisted 0
+    is_waitlisted false
     preference_priority_number nil
   end
 

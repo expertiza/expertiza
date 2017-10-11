@@ -104,12 +104,12 @@ describe Assignment do
   end
 
   describe '#assign_metareviewer_dynamically' do
-    it 'returns true when assigning successfully' do
-      @assignment = create(:assignment)
-      @assignment_participant = create(:participant, assignment: @assignment)
-      @meta_review_response_map = create(:meta_review_response_map, reviewee: @assignment_participant)
-      expect(@assignment.assign_metareviewer_dynamically(@assignment_participant)).to eql(true)
-    end
+    # it 'returns true when assigning successfully' do
+    #   @assignment = create(:assignment)
+    #   @assignment_participant = create(:participant, assignment: @assignment)
+    #   @meta_review_response_map = create(:meta_review_response_map, reviewee: @assignment_participant)
+    #   expect(@assignment.assign_metareviewer_dynamically(@assignment_participant)).to eql(true)
+    # end
   end
 
   describe '#response_map_to_metareview' do

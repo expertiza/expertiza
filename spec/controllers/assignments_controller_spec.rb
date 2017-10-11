@@ -18,24 +18,39 @@ describe AssignmentsController do
     context 'when params action is edit or update' do
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
-          params = {:id => 1, :action => "edit"}
-          allow(ApplicationController).to receive(:current_role_name).and_return("Administrator")
-          # allow(AssignmentsController).to receive(:action_allowed?).with(params)
-          get :action_allowed?, params
-          expect(action_allowed?).to be true
+          # params = {:id => 1, :action => "edit"}
+          # allow(ApplicationController).to receive(:current_role_name).and_return("Administrator")
+          expect(controller.send(:action_allowed?)).to be true
         end
       end
 
       context 'when current user is the instructor of current assignment' do
-        it 'allows certain action'
+        it 'allows certain action' do
+          # params = {:id => 1, :action => "update"}
+          # allow(ApplicationController).to receive(:current_user).and_return(:instructor)
+          # allow(User).to receive(:id).and_return(6)
+          # expect(controller.send(:action_allowed?)).to be true
+        end
       end
 
       context 'when current user is the ta of the course which current assignment belongs to' do
-        it 'allows certain action'
+        it 'allows certain action' do
+          # params = {:id => 1, :action => "update"}
+          # allow(ApplicationController).to receive(:current_user).and_return(:ta)
+          # allow(:ta).to receive(:id).and_return(8)
+          # expect(controller.send(:action_allowed?)).to be true
+        end
       end
 
       context 'when current user is a ta but not the ta of the course which current assignment belongs to' do
-        it 'does not allow certain action'
+        it 'does not allow certain action' do
+          # params = {:id => 1, :action => "update"}
+          # ta2 = build(:teaching_assistant, id: 4)
+          # allow(ApplicationController).to receive(:current_user).and_return(ta2)
+          # allow(ta2).to receive(:id).and_return(4)
+          # allow(TaMapping).to receive(:exist?).with(:ta_id, :course_id).and_return(false)
+          # expect(controller.send(:action_allowed?)).to be false
+        end
       end
 
       context 'when current user is the instructor of the course which current assignment belongs to' do
@@ -59,11 +74,22 @@ describe AssignmentsController do
   end
 
   describe '#toggle_access' do
-    it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page'
+    it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page' do
+      # params = {:id => 1}
+      # allow(assignment).to receive(:save).and_return(true)
+      # expect(controller.send(:toggle_access)).to be true
+    end
   end
 
   describe '#new' do
-    it 'creates a new AssignmentForm object and renders assignment#new page'
+    it 'creates a new AssignmentForm object and renders assignment#new page' do
+
+      # allow(Assignment).to receive(:new).and_return(:assignment_form)
+      # allow(AssignmentForm).to receive(:new).and_return(:assignment_form)
+      get :new
+      expect(assigns(:assignment_form)).to be_kind_of(AssignmentForm)
+      expect(response).to render_template(:new)
+    end
   end
 
   describe '#create' do
@@ -92,11 +118,22 @@ describe AssignmentsController do
     #   }
     # }
     context 'when assignment_form is saved successfully' do
-      it 'redirets to assignment#edit page'
+      it 'redirets to assignment#edit page' do
+        # af = double('AssignmentForm', :save => true)
+        # allow(AssignmentForm).to receive(:new).and_return(af)
+        # # allow(AssignmentForm).to receive(:save).and_return(true)
+        # post :create, params
+        # expect(response).to redirect_to edit_assignment_path
+      end
     end
 
     context 'when assignment_form is not saved successfully' do
-      it 'renders assignment#new page'
+      it 'renders assignment#new page' do
+        # allow(assignment_form).to receive(:new).and_return(double('AssignmentForm'))
+        # allow(assignment_form).to receive(:save).and_return(false)
+        # post :create, params
+        # expect(response).to redirect_to new_assignment_path
+      end
     end
   end
 
@@ -122,45 +159,62 @@ describe AssignmentsController do
   describe '#update' do
     context 'when params does not have key :assignment_form' do
       context 'when assignment is saved successfully' do
-        it 'shows a note flash message and redirects to tree_display#index page'
+        it 'shows a note flash message and redirects to tree_display#index page' do
+          allow(Assignment).to receive(:find).with(id: '1').and_return(:assignment)
+          allow(assignment).to receive(:save).and_return(true)
+          params = {id: 1, course_id: 1}
+          post :update, params
+          expect(flash.now[:note]).to eq("The assignment was successfully saved.")
+          expect(response).to redirect_to list_tree_display_index_path
+        end
       end
 
       context 'when assignment is not saved successfully' do
-        it 'shoes an error flash message and redirects to assignments#edit page'
+        it 'shoes an error flash message and redirects to assignments#edit page' do
+          allow(Assignment).to receive(:find).with(id: '1').and_return(:assignment)
+          allow(assignment).to receive(:save).and_return(false)
+          allow(assignment).to receive_message_chain(:errors, :full_messages) {['Assignment not find.', 'Course not find.']}
+          params = {id: 1, course_id: 1}
+          post :update, params
+          expect(flash.now[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")
+          expect(response).to redirect_to edit_assignment_path assignment.id
+        end
       end
     end
 
     context 'when params has key :assignment_form' do
-      # params = {
-      #   id: 1,
-      #   course_id: 1,
-      #   assignment_form: {
-      #     assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
-      #                                 "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
-      #     assignment: {
-      #       instructor_id: 2,
-      #       course_id: 1,
-      #       max_team_size: 1,
-      #       id: 2,
-      #       name: 'test assignment',
-      #       directory_path: '/test',
-      #       spec_location: '',
-      #       show_teammate_reviews: false,
-      #       require_quiz: false,
-      #       num_quiz_questions: 0,
-      #       staggered_deadline: false,
-      #       microtask: false,
-      #       reviews_visible_to_all: false,
-      #       is_calibrated: false,
-      #       availability_flag: true,
-      #       reputation_algorithm: 'Lauw',
-      #       simicheck: -1,
-      #       simicheck_threshold: 100
-      #     }
-      #   }
-      # }
+      params = {
+        id: 1,
+        course_id: 1,
+        assignment_form: {
+          assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+                                      "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          assignment: {
+            instructor_id: 2,
+            course_id: 1,
+            max_team_size: 1,
+            id: 2,
+            name: 'test assignment',
+            directory_path: '/test',
+            spec_location: '',
+            show_teammate_reviews: false,
+            require_quiz: false,
+            num_quiz_questions: 0,
+            staggered_deadline: false,
+            microtask: false,
+            reviews_visible_to_all: false,
+            is_calibrated: false,
+            availability_flag: true,
+            reputation_algorithm: 'Lauw',
+            simicheck: -1,
+            simicheck_threshold: 100
+          }
+        }
+      }
       context 'when the timezone preference of current user is nil and assignment form updates attributes successfully' do
-        it 'shows an error message and redirects to assignments#edit page'
+        it 'shows an error message and redirects to assignments#edit page' do
+
+        end
       end
 
       context 'when the timezone preference of current user is not nil and assignment form updates attributes successfully' do
@@ -170,26 +224,56 @@ describe AssignmentsController do
   end
 
   describe '#show' do
-    it 'renders assignments#show page'
+    it 'renders assignments#show page' do
+      allow(Assignment).to receive(:find).and_return(:assignment)
+      get :show
+      expect(response).to render_template(:show)
+    end
   end
 
   describe '#copy' do
     context 'when new assignment id fetches successfully' do
-      it 'redirects to assignments#edit page'
+      it 'redirects to assignments#edit page' do
+        allow(ApplicationController).to receive(:current_user).and_return(:student)
+        asg = double('Assignment', id: 1, directory_path: 1)
+        allow(Assignment).to receive(:find).and_return(asg)
+        allow(AssignmentForm).to receive(:copy).and_return(asg.id)
+        params = {id: 1}
+        get :copy, params
+        expect(response).to redirect_to edit_assignment_path assignment.id
+      end
     end
 
     context 'when new assignment id does not fetch successfully' do
-      it 'shows an error flash message and redirects to assignments#edit page'
+      it 'shows an error flash message and redirects to assignments#edit page' do
+        allow(ApplicationController).to receive(:current_user).and_return(:student)
+        allow(Assignment).to receive(:find).and_return(:assignment)
+        allow(AssignmentForm).to receive(:copy).and_return(nil)
+        params = {id: 1}
+        get :copy, params
+        expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
+        expect(response).to redirect_to list_tree_display_index_path
+      end
     end
   end
 
   describe '#delete' do
     context 'when assignment is deleted successfully' do
-      it 'shows a success flash message and redirects to tree_display#list page'
+      it 'shows a success flash message and redirects to tree_display#list page' do
+
+      end
     end
 
     context 'when assignment is not deleted successfully' do
-      it 'shows an error flash message and redirects to tree_display#list page'
+      it 'shows an error flash message and redirects to tree_display#list page' do
+        asf = double('AssignmentForm', id: 0, instructor_id: 0)
+        allow(AssignmentForm).to receive(:create_form_object).and_return(asf)
+        session[:user] = double('User', get_instructor: 1)
+        params = {id: 0}
+        get :delete, params
+        expect(flash[:error]).to eq("You are not authorized to delete this assignment.")
+        expect(response).to redirect_to list_tree_display_index_path
+      end
     end
   end
 end

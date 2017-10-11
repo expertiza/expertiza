@@ -18,7 +18,11 @@ describe AssignmentsController do
     context 'when params action is edit or update' do
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
-
+          params = {:id => 1, :action => "edit"}
+          allow(ApplicationController).to receive(:current_role_name).and_return("Administrator")
+          # allow(AssignmentsController).to receive(:action_allowed?).with(params)
+          get :action_allowed?, params
+          expect(action_allowed?).to be true
         end
       end
 

@@ -260,14 +260,23 @@ describe AssignmentsController do
   describe '#delete' do
     context 'when assignment is deleted successfully' do
       it 'shows a success flash message and redirects to tree_display#list page' do
-
+        asg = double('Assignmnet', instructor_id: 6)
+        asg_form = double('AssignmentForm', id: 0, assignment: asg)
+        allow(asg_form).to receive(:delete)
+        allow(AssignmentForm).to receive(:create_form_object).and_return(asg_form)
+        session[:user] = double('User', get_instructor: 6)
+        params = {id: 0, force: true}
+        get :delete, params
+        expect(flash[:success]).to eq("The assignment was successfully deleted.")
+        expect(response).to redirect_to list_tree_display_index_path
       end
     end
 
     context 'when assignment is not deleted successfully' do
       it 'shows an error flash message and redirects to tree_display#list page' do
-        asf = double('AssignmentForm', id: 0, instructor_id: 0)
-        allow(AssignmentForm).to receive(:create_form_object).and_return(asf)
+        asg = double('Assignmnet', instructor_id: 0)
+        asg_form = double('AssignmentForm', id: 0, assignment: asg)
+        allow(AssignmentForm).to receive(:create_form_object).and_return(asg_form)
         session[:user] = double('User', get_instructor: 1)
         params = {id: 0}
         get :delete, params

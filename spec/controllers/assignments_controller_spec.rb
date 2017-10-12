@@ -18,18 +18,19 @@ describe AssignmentsController do
     context 'when params action is edit or update' do
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
-          # params = {:id => 1, :action => "edit"}
-          # allow(ApplicationController).to receive(:current_role_name).and_return("Administrator")
+          params = {:id => 1, :action => "edit"}
+          allow(ApplicationController).to receive(:current_role_name).and_return("Administrator")
           expect(controller.send(:action_allowed?)).to be true
         end
       end
 
       context 'when current user is the instructor of current assignment' do
         it 'allows certain action' do
-          # params = {:id => 1, :action => "update"}
-          # allow(ApplicationController).to receive(:current_user).and_return(:instructor)
+          params = {:id => 1, :action => "update"}
+          allow(Assignment).to receive(:find).and_return(assignment)
+          allow(ApplicationController).to receive(:current_user).and_return(:instructor)
           # allow(User).to receive(:id).and_return(6)
-          # expect(controller.send(:action_allowed?)).to be true
+          expect(controller.send(:action_allowed?)).to be true
         end
       end
 
@@ -213,11 +214,23 @@ describe AssignmentsController do
       }
       context 'when the timezone preference of current user is nil and assignment form updates attributes successfully' do
         it 'shows an error message and redirects to assignments#edit page' do
-
+          # asg = double('Assignment', instructor_id: 6)
+          # asg_form = double('AssignmentForm', id: 0, assignment: asg)
+          # allow(asg_form).to receive(:update_attributes).and_return(true)
+          # allow(AssignmentForm).to receive(:create_form_object).and_return(asg_form)
+          #
+          # usr = double('User', timezonepref: nil, parent_id: 1)
+          # parent = double('User', timezonepref: "UTC")
+          # allow(User).to receive(:find).and_return(parent)
+          # allow(ApplicationController).to receive(:current_user).and_return(usr)
+          # allow(assignment_form).to receive_message_chain(assignment, instructor).with(usr)
+          # post :update, params
+          # expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in UTC")
+          # expect(response).to redirect_to edit_assignment_path asg_form.assignment.id
         end
       end
 
-      context 'when the timezone preference of current user is not nil and assignment form updates attributes successfully' do
+      context 'when the timezone preference of current user is not nil and assignment form updates attributes not successfully' do
         it 'shows an error message and redirects to assignments#edit page'
       end
     end
@@ -260,7 +273,7 @@ describe AssignmentsController do
   describe '#delete' do
     context 'when assignment is deleted successfully' do
       it 'shows a success flash message and redirects to tree_display#list page' do
-        asg = double('Assignmnet', instructor_id: 6)
+        asg = double('Assignment', instructor_id: 6)
         asg_form = double('AssignmentForm', id: 0, assignment: asg)
         allow(asg_form).to receive(:delete)
         allow(AssignmentForm).to receive(:create_form_object).and_return(asg_form)

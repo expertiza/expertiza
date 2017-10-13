@@ -1,0 +1,55 @@
+<table class="table table-bordered table-striped">
+  <thead>
+  <tr>
+
+    <!-- CONSIDER USING JAVASCRIPT TO MAKE SELECT OPTIONS MUTUALLY EXCLUSIVE -->
+
+    <th>
+      <select class="form-control" style="background-color:lightgrey">
+        <option value="user_name">User Name</option>
+        <option value="full_name">Full Name</option>
+        <option value="email_address">Email Address</option>
+      </select>
+    </th>
+    <th>
+      <select class="form-control" style="background-color:lightgrey">
+        <option value="full_name">Full Name</option>
+        <option value="user_name">User Name</option>
+        <option value="email_address">Email Address</option>
+      </select>
+    </th>
+    <th>
+      <select class="form-control" style="background-color:lightgrey">
+        <option value="email_address">Email Address</option>
+        <option value="user_name">User Name</option>
+        <option value="full_name">Full Name</option>
+      </select>
+    </th>
+  </tr>
+  </thead>
+
+  <!-- SAMPLE BODY -->
+
+  <tbody>
+  <tr>
+    <td align="center">R1 C1</td>
+    <td align="center">R1 C2</td>
+    <td align="center">R1 C3</td>
+  </tr>
+  <tr>
+    <td align="center">R2 C1</td>
+    <td align="center">R2 C2</td>
+    <td align="center">R2 C3</td>
+  </tr>
+  <tr>
+    <td align="center">R3 C1</td>
+    <td align="center">R3 C2</td>
+    <td align="center">R3 C3</td>
+  </tr>
+  </tbody>
+
+</table>
+
+<div style="text-align:center">
+  <button type="button" class="btn-primary" style="padding:25px 25px 25px 25px">Import <%= @model %></button>
+</div>

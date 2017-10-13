@@ -1,0 +1,13 @@
+<h2>Please Confirm the Columns for <strong><em><%= @model %></em></strong>:</h2>
+
+<% if @model == 'User' %>
+    <%= render 'import_file/user' %>
+<% elsif @model == 'AssignmentTeam' %>
+    <%= render 'import_file/assignment_team' %>
+<% elsif @model == 'CourseTeam' %>
+    <%= render 'import_file/course_team' %>
+<% elsif @model == 'SignUpTopic' %>
+    <%= render 'import_file/sign_up_topic' %>
+<% else %>
+    <h1>There was a problem with the @model in app/views/import_file/show.html.erb.</h1>
+<% end %>

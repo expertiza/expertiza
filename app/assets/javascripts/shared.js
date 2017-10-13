@@ -1,3 +1,15 @@
+function checkForFile() {
+    var file_value = $('#import_file').val();
+    $(document).ready(function() {
+        $('#import_form').submit(file_value)
+        if (file_value.length <= 0) {
+            alert('Please select a file before clicking Import.');
+        } else {
+            import_form.submit();
+        };
+    });
+}
+
 function checkIfFileExists(filename, flag)
 {
     if(filename=='')

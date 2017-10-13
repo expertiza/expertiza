@@ -6,6 +6,10 @@ class ImportFileController < ApplicationController
      'Super-Administrator'].include? current_role_name
   end
 
+  def show
+    @model = 'SignUpTopic'
+  end
+
   def start
     @id = params[:id]
     @expected_fields = params[:expected_fields]

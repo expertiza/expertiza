@@ -1,5 +1,5 @@
 <h2>Import <%= @title %></h2>
-<%= form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form'}) do %>
+<%= form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form', :id => 'import_form'}) do %>
   <table>
     <tr>
       <td valign='Top'>Delimiter:</td>
@@ -25,7 +25,7 @@
   <br/>
 <% end %>
 <br/>
-<label for="file">File to import: </label><%= file_field_tag 'file', :size => 40 %><br/><br/>
+<label for="file">File to import: </label><%= file_field_tag 'file', :size => 40, :id => 'import_file' %><br/><br/>
 <%= hidden_field_tag('model', @model) %>
 <%= hidden_field_tag('id', @id) %>
 
@@ -33,7 +33,7 @@
 * The import process expects the following columns:<br/>
 &nbsp;&nbsp;&nbsp;<%= @expected_fields %>
  <br/><br/>
- <input type='submit' value='Import' onclick='if (checkIfFileExists(file)) {import_form.submit();} else {alert("Please select a file before clicking Next.");}'/>
+ <button type='button' onclick='checkForFile()'>Import</button>
  <% end %>
  <br/><br/>
 

@@ -18,6 +18,7 @@ describe AssignmentsController do
     context 'when params action is edit or update' do
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
+          stub_current_user(admin, admin.role.name, admin.role)
           params = {:id => 1, :action => "edit"}
           allow(ApplicationController).to receive(:current_role_name).and_return("Administrator")
           expect(controller.send(:action_allowed?)).to be true
@@ -36,6 +37,7 @@ describe AssignmentsController do
 
       context 'when current user is the ta of the course which current assignment belongs to' do
         it 'allows certain action' do
+          stub_current_user(ta, ta.role.name, ta.role)
           # params = {:id => 1, :action => "update"}
           # allow(ApplicationController).to receive(:current_user).and_return(:ta)
           # allow(:ta).to receive(:id).and_return(8)

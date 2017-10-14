@@ -64,14 +64,16 @@ class CourseController < ApplicationController
     begin
       new_course.save!
       parent_id = CourseNode.get_parent_id
+      params_local = {}
       if parent_id
-        CourseNode.create(node_object_id: new_course.id, parent_id: parent_id)
+        params_local[:course_node] = {node_object_id: new_course.id, parent_id: parent_id}
       else
-        CourseNode.create(node_object_id: new_course.id)
+        params_local[:course_node] = {node_object_id: new_course.id}
       end
+      CourseNode.create(course_params(params_local))
 
-      undo_link("The course \"#{orig_course.name}\" has been successfully copied. 
-        The copy is currently associated with an existing location from the original course. 
+      undo_link("The course \"#{orig_course.name}\" has been successfully copied.
+        The copy is currently associated with an existing location from the original course.
         This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
       redirect_to controller: 'course', action: 'edit', id: new_course.id
 
@@ -177,4 +179,11 @@ class CourseController < ApplicationController
 
     render action: 'remove_ta.js.erb', layout: false
   end
+
+  private
+
+    # Only allow a trusted parameter "white list" through.
+    def course_params(params_local)
+      params_local.require(:course_node).permit(:node_object_id, :parent_id)
+    end
 end

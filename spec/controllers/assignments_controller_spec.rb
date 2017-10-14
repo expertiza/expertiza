@@ -6,7 +6,7 @@ describe AssignmentsController do
   let(:assignment_form) { double('AssignmentForm') }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:instructor2) { build(:instructor, id: 66) }
+  let(:instructor2) { build(:instructor, id: 10) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
   before(:each) do
@@ -19,18 +19,14 @@ describe AssignmentsController do
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
           stub_current_user(admin, admin.role.name, admin.role)
-          params = {:id => 1, :action => "edit"}
-          allow(ApplicationController).to receive(:current_role_name).and_return("Administrator")
+          controller.params = {:id => '1', :action => "edit"}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
 
       context 'when current user is the instructor of current assignment' do
         it 'allows certain action' do
-          params = {:id => 1, :action => "update"}
-          allow(Assignment).to receive(:find).and_return(assignment)
-          allow(ApplicationController).to receive(:current_user).and_return(:instructor)
-          # allow(User).to receive(:id).and_return(6)
+          controller.params = {:id => '1', :action => "edit"}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
@@ -38,40 +34,53 @@ describe AssignmentsController do
       context 'when current user is the ta of the course which current assignment belongs to' do
         it 'allows certain action' do
           stub_current_user(ta, ta.role.name, ta.role)
-          # params = {:id => 1, :action => "update"}
-          # allow(ApplicationController).to receive(:current_user).and_return(:ta)
-          # allow(:ta).to receive(:id).and_return(8)
-          # expect(controller.send(:action_allowed?)).to be true
+          allow(TaMapping).to receive(:exists?).and_return(true)
+          controller.params = {:id => '1', :action => "update"}
+          expect(controller.send(:action_allowed?)).to be true
         end
       end
 
       context 'when current user is a ta but not the ta of the course which current assignment belongs to' do
         it 'does not allow certain action' do
-          # params = {:id => 1, :action => "update"}
-          # ta2 = build(:teaching_assistant, id: 4)
-          # allow(ApplicationController).to receive(:current_user).and_return(ta2)
-          # allow(ta2).to receive(:id).and_return(4)
-          # allow(TaMapping).to receive(:exist?).with(:ta_id, :course_id).and_return(false)
-          # expect(controller.send(:action_allowed?)).to be false
+          ta2 = build(:teaching_assistant, id: 4)
+          stub_current_user(ta2, ta2.role.name, ta2.role)
+          allow(TaMapping).to receive(:exists?).and_return(false)
+          controller.params = {:id => '1', :action => "update"}
+          expect(controller.send(:action_allowed?)).to be false
         end
       end
 
       context 'when current user is the instructor of the course which current assignment belongs to' do
-        it 'allows certain action'
+        it 'allows certain action' do
+          controller.params = {:id => '1', :action => "edit"}
+          expect(controller.send(:action_allowed?)).to be true
+        end
       end
 
       context 'when current user is an instructor but not the instructor of current course or current assignment' do
-        it 'does not allow certain action'
+        it 'does not allow certain action' do
+          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+          controller.params = {:id => '1', :action => "edit"}
+          expect(controller.send(:action_allowed?)).to be false
+        end
       end
     end
 
     context 'when params action is not edit and update' do
       context 'when the role current user is super admin/admin/instractor/ta' do
-        it 'allows certain action except edit and update'
+        it 'allows certain action except edit and update' do
+          stub_current_user(ta, ta.role.name, ta.role)
+          controller.params = {:id => '1', :action => "create"}
+          expect(controller.send(:action_allowed?)).to be true
+        end
       end
 
       context 'when the role current user is student' do
-        it 'does not allow certain action'
+        it 'does not allow certain action' do
+          stub_current_user(student, student.role.name, student.role)
+          controller.params = {:id => '1', :action => "create"}
+          expect(controller.send(:action_allowed?)).to be false
+        end
       end
     end
   end
@@ -86,9 +95,6 @@ describe AssignmentsController do
 
   describe '#new' do
     it 'creates a new AssignmentForm object and renders assignment#new page' do
-
-      # allow(Assignment).to receive(:new).and_return(:assignment_form)
-      # allow(AssignmentForm).to receive(:new).and_return(:assignment_form)
       get :new
       expect(assigns(:assignment_form)).to be_kind_of(AssignmentForm)
       expect(response).to render_template(:new)

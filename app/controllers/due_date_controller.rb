@@ -45,11 +45,22 @@ class DueDateController < ApplicationController
       return
     end
 
-    @due_date = AssignmentDueDate.new(params)
+    @due_date = AssignmentDueDate.new(assignment_due_date_params)
     @due_date.save
 
     respond_to do |format|
       format.json { render json: @due_date }
     end
+  end
+
+  private
+
+  # Only allow a trusted parameter "white list" through.
+  def assignment_due_date_params
+    params.permit(:due_at, :deadline_type_id, :parent_id,
+                  :submission_allowed_id, :review_allowed_id,
+                  :review_of_review_allowed_id, :round, :flag, :threshold,
+                  :delayed_job_id, :deadline_name, :description_url,
+                  :quiz_allowed_id, :teammate_review_allowed_id, :type)
   end
 end

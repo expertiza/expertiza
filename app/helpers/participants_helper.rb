@@ -39,7 +39,7 @@ module ParticipantsHelper
 
   def self.create_new_user(attrs, session)
     user = User.new
-    user.update_attributes attrs
+    user.update_attributes(user_params(attrs))
     user.parent_id = (session[:user]).id
     user.save
     user
@@ -48,7 +48,7 @@ module ParticipantsHelper
   def self.add_user_to_assignment(params, user)
     assignment = Assignment.find params[:assignment_id]
     if AssignmentParticipant.where('user_id = ? AND parent_id = ?', user.id, assignment.id).empty?
-      return AssignmentParticipant.create(parent_id: assignment.id, user_id: user.id)
+      return AssignmentParticipant.create(assignment_participant_params(parent_id: assignment.id, user_id: user.id))
     end
   end
 
@@ -78,5 +78,41 @@ module ParticipantsHelper
       newstr = line_split[1].sub!("\n", "")
       config[ident] = newstr.strip unless newstr.nil?
     end
+  end
+
+  private
+
+  def user_params(params_hash)
+    params_local = params
+    params_local[:user] = params_hash
+    params_local.require(:user).permit(:name,
+                                       :crypted_password,
+                                       :role_id,
+                                       :password_salt,
+                                       :fullname,
+                                       :email,
+                                       :parent_id,
+                                       :private_by_default,
+                                       :mru_directory_path,
+                                       :email_on_review,
+                                       :email_on_submission,
+                                       :email_on_review_of_review,
+                                       :is_new_user,
+                                       :master_permission_granted,
+                                       :handle,
+                                       :digital_certificate,
+                                       :persistence_token,
+                                       :timezonepref,
+                                       :public_key,
+                                       :copy_of_emails,
+                                       :institution_id)
+  end
+
+  def assignment_participant_params(params_hash)
+    params_local = params
+    params_local[:assignment_participant] = params_hash
+    params_local.require(:assignment_participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
+                                                         :permission_granted, :penalty_accumulated, :grade, :type, :handle,
+                                                         :time_stamp, :digital_signature, :duty, :can_take_quiz)
   end
 end

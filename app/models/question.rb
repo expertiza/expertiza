@@ -6,6 +6,8 @@ class Question < ActiveRecord::Base
   has_many :signup_choices # ?? this may reference signup type questionnaires
   has_many :answers
 
+  attr_accessible
+
   validates_presence_of :seq # user must define sequence for a question
   validates_numericality_of :seq # sequence must be numeric
   validates :txt, length: {minimum: 0, allow_nil: false, message: "can't be nil"} # user must define text content for a question

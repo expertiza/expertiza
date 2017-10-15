@@ -84,14 +84,14 @@ describe Assignment do
       end
     end
     context 'when the first if condition is false, num_metareviews_allowed is not -1, and num_metareviews_allowed less than num_metareviews_required' do
-      it 'adds an error message to current assignment object' 
-      #   @assignment = create(:assignment)
-      #   @assignment.num_reviews_allowed = 4
-      #   @assignment.num_reviews_required = 3
-      #   @assignment.num_metareviews_allowed = 2
-      #   @assignment.num_metareviews_required = 3
-      #   expect(@assignment.num_metareviews_allowed < @assignment.num_metareviews_required).to eql(!@assignment.has_attribute?(:message))
-      # end
+      it 'adds an error message to current assignment object' do
+        @assignment = create(:assignment)
+        @assignment.num_reviews_allowed = 4
+        @assignment.num_reviews_required = 3
+        @assignment.num_metareviews_allowed = 2
+        @assignment.num_metareviews_required = 3
+        expect(@assignment.num_metareviews_allowed < @assignment.num_metareviews_required).to eql(!@assignment.has_attribute?(:message))
+      end
     end
   end
   describe '#assign_metareviewer_dynamically' do
@@ -351,43 +351,56 @@ describe Assignment do
 
     context 'when assignment does not have staggered deadline' do
       context "when due date is not equal to 'Finished', due date is not nil and its deadline name is not nil" do
-        it 'returns the deadline name of current due date'
+        it 'returns the deadline name of current due date' do
+             assignment = create(:assignment, staggered_deadline: false)
+              dead_rigth = create(:deadline_right)
+              ass_due_date = create(:assignment_due_date,deadline_name: 'submission', :parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+              expect(assignment.current_stage_name(nil)).to eql(ass_due_date.deadline_name.to_s)
+        end 
       end
     end
   end
-
   describe '#microtask?' do
     it 'checks whether assignment is a micro task' do
       assignment = build(:assignment, microtask: true)
       expect(assignment.microtask?).to equal(true)
     end
   end
-
-
   describe '#varying_rubrics_by_round?' do
-    it 'returns true if the number of 2nd round questionnaire(s) is larger or equal 1'
+    it 'returns true if the number of 2nd round questionnaire(s) is larger or equal 1' do
+      assignment = create(:assignment)
+      questionnaire = create(:questionnaire)
+      assignment_questionnaire = create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire , used_in_round: 2)
+      expect(assignment.varying_rubrics_by_round?).to eq(true)
+      end
   end
-
+  
   describe '#link_for_current_stage' do
     context 'when current assignment has staggered deadline and topic id is nil' do
-        it 'returns nil' do
-          assignment = build( :assignment, staggered_deadline: true )
-          expect(assignment.link_for_current_stage(nil)).to eq(nil)
-        end
+      it 'returns nil' do
+        assignment = create( :assignment, staggered_deadline: true )
+        expect(assignment.link_for_current_stage(nil)).to eq(nil)
       end
-
-
+    end
     context 'when current assignment does not have staggered deadline' do
       context 'when due date is a TopicDueDate' do
-        it 'returns nil'
+        it 'returns nil' do
+          assignment = create( :assignment, staggered_deadline: false)
+          dead_rigth = create(:deadline_right)
+          assignment_due_date = create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id,)
+          expect(assignment.link_for_current_stage).to eq(nil)
+        end
       end
-
       context 'when due_date is not nil, not finished and is not a TopicDueDate' do
-        it 'returns description url of current due date'
+        it 'returns description url of current due date' do
+          assignment = create(:assignment, staggered_deadline: false)
+          dead_rigth = create(:deadline_right)
+          ass_due_date = create(:assignment_due_date, due_at: DateTime.now.in_time_zone + 1.day, :parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
+           expect(assignment.link_for_current_stage).to eql(ass_due_date.description_url)
+        end
       end
     end
   end
-
   describe '#stage_deadline' do
     context 'when topic id is nil and current assignment has staggered deadline' do
       it 'returns Unknown' do
@@ -396,7 +409,6 @@ describe Assignment do
         expect(assignment.stage_deadline()).to eq("Unknown")  
       end
     end
-
     context 'when current assignment does not have staggered deadline' do
       context 'when due date is nil' do
         it 'returns nil' do
@@ -541,6 +553,4 @@ describe Assignment do
       end
     end
   end
-
 end
-

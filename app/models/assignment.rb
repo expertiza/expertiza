@@ -139,7 +139,7 @@ class Assignment < ActiveRecord::Base
   def metareview_mappings
     mappings = []
     self.review_mappings.each do |map|
-      m_map = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
+      m_map = MetareviewResponseMap.find_by(reviewed_object_id: map.id)
       mappings << m_map unless m_map.nil?
     end
     mappings
@@ -303,7 +303,7 @@ class Assignment < ActiveRecord::Base
   # manual addition
   # user_name - the user account name of the participant to add
   def add_participant(user_name, can_submit, can_review, can_take_quiz)
-    user = User.find_by_name(user_name)
+    user = User.find_by(name: user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" +
       url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id:  user.id)
@@ -318,7 +318,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def create_node
-    parent = CourseNode.find_by_node_object_id(self.course_id)
+    parent = CourseNode.find_by(node_object_id: self.course_id)
     node = AssignmentNode.create(node_object_id: self.id)
     node.parent_id = parent.id unless parent.nil?
     node.save
@@ -545,7 +545,7 @@ class Assignment < ActiveRecord::Base
 
     questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round?
-        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
         questionnaire_symbol = if round.nil?
                                  questionnaire.symbol
                                else
@@ -618,6 +618,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 end

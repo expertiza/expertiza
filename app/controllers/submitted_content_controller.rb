@@ -48,10 +48,10 @@ class SubmittedContentController < ApplicationController
       begin
         team.submit_hyperlink(params['submission'])
         SubmissionRecord.create(submission_record_params(team_id: team.id,
-                                content: params['submission'],
-                                user: @participant.name,
-                                assignment_id: @participant.assignment.id,
-                                operation: "Submit Hyperlink"))
+                                                         content: params['submission'],
+                                                         user: @participant.name,
+                                                         assignment_id: @participant.assignment.id,
+                                                         operation: "Submit Hyperlink"))
       rescue
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end

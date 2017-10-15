@@ -4,6 +4,7 @@ class SystemSettings < ActiveRecord::Base
   attr_accessor :public_role, :default_markup_style
   attr_accessor :site_default_page, :not_found_page, :permission_denied_page,
                 :session_expired_page
+  attr_accessible
 
   def public_role
     @public_role ||= Role.find(self.public_role_id)

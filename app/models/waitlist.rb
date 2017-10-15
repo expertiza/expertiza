@@ -1,4 +1,6 @@
 class Waitlist < ActiveRecord::Base
+  attr_accessible
+
   def self.cancel_all_waitlists(team_id, assignment_id)
     waitlisted_topics = SignUpTopic.find_waitlisted_topics(assignment_id, team_id)
     unless waitlisted_topics.nil?

@@ -3,6 +3,7 @@
 class SelfReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  attr_accessible
 
   # This method is used to get questionnaire for self-review to be performed by user
   def questionnaire(round)

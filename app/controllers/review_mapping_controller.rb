@@ -24,7 +24,7 @@ class ReviewMappingController < ApplicationController
   def add_calibration
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?
-      participant = AssignmentParticipant.create(assignment_participant_params(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle'))
+      participant = AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle'))
     end
     map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
     if map.nil?
@@ -407,7 +407,7 @@ class ReviewMappingController < ApplicationController
     when "Calibration"
       participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
       if participant.nil?
-        participant = AssignmentParticipant.create(assignment_participant_params(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle'))
+        participant = AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle'))
       end
       @assignment = Assignment.find(params[:id])
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
@@ -599,14 +599,6 @@ class ReviewMappingController < ApplicationController
       end
       iterator += 1
     end
-  end
-
-  def assignment_participant_params(params_hash)
-    params_local = params
-    params_local[:assignment_participant] = params_hash
-    params_local.require(:assignment_participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
-                                              :permission_granted, :penalty_accumulated, :grade, :type, :handle,
-                                              :time_stamp, :digital_signature, :duty, :can_take_quiz)
   end
 
   def review_response_map_params(params_hash)

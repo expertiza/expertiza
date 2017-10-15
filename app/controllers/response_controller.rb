@@ -135,7 +135,9 @@ class ResponseController < ApplicationController
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
       if map.nil?
         # if no feedback exists by dat user den only create for dat particular response/review
-        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
+        map = FeedbackResponseMap.create(feedback_response_map_params(reviewed_object_id: review.id,
+                                                                      reviewer_id: reviewer.id,
+                                                                      reviewee_id: review.map.reviewer.id))
       end
       redirect_to action: 'new', id: map.id, return: "feedback"
     else
@@ -169,12 +171,12 @@ class ResponseController < ApplicationController
                    else
                      false
                    end
-    @response = Response.create(
+    @response = Response.create(response_params(
       map_id: @map.id,
       additional_comment: params[:review][:comments],
       round: @round,
       is_submitted: is_submitted
-    )
+    ))
     # ,:version_num=>@version)
 
     # Change the order for displaying questions for editing response views.
@@ -384,5 +386,17 @@ class ResponseController < ApplicationController
     @prev = Response.where(map_id: @map.id)
     # not sure what this is about
     @review_scores = @prev.to_a
+  end
+
+  def feedback_response_map_params(params_hash)
+    params_local = params
+    params_local[:feedback_response_map] = params_hash
+    params_local.require(:feedback_response_map).permit(:reviewee_id, :reviewer_id, :reviewed_object_id)
+  end
+
+  def response_params(params_hash)
+    params_local = params
+    params_local[:response] = params_hash
+    params_local.require(:response).permit(:map_id, :additional_comment, :round, :is_submitted)
   end
 end

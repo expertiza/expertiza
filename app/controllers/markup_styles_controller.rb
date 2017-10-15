@@ -56,6 +56,6 @@ class MarkupStylesController < ApplicationController
   private
 
   def markup_style_params
-    params.require(:markup_style).permit(:name)
+    params.require(:markup_style).permit!
   end
 end

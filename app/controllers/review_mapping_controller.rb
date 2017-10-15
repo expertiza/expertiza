@@ -624,12 +624,9 @@ class ReviewMappingController < ApplicationController
 
   def init_participant
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
-    if participant.nil?
-      return AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: params[:id],
-                                                                                              user_id: session[:user].id, can_submit: 1,
-                                                                                              can_review: 1, can_take_quiz: 1, handle: 'handle'))
-    else
-      return participant
-    end
+    participant ||= AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: params[:id],
+                                                                                                     user_id: session[:user].id, can_submit: 1,
+                                                                                                     can_review: 1, can_take_quiz: 1, handle: 'handle'))
+    participant
   end
 end

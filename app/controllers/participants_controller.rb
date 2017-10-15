@@ -63,14 +63,14 @@ class ParticipantsController < ApplicationController
     can_take_quiz = permissions[:can_take_quiz]
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
+    participant.update_attributes(participant_params(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz))
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
   # duties: manager, designer, programmer, tester
   def update_duties
     participant = Participant.find(params[:student_id])
-    participant.update_attributes(duty: params[:duty])
+    participant.update_attributes(participant_params(duty: params[:duty]))
     redirect_to controller: 'student_teams', action: 'view', student_id: participant.id
   end
 
@@ -145,7 +145,7 @@ class ParticipantsController < ApplicationController
         flash[:error] = "<b>The handle #{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different one."
         redirect_to controller: 'participants', action: 'change_handle', id: @participant
       else
-        @participant.update_attributes(participant_params)
+        @participant.update_attributes(participant_params(nil))
         redirect_to controller: 'student_task', action: 'view', id: @participant
       end
     end
@@ -189,10 +189,12 @@ class ParticipantsController < ApplicationController
 
   private
 
-  def participant_params
-    params.require(:participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
-                                        :permission_granted, :penalty_accumulated, :grade, :type, :handle,
-                                        :time_stamp, :digital_signature, :duty, :can_take_quiz)
+  def participant_params(params_hash)
+    params_local = params
+    params_local[:participant] = params_hash unless nil == params_hash
+    params_local.require(:participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
+                                              :permission_granted, :penalty_accumulated, :grade, :type, :handle,
+                                              :time_stamp, :digital_signature, :duty, :can_take_quiz)
   end
 
   # Get the user info from the team user

@@ -25,9 +25,8 @@ class MarkupStylesController < ApplicationController
   end
 
   def create
-    @markup_style = MarkupStyle.new(markup_style_params)
     begin
-      @markup_style.save!
+      @markup_style = MarkupStyle.create(markup_style_params)
       flash[:notice] = 'The markup style was successfully created.'
       redirect_to action: 'list'
     rescue

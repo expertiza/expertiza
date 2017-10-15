@@ -445,7 +445,7 @@ class QuestionnairesController < ApplicationController
         else
           # Update existing question.
           question = Question.find(question_key)
-          unless question.update_attributes(params[:question][question_key])
+          unless question.update_attributes(question_key_params(question_key))
             Rails.logger.info(question.errors.messages.inspect)
           end
           end
@@ -470,11 +470,10 @@ class QuestionnairesController < ApplicationController
                     0
                   end
           if q_type == "MultipleChoiceCheckbox"
-            if params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-            else
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-            end
+            iscorrect_s = (params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s).to_s
+            q = QuizQuestionChoice.new(quiz_question_choice_params(
+                                           txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt],
+                                           iscorrect: iscorrect_s, question_id: question.id))
             q.save
           elsif q_type == "TrueFalse"
             if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
@@ -489,11 +488,11 @@ class QuestionnairesController < ApplicationController
               q.save
             end
           else
-            if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-            else
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-            end
+
+            iscorrect_s = (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key).to_s
+            q = QuizQuestionChoice.new(quiz_question_choice_params(
+                txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt],
+                iscorrect: iscorrect_s, question_id: question.id))
             q.save
           end
         end
@@ -511,6 +510,25 @@ class QuestionnairesController < ApplicationController
   def question_params
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
                                      :alternatives, :break_before, :max_label, :min_label)
+  end
+
+  def question_key_params(key)
+    params_local = params
+    params_local[:question_key] = params_local[:question][key]
+    params_local.require(:question_key).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
+                                     :alternatives, :break_before, :max_label, :min_label)
+  end
+
+  def quiz_question_choice_params(params_hash)
+    params_local = params
+    params_local[:quiz_question_choice] = params_hash
+    params_local.require(:quiz_question_choice).permit(:txt, :iscorrect, :question_id)
+  end
+
+  def questionnaire_node_params(params_hash)
+    params_local = params
+    params_local[:questionnaire_node] = params_hash
+    params_local.require(:questionnaire_node).permit(:parent_id, :node_object_id, :type)
   end
 
   # FIXME: These private methods belong in the Questionnaire model

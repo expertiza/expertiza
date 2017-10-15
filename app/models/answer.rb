@@ -5,6 +5,8 @@ class Answer < ActiveRecord::Base
   belongs_to :question
   belongs_to :response
 
+  attr_accessible
+
   # Computes the total score for a *list of assessments*
   # parameters
   #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)

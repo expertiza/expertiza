@@ -4,6 +4,8 @@ class AssignmentTeam < Team
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
 
+  attr_accessible
+
   # START of contributor methods, shared with AssignmentParticipant
 
   # Whether this team includes a given participant or not

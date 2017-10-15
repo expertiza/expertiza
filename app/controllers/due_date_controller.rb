@@ -46,8 +46,7 @@ class DueDateController < ApplicationController
     end
 
     params[:assignment_due_date] = params
-    @due_date = AssignmentDueDate.new(assignment_due_date_params)
-    @due_date.save
+    @due_date = AssignmentDueDate.create(assignment_due_date_params)
 
     respond_to do |format|
       format.json { render json: @due_date }

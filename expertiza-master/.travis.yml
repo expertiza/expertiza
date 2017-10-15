@@ -1,0 +1,47 @@
+language: ruby
+dist: trusty
+cache:
+    bundler: true
+rvm:
+    - 2.2.7
+branches:
+  only:
+    - master
+before_install:
+    - uname -a
+    - lsb_release -a
+    - rvm list
+    - unset RAILS_ENV
+    - rvm rubygems current
+    - npm install -g bower
+    - bower install
+    - wget https://github.com/mozilla/geckodriver/releases/download/v0.18.0/geckodriver-v0.18.0-linux64.tar.gz
+    - tar -xf geckodriver-v0.18.0-linux64.tar.gz
+    - sudo mv geckodriver /usr/local/bin/geckodriver
+    - geckodriver --version
+    - redis-server --version
+    - redis-server &
+before_script:
+    - mysql -u root < db/grant_expertiza.sql
+    - cp config/database.yml.example config/database.yml
+    - cp config/secrets.yml.example config/secrets.yml
+    - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
+    - bundle install
+    - bundle exec rake db:setup
+    # Using xvfb to Run Tests That Require a GUI (https://docs.travis-ci.com/user/gui-and-headless-browsers/)
+    - "export DISPLAY=:99.0"
+    - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
+    - sleep 3 # give xvfb some time to start
+script:
+    - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake 2> /dev/null"
+services:
+    - mysql
+addons:
+    firefox: latest
+notifications:
+    email:
+      recipients:
+        - expertiza-support@lists.ncsu.edu
+      on_success: change
+      on_failure: change
+    slack: expertiza-support:sbS46L9sFGW9vrRDszFaD9C2

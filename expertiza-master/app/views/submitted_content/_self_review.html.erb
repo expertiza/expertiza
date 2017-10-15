@@ -1,0 +1,88 @@
+<!--#E1600-->
+<table>
+  <!--@assignment.isSelfReview-->
+  <!--Some instance variables are created in the View because this view is fetched from multiple controllers/controller methods.
+  If these instances variables are to be declared in controllers, then it will violate the DRY principle and will be hard
+  to maintain code in future-->
+  <% @sorted_responses = [] %>
+  <tr>
+    <!--Heading-->
+    <td><b>Self Review:</b><BR/></td>
+    <% @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+    <% @review_phase = @assignment.get_current_stage(@topic_id) %>
+    <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id) %>
+    <% if !@review_mappings.nil? && !@review_mappings.empty? %>
+        <!--If there is a review mapping (requested a self-review) that already exists, then show options such as Begin/View/Edit/Update -->
+        <% if !@review_mappings[0].response.empty? %>
+            <!--The above if statement checks if there are any existing responses, else it give 'Begin' option to the user-->
+            <!--!Response.find(@review_mappings.id).nil?-->
+            <% array_not_empty = 0 %>
+            <% @sorted_responses = Array.new %>
+            <% @prev = Response.where(:map_id => @review_mappings[0].id) %>
+            <% for element in @prev %>
+                <% array_not_empty = 1 %>
+                <% @sorted_responses << element %>
+            <% end %>
+            <!--The code above helps in retrieving any exsiting responses for self-review-->
+            <!--The if condition below ensures that responses are retrieved and can be viewed by user when 'View' option is selected-->
+            <% if (array_not_empty == 1) %>
+                <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } %>
+                <!--^the latest should be at the last-->
+                <% @latest_response = @sorted_responses.last %>
+
+                <% if @latest_response.round.nil? %>
+                    <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id, @latest_response) %>
+                <% else %>
+                    <% last_response_round = @latest_response.round %>
+                <% end %>
+
+                <% current_round = @assignment.number_of_current_round(@topic_id) %>
+
+                <td>&nbsp;&nbsp;</td>
+                <td><%= link_to 'View', {:controller => 'response', :action => 'view', :id => @latest_response.id} %></td>
+                <td>&nbsp;&nbsp;</td>
+
+                <% if @assignment.get_current_stage(@topic_id) != 'Finished' %>
+                    <!--show the link as edit when latest review is done in current deadline-->
+                    <!--show link as update when latest review is done in different deadline than current phase-->
+                    <% if (last_response_round == current_round) %>
+                        <td>
+                          <% if (!@latest_response.is_submitted) %>
+                              <%= link_to 'Edit', {:controller => 'response', :action => 'edit', :return=>"selfreview", :id => @latest_response.id} %>
+                          <% end %>
+                        </td>
+                    <% else %>
+                        <td><%= link_to 'Update', {:controller => 'response', :action => 'new', :return=>"selfreview", :id => @review_mappings[0].map_id} %></td>
+                    <% end %>
+                <% end %>
+            <% end %>
+        <% elsif @assignment.get_current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
+            <td>&nbsp;&nbsp;</td>
+            <td><%= link_to 'Begin', {:controller => 'response', :action => 'new', :id => @review_mappings[0].id} %></td>
+        <% end %>
+    <% elsif @assignment.get_current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
+        <!--If the reviewer is yet to request a self-review, then the controller reaches this point-->
+        <%= form_tag :controller => 'review_mapping',
+                     :action => 'start_self_review',
+                     :assignment_id => @assignment.id,
+                     :reviewer_id => @participant.id,
+                     :reviewer_userid => @participant.user_id do %>
+            <td>&nbsp;&nbsp;</td>
+            <% @team_id = TeamsUser.find_by_sql(['SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?', @assignment.id, @participant.user_id]) %>
+            <% @count_users = TeamsUser.find_by_sql(['SELECT count(*) as users FROM teams_users WHERE team_id = ?', @team_id[0].t_id]) %>
+            <!--if condition belows is used to modify button name based on whether there are one or participants in the team for a given assignment-->
+            <% if @count_users[0].users > 1 %>
+                <% reviewType = 'our' %>
+            <% else %>
+                <% reviewType = 'my' %>
+            <% end %>
+            <td><%= submit_tag "Review #{reviewType} own work", :name => 'review' %></td>
+            <td>&nbsp;&nbsp;</td>
+        <% end %>
+    <% else %>
+        <td>&nbsp;&nbsp;</td>
+        <td> (Work has not yet been submitted)</td>
+    <% end %>
+
+  </tr>
+</table>

@@ -1,0 +1,16 @@
+<h1>Editing bookmark</h1>
+
+<%= form_for @bookmark, :action => 'update' do |f| %>
+  <p>
+    <%= label_tag 'Title' %><br/>
+    <%= f.text_field :title %><br/><br/>
+    <%= label_tag 'Url' %><br/>
+    <%= f.text_field :url %><br/><br/>
+    <%= label_tag 'Description' %><br/>
+    <%= f.text_area :description %><br/>
+  </p>
+  <p>
+    <%= f.submit 'Update' %> |
+	<%= link_to 'Back', :action => 'list', :id => @bookmark.topic_id %>
+  </p>
+<% end %>

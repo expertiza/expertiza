@@ -1,0 +1,56 @@
+<style>
+th, td {
+    padding: 5px;
+}
+</style>
+<% @calibration_response_maps.each_with_index do |response_map, index| %>
+	<% team = Team.find(response_map.reviewee_id) %>
+	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>
+	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
+	<% current_responses = @responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
+	<% response_ids = Array.new %>
+	<% current_responses.each { |curr_response|response_ids << curr_response.id } %>
+	<% participant_num = current_responses.count %>
+	
+	<h3> <%= "Calibration #{index+1} (team name:  #{team.name})" %></h3>
+	<% @questions.each_with_index do |question, index| %>
+		<% instructor_answer = Answer.select('answer').where(["question_id = ? and response_id = ?", question.id, response_map.response[0].id]).first.answer ||= 0 %>
+		<b><%= "Question #{index+1}: " %></b><%= question.txt %>
+		<table border="1">
+			<tr>
+				<th width = "20%"> Assigned Score </th>
+				<% (min_question_score..max_question_score).each do |answer| %>
+					<th width = <%= (80.0 / (max_question_score - min_question_score + 1)).to_s + '%'%>><%= answer %></th>
+				<% end %>
+			</tr>
+			<tr>
+				<td> % of students </td>
+				<% max_count = 0 %>
+				<% count_hash = Hash.new %>
+				<% (min_question_score..max_question_score).each do |answer| %>
+					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, response_ids, answer]).size %>
+					<% count_hash[answer] = count %>
+					<% max_count = count if count > max_count %>
+				<% end %>
+				<% count_hash.each do |answer, count| %>
+					<% answer = 0 if answer.nil? %>
+					<% css_class = get_css_style_for_calibration_report(answer - instructor_answer) %>
+					<td class=<%= css_class %>>
+						<% if count == max_count %>
+							<b><%= (count * 100.0 / participant_num).round(2).to_s + '%' %></b>
+						<% else %>
+							<%= (count * 100.0 / participant_num).round(2).to_s + '%' %>
+						<% end %>
+					</td>
+				<% end %>
+			</tr>
+		</table><br/>
+	<% end %>
+<% end %>
+
+<p> ** The <b>bolded</b> percentages are the highest ones for each question. <br>
+  The scores in <i class = "c5">green cells</i> are the review scores that given by the teaching staff (expert-review); <br>
+  the scores in <i class = "c4">light green cells</i> are the review scores that 1 point away from the expert-review; <br>
+  the scores in <i class = "c3">yellow cells</i> are the review scores that 2 points away from the expert-review; <br>
+  the scores in <i class = "c2">orange cells</i> are the review scores that 3 points away from the expert-review; <br>
+  the scores in <i class = "c1">red cells</i> are the review scores that 4 points or more away from the expert-review. </p>

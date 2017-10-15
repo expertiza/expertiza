@@ -1,0 +1,63 @@
+<h1>Submissions for <%= @assignment.name %></h1>
+
+<% headers = {} %>
+<% headers["Topic_name"] = "16%" if @assignment.has_topics? %>
+<% if @assignment.max_team_size > 1 %>
+  <% headers["Team name"] = "14%" %>
+  <% headers["Team member(s)"] = "18%" %>
+<% else %>
+  <% headers["Participant name"] = "18%" %>
+<% end %>                              
+<% headers["Submitted item(s)"] = nil %>
+<%= create_report_table_header(headers) %>
+    <% @l = -1 %>
+    <% @teams.each do |team| %>
+      <% @l = @l+1 %>
+      <tr>
+        <% bgcolor = @l.even? ? "#ffffff" : "#DDDDBB" %>
+        <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+
+        <!--Topic name-->
+        <% if @assignment.has_topics? %>
+          <td bgcolor= <%= bgcolor %>><%= topic_identifier + '. ' + topic_name %></td>
+        <% end %>
+
+        <!--Team name-->
+        <% if @assignment.max_team_size > 1 %>
+          <td bgcolor= <%= bgcolor %>><%= team.name %>
+          <% unless participants.empty? %>
+            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
+          <% end %>
+        <% end %>
+
+        <!--Team member(s) / Participant name-->
+          <td bgcolor= <%= bgcolor %>>
+              <% users_for_curr_team.each do |user| %>
+                  <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
+                  (<%= user.fullname%>)<br>
+              <% end %>
+          </td>
+
+        <!--Submitted item(s)-->
+        <td bgcolor= <%= bgcolor %>>
+        <!--Display submitted hyperlinks-->
+          <% participant = participants.compact.first %>
+          <%= link_to "Show Submission Records", submission_records_path(team_id: team.id) %>
+          <br></br>
+          <% if participant and !team.hyperlinks.empty? %>
+            Hyperlinks: <br/>
+            <% team.hyperlinks.each do |link| %>
+              <a href="<%= link %>" target="_blank"><%= link %></a><br/>
+            <% end %>
+          <% end %>
+
+          <!--Display submitted files-->
+          <% if participant and !team.submitted_files.empty? %>
+            <% files = team.submitted_files %>
+            Files: <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>

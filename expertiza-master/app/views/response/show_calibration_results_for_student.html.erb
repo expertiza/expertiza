@@ -1,0 +1,101 @@
+<h1>Your calibration results <%= " for " + @assignment.name if !@assignment.course.nil?%></h1>
+<style>
+th, td {
+    padding: 5px;
+}
+</style>
+<% @questions.each_with_index do |question, index| %>
+	<% next if question.break_before == false %>
+	<% instructor_answer = Answer.where(["question_id = ? and response_id = ?", question.id, @calibration_response.id]).first ||= 0 %>
+	<% stu_answer = Answer.where(["question_id = ? and response_id = ?", question.id, @review_response.id]).first ||= 0 %>
+	<b><%= "Question #{index+1} [#{question.type}]: " %></b><%= question.txt %>
+	<table border = "1">
+		<tr>
+			<th></th>
+			<th>Answer</th>
+			<th>Comment</th>
+		</tr>
+		<tr>
+			<% case instructor_answer.answer %>
+				<% when 5 %>
+					<% instructor_css_class = 'c5' %>
+				<% when 4 %>
+					<% instructor_css_class = 'c4' %>
+				<% when 3 %>
+					<% instructor_css_class = 'c3' %>
+				<% when 2 %>
+					<% instructor_css_class = 'c2' %>
+				<% else %>
+					<% instructor_css_class = 'c1' %>
+			<% end %>
+			<% case stu_answer.answer %>
+				<% when 5 %>
+					<% stu_css_class = 'c5' %>
+				<% when 4 %>
+					<% stu_css_class = 'c4' %>
+				<% when 3 %>
+					<% stu_css_class = 'c3' %>
+				<% when 2 %>
+					<% stu_css_class = 'c2' %>
+				<% else %>
+					<% stu_css_class = 'c1' %>
+			<% end %>
+
+			<td>Expert review</td>
+			<% if question.instance_of? Checkbox %>
+				<% if instructor_answer.answer == 1 %>
+					<td><img src="/assets/Check-icon.png"></td>
+				<% else %>
+					<td><img src="/assets/delete-icon.png"></td>
+				<% end %>
+				<td>N/A</td></tr>
+
+				<tr><td>Your review</td>
+				<% if stu_answer.answer == 1 %>
+					<td><img src="/assets/Check-icon.png"></td>
+				<% else %>
+					<td><img src="/assets/delete_icon.png"></td>
+				<% end %>
+				<td>N/A</td>
+			<% elsif question.instance_of? Dropdown or question.instance_of? TextArea %>
+				<td>N/A</td>
+				<td><%= instructor_answer.comments %></td></tr>
+
+				<tr><td>Your review</td>
+				<td>N/A</td>
+				<td><%= stu_answer.comments %></td>
+			<% elsif question.instance_of? TextField %>
+				<% if (index+1) <= @questions.length-1 %>
+					<% next_question = @questions[index+1] %>
+					<% next_instructor_answer = Answer.where(question_id: @questions[index+1].id, response_id: @calibration_response.id).first %>
+					<% next_stu_answer = Answer.where(question_id: @questions[index+1].id, response_id: @review_response.id).first %>
+				<% end %>
+				<% if question.break_before == true and !next_question.nil? and next_question.break_before == false %>
+					<td><%= "#{instructor_answer.comments} - #{next_instructor_answer.comments}" %></td>
+					<td>N/A</td></tr>
+
+					<tr><td>Your review</td>
+					<td><%= "#{stu_answer.comments} - #{next_stu_answer.comments}" %></td>
+					<td>N/A</td>
+				<% elsif question.break_before == false or next_question.break_before == false %>
+					<% next %>
+				<% else %>
+					<td><%= instructor_answer.comments %></td>
+					<td>N/A</td></tr>
+
+					<tr><td>Your review</td>
+					<td><%= stu_answer.comments %></td>
+					<td>N/A</td>
+				<% end %>
+			<% else %>
+				<td class=<%= instructor_css_class %>><%= instructor_answer.answer %></td>
+				<td><%= instructor_answer.comments %></td></tr>
+
+				<tr><td>Your review</td>
+				<td class=<%= stu_css_class %>><%= stu_answer.answer %></td>
+				<td><%= stu_answer.comments %></td>
+			<% end %>
+		</tr>		
+	</table>
+	<br>
+<% end %>

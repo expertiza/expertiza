@@ -1,0 +1,138 @@
+<!--The reason why add an empty form_tag here. (https://github.com/expertiza/expertiza/commit/4d1a9d50833aca4e8771afd851daa40455d4fc37)-->
+<%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment_form.assignment.id do %>
+<% end %>
+<table>
+  <tr id='assignment_review_assignment_strategy_row'>
+    <td>
+      <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review Strategy:') %>
+      <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options, {:selected => @assignment_form.assignment.review_assignment_strategy}) %>
+      <script>
+        jQuery(document).ready(function() {reviewStrategyChanged();});
+          jQuery('#assignment_form_assignment_review_assignment_strategy').on('change', function() {reviewStrategyChanged();});
+      </script>
+
+      <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom
+- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
+    </td>
+  </tr>
+
+  <tr id="assignment_review_topic_threshold_row">
+    <td>
+      <%= label_tag('assignment_form[assignment][review_topic_threshold]', 'Review topic threshold (k):') %>
+      <%= text_field_tag('assignment_form[assignment][review_topic_threshold]', @assignment_form.assignment.review_topic_threshold, size: 1) %>
+      <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'>
+    <br/>
+      <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
+      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 1) %>
+    <br/>
+      <%= check_box_tag('review', 'true', true, {:onChange => 'hasReviewChanged()'}) %>
+      <%= label_tag('review', 'Has Max Review Limit?') %>&emsp;&emsp;
+      <span id="reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_reviews_allowed.nil?%>>
+      <%= label_tag('assignment_form[assignment][num_reviews_allowed]', ' Set Allowed Number of Reviews per reviewer') %>
+        <%if @assignment_form.assignment.num_reviews_allowed && @assignment_form.assignment.num_reviews_allowed >= 0 %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]', @assignment_form.assignment.num_reviews_allowed, size: 1) %>
+        <%else%>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]',  3, size: 1) %>
+        <%end%>
+      </span>
+    <br/>
+      <%= label_tag('assignment_form[assignment][num_reviews_required]', 'Set Required Number of Reviews per reviewer') %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_required]', @assignment_form.assignment.num_reviews_required ||= @assignment_form.assignment.num_reviews, size: 1) %>
+    <br/>
+      <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
+      <%= label_tag('meta_review', 'Has Meta Review Limit?') %>&emsp;&emsp;
+      <span id="meta_reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_metareviews_allowed.nil?%>>
+      <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', ' Set Allowed Number of MetaReviews per reviewer') %>
+        <%if @assignment_form.assignment.num_metareviews_allowed && @assignment_form.assignment.num_metareviews_allowed >= 0 %>
+      <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]', @assignment_form.assignment.num_metareviews_allowed ||= 3, size: 1) %>
+        <%else%>
+      <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]',  3, size: 1) %>
+        <%end%>
+      </span>
+    <br/>
+      <%= label_tag('assignment_form[assignment][num_metareviews_required]', 'Set Required Number of MetaReviews per reviewer') %>
+      <%= text_field_tag('assignment_form[assignment][num_metareviews_required]', @assignment_form.assignment.num_metareviews_required ||= @assignment_form.assignment.num_metareviews_allowed, size: 1) %>
+    </td>
+  </tr>
+  <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
+    <td>
+      <%= form_tag :controller => 'review_mapping', :action => 'automatic_review_mapping', :id => @assignment_form.assignment.id do %>
+        <input name="max_team_size" type="hidden" value="<%= @assignment_form.assignment.max_team_size %>"/>
+        <%= radio_button_tag 'num_reviews', 'student', true %>
+        <%= label_tag('num_reviews_per_student', 'Set number of reviews done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id='num_reviews_per_student_threshold'>
+          <%= text_field_tag('num_reviews_per_student', 0, {:style => 'width:20px'}) %>
+          <%= submit_tag 'Assign reviewers', :id => 'first_submit_tag' %>
+        </span><br/>
+
+        <%= radio_button_tag 'num_reviews', 'submission', false %>
+        <%= label_tag('num_reviews_per_submission', 'Set minimum number of reviews done for each submission') %>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id='num_reviews_per_submission_threshold' hidden='hidden'>
+          <%= text_field_tag('num_reviews_per_submission', 0, {:style => 'width:20px'}) %>
+          <%= submit_tag 'Assign reviewers', :id => 'second_submit_tag' %>
+        </span><br/>
+
+        <%= radio_button_tag 'num_reviews', 'calibrated_and_uncalibrated', false %>
+        <%= label_tag('assign_both_calibrated_and_uncalibrated_artifacts', 'Set both calibrated and uncalibrated artifacts') %>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span id='calibrated_and_uncalibrated_artifacts_threshold' hidden='hidden'>
+          <%= text_field_tag('num_calibrated_artifacts', 0, {:style => 'width:20px'}) %>
+          <%= label_tag('num_calibrated_artifacts', 'of calibrated artifacts and ') %>&nbsp;&nbsp;&nbsp;&nbsp;
+          <%= text_field_tag('num_uncalibrated_artifacts', 0, {:style => 'width:20px'}) %>
+          <%= label_tag('num_uncalibrated_artifacts', 'of uncalibrated artifacts done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
+          <%= submit_tag 'Assign both calibrated and uncalibrated artifacts', :id => 'third_submit_tag' %>
+        </span><br/>
+      <% end %>
+    </td>
+  </tr>
+
+  <tr>
+    <td style='padding:5px' id='is_anonymous'>
+      <input name="assignment_form[assignment][is_anonymous]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_anonymous]', 'true', @assignment_form.assignment.is_anonymous) %>
+      <%= label_tag('assignment_form[assignment][is_anonymous]', 'Is Anonymous Review?') %>
+    </td>
+  </tr>
+
+  <!--#E1600-->
+  <!-- self review flag should be the last checkbox in review strategy tab while editing/creating assignment-->
+  <tr>
+    <td style='padding:5px' id='assignment_is_selfreview_enabled'>
+      <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_selfreview_enabled]', 'true', @assignment_form.assignment.is_selfreview_enabled) %>
+      <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
+    </td>
+  </tr>
+
+</table>
+<script>
+    function hasReviewChanged() {
+        var checkbox = jQuery('#review');
+        var reviews_allowed_field = jQuery('#reviews_allowed');
+        if (checkbox.is(':checked')) {
+            reviews_allowed_field.removeAttr('hidden');
+            jQuery('#assignment_form_assignment_num_reviews_allowed').val('<%=@assignment_form.assignment.num_reviews_allowed ||= 3%>');
+
+
+        } else {
+                reviews_allowed_field.attr('hidden', true);
+                jQuery('#assignment_form_assignment_num_reviews_allowed').val('-1');
+
+
+        }
+    }
+    function hasMetaReviewChanged() {
+        var checkbox = jQuery('#meta_review');
+        var meta_reviews_allowed_field = jQuery('#meta_reviews_allowed');
+        if (checkbox.is(':checked')) {
+            meta_reviews_allowed_field.removeAttr('hidden');
+            jQuery('#assignment_form_assignment_num_metareviews_allowed').val(<%=@assignment_form.assignment.num_metareviews_allowed ||= 3%>);
+
+
+        } else {
+                meta_reviews_allowed_field.attr('hidden', true);
+                jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
+
+        }
+    }
+
+</script>

@@ -1,0 +1,16 @@
+<h1>Super-Administrators</h1>
+
+<table>
+  <tr><th>Name</th><th>Full name</th><th>E-mail address</th></tr>
+  <% for user in @users %>
+    <tr>
+      <td><%= link_to user.name, :action => 'show_super_admin',
+        :id => user.id %></td>
+      <td><%= user.fullname %></td>
+      <td><%= user.email %></td>
+    </tr>
+  <% end -%>
+</table>
+
+<hr/>
+There can be only One Super Administrator

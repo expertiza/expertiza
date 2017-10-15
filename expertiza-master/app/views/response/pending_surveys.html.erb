@@ -1,0 +1,83 @@
+<style>
+table
+{
+  width:960px;
+}
+
+</style>
+<h1> Pending Surveys </h1>
+
+<table class=listing cellpadding=2 width=50% border=1>
+<% if (@surveys.size > 0) %>
+      <tr>
+        <th> Survey Name&nbsp;&nbsp;</th>
+        <th> Survey Type </th>
+        <th> Start Date&nbsp;&nbsp;</th>
+        <th> End Date&nbsp;&nbsp;</th>
+        <th> Course/Assignment Name</th>
+        <th> Survey Actions&nbsp;&nbsp;</th>
+        <th> Global Survey </th>
+      </tr>
+      <% @surveys.each do |survey| %>
+          <tr>
+            <td align=left><%= survey.first['survey']['name'] %></td>
+            <td align=left><%= survey.first['survey']['type'] %></td>
+            <td align=left><%= survey.first['start_date'].strftime('%A %B %d %Y, %I:%M%p') %></td>
+            <td align=left><%= survey.first['end_date'].strftime('%A %B %d %Y, %I:%M%p') %></td>
+            <% if survey.first['survey']['type'] == 'CourseSurveyQuestionnaire' %>
+               <td align=left><%= Course.find_by_id(survey.first['parent_id']).name %></td>
+               <% map = CourseSurveyResponseMap.where(['reviewer_id = ? and reviewee_id = ?', survey.first['participant_id'], survey.first['survey_deployment_id']]).first
+                   if map.nil?
+                     map = CourseSurveyResponseMap.create(:reviewer_id => survey.first['participant_id'], :reviewee_id => survey.first['survey_deployment_id'], :reviewed_object_id => survey.first['parent_id'])
+                   end
+                   survey_response = map.response.last
+                   if survey_response.nil? %>
+                <td align=left><%= link_to "Take Survey", {:controller=>'response',:action=>'new',:id => map.map_id, :return => "survey"} %>
+                </td>
+                <% else %>
+                    <td>
+                      <%= link_to "View Survey", {:controller => 'response', :action => 'view', :id => survey_response.id} %>
+                    </td>
+                <% end %>
+            <% elsif survey.first['survey']['type'] == 'AssignmentSurveyQuestionnaire' %>
+               <td align=left><%= Assignment.find_by_id(survey.first['parent_id']).name %></td>
+                <% map = AssignmentSurveyResponseMap.where(['reviewer_id = ? and reviewee_id = ?', survey.first['participant_id'], survey.first['survey_deployment_id']]).first
+                   if map.nil?
+                     map = AssignmentSurveyResponseMap.create(:reviewer_id => survey.first['participant_id'], :reviewee_id => survey.first['survey_deployment_id'], :reviewed_object_id => survey.first['parent_id'])
+                   end
+                   survey_response = map.response.last
+                   if survey_response.nil? %>
+                <td align=left><%= link_to "Take Survey", {:controller=>'response',:action=>'new',:id => map.map_id, :return => "survey"} %>
+                </td>
+                <% else %>
+                    <td>
+                      <%= link_to "View Survey", {:controller => 'response', :action => 'view', :id => survey_response.id} %>
+                    </td>
+                <% end %>
+            <% end %>
+            <td align=left>
+            <% if survey.first['global_survey_id']
+                   global_map = GlobalSurveyResponseMap.where(['reviewer_id = ? and reviewee_id = ?', survey.first['participant_id'], survey.first['survey_deployment_id']]).first
+                   if global_map.nil?
+                     global_map = GlobalSurveyResponseMap.create(:reviewer_id => survey.first['participant_id'], :reviewee_id => survey.first['survey_deployment_id'], :reviewed_object_id => survey.first['global_survey_id'])
+                   end
+                   survey_response = global_map.response.last
+                   if survey_response.nil? %>
+                    <%= link_to "Take Global Survey", {:controller=>'response',:action=>'new',:id => global_map.map_id, :return => "survey"} %>
+                   <% else %>
+                      <%= link_to "View Global Survey", {:controller => 'response', :action => 'view', :id => survey_response.id} %>
+                   <% end %>
+            <% end %>
+            </td>
+          </tr>
+      <% end %>
+<% else %>
+  <tr>
+    <td>
+      <div class="flash_note">
+        There exist no pending Surveys.
+      </div>
+  </td> </tr>
+<% end %>
+
+</table>

@@ -1,0 +1,10 @@
+<h1>Editing late policy</h1>
+
+<%= form_for @penalty_policy do |f| %>
+  <%= render partial: 'form', locals: { f: f } %>
+  <%= f.submit 'Save' %>
+<% end %>
+
+<br>
+<br>
+<%= link_to 'Back', :action => 'index' %>

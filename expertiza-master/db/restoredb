@@ -1,0 +1,4 @@
+mysqladmin -u root drop -f expertiza_development
+mysqladmin -u root create expertiza_development
+gunzip -c $1 | mysql -u root expertiza_development
+

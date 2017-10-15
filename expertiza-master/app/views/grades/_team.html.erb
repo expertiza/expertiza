@@ -1,0 +1,20 @@
+<TR id="<%= prefix %>_header" style="background-color: white"><TD>       
+     <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%=image_tag("expand.png")%></a>
+
+  <% topic_id = tscore[:team].topic%>
+  <% if topic_id%>
+    <%= tscore[:team].name + ' ('+SignUpTopic.find(topic_id).topic_identifier+')' %>
+  <% else %>
+    <%= tscore[:team].name %>
+  <% end %>
+     <% if tscore[:scores][:avg] %>
+      	<TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>
+       	<TD COLSPAN="<%= col_range_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.0f",tscore[:scores][:min]) %>% - <%= sprintf("%.0f",tscore[:scores][:max]) %>%</TD>
+     <% else %>
+        <TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER">---</TD>
+        <TD COLSPAN="<%= col_range_th_span_value %>" ALIGN="CENTER">---</TD>
+     <% end %>
+     <TD WIDTH="9">&nbsp;</TD></TR>  
+     
+<%= render :partial => 'tabbing', :locals => {:prefix => prefix, :tscore => tscore } %>
+

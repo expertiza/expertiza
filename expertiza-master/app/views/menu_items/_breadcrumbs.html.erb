@@ -1,0 +1,8 @@
+<div class="breadcrumbs">
+  <% crumbs.each_with_index do |crumb, i| %>
+    <%= link_to crumb.label, "/menu/#{crumb.name}" %>
+    <%= ">" if i < (crumbs.length - 1) %>
+  <% end %>
+  <div style="float: right;">
+  Current local time : <%= DateTime.now.in_time_zone(session[:user].timezonepref ||= "Eastern Time (US & Canada)").strftime("%Y-%m-%d %H:%M %z")%></div>
+</div>

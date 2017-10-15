@@ -1,0 +1,2 @@
+class TeamExistsError < StandardError
+end

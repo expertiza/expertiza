@@ -1,0 +1,19 @@
+<h1>Administrators</h1>
+
+<table>
+  <tr><th>Name</th><th></th><th>Full name</th><th></th><th>E-mail address</th><th></th><th>Parent</th><th></th></tr>
+  <% for user in @users %>
+    <tr>
+      <td><%= link_to user.name, :action => 'show_admin',
+        :id => user.id %></td><td> </td>
+      <td><%= user.fullname %></td><td> </td>
+      <td><%= user.email %></td><td> </td>
+      <td><%= (User.find(user.parent_id)).name %></td><td> </td>
+    </tr>
+  <% end -%>
+</table>
+<hr/>
+<%= form_tag(new_user_path, method: :get) do %> 
+<%= hidden_field_tag :role, "Administrator" %>
+<%= submit_tag("New Administrator")%>
+<% end %>

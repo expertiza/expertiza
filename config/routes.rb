@@ -234,6 +234,7 @@ Expertiza::Application.routes.draw do
   resources :profile do
     collection do
       get :edit
+      get :github_callback
     end
   end
 

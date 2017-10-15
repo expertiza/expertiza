@@ -14,19 +14,16 @@ development:
 test:
   <<: *default
   database: expertiza_test
-<<<<<<< HEAD
-=======
   username: root
-  password: 
+  password:
   host: localhost
 
 cucumber
   adapter: mysql2
   database: expertiza_cucumber
   username: root
-  password: 
+  password:
   host: localhost
->>>>>>> Fetching Git Commit Stats Data added; reusing loader strategy already in place
 
 production:
   <<: *default

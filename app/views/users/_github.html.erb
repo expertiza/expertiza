@@ -1,0 +1,8 @@
+<p><label for="github_id">Github Id</label><br/>
+  <% if @user.github_id.nil? %>
+    <a href="https://github.com/login/oauth/authorize?client_id=<%= @client_id %>">
+      Click here</a> to add your github id!
+  <% else %>
+    Your Github ID is <b><%= @user.github_id %></b>. To refresh <a href="https://github.com/login/oauth/authorize?client_id=<%= @client_id %>">
+      click here.</a>
+  <% end %>

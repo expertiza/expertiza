@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170925225438) do
+ActiveRecord::Schema.define(version: 20171015034850) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -711,6 +711,7 @@ ActiveRecord::Schema.define(version: 20170925225438) do
     t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
+    t.string  "github_id",                 limit: 255
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

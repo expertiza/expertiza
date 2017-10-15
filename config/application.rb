@@ -40,6 +40,11 @@ module Expertiza
     # Minimum Sass number precision required by bootstrap-sass
     ::Sass::Script::Value::Number.precision = [8, ::Sass::Script::Value::Number.precision].max
 
+    config.github_oauth_app_secrets = {
+      client_id: ENV["GITHUB_OAUTH_CLIENT_ID"],
+      client_secret: ENV["GITHUB_OAUTH_CLIENT_SECRET"]
+    }
+
     config.github_tokens = {
       github_token: ENV["GITHUB_TOKEN"],
       ncsu_token: ENV["NCSU_TOKEN"]

@@ -24,11 +24,11 @@ class ReviewMappingController < ApplicationController
   def add_calibration
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?
-      participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+      participant = AssignmentParticipant.create(assignment_participant_params(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle'))
     end
     map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
     if map.nil?
-      map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true)
+      map = ReviewResponseMap.create(review_response_map_params(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true))
     end
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
@@ -67,7 +67,7 @@ class ReviewMappingController < ApplicationController
         # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+          ReviewResponseMap.create(review_response_map_params(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id))
         else
           raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
         end
@@ -153,9 +153,9 @@ class ReviewMappingController < ApplicationController
       unless MetareviewResponseMap.where(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id).first.nil?
         raise "The metareviewer \"" + reviewer.user.name + "\" is already assigned to this reviewer."
       end
-      MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
+      MetareviewResponseMap.create(metareview_response_map_params(reviewed_object_id: mapping.map_id,
                                    reviewer_id: reviewer.id,
-                                   reviewee_id: mapping.reviewer.id)
+                                   reviewee_id: mapping.reviewer.id))
     rescue => e
       msg = e.message
     end
@@ -407,7 +407,7 @@ class ReviewMappingController < ApplicationController
     when "Calibration"
       participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
       if participant.nil?
-        participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+        participant = AssignmentParticipant.create(assignment_participant_params(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle'))
       end
       @assignment = Assignment.find(params[:id])
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
@@ -429,7 +429,7 @@ class ReviewMappingController < ApplicationController
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
     if review_grade.nil?
-      review_grade = ReviewGrade.create(participant_id: params[:participant_id])
+      review_grade = ReviewGrade.create(review_grade_params(participant_id: params[:participant_id]))
     end
     review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
     review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
@@ -452,9 +452,9 @@ class ReviewMappingController < ApplicationController
       # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       if SelfReviewResponseMap.where(reviewee_id: team_id[0].t_id, reviewer_id: params[:reviewer_id]).first.nil?
-        SelfReviewResponseMap.create(reviewee_id: team_id[0].t_id,
+        SelfReviewResponseMap.create(self_review_response_map_params(reviewee_id: team_id[0].t_id,
                                      reviewer_id: params[:reviewer_id],
-                                     reviewed_object_id: assignment.id)
+                                     reviewed_object_id: assignment.id))
       else
         raise "Self review already assigned!"
       end
@@ -599,5 +599,37 @@ class ReviewMappingController < ApplicationController
       end
       iterator += 1
     end
+  end
+
+  def assignment_participant_params(params_hash)
+    params_local = params
+    params_local[:assignment_participant] = params_hash
+    params_local.require(:assignment_participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
+                                              :permission_granted, :penalty_accumulated, :grade, :type, :handle,
+                                              :time_stamp, :digital_signature, :duty, :can_take_quiz)
+  end
+
+  def review_response_map_params(params_hash)
+    params_local = params
+    params_local[:review_response_map] = params_hash
+    params_local.require(:review_response_map).permit(:reviewee_id, :reviewer_id, :reviewed_object_id, :calibrate_to)
+  end
+
+  def metareview_response_map_params(params_hash)
+    params_local = params
+    params_local[:metareview_response_map] = params_hash
+    params_local.require(:metareview_response_map).permit(:reviewee_id, :reviewer_id, :reviewed_object_id)
+  end
+
+  def self_review_response_map_params(params_hash)
+    params_local = params
+    params_local[:self_review_response_map] = params_hash
+    params_local.require(:self_review_response_map).permit(:reviewee_id, :reviewer_id, :reviewed_object_id)
+  end
+
+  def review_grade_params(params_hash)
+    params_local = params
+    params_local[:review_grade] = params_hash
+    params_local.require(:review_grade).permit(:participant_id)
   end
 end

@@ -28,7 +28,7 @@
 </table> 
 
 
-<% if @topic.assignment.is_microtask? %>
+<% if @topic.assignment.microtask? %>
   <p><label for="micropayment">Micropayment</label><br/>
     <%= text_field 'topic', 'micropayment' %></p>
 <% end %>

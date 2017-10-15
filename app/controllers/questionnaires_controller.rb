@@ -247,7 +247,7 @@ class QuestionnairesController < ApplicationController
         flash[:error] = "You should create or join a team first."
         valid_request = false
       else
-        if assignment.has_topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
+        if assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
           flash[:error] = "Your team should have a topic."
           valid_request = false
         end

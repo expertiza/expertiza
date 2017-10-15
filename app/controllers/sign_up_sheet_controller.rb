@@ -402,7 +402,7 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-    if @assignment.is_microtask?
+    if @assignment.microtask?
       @sign_up_topic.micropayment = params[:topic][:micropayment]
     end
     if @assignment.staggered_deadline?

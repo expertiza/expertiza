@@ -110,7 +110,7 @@ class AssignmentParticipant < Participant
     end
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
-    if assignment.is_microtask?
+    if assignment.microtask?
       topic = SignUpTopic.find_by_assignment_id(assignment.id)
       unless topic.nil?
         scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)

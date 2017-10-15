@@ -140,13 +140,13 @@ describe Assignment do
   # describe '#scores' do
   #   context 'when assignment is varying rubric by round assignment' do
   #     it 'calculates scores in each round of each team in current assignment' do 
-  #       @assignment = create(:assignment,id: 999)
-  #       @review_response_map = create(:review_response_map)
-  #       @participant=create(:participant,:assignment => @assignment)
+  #       # @assignment = create(:assignment,id: 999)
+  #       # @review_response_map = create(:review_response_map)
+  #       # @participant=create(:participant,:assignment => @assignment)
   #       @questionnaire = create(:questionnaire)
   #       @assignment_questionnaire = create(:assignment_questionnaire, assignment: @assignment, used_in_round: 2, questionnaire: @questionnaire)
   #       @questions = create(:question, questionnaire: @questionnaire)
-  #       expect(@assignment.scores(@questions)).to eql(10)
+  #       expect(assignment.scores(@questions)).to eql(10)
   #     end
   #   end
   #   context 'when assignment is not varying rubric by round assignment' do

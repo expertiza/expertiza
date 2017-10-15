@@ -143,7 +143,9 @@ class GradesController < ApplicationController
 
       if review_mapping.nil?
         review_exists = false
-        review_mapping = ReviewResponseMap.create(review_response_map_params(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id))
+        review_mapping = ReviewResponseMap.create(review_response_map_params(reviewee_id: participant.team.id,
+                                                                             reviewer_id: reviewer.id,
+                                                                             reviewed_object_id: participant.assignment.id))
         review = Response.find_by_map_id(review_mapping.map_id)
 
         if review_exists

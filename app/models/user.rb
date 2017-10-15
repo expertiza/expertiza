@@ -341,4 +341,30 @@ class User < ActiveRecord::Base
     end
     users
   end
+
+  private
+
+  def user_params(params_hash)
+    params_hash.slice(:name,
+                      :crypted_password,
+                      :role_id,
+                      :password_salt,
+                      :fullname,
+                      :email,
+                      :parent_id,
+                      :private_by_default,
+                      :mru_directory_path,
+                      :email_on_review,
+                      :email_on_submission,
+                      :email_on_review_of_review,
+                      :is_new_user,
+                      :master_permission_granted,
+                      :handle,
+                      :digital_certificate,
+                      :persistence_token,
+                      :timezonepref,
+                      :public_key,
+                      :copy_of_emails,
+                      :institution_id)
+  end
 end

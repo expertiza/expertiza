@@ -48,7 +48,7 @@ module ParticipantsHelper
   def self.add_user_to_assignment(params, user)
     assignment = Assignment.find params[:assignment_id]
     if AssignmentParticipant.where('user_id = ? AND parent_id = ?', user.id, assignment.id).empty?
-      return AssignmentParticipant.create(assignment_participant_params(parent_id: assignment.id, user_id: user.id))
+      return AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: assignment.id, user_id: user.id))
     end
   end
 
@@ -106,13 +106,5 @@ module ParticipantsHelper
                                        :public_key,
                                        :copy_of_emails,
                                        :institution_id)
-  end
-
-  def assignment_participant_params(params_hash)
-    params_local = params
-    params_local[:assignment_participant] = params_hash
-    params_local.require(:assignment_participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
-                                                         :permission_granted, :penalty_accumulated, :grade, :type, :handle,
-                                                         :time_stamp, :digital_signature, :duty, :can_take_quiz)
   end
 end

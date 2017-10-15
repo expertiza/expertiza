@@ -283,4 +283,11 @@ class AssignmentParticipant < Participant
     end
     return stage
   end
+
+  def self.assignment_participant_params(params_local, params_hash)
+    params_local[:assignment_participant] = params_hash
+    params_local.require(:assignment_participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
+                                                         :permission_granted, :penalty_accumulated, :grade, :type, :handle,
+                                                         :time_stamp, :digital_signature, :duty, :can_take_quiz)
+  end
 end

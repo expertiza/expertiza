@@ -25,7 +25,7 @@ class MarkupStylesController < ApplicationController
   end
 
   def create
-    @markup_style = MarkupStyle.new(params[:markup_style])
+    @markup_style = MarkupStyle.new(markup_style_params)
     begin
       @markup_style.save!
       flash[:notice] = 'The markup style was successfully created.'
@@ -41,7 +41,7 @@ class MarkupStylesController < ApplicationController
 
   def update
     @markup_style = MarkupStyle.find(params[:id])
-    if @markup_style.update_attributes(params[:markup_style])
+    if @markup_style.update_attributes(markup_style_params)
       redirect_to action: 'show', id: @markup_style
       flash[:notice] = 'The markup style was successfully updated.'
     else
@@ -52,5 +52,11 @@ class MarkupStylesController < ApplicationController
   def destroy
     MarkupStyle.find(params[:id]).destroy
     redirect_to action: 'list'
+  end
+
+  private
+
+  def markup_style_params
+    params.require(:markup_style).permit(:name)
   end
 end

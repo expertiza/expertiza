@@ -16,7 +16,8 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  attr_accessor :anonymous_mode 
+  attr_accessor :anonymous_mode
+  attr_accessible
   validates_presence_of :name
   validates_uniqueness_of :name
 

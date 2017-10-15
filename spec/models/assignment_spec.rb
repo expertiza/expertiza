@@ -144,17 +144,18 @@ describe Assignment do
 
   # Take guidance from guide
   describe '#scores' do
-    # context 'when assignment is varying rubric by round assignment' do
-    #   it 'calculates scores in each round of each team in current assignment' do 
-    #     @assignment = create(:assignment)
-    #     @questionnaire = create(:questionnaire)
-    #     @assignment_questionnaire = create(:assignment_questionnaire, assignment: @assignment, used_in_round: 2)
-    #     @questions = create(:question, questionnaire: @questionnaire)
-    #     expect(@assignment.scores(@question)).to include({
-    #       :a => 4 
-    #       })
-    #   end
-    # end
+    context 'when assignment is varying rubric by round assignment' do
+      it 'calculates scores in each round of each team in current assignment' do 
+        @assignment = create(:assignment,id: 999)
+        @review_response_map = create(:review_response_map)
+        @participant=create(:participant,:assignment => @assignment)
+
+        @questionnaire = create(:questionnaire)
+        @assignment_questionnaire = create(:assignment_questionnaire, assignment: @assignment, used_in_round: 2, questionnaire: @questionnaire)
+        @questions = create(:question, questionnaire: @questionnaire)
+        expect(@assignment.scores(@questions)).to eql(10)
+      end
+    end
 
     context 'when assignment is not varying rubric by round assignment' do
       it 'calculates scores of each team in current assignment'
@@ -171,21 +172,21 @@ describe Assignment do
       end
     end
 
-    context 'when course_id is not nil and course_id is larger than 0' do
-      it 'returns path with course directory path' do
-        assignment=create(:assignment)
-        assignment.course_id= 1
-        expect(assignment.path).to be == "/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test"
-      end
-    end
+    # context 'when course_id is not nil and course_id is larger than 0' do
+    #   it 'returns path with course directory path' do
+    #     assignment=create(:assignment)
+    #     assignment.course_id= 1
+    #     expect(assignment.path).to be == "/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test"
+    #   end
+    # end
 
-    context 'when course_id is nil' do
-      it 'returns path without course directory path' do
-        assignment=create(:assignment)
-        assignment.course_id=nil
-        expect(assignment.path).to be == "/home/expertiza_developer/expertiza/pg_data/instructor6/final_test"
-      end
-     end
+    # context 'when course_id is nil' do
+      # it 'returns path without course directory path' do
+      #   assignment=create(:assignment)
+      #   assignment.course_id=nil
+      #   expect(assignment.path).to be == "/home/expertiza_developer/expertiza/pg_data/instructor6/final_test"
+      # end
+     # end
   end
 
   describe '#check_condition' do

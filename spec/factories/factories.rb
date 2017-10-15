@@ -308,7 +308,7 @@ FactoryGirl.define do
     type "CourseNode"
   end
 
-  factory :questionnaire, class: Questionnaire do
+  factory :questionnaire, class: ReviewQuestionnaire do
     name 'Test questionnaire'
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0

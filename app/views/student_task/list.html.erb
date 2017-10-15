@@ -15,7 +15,7 @@
         action = "edit"
 
         # check if the assignment has a sign-up sheet
-        if Assignment.find(participant.assignment.id).has_topics?
+        if Assignment.find(participant.assignment.id).topics?
           selected_topics = nil
 
           #ACS Get the topics selected by all teams

@@ -51,7 +51,7 @@ class StudentTeamsController < ApplicationController
 
     current_team = @student.team
 
-    @users_on_waiting_list = if @student.assignment.has_topics? && current_team && current_team.topic
+    @users_on_waiting_list = if @student.assignment.topics? && current_team && current_team.topic
                                SignUpTopic.find(current_team.topic).users_on_waiting_list
                              end
 

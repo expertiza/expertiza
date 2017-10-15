@@ -51,7 +51,7 @@ class Assignment < ActiveRecord::Base
   end
   alias team_assignment team_assignment?
 
-  def has_topics?
+  def topics?
     @has_topics ||= !sign_up_topics.empty?
   end
 
@@ -71,7 +71,7 @@ class Assignment < ActiveRecord::Base
     FileHelper.update_file_location(oldpath, newpath)
   end
 
-  def has_teams?
+  def teams?
     @has_teams ||= !self.teams.empty?
   end
 
@@ -293,7 +293,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Check to see if assignment is a microtask
-  def is_microtask?
+  def microtask?
     self.microtask.nil? ? false : self.microtask
   end
 
@@ -557,6 +557,7 @@ class Assignment < ActiveRecord::Base
     @scores = @assignment.scores(@questions)
 
     return csv if @scores[:teams].nil?
+    spec
 
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]

@@ -1,6 +1,6 @@
 <th width="5%">Topic #</th>
 <th width="50%">Topic name(s)</th>
-<% if @assignment.is_microtask? %>
+<% if @assignment.microtask? %>
   <th width="5%">Micro- payment</th>
 <% end %>
 <% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>

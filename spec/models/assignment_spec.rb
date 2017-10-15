@@ -105,12 +105,12 @@ describe Assignment do
   end
 
   describe '#assign_metareviewer_dynamically' do
-    # it 'returns true when assigning successfully' do
-    #   @assignment = create(:assignment)
-    #   @assignment_participant = create(:participant, assignment: @assignment)
-    #   @meta_review_response_map = create(:meta_review_response_map, reviewee: @assignment_participant)
-    #   expect(@assignment.assign_metareviewer_dynamically(@assignment_participant)).to eql(true)
-    # end
+    it 'returns true when assigning successfully' do
+      @assignment = create(:assignment)
+      @assignment_participant = create(:participant, assignment: @assignment)
+      @assignment.review_mappings << review_response_map
+      expect(@assignment.assign_metareviewer_dynamically(@assignment_participant)).to be_an_instance_of(MetareviewResponseMap)
+    end
   end
 
   describe '#response_map_to_metareview' do
@@ -470,7 +470,7 @@ describe Assignment do
 
     context 'when next due date is nil' do
       it 'returns next due date object' do
-        # assignment=create(:assignment)
+        assignment=create(:assignment)
         dead_rigth=create(:deadline_right)
         ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
         expect(assignment.find_current_stage()).to eq(ass_due_date) 
@@ -483,7 +483,7 @@ describe Assignment do
     it 'returns review_questionnaire_id' do
       @assignment = create(:assignment)
       @questionnaire = create(:questionnaire)
-      @assignment_questionnaire = create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire)
+      @assignment_questionnaire = create(:assignment_questionnaire, assignment:@assignment, questionnaire: @questionnaire)
       expect(@assignment.review_questionnaire_id>0).to eql(true)
     end
   end

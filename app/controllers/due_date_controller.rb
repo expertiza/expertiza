@@ -57,10 +57,7 @@ class DueDateController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def assignment_due_date_params
-    params.require(:assignment_due_date).permit(:due_at, :deadline_type_id, :parent_id,
-                                                :submission_allowed_id, :review_allowed_id,
-                                                :review_of_review_allowed_id, :round, :flag, :threshold,
-                                                :delayed_job_id, :deadline_name, :description_url,
-                                                :quiz_allowed_id, :teammate_review_allowed_id, :type)
+    params.require(:assignment_due_date).permit(:deadline_type_id, :submission_allowed_id, :parent_id,
+                                                :review_allowed_id, :review_of_review_allowed_id)
   end
 end

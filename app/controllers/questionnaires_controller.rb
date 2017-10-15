@@ -292,7 +292,7 @@ class QuestionnairesController < ApplicationController
   def update_quiz
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.nil?
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid] 
+      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
       return
     end
     if params['save'] && params[:question].try(:keys)
@@ -423,7 +423,7 @@ class QuestionnairesController < ApplicationController
       end
 
       next unless should_delete
-      question.question_advices.each{ |advice| advice.destroy }
+      question.question_advices.each(&:destroy)
       # keep track of the deleted questions
       @deleted_questions.push(question)
       question.destroy
@@ -482,10 +482,12 @@ class QuestionnairesController < ApplicationController
               q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
               q.save
             end
-            else
-            iscorrect_s = (q_type == "MultipleChoiceCheckbox") ?
-                              (params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s).to_s :
-                              (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key).to_s
+          else
+            iscorrect_s = if q_type == "MultipleChoiceCheckbox"
+                            (params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s).to_s
+                          else
+                            (params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key).to_s
+                          end
             q = QuizQuestionChoice.new(quiz_question_choice_params(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt],
                                                                    iscorrect: iscorrect_s, question_id: question.id))
             q.save
@@ -498,7 +500,7 @@ class QuestionnairesController < ApplicationController
   end
 
   def questionnaire_params
-    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score, 
+    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
   end
 
@@ -580,7 +582,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  def assign_instructor_id 
+  def assign_instructor_id
     # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
     if session[:user].role.name != "Teaching Assistant"
       session[:user].id

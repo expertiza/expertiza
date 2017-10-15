@@ -302,12 +302,12 @@ class Assignment < ActiveRecord::Base
       url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id:  user.id)
     raise "The user #{user.name} is already a participant." if participant
-    new_part = AssignmentParticipant.create(parent_id: self.id,
-                                            user_id: user.id,
-                                            permission_granted: user.master_permission_granted,
-                                            can_submit: can_submit,
-                                            can_review: can_review,
-                                            can_take_quiz: can_take_quiz)
+    new_part = AssignmentParticipant.create(assignment_participant_params(parent_id: self.id,
+                                                                          user_id: user.id,
+                                                                          permission_granted: user.master_permission_granted,
+                                                                          can_submit: can_submit,
+                                                                          can_review: can_review,
+                                                                          can_take_quiz: can_take_quiz))
     new_part.set_handle
   end
 
@@ -608,5 +608,15 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
+  end
+
+  private
+
+  def assignment_participant_params(params_hash)
+    params_local = params
+    params_local[:assignment_participant] = params_hash
+    params_local.require(:assignment_participant).permit(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
+                                                         :permission_granted, :penalty_accumulated, :grade, :type, :handle,
+                                                         :time_stamp, :digital_signature, :duty, :can_take_quiz)
   end
 end

@@ -339,7 +339,7 @@ class SignUpSheetController < ApplicationController
                                                       review_allowed_id:
                                                           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
                                                       review_of_review_allowed_id:
-                                                          instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
+                                                          instance_variable_get('@assignment_'+deadline_type+'_due_dates')[i-1].review_of_review_allowed_id,
                                                       round:                       i,
                                                       flag:
                                                           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
@@ -354,7 +354,7 @@ class SignUpSheetController < ApplicationController
                                                       quiz_allowed_id:
                                                           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
                                                       teammate_review_allowed_id:
-                                                          instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id,
+                                                          instance_variable_get('@assignment_'+deadline_type+'_due_dates')[i-1].teammate_review_allowed_id,
                                                       type:                       'TopicDueDate'))
           else # update an existed record
             topic_due_date.update_attributes(

@@ -23,4 +23,17 @@ module ImportTopicsHelper
     sign_up_topic.save
     # sign_up_topic
   end
+
+  private
+
+  def sign_up_topic_params(params_hash)
+    params_local = params
+    params_local[:sign_up_topic] = params_hash
+    params_local.require(:sign_up_topic).permit(:topic_identifier,
+                                                :topic_name,
+                                                :max_choosers,
+                                                :category,
+                                                :description,
+                                                :link)
+  end
 end

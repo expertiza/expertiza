@@ -14,20 +14,17 @@ describe Assignment do
                                 description_url: 'https://expertiza.ncsu.edu/', round: 1)
   end
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
-
   describe '.max_outstanding_reviews' do
     it 'returns 2 by default' do
       expect(Assignment.max_outstanding_reviews).to equal(2)
     end
   end
-
   describe '#team_assignment?' do
     it 'checks an assignment has team' do
       # @assignment = build(:assignment)
       expect(assignment.team_assignment).to eql(true)
     end
   end
-
   # Need to create assignment, else giving error
   describe '#topics?' do
     context 'when sign_up_topics array is not empty' do
@@ -39,7 +36,6 @@ describe Assignment do
         expect(@assignment.sign_up_topics.empty?).to eql(false)
       end
     end
-
     context 'when sign_up_topics array is empty' do
       it 'says current assignment does not have a topic' do
         # @assignment = create(:assignment)
@@ -47,7 +43,6 @@ describe Assignment do
       end
     end
   end
-
   # Ask guide -> Build not working in this case
   describe '.set_courses_to_assignment' do
     it 'fetches all courses belong to current instructor and with the order of course names' do
@@ -61,7 +56,6 @@ describe Assignment do
       expect(@arr).to match_array(['A','B','C'])
     end
   end
-
   describe '#teams?' do
     context 'when teams array is not empty' do
       it 'says current assignment has teams' do
@@ -72,7 +66,6 @@ describe Assignment do
         expect(assignment.teams.empty?).to equal(false)
       end
     end
-
     context 'when sign_up_topics array is empty' do
       it 'says current assignment does not have a team' do
         assignment=build(:assignment)
@@ -80,7 +73,6 @@ describe Assignment do
       end
     end
   end
-
   describe '#valid_num_review' do
     context 'when num_reviews_allowed is not -1 and num_reviews_allowed is less than num_reviews_required' do
       it 'adds an error message to current assignment object' do
@@ -91,7 +83,6 @@ describe Assignment do
         expect(assignment.num_reviews_allowed < assignment.num_reviews_required).to eql(!assignment.has_attribute?(:message))
       end
     end
-
     context 'when the first if condition is false, num_metareviews_allowed is not -1, and num_metareviews_allowed less than num_metareviews_required' do
       it 'adds an error message to current assignment object' 
       #   @assignment = create(:assignment)
@@ -103,7 +94,6 @@ describe Assignment do
       # end
     end
   end
-
   describe '#assign_metareviewer_dynamically' do
     it 'returns true when assigning successfully' do
       @assignment = create(:assignment)
@@ -112,20 +102,26 @@ describe Assignment do
       expect(@assignment.assign_metareviewer_dynamically(@assignment_participant)).to be_an_instance_of(MetareviewResponseMap)
     end
   end
-
   describe '#response_map_to_metareview' do
-    it 'does not raise any errors and returns the first review response map'
-    #   assignment=create(:assignment)
-    #   participant=create(:participant)
-    #   review_map=create(:review_response_map,reviewed_object_id:assignment.id)
-    #   expect(assignment.response_map_to_metareview(participant).empty?).to equal(true)
-    # end
+    it 'does not raise any errors and returns the first review response map' do
+      @assignment=create(:assignment)
+      @participant=create(:participant,assignment:@assignment)
+      #@review_response_map=create(:review_response_map,assignment:@assignment)
+      @meta_review_response_map=create(:meta_review_response_map,review_mapping:review_response_map,reviewee:@participant)
+      @assignment.review_mappings << review_response_map
+      expect(@assignment.response_map_to_metareview(@participant)).to eq(review_response_map)
+    end
   end
-
   describe '#metareview_mappings' do
-    it 'returns review mapping'
+    it 'returns review mapping' do
+      @assignment=create(:assignment)
+      @participant=create(:participant,assignment:@assignment)
+      #@review_response_map=create(:review_response_map,assignment:@assignment)
+      @meta_review_response_map=create(:meta_review_response_map,review_mapping:review_response_map,reviewee:@participant)
+      @assignment.review_mappings << review_response_map
+      expect(@assignment.metareview_mappings.first).to eq(@meta_review_response_map)
+    end
   end
-
   describe '#dynamic_reviewer_assignment?' do
     context 'when review_assignment_strategy of current assignment is Auto-Selected' do
       it 'returns true' do
@@ -133,7 +129,6 @@ describe Assignment do
         expect(assignment.review_assignment_strategy).to eql('Auto-Selected')
       end
     end
-
     context 'when review_assignment_strategy of current assignment is Instructor-Selected' do
       it 'returns false' do
         # @assignment = create(:assignment)
@@ -141,8 +136,6 @@ describe Assignment do
       end
     end
   end
-
-
   # Take guidance from guide
   # describe '#scores' do
   #   context 'when assignment is varying rubric by round assignment' do
@@ -156,12 +149,10 @@ describe Assignment do
   #       expect(assignment.scores(@questions)).to eql(10)
   #     end
   #   end
-
   #   context 'when assignment is not varying rubric by round assignment' do
   #     it 'calculates scores of each team in current assignment'
   #   end
   # end
-
   describe '#path' do
     context 'when both course_id and instructor_id are nil' do
       it 'raises an error' do
@@ -171,7 +162,6 @@ describe Assignment do
         expect{assignment.path}.to raise_error(RuntimeError,"The path cannot be created. The assignment must be associated with either a course or an instructor.")
       end
     end
-
     context 'when course_id is not nil and course_id is larger than 0' do
       it 'returns path with course directory path' do
         # assignment=create(:assignment)
@@ -179,7 +169,6 @@ describe Assignment do
         expect(assignment.path).to be == "#{Rails.root}/pg_data/instructor6/csc517/test/final_test"
       end
     end
-
     context 'when course_id is nil' do
       it 'returns path without course directory path' do
         # assignment=create(:assignment)
@@ -188,7 +177,6 @@ describe Assignment do
       end
      end
   end
-
   describe '#check_condition' do
     context 'when the next due date is nil' do
       it 'returns false ' do
@@ -200,7 +188,6 @@ describe Assignment do
         expect(assignment.check_condition(:id)).to equal(false)
       end
     end
-
     # Changing to build gives active record not found error
     context 'when the next due date is allowed to review submissions' do
       it 'returns true' do
@@ -215,7 +202,6 @@ describe Assignment do
       end
     end
   end
-
   describe '#submission_allowed' do
     it 'returns true when the next topic due date is allowed to submit sth'do
       # assignment=create(:assignment)
@@ -224,7 +210,6 @@ describe Assignment do
       expect(assignment.submission_allowed).to equal (true)
     end
   end
-
   describe '#quiz_allowed' do
     it 'returns false when the next topic due date is not allowed to do quiz' do
       # assignment=create(:assignment)
@@ -233,7 +218,6 @@ describe Assignment do
       expect(assignment.submission_allowed).to equal (false)    
     end  
   end
-
   describe '#can_review' do
     it "returns false when the next assignment due date is not allowed to review other's work" do
       # assignment=create(:assignment)
@@ -242,7 +226,6 @@ describe Assignment do
       expect(assignment.submission_allowed).to equal (false)
     end
   end
-
   describe '#metareview_allowed' do
     it 'returns true when the next assignment due date is not allowed to do metareview' do
       # assignment=create(:assignment)
@@ -251,7 +234,6 @@ describe Assignment do
       expect(!assignment.submission_allowed).to equal (true)
     end
   end
-
   # Does not work without create
   describe '#delete' do
     context 'when there is at least one review response in current assignment' do
@@ -261,7 +243,6 @@ describe Assignment do
         expect{@assignent.delete}.to raise_error(NoMethodError,'undefined method `delete\' for nil:NilClass')
       end
     end
-
     context 'when there is no review response in current assignment and at least one teammate review response in current assignment' do
       it 'raises an error messge and current assignment cannot be deleted' do
         @assignment = create(:assignment)
@@ -270,7 +251,6 @@ describe Assignment do
         expect{@assignent.delete}.to raise_error(NoMethodError,'undefined method `delete\' for nil:NilClass')
       end
     end
-
     context 'when ReviewResponseMap and TeammateReviewResponseMap can be deleted successfully' do
       it 'deletes other corresponding db records and current assignment' do
         # @assignment = create(:assignment)
@@ -280,7 +260,6 @@ describe Assignment do
       end
     end
   end
-
   describe '#microtask?' do
     context 'when microtask is not nil' do
       it 'returns microtask status (false by default)' do
@@ -289,7 +268,6 @@ describe Assignment do
           expect(assignment.microtask?).to eql(true)
       end 
     end
-
     context 'when microtask is nil' do
       it 'returns false' do
           assignment = build(:assignment, microtask: nil)
@@ -297,8 +275,6 @@ describe Assignment do
       end
     end
   end
-
-
   describe '#add_participant' do
     context 'when user is nil' do
       it 'raises an error' do
@@ -546,4 +522,25 @@ describe Assignment do
       expect(generated_csv(assignment, @options)).to eq(expected_csv)
     end
   end
+
+  describe 'find_due_dates' do
+    context 'if deadline is of assignment' do
+      it ' return assignment due_date' do
+        assignment = create(:assignment)
+        dead_rigth=create(:deadline_right)
+        @deadline_type = create(:deadline_type)  
+        @assignment_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id,deadline_type:@deadline_type)
+        expect(assignment.find_due_dates("submission").first).to eq(@assignment_due_date)
+      end
+    end
+
+    context 'if deadline is of assignment' do
+      it ' return assignment nil' do
+        assignment = create(:assignment)
+        expect(assignment.find_due_dates("submission").first).to eq(nil)
+      end
+    end
+  end
+
 end
+

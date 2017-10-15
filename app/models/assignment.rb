@@ -94,6 +94,8 @@ class Assignment < ActiveRecord::Base
 
   # Returns a review (response) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
+    puts "-------------------------------------->"
+    #puts review_mapppings
     response_map_set = Array.new(review_mappings)
 
     # Reject response maps without responses
@@ -557,8 +559,11 @@ class Assignment < ActiveRecord::Base
     @scores = @assignment.scores(@questions)
 
     return csv if @scores[:teams].nil?
-    spec
+    export_not_nil(csv,@scores,parent_id,options)
+  end
 
+  def self.export_not_nil (csv, scores,parent_id, options)
+    @scores=scores
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
@@ -576,6 +581,7 @@ class Assignment < ActiveRecord::Base
         tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
         tcsv.push('---', '---', '---') if options['team_score'] == 'true'
 
+      
       pscore[:review] ?
         tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
         tcsv.push('---', '---', '---') if options['submitted_score']

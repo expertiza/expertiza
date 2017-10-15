@@ -67,7 +67,7 @@ class StudentTeamsController < ApplicationController
         redirect_to view_student_teams_path student_id: student.id
         return
       end
-      team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+      team = AssignmentTeam.new(assignment_team_params(name: params[:team][:name], parent_id: student.parent_id))
       team.save
       parent = AssignmentNode.find_by_node_object_id student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
@@ -174,5 +174,13 @@ class StudentTeamsController < ApplicationController
   def review
     @assignment = Assignment.find params[:assignment_id]
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
+  end
+
+  private
+
+  def assignment_team_params(params_hash)
+    params_local = params
+    params_local[:assignment_team] = params_hash
+    params_local.require(:assignment_team).permit(:name, :parent_id)
   end
 end

@@ -1,40 +1,85 @@
-<h2>Import <%= @title %></h2>
-<%= form_tag({:controller => 'import_file', :action => 'import'}, {:method => 'post', :multipart => true, :name => 'import_form', :id => 'import_form'}) do %>
-  <table>
-    <tr>
-      <td valign='Top'>Delimiter:</td>
-      <td>
-        <%= radio_button_tag 'delim_type','comma',true %> Comma<br/>
-        <%= radio_button_tag 'delim_type','space' %> Space<br/>
-        <%= radio_button_tag 'delim_type','tab' %> Tab<br/>
-        <%= radio_button_tag 'delim_type','other' %> Other <%= text_field_tag 'other_char' %><br/>
-      </td>
-    </tr>
-  </table>
-  <% if @model == 'AssignmentTeam' or @model == 'CourseTeam'%>
-    <br/>
-    <label for="column_one_has_name">Interpret first column as team name:</label>
-    <%= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %><br/>
-    <label for="options[handle_dups]">If a duplicate team name is found in the roster,</label></td>
-  <select id="options_handle_dups" name="options[handle_dups]">
-    <option value="ignore">ignore the new team
-    <option value="replace">replace the existing team with the new team
-    <option value="insert">insert any new members into the existing team
-    <option value="rename">rename the new team and import
-  </select>
-  <br/>
-<% end %>
+<h2>Import <%= @model %> List</h2>
+
 <br/>
-<label for="file">File to import: </label><%= file_field_tag 'file', :size => 40, :id => 'import_file' %><br/><br/>
-<%= hidden_field_tag('model', @model) %>
-<%= hidden_field_tag('id', @id) %>
 
+<%= form_tag( { :controller => 'import_file', :action => 'show' },
+              { :method => 'post', :multipart => true, :name => 'import_form', :id => 'import_form' } ) do %>
 
-* The import process expects the following columns:<br/>
-&nbsp;&nbsp;&nbsp;<%= @expected_fields %>
- <br/><br/>
- <button type='button' onclick='checkForFile()'>Import</button>
- <% end %>
- <br/><br/>
+    <table>
 
- <a href="<%= session[:return_to]%>">Back</a>
+      <tr>
+        <td><strong>Delimiter:</strong></td>
+      </tr>
+      <tr>
+        <td>
+          <%= radio_button_tag 'delim_type','comma',true %> Comma<br/>
+          <%= radio_button_tag 'delim_type','space' %> Space<br/>
+          <%= radio_button_tag 'delim_type','tab' %> Tab<br/>
+          <%= radio_button_tag 'delim_type','other' %> Other <%= text_field_tag 'other_char' %><br/>
+        </td>
+      </tr>
+
+      <tr><td><br/></td></tr>
+
+      <tr>
+        <td><strong>Header:</strong></td>
+      </tr>
+      <tr>
+        <td>
+          <%= radio_button_tag 'has_header', 'true', true %> File has a header<br/>
+          <%= radio_button_tag 'has_header', 'false' %> File does not have a header<br/>
+        </td>
+      </tr>
+
+    </table>
+
+    <% if @model == 'AssignmentTeam' or @model == 'CourseTeam' %>
+
+        <br/>
+
+        <label for="column_one_has_name">Interpret first column as team name:</label>
+        <%= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %>
+
+        <br/>
+
+        <label for="options[handle_dups]">If a duplicate team name is found in the roster,</label>
+        <select id="options[handle_dups]" name="options[handle_dups]">
+          <option value="ignore">ignore the new team</option>
+          <option value="replace">replace the existing team with the new team</option>
+          <option value="insert">insert any new members into the existing team</option>
+          <option value="rename">rename the new team and import</option>
+        </select>
+
+        <br/>
+
+    <% end %>
+
+    <br/>
+
+    <label for="file">File to import: </label>
+    <%= file_field_tag 'file', :size => 40, :id => 'import_file' %>
+
+    <br/>
+
+    <%= hidden_field_tag('model', @model) %>
+
+    <%= hidden_field_tag('id', @id) %>
+
+    <p>
+      <strong>NOTE:</strong>
+      <br/>
+      The import process expects the following columns:
+      <br/>
+      <%= @expected_fields.html_safe %>
+    </p>
+
+    <button type='button' onclick='checkForFile()' class='btn-primary'>Import</button>
+
+<% end %>
+
+<br/>
+
+<span style="color:red;font-weight:bold"><%= params %></span>
+<br/><br/>
+
+<a href="<%= session[:return_to]%>">Back</a>

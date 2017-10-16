@@ -31,21 +31,21 @@
   <!-- SAMPLE BODY -->
 
   <tbody>
+
+<% @contents_grid.each do |row| %>
+
   <tr>
-    <td align="center">R1 C1</td>
-    <td align="center">R1 C2</td>
-    <td align="center">R1 C3</td>
+
+      <% row.each do |column| %>
+
+      <td align="center"><%= column %></td>
+
+      <% end %>
+
   </tr>
-  <tr>
-    <td align="center">R2 C1</td>
-    <td align="center">R2 C2</td>
-    <td align="center">R2 C3</td>
-  </tr>
-  <tr>
-    <td align="center">R3 C1</td>
-    <td align="center">R3 C2</td>
-    <td align="center">R3 C3</td>
-  </tr>
+
+  <% end %>
+
   </tbody>
 
 </table>

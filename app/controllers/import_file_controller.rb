@@ -7,7 +7,11 @@ class ImportFileController < ApplicationController
   end
 
   def show
-    @model = 'SignUpTopic'
+    @model = params[:model]
+    @delimiter = get_delimiter(params)
+    @current_file = params[:file]
+    @current_file_contents = @current_file.read
+    @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
   end
 
   def start
@@ -30,6 +34,14 @@ class ImportFileController < ApplicationController
   end
 
   protected
+
+  def parse_to_grid(contents, delimiter)
+    contents_grid = []
+    contents.each_line do |line|
+      contents_grid << parse_line(line, delimiter)
+    end
+    contents_grid
+  end
 
   def importFile(session, params)
     delimiter = get_delimiter(params)

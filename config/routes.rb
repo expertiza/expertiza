@@ -154,6 +154,8 @@ Expertiza::Application.routes.draw do
 
   get '/import_file/show', controller: :import_file, action: :show
 
+  post '/import_file/show', controller: :import_file, action: :show
+
   resources :institution do
     collection do
       get :list

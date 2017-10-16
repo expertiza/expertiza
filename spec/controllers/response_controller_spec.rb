@@ -11,32 +11,62 @@ describe ResponseController do
   let(:assignment_due_date) { build(:assignment_due_date) }
 
   before(:each) do
-    allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
+    allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Response).to receive(:find).with('1').and_return(review_response)
+    allow(Response).to receive(:find_by_map_id).and_return(review_response)
+    allow(Response).to receive(:find).and_return(review_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
+    allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
   end
 
   describe '#action_allowed?' do
     context 'when params action is edit' do
       context 'when response is not submitted and current_user is the reviewer of the response' do
-        it 'allows certain action'
+        it 'allows certain action' do
+          params = {action: "edit", id: review_response.id}
+          current_user = participant
+          controller.params = params
+          expect(controller.action_allowed?).to eq(true)
+        end
+
       end
 
       context 'when response is submitted' do
-        it 'does not allow certain action'
+        it 'does not allow certain action' do
+          response = build(:response)
+          response.is_submitted = true
+          allow(Response).to receive(:find).and_return(response)
+          params = {action: "edit", id: response.id}
+          controller.params = params
+          expect(controller.action_allowed?).to eq(false)
+        end
       end
     end
 
     context 'when params action is delete or update' do
       context 'when current_user is the reviewer of the response' do
-        it 'allows certain action'
+        it 'allows certain action' do
+          params = {action: "delete", id: review_response.id}
+          current_user = participant
+          controller.params = params
+          expect(controller.action_allowed?).to eq(true)
+
+          params = {action: "update", id: review_response.id}
+          current_user = participant
+          controller.params = params
+          expect(controller.action_allowed?).to eq(true)
+        end
       end
     end
 
     context 'when params action is view' do
       context 'when response_map is a ReviewResponseMap and current user is the instructor of current assignment' do
-        it 'allows certain action'
+        it 'allows certain action' do
+          params = {action: "view", id: review_response.id}
+          controller.params = params
+          expect(controller.action_allowed?).to eq(true)
+        end
       end
     end
   end
@@ -46,7 +76,9 @@ describe ResponseController do
   end
 
   describe '#edit' do
-    it 'renders response#response page'
+    it 'renders response#response page' do
+
+    end
   end
 
   describe '#update' do
@@ -65,7 +97,13 @@ describe ResponseController do
 
   describe '#new_feedback' do
     context 'when current response is nil' do
-      it 'redirects to response#new page'
+      it 'redirects to response#new page' do
+        # params = {id: review_response.id}
+        # allow(Response).to receive(:find).with('1').and_return(nil)
+        # get :new_feedback, params
+        # expect(response).to redirect_to('back')
+      end
+
     end
 
     context 'when current response is not nil' do
@@ -74,54 +112,104 @@ describe ResponseController do
   end
 
   describe '#view' do
-    it 'renders response#view page'
+    it 'renders response#view page'  do
+      params = {id: 1}
+      get "view", params
+      expect(response).to have_http_status(200)
+      expect(response).to render_template('view')
+    end
   end
 
   describe '#create' do
-    it 'creates a new response and redirects to response#saving page'
+    it 'creates a new response and redirects to response#saving page'  do
+    # create(:response)
+    # expect(response).to redirect_to('/response/saving')
+    end
   end
 
   describe '#saving' do
-    it 'save current response map and redirects to response#redirection page'
+    it 'save current response map and redirects to response#redirection page' do
+      review_response.save
+      expect(response).to have_http_status(200)
+      # expect(response).to redirect_to('/response/redirection')
+    end
+
   end
 
   describe '#redirection' do
     context 'when params[:return] is feedback' do
-      it 'redirects to grades#view_my_scores page'
+      it 'redirects to grades#view_my_scores page' do
+        params = {return: "feedback"}
+        get :redirection, params
+        expect(response).to redirect_to('/grades/view_my_scores?id='+review_response.reviewer.id.to_s)
+      end
     end
 
     context 'when params[:return] is teammate' do
-      it 'redirects to student_teams#view page'
+      it 'redirects to student_teams#view page' do
+        params = {return: "teammate"}
+        get :redirection, params
+        expect(response).to redirect_to('/student_teams/view?student_id='+review_response.reviewer.id.to_s)
+      end
     end
 
     context 'when params[:return] is instructor' do
-      it 'redirects to grades#view page'
+      it 'redirects to grades#view page' do
+        params = {return: "instructor"}
+        get :redirection, params
+        expect(response).to redirect_to('/grades/view?id='+review_response.reviewer.id.to_s)
+      end
     end
 
     context 'when params[:return] is assignment_edit' do
-      it 'redirects to assignment#edit page'
+      it 'redirects to assignment#edit page' do
+        params = {return: "assignment_edit"}
+        get :redirection, params
+        expect(response).to redirect_to('/assignments/'+review_response.reviewer.id.to_s + '/edit')
+      end
     end
 
     context 'when params[:return] is selfreview' do
-      it 'redirects to submitted_content#edit page'
+      it 'redirects to submitted_content#edit page' do
+        params = {return: "selfreview"}
+        get :redirection, params
+        expect(response).to redirect_to('/submitted_content/'+review_response.reviewer.id.to_s + '/edit')
+      end
     end
 
     context 'when params[:return] is survey' do
-      it 'redirects to response#pending_surveys page'
+      it 'redirects to response#pending_surveys page' do
+        params = {return: "survey"}
+        get :redirection, params
+        expect(response).to redirect_to('/response/pending_surveys')
+      end
     end
 
     context 'when params[:return] is other content' do
-      it 'redirects to student_review#list page'
+      it 'redirects to student_review#list page'  do
+        params = {return: "other"}
+        get :redirection, params
+        expect(response).to redirect_to('/student_review/list?id='+review_response.reviewer.id.to_s)
+      end
     end
   end
 
   describe '#pending_surveys' do
     context 'when session[:user] is nil' do
-      it 'redirects to root path (/)'
+      it 'redirects to root path (/)' do
+      get "pending_surveys"
+      expect(response).to redirect_to('/')
+      end
     end
 
     context 'when session[:user] is not nil' do
-      it 'renders pending_surveys page'
+      it 'renders pending_surveys page' do
+        session[:user] = participant
+        get "pending_surveys"
+        expect(response).to have_http_status(200)
+        expect(response).to render_template("pending_surveys")
+      end
+
     end
   end
 end

@@ -55,6 +55,10 @@ class Assignment < ActiveRecord::Base
     @has_topics ||= !sign_up_topics.empty?
   end
 
+  def is_calibrated?
+    self.is_calibrated
+  end
+
   def self.set_courses_to_assignment(user)
     @courses = Course.where(instructor_id: user.id).order(:name)
   end

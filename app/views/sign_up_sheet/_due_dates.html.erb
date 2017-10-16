@@ -1,5 +1,6 @@
 <table class="general">
   <tr>
+
     <th>#</th>
     <th>Topic name</th>
     <th>Submission deadline</th>
@@ -12,7 +13,12 @@
   <% i=0 %>
   <% for i in 0..(@assignment.sign_up_topics.size - 1) %>
     <tr>
-      <td><%= @assignment.sign_up_topics[i].topic_identifier %></td>
+      <% if @assignment.staggered_deadline == true %>
+          <td><%= check_box_tag 'selected_ids[]', i -%>
+       <%= @assignment.sign_up_topics[i].topic_identifier %></td>
+      <%else%>
+        <td><%= @assignment.sign_up_topics[i].topic_identifier %></td>
+      <%end%>
       <td><%= @assignment.sign_up_topics[i].topic_name %></td>
       <% for review_round in 1..review_rounds %>
         <% topic_id = @assignment.sign_up_topics[i].id %>
@@ -23,4 +29,28 @@
   <% end %>
 </table>
 <br/>
+
+<% if @assignment.staggered_deadline == true %>
+
+<h1>New deadline for selected topics</h1>
+<table class="general">
+  <tr>
+    <th> New submission deadline</th>
+    <th> New review deadline</th>
+    <%for i in 2..review_rounds%>
+        <th>New submission deadline <%=i%></th>
+        <th> New Review deadline <%=i%></th>
+    <%end%>
+  </tr>
+  <tr>
+<% for review_round in 1..review_rounds %>
+    <% topic_id = @assignment.sign_up_topics[1].id %>
+    <td><%= text_field :due_date, ('selected_topics_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round) %></td>
+    <td><%= text_field :due_date, ('selected_topics_review_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_review_due_dates, topic_id, 2, review_round) %></td>
+<%end%>
+  </tr>
+</table>
+<br/>
+<%end%>
+
 <%= submit_tag "Save start/due dates" %>

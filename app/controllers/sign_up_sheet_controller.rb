@@ -314,6 +314,7 @@ class SignUpSheetController < ApplicationController
   # This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic and per round basis
   def save_topic_deadlines
+
     assignment = Assignment.find(params[:assignment_id])
     @assignment_submission_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 1 }
     @assignment_review_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 2 }
@@ -349,8 +350,16 @@ class SignUpSheetController < ApplicationController
               type:                       'TopicDueDate'
             )
           else # update an existed record
+            #E1763, added new due dates for selected topics
+            current_topic_due_date = instance_variable_get('@topic_' + deadline_type + '_due_date')
+            if !params[:selected_ids].nil?
+              if params[:selected_ids].include? index.to_s
+                current_topic_due_date = due_dates['selected_topics' + '_' + deadline_type + '_'+ i.to_s + '_due_date']
+              end
+            end
+
             topic_due_date.update_attributes(
-              due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
+              due_at:                      current_topic_due_date,
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
               review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
               review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
@@ -361,6 +370,7 @@ class SignUpSheetController < ApplicationController
         end
       end
     end
+
     redirect_to_assignment_edit(params[:assignment_id])
   end
 

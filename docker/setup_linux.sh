@@ -44,7 +44,7 @@ sed -i "s/.*host.*/  host: scrubbed_db/" database.yml
 cd $DIR
 
 # Close any docker containers if any
-docker-compose down
+sudo docker-compose down
 
 # Finally docker-compose up in the background
-docker-compose up  &
+sudo docker-compose up  &

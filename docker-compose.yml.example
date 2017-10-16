@@ -22,7 +22,7 @@ services:
     image: mysql:5.7
     volumes:
       # https://stackoverflow.com/questions/25920029/setting-up-mysql-and-importing-dump-within-dockerfile
-      - '/your/database/folder/path:/docker-entrypoint-initdb.d'
+      - './scrubbed_db:/docker-entrypoint-initdb.d'
     environment:
       MYSQL_ROOT_PASSWORD: expertiza
 

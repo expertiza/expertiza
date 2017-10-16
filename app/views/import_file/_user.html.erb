@@ -1,55 +1,78 @@
 <table class="table table-bordered table-striped">
+
   <thead>
   <tr>
 
     <!-- CONSIDER USING JAVASCRIPT TO MAKE SELECT OPTIONS MUTUALLY EXCLUSIVE -->
 
-    <th>
-      <select class="form-control" style="background-color:lightgrey">
-        <option value="user_name">User Name</option>
-        <option value="full_name">Full Name</option>
-        <option value="email_address">Email Address</option>
-      </select>
-    </th>
-    <th>
-      <select class="form-control" style="background-color:lightgrey">
-        <option value="full_name">Full Name</option>
-        <option value="user_name">User Name</option>
-        <option value="email_address">Email Address</option>
-      </select>
-    </th>
-    <th>
-      <select class="form-control" style="background-color:lightgrey">
-        <option value="email_address">Email Address</option>
-        <option value="user_name">User Name</option>
-        <option value="full_name">Full Name</option>
-      </select>
-    </th>
-  </tr>
-  </thead>
+    <% if @has_header == 'true' %>
 
-  <!-- SAMPLE BODY -->
+        <th style="text-align:center">
+          <%= @contents_hash[:header][0].to_s.capitalize %>
+        </th>
+        <th style="text-align:center">
+          <%= @contents_hash[:header][1].to_s.capitalize %>
+        </th>
+        <th style="text-align:center">
+          <%= @contents_hash[:header][2].to_s.capitalize %>
+        </th>
+
+    <% else %>
+
+        <th>
+          <select class="form-control" style="background-color:lightgrey">
+            <option value="user_name">User Name</option>
+            <option value="full_name">Full Name</option>
+            <option value="email_address">Email Address</option>
+          </select>
+        </th>
+        <th>
+          <select class="form-control" style="background-color:lightgrey">
+            <option value="full_name">Full Name</option>
+            <option value="user_name">User Name</option>
+            <option value="email_address">Email Address</option>
+          </select>
+        </th>
+        <th>
+          <select class="form-control" style="background-color:lightgrey">
+            <option value="email_address">Email Address</option>
+            <option value="user_name">User Name</option>
+            <option value="full_name">Full Name</option>
+          </select>
+        </th>
+        </tr>
+        </thead>
+
+    <% end %>
 
   <tbody>
-
 <% @contents_grid.each do |row| %>
-
   <tr>
-
       <% row.each do |column| %>
-
-      <td align="center"><%= column %></td>
-
+        <td align="center"><%= column %></td>
       <% end %>
-
   </tr>
-
   <% end %>
-
   </tbody>
-
 </table>
 
 <div style="text-align:center">
-  <button type="button" class="btn-primary" style="padding:25px 25px 25px 25px">Import <%= @model %></button>
+  <button class="btn btn-primary">Import <%= @model %></button>
 </div>
+
+<!-- TAKE THIS OUT AFTER DONE DEVELOPING -->
+
+<br/><br/>
+<%= @contents_hash[:header] %>
+<br/>
+<%= @contents_hash[:body] %>
+
+<br/><br/>
+<p style="color:red;border:1px solid red;padding:25px 25px 25px 25px">
+  <% params.each do |param| %>
+  <%= param %><br/><br/>
+  <% end %>
+</p>
+
+
+<!-- WE NEED TO SOMEHOW PROMPT THE IMPORT WITH THE CORRECT DATA -->

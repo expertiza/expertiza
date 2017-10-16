@@ -7,11 +7,14 @@ class ImportFileController < ApplicationController
   end
 
   def show
+    @id = params[:id]
     @model = params[:model]
     @delimiter = get_delimiter(params)
+    @has_header = params[:has_header]
     @current_file = params[:file]
     @current_file_contents = @current_file.read
     @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
+    @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
   end
 
   def start
@@ -34,6 +37,30 @@ class ImportFileController < ApplicationController
   end
 
   protected
+
+  def parse_to_hash(import_grid, has_header)
+
+    # Check to see if there is a header associated with this import.
+
+    file_hash = Hash.new
+
+    if has_header == 'true' # Import has a header.
+
+      file_hash[:header] = import_grid.shift
+
+      file_hash[:body] = import_grid
+
+    else # Import does not have a header.
+
+      file_hash[:header] = nil
+
+      file_hash[:body] = import_grid
+
+    end
+
+    file_hash
+
+  end
 
   def parse_to_grid(contents, delimiter)
     contents_grid = []

@@ -4,16 +4,17 @@
 ### For Mac ###
 ###############
 
-if [ "$(uname)" == "Darwin" ]
-cp config/database.yml.example config/database.yml
-cp config/secrets.yml.example config/secrets.yml
-
-NODE_VERSION=8.4.0
-NPM_VERSION=5.4.2
-
+if [ "$(uname)" = "Darwin" ]
 then
+  DIR=$(pwd)
+  cp config/database.yml.example config/database.yml
+  cp config/secrets.yml.example config/secrets.yml
+
+  NODE_VERSION=8.4.0
+  NPM_VERSION=5.4.2
+  
   echo 'Install Third-party Javascript Libraries for Mac OS X platform'
- 
+
  # Checking Homebrew
   which -s brew
   if [[ $? != 0 ]] ; then
@@ -44,6 +45,7 @@ then
     echo "NodeJS $(node -v) is already installed"
   fi
 
+    cd $DIR
   # Checking NPM
   echo "Checking for NPM"
   npm --version
@@ -55,48 +57,51 @@ then
   else
       echo "NPM $(npm --version) is already installed"
       echo "Looking for an update"
-      npm i -g npm
+      sudo npm i -g npm
   fi
-    sudo npm install -g bower && bower install
+      sudo npm install -g bower && bower install
 
 #################
 ### For Linux ###
 #################
 
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]
+elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]
 then
-cp config/database.yml.example config/database.yml
-cp config/secrets.yml.example config/secrets.yml
-echo 'Install Third-party Javascript Libraries for Linux Platform'
-sudo apt-get update  
+    cp config/database.yml.example config/database.yml
+    cp config/secrets.yml.example config/secrets.yml
+    
+    echo 'Install Third-party Javascript Libraries for Linux Platform'
+    sudo apt-get update  
+    sudo apt-get install build-essential libssl-dev
 
-# Checking Node
-echo "Checking for Node"
-node --version
-if [[ $? != 0 ]] ; then
-    # Install Node
-    sudo apt-get install -y nodejs
-else
-  echo "NodeJS $(node -v) is already installed"
-fi
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 
-# Checking NPM
-echo "Checking for NPM"
-npm --version
-if [[ $? != 0 ]] ; then
-    echo "Installing NPM"
-    sudo apt-get install -y npm
-else
-    echo "NPM was already installed"
-    echo "Looking for an update"
-    npm i -g npm
-fi
+    sudo apt-get install -y nodejs && sudo apt-get install -y npm && sudo ln -s /usr/bin/nodejs /usr/bin/node
+    
+  # Checking NPM
+    echo "Checking for NPM"
+    npm --version
+    if [ $? != 0 ]
+    then
+        echo "Installing NPM"
+        sudo apt-get install -y npm
+    else
+        echo "NPM was already installed"
+        echo "Looking for an update"
+        sudo npm i -g npm
+    fi
+    
+    # sudo ln -s /usr/bin/nodejs /usr/bin/node
 
-sudo ln -s /usr/bin/nodejs /usr/bin/node
-
-# Installing Bower
-sudo npm install -g bower && bower install
-
+    # Installing Bower
+    
+    sudo chown -R $USER:$GROUP ~/.npm
+    sudo chown -R $USER:$GROUP ~/.config
+    
+    sudo npm install -g bower
+    bower install
+    sudo apt-get autoremove
+    
 ######################
 ### For Windows :( ###
 ######################
@@ -105,3 +110,4 @@ elif [ -n "$COMSPEC" -a -x "$COMSPEC" ]
 then 
   echo $0: this script does not support Windows \:\(
 fi
+

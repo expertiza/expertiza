@@ -6,22 +6,32 @@ describe AssignmentParticipant do
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1) }
-  let(:review_questionnaire) { build(:questionnaire, id: 1) }
+  let(:review_questionnaire) { build(:questionnaire, id: 1) } #what's the relationship between factory and let build
   let(:question) { double('Question') }
+  let(:quiz_questionaire) { build(:questionnaire, id: 2) }   #why cannot use quiz:questionaire
   before(:each) do
     allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
     allow(participant).to receive(:team).and_return(team)
   end
   describe '#dir_path' do
-    it 'returns the directory path of current assignment'
+    it 'returns the directory path of current assignment' do
+      expect(participant.dir_path).to eq "final_test"
+    end
   end
 
   describe '#assign_quiz' do
-    it 'creates a new QuizResponseMap record'
+    it 'creates a new QuizResponseMap record' do
+      expect(QuizQuestionnaire).to receive(:find_by_instructor_id).with(1).and_return(quiz_questionaire)
+      expect(participant.assign_quiz(participant, participant2, nil)).to be_an_instance_of(QuizResponseMap)
+    end
   end
 
   describe '#reviewers' do
-    it 'returns all the participants in this assignment who have reviewed the team where this participant belongs'
+    it 'returns all the participants in this assignment who have reviewed the team where this participant belongs' do
+      expect(ReviewResponseMap).to receive(:where).and_return([response_map]) #differences with .with(parameter)
+      expect(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+      expect(participant.reviewers).to eq([participant2])
+    end
   end
 
   describe '#review_score' do

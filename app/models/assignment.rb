@@ -33,6 +33,18 @@ class Assignment < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
+  validate :check_directory_path
+
+  def check_directory_path
+    @assignments = Assignment.all
+    @assignments.each do |assignment|
+      if(assignment.directory_path == self.directory_path)
+        errors.add(:directory_path,"The directory is already in use")
+        return false
+      end
+    end
+    return true
+  end
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
   #  Review Strategy information.

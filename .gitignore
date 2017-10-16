@@ -15,7 +15,13 @@ nohup.out
 pg_data/*
 
 #################
-## npm & bower
+## scrubbed_db ##
+#################
+scrubbed_db
+docker/scrubbed_db
+
+#################
+## npm & bower ##
 #################
 node_modules
 package.json

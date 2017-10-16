@@ -91,8 +91,6 @@ then
         sudo npm i -g npm
     fi
     
-    # sudo ln -s /usr/bin/nodejs /usr/bin/node
-
     # Installing Bower
     
     sudo chown -R $USER:$GROUP ~/.npm
@@ -110,4 +108,3 @@ elif [ -n "$COMSPEC" -a -x "$COMSPEC" ]
 then 
   echo $0: this script does not support Windows \:\(
 fi
-

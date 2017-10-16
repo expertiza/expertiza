@@ -31,3 +31,23 @@
 * After some time open up your browser and go to the `localhost:3000` 
 * If you see the following error, it means the script ran successfully and you just need to do the database migration.
 ![migration_error](https://github.com/VivekBhat/expertiza/blob/master/docker/migration_pending_error.png)
+
+#### Database Migration
+
+* Once you see the above error, open up a new terminal.
+* List all the active containers by typing `sudo docker ps -a`
+* Look for the CONTAINER ID of the IMAGE `winbobob/expertiza:ruby-2.2.7`
+* And run the following command: `sudo docker exec -it <CONTAINER ID> bin/rake db:migrate RAILS_ENV=development`
+* For example: 
+
+   ```
+   vivekbhat$ sudo docker ps -a 
+   CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS                        PORTS                    NAMES
+   2a63f480521f        winbobob/expertiza:ruby-2.2.7   "bundle exec thin ..."   12 hours ago        Exited (255) 3 hours ago      0.0.0.0:3000->3000/tcp   expertiza_expertiza_1
+   017b6688d44c        redis:alpine                    "docker-entrypoint..."   12 hours ago        Exited (255) 3 hours ago      6379/tcp                 expertiza_redis_1
+   7c9e5c30de7c        mysql:5.7                       "docker-entrypoint..."   12 hours ago        Exited (255) 3 hours ago      3306/tcp                 expertiza_scrubbed_db_1
+
+   vivekbhat$ sudo docker exec -it 2a63f480521f bin/rake db:migrate RAILS_ENV=development
+   ```
+* Wait for the program to finish the database migration
+* Once completed go to `localhost:3000` and Expertiza should be up and running :) 

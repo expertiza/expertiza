@@ -87,8 +87,8 @@ describe User do
   describe '#is_recursively_parent_of' do
     context 'when the parent of target user (user) is nil' do
       it 'returns false' do
-        user.parent = nil
-        expect(is_recursively_parent_of(user)).to eq false
+        allow(user).to receive(:parent).and_return(nil)
+        expect(user1.is_recursively_parent_of(user)).to eq false
       end
     end
 
@@ -101,8 +101,9 @@ describe User do
 
     context 'when the parent of target user (user) is not current user (user1), but super admin (user2)' do
       it 'returns false' do
-        allow(user).to receive_message_chain("role.name") {"Super-Administrator"}
-        expect(is_recursively_parent_of(user)).to eq false
+        allow(user2).to receive_message_chain("role.name") {"Super-Administrator"}
+        allow(user).to receive(:parent).and_return(user2)
+        expect(user1.is_recursively_parent_of(user)).to eq false
       end
     end
   end

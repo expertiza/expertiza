@@ -66,8 +66,11 @@ describe User do
     it 'will always return true'
   end
 
+  # xzhang72
   describe '#get_available_users' do
-    it 'returns the first 10 visible users'
+    it 'returns the first 10 visible users' do
+
+    end
   end
 
   describe '#can_impersonate?' do
@@ -80,17 +83,27 @@ describe User do
     it 'cannot impersonate target user if current user does not satisfy all requirements'
   end
 
+  # xzhang72
   describe '#is_recursively_parent_of' do
     context 'when the parent of target user (user) is nil' do
-      it 'returns false'
+      it 'returns false' do
+        user.parent = nil
+        expect(is_recursively_parent_of(user)).to eq false
+      end
     end
 
     context 'when the parent of target user (user) is current user (user1)' do
-      it 'returns true'
+      it 'returns true' do
+        user.parent = user1
+        expect(user1.is_recursively_parent_of(user)).to eq true
+      end
     end
 
     context 'when the parent of target user (user) is not current user (user1), but super admin (user2)' do
-      it 'returns false'
+      it 'returns false' do
+        user.role.name = "Super-Administrator"
+        expect(is_recursively_parent_of(user)).to eq false
+      end
     end
   end
 
@@ -119,13 +132,13 @@ describe User do
 
     it 'returns false of current user (user) is not the creator of target user (user1)'
   end
-
+  # xzhang72
   describe '.import' do
     it 'raises error if import column does not equal to 3'
 
     it 'updates an existing user with info from impor file'
   end
-
+  # xzhang72
   describe '.yesorno' do
     it 'returns yes when input is true'
 
@@ -133,7 +146,7 @@ describe User do
 
     it 'returns empty string when input is other content'
   end
-
+  # xzhang72
   describe '.find_by_login' do
     context 'when user\'s email is stored in DB' do
       it 'finds user by email'
@@ -143,7 +156,7 @@ describe User do
       it 'finds user by email if the local part of email is the same as username'
     end
   end
-
+  # xzhang72
   describe '#get_instructor' do
     it 'gets the instructor id'
   end
@@ -183,7 +196,7 @@ describe User do
 
     it 'exports only handle'
   end
-
+  # xzhang72
   describe '.from_params' do
     it 'returns user by user_id fetching from params'
 

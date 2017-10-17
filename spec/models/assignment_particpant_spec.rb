@@ -21,21 +21,29 @@ describe AssignmentParticipant do
 
   describe '#assign_quiz' do
     it 'creates a new QuizResponseMap record' do
-      expect(QuizQuestionnaire).to receive(:find_by_instructor_id).with(1).and_return(quiz_questionaire)
-      expect(participant.assign_quiz(participant, participant2, nil)).to be_an_instance_of(QuizResponseMap)
+      allow(QuizQuestionnaire).to receive(:find_by_instructor_id).with(any_args).and_return(quiz_questionaire)#WHY CAN NOT DELETE THIS SENTENCE
+      expect{participant.assign_quiz(participant,participant2,nil)}.to change {QuizResponseMap.count}.from(0).to(1)
+      expect(participant.assign_quiz(participant,participant2,nil)).to be_an_instance_of(QuizResponseMap)
     end
   end
 
   describe '#reviewers' do
     it 'returns all the participants in this assignment who have reviewed the team where this participant belongs' do
-      expect(ReviewResponseMap).to receive(:where).and_return([response_map]) #differences with .with(parameter)
-      expect(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+      allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([response_map]) #differences with .with(parameter)
+      allow(AssignmentParticipant).to receive(:find).with(any_args).and_return(participant2)
       expect(participant.reviewers).to eq([participant2])
     end
   end
 
   describe '#review_score' do
-    it 'returns the review score'
+    it 'returns the review score' do
+      #diao yong de method tai duo le,er qie bu zhi dao sha yi si
+      allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
+      allow(review_questionnaire).to receive(:questions).and_return(question)
+      allow(Answer).to receive(:compute_scores).with([response], question).and_return({avg:100})
+      allow(review_questionnaire).to receive(:max_possible_score).and_return(100)
+      expect(participant.review_score).to eq(100)
+    end
   end
 
   describe '#scores' do
@@ -53,19 +61,32 @@ describe AssignmentParticipant do
   end
 
   describe '#copy' do
-    it 'copies assignment participants to a certain course'
+    it 'copies assignment participants to a certain course' do
+      expect(participant.copy(517)).to be_an_instance_of(CourseParticipant)
+    end
   end
 
   describe '#feedback' do
-    it 'returns corrsponding author feedback responses given by current participant'
+    it 'returns corrsponding author feedback responses given by current participant' do
+      allow(FeedbackResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])  #make no sense
+      expect(participant.feedback).to eq([response]) #make no sense
+    end
   end
 
   describe '#reviews' do
-    it 'returns corrsponding peer review responses given by current team'
+    it 'returns corrsponding peer review responses given by current team' do
+      expect(participant).to receive(:team).and_return(team)
+      expect(ReviewResponseMap).to receive(:get_assessments_for).and_return([response])
+      expect(participant.reviews).to eq([response]) #make no sense
+    end
   end
 
   describe '#reviews_by_reviewer' do
-    it 'returns corrsponding peer review responses given by certain reviewer'
+    it 'returns corrsponding peer review responses given by certain reviewer' do
+      expect(participant).to receive(:team).and_return(team)
+      expect(ReviewResponseMap).to receive(:get_reviewer_assessments_for).and_return([response])
+      expect(participant.reviews_by_reviewer).to eq([response])
+    end
   end
 
   describe '#quizzes_taken' do

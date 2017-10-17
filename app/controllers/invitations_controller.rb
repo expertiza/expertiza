@@ -13,6 +13,8 @@ class InvitationsController < ApplicationController
     # check if the invited user is already invited (i.e. awaiting reply)
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       create_utility
+      prepared_mail = MailerHelper.send_mail_about_invitation(@student, @user, "invitation_pending")
+      prepared_mail.deliver
     else
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end
@@ -44,6 +46,10 @@ class InvitationsController < ApplicationController
       flash[:error] = 'The system failed to add you to the team that invited you.'
     end
 
+    @inviter = User.find(@inv.from_id)
+    prepared_mail = MailerHelper.send_mail_about_invitation(@student, @inviter, "invitation_accepted")
+    prepared_mail.deliver
+
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -53,6 +59,12 @@ class InvitationsController < ApplicationController
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])
+
+    @inviter = User.find(@inv.from_id)
+    @invitee = User.find(@inv.to_id)
+    prepared_mail = MailerHelper.send_mail_about_invitation(@invitee, @inviter, "invitation_declined")
+    prepared_mail.deliver
+
     redirect_to view_student_teams_path student_id: student.id
   end
 

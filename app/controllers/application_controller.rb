@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   force_ssl if Rails.env.production?
 
   helper_method :current_user, :current_user_role?, :anonymous_mode?
-  protect_from_forgery with: :exception
+  #protect_from_forgery with: :exception
   before_action :set_time_zone
   before_action :authorize
 

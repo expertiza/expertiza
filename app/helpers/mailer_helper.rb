@@ -23,4 +23,15 @@ module MailerHelper
       }
     })
   end
+
+  def self.send_mail_about_invitation(sender, receiver, partial_name)
+    Mailer.invite_message ({
+      to: receiver.email,
+      body: {
+        partial_name: partial_name,
+        sender: sender,
+        receiver: receiver
+      }
+    })
+  end
 end

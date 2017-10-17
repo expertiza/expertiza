@@ -94,7 +94,7 @@ describe User do
 
     context 'when the parent of target user (user) is current user (user1)' do
       it 'returns true' do
-        user.parent = user1
+        allow(user).to receive(:parent).and_return(user1)
         expect(user1.is_recursively_parent_of(user)).to eq true
       end
     end

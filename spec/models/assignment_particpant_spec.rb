@@ -58,31 +58,31 @@ describe AssignmentParticipant do
     it 'returns corrsponding peer review responses given by certain reviewer'
   end
 
-  describe '#quizzes_taken' do
+  ﻿  describe '#quizzes_taken' do
     it 'returns corrsponding quiz responses given by current participant' do
-      allow(QuizResponseMap).to receive(:get_assessments_for).with(any_args).and_return response
-      expect(participant.quizzes_taken).to be response
+      allow(QuizResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])
+      expect(participant.quizzes_taken).to eq([response])
     end
   end
 
   describe '#metareviews' do
     it 'returns corrsponding metareview responses given by current participant' do
-      allow(MetareviewResponseMap).to receive(:get_assessments_for).with(any_args).and_return response
-      expect(participant.metareviews).to be response
+      allow(MetareviewResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])
+      expect(participant.metareviews).to eq([response])
     end
   end
 
   describe '#teammate_reviews' do
     it 'returns corrsponding teammate review responses given by current participant' do
-      allow(TeammateReviewResponseMap).to receive(:get_assessments_for).with(any_args).and_return response
-      expect(participant.teammate_reviews).to be response
+      allow(TeammateReviewResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])
+      expect(participant.teammate_reviews).to eq([response])
     end
   end
 
   describe '#bookmark_reviews' do
     it 'returns corrsponding bookmark review responses given by current participant' do
-      allow(BookmarkRatingResponseMap).to receive(:get_assessments_for).with(any_args).and_return response
-      expect(participant.bookmark_reviews).to be response
+      allow(BookmarkRatingResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])
+      expect(participant.bookmark_reviews).to eq([response])
     end
   end
 

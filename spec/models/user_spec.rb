@@ -101,7 +101,7 @@ describe User do
 
     context 'when the parent of target user (user) is not current user (user1), but super admin (user2)' do
       it 'returns false' do
-        user.role.name = "Super-Administrator"
+        allow(user).to receive_message_chain("role.name") {"Super-Administrator"}
         expect(is_recursively_parent_of(user)).to eq false
       end
     end

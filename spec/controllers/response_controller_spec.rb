@@ -1,5 +1,8 @@
 describe ResponseController do
   success_response = Net::HTTPResponse.new(1.0, 200, "OK")
+  current_round = 1
+  stage = nil
+  let(:stage) {build(:stage, id: 1)}
   let(:assignment) { build(:assignment, instructor_id: 6) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -17,9 +20,14 @@ describe ResponseController do
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(Response).to receive(:find_by_map_id).and_return(review_response)
     allow(Response).to receive(:find).and_return(review_response)
+    allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
+    allow(assignment).to receive(:number_of_current_round).and_return(current_round)
+    allow(assignment).to receive(:get_current_stage).and_return(stage)
     allow(review_response).to receive(:delete).and_return(success_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
     allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
+    allow(review_response_map).to receive(:assignment).and_return(assignment)
+    allow(review_response_map).to receive(:questionnaire).with(current_round).and_return(questionnaire)
   end
 
   describe '#action_allowed?' do
@@ -84,7 +92,7 @@ describe ResponseController do
 
   describe '#edit' do
     it 'renders response#response page' do
-      params = {return: ''}
+      params = {id: review_response.id, return: ''}
       post :edit, params
       expect(response).to render_template("response")
     end
@@ -101,7 +109,11 @@ describe ResponseController do
   end
 
   describe '#new' do
-    it 'renders response#response page'
+    it 'renders response#response page' do
+      params = {id: review_response.id, feedback: ''}
+      post :new, params
+      expect(response).to render_template("response")
+    end
   end
 
   describe '#new_feedback' do

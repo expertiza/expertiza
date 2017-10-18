@@ -28,6 +28,8 @@ describe ResponseController do
     allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
     allow(review_response_map).to receive(:assignment).and_return(assignment)
     allow(review_response_map).to receive(:questionnaire).with(current_round).and_return(questionnaire)
+
+
   end
 
   describe '#action_allowed?' do
@@ -100,7 +102,14 @@ describe ResponseController do
 
   describe '#update' do
     context 'when something is wrong during response updating' do
-      it 'raise an error and redirects to response#saving page'
+      it 'raise an error and redirects to response#saving page' do
+        allow(review_response).to receive(:update_attribute).and_raise('wrong input')
+        params = {id: review_response.id}
+        put :update, params
+        #fetching correct message embedded in response to check while redirection
+        message = response["Location"].split("&msg=").last
+        expect(response).to redirect_to('/response/saving?id=' + review_response.id.to_s + '&msg=' + message)
+      end
     end
 
     context 'when response is updated successfully' do

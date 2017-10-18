@@ -2,7 +2,6 @@ describe ResponseController do
   success_response = Net::HTTPResponse.new(1.0, 200, "OK")
   current_round = 1
   stage = nil
-  let(:stage) {build(:stage, id: 1)}
   let(:assignment) { build(:assignment, instructor_id: 6) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -28,8 +27,6 @@ describe ResponseController do
     allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
     allow(review_response_map).to receive(:assignment).and_return(assignment)
     allow(review_response_map).to receive(:questionnaire).with(current_round).and_return(questionnaire)
-
-
   end
 
   describe '#action_allowed?' do
@@ -113,7 +110,12 @@ describe ResponseController do
     end
 
     context 'when response is updated successfully' do
-      it 'redirects to response#saving page'
+      it 'redirects to response#saving page' do
+        allow(review_response).to receive(:update_attribute).and_return(true)
+        params = {id: review_response.id, :review => {:comments=>''}}
+        put :update, params
+        expect(response).to redirect_to('/response/saving?id=' + review_response.id.to_s + '&msg=')
+      end
     end
   end
 

@@ -1,4 +1,5 @@
 describe ResponseController do
+  success_response = Net::HTTPResponse.new(1.0, 200, "OK")
   let(:assignment) { build(:assignment, instructor_id: 6) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -16,6 +17,7 @@ describe ResponseController do
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(Response).to receive(:find_by_map_id).and_return(review_response)
     allow(Response).to receive(:find).and_return(review_response)
+    allow(review_response).to receive(:delete).and_return(success_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
     allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
   end
@@ -72,7 +74,12 @@ describe ResponseController do
   end
 
   describe '#delete' do
-    it 'deletes current response and redirects to response#redirection page'
+    it 'deletes current response and redirects to response#redirection page' do
+      params = {id: review_response.id}
+      delete :delete, params
+      expect(response).to redirect_to('/response/redirection?id=' + review_response.id.to_s + '&msg=The+response+was+deleted.')
+      expect(response).to have_http_status 302
+    end
   end
 
   describe '#edit' do

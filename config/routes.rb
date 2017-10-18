@@ -373,6 +373,9 @@ Expertiza::Application.routes.draw do
       post :set_priority
       post :save_topic_deadlines
     end
+    member do
+      get :load_add_signup_topics
+    end
   end
 
   resources :site_controllers do

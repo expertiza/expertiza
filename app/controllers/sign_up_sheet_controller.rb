@@ -106,9 +106,16 @@ class SignUpSheetController < ApplicationController
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
+
+
+  # issue 971 - do enable ajax control
+  # 1781
+  # see Js Grid for json format to insert in the model
   def add_signup_topics
-    load_add_signup_topics(params[:id])
-    SignUpSheet.add_signup_topic(params[:id])
+
+    console.log("Assignment Id : ",params[:id])
+   # load_add_signup_topics(params[:id])
+    SignUpSheet.add_signup_topic(params[:id]) #model call - just a get query .. nothing to do with add
   end
 
   def add_signup_topics_staggered
@@ -116,8 +123,12 @@ class SignUpSheetController < ApplicationController
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
-  def load_add_signup_topics(assignment_id)
-    @id = assignment_id
+  # this should retrieve results in Json so that it can be ajaxed
+  #1781
+  def load_add_signup_topics
+
+    @id = params[:id]
+    assignment_id =  params[:id]
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
@@ -128,6 +139,19 @@ class SignUpSheetController < ApplicationController
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recored are also counted)
     @participants = SignedUpTeam.find_team_participants(assignment_id)
+
+    render :json => {
+        :id => @id.as_json,
+        :sign_up_topics => @sign_up_topics.as_json,
+        :slots_filled => @slots_filled.as_json,
+        :slots_waitlisted => @slots_waitlisted.as_json,
+        :assignment => @assignment.as_json,
+        :participants => @participants.as_json
+
+      }
+
+
+
   end
 
   def set_values_for_new_topic

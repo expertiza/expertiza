@@ -11,6 +11,15 @@
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment.id do %>
 <% end %>
 
+
+<br>
+
+<%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id } do %>
+<% end %>
+
+
+
+<!-- 1781 -->
   <% if @sign_up_topics.size != 0 %>
     <table class="general" id="topics">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>

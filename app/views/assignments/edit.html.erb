@@ -16,8 +16,10 @@
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
       </div>
+
+
       <div id="tabs-2">
-        <h1>Topics for <%= @assignment_form.assignment.name %> assignment</h1>
+        <h1>Topics for  <%= @assignment_form.assignment.name %> assignment</h1>
             <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
             <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
@@ -43,22 +45,32 @@
             <input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][use_bookmark]', 'true', @assignment_form.assignment.use_bookmark, {:onChange => 'useBookmarkChanged()'})%>
             <%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
-          <br><br>
+          <br><br><br><br><br><br><br><br>
+
           <% if @assignment_form.assignment.staggered_deadline == true %>
+           <!-- 1781 the table that is shown -->
               <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>
           <% else %>
+               <!-- 1781 need to find what is this doing -->
+               
               <%= render '/sign_up_sheet/add_signup_topics' %>
           <% end %>
       </div>
+
+
+
+
       <div id="tabs-3">
         <%= render 'assignments/edit/rubrics' %>
       </div>
       <div id="tabs-4">
         <%= render 'assignments/edit/review_strategy' %>
       </div>
+     
       <div id="tabs-5">
         <%= render 'assignments/edit/due_dates' %>
       </div>
+
       <%if @assignment_form.assignment.is_calibrated%>
         <div id="tabs-6">
           <%= render 'assignments/edit/calibration' %>

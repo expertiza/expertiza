@@ -9,6 +9,7 @@ class ImportFileController < ApplicationController
   def show
     @id = params[:id]
     @model = params[:model]
+    @options = params[:options]
     @delimiter = get_delimiter(params)
     @has_header = params[:has_header]
     @current_file = params[:file]
@@ -24,44 +25,136 @@ class ImportFileController < ApplicationController
     @title = params[:title]
   end
 
+  ###############################################################
+  #                                                             #
+  #    CALL OUR NEW METHOD FROM import INSTEAD OF importFile    #
+  #                                                             #
+  ###############################################################
+
   def import
-    errors = importFile(session, params)
+
+    puts ""
+    puts ""
+    puts "def import reached"
+    puts ""
+    puts ""
+
+    errors = import_from_hash(session, params)
+
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
+
     errors.each do |error|
       err_msg = err_msg + "<li>" + error.to_s + "<br/>"
     end
+
     err_msg += "</ul>"
     flash[:error] = err_msg unless errors.empty?
     undo_link("The file has been successfully imported.")
     redirect_to session[:return_to]
+
+  end
+
+  # def import
+  #   errors = importFile(session, params)
+  #   err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
+  #   errors.each do |error|
+  #     err_msg = err_msg + "<li>" + error.to_s + "<br/>"
+  #   end
+  #   err_msg += "</ul>"
+  #   flash[:error] = err_msg unless errors.empty?
+  #   undo_link("The file has been successfully imported.")
+  #   redirect_to session[:return_to]
+  # end
+
+
+  def import_from_hash(session, params)
+
+    # MAYBE - check for presence of header.
+    # If no header, call a method (yet to be written)
+    # that adds the header from the selected options.
+
+    ##################################################################
+    #                                                                #
+    #    WE WILL NEED TO RETRIEVE OTHER ITEMS FOR THE USER IMPORT    #
+    #                                                                #
+    ##################################################################
+
+    if params[:model] == 'User'
+
+      contents_hash = eval(params[:contents_hash])
+
+      #########################################################
+      #                                                       #
+      #    I don't know if the statement below is correct.    #
+      #                                                       #
+      #########################################################
+
+      # parent_id = params[:session][:id]
+
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      else
+        new_header = [params[:select1], params[:select2], params[:select3]]
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      end
+
+      errors = []
+
+      begin
+
+        @header_integrated_body.each do |row_hash|
+          User.import(row_hash, session)
+        end
+
+      rescue
+        errors << $ERROR_INFO
+        puts errors.to_s
+      end
+
+    else
+
+    end
+    errors
   end
 
   protected
 
-  def parse_to_hash(import_grid, has_header)
 
-    # Check to see if there is a header associated with this import.
+  # Produces an array, where each entry in the array is a hash.
+  # The hash keys are the column titles, and the hash values are the associated values.
+  # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
+  #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
+  def hash_rows_with_headers(header, body)
 
-    file_hash = Hash.new
+    new_body = []
 
-    if has_header == 'true' # Import has a header.
+    header.map! { |column_name| column_name.to_sym }
 
-      file_hash[:header] = import_grid.shift
-
-      file_hash[:body] = import_grid
-
-    else # Import does not have a header.
-
-      file_hash[:header] = nil
-
-      file_hash[:body] = import_grid
-
+    body.each do |row|
+      new_body << header.zip(row).to_h
     end
 
-    file_hash
-
+    new_body
   end
 
+  # Produces a hash where :header refers to the header (may be nil)
+  # and :body refers to the contents of the file except the header.
+  # :header is an array, and :body is a two-dimensional array.
+  def parse_to_hash(import_grid, has_header)
+    file_hash = Hash.new
+    if has_header == 'true'
+      file_hash[:header] = import_grid.shift
+      file_hash[:body] = import_grid
+    else
+      file_hash[:header] = nil
+      file_hash[:body] = import_grid
+    end
+    file_hash
+  end
+
+  # Produces a two-dimensional array.
+  # The outer array contains "rows".
+  # The inner arrays contain "elements of rows" or "columns".
   def parse_to_grid(contents, delimiter)
     contents_grid = []
     contents.each_line do |line|

@@ -1,9 +1,11 @@
-<table class="table table-bordered table-striped">
+<%= form_tag( { :controller => 'import_file', :action => 'import' },
+              { :method => 'post', :name => 'column_form', :id => 'column_form'} ) do %>
+
+
+    <table class="table table-bordered table-striped">
 
   <thead>
   <tr>
-
-    <!-- CONSIDER USING JAVASCRIPT TO MAKE SELECT OPTIONS MUTUALLY EXCLUSIVE -->
 
     <% if @has_header == 'true' %>
 
@@ -19,60 +21,61 @@
 
     <% else %>
 
+
         <th>
-          <select class="form-control" style="background-color:lightgrey">
-            <option value="user_name">User Name</option>
-            <option value="full_name">Full Name</option>
-            <option value="email_address">Email Address</option>
+
+          <select name="select1" id="select1" class="form-control" style="background-color:lightgrey">
+            <option value="name">Name</option>
+            <option value="fullname">Fullname</option>
+            <option value="email">Email</option>
           </select>
         </th>
         <th>
-          <select class="form-control" style="background-color:lightgrey">
-            <option value="full_name">Full Name</option>
-            <option value="user_name">User Name</option>
-            <option value="email_address">Email Address</option>
+          <select name="select2" id="select2" class="form-control" style="background-color:lightgrey">
+            <option value="fullname">Fullname</option>
+            <option value="name">Name</option>
+            <option value="email">Email</option>
           </select>
         </th>
         <th>
-          <select class="form-control" style="background-color:lightgrey">
-            <option value="email_address">Email Address</option>
-            <option value="user_name">User Name</option>
-            <option value="full_name">Full Name</option>
+          <select name="select3" id="select3" class="form-control" style="background-color:lightgrey">
+            <option value="email">Email</option>
+            <option value="name">Name</option>
+            <option value="fullname">Fullname</option>
           </select>
         </th>
-        </tr>
-        </thead>
+
+
 
     <% end %>
 
-  <tbody>
-<% @contents_grid.each do |row| %>
-  <tr>
-      <% row.each do |column| %>
-        <td align="center"><%= column %></td>
-      <% end %>
   </tr>
+  </thead>
+
+  <tbody>
+
+  <% @contents_hash[:body].each do |row| %>
+      <tr>
+        <% row.each do |column| %>
+            <td align="center"><%= column %></td>
+        <% end %>
+      </tr>
+
   <% end %>
+
   </tbody>
 </table>
 
-<div style="text-align:center">
-  <button class="btn btn-primary">Import <%= @model %></button>
-</div>
+    <%= hidden_field_tag('contents_hash', @contents_hash) %>
+    <%= hidden_field_tag('has_header', @has_header) %>
+    <%= hidden_field_tag('model', @model) %>
 
-<!-- TAKE THIS OUT AFTER DONE DEVELOPING -->
+    <div style="text-align:center">
+      <% if @has_header == 'true' %>
+          <button type="button" class="btn btn-primary" onclick="column_form.submit()">Import <%= @model %></button>
+      <% else %>
+          <button type="button" class="btn btn-primary" onclick="checkIfColumnDuplicate()">Import <%= @model %></button>
+      <% end %>
+    </div>
 
-<br/><br/>
-<%= @contents_hash[:header] %>
-<br/>
-<%= @contents_hash[:body] %>
-
-<br/><br/>
-<p style="color:red;border:1px solid red;padding:25px 25px 25px 25px">
-  <% params.each do |param| %>
-  <%= param %><br/><br/>
-  <% end %>
-</p>
-
-
-<!-- WE NEED TO SOMEHOW PROMPT THE IMPORT WITH THE CORRECT DATA -->
+<% end %>

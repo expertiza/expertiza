@@ -165,24 +165,48 @@ class User < ActiveRecord::Base
     password
   end
 
-  def self.import(row, _row_header, session, _id = nil)
-    if row.length != 3
-      raise ArgumentError, "Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email."
+  def self.import(row_hash, session)
+
+    if row_hash.length != 3
+      raise ArgumentError, "Not enough items. Three columns are expected, your username, your full name, and your email."
     end
-    user = User.find_by_name(row[0])
+
+    user = User.find_by_name(row_hash[:name])
 
     if user.nil?
-      attributes = ImportFileHelper.define_attributes(row)
+      attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
-      password = user.reset_password # the password is reset
+      password = user.reset_password
       MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
-      user.email = row[2].strip
-      user.fullname = row[1].strip
+      user.email = row_hash[:email]
+      user.fullname = row_hash[:fullname]
       user.parent_id = (session[:user]).id
       user.save
     end
+
   end
+
+  # The old method is commented out below.
+
+  # def self.import(row, _row_header, session, _id = nil)
+  #   if row.length != 3
+  #     raise ArgumentError, "Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email."
+  #   end
+  #   user = User.find_by_name(row[0])
+  #
+  #   if user.nil?
+  #     attributes = ImportFileHelper.define_attributes(row)
+  #     user = ImportFileHelper.create_new_user(attributes, session)
+  #     password = user.reset_password # the password is reset
+  #     MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
+  #   else
+  #     user.email = row[2].strip
+  #     user.fullname = row[1].strip
+  #     user.parent_id = (session[:user]).id
+  #     user.save
+  #   end
+  # end
 
   def self.yesorno(elt)
     if elt == true

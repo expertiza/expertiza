@@ -84,7 +84,9 @@ describe ResponseController do
 
   describe '#edit' do
     it 'renders response#response page' do
-
+      params = {return: ''}
+      post :edit, params
+      expect(response).to render_template("response")
     end
   end
 

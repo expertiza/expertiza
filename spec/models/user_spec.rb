@@ -168,7 +168,7 @@ describe User do
     context 'when user\'s email is not stored in DB' do
       it 'finds user by email if the local part of email is the same as username' do
         email = 'abcxyz@gmail.com'
-        allow(User).to receive(:find_by_email).with(email).and_return(nil)
+        allow(User).to receive(:find_by_email).and_return(nil)
         allow(User).to receive(:where).and_return([name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789'])
         expect(User.find_by_login(email)).to eq [name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789']
       end

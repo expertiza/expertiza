@@ -87,14 +87,18 @@ describe AssignmentsController do
 
   describe '#toggle_access' do
     it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page' do
-      # params = {:id => 1}
-      # allow(assignment).to receive(:save).and_return(true)
-      # expect(controller.send(:toggle_access)).to be true
+      controller.params = {:id => '1'}
+      allow(assignment).to receive(:private).and_return(true)
+      allow(assignment).to receive(:save).and_return(true)
+      # controller.send(:toggle_access)
+      # expect(response).to redirect_to list_tree_display_index_path
     end
   end
 
   describe '#new' do
     it 'creates a new AssignmentForm object and renders assignment#new page' do
+      # allow(AssignmentForm).to receive(:new).and_return(:assignment_form)
+      # allow(:assignment_form).to receive_message_chain(:assignment, :instructor).and_return(:instructor)
       get :new
       expect(assigns(:assignment_form)).to be_kind_of(AssignmentForm)
       expect(response).to render_template(:new)
@@ -102,44 +106,48 @@ describe AssignmentsController do
   end
 
   describe '#create' do
-    # params = {
-    #   assignment_form: {
-    #     assignment: {
-    #       instructor_id: 2,
-    #       course_id: 1,
-    #       max_team_size: 1,
-    #       id: 1,
-    #       name: 'test assignment',
-    #       directory_path: '/test',
-    #       spec_location: '',
-    #       show_teammate_reviews: false,
-    #       require_quiz: false,
-    #       num_quiz_questions: 0,
-    #       staggered_deadline: false,
-    #       microtask: false,
-    #       reviews_visible_to_all: false,
-    #       is_calibrated: false,
-    #       availability_flag: true,
-    #       reputation_algorithm: 'Lauw',
-    #       simicheck: -1,
-    #       simicheck_threshold: 100
-    #     }
-    #   }
-    # }
+    params = {
+      assignment_form: {
+        assignment: {
+          instructor_id: 2,
+          course_id: 1,
+          max_team_size: 1,
+          id: 1,
+          name: 'test assignment',
+          directory_path: '/test',
+          spec_location: '',
+          show_teammate_reviews: false,
+          require_quiz: false,
+          num_quiz_questions: 0,
+          staggered_deadline: false,
+          microtask: false,
+          reviews_visible_to_all: false,
+          is_calibrated: false,
+          availability_flag: true,
+          reputation_algorithm: 'Lauw',
+          simicheck: -1,
+          simicheck_threshold: 100
+        }
+      }
+    }
     context 'when assignment_form is saved successfully' do
       it 'redirets to assignment#edit page' do
         # af = double('AssignmentForm', :save => true)
-        # allow(AssignmentForm).to receive(:new).and_return(af)
-        # # allow(AssignmentForm).to receive(:save).and_return(true)
-        # post :create, params
-        # expect(response).to redirect_to edit_assignment_path
+        allow(assignment_form_params).to
+        allow(AssignmentForm).to receive(:new).and_return(assignment_form)
+        allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:create_assignment_node).and_return(true)
+        allow(assignment_form).to receive_message_chain(:assignment, :id).and_return(1)
+        post :create, params
+        expect(response).to redirect_to edit_assignment_path 1
       end
     end
 
     context 'when assignment_form is not saved successfully' do
       it 'renders assignment#new page' do
-        # allow(assignment_form).to receive(:new).and_return(double('AssignmentForm'))
-        # allow(assignment_form).to receive(:save).and_return(false)
+        # allow(AssignmentForm).to receive(:new).and_return(double('AssignmentForm'))
+        allow(AssignmentForm).to receive(:new).and_return(assignment_form)
+        allow(assignment_form).to receive(:save).and_return(false)
         # post :create, params
         # expect(response).to redirect_to new_assignment_path
       end

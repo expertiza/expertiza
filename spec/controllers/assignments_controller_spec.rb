@@ -137,7 +137,8 @@ describe AssignmentsController do
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(true)
-        allow(assignment_form).to receive_message_chain(:assignment, :id).and_return(1)
+        # allow(assignment).to receive(:id).and_return(1)
+        allow(assignment_form).to receive(:assignment).and_return(assignment)
         post :create, params
         expect(response).to redirect_to edit_assignment_path 1
       end
@@ -148,8 +149,8 @@ describe AssignmentsController do
         # allow(AssignmentForm).to receive(:new).and_return(double('AssignmentForm'))
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:save).and_return(false)
-        # post :create, params
-        # expect(response).to redirect_to new_assignment_path
+        post :create, params
+        expect(response).to render_template(:new)
       end
     end
   end

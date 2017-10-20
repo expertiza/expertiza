@@ -133,7 +133,7 @@ describe AssignmentsController do
     context 'when assignment_form is saved successfully' do
       it 'redirets to assignment#edit page' do
         # af = double('AssignmentForm', :save => true)
-        allow(assignment_form_params).to
+        # allow(assignment_form_params).to
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(true)

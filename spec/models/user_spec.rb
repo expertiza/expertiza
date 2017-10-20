@@ -169,6 +169,7 @@ describe User do
       it 'finds user by email if the local part of email is the same as username' do
         allow(User).to receive(:find_by_email).and_return(nil)
         allow(User).to receive(:where).and_return([double("userList", name: 'abc', fullname: 'abc bbc')])
+        #allow(userList).to receive(:first).and_return(userList)
         expect(User.find_by_login('abcxyz@gmail.com')).to eq ([name: 'abc', fullname: 'abc bbc'])
       end
     end

@@ -87,11 +87,16 @@ describe AssignmentsController do
 
   describe '#toggle_access' do
     it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page' do
-      controller.params = {:id => '1'}
-      allow(assignment).to receive(:private).and_return(true)
+    # sleep(10000)
+      params = {:id => '1'}
+      # allow(Assignment).to receive(:find).with('').and_return(assignment)
+      # allow(assignment).to receive(:private).and_return(true)
+      # allow(assignment).to receive(:save).and_return(true)
       allow(assignment).to receive(:save).and_return(true)
-      # controller.send(:toggle_access)
-      # expect(response).to redirect_to list_tree_display_index_path
+      get :toggle_access, params
+      # expect(Assignment.count).to eq(1)
+      # expect(Assignment.second.private).to be true
+      expect(response).to redirect_to '/tree_display/list'
     end
   end
 
@@ -137,8 +142,8 @@ describe AssignmentsController do
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(true)
-        # allow(assignment).to receive(:id).and_return(1)
-        allow(assignment_form).to receive(:assignment).and_return(assignment)
+        allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(true)
+        allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>1, :name=>"test assignment"))
         post :create, params
         expect(response).to redirect_to edit_assignment_path 1
       end
@@ -239,7 +244,7 @@ describe AssignmentsController do
           # usr = double('User', timezonepref: nil, parent_id: 1)
           # parent = double('User', timezonepref: "UTC")
           # allow(User).to receive(:find).and_return(parent)
-          # allow(ApplicationController).to receive(:current_user).and_return(usr)
+          # allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(usr)
           # allow(assignment_form).to receive_message_chain(assignment, instructor).with(usr)
           # post :update, params
           # expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in UTC")

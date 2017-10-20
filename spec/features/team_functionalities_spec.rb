@@ -53,8 +53,7 @@ describe "create group assignment"  do
     fill_in 'topic_topic_name', with: 'test_topic_1'
     fill_in 'topic_category', with: 'test_topic_1'
     fill_in 'topic_max_choosers', with: 3
-    # fill_in 'topic_link', with: 'test_topic_1'
-    # fill_in 'topic_description', with: 'test_topic_1'
+
     click_button 'Create'
     sign_up_topics = SignUpTopic.where(topic_name: 'test_topic_1').first
     expect(sign_up_topics).to have_attributes(
@@ -65,22 +64,44 @@ describe "create group assignment"  do
                                   category: 'test_topic_1'
                               )
     create(:assignment_due_date)
-    # assignment = Assignment.where(name: 'public assignment for test').first
+    create_list(:participant, 3)
+    user = User.find_by(name: "student2064")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    # Assignment name
+    expect(page).to have_content('public assignment for test')
+    click_link 'public assignment for test'
+    expect(page).to have_content('Submit or Review work for public assignment for test')
 
-    # expect(page).to have_current_path("/assignments/#{assignment.id}/edit#tabs-5", url: true)
-    # visit "/assignments/#{assignment.id}/edit#tabs-5"
-    # puts current_url
-    # fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
-    # fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
-    # fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
-    # click_button 'Save'
-    # expect(page).to have_content("The assignment was successfully saved....")
+    click_link 'Signup sheet'
+    expect(page).to have_content('Signup sheet for public assignment for test assignment')
+
+    # click Signup check button
+    assignment_id = Assignment.first.id
+    visit "/sign_up_sheet/sign_up?id=#{assignment_id}&topic_id=1"
+    expect(page).to have_content('Your topic(s): test_topic_1')
+
+    visit '/student_task/list'
+    click_link 'public assignment for test'
+    click_link 'Your team'
+    expect(page).to have_content('public assignment for test_Team1')
+
+    fill_in 'user_name', with: 'student2065'
+    click_button 'Invite'
+    expect(page).to have_content('student2065')
+
+    user = User.find_by(name: "student2065")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    expect(page).to have_content('public assignment for test')
+
+    click_link 'public assignment for test'
+    click_link 'Your team'
+
+
+
 
   end
 
-  # it "adds topic to assignment" do
-  #   assignment = Assignment.where(name: 'public assignment for test').first
-  #   visit "/assignments/#{assignment.id}/edit"
-  #   puts "/assignments/#{assignment.id}/edit"
-  # end
+
 end

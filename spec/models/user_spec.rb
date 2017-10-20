@@ -170,7 +170,7 @@ describe User do
         email = 'abcxyz@gmail.com'
         allow(User).to receive(:find_by_email).and_return(nil)
         allow(User).to receive(:where).and_return([name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789'])
-        expect(User.find_by_login(email)).to eq [name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789']
+        expect(User.find_by_login(email)).to eq {name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789'}
       end
     end
   end

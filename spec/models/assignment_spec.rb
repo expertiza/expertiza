@@ -59,10 +59,6 @@ describe Assignment do
   describe '#teams?' do
     context 'when teams array is not empty' do
       it 'says current assignment has teams' do
-        # assignment=create(:assignment)
-        # expect(assignment.teams.empty?).to equal(true)
-        # team=create(:assignment_team)
-        # team.parent_id=assignment.id
         expect(assignment.teams.empty?).to equal(false)
       end
     end
@@ -76,8 +72,6 @@ describe Assignment do
   describe '#valid_num_review' do
     context 'when num_reviews_allowed is not -1 and num_reviews_allowed is less than num_reviews_required' do
       it 'adds an error message to current assignment object' do
-        # Check error
-        # @assignment = create(:assignment)
         assignment.num_reviews_allowed = 2
         assignment.num_reviews_required = 3
         expect(assignment.num_reviews_allowed < assignment.num_reviews_required).to eql(!assignment.has_attribute?(:message))
@@ -116,7 +110,6 @@ describe Assignment do
     it 'returns review mapping' do
       @assignment=create(:assignment)
       @participant=create(:participant,assignment:@assignment)
-      #@review_response_map=create(:review_response_map,assignment:@assignment)
       @meta_review_response_map=create(:meta_review_response_map,review_mapping:review_response_map,reviewee:@participant)
       @assignment.review_mappings << review_response_map
       expect(@assignment.metareview_mappings.first).to eq(@meta_review_response_map)
@@ -125,40 +118,47 @@ describe Assignment do
   describe '#dynamic_reviewer_assignment?' do
     context 'when review_assignment_strategy of current assignment is Auto-Selected' do
       it 'returns true' do
-        # @assignment = create(:assignment)
         expect(assignment.review_assignment_strategy).to eql('Auto-Selected')
       end
     end
     context 'when review_assignment_strategy of current assignment is Instructor-Selected' do
       it 'returns false' do
-        # @assignment = create(:assignment)
         expect(assignment.review_assignment_strategy=='Instructor-Selected').to eql(false)
       end
     end
   end
-  # Take guidance from guide
   describe '#scores' do
-
     context 'when assignment is varying rubric by round assignment' do
       it 'calculates scores in each round of each team in current assignment' do 
         @assignment = create(:assignment,id: 999, rounds_of_reviews: 3)
-        
         @user = create(:student)
         @participant=create(:participant,:assignment => @assignment, :id => 123,  user: @user)
-        # @team
         @questionnaire = create(:questionnaire)
         @assignment_questionnaire = create(:assignment_questionnaire, assignment:@assignment, used_in_round: 2, questionnaire: @questionnaire)
         @questions = create(:question, questionnaire: @questionnaire)
         @review_response_map = create(:review_response_map, assignment: @assignment)
         @response=create(:response,response_map: @review_response_map)
-         # allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team: team,i: 1).and_return([@review_response_map])
-         allow(Answer).to receive(:compute_scores).with(any_args).and_return({min: 0, max: 5, avg: 4})
-         # allow(Assignment).to receive(:num_review_rounds).and_return(2)
-        expect(@assignment.scores(@questions)).should include(10)
+        allow(Assignment).to receive(:num_review_rounds).and_return(2)
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return({min: 0, max: 5, avg: 4})
+        (ReviewResponseMap).to receive(:get_responses_for_team_round).with(any_args).and_return([response])
+        expect(@assignment.scores(@questions)["participants".to_sym][123.to_s.to_sym]["review2".to_sym]["scores".to_sym]["max".to_sym]).to eql(5)
       end
     end
     context 'when assignment is not varying rubric by round assignment' do
-      it 'calculates scores of each team in current assignment'
+      it 'calculates scores of each team in current assignment' do
+        @assignment = create(:assignment,id: 999, rounds_of_reviews: 3)
+        @user = create(:student)
+        @participant=create(:participant,:assignment => @assignment, :id => 123,  user: @user)
+        @questionnaire = create(:questionnaire)
+        @assignment_questionnaire = create(:assignment_questionnaire, assignment:@assignment, used_in_round: 0, questionnaire: @questionnaire)
+        @questions = create(:question, questionnaire: @questionnaire)
+        @review_response_map = create(:review_response_map, assignment: @assignment)
+        @response=create(:response,response_map: @review_response_map)
+        allow(Assignment).to receive(:num_review_rounds).and_return(2)
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return({min: 0, max: 5, avg: 4})
+        allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(any_args).and_return([response])
+        expect(@assignment.scores(@questions)["participants".to_sym][123.to_s.to_sym]["review0".to_sym]["scores".to_sym]["max".to_sym]).to eql(5)
+      end
     end
   end
   describe '#path' do
@@ -427,7 +427,6 @@ describe Assignment do
           expect(assignment.stage_deadline).not_to be_nil    
         end
       end
-
       # We do require create over here
       context 'when due date is not nil and due date is not equal to Finished' do
         it 'returns due date' do
@@ -440,11 +439,8 @@ describe Assignment do
       end
     end
   end
-
-  # We need create here 
   describe '#num_review_rounds' do
     it 'returns max round number in all due dates of current assignment' do
-      # assignment=create(:assignment)
       dead_rigth=create(:deadline_right)
       create(:assignment_due_date,:round=>1,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
       create(:assignment_due_date,:round=>2,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
@@ -452,17 +448,14 @@ describe Assignment do
       expect(assignment.num_review_rounds).to equal(3) 
     end
   end
-
   describe '#find_current_stage' do
     context 'when next due date is nil' do
       it 'returns Finished'do
-        # assignment=create(:assignment)
         dead_rigth=create(:deadline_right)
         ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id,:due_at=> DateTime.now.in_time_zone - 1.day)
         expect(assignment.find_current_stage()).to eq("Finished")
       end
     end
-
     context 'when next due date is nil' do
       it 'returns next due date object' do
         assignment=create(:assignment)
@@ -472,7 +465,6 @@ describe Assignment do
       end
     end
   end
-
   # MySql error if create not used
   describe '#review_questionnaire_id' do
     it 'returns review_questionnaire_id' do
@@ -482,7 +474,6 @@ describe Assignment do
       expect(@assignment.review_questionnaire_id>0).to eql(true)
     end
   end
-
   describe 'has correct csv values?' do
     before(:each) do
       create(:assignment)
@@ -498,7 +489,6 @@ describe Assignment do
                   'question_id' => 'true', 'comment_id' => 'true',
                   'comments' => 'true', 'score' => 'true'}
     end
-
     def generated_csv(t_assignment, t_options)
       delimiter = ','
       CSV.generate(col_sep: delimiter) do |csv|
@@ -507,13 +497,11 @@ describe Assignment do
         Assignment.export_details(csv, t_assignment.id, t_options)
       end
     end
-
     it 'checks_if_csv has the correct data' do
       create(:answer, comments: 'Test comment')
       expected_csv = File.read('spec/features/assignment_export_details/expected_details_csv.txt')
       expect(generated_csv(assignment, @options)).to eq(expected_csv)
     end
-
     it 'checks csv with some options' do
       create(:answer, comments: 'Test comment')
       @options['team_id'] = 'false'
@@ -522,12 +510,10 @@ describe Assignment do
       expected_csv = File.read('spec/features/assignment_export_details/expected_details_some_options_csv.txt')
       expect(generated_csv(assignment, @options)).to eq(expected_csv)
     end
-
     it 'checks csv with no data' do
       expected_csv = File.read('spec/features/assignment_export_details/expected_details_no_data_csv.txt')
       expect(generated_csv(assignment, @options)).to eq(expected_csv)
     end
-
     it 'checks csv with data and no options' do
       create(:answer, comments: 'Test comment')
       @options['team_id'] = 'false'
@@ -542,7 +528,6 @@ describe Assignment do
       expect(generated_csv(assignment, @options)).to eq(expected_csv)
     end
   end
-
   describe 'find_due_dates' do
     context 'if deadline is of assignment' do
       it ' return assignment due_date' do

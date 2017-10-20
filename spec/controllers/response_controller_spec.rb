@@ -16,10 +16,14 @@ describe ResponseController do
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    allow(Assignment).to receive(:find).and_return(assignment)
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(Response).to receive(:find_by_map_id).and_return(review_response)
     allow(Response).to receive(:find).and_return(review_response)
     allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
+    allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+    allow(Participant).to receive(:find).with(1).and_return(participant)
+    allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     allow(assignment).to receive(:number_of_current_round).and_return(current_round)
     allow(assignment).to receive(:get_current_stage).and_return(stage)
     allow(review_response).to receive(:delete).and_return(success_response)
@@ -27,6 +31,7 @@ describe ResponseController do
     allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
     allow(review_response_map).to receive(:assignment).and_return(assignment)
     allow(review_response_map).to receive(:questionnaire).with(current_round).and_return(questionnaire)
+    request.env['HTTP_REFERER'] = 'www.google.com'
   end
 
   describe '#action_allowed?' do
@@ -130,16 +135,26 @@ describe ResponseController do
   describe '#new_feedback' do
     context 'when current response is nil' do
       it 'redirects to response#new page' do
-        # params = {id: review_response.id}
-        # allow(Response).to receive(:find).with('1').and_return(nil)
-        # get :new_feedback, params
-        # expect(response).to redirect_to('back')
+        session[:user] = participant
+        params = {id: review_response.id}
+        allow(AssignmentParticipant).to receive(:where).and_return([participant])
+        allow(FeedbackResponseMap).to receive(:where).and_return([])
+        get :new_feedback, params, session
+        #fetching newly created map id in response to check while redirection
+        id = response["Location"].split("?id=").last.split("&return").first
+        expect(response).to redirect_to('/response/new?id=' + id + "&return=feedback")
       end
 
     end
 
     context 'when current response is not nil' do
-      it 'redirects to previous page'
+      it 'redirects to previous page' do
+        session[:user] = participant
+        params = {id: review_response.id}
+        allow(Response).to receive(:find).and_return(nil)
+        get :new_feedback, params, session
+        expect(response).to redirect_to(request.env['HTTP_REFERER'])
+      end
     end
   end
 
@@ -154,15 +169,18 @@ describe ResponseController do
 
   describe '#create' do
     it 'creates a new response and redirects to response#saving page'  do
-    # create(:response)
-    # expect(response).to redirect_to('/response/saving')
+      params = {id: review_response.id, review: {questionnaire_id: questionnaire.id}}
+      post :create, params
+      #fetching correct message embedded in response to check while redirection
+      message = response["Location"].split("&msg=").last
+      expect(response).to redirect_to(saving_response_index_url + "?error_msg=&id=" + review_response.id.to_s + "&msg=" + message)
     end
   end
 
   describe '#saving' do
     it 'save current response map and redirects to response#redirection page' do
-      review_response.save
-      expect(response).to have_http_status(200)
+      # params = {id: review_response_map.id}
+      # get :saving, params
       # expect(response).to redirect_to('/response/redirection')
     end
 
@@ -187,7 +205,7 @@ describe ResponseController do
 
     context 'when params[:return] is instructor' do
       it 'redirects to grades#view page' do
-        params = {return: "instructor"}
+        params = {return: "instructor", id: 1}
         get :redirection, params
         expect(response).to redirect_to('/grades/view?id='+review_response.reviewer.id.to_s)
       end

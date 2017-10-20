@@ -137,22 +137,30 @@ describe Assignment do
     end
   end
   # Take guidance from guide
-  # describe '#scores' do
-  #   context 'when assignment is varying rubric by round assignment' do
-  #     it 'calculates scores in each round of each team in current assignment' do 
-  #       # @assignment = create(:assignment,id: 999)
-  #       # @review_response_map = create(:review_response_map)
-  #       # @participant=create(:participant,:assignment => @assignment)
-  #       @questionnaire = create(:questionnaire)
-  #       @assignment_questionnaire = create(:assignment_questionnaire, assignment: @assignment, used_in_round: 2, questionnaire: @questionnaire)
-  #       @questions = create(:question, questionnaire: @questionnaire)
-  #       expect(assignment.scores(@questions)).to eql(10)
-  #     end
-  #   end
-  #   context 'when assignment is not varying rubric by round assignment' do
-  #     it 'calculates scores of each team in current assignment'
-  #   end
-  # end
+  describe '#scores' do
+
+    context 'when assignment is varying rubric by round assignment' do
+      it 'calculates scores in each round of each team in current assignment' do 
+        @assignment = create(:assignment,id: 999, rounds_of_reviews: 3)
+        
+        @user = create(:student)
+        @participant=create(:participant,:assignment => @assignment, :id => 123,  user: @user)
+        # @team
+        @questionnaire = create(:questionnaire)
+        @assignment_questionnaire = create(:assignment_questionnaire, assignment:@assignment, used_in_round: 2, questionnaire: @questionnaire)
+        @questions = create(:question, questionnaire: @questionnaire)
+        @review_response_map = create(:review_response_map, assignment: @assignment)
+        @response=create(:response,response_map: @review_response_map)
+         # allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team: team,i: 1).and_return([@review_response_map])
+         allow(Answer).to receive(:compute_scores).with(any_args).and_return({min: 0, max: 5, avg: 4})
+         # allow(Assignment).to receive(:num_review_rounds).and_return(2)
+        expect(@assignment.scores(@questions)).should include(10)
+      end
+    end
+    context 'when assignment is not varying rubric by round assignment' do
+      it 'calculates scores of each team in current assignment'
+    end
+  end
   describe '#path' do
     context 'when both course_id and instructor_id are nil' do
       it 'raises an error' do

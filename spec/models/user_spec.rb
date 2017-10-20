@@ -148,7 +148,7 @@ describe User do
       expect(User.yesorno(true)).to eq "yes"
     end
     it 'returns no when input is false' do
-      expect(User.yesorno(no)).to eq "no"
+      expect(User.yesorno(false)).to eq "no"
     end
     it 'returns empty string when input is other content' do
       content = "TEXT"
@@ -166,7 +166,12 @@ describe User do
     end
 
     context 'when user\'s email is not stored in DB' do
-      it 'finds user by email if the local part of email is the same as username'
+      it 'finds user by email if the local part of email is the same as username' do
+        email = 'abcxyz@gmail.com'
+        allow(User).to receive(:find_by_email).with(email).and_return(nil)
+        allow(User).to receive(:where).and_return([name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789'])
+        expect(User.find_by_login(email)).to eq [name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789']
+      end
     end
   end
   # xzhang72

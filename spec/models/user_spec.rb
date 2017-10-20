@@ -144,13 +144,16 @@ describe User do
   end
   # xzhang72
   describe '.yesorno' do
-    it 'returns yes when input is true'
+    it 'returns yes when input is true' do
       expect(User.yesorno(true)).to eq "yes"
-    it 'returns no when input is false'
+    end
+    it 'returns no when input is false' do
       expect(User.yesorno(no)).to eq "no"
-    it 'returns empty string when input is other content'
+    end
+    it 'returns empty string when input is other content' do
       content = "TEXT"
       expect(User.yesorno(content)).to eq ""
+    end
   end
   # xzhang72
   describe '.find_by_login' do

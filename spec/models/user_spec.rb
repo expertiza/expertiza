@@ -144,15 +144,21 @@ describe User do
   # xzhang72
   describe '.yesorno' do
     it 'returns yes when input is true'
-
+      expect(User.yesorno(true)).to eq "yes"
     it 'returns no when input is false'
-
+      expect(User.yesorno(no)).to eq "no"
     it 'returns empty string when input is other content'
+      content = "TEXT"
+      expect(User.yesorno(content)).to eq ""
   end
   # xzhang72
   describe '.find_by_login' do
     context 'when user\'s email is stored in DB' do
-      it 'finds user by email'
+      it 'finds user by email' do
+        email = 'abcxyz@gmail.com'
+        allow(User).to receive(:find_by_email).with(email).and_return(user)
+        expect(User.find_by_login(email)).to eq user
+      end
     end
 
     context 'when user\'s email is not stored in DB' do

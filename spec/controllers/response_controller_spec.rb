@@ -30,6 +30,7 @@ describe ResponseController do
     allow(review_response).to receive(:map).and_return(review_response_map)
     allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
     allow(review_response_map).to receive(:assignment).and_return(assignment)
+    allow(review_response_map).to receive(:save).and_return(true)
     allow(review_response_map).to receive(:questionnaire).with(current_round).and_return(questionnaire)
     request.env['HTTP_REFERER'] = 'www.google.com'
   end
@@ -179,9 +180,9 @@ describe ResponseController do
 
   describe '#saving' do
     it 'save current response map and redirects to response#redirection page' do
-      # params = {id: review_response_map.id}
-      # get :saving, params
-      # expect(response).to redirect_to('/response/redirection')
+       params = {id: review_response_map.id}
+       post :saving, params
+       expect(response).to redirect_to('/response/redirection?id=' + review_response.id.to_s)
     end
 
   end

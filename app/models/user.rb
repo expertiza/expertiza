@@ -1,6 +1,9 @@
 class User < ActiveRecord::Base
 
-   include AccessHelper
+  include ActionView::Helpers::UrlHelper
+  include ActionView::Helpers::TagHelper
+  include ActionController::PolymorphicRoutes
+  include ActionController::UrlWriter
 
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness

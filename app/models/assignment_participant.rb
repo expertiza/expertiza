@@ -29,7 +29,7 @@ class AssignmentParticipant < Participant
   end
 
   def assign_quiz(contributor, reviewer, _topic = nil)
-    quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
+    quiz = QuizQuestionnaire.find_by(:instructor_id, contributor.id)
     QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
   end
 

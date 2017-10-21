@@ -73,12 +73,21 @@ describe User do
   end
 
   describe '#can_impersonate?' do
-    it 'can impersonate target user if current user is super admin'
+    it 'can impersonate target user if current user is super admin' do
+      allow(user1).to receive_message_chain("role.super_admin?"){true}
+      expect(user1.can_impersonate?(user)).to be_truthy
+    end
+    it 'can impersonate target user if current user is the TA of target user'do
+      allow(user1).to receive_message_chain("role.super_admin?"){true}
+      allow(user1).to receive(:is_teaching_assistant_for?).and_return(user)
+      expect(user1.can_impersonate?(user)).to be_truthy
 
-    it 'can impersonate target user if current user is the TA of target user'
-
-    it 'can impersonate target user if current user is the recursively parent of target user'
-
+    end
+    it 'can impersonate target user if current user is the recursively parent of target user'do
+      allow(user1).to receive_message_chain("role.super_admin?"){true}
+      allow(user1).to receive(:is_recursively_parent_of).and_return(user)
+      expect(user1.can_impersonate?(user)).to be_truthy
+    end
     it 'cannot impersonate target user if current user does not satisfy all requirements'
   end
 
@@ -210,9 +219,16 @@ describe User do
   end
 
   describe '#is_teaching_assistant_for?' do
-    it 'returns false if current user is not a TA'
+    it 'returns false if current user is not a TA' do
+      allow(user1).to receive_message_chain("role.ta?"){ false }
+      expect(user1.is_teaching_assistant_for?(user)).to be_falsey
+    end
 
-    it 'returns false if current user is a TA, but target user is not a student'
+    it 'returns false if current user is a TA, but target user is not a student'do
+      allow(user1).to receive_message_chain("role.ta?"){true }
+      allow(user).to receive_message_chain("role.name").and_return('teacher')
+      expect(user1.is_teaching_assistant_for?(user)).to be_falsey
+    end
 
     it 'returns true if current user is a TA of target user'
   end

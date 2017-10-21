@@ -2,7 +2,6 @@ class User < ActiveRecord::Base
 
   include ActionView::Helpers::UrlHelper
   include ActionView::Helpers::TagHelper
-  include ActionController::UrlWriter
 
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness

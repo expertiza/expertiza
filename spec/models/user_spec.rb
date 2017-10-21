@@ -112,9 +112,15 @@ describe User do
   end
 
   describe '#super_admin?' do
-    it 'returns ture if role name is Super-Administrator'
+    it 'returns ture if role name is Super-Administrator' do
+      allow(user).to receive_message_chain("role.name"){'Super-Administrator'}
+      expect(user.super_admin?).to be_truthy
+    end
 
-    it 'returns false if role name is not Super-Administrator'
+    it 'returns false if role name is not Super-Administrator' do
+      allow(user).to receive_message_chain("role.name"){'CAt'}
+      expect(user.super_admin?).to be_falsey
+    end
   end
 
   describe '#is_creator_of?' do

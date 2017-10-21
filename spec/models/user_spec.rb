@@ -236,7 +236,7 @@ describe User do
         :userid => 1,
       }
       allow(User).to receive(:find).and_return(nil)
-      expect(User.from_params(params)).to raise_error "Please <a href='#{newuser}'>create an account</a> for this user to continue."
+      expect(User.from_params(params)).to raise_error
     end
   end
 

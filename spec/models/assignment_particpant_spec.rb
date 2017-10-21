@@ -89,7 +89,7 @@ describe AssignmentParticipant do
     end
   end
 
-  ﻿  describe '#quizzes_taken' do
+  describe '#quizzes_taken' do
     it 'returns corrsponding quiz responses given by current participant' do
       allow(QuizResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])
       expect(participant.quizzes_taken).to eq([response])

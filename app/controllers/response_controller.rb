@@ -5,9 +5,9 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = user_id = nil
     action = params[:action]
-    if (%w(edit delete update view).include?(action))
+    if %w(edit delete update view).include?(action)
       response = Response.find(params[:id])
-      user_id = response.map.reviewer.user_id if(response.map.reviewer)
+      user_id = response.map.reviewer.user_id if (response.map.reviewer)
     end
     case action
     when 'edit' # If response has been submitted, no further editing allowed
@@ -17,7 +17,7 @@ class ResponseController < ApplicationController
     when 'delete', 'update'
       return current_user_id?(user_id)
     when 'view'
-      return edit_allowed?(response.map,user_id)
+      return edit_allowed?(response.map, user_id)
     else
       current_user
     end
@@ -212,7 +212,7 @@ class ResponseController < ApplicationController
       participant_type = item.where(user_id: session[:user].id)
       next unless participant_type
       participant_type.each do |p|
-        survey_deployment_type = (participant_type == CourseParticipant) ? AssignmentSurveyDeployment : CourseSurveyDeployment
+        survey_deployment_type = participant_type == CourseParticipant ? AssignmentSurveyDeployment : CourseSurveyDeployment
         survey_deployments = survey_deployment_type.where(parent_id: p.parent_id)
         next unless survey_deployments
         survey_deployments.each do |survey_deployment|

@@ -85,7 +85,7 @@ describe ResponseController do
   describe '#delete' do
     it 'deletes current response and redirects to response#redirection page' do
       params = {id: review_response.id}
-      delete :delete, params
+      delete :delete, params: params
       expect(response).to redirect_to('/response/redirection?id=' + review_response.id.to_s + '&msg=The+response+was+deleted.')
       expect(response).to have_http_status 302
     end
@@ -94,7 +94,7 @@ describe ResponseController do
   describe '#edit' do
     it 'renders response#response page' do
       params = {id: review_response.id, return: ''}
-      post :edit, params
+      post :edit, params: params
       expect(response).to render_template("response")
     end
   end
@@ -104,7 +104,7 @@ describe ResponseController do
       it 'raise an error and redirects to response#saving page' do
         allow(review_response).to receive(:update_attribute).and_raise('wrong input')
         params = {id: review_response.id}
-        put :update, params
+        put :update, params: params
         # fetching correct message embedded in response to check while redirection
         message = response["Location"].split("&msg=").last
         expect(response).to redirect_to('/response/saving?id=' + review_response.id.to_s + '&msg=' + message)
@@ -115,8 +115,10 @@ describe ResponseController do
       it 'redirects to response#saving page' do
         allow(review_response).to receive(:update_attribute).and_return(true)
         params = {id: review_response.id, review: {comments: ''}}
-        put :update, params
-        expect(response).to redirect_to('/response/saving?id=' + review_response.id.to_s + '&msg=')
+        put :update, params: params
+        # fetching correct message embedded in response to check while redirection
+        message = response["Location"].split("&msg=").last
+        expect(response).to redirect_to('/response/saving?id=' + review_response.id.to_s + '&msg=' + message)
       end
     end
   end
@@ -136,7 +138,7 @@ describe ResponseController do
         params = {id: review_response.id}
         allow(AssignmentParticipant).to receive(:where).and_return([participant])
         allow(FeedbackResponseMap).to receive(:where).and_return([])
-        get :new_feedback, params, session: session
+        get :new_feedback, params: params, session: session
         # fetching newly created map id in response to check while redirection
         id = response["Location"].split("?id=").last.split("&return").first
         expect(response).to redirect_to('/response/new?id=' + id + "&return=feedback")
@@ -157,7 +159,7 @@ describe ResponseController do
   describe '#view' do
     it 'renders response#view page' do
       params = {id: 1}
-      get "view", params
+      get "view", params: params
       expect(response).to have_http_status(200)
       expect(response).to render_template('view')
     end

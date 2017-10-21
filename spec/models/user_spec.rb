@@ -84,6 +84,7 @@ describe User do
 
   describe '#is_recursively_parent_of' do
     context 'when the parent of target user (user) is nil' do
+
       it 'returns false'
     end
 
@@ -211,8 +212,14 @@ describe User do
   end
 
   describe '#is_teaching_assistant?' do
-    it 'returns true if current user is a TA'
+    it 'returns true if current user is a TA' do
+      allow(user).to receive_message_chain("role.ta?"){ true }
+      expect(user.is_teaching_assistant?).to be_truthy
+    end
 
-    it 'returns false if current user is not a TA'
+    it 'returns false if current user is not a TA' do
+      allow(user).to receive_message_chain("role.ta?"){ false }
+      expect(user.is_teaching_assistant?).to be_falsey
+    end
   end
 end

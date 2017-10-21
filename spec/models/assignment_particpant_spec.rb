@@ -1,4 +1,4 @@
-﻿describe AssignmentParticipant do
+﻿﻿describe AssignmentParticipant do
   let(:response) { build(:response) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:team2) { build(:assignment_team, id: 2) }
@@ -180,8 +180,8 @@
   describe '#review_file_path' do
     it 'returns the file path for reviewer to upload files during peer review' do
       allow(ResponseMap).to receive(:find).with(any_args).and_return(response_map)
-      allow(TeamsUser).to receive_message_chain(:where, :first, :user_id).with(any_args).and_return(1)
-      allow(Participant).to receive_message_chain(:where, :first).with(any_args).and_return(participant)
+      allow(TeamsUser).to receive_message_chain(:find_by, :user_id).with(any_args).and_return(1)
+      allow(Participant).to receive_message_chain(:find_by).with(any_args).and_return(participant)
       expect(participant.review_file_path(1)).to eq("/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test/0_review/1")
 
     end

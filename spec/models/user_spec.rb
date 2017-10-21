@@ -233,9 +233,11 @@ describe User do
     end
     it 'raises an error when Expertiza cannot find user' do
       params = {
-        :userid => 1,
+        :user => {
+          :name => 'ncsu'
+        }
       }
-      allow(User).to receive(:find).and_return(user)
+      allow(User).to receive(:find_by_name).and_return(nil)
       allow(user).to receive(:nil?).and_return(true)
       expect(User.from_params(params)).to raise_error
     end

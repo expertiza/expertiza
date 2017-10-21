@@ -236,19 +236,25 @@ describe AssignmentsController do
       }
       context 'when the timezone preference of current user is nil and assignment form updates attributes successfully' do
         it 'shows an error message and redirects to assignments#edit page' do
-          # asg = double('Assignment', instructor_id: 6)
+          # admin2 = double(:admin, timezonepref: nil, )
+          stub_current_user(admin, admin.role.name, admin.role)
+          # asg = double('Assignment', instructor_id: 6, instructor: instructor)
           # asg_form = double('AssignmentForm', id: 0, assignment: asg)
           # allow(asg_form).to receive(:update_attributes).and_return(true)
           # allow(AssignmentForm).to receive(:create_form_object).and_return(asg_form)
-          #
+          allow(AssignmentQuestionnaire).to receive(:where).and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+          allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).and_return(true)
           # usr = double('User', timezonepref: nil, parent_id: 1)
-          # parent = double('User', timezonepref: "UTC")
-          # allow(User).to receive(:find).and_return(parent)
-          # allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(usr)
-          # allow(assignment_form).to receive_message_chain(assignment, instructor).with(usr)
-          # post :update, params
-          # expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in UTC")
-          # expect(response).to redirect_to edit_assignment_path asg_form.assignment.id
+          parent = double('User')
+          allow(parent).to receive(:timezonepref).and_return("UTC")
+          allow(User).to receive(:find).and_return(parent)
+          allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(student)
+          allow(assignment_form).to receive_message_chain(assignment, instructor).with(student)
+          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>2, :name=>"test assignment"))
+          # allow()
+          post :update, params
+          expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in UTC")
+          expect(response).to redirect_to edit_assignment_path assignment_form.assignment.id
         end
       end
 

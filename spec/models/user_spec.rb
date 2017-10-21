@@ -215,11 +215,29 @@ describe User do
   end
   # xzhang72
   describe '.from_params' do
-    it 'returns user by user_id fetching from params'
-
-    it 'returns user by user name fetching from params'
-
-    it 'raises an error when Expertiza cannot find user'
+    it 'returns user by user_id fetching from params' do
+      params = {
+        :userid => 1,
+      }
+      allow(User).to receive(:find).and_return(user)
+      expect(User.from_params(params)).to eq user
+    end
+    it 'returns user by user name fetching from params' do
+      params = {
+        :user => {
+          :name => 'abc'
+        }
+      }
+      allow(User).to receive(:find_by_name).and_return(user)
+      expect(User.from_params(params)).to eq user
+    end
+    it 'raises an error when Expertiza cannot find user' do
+      params = {
+        :userid => 1,
+      }
+      allow(User).to receive(:find).and_return(nil)
+      expect(User.from_params(params)).to raise_error "Please <a href='#{newuser}'>create an account</a> for this user to continue."
+    end
   end
 
   describe '#is_teaching_assistant_for?' do

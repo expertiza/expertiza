@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+
+   include AccessHelper
+
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
     config.crypto_provider = Authlogic::CryptoProviders::Sha1
@@ -16,7 +19,7 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  attr_accessor :anonymous_mode 
+  attr_accessor :anonymous_mode
   validates_presence_of :name
   validates_uniqueness_of :name
 

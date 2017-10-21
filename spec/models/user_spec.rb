@@ -235,7 +235,8 @@ describe User do
       params = {
         :userid => 1,
       }
-      allow(User).to receive(:find).and_return(nil)
+      allow(User).to receive(:find).and_return(user)
+      allow(user).to receive(:nil?).and_return(true)
       expect(User.from_params(params)).to raise_error
     end
   end

@@ -231,7 +231,7 @@ describe ResponseController do
     end
 
     context 'when params[:return] is other content' do
-      it 'redirects to student_review#list page'  do
+      it 'redirects to student_review#list page' do
         params = {return: "other"}
         get :redirection, params
         expect(response).to redirect_to('/student_review/list?id=' + review_response.reviewer.id.to_s)
@@ -254,7 +254,6 @@ describe ResponseController do
         expect(response).to have_http_status(200)
         expect(response).to render_template("pending_surveys")
       end
-
     end
   end
 end

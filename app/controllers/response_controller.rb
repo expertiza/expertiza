@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = user_id = nil
     action = params[:action]
-    if(['edit','delete','update','view'].include?(action))
+    if (%w(edit delete update view).include?(action))
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if(response.map.reviewer)
     end
@@ -17,13 +17,13 @@ class ResponseController < ApplicationController
     when 'delete', 'update'
       return current_user_id?(user_id)
     when 'view'
-      return is_edit_allowed?(response.map,user_id)
+      return edit_allowed?(response.map,user_id)
     else
       current_user
     end
   end
 
-  def is_edit_allowed?(map,user_id)
+  def edit_allowed?(map, user_id)
     assignment = map.reviewer.assignment
     # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
     if map.is_a? ReviewResponseMap
@@ -141,10 +141,10 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     @response = Response.create(
-          map_id: @map.id,
-          additional_comment: params[:review][:comments],
-          round: @round,
-          is_submitted: is_submitted
+      map_id: @map.id,
+      additional_comment: params[:review][:comments],
+      round: @round,
+      is_submitted: is_submitted
     )
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -207,25 +207,25 @@ class ResponseController < ApplicationController
 
     # Get all the course survey deployments for this user
     @surveys = []
-    [CourseParticipant,AssignmentParticipant].each do |item|
+    [CourseParticipant, AssignmentParticipant].each do |item|
       # Get all the participant(course or assignment) entries for this user
       participant_type = item.where(user_id: session[:user].id)
       next unless participant_type
       participant_type.each do |p|
-        survey_deployment_type = (participant_type == CourseParticipant)? AssignmentSurveyDeployment : CourseSurveyDeployment
+        survey_deployment_type = (participant_type == CourseParticipant) ? AssignmentSurveyDeployment : CourseSurveyDeployment
         survey_deployments = survey_deployment_type.where(parent_id: p.parent_id)
         next unless survey_deployments
         survey_deployments.each do |survey_deployment|
           next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
           @surveys <<
               [
-                  'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-                  'survey_deployment_id' => survey_deployment.id,
-                  'start_date' => survey_deployment.start_date,
-                  'end_date' => survey_deployment.end_date,
-                  'parent_id' => p.parent_id,
-                  'participant_id' => p.id,
-                  'global_survey_id' => survey_deployment.global_survey_id
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date,
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => p.parent_id,
+                'participant_id' => p.id,
+                'global_survey_id' => survey_deployment.global_survey_id
               ]
         end
       end
@@ -257,18 +257,18 @@ class ResponseController < ApplicationController
 
   def set_questionnaire_for_new_response
     case @map.type
-      when "ReviewResponseMap", "SelfReviewResponseMap"
-        reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-        @current_round = @assignment.number_of_current_round(reviewees_topic)
-        @questionnaire = @map.questionnaire(@current_round)
-      when
+    when "ReviewResponseMap", "SelfReviewResponseMap"
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
+      @current_round = @assignment.number_of_current_round(reviewees_topic)
+      @questionnaire = @map.questionnaire(@current_round)
+    when
       "MetareviewResponseMap",
-          "TeammateReviewResponseMap",
-          "FeedbackResponseMap",
-          "CourseSurveyResponseMap",
-          "AssignmentSurveyResponseMap",
-          "GlobalSurveyResponseMap"
-        @questionnaire = @map.questionnaire
+      "TeammateReviewResponseMap",
+      "FeedbackResponseMap",
+      "CourseSurveyResponseMap",
+      "AssignmentSurveyResponseMap",
+      "GlobalSurveyResponseMap"
+      @questionnaire = @map.questionnaire
     end
   end
 
@@ -276,8 +276,8 @@ class ResponseController < ApplicationController
     @review_scores = []
     @questions.each do |question|
       @review_scores << Answer.where(
-          response_id: @response.id,
-          question_id:  question.id
+        response_id: @response.id,
+        question_id:  question.id
       ).first
     end
   end
@@ -292,7 +292,7 @@ class ResponseController < ApplicationController
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
-                       .first.try(:dropdown)
+                                          .first.try(:dropdown)
     @dropdown_or_scale = (use_dropdown == true ? 'dropdown' : 'scale')
   end
 

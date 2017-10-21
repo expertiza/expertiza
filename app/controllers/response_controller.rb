@@ -169,7 +169,7 @@ class ResponseController < ApplicationController
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
-    @map = Response.find_by(map_id: params[:id])
+    @map = Response.find_by_map_id(params[:id])
 
     if params[:return] == "feedback"
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id

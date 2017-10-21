@@ -32,6 +32,11 @@
                       </div>
                   <% end %>
               <% end %>
+              <% if session.key?(:student_view) %>
+                 <%= form_for :student_view, url: '/student_view/revert', html: {id: 'instructor-form'} do |f| %>
+                   <button type="button" class="btn btn-primary" id="instructor-button">Revert to Instructor View</button>
+		 <% end %>
+              <% end %>
             </li>
             <li class="divider-vertical"></li>
             <li class="right-most logout-box">
@@ -46,6 +51,10 @@
 <script type="text/javascript">
     jQuery("#impersonate-button").click(function(event) {
         jQuery("#impersonate-form").submit()
+    });
+
+    jQuery("#instructor-button").click(function(event) {
+	jQuery("#instructor-form").submit()
     });
 
     $(function() {

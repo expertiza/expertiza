@@ -87,6 +87,9 @@ development:
       impersonate:
         start: true
         impersonate: true
+      student_view:
+        set: true
+        revert: true
       review_mapping:
         list: true
         assign_reviewer_dynamically: true
@@ -199,6 +202,7 @@ development:
       analytic: true
       versions: true
       student_quiz: true
+      student_view: true
     pages:
       home: true
       expired: true
@@ -250,6 +254,7 @@ development:
         - 45
         - 33
         - 50
+        - 51
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -472,6 +477,16 @@ development:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymous_mode"
+      51: &25 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 51
+        label: Student View
+        name: student_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/student_view/set"
     by_name:
       home: *1
       manage instructor content: *2
@@ -496,6 +511,7 @@ development:
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
       anonymized_view: *24
+      student_view: *25
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node
@@ -589,6 +605,9 @@ test:
       impersonate:
         start: true
         impersonate: true
+      student_view:
+        set: true
+        revert: true
       review_mapping:
         list: true
         add_dynamic_reviewer: true
@@ -690,6 +709,7 @@ test:
       delete_object: true
       advertise_for_partner: true
       join_team_requests: true
+      student_view: true
     pages:
       home: true
       expired: true
@@ -736,6 +756,7 @@ test:
         - 21
         - 22
         - 23
+        - 25
       4: &3 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -1056,6 +1077,9 @@ production:
       impersonate:
         start: true
         impersonate: true
+      student_view:
+        set: true
+        revert: true
       review_mapping:
         list: true
         assign_reviewer_dynamically: true
@@ -1168,6 +1192,7 @@ production:
       analytic: true
       versions: true
       student_quiz: true
+      student_view: true
     pages:
       home: true
       expired: true
@@ -1219,6 +1244,7 @@ production:
         - 45
         - 33
         - 50
+        - 51
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -1441,6 +1467,16 @@ production:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymous_mode"
+      51: &25 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 51
+        label: Student View
+        name: student_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/student_view/set"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1465,6 +1501,7 @@ production:
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
       anonymized_view: *24
+      student_view: *25
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

@@ -63,7 +63,9 @@ describe User do
   end
 
   describe '#salt_first?' do
-    it 'will always return true'
+    it 'will always return true' do
+      expect(user.salt_first?).to be true
+    end
   end
 
   describe '#get_available_users' do
@@ -115,9 +117,17 @@ describe User do
   end
 
   describe '#is_creator_of?' do
-    it 'returns true of current user (user) is the creator of target user (user1)'
+    it 'returns true of current user (user) is the creator of target user (user1)' do
+      allow(user1).to receive(:creator).and_return(user)
+      expect(user.is_creator_of?(user1)).to be true
+    end
 
-    it 'returns false of current user (user) is not the creator of target user (user1)'
+    it 'returns false of current user (user) is not the creator of target user (user1)' do
+      allow(user1).to receive(:creator).and_return(user2)
+      expect(user.is_creator_of?(user1)).to be false
+      expect(user2.is_creator_of?(user1)).to be true
+
+    end
   end
 
   describe '.import' do

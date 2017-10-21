@@ -145,31 +145,64 @@ describe User do
   end
 
   describe '#get_instructor' do
-    it 'gets the instructor id'
+    it 'gets the instructor id' do
+      allow(user).to receive(:id).and_return(123)
+      expect(user.get_instructor).to eq(123)
+      end
   end
 
   describe '#instructor_id' do
-    it 'returns id when role of current user is a super admin'
+    it 'returns id when role of current user is a super admin' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Super-Administrator')
+      allow(user).to receive(:id).and_return(1)
+      expect(user.instructor_id).to eq(1)
+    end
 
-    it 'returns id when role of current user is an Administrator'
+    it 'returns id when role of current user is an Administrator' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Administrator')
+      allow(user).to receive(:id).and_return(2)
+      expect(user.instructor_id).to eq(2)
+    end
 
-    it 'returns id when role of current user is an Instructor'
+    it 'returns id when role of current user is an Instructor' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Instructor')
+      allow(user).to receive(:id).and_return(3)
+      expect(user.instructor_id).to eq(3)
+    end
 
-    it 'returns instructor_id when role of current user is a TA'
+    it 'returns instructor_id when role of current user is a TA' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Teaching Assistant')
+      allow(Ta).to receive(:get_my_instructor).and_return(4)
+      expect(user.instructor_id).to eq(4)
+    end
 
-    it 'raise an error when role of current user is other type'
+    it 'raise an error when role of current user is other type' do
+      allow(user).to receive_message_chain(:role,:name).and_return('abc')
+      expect{user.instructor_id}.to raise_error(NotImplementedError,"for role abc")
+    end
+
   end
 
   describe '.export' do
-    it 'exports all information setting in options'
+    it 'exports all information setting in options' do
 
-    it 'exports only personal_details'
+    end
 
-    it 'exports only current role and parent'
+    it 'exports only personal_details'do
 
-    it 'exports only email_options'
+    end
 
-    it 'exports only handle'
+    it 'exports only current role and parent' do
+
+    end
+
+    it 'exports only email_options' do
+
+    end
+
+    it 'exports only handle' do
+
+    end
   end
 
   describe '.export_fields' do

@@ -5,12 +5,17 @@
   long_name = item.name.split(/\W/).collect{|word| word.capitalize}.join(' ')
   student_view = session.key?(:student_view) ? ([1, 26, 27, 2, 14].include? item_id) ? true : false : false
   instructor_view = !session.key?(:student_view) ? ([1, 37, 35, 30, 27, 2, 13, 38, 44, 45, 33, 50, 51, 36, 14].include? item_id) ? true: false : false
-  if !student_view and !instructor_view then
-    conditional = false
+  if session[:user].role.name == "Instructor" then
+    if !student_view and !instructor_view then
+      conditional = false
+    else
+      conditional = true
+    end
   else
     conditional = true
   end
 %>
+
     <% if level == 1 %>
         <li class="dropdown first-level">
     <% elsif level == 2 %>

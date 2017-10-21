@@ -217,7 +217,7 @@ describe User do
   describe '.from_params' do
     it 'returns user by user_id fetching from params' do
       params = {
-        :userid => 1,
+        :user_id => 1,
       }
       allow(User).to receive(:find).and_return(user)
       expect(User.from_params(params)).to eq user

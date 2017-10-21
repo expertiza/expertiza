@@ -1,4 +1,4 @@
-describe AssignmentParticipant do
+﻿describe AssignmentParticipant do
   let(:response) { build(:response) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:team2) { build(:assignment_team, id: 2) }
@@ -21,7 +21,7 @@ describe AssignmentParticipant do
 
   describe '#assign_quiz' do
     it 'creates a new QuizResponseMap record' do
-      allow(QuizQuestionnaire).to receive(:find_by_instructor_id).with(any_args).and_return(quiz_questionaire)#WHY CAN NOT DELETE THIS SENTENCE
+      allow(QuizQuestionnaire).to receive(:find_by).with(any_args).and_return(quiz_questionaire)#WHY CAN NOT DELETE THIS SENTENCE
       expect{participant.assign_quiz(participant,participant2,nil)}.to change {QuizResponseMap.count}.from(0).to(1)
       expect(participant.assign_quiz(participant,participant2,nil)).to be_an_instance_of(QuizResponseMap)
     end

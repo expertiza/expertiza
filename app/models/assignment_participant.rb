@@ -29,7 +29,7 @@ class AssignmentParticipant < Participant
   end
 
   def assign_quiz(contributor, reviewer, _topic = nil)
-    quiz = QuizQuestionnaire.find_by(:instructor_id, contributor.id)
+    quiz = QuizQuestionnaire.find_by(instructor_id: contributor.id)
     QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
   end
 
@@ -264,8 +264,8 @@ class AssignmentParticipant < Participant
   # zhewei: this is the file path for reviewer to upload files during peer review
   def review_file_path(response_map_id)
     response_map = ResponseMap.find(response_map_id)
-    first_user_id = TeamsUser.find_by(:team_id, response_map.reviewee_id).user_id
-    participant = Participant.find_by(:parent_id, response_map.reviewed_object_id, :user_id, first_user_id)
+    first_user_id = TeamsUser.find_by(team_id: response_map.reviewee_id).user_id
+    participant = Participant.find_by(parent_id: response_map.reviewed_object_id, user_id: first_user_id)
     self.assignment.path + "/" + participant.team.directory_num.to_s + "_review" + "/" + response_map_id.to_s
   end
 

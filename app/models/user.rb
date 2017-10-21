@@ -2,7 +2,6 @@ class User < ActiveRecord::Base
 
   include ActionView::Helpers::UrlHelper
   include ActionView::Helpers::TagHelper
-  include ActionController::PolymorphicRoutes
   include ActionController::UrlWriter
 
   acts_as_authentic do |config|

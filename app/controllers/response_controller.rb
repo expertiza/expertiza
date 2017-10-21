@@ -10,16 +10,16 @@ class ResponseController < ApplicationController
       user_id = response.map.reviewer.user_id if(response.map.reviewer)
     end
     case action
-      when 'edit' # If response has been submitted, no further editing allowed
-        return false if response.is_submitted
-        return current_user_id?(user_id)
+    when 'edit' # If response has been submitted, no further editing allowed
+      return false if response.is_submitted
+      return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
-      when 'delete', 'update'
-        return current_user_id?(user_id)
-      when 'view'
-        return is_edit_allowed?(response.map,user_id)
-      else
-        current_user
+    when 'delete', 'update'
+      return current_user_id?(user_id)
+    when 'view'
+      return is_edit_allowed?(response.map,user_id)
+    else
+      current_user
     end
   end
 
@@ -141,10 +141,10 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round,
-        is_submitted: is_submitted
+          map_id: @map.id,
+          additional_comment: params[:review][:comments],
+          round: @round,
+          is_submitted: is_submitted
     )
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.

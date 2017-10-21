@@ -1,6 +1,5 @@
 class User < ActiveRecord::Base
   include Rails.application.routes.url_helpers
-  include UrlFor
 
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness

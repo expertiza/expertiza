@@ -237,6 +237,7 @@ describe User do
           :name => 'ncsu'
         }
       }
+      include Rails.application.routes.url_helpers
       #allow(User).to receive(:find_by_name).and_return(nil)
       allow(user).to receive(:nil?).and_return(true)
       expect(User.from_params(params)).to raise_error

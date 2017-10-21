@@ -107,11 +107,21 @@ describe AssignmentParticipant do
 
   describe '#files' do
     context 'when there is not subdirectory in current directory' do
-      it 'returns all files in current directory'
+      it 'returns all files in current directory' do
+        allow(Dir).to receive(:[]).with("a/*").and_return(["a/k.rb"])
+        allow(File).to receive(:directory?).with("a/k.rb").and_return(false)
+        expect(participant.files("a")).to eq(["a/k.rb"])
+      end
     end
 
     context 'when there is subdirectory in current directory' do
-      it 'recursively returns all files in current directory'
+      it 'recursively returns all files in current directory' do
+        allow(Dir).to receive(:[]).with("a/*").and_return(["a/b"])
+        allow(File).to receive(:directory?).with("a/b").and_return(true)
+        allow(Dir).to receive(:[]).with("a/b/*").and_return(["a/b/k.rb"])
+        allow(File).to receive(:directory?).with("a/b/k.rb").and_return(false)
+        expect(participant.files("a")).to eq(["a/b/k.rb", "a/b"])
+      end
     end
   end
 
@@ -156,25 +166,53 @@ describe AssignmentParticipant do
   end
 
   describe '#review_file_path' do
-    it 'returns the file path for reviewer to upload files during peer review'
+    it 'returns the file path for reviewer to upload files during peer review' do
+      allow(ResponseMap).to receive(:find).with(any_args).and_return(response_map)
+      allow(TeamsUser).to receive_message_chain(:where, :first, :user_id).with(any_args).and_return(1)
+      allow(Participant).to receive_message_chain(:where, :first).with(any_args).and_return(participant)
+      expect(participant.review_file_path(1)).to eq("/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test/0_review/1")
+
+    end
   end
 
   describe '#current_stage' do
-    it 'returns stage of current assignment'
+    it 'returns stage of current assignment' do
+      allow(SignedUpTeam).to receive_(:topic_id).with(any_args).and_return(1)
+      allow(assignment).to receive(:get_current_stage).with(1).and_return("Finished")
+      expect(participant.current_stage).to eq("Finished")
+    end
   end
 
   describe '#stage_deadline' do
     context 'when stage of current assignment is not Finished' do
-      it 'returns current stage'
+      it 'returns current stage' do
+        #allow(participant).to receive(:patent_id).and_return(1)
+        #allow(participant).to receive(:user_id).and_return(1)
+        allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
+        allow(assignment).to receive(:stage_deadline).with(1).and_return("Unknow")
+        expect(participant.stage_deadline).to eq("Unknow")
+      end
     end
 
     context 'when stage of current assignment not Finished' do
       context 'current assignment is not a staggered deadline assignment' do
-        it 'returns the due date of current assignment'
+        it 'returns the due date of current assignment' do
+          allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
+          allow(assignment).to receive(:stage_deadline).with(1).and_return("Finished")
+          allow(assignment).to receive(:staggered_deadline?).and_return(false)
+          allow(assignment).to receive_message_chain(:due_dates, :last, :due_at).and_return(1)
+          expect(participant.stage_deadline).to eq("1")
+        end
       end
 
       context 'current assignment is a staggered deadline assignment' do
-        it 'returns the due date of current topic'
+        it 'returns the due date of current topic' do
+          allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
+          allow(assignment).to receive(:stage_deadline).with(1).and_return("Finished")
+          allow(assignment).to receive(:staggered_deadline?).and_return(true)
+          allow(TopicDueDate).to receive_message_chain(:find_by, :last, :due_at).and_return(1)
+          expect(participant.stage_deadline).to eq("1")
+        end
       end
     end
   end

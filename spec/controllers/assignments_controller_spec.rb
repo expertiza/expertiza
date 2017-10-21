@@ -248,18 +248,37 @@ describe AssignmentsController do
           parent = double('User')
           allow(parent).to receive(:timezonepref).and_return("UTC")
           allow(User).to receive(:find).and_return(parent)
-          allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(student)
-          allow(assignment_form).to receive_message_chain(assignment, instructor).with(student)
+          allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(admin)
+          allow(assignment_form).to receive_message_chain(assignment, instructor).with(admin)
+          allow(assignment_form).to receive(:update_attributes).and_return(true)
           allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>2, :name=>"test assignment"))
-          # allow()
           post :update, params
+          expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in UTC")
           expect(response).to redirect_to edit_assignment_path assignment_form.assignment.id
         end
       end
 
       context 'when the timezone preference of current user is not nil and assignment form updates attributes not successfully' do
-        it 'shows an error message and redirects to assignments#edit page'
+        it 'shows an error message and redirects to assignments#edit page' do
+          admin = build(:admin, timezonepref: 'Eastern Time (US & Canada)')
+          stub_current_user(admin, admin.role.name, admin.role)
+          allow(AssignmentQuestionnaire).to receive(:where).and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+          allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).and_return(true)
+          # allow_any_instance_of(AssignmentForm).to receive(:create_form_object).and_return(assignment_form)
+          parent = double('User')
+          allow(parent).to receive(:timezonepref).and_return("UTC")
+          allow(User).to receive(:find).and_return(parent)
+          allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(admin)
+          allow(assignment_form).to receive_message_chain(assignment, instructor).with(admin)
+          allow(assignment_form).to receive(:update_attributes).and_return(false)
+          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>2, :name=>"test assignment"))
+          allow(assignment_form).to receive_message_chain(:errors, :messages) {['Assignment not find.', 'Course not find.']}
+          post :update, params
+          # expect(flash[:note]).to eq('The assignment was successfully saved....')
+          expect(flash[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")
+          expect(response).to redirect_to edit_assignment_path assignment_form.assignment.id
+        end
       end
     end
   end

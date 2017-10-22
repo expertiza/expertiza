@@ -69,8 +69,24 @@ describe User do
 
   # xzhang72
   describe '#get_available_users' do
+    before(:each) do
+      role = Role.new
+    end
     it 'returns the first 10 visible users' do
-
+      lesser_roles = double
+      allow(@role).to receive(:get_parents).and_return(['Teaching Assistant','Instructor','Administrator'])
+      allow(User).to receive(:all).and_return([
+          {:name => 'abca'},{:name => 'abcb'},{:name => 'abcc'},{:name => 'abcd'},{:name => 'abce'},
+          {:name => 'abcf'},{:name => 'abcg'},{:name => 'abch'},{:name => 'abci'},{:name => 'abcj'},
+          {:name => 'abck'},{:name => 'abcl'},{:name => 'abcm'},{:name => 'abcn'},{:name => 'abco'},
+          {:name => 'abcp'},{:name => 'abcq'},{:name => 'abcr'},{:name => 'abcs'},{:name => 'abct'}
+        ])
+      allow(user).to receive(:role)
+      allow(lesser_roles).to receive(:include?)
+      expect(user.get_available_users("abc")).to eq ([
+        {:name => 'abca'},{:name => 'abcb'},{:name => 'abcc'},{:name => 'abcd'},{:name => 'abce'},
+        {:name => 'abcf'},{:name => 'abcg'},{:name => 'abch'},{:name => 'abci'},{:name => 'abcj'}
+        ])
     end
   end
 

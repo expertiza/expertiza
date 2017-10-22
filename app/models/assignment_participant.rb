@@ -199,6 +199,7 @@ class AssignmentParticipant < Participant
       #########################################################################################
       #                                                                                       #
       #    THIS DOES NOT SET THE PASSWORD TO WHAT THE FILE SPECIFIES IF THEY ARE NEW USERS    #
+      #    IN FACT, THE PASSWORD COLUMN DOES NOT SEEM TO BE USED AT ALL                       #
       #                                                                                       #
       #########################################################################################
 

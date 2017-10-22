@@ -108,7 +108,7 @@ class ImportFileController < ApplicationController
         errors << $ERROR_INFO
       end
 
-    elsif params[:model] == 'AssignmentParticipant'
+    elsif params[:model] == 'AssignmentParticipant' || 'CourseParticipant'
 
       contents_hash = eval(params[:contents_hash])
 
@@ -123,15 +123,23 @@ class ImportFileController < ApplicationController
 
       begin
 
-        @header_integrated_body.each do |row_hash|
-          AssignmentParticipant.import(row_hash, session, params[:id])
+        if params[:model] == 'AssignmentParticipant'
+
+          @header_integrated_body.each do |row_hash|
+            AssignmentParticipant.import(row_hash, session, params[:id])
+          end
+
+        elsif params[:model] == 'CourseParticipant'
+
+          @header_integrated_body.each do |row_hash|
+            CourseParticipant.import(row_hash, session, params[:id])
+          end
+
         end
 
       rescue
         errors << $ERROR_INFO
       end
-
-    elsif params[:model] == 'CourseParticipant'
 
     elsif params[:model] == 'AssignmentTeam'
 

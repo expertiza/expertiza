@@ -3,10 +3,10 @@
 
 <% if @model == 'User' %>
     <%= render 'import_file/user' %>
-    <a href="/import_file/start?expected_fields=username%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Bfull+name+%28first+%5Bmiddle%5D+last%29%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Be-mail+address&model=User">Back</a>
-<% elsif @model == 'AssignmentParticipant' %>
-    <%=  render 'import_file/assignment_participant' %>
-    <a href="/import_file/start?expected_fields=username%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Bfull+name+%28first+%5Bmiddle%5D+last%29%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Be-mail+address%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Bpassword&id=844&model=AssignmentParticipant&title=Assignment+Participants">Back</a>
+<% elsif @model == 'AssignmentParticipant' || 'CourseParticipant' %>
+    <%=  render 'import_file/participant' %>
 <% else %>
     <h3 style="color:red">There was a problem with the @model in app/views/import_file/show.html.erb.</h3>
 <% end %>
+
+<a href="/import_file/start?expected_fields=<%= @expected_fields %>&model=<%= @model %>">Back</a>

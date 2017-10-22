@@ -40,6 +40,25 @@ describe "Edit rubric advice" do
     click_button "Add"
   end
 
+  describe "Edit a review advice" do
+    it "is able to edit a public review advice", :js => true do
+      # create review advice
+      load_question 'Criterion'
+      click_button "Edit/View advice"
+      expect(page).to have_content('Edit an existing questionnaire')
+      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Initial advice")
+      click_button "Save and redisplay advice"
+      expect(page).to have_content('advice was successfully saved')
+      expect(page).to have_content('Initial advice')
+      # edit review advice
+      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Edited the advice")
+      click_button "Save and redisplay advice"
+      expect(page).to have_content('advice was successfully saved')
+      expect(page).to have_content('Edited the advice')
+    end
+  end
+
+
 
 
 end

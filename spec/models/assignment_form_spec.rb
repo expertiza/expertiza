@@ -7,9 +7,6 @@ describe AssignmentForm do
   let(:assignment_questionnaire2) { double('AssignmentQuestionnaire') }
   before(:each) do
     assignment_form.instance_variable_set(:@assignment, assignment)
-    DelayedJob.new
-    DeadlineType.new(:name => "review")
-    DeadlineType.new(:name => "team_formation")
   end
 
   describe '.create_form_object' do

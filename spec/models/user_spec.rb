@@ -132,10 +132,10 @@ describe User do
         allow(user).to receive_message_chain("role.instructor?") { false }
         allow(user).to receive_message_chain("role.ta?") { false }
         allow(user).to receive_message_chain("role.super_admin?") { false }
-        allow(User).to receive_message_chain("all.find_each").and_return([user1])
+        allow(User).to receive_message_chain("all.find_each").and_yield(user1).and_yield(user2)
         #user_list = double
         #allow(user_list).to receive(uniq).and_return(user1)
-        expect(user.get_user_list()).to eq ([user1])
+        expect(user.get_user_list()).to eq ([user1,user2])
       end
     end
 

@@ -1,3 +1,4 @@
+include Rails.application.routes.url_helpers
 describe User do
   let(:user) do
     User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
@@ -240,7 +241,7 @@ describe User do
       include Rails.application.routes.url_helpers
       #allow(User).to receive(:find_by_name).and_return(nil)
       allow(user).to receive(:nil?).and_return(true)
-      expect(User.from_params(params)).to raise_error
+      expect {User.from_params(params)}.to raise_error("Please <a href='http://localhost:3000/users/new'>create an account</a> for this user to continue.")
     end
   end
 

@@ -3,7 +3,7 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
-
+  include Files
   # START of contributor methods, shared with AssignmentParticipant
 
   # Whether this team includes a given participant or not
@@ -100,19 +100,7 @@ class AssignmentTeam < Team
   end
 
   # Return the files residing in the directory of team submissions
-  def files(directory)
-    files_list = Dir[directory + "/*"]
-    files = []
 
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each {|f| files << f }
-      end
-      files << file
-    end
-    files
-  end
 
   # Main calling method to return the files residing in the directory of team submissions
   def submitted_files(path = self.path)

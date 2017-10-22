@@ -129,6 +129,9 @@ describe User do
     context 'when current user is super admin' do
       it 'fetches all users' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
+        allow(user).to receive_message_chain("role.instructor?") { false }
+        allow(user).to receive_message_chain("role.ta?") { false }
+        allow(user).to receive_message_chain("role.super_admin?") { false }
         allow(User).to receive_message_chain("all.find_each") {[user1,user2]}
         expect(user.get_user_list()).to eq ([user1,user2])
       end

@@ -55,7 +55,6 @@ describe ReviewMappingController do
       it 'runs another algorithms and redirects to student_review#list page'
     end
   end
-
   describe '#assign_quiz_dynamically' do
     context 'when corresponding response map exists' do
       it 'shows a flash error and redirects to student_quizzes page'
@@ -71,7 +70,7 @@ describe ReviewMappingController do
   end
 
   describe '#assign_metareviewer_dynamically' do9
-    it 'redirects to student_review#list page' do
+    it  'redirects to student_review#list page' do
       param = Hash.new
       param[:assignment_id] = assignment.id
 

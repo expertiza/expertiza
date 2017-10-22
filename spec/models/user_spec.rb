@@ -184,23 +184,36 @@ describe User do
   end
 
   describe '.export' do
-    it 'exports all information setting in options' do
+    before (:each) do
+      allow(user).to receive_message_chain(:role,:name).and_return('abc')
+      allow(user).to receive_message_chain(:parent,:name).and_return('abc')
+      allow(users).to receive(:each).and_return([user])
+    end
 
+    it 'exports all information setting in options' do
+      options={:personal_details=>true, :role=>true,:parent=>true,:email_options=>true,:handle=>true}
+      expect(User.export([], 0, options)).to eq([user.name,user.fullname,user.email,user.role.name,
+                                                 user.parent.name,user.email_on_submission,user.email_on_review,user.email_on_review_of_review,
+                                                 user.copy_of_emails,user.handle])
     end
 
     it 'exports only personal_details'do
+      options={:personal_details=>true, :role=>false,:parent=>false,:email_options=>false,:handle=>false}
 
     end
 
     it 'exports only current role and parent' do
+      options={:personal_details=>false, :role=>true,:parent=>true,:email_options=>false,:handle=>false}
 
     end
 
     it 'exports only email_options' do
+      options={:personal_details=>false, :role=>false,:parent=>false,:email_options=>true,:handle=>false}
 
     end
 
     it 'exports only handle' do
+      options={:personal_details=>false, :role=>false,:parent=>false,:email_options=>false,:handle=>true}
 
     end
   end

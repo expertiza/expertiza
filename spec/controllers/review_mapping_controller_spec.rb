@@ -70,8 +70,17 @@ describe ReviewMappingController do
     it 'redirects to review_mapping#list_mappings page'
   end
 
-  describe '#assign_metareviewer_dynamically' do
-    it 'redirects to student_review#list page'
+  describe '#assign_metareviewer_dynamically' do9
+    it 'redirects to student_review#list page' do
+      param = Hash.new
+      param[:assignment_id] = assignment.id
+
+      expect(AssignmentParticipant).to receive_message_chain("where.first").and_return(participant)
+      expect(Assignment).to receive(:assign_metareviewer_dynamically).with(participant)
+      get :assign_metareviewer_dynamically, :assignment_id=> assignment.id, :metareviewer_id=>participant.id
+
+      expect(response).to redirect_to controller: 'student_review', action: 'list'
+    end
   end
 
   describe '#delete_outstanding_reviewers' do

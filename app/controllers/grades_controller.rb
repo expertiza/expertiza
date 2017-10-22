@@ -96,23 +96,24 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
 
-    questionnaires = @assignment.questionnaires.find_by type: "ReviewQuestionnaire"
+    questionnaires = @assignment.questionnaires.where type: "ReviewQuestionnaire"
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
-    questionnaires.each do |questionnaire|
-      @round = if @assignment.varying_rubrics_by_round?
-                 AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
-               end
-      vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
-      # TODO: Use find_by instead of dynamic method
-      questions = questionnaire.questions
-      vm.add_questions(questions)
-      vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
-      vm.get_number_of_comments_greater_than_10_words
-      @vmlist << vm
+    unless questionnaires.nil?
+      questionnaires.each do |questionnaire|
+        @round = if @assignment.varying_rubrics_by_round?
+                   AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+                 end
+        vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
+        questions = questionnaire.questions
+        vm.add_questions(questions)
+        vm.add_team_members(@team)
+        vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+        vm.get_number_of_comments_greater_than_10_words
+        @vmlist << vm
+      end
     end
     @current_role_name = current_role_name
   end
@@ -125,17 +126,11 @@ class GradesController < ApplicationController
   end
 
   def instructor_review
-    # TODO: Use find_or_create_by instead of where.first then create
     participant = AssignmentParticipant.find(params[:id])
     reviewer = AssignmentParticipant.find_or_create_by(user_id: session[:user].id, parent_id: participant.assignment.id)
     if reviewer.new_record?
       reviewer.set_handle
     end
-    # reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
-    # if reviewer.nil?
-    #   reviewer = AssignmentParticipant.create(user_id: session[:user].id, parent_id: participant.assignment.id)
-    #   reviewer.set_handle
-    # end
     review_exists = true
     reviewee = participant.team
     review_mapping = ReviewResponseMap.find_or_create_by(reviewee_id: reviewee.id, reviewer_id: reviewer.id)
@@ -144,14 +139,6 @@ class GradesController < ApplicationController
     else
       review = Response.find_by(map_id: review_mapping.map_id)
     end
-
-    # review_mapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-    # if review_mapping.nil?
-    #   review_exists = false
-    #   review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
-    # else
-    #   review = Response.find_by_map_id(review_mapping.map_id)
-    # end
     if review_exists
       redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
     else
@@ -246,39 +233,23 @@ class GradesController < ApplicationController
   end
 
   def calculate_penatly_attributes(_participant)
-    # TODO: Remove/simplify duplicated code
     deadline_type_id = [1, 2, 5]
     penalties_symbols = [:submission, :review, :meta_review]
     deadline_type_id.zip(penalties_symbols).each do |id, symbol|
       CalculatedPenalty.create({deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol]})
     end
-    # penalty_attr1 = {deadline_type_id: 1, participant_id: @participant.id, penalty_points: penalties[:submission]}
-    # CalculatedPenalty.create(penalty_attr1)
-    #
-    # penalty_attr2 = {deadline_type_id: 2, participant_id: @participant.id, penalty_points: penalties[:review]}
-    # CalculatedPenalty.create(penalty_attr2)
-    #
-    # penalty_attr3 = {deadline_type_id: 5, participant_id: @participant.id, penalty_points: penalties[:meta_review]}
-    # CalculatedPenalty.create(penalty_attr3)
   end
 
   def assign_all_penalties(participant, penalties)
-    # TODO: Remove/simplify duplicated code
     @all_penalties[participant.id] = {
       submission: penalties[:submission],
       review: penalties[:review],
       meta_review: penalties[:meta_review],
       total_penalty: @total_penalty
     }
-    # @all_penalties[participant.id][:submission] =
-    # @all_penalties[participant.id][:review] =
-    # @all_penalties[participant.id][:meta_review] =
-    # @all_penalties[participant.id][:total_penalty] = @total_penalty
   end
 
   def make_chart
-    # TODO: Split into several simpler methods and assign reasonable names
-    # TODO: Extract duplicated code into separate methods
     @grades_bar_charts = {}
     type_of_participant_score = [:metareview, :feedback, :teammate]
     if @participant_score[:review]
@@ -292,34 +263,11 @@ class GradesController < ApplicationController
         @grades_bar_charts[:review] = bar_chart(scores)
       else
         drop_decrement_from_scores(:review)
-        # scores = get_scores_for_chart @participant_score[:review][:assessments], 'review'
-        # scores -= [-1.0]
-        # @grades_bar_charts[:review] = bar_chart(scores)
       end
 
     end
 
     type_of_participant_score.each { |symbol| drop_decrement_from_scores symbol }
-  #   if @participant_score[:metareview]
-  #     drop_decrement_from_scores(:metareview)
-  #     scores = get_scores_for_chart @participant_score[:metareview][:assessments], 'metareview'
-  #     scores -= [-1.0]
-  #     @grades_bar_charts[:metareview] = bar_chart(scores)
-  #   end
-  #
-  #   if @participant_score[:feedback]
-  #     drop_decrement_from_scores(:feedback)
-  #     scores = get_scores_for_chart @participant_score[:feedback][:assessments], 'feedback'
-  #     scores -= [-1.0]
-  #     @grades_bar_charts[:feedback] = bar_chart(scores)
-  #   end
-  #
-  #   if @participant_score[:teammate]
-  #     drop_decrement_from_scores(:teammate)
-  #     scores = get_scores_for_chart @participant_score[:teammate][:assessments], 'teammate'
-  #     scores -= [-1.0]
-  #     @grades_bar_charts[:teammate] = bar_chart(scores)
-  #   end
   end
 
   # A helper function to drop one score and make a bar chart

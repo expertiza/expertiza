@@ -4,6 +4,10 @@
 <% if @model == 'User' %>
     <%= render 'import_file/user' %>
     <a href="/import_file/start?expected_fields=username%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Bfull+name+%28first+%5Bmiddle%5D+last%29%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Be-mail+address&model=User">Back</a>
-<% else %>
+<% else if @model == 'AssignmentTeam' || @model == "CourseTeam"%>
+    <%= render 'import_file/team' %>
+        <a href="/import_file/start?expected_fields=%3CTeam+Name%3E+-+optional%2C+Team+Member+1%2C+Team+Member+2%2C+...%2C+Team+Member+n&id=772&model=AssignmentTeam&title=Teams" >Back</a>
+    <% else %>
     <h3 style="color:red">There was a problem with the @model in app/views/import_file/show.html.erb.</h3>
+<% end %>
 <% end %>

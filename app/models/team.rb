@@ -156,50 +156,82 @@ class Team < ActiveRecord::Base
   end
 
   # Extract team members from the csv and push to DB
-  def import_team_members(starting_index, row)
-    index = starting_index
-    while index < row.length
-      user = User.find_by_name(row[index].to_s.strip)
-      if user.nil?
-        raise ImportError, "The user \"" + row[index].to_s.strip + "\" was not found. <a href='/users/new'>Create</a> this user?"
-      else
-        if TeamsUser.where(["team_id =? and user_id =?", id, user.id]).first.nil?
-          add_member(user, nil)
-        end
+  def import_team_members(row_hash)
+
+    row_hash[:teammembers].each do |teammember|
+    user = User.find_by_name(teammember.to_s)
+    if user.nil?
+         raise ImportError, "The user \"" + teammember.to_s + "\" was not found. <a href='/users/new'>Create</a> this user?"
+    else
+      if TeamsUser.where(["team_id =? and user_id =?", id, user.id]).first.nil?
+           add_member(user, nil)
       end
-      index += 1
+    end
     end
   end
 
-  # REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
-  # Import from csv
-  def self.import(row, id, options, teamtype)
-    raise ArgumentError, "Not enough fields on this line." if (row.length < 2 && options[:has_column_names] == "true") || (row.empty? && options[:has_column_names] != "true")
-
-    if options[:has_column_names] == "true"
-      name = row[0].to_s.strip
+  def self.import(row_hash, id, options, teamtype)
+    raise ArgumentError, "Not enough fields on this line." if (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
+    if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
+      name = row_hash[:teamname]
       team = where(["name =? && parent_id =?", name, id]).first
       team_exists = !team.nil?
       name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
-      index = 1
     else
-      if teamtype.is_a?(CourseTeam)
+      if teamtype.to_s == "CourseTeam"
         name = self.generate_team_name(Course.find(id).name)
-      elsif teamtype.is_a?(AssignmentTeam)
+      elsif teamtype.to_s == "AssignmentTeam"
         name = self.generate_team_name(Assignment.find(id).name)
       end
-      index = 0
     end
-
     if name
-      team = Object.const_get(teamtype.class.to_s).create_team_and_node(id)
+      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
       team.name = name
       team.save
     end
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-    team.import_team_members(index, row) unless team_exists && options[:handle_dups] == "ignore"
+
+    team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
+
+
+  # Old function is written below
+
+  # REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
+  # Import from csv
+  # def self.import(row, id, options, teamtype)
+  #   raise ArgumentError, "Not enough fields on this line." if (row.length < 2 && options[:has_column_names] == "true") || (row.empty? && options[:has_column_names] != "true")
+  #
+  #   if options[:has_column_names] == "true"
+  #     # row_hash [:team_name].to_s
+  #     name = row[0].to_s.strip
+  #     team = where(["name =? && parent_id =?", name, id]).first
+  #     team_exists = !team.nil?
+  #     name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
+  #     # remove this line
+  #     index = 1
+  #   else
+  #     if teamtype.is_a?(CourseTeam)
+  #       name = self.generate_team_name(Course.find(id).name)
+  #     elsif teamtype.is_a?(AssignmentTeam)
+  #       name = self.generate_team_name(Assignment.find(id).name)
+  #     end
+  #     # remove this line
+  #     index = 0
+  #   end
+  #
+  #   if name
+  #     team = Object.const_get(teamtype.class.to_s).create_team_and_node(id)
+  #     team.name = name
+  #     team.save
+  #   end
+  #
+  #   # insert team members into team unless team was pre-existing & we ignore duplicate teams
+  #
+  #   #team.import_team_members(row) unless team_exists && options[:handle_dups] == "ignore"
+  #   team.import_team_members(index, row) unless team_exists && options[:handle_dups] == "ignore"
+  # end
 
   # Handle existence of the duplicate team
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)

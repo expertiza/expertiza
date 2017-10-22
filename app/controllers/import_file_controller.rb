@@ -12,6 +12,11 @@ class ImportFileController < ApplicationController
     @options = params[:options]
     @delimiter = get_delimiter(params)
     @has_header = params[:has_header]
+    if (@model == 'AssignmentTeam'|| @model == 'CourseTeam')
+      @has_teamname = params[:has_teamname]
+    else
+      @has_teamname = "nil"
+    end
     @current_file = params[:file]
     @current_file_contents = @current_file.read
     @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
@@ -32,12 +37,6 @@ class ImportFileController < ApplicationController
   ###############################################################
 
   def import
-
-    puts ""
-    puts ""
-    puts "def import reached"
-    puts ""
-    puts ""
 
     errors = import_from_hash(session, params)
 
@@ -68,28 +67,9 @@ class ImportFileController < ApplicationController
 
 
   def import_from_hash(session, params)
-
-    # MAYBE - check for presence of header.
-    # If no header, call a method (yet to be written)
-    # that adds the header from the selected options.
-
-    ##################################################################
-    #                                                                #
-    #    WE WILL NEED TO RETRIEVE OTHER ITEMS FOR THE USER IMPORT    #
-    #                                                                #
-    ##################################################################
-
     if params[:model] == 'User'
 
       contents_hash = eval(params[:contents_hash])
-
-      #########################################################
-      #                                                       #
-      #    I don't know if the statement below is correct.    #
-      #                                                       #
-      #########################################################
-
-      # parent_id = params[:session][:id]
 
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
@@ -111,7 +91,29 @@ class ImportFileController < ApplicationController
         puts errors.to_s
       end
 
-    else
+    elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
+
+      contents_hash = eval(params[:contents_hash])
+      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      errors = []
+
+      begin
+
+        @header_integrated_body.each do |row_hash|
+          if params[:model] == "AssignmentTeam"
+            teamtype = AssignmentTeam
+          else
+            teamtype = CourseTeam
+          end
+          options = eval(params[:options])
+          options[:has_teamname] = params[:has_teamname]
+          Team.import(row_hash,params[:id], options, teamtype)
+        end
+
+      rescue
+        errors << $ERROR_INFO
+        puts errors.to_s
+      end
 
     end
     errors
@@ -128,10 +130,30 @@ class ImportFileController < ApplicationController
 
     new_body = []
 
-    header.map! { |column_name| column_name.to_sym }
+    if params[:model] == "User"
+      header.map! { |column_name| column_name.to_sym }
 
-    body.each do |row|
-      new_body << header.zip(row).to_h
+      body.each do |row|
+        new_body << header.zip(row).to_h
+      end
+
+
+    elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
+      header.map! { |column_name| column_name.to_sym }
+      body.each do |row|
+        h = Hash.new()
+        if params[:has_teamname] == "true_first"
+          h[header[0]] = row.shift
+          h[header[1]] = row
+        elsif params[:has_teamname] == "true_last"
+          h[header[1]] = row.pop
+          h[header[0]] = row
+        else
+          h[header[0]] = row
+        end
+        new_body << h
+      end
+
     end
 
     new_body
@@ -149,6 +171,7 @@ class ImportFileController < ApplicationController
       file_hash[:header] = nil
       file_hash[:body] = import_grid
     end
+    puts file_hash
     file_hash
   end
 

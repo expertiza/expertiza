@@ -20,7 +20,6 @@
       </tr>
 
       <tr><td><br/></td></tr>
-
       <tr>
         <td><strong>Header:</strong></td>
       </tr>
@@ -34,11 +33,22 @@
     </table>
 
     <% if @model == 'AssignmentTeam' or @model == 'CourseTeam' %>
-
+       <br/>
+       <table>
+        <tr>
+          <td><strong>Team Name:</strong></td>
+        </tr>
+        <tr>
+          <td>
+            <%= radio_button_tag 'has_teamname', 'true_first', true %> File has a team name as first column<br/>
+            <%= radio_button_tag 'has_teamname', 'true_last' %> File has a team name as last column<br/>
+            <%= radio_button_tag 'has_teamname', 'false' %> File does not contain team names<br/>
+          </td>
+        </tr>
+       </table>
         <br/>
 
-        <label for="column_one_has_name">Interpret first column as team name:</label>
-        <%= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %>
+        <!--<= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %>-->
 
         <br/>
 

@@ -44,7 +44,10 @@ describe ReviewMappingController do
 
   describe '#assign_reviewer_dynamically' do
     context 'when assignment has topics and no topic is selected by reviewer' do
-      it 'shows an error message and redirects to student_review#list page'
+      it 'shows an error message and redirects to student_review#list page' do
+        assignment  = create(:assignment)
+        assignment
+      end
     end
 
     context 'when assignment has topics and a topic is selected by reviewer' do
@@ -67,7 +70,10 @@ describe ReviewMappingController do
   end
 
   describe '#add_metareviewer' do
-    it 'redirects to review_mapping#list_mappings page'
+    it 'redirects to review_mapping#list_mappings page' do
+
+    end
+
   end
 
   describe '#assign_metareviewer_dynamically' do
@@ -96,7 +102,13 @@ describe ReviewMappingController do
 
   describe '#unsubmit_review' do
     context 'when attributes of response are updated successfully' do
-      it 'shows a success flash.now message and renders a .js.erb file'
+      it 'shows a success flash.now message and renders a .js.erb file' do
+      allow(Response).to receive(:update_attribute).and_return(true)
+      allow(ReviewResponseMap).to receive(:find_by).with(id: assignment.id)
+        get :unsubmit_review, map_id: assignment.id
+      expect(response).to be_redirect
+
+    end
     end
 
     context 'when attributes of response are not updated successfully' do
@@ -116,7 +128,16 @@ describe ReviewMappingController do
 
   describe '#delete_metareviewer' do
     context 'when metareview_response_map can be deleted successfully' do
-      it 'show a note flash message and redirects to review_mapping#list_mappings page'
+      it 'show a note flash message and redirects to review_mapping#list_mappings page' do
+        allow(MetareviewResponseMap).to receive(:find).and_return(metareview_response_map)
+        allow(metareview_response_map).to receive(:delete).and_return(true)
+        get :delete_metareviewer, id: assignment.id
+        expect(flash[:note]).to eq("The metareview mapping for " + metareview_response_map.reviewee.name+
+                                       " and " + metareview_response_map.reviewer.name + " has been deleted.")
+
+        expect(response).to redirect_to ('/review_mapping/list_mappings?id=' +assignment.id.to_s)
+
+      end
     end
 
     context 'when metareview_response_map cannot be deleted successfully' do

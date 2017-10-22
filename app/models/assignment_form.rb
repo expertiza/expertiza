@@ -186,7 +186,7 @@ class AssignmentForm
 
     submissions = @assignment.find_due_dates('submission')
     reviews = @assignment.find_due_dates('review')
-    @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
+    # @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
 
     @assignment.directory_path = nil if @assignment.directory_path.empty?
   end

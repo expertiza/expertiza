@@ -1,6 +1,7 @@
 <script type="text/javascript">
     jQuery(document).ready(function() {
     jQuery("#set_rounds").click(function () {
+        console.log("KAAKA")
         changeReviewRounds();
         event.preventDefault(); // Prevent link from following its href
     });
@@ -266,7 +267,8 @@
         var current_round_count = 0;
         var round_no;
         for (i = 0; i < due_dates_table_element_list.length; i++) {
-            round_no = parseInt(due_dates_table_element_list[i].id.split('_').last());
+            split_array = due_dates_table_element_list[i].id.split('_')
+            round_no = parseInt(split_array[split_array.length - 1]);
             if (!isNaN(round_no)) {
                 if (current_round_count < round_no) {
                     current_round_count = round_no;
@@ -476,9 +478,9 @@ function addDaysOrMonth(mul, type) {
     <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
 </span>
 
-<input name="metareivewAllowed" type="hidden" value="false" />
+<input name="metareviewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
+<%= label_tag('metareviewAllowed', 'Use metareview deadline') %><br/>
 <div id="date_updater_div">
                                                     <button type="button" id="show_date_updater">Show/Hide Date Updater</button>
                                                     <div id="date_updater_inner">

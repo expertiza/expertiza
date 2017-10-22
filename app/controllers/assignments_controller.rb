@@ -118,6 +118,7 @@ class AssignmentsController < ApplicationController
     unless params.key?(:assignment_form)
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]
+      puts "Perry1"
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
         redirect_to list_tree_display_index_path
@@ -130,8 +131,28 @@ class AssignmentsController < ApplicationController
 
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
+
+    @assignment = Assignment.find(params[:id])
+    submissions = @assignment.find_due_dates('submission')
+
+    puts params[:assignment_form][:assignment][:rounds_of_reviews]
+
+    if params[:assignment_form][:assignment][:rounds_of_reviews].to_i < submissions.count
+      puts "Less"
+      flash[:error] = "Submission count is greater than rounds of review"
+    end
+
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
+    end
+
+    # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+
+    @due_date_info = DueDate.find_each(parent_id: params[:id])
+    puts @due_date_info.inspect
+    
+    if params[:metareviewAllowed] == "false"
+      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
     end
 
     if current_user.timezonepref.nil?
@@ -140,6 +161,8 @@ class AssignmentsController < ApplicationController
       flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
       current_user.timezonepref = parent_timezone
     end
+    # if @assignment.rounds_of_reviews < submissions.count
+    #   flash[:error] = "Submissions count greater than Rounds of reviews"
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else

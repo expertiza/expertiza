@@ -52,10 +52,10 @@ class SignUpSheetController < ApplicationController
   # that assignment id will virtually be the signup sheet id as well as we have assumed
   # that every assignment will have only one signup sheet
   def create
-    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
+    topic = SignUpTopic.where(topic_name: params[:topic_name], assignment_id: params[:id]).first
 
     # if the topic already exists then update
-    if topic.nil?
+    if topic == nil
       setup_new_topic
     else
       update_existing_topic topic
@@ -68,13 +68,14 @@ class SignUpSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
     if @topic
       @topic.destroy
-      undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
+     # undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
     else
-      flash[:error] = "The topic could not be deleted."
+        render json: {status: 'FAIL'}
     end
     # changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
-  end
+      render json: {status: 'STATUS'}
+
+        end
 
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
@@ -82,6 +83,8 @@ class SignUpSheetController < ApplicationController
   end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
+=begin 
+
   def update
     @topic = SignUpTopic.find(params[:id])
 
@@ -101,6 +104,34 @@ class SignUpSheetController < ApplicationController
       end
     # changing the redirection url to topics tab in edit assignment view.
     redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
+    end
+=end
+
+    def update
+   # puts("received params : "+params)
+   @topic = SignUpTopic.find(params[:id])
+
+    if @topic
+        @topic.topic_identifier = params[:topic_identifier]
+        update_max_choosers @topic
+        # update tables
+        @topic.category = params[:category]
+        @topic.topic_name = params[:topic_name]
+        @topic.micropayment = params[:micropayment]
+        @topic.description = params[:description]
+        @topic.link = params[:link]
+        @topic.save
+      #  undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
+    else
+       
+    render json: {status: 'FAIL'}
+      end
+    # changing the redirection url to topics tab in edit assignment view.
+    # redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
+
+    render :json => @topic.as_json
+
+
     end
 
   # This displays a page that lists all the available topics for an assignment.
@@ -154,13 +185,18 @@ class SignUpSheetController < ApplicationController
 
   end
 
+
+
+
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
+    @sign_up_topic.topic_identifier = params[:topic_identifier]
+    @sign_up_topic.topic_name = params[:topic_name]
+    @sign_up_topic.max_choosers = params[:max_choosers]
+    @sign_up_topic.category = params[:category]
     @sign_up_topic.assignment_id = params[:id]
+    @sign_up_topic.description =params[:description]
+    @sign_up_topic.link =params[:link]
     @assignment = Assignment.find(params[:id])
   end
 
@@ -435,7 +471,7 @@ class SignUpSheetController < ApplicationController
     set_values_for_new_topic
 
     if @assignment.is_microtask?
-      @sign_up_topic.micropayment = params[:topic][:micropayment]
+      @sign_up_topic.micropayment = params[:micropayment]
     end
 
     if @assignment.staggered_deadline?
@@ -443,39 +479,45 @@ class SignUpSheetController < ApplicationController
       topic = @sign_up_topic.id
     end
 
-    if @sign_up_topic.save
-      undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
+    if !@sign_up_topic.save
+     # undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       # changing the redirection url to topics tab in edit assignment view.
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
+   
+      render json: {status: 'FAIL'}
     else
-      render action: 'new', id: params[:id]
+      render json: @sign_up_topic.as_json
     end
   end
 
+
+
+
+
   def update_existing_topic(topic)
-    topic.topic_identifier = params[:topic][:topic_identifier]
+    topic.topic_identifier = params[:topic_identifier]
 
     update_max_choosers topic
 
-    topic.category = params[:topic][:category]
+    topic.category = params[:category]
     # topic.assignment_id = params[:id]
     topic.save
-    redirect_to_sign_up params[:id]
-  end
+
+    render json: topic.as_json
+    end
 
   def update_max_choosers(topic)
     # While saving the max choosers you should be careful; if there are users who have signed up for this particular
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
+    if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:max_choosers]
+      topic.max_choosers = params[:max_choosers]
     else
-      if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-        topic.update_waitlisted_users params[:topic][:max_choosers]
-        topic.max_choosers = params[:topic][:max_choosers]
+      if topic.max_choosers.to_i < params[:max_choosers].to_i
+        topic.update_waitlisted_users params[:max_choosers]
+        topic.max_choosers = params[:max_choosers]
       else
-        flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
+        render json: {status: 'FAIL'}
       end
     end
   end

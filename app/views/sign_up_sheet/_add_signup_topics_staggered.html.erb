@@ -14,12 +14,16 @@
 
 <br>
 
-<%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id } do %>
+<!-- 1781 -->
+<%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id }  do %>
 <% end %>
 
+<br><br>
 
 
-<!-- 1781 -->
+
+
+
   <% if @sign_up_topics.size != 0 %>
     <table class="general" id="topics">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>

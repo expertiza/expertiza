@@ -3,6 +3,8 @@ class LatePolicy < ActiveRecord::Base
 
   has_many :assignments
 
+  attr_accessible
+
   validates :policy_name, presence: true
   validates :instructor_id, presence: true
   validates :max_penalty, presence: true

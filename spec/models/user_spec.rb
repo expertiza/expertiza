@@ -1,3 +1,4 @@
+include Rails.application.routes.url_helpers
 describe User do
   let(:user) do
     User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
@@ -68,8 +69,24 @@ describe User do
 
   # xzhang72
   describe '#get_available_users' do
+    before(:each) do
+      role = Role.new
+    end
     it 'returns the first 10 visible users' do
-
+      lesser_roles = double
+      allow(@role).to receive(:get_parents).and_return(['Teaching Assistant','Instructor','Administrator'])
+      allow(User).to receive(:all).and_return([
+          {:name => 'abca'},{:name => 'abcb'},{:name => 'abcc'},{:name => 'abcd'},{:name => 'abce'},
+          {:name => 'abcf'},{:name => 'abcg'},{:name => 'abch'},{:name => 'abci'},{:name => 'abcj'},
+          {:name => 'abck'},{:name => 'abcl'},{:name => 'abcm'},{:name => 'abcn'},{:name => 'abco'},
+          {:name => 'abcp'},{:name => 'abcq'},{:name => 'abcr'},{:name => 'abcs'},{:name => 'abct'}
+        ])
+      allow(user).to receive(:role)
+      allow(lesser_roles).to receive(:include?)
+      expect(user.get_available_users("abc")).to eq ([
+        {:name => 'abca'},{:name => 'abcb'},{:name => 'abcc'},{:name => 'abcd'},{:name => 'abce'},
+        {:name => 'abcf'},{:name => 'abcg'},{:name => 'abch'},{:name => 'abci'},{:name => 'abcj'}
+        ])
     end
   end
 
@@ -243,7 +260,7 @@ describe User do
       }
       #allow(User).to receive(:find_by_name).and_return(nil)
       allow(user).to receive(:nil?).and_return(true)
-      expect(User.from_params(params)).to raise_error
+      expect {User.from_params(params)}.to raise_error("Please <a href='http://localhost:3000/users/new'>create an account</a> for this user to continue.")
     end
   end
 

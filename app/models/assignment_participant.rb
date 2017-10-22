@@ -189,6 +189,29 @@ class AssignmentParticipant < Participant
     AssignmentTeam.team(self)
   end
 
+  def self.import(row_hash, session, id)
+    raise ArgumentError, "No user id has been specified." if row_hash.empty?
+    user = User.find_by_name(row_hash[:name])
+    if user.nil?
+      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+      attributes = ImportFileHelper.define_attributes(row_hash)
+
+      #########################################################################################
+      #                                                                                       #
+      #    THIS DOES NOT SET THE PASSWORD TO WHAT THE FILE SPECIFIES IF THEY ARE NEW USERS    #
+      #                                                                                       #
+      #########################################################################################
+
+      user = ImportFileHelper.create_new_user(attributes, session)
+    end
+    raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?
+    unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
+      new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
+      new_part.set_handle
+    end
+  end
+
+=begin
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)
@@ -205,6 +228,7 @@ class AssignmentParticipant < Participant
       new_part.set_handle
     end
   end
+=end
 
   # provide export functionality for Assignment Participants
   def self.export(csv, parent_id, _options)

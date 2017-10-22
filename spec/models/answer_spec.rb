@@ -1,4 +1,4 @@
-describe Answer do
+ogdescribe Answer do
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
   let(:question2) { create(:question, questionnaire: questionnaire, weight: 2, id: 2) }

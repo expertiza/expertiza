@@ -1,5 +1,5 @@
 <%= form_tag( { :controller => 'import_file', :action => 'import' },
-              { :method => 'post', :name => 'column_form', :id => 'column_form'} ) do %>
+              { :method => 'post', :name => 'column_form', :id => 'column_form' } ) do %>
 
     <table class="table table-bordered table-striped">
 
@@ -17,6 +17,9 @@
             <th style="text-align:center">
               <%= @contents_hash[:header][2].to_s.capitalize %>
             </th>
+            <th style="text-align:center">
+              <%= @contents_hash[:header][3].to_s.capitalize %>
+            </th>
 
         <% else %>
 
@@ -25,6 +28,7 @@
                 <option value="name">Name</option>
                 <option value="fullname">Fullname</option>
                 <option value="email">Email</option>
+                <option value="password">Password</option>
               </select>
             </th>
             <th>
@@ -32,6 +36,7 @@
                 <option value="fullname">Fullname</option>
                 <option value="name">Name</option>
                 <option value="email">Email</option>
+                <option value="password">Password</option>
               </select>
             </th>
             <th>
@@ -39,6 +44,15 @@
                 <option value="email">Email</option>
                 <option value="name">Name</option>
                 <option value="fullname">Fullname</option>
+                <option value="password">Password</option>
+              </select>
+            </th>
+            <th>
+              <select name="select4" id="select4" class="form-control" style="background-color:lightgrey">
+                <option value="password">Password</option>
+                <option value="name">Name</option>
+                <option value="fullname">Fullname</option>
+                <option value="email">Email</option>
               </select>
             </th>
 
@@ -63,6 +77,7 @@
     <%= hidden_field_tag('contents_hash', @contents_hash) %>
     <%= hidden_field_tag('has_header', @has_header) %>
     <%= hidden_field_tag('model', @model) %>
+    <%= hidden_field_tag('id', @id) %>
 
     <div style="text-align:center">
       <% if @has_header == 'true' %>

@@ -25,19 +25,28 @@ class ImportFileController < ApplicationController
     @title = params[:title]
   end
 
-  ###############################################################
-  #                                                             #
-  #    CALL OUR NEW METHOD FROM import INSTEAD OF importFile    #
-  #                                                             #
-  ###############################################################
+
+
+  def test_import
+
+    contents_hash = eval(params[:contents_hash])
+
+    if params[:has_header] == 'true'
+      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+    else
+      new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+      @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+    end
+
+  end
+
+  ################################################################################
+  #                                                                              #
+  #    CALL OUR NEW METHOD import_from_hash FROM import INSTEAD OF importFile    #
+  #                                                                              #
+  ################################################################################
 
   def import
-
-    puts ""
-    puts ""
-    puts "def import reached"
-    puts ""
-    puts ""
 
     errors = import_from_hash(session, params)
 
@@ -69,27 +78,16 @@ class ImportFileController < ApplicationController
 
   def import_from_hash(session, params)
 
-    # MAYBE - check for presence of header.
-    # If no header, call a method (yet to be written)
-    # that adds the header from the selected options.
-
-    ##################################################################
-    #                                                                #
-    #    WE WILL NEED TO RETRIEVE OTHER ITEMS FOR THE USER IMPORT    #
-    #                                                                #
-    ##################################################################
+    ########################################################################
+    #                                                                      #
+    #    WE WILL NEED TO MAKE SURE WE ARE CHECKING FOR ALL MODELS,         #
+    #    OR ALTERNATIVELY, MIMICKING THE EXISTING CONDITIONAL STRUCTURE    #
+    #                                                                      #
+    ########################################################################
 
     if params[:model] == 'User'
 
       contents_hash = eval(params[:contents_hash])
-
-      #########################################################
-      #                                                       #
-      #    I don't know if the statement below is correct.    #
-      #                                                       #
-      #########################################################
-
-      # parent_id = params[:session][:id]
 
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
@@ -108,8 +106,36 @@ class ImportFileController < ApplicationController
 
       rescue
         errors << $ERROR_INFO
-        puts errors.to_s
       end
+
+    elsif params[:model] == 'AssignmentParticipant'
+
+      contents_hash = eval(params[:contents_hash])
+
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+      else
+        new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      end
+
+      errors = []
+
+      begin
+
+        @header_integrated_body.each do |row_hash|
+          AssignmentParticipant.import(row_hash, session, params[:id])
+        end
+
+      rescue
+        errors << $ERROR_INFO
+      end
+
+    elsif params[:model] == 'CourseParticipant'
+
+    elsif params[:model] == 'AssignmentTeam'
+
+    elsif params[:model] == 'SignUpTopic'
 
     else
 
@@ -214,6 +240,12 @@ class ImportFileController < ApplicationController
                 end
     delimiter
   end
+
+  ##############################################################
+  #                                                            #
+  #    DOES THIS ACTUALLY WORK IF THE DELIMITER IS A SPACE?    #
+  #                                                            #
+  ##############################################################
 
   def parse_line(line, delimiter)
     items = if delimiter == ","

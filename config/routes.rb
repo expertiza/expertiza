@@ -148,7 +148,11 @@ Expertiza::Application.routes.draw do
       get :start
       post :import
 
-      # MAY BE ABLE TO PUT ROUTE HERE
+      #################################################################
+      #                                                               #
+      #    CAN WE INCLUDE THE ROUTES LISTED BELOW IN THIS SECTION?    #
+      #                                                               #
+      #################################################################
 
     end
   end
@@ -159,7 +163,7 @@ Expertiza::Application.routes.draw do
 
   post '/import_file/show', controller: :import_file, action: :show
 
-  post '/import_file/import_from_hash', controller: :import_file, action: :import_from_hash
+  post '/import_file/test_import', controller: :import_file, action: :test_import
 
   resources :institution do
     collection do

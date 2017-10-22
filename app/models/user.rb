@@ -73,10 +73,9 @@ class User < ActiveRecord::Base
     if self.role.super_admin?
       User.all.find_each do |user|
         user_list << user
-        user_list << "dou niwan"
       end
     end
-    user_list << "dou niwan 2"
+
     # If the user is an instructor, fetch all users in his course/assignment
     if self.role.instructor?
       participants = []

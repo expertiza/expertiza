@@ -138,24 +138,35 @@
   end
 
   describe ".import" do
-    context 'when record is empty' do
-      it 'raises an ArgumentError'
+    it "raise error if record is empty" do
+      row = []
+      expect { Participant.import(row, nil, nil, nil) }.to raise_error("No user id has been specified.")
     end
 
-    context 'when no user is found by offered username' do
-      context 'when the record has less than 4 items' do
-        it 'raises an ArgumentError'
-      end
+    it "raise error if record does not have enough items " do
+      row = ["user_name", "user_fullname", "name@email.com"]
+      expect {Participant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[0]} does not have enough items.")
+    end
 
-      context 'when the record has more than 4 items' do
-        context 'when certain assignment cannot be found' do
-          it 'creates a new user based on import information and raises an ImportError'
-        end
+    it "raise error if course with id not found" do
+      course = build(:course)
+      session = {}
+      row = []
+      allow(Course).to receive(:find).and_return(nil)
+      allow(session[:user]).to receive(:id).and_return(1)
+      row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
+      expect {Participant.import(row, nil, session, 2) }.to raise_error("The assignment with the id \"2\" was not found.")
+    end
 
-        context 'when certain assignment can be found and assignment participant does not exists' do
-          it 'creates a new user, new participant and raises an ImportError'
-        end
-      end
+    it "creates assignment participant form record" do
+      course = build(:course)
+      session = {}
+      row = []
+      allow(Course).to receive(:find).and_return(course)
+      allow(session[:user]).to receive(:id).and_return(1)
+      row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
+      course_part = Participant.import(row, nil, session, 2)
+      expect(course_part).to be_an_instance_of(Participant)
     end
   end
 

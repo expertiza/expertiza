@@ -1,4 +1,6 @@
 class TextResponse < Question
+  attr_accessible
+
   validates_presence_of :size
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)

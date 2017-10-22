@@ -2,7 +2,7 @@ $=jQuery;
 
 $(function () {
     $("[data-toggle='tooltip']").tooltip();
-    $("#scoresTable").tablesorter();
+    $(".scoresTable").tablesorter();
 });
 
 var lesser = false;

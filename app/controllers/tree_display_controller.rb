@@ -164,7 +164,9 @@ class TreeDisplayController < ApplicationController
         if node_type == 'Courses' || node_type == "Assignments"
           courses_assignments_obj(node_type, tmp_object, node)
         end
-        res[node_type] << tmp_object
+        if tmp_object['private']
+          res[node_type] << tmp_object
+        end
       end
     end
     res
@@ -205,6 +207,7 @@ class TreeDisplayController < ApplicationController
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == node.node_object_id
     end
+    false
   end
 
   # check if nodetype is assignmentnode
@@ -213,6 +216,7 @@ class TreeDisplayController < ApplicationController
     ta_mappings.each do |ta_mapping|
       return true if ta_mapping.course_id == course_id
     end
+    false
   end
 
   # check if user is ta for current course

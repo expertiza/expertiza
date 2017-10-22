@@ -110,7 +110,11 @@ describe User do
 
   describe '#get_user_list' do
     context 'when current user is super admin' do
-      it 'fetches all users'
+      it 'fetches all users' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        allow(User).to receive_message_chain("all.find_each") {[user1,user2]}
+        expect(user.get_user_list()).to eq ([user1,user2])
+      end
     end
 
     context 'when current user is an instructor' do
@@ -237,7 +241,6 @@ describe User do
           :name => 'ncsu'
         }
       }
-      include Rails.application.routes.url_helpers
       #allow(User).to receive(:find_by_name).and_return(nil)
       allow(user).to receive(:nil?).and_return(true)
       expect(User.from_params(params)).to raise_error

@@ -44,6 +44,7 @@ class Mailer < ActionMailer::Base
     @obj_name = defn[:body][:obj_name]
     @first_name = defn[:body][:first_name]
     @partial_name = defn[:body][:partial_name]
+    @team_id = defn[:body][:team_id]
 
     # if Rails.env.development? || Rails.env.test?
     #   defn[:to] = 'expertiza.development@gmail.com'

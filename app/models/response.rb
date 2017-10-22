@@ -141,6 +141,7 @@ class Response < ActiveRecord::Base
     defn = {}
     defn[:body] = {}
     defn[:body][:partial_name] = partial
+    defn[:body][:team_id] = response_map.reviewer_id
     response_map = ResponseMap.find map_id
 
     reviewer_participant_id = response_map.reviewer_id

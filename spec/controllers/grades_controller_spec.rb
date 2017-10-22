@@ -23,6 +23,9 @@ describe GradesController do
   describe '#view' do
     context 'when current assignment varys rubric by round' do
       it 'retrieves questions, calculates scores and renders grades#view page'
+
+
+
     end
 
     context 'when current assignment does not vary rubric by round' do
@@ -46,12 +49,18 @@ describe GradesController do
   end
 
   describe '#view_team' do
-    it 'renders grades#view_team page'
+    before { get :view_team, { id: 1 } }
+    it 'renders grades#view_team page' do
+      response.should be_success
+    end
   end
 
-  describe '#edit' do
-    it 'renders grades#edit page'
-  end
+  # describe '#edit' do
+  #   before { get :edit, { id: 1 } }
+  #   it 'renders grades#edit page' do
+  #     response.should be_success
+  #   end
+  # end
 
   describe '#instructor_review' do
     context 'when review does not exist' do

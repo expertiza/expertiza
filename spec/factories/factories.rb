@@ -155,6 +155,11 @@ FactoryGirl.define do
     use_bookmark false
     can_review_same_topic true
     can_choose_topic_to_review true
+    num_reviews_required 3
+    num_metareviews_required 3
+    num_reviews_allowed 3
+    num_metareviews_allowed 3
+    is_calibrated false
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -201,7 +206,7 @@ FactoryGirl.define do
   factory :signed_up_team, class: SignedUpTeam do
     topic { SignUpTopic.first || association(:topic) }
     team_id 1
-    is_waitlisted 0
+    is_waitlisted false
     preference_priority_number nil
   end
 
@@ -303,7 +308,7 @@ FactoryGirl.define do
     type "CourseNode"
   end
 
-  factory :questionnaire, class: Questionnaire do
+  factory :questionnaire, class: ReviewQuestionnaire do
     name 'Test questionnaire'
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
@@ -314,7 +319,7 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
-  factory :question, class: Question do
+  factory :question, class: Criterion do
     txt 'Test question:'
     weight 1
     questionnaire { Questionnaire.first || association(:questionnaire) }

@@ -55,7 +55,7 @@ class Assignment < ActiveRecord::Base
     @has_topics ||= !sign_up_topics.empty?
   end
 
-  def is_calibrated?
+  def calibrated?
     self.is_calibrated
   end
 

@@ -251,7 +251,7 @@ describe User do
   describe '#is_teaching_assistant?' do
     it 'returns true if current user is a TA' do
       allow(user).to receive_message_chain("role.ta?"){ true }
-      expect(user.is_teaching_assistant?).to be_truthy
+      expect(user.is_teaching_assistant?).to be true
     end
 
     it 'returns false if current user is not a TA' do

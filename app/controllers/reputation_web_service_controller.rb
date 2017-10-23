@@ -47,7 +47,7 @@ class ReputationWebServiceController < ApplicationController
   #
   #         result = ActiveRecord::Base.connection.select_all(query)
   # normal db query, return peer review grades
-  def db_query(assignment_id, round_num, has_topic,another_assignment_id = 0)
+  def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
@@ -98,7 +98,7 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  def json_generator(assignment_id, round_num = 2, type = 'peer review grades',another_assignment_id = 0)
+  def json_generator(assignment_id, round_num = 2, type = 'peer review grades', another_assignment_id = 0)
     assignment = Assignment.find_by(id: assignment_id)
 
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?

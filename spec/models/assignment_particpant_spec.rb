@@ -4,14 +4,19 @@
   let(:team2) { build(:assignment_team, id: 2) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response]) }
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
-  let(:participant2) { build(:participant, id: 2) }
+  let(:participant2) { build(:participant, id: 2, grade:100) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:review_questionnaire) { build(:questionnaire, id: 1) } #what's the relationship between factory and let build
   let(:question) { double('Question') }
-  let(:quiz_questionaire) { build(:questionnaire, id: 2) }   #why cannot use quiz:questionaire
+  let(:quiz_questionaire) { build(:questionnaire, id: 2) }
+  let(:student) { build(:student)}
+  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, used_in_round:1) }
+  let(:topic) {build(:topic)}
   before(:each) do
     allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
     allow(participant).to receive(:team).and_return(team)
+    allow(participant).to receive(:user).and_return(student)
   end
   describe '#dir_path' do
     it 'returns the directory path of current assignment' do
@@ -48,15 +53,128 @@
 
   describe '#scores' do
     context 'when assignment is not varying rubric by round and not an microtask' do
-      it 'calculates scores that this participant has been given'
+      it 'calculates scores that this participant has been given' do
+        expect(participant).to receive(:assignment_questionnaires)#.with(any_args).and_return({avg:100})
+        expect(assignment).to receive(:compute_total_score)#.and_return(100)
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        allow(assignment).to receive(:is_microtask?).and_return(false)
+        expect(assignment).to receive(:compute_total_score)#.and_return(100)
+        expect(participant).to receive(:caculate_scores)#with(any_args).and_return({participant:participant, review:{assesment:[response], scores:{avg:100}}, total_score:100})
+        participant.scores(question)
+      end
     end
 
     context 'when assignment is varying rubric by round but not an microtask' do
-      it 'calculates scores that this participant has been given'
+      it 'calculates scores that this participant has been given' do
+        expect(participant).to receive(:assignment_questionnaires)#.with(any_args).and_return({avg:100})
+        expect(assignment).to receive(:compute_total_score)#.and_return(100).
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+        expect(participant).to receive(:merge_scores)#.with(any_args).and_return(0)
+        allow(assignment).to receive(:is_microtask?).and_return(false)
+        expect(assignment).to receive(:compute_total_score)#.with(any_args).and_return(0)
+        expect(participant).to receive(:caculate_scores)
+        participant.scores(question)
+        #expect(participant.scores(question)).to eq({participant:participant, review:{assesment:[], scores:{max:0, min:0, avg:0}}, total_score:0})
+      end
     end
 
     context 'when assignment is not varying rubric by round but an microtask' do
-      it 'calculates scores that this participant has been given'
+      it 'calculates scores that this participant has been given' do
+        expect(participant).to receive(:assignment_questionnaires)#.with(any_args).and_return({avg:100})
+        expect(assignment).to receive(:compute_total_score)#.and_return(100).
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        #expect(participant).to_not receive(:merge_scores).with(any_args)
+        allow(assignment).to receive(:is_microtask?).and_return(true)
+        expect(participant).to receive(:topic_total_scores)#.and_return(0) #scores[:max_pts_available] = topic.micropayment=0
+        expect(assignment).to receive(:compute_total_score)
+        expect(participant).to receive(:caculate_scores)
+        participant.scores(question)
+        #expect(participant.scores(question)).to eq({participant:participant, review:{assesment:[response], scores:{avg:100}}, total_score:0, max_pts_available:0})
+      end
+    end
+  end
+# included method
+  describe '#assignment_questionnaires' do
+    context 'when the round of questionnaire is nil' do
+      it 'record the result as review scores' do
+        scores = {}
+        question_hash = {review:question}
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(any_args).and_return(assignment_questionnaire)
+        allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max:100, min:100, avg:100})
+        participant.assignment_questionnaires(question_hash, scores) #{review:{assessments:[response], scores:{max:100, min:100, avg:100}}}
+        expect(scores[:review][:assessments]).to eq([response])
+        expect(scores[:review][:scores]).to eq({max:100, min:100, avg:100})
+      end
+    end
+
+    context 'when the round of questionnaire is not nil' do
+      it 'record the result as review#{n} scores' do
+        scores = {}
+        question_hash = {review1:question}
+        allow(AssignmentQuestionnaire).to receive(:find_by).and_return(assignment_questionnaire2)
+        allow(review_questionnaire).to receive(:get_assessments_round_for).with(any_args).and_return([response])
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max:100, min:100, avg:100})
+        participant.assignment_questionnaires(question_hash, scores)
+        expect(scores[:review1][:assessments]).to eq([response])
+        expect(scores[:review1][:scores]).to eq({max:100, min:100, avg:100})
+      end
+    end
+  end
+  describe '#merge_scores' do
+    context 'when all of the review_n are nil' do
+      it 'set max, min, avg of review score as 0' do
+        scores = {}
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        participant.merge_scores(scores)
+        expect(scores[:review][:scores][:max]).to eq(0)
+        expect(scores[:review][:scores][:min]).to eq(0)
+        expect(scores[:review][:scores][:min]).to eq(0)
+      end
+    end
+
+    context 'when the review_n is not nil' do
+      it 'merge the score of review_n to the score of review' do
+        scores = {review1:{scores:{max:100, min:100, avg:100}, assessments:[response]}}
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        participant.merge_scores(scores)
+        expect(scores[:review][:scores][:max]).to eq(100)
+        expect(scores[:review][:scores][:min]).to eq(100)
+        expect(scores[:review][:scores][:min]).to eq(100)
+      end
+    end
+  end
+
+  describe '#topic_total_scores' do
+    it 'set total_score and max_pts_available of score when topic is not nil' do
+      scores = {total_score:100}
+      allow(SignUpTopic).to receive(:find_by_assignment_id).and_return(topic)
+      participant.topic_total_scores(scores)
+      expect(scores[:total_score]).to eq(0)
+      expect(scores[:max_pts_available]).to eq(0)
+      end
+  end
+
+  describe '#caculate_scores' do
+    context 'when the participant has the grade' do
+      it 'his total scores equals his grade' do
+        scores = {}
+        expect(participant2.caculate_scores(scores)).to eq(100.0)
+      end
+    end
+    context 'when the participant has the grade and the total score more than 100' do
+      it 'return the score of a given participant with total score 100' do
+        scores = {}
+        allow(scores[:total_score]).to receive(:>).and_return(true)
+        expect(participant.caculate_scores(scores)).to eq({total_score:100})
+      end
+    end
+    context 'when the participant has the grade and the total score less than 100' do
+      it 'return the score of a given participant with total score' do
+        scores = {total_score:90}
+        allow(scores[:total_score]).to receive(:>).and_return(false)
+        expect(participant.caculate_scores(scores)).to eq({total_score:90})
+      end
     end
   end
 
@@ -171,20 +289,36 @@
   end
 
   describe '.export' do
-    it 'exports all participants in current assignment'
+    it 'exports all participants in current assignment' do
+      csv = []
+      expect(AssignmentParticipant).to receive_message_chain(:where, :find_each).with(any_args).and_yield(participant)
+      expect(AssignmentParticipant.export(csv, 1, any_args)).to eq([["student2066", "2066, student", "expertiza@mailinator.com", "Student", "instructor6", true, true, true, "handle"]])
+    end
   end
 
   describe '#set_handle' do
     context 'when the user of current participant does not have handle' do
-      it 'sets the user name as the handle of current participant'
+      it 'sets the user name as the handle of current participant' do
+        allow(participant).to receive_message_chain(:user, :handle, :nil?).and_return(true)
+        allow(participant).to receive_message_chain(:user, :handle).and_return("")
+        participant.set_handle
+        expect(participant.handle).to eq("student2066")
+      end
     end
 
     context 'when current assignment exists participants with same handle as the one of current user' do
-      it 'sets the user name as the name of current participant'
+      it 'sets the user name as the name of current participant' do
+        allow(AssignmentParticipant).to receive(:exists?).with(any_args).and_return(true)
+        participant.set_handle
+        expect(participant.handle).to eq("student2066")
+      end
     end
 
     context 'when current assignment does not have participants with same handle as the one of current user' do
-      it 'sets the user name as the handle of current participant'
+      it 'sets the user name as the handle of current participant' do
+        participant.set_handle
+        expect(participant.handle).to eq("handle")
+      end
     end
   end
 
@@ -194,7 +328,6 @@
       allow(TeamsUser).to receive_message_chain(:find_by, :user_id).with(any_args).and_return(1)
       allow(Participant).to receive_message_chain(:find_by).with(any_args).and_return(participant)
       expect(participant.review_file_path(1)).to eq("/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test/0_review/1")
-
     end
   end
 

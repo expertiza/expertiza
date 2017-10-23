@@ -28,7 +28,7 @@ describe Team do
     it 'always returns TeamNode'
   end
 
-  describe '#get_author_names' do
+  describe '#author_names' do
     it 'returns an array of author\'s name'
   end
 

@@ -31,7 +31,7 @@ class Team < ActiveRecord::Base
   end
 
   # Get the names of the users
-  def get_author_names
+  def author_names
     names = []
     users.each do |user|
       names << user.fullname

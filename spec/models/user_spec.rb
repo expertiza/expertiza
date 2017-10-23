@@ -75,20 +75,24 @@ describe User do
   describe '#can_impersonate?' do
     it 'can impersonate target user if current user is super admin' do
       allow(user1).to receive_message_chain("role.super_admin?"){true}
-      expect(user1.can_impersonate?(user)).to be_truthy
+      expect(user1.can_impersonate?(user)).to be true
     end
     it 'can impersonate target user if current user is the TA of target user'do
-      allow(user1).to receive_message_chain("role.super_admin?"){true}
+      allow(user1).to receive_message_chain("role.super_admin?"){false}
       allow(user1).to receive(:is_teaching_assistant_for?).and_return(user)
-      expect(user1.can_impersonate?(user)).to be_truthy
+      expect(user1.can_impersonate?(user)).to be true
 
     end
     it 'can impersonate target user if current user is the recursively parent of target user'do
       allow(user1).to receive_message_chain("role.super_admin?"){true}
       allow(user1).to receive(:is_recursively_parent_of).and_return(user)
-      expect(user1.can_impersonate?(user)).to be_truthy
+      expect(user1.can_impersonate?(user)).to be true
     end
-    it 'cannot impersonate target user if current user does not satisfy all requirements'
+    it 'cannot impersonate target user if current user does not satisfy all requirements'do
+      allow(user1).to receive_message_chain("role.super_admin?"){false}
+      allow(user1).to receive_message_chain("role.ta?"){false}
+      expect(user1.can_impersonate?(user)).to be false
+    end
   end
 
   describe '#is_recursively_parent_of' do

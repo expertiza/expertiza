@@ -249,6 +249,8 @@ describe SignUpSheetController do
     let(:params) { { id: '1', assignment_id: 1 } }
     it 'renders show_team page' do
       allow(SignedUpTeam).to receive(:where).with(any_args).and_return([signed_up_team])
+      get :show_team, params
+      expect(response).to render_template(:show_team)
     end
   end
 

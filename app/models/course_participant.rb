@@ -1,6 +1,6 @@
 class CourseParticipant < Participant
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
-  include Import
+  extend Import
 
   # Copy this participant to an assignment
   def copy(assignment_id)
@@ -16,6 +16,16 @@ class CourseParticipant < Participant
 
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
+  def self.import(row, _row_header = nil, session, id)
+    CourseParticipant.import(row, _row_header = nil, session, id)
+    course = Course.find(id)
+    if course.nil?
+      raise ImportError, "The course with the id \"" + id.to_s + "\" was not found."
+    end
+    unless CourseParticipant.exists?(user_id: user.id, parent_id: course.id)
+      CourseParticipant.create(user_id: user.id, parent_id: course.id)
+    end
+  end
 
   def path
     Course.find(self.parent_id).path + self.directory_num.to_s + "/"

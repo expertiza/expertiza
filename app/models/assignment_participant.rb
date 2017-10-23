@@ -24,7 +24,7 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
   include Files
-  include Import
+  extend Import
 
   def dir_path
     assignment.try :directory_path
@@ -179,6 +179,14 @@ class AssignmentParticipant < Participant
 
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
+  def self.import(row, _row_header = nil, session, id)
+    AssignmentParticipant.import(row, _row_header = nil, session, id)
+    raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?
+    unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
+      new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
+      new_part.set_handle
+    end
+  end
 
 
   # provide export functionality for Assignment Participants

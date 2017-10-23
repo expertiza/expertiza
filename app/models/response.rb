@@ -203,6 +203,7 @@ class Response < ActiveRecord::Base
   # compare the current response score with other scores on the same artifact, and test if the difference
   # is significant enough to notify instructor.
   # Precondition: the response object is associated with a ReviewResponseMap
+  ### "map_class.get_assessments_for" method need to be refactored
   def significant_difference?
     map_class = self.map.class
     existing_responses = map_class.get_assessments_for(self.map.reviewee)
@@ -230,7 +231,6 @@ class Response < ActiveRecord::Base
         scores_assigned << existing_response.get_total_score.to_f / existing_response.get_maximum_score
       end
     end
-
     [scores_assigned.sum / scores_assigned.size.to_f, count]
   end
 
@@ -239,13 +239,10 @@ class Response < ActiveRecord::Base
     reviewer_participant_id = response_map.reviewer_id
     reviewer_participanat = AssignmentParticipant.find(reviewer_participant_id)
     reviewer_name = User.find(reviewer_participanat.user_id).fullname
-
     reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
     reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
     reviewee_name = User.find(reviewee_participant.user_id).fullname
-
     assignment = Assignment.find(reviewer_participanat.parent_id)
-
     Mailer.notify_grade_conflict_message({
       to: assignment.instructor.email,
        subject: "Expertiza Notification: A review score is outside the acceptable range",

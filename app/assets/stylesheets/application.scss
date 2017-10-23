@@ -21,3 +21,17 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 @import "login_form";
 @import "jsgrid/css/jsgrid";
 @import "jsgrid/css/theme";
+
+.jsgrid-grid-body {
+
+    overflow-x: scroll;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+.jsgrid-table {
+    width: 200%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+}

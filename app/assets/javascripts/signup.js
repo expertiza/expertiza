@@ -49,6 +49,7 @@ jQuery("input[id^='due_date_']").datetimepicker({
 jQuery(function(){
 
 
+
 jQuery( window ).resize(function() {
     var rows = jQuery(".jsgrid-grid-body").find("tr")
 
@@ -68,26 +69,20 @@ jQuery('.jsgrid-grid-header, .jsgrid-grid-body').css('margin-left', '100px');
 
 var assignmentId = jQuery("#jsGrid").data("assignmentid");
 
-
-jQuery("#jsGrid").jsGrid("option", "width","600px");
-jQuery("#jsGrid").jsGrid("option", "height","600px");
-
 jQuery("#jsGrid").jsGrid({  
-                height: "100%",
                 width: "100%",
+                height : "400%",
 
                 filtering: true,
                 inserting: true,
                 editing: true,
                 sorting: true,
                 paging: true,
-                
 
                 autoload: true,
-                pageSize: 20,
-                pageButtonCount: 5,
-                loadonce: true,
-                updateOnResize: true,
+                updateOnResize : true,
+                
+
                 
                 deleteConfirm: "Do you really want to delete client?",
                 controller: {
@@ -102,12 +97,6 @@ jQuery("#jsGrid").jsGrid({
                             }).done(function(response){
                                var sign_up_topics =  response.sign_up_topics;
                                data.resolve(sign_up_topics);
-
-                                var rows = jQuery(".jsgrid-grid-body").find("tr")
-                                console.log(rows.length)
-                                var rowSize = rows.length
-
-                                jQuery(".jsgrid-grid-body").css("height",rowSize*20+"px")
                         });
                     return data.promise();
                     },
@@ -178,15 +167,57 @@ jQuery("#jsGrid").jsGrid({
                 },
                     { name: "category", type: "text",title: "Test category" },
                     { name: "max_choosers", type: "text" ,title: "Num of Slots"},
-                    { name: "link", type: "text",title: "Topic Link" ,width :"auto" },
-                    { name: "description", type: "text",title: "Topic Description" },
+                    { name: "available_slots", editing: false ,title: "Available Slots"},
+                    { name: "max_choosers",  editing: false  ,title: "Num on Waitlist"},
+
+                    { name: "link", type: "text",title: "Topic Link" ,width :"20%" },
+                    { name: "description", type: "textarea",title: "Topic Description",width :"20%" },
+                    { name: "id",title: "Bookmarks",width :"20%", editing: false,
+
+                        itemTemplate: function(value, topic) {
+                        console.log("value ",value)
+                        console.log("topic ",topic)
+                        var $customBookmarkAddButton = $("<a>").attr({
+                            href:"/bookmarks/list/"+topic.id });
+                        
+                        var $BookmarkSelectButton= $("<i>").attr({class :"jsgrid-bookmark-show fa fa-bookmark", title :"View Topic Bookmarks"});
+
+
+                        var $customBookmarkSetButton = $("<a>").attr({
+                            href:"/bookmarks/new?id="+topic.id });
+                        
+                        var $BookmarkSetButton= $("<i>").attr({class :"jsgrid-bookmark-add fa fa-plus" , title :"Add Bookmark to Topic"});
+
+
+                        var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
+                        var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
+
+                        return $("<div>").append(set1).append(set2);
+                     }
+
+
+                     /*   itemTemplate: function(value, topic) {
+                        console.log("value ",value)
+                        console.log("topic ",topic)
+                      
+
+                        return $customBookmarkSetButton.append($BookmarkSetButton);
+
+                     }*/
+
+                     ,filtering: true 
+
+
+                      },
+                    
+
                     { type: "control",                      
                         editButton: true,                               // show edit button
                         deleteButton: true,                             // show delete button
                         clearFilterButton: true,                        // show clear filter button
                         modeSwitchButton: true,                         // show switching filtering/inserting button
-
-                     }
+                        
+                 }
                    
                 ]
             });

@@ -184,50 +184,66 @@ describe User do
   end
 
   describe '.export' do
-    before (:each) do
+    before(:each) do
       allow(user).to receive_message_chain(:role,:name).and_return('abc')
       allow(user).to receive_message_chain(:parent,:name).and_return('abc')
-      allow(users).to receive(:each).and_return([user])
+      allow(User).to receive(:all).and_return([user])
+      allow_any_instance_of(User).to receive(:each).and_yield(user)
     end
 
     it 'exports all information setting in options' do
-      options={:personal_details=>true, :role=>true,:parent=>true,:email_options=>true,:handle=>true}
-      expect(User.export([], 0, options)).to eq([user.name,user.fullname,user.email,user.role.name,
-                                                 user.parent.name,user.email_on_submission,user.email_on_review,user.email_on_review_of_review,
-                                                 user.copy_of_emails,user.handle])
+      options={"personal_details"=>"true", "role"=>"true","parent"=>"true","email_options"=>"true","handle"=>"true"}
+      expect(User.export([],0 , options)).to eq([user.name,user.fullname,user.email,
+                                                 user.role.name,user.parent.name,user.email_on_submission, user.email_on_review,
+                                                 user.email_on_review_of_review, user.copy_of_emails,user.handle])
     end
 
     it 'exports only personal_details'do
-      options={:personal_details=>true, :role=>false,:parent=>false,:email_options=>false,:handle=>false}
-
+      options={"personal_details"=>"true", "role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"false"}
+      User.export([],0 , options)
     end
 
     it 'exports only current role and parent' do
-      options={:personal_details=>false, :role=>true,:parent=>true,:email_options=>false,:handle=>false}
-
+      options={"personal_details"=>"false", "role"=>"true","parent"=>"true","email_options"=>"false","handle"=>"false"}
+      User.export([],0 , options)
     end
 
     it 'exports only email_options' do
-      options={:personal_details=>false, :role=>false,:parent=>false,:email_options=>true,:handle=>false}
-
+      options={"personal_details"=>"false", "role"=>"false","parent"=>"false","email_options"=>"true","handle"=>"false"}
+      User.export([],0 , options)
     end
 
     it 'exports only handle' do
-      options={:personal_details=>false, :role=>false,:parent=>false,:email_options=>false,:handle=>true}
-
+      options={"personal_details"=>"false", "role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"true"}
+      User.export([],0 , options)
     end
   end
 
   describe '.export_fields' do
-    it 'exports all information setting in options'
+    it 'exports all information setting in options' do
+      options={"personal_details"=>"true","role"=>"true","parent"=>"true","email_options"=>"true","handle"=>"true"}
+      expect(User.export_fields(options)).to eq(["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"])
+    end
 
-    it 'exports only personal_details'
+    it 'exports only personal_details' do
+      options={"personal_details"=>"true","role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"false"}
+      expect(User.export_fields(options)).to eq(["name","full name","email"])
+    end
 
-    it 'exports only current role and parent'
+    it 'exports only current role and parent' do
+      options={"personal_details"=>"false","role"=>"true","parent"=>"true","email_options"=>"false","handle"=>"false"}
+      expect(User.export_fields(options)).to eq(["role","parent"])
+    end
 
-    it 'exports only email_options'
+    it 'exports only email_options' do
+      options={"personal_details"=>"false","role"=>"false","parent"=>"false","email_options"=>"true","handle"=>"false"}
+      expect(User.export_fields(options)).to eq(["email on submission","email on review","email on metareview"])
+    end
 
-    it 'exports only handle'
+    it 'exports only handle' do
+      options={"personal_details"=>"false","role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"true"}
+      expect(User.export_fields(options)).to eq(["handle"])
+    end
   end
 
   describe '.from_params' do

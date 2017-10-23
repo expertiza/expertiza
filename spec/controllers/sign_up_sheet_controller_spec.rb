@@ -196,24 +196,43 @@ describe SignUpSheetController do
   end
 
   describe '#set_priority' do
-    let(:params) { { participant_id: '1', id: 1, topic: [1], assignment_id: 1 } }
+    let(:params) { { participant_id: '1', id: 1, topic: Array.new(1 + rand(5)) { 1 }, assignment_id: 1 } }
     let(:team_id) { participant.team.try(:id) }
-    let(:bid) { [Bid.new] }
+    let(:bid) { Array.new(1 + rand(5)) { Bid.new } }
     it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: params[:participant_id]).and_return(participant)
       allow(SignUpTopic).to receive_message_chain(:find, :assignment).with(params[:topic].first).with(no_args).and_return(assignment)
       allow(Bid).to receive(:where).with(team_id: team_id).and_return(bid)
-      allow(bid[0]).to receive(:topic_id).and_return(1)
+      bid.each do |x|
+        allow(x).to receive(:topic_id).and_return(1)
+      end
+      allow(Bid).to receive(:where).with(topic_id: Integer, team_id: team_id).and_return(bid)
       allow(Bid).to receive(:where).with(topic_id: String, team_id: team_id).and_return(bid)
       allow(bid).to receive(:update_all).with(priority: Integer)
+      expect(bid).to receive(:update_all).with(priority: Integer)
       get :set_priority, params
       expect(response).to redirect_to action: 'list', assignment_id: params[:assignment_id]
     end
   end
 
   describe '#save_topic_deadlines' do
+    let(:params) { { assignment_id: 1, due_date: [due_date, due_date2] } }
+    let(:due_dates) { params[due_date] }
+    let(:topics) { Array.new(1 + rand(5)) { topic } }
     context 'when topic_due_date cannot be found' do
-      it 'creates a new topic_due_date record and redirects to assignment#edit page'
+      it 'creates a new topic_due_date record and redirects to assignment#edit page' do
+        allow(TopicDueDate).to receive(:where).with(any_args).and_return nil
+        allow(SignUpTopic).to receive(:where).with(any_args).and_return(topics)
+        allow(assignment).to receive(:num_review_rounds).and_return(1 + rand(3))
+        allow(due_dates).to receive(:[]).with(String).and_return(due_date)
+        expect(TopicDueDate).to receive(:create).with(any_args)
+        get :save_topic_deadlines, params
+        expect(response).to redirect_to_assignment_edit(params[:assignment_id])
+        allow(TopicDueDate).to receive(:where).with(any_args).and_return due_date
+        expect(due_date).to receive(:update_attributes).with(any_args)
+        get :save_topic_deadlines, params
+        expect(response).to redirect_to_assignment_edit(params[:assignment_id])
+      end
     end
 
     context 'when topic_due_date can be found' do

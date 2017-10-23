@@ -1,0 +1,33 @@
+%h1 Listing git_data
+
+%table
+  %thead
+    %tr
+      %th Pull request
+      %th Author
+      %th Commits
+      %th Files
+      %th Additions
+      %th Deletions
+      %th Date
+      %th
+      %th
+      %th
+
+  %tbody
+    - @git_data.each do |git_datum|
+      %tr
+        %td= git_datum.pull_request
+        %td= git_datum.author
+        %td= git_datum.commits
+        %td= git_datum.files
+        %td= git_datum.additions
+        %td= git_datum.deletions
+        %td= git_datum.date
+        %td= link_to 'Show', git_datum
+        %td= link_to 'Edit', edit_git_datum_path(git_datum)
+        %td= link_to 'Destroy', git_datum, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Git datum', new_git_datum_path

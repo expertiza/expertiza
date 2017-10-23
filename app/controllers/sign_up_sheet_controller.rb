@@ -165,14 +165,57 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
 
     @assignment = Assignment.find(assignment_id)
+    @participants = SignedUpTeam.find_team_participants(assignment_id)
 
     # colloborating for JSON
-   
+   @sign_up_topics.each {|topic|
+    topic_id = topic.id
+    slots_fill_temp = 0
+    slots_waitlisted = 0
+    participants = []
+    if @slots_filled 
+      @slots_filled.each {|slot| 
+        if slot.topic_id == topic_id
+          slots_fill_temp = slot.count
+        end
+      }
+
+    end
+
+    if @slots_waitlisted 
+      @slots_waitlisted.each {|slot| 
+        if slot.topic_id == topic_id
+          slots_waitlisted = slot.count
+        end
+      }
+
+    end
+
+
+    if @participants 
+      @participants.each {|participant| 
+        if participant.topic_id == topic_id
+           
+          participants << participant
+        end
+      }
+
+    end
 
 
 
 
-    # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
+    topic.slots_filled_value = slots_fill_temp
+    topic.slots_waitlisted = slots_waitlisted
+    topic.slots_available = topic.max_choosers - topic.slots_filled_value
+    topic.partipants = participants
+   # puts("slots filled value",  topic.slots_filled_value)
+
+
+
+   }
+
+       # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recored are also counted)
@@ -180,18 +223,16 @@ class SignUpSheetController < ApplicationController
 
     render :json => {
         :id => @id.as_json,
-        :sign_up_topics => @sign_up_topics.as_json,
-        :slots_filled => @slots_filled.as_json,
+        :sign_up_topics => @sign_up_topics.as_json( :methods => [:slots_filled_value,:slots_waitlisted,:slots_available,:partipants]),
+        # :slots_filled => @slots_filled.as_json,
         :slots_waitlisted => @slots_waitlisted.as_json,
-        :assignment => @assignment.as_json,
-        :participants => @participants.as_json
+        :assignment => @assignment.as_json
 
       }
 
 
 
   end
-
 
 
 

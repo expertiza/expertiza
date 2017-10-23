@@ -153,26 +153,77 @@ jQuery("#jsGrid").jsGrid({
                 ],
                */
 
+               /*
+                    <a href="/sign_up_sheet/signup_as_instructor?assignment_id=843&amp;topic_id=3958">
+                    <img border="0" title="Sign Up Student" align="middle" src="/assets/signup-806fc3d5ffb6923d8f5061db243bf1afd15ec4029f1bac250793e6ceb2ab22bf.png" alt="Signup"></a>
+        
+               */
+
 
                 fields: [
                     { name: "topic_identifier", type: "text" ,title: "Topic #" },
-                    { name: "topic_name", type: "text" ,title: "Topic name(s)",
+                    { name: "topic_name", type: "text" ,title: "Topic name(s)",width : "10%",
                         itemTemplate: function(value,topic) {
-                            return $("<a>").attr("href", topic.link).text(value);
+
+                            var linkText =  $("<a>").attr("href", topic.link).text(value);
+                            var signupUrl = "/sign_up_sheet/signup_as_instructor?assignment_id=" + assignmentId + "&topic_id="+topic.id;
+                            var signUpUser = $("<a>").attr("href", signupUrl);
+
+                            var signUpUserImage = $("<img>").attr({src: "/assets/signup-806fc3d5ffb6923d8f5061db243bf1afd15ec4029f1bac250793e6ceb2ab22bf.png"
+                            , title: "Sign Up Student" 
+                            , alt: "Signup"});
+
+
+
+                            
+                            //participants
+                            var participants_temp = topic.partipants;
+
+                            var participants_div = $("<div>");
+
+
+                            for(var p = 0 ; p < participants_temp.length ; p ++)
+                            {
+                                
+                                var current_participant = participants_temp[p];
+                                var text = $("<span>");
+                                text.html(current_participant.user_name_placeholder);
+
+                                var dropStudentUrl = "/sign_up_sheet/delete_signup_as_instructor/" + current_participant.team_id + "?topic_id="+topic.id;
+                                
+                                var dropStudentAnchor = $("<a>").attr("href", dropStudentUrl);
+                               
+                                var dropStudentImage = $("<img>").attr({src: "/assets/delete_icon.png"
+                                 , title: "Drop Student" 
+                                 , alt: "Drop Student Image"});
+
+                                participants_div.append(text).append(dropStudentAnchor.append(dropStudentImage));
+
+
+                            }
+
+
+
+                            return $("<div>").append(linkText).append(signUpUser.append(signUpUserImage)).append(participants_div);
+
+
+
+
+                       //     return $("<a>").attr("href", topic.link).text(value);
                         } , filtering: true 
 
 
 
 
                 },
-                    { name: "category", type: "text",title: "Test category" },
+                    { name: "category", type: "text",title: "Topic category" },
                     { name: "max_choosers", type: "text" ,title: "Num of Slots"},
-                    { name: "available_slots", editing: false ,title: "Available Slots"},
-                    { name: "max_choosers",  editing: false  ,title: "Num on Waitlist"},
+                    { name: "slots_available", editing: false ,title: "Available Slots"},
+                    { name: "slots_waitlisted",  editing: false  ,title: "Num on Waitlist"},
 
                     { name: "link", type: "text",title: "Topic Link" ,width :"20%" },
                     { name: "description", type: "textarea",title: "Topic Description",width :"20%" },
-                    { name: "id",title: "Bookmarks",width :"20%", editing: false,
+                    { name: "id",title: "Bookmarks",width :"20%", editing: false,width :"4%",
 
                         itemTemplate: function(value, topic) {
                         console.log("value ",value)
@@ -192,7 +243,7 @@ jQuery("#jsGrid").jsGrid({
                         var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
                         var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
 
-                        return $("<div>").append(set1).append(set2);
+                        return $("<div>").attr("align","center").append(set1).append(set2);
                      }
 
 

@@ -4,7 +4,11 @@ class SignUpTopic < ActiveRecord::Base
   has_many :due_dates, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
-  attr_accessor :slots_filled
+  
+  attr_accessor :slots_filled_value
+   attr_accessor :slots_waitlisted
+   attr_accessor :slots_available
+   attr_accessor :partipants
 
   has_paper_trail
 

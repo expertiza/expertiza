@@ -21,7 +21,7 @@
 
       <tr><td><br/></td></tr>
 
-      <% if @model != 'AssignmentTeam' or @model != 'CourseTeam' %>
+      <% if !(@model == 'AssignmentTeam' or @model == 'CourseTeam') %>
       <tr>
         <td><strong>Header:</strong></td>
       </tr>

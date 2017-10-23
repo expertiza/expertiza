@@ -20,6 +20,8 @@
       </tr>
 
       <tr><td><br/></td></tr>
+
+      <% if @model != 'AssignmentTeam' or @model != 'CourseTeam' %>
       <tr>
         <td><strong>Header:</strong></td>
       </tr>
@@ -29,6 +31,7 @@
           <%= radio_button_tag 'has_header', 'false' %> File does not have a header<br/>
         </td>
       </tr>
+      <% end %>
 
     </table>
 

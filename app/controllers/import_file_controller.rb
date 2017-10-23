@@ -67,31 +67,7 @@ class ImportFileController < ApplicationController
 
 
   def import_from_hash(session, params)
-    if params[:model] == 'User'
-
-      contents_hash = eval(params[:contents_hash])
-
-      if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      else
-        new_header = [params[:select1], params[:select2], params[:select3]]
-        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-      end
-
-      errors = []
-
-      begin
-
-        @header_integrated_body.each do |row_hash|
-          User.import(row_hash, session)
-        end
-
-      rescue
-        errors << $ERROR_INFO
-        puts errors.to_s
-      end
-
-    elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
+    if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
 
       contents_hash = eval(params[:contents_hash])
       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
@@ -115,7 +91,35 @@ class ImportFileController < ApplicationController
         puts errors.to_s
       end
 
-    end
+    elsif params[:model] == 'SignUpTopic'
+      session[:assignment_id] = params[:id]
+      contents_hash[:body].each do |row|
+        SignUpTopic.import(row, session, params[:id])
+      end
+
+    else    # params[:model] = "User"
+      contents_hash = eval(params[:contents_hash])
+
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      else
+        new_header = [params[:select1], params[:select2], params[:select3]]
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      end
+
+      errors = []
+
+      begin
+
+        @header_integrated_body.each do |row_hash|
+          User.import(row_hash, session)
+        end
+
+      rescue
+        errors << $ERROR_INFO
+        puts errors.to_s
+      end
+   end
     errors
   end
 
@@ -137,7 +141,6 @@ class ImportFileController < ApplicationController
         new_body << header.zip(row).to_h
       end
 
-
     elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
       header.map! { |column_name| column_name.to_sym }
       body.each do |row|
@@ -153,7 +156,6 @@ class ImportFileController < ApplicationController
         end
         new_body << h
       end
-
     end
 
     new_body

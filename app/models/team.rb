@@ -53,20 +53,45 @@ class Team < ActiveRecord::Base
   end
 
   # Add memeber to the team
-  def add_member(user, _assignment_id)
+  def add_member(user, _assignment_id = nil )
+    puts "********************** add member starts*********************"
     if has_user(user)
+      puts "********************** has_user if starts *********************"
       raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
     end
-
+    puts "********************** has_user end *********************"
     if can_add_member = !full?
+      puts "********************** can add member starts *********************"
       t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
       parent = TeamNode.find_by_node_object_id(self.id)
+      puts "********************** before teamusernode.create*********************"
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+      puts "********************** after teamusernode.node *********************"
       add_participant(self.parent_id, user)
+      puts "********************** add participate end *********************"
     end
-
+    puts "********************** add member ends = #{can_add_member.to_s} *********************"
     can_add_member
   end
+
+  # Old Method
+  # Add memeber to the team
+  # def add_member(user, _assignment_id)
+  #   if has_user(user)
+  #     raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
+  #   end
+  #
+  #   if can_add_member = !full?
+  #     t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
+  #     parent = TeamNode.find_by_node_object_id(self.id)
+  #     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+  #     add_participant(self.parent_id, user)
+  #   end
+  #
+  #   can_add_member
+  # end
+
+
 
   # Define the size of the team
   def self.size(team_id)
@@ -160,15 +185,34 @@ class Team < ActiveRecord::Base
 
     row_hash[:teammembers].each do |teammember|
     user = User.find_by_name(teammember.to_s)
+    puts "********************** user = #{user.name} *********************"
     if user.nil?
-         raise ImportError, "The user \"" + teammember.to_s + "\" was not found. <a href='/users/new'>Create</a> this user?"
+      raise ImportError, "The user \"" + teammember.to_s + "\" was not found. <a href='/users/new'>Create</a> this user?"
     else
       if TeamsUser.where(["team_id =? and user_id =?", id, user.id]).first.nil?
-           add_member(user, nil)
+        add_member(user, nil)
       end
     end
     end
   end
+
+  # Old Method
+  # Extract team members from the csv and push to DB
+  # def import_team_members(starting_index, row)
+  #   index = starting_index
+  #   while index < row.length
+  #     user = User.find_by_name(row[index].to_s.strip)
+  #     if user.nil?
+  #       raise ImportError, "The user \"" + row[index].to_s.strip + "\" was not found. <a href='/users/new'>Create</a> this user?"
+  #     else
+  #       if TeamsUser.where(["team_id =? and user_id =?", id, user.id]).first.nil?
+  #         add_member(user, nil)
+  #       end
+  #     end
+  #     index += 1
+  #   end
+  # end
+
 
   def self.import(row_hash, id, options, teamtype)
     raise ArgumentError, "Not enough fields on this line." if (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))

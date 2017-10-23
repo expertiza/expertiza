@@ -47,7 +47,7 @@ class ReputationWebServiceController < ApplicationController
   #
   #         result = ActiveRecord::Base.connection.select_all(query)
   # normal db query, return peer review grades
-  def db_query(assignment_id, another_assignment_id = 0, round_num, has_topic)
+  def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
@@ -55,7 +55,7 @@ class ReputationWebServiceController < ApplicationController
     ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
-      topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
+      topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !has_topic)
       last_valid_response = response_map.response.select {|r| r.round == round_num }.sort.last
       valid_response = [last_valid_response] unless last_valid_response.nil?
       next unless topic_condition == true and !valid_response.nil? and !valid_response.empty?

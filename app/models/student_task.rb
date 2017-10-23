@@ -34,6 +34,10 @@ class StudentTask
     topic.try(:topic_name) || '-'
   end
 
+  def late_tasks?
+    current_stage == 'Finished' && !started?
+  end
+
   def complete?
     stage_deadline == 'Complete'
   end
@@ -50,6 +54,9 @@ class StudentTask
 
   def incomplete?
     !complete?
+  end
+  def unknown?
+    !in_work_stage? && not_started?
   end
 
   def metareviews_given?

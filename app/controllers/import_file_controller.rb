@@ -25,8 +25,6 @@ class ImportFileController < ApplicationController
     @title = params[:title]
   end
 
-
-
   def test_import
 
     contents_hash = eval(params[:contents_hash])
@@ -108,7 +106,7 @@ class ImportFileController < ApplicationController
         errors << $ERROR_INFO
       end
 
-    elsif params[:model] == 'AssignmentParticipant' || 'CourseParticipant'
+    elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
 
       contents_hash = eval(params[:contents_hash])
 

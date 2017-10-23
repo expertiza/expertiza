@@ -68,7 +68,7 @@
       <% if @has_header == 'true' %>
           <button type="button" class="btn btn-primary" onclick="column_form.submit()">Import <%= @model %></button>
       <% else %>
-          <button type="button" class="btn btn-primary" onclick="checkIfColumnDuplicate()">Import <%= @model %></button>
+          <button type="button" class="btn btn-primary" onclick="checkForUserColumnDuplicate()">Import <%= @model %></button>
       <% end %>
     </div>
 

@@ -1,0 +1,27 @@
+%p#notice= notice
+
+%p
+  %b Pull request:
+  = @git_datum.pull_request
+%p
+  %b Author:
+  = @git_datum.author
+%p
+  %b Commits:
+  = @git_datum.commits
+%p
+  %b Files:
+  = @git_datum.files
+%p
+  %b Additions:
+  = @git_datum.additions
+%p
+  %b Deletions:
+  = @git_datum.deletions
+%p
+  %b Date:
+  = @git_datum.date
+
+= link_to 'Edit', edit_git_datum_path(@git_datum)
+\|
+= link_to 'Back', git_data_path

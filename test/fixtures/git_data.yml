@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pull_request: 1
+  author: MyString
+  commits: 1
+  files: 1
+  additions: 1
+  deletions: 1
+  date: 2017-10-23 14:52:45
+
+two:
+  pull_request: 1
+  author: MyString
+  commits: 1
+  files: 1
+  additions: 1
+  deletions: 1
+  date: 2017-10-23 14:52:45

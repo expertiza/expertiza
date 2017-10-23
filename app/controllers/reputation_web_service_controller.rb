@@ -183,8 +183,8 @@ class ReputationWebServiceController < ApplicationController
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
     @request_body = req.body
-    #puts 'This is the request prior to encryption: ' + req.body
-    #puts
+    # puts 'This is the request prior to encryption: ' + req.body
+    # puts
     # Encryption
     # AES symmetric algorithm encrypts raw data
     aes_encrypted_request_data = aes_encrypt(req.body)
@@ -210,9 +210,9 @@ class ReputationWebServiceController < ApplicationController
     aes_encrypted_response_data = response.body["data"]
     response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
 
-    #puts "Response #{response.code} #{response.message}:
-    #{response.body}"
-    #puts
+    # puts "Response #{response.code} #{response.message}:
+    # {response.body}"
+    # puts
     @response = response
     @response_body = response.body
 

@@ -45,10 +45,15 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    @assignment = Assignment.find(params[:id])
+    @submissions = @assignment.find_due_dates('submission')
+
+
     # give an error message is instructor have not set the time zone.
     if current_user.timezonepref.nil?
       flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
     end
+
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
@@ -132,15 +137,9 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
 
+    
     @assignment = Assignment.find(params[:id])
-    submissions = @assignment.find_due_dates('submission')
-
-    puts params[:assignment_form][:assignment][:rounds_of_reviews]
-
-    if params[:assignment_form][:assignment][:rounds_of_reviews].to_i < submissions.count
-      puts "Less"
-      flash[:error] = "Submission count is greater than rounds of review"
-    end
+    @submissions = @assignment.find_due_dates('submission')
 
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
@@ -161,12 +160,15 @@ class AssignmentsController < ApplicationController
       flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
       current_user.timezonepref = parent_timezone
     end
-    # if @assignment.rounds_of_reviews < submissions.count
-    #   flash[:error] = "Submissions count greater than Rounds of reviews"
-    if @assignment_form.update_attributes(assignment_form_params, current_user)
-      flash[:note] = 'The assignment was successfully saved....'
+    
+    if params[:set_pressed][:bool] == 'false'
+      flash[:error] = "Submissions count greater than rounds of reviews. Please set the value before saving."
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      if @assignment_form.update_attributes(assignment_form_params, current_user)
+        flash[:note] = 'The assignment was successfully saved....'
+      else
+        flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      end
     end
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end

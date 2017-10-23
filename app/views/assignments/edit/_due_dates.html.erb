@@ -1,9 +1,15 @@
 <script type="text/javascript">
     jQuery(document).ready(function() {
     jQuery("#set_rounds").click(function () {
-        console.log("KAAKA")
         changeReviewRounds();
+        jQuery("#set_pressed_bool").val(true)
+        console.log(jQuery("#set_pressed_bool").val())
         event.preventDefault(); // Prevent link from following its href
+    });
+
+    jQuery("#assignment_form_assignment_rounds_of_reviews").change(function(){
+        jQuery("#set_pressed_bool").val(false)
+        console.log(jQuery("#set_pressed_bool").val())
     });
 
 
@@ -257,6 +263,8 @@
 
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
+
+        var submissions_count = <%= @submissions.count %>
         if (new_round_count <= 0) {
             alert('ERROR: number of rounds of review should be greater than 0');
             return
@@ -275,7 +283,16 @@
                 }
             }
         }
+
         var original_round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
+            
+        if(new_round_count < submissions_count){
+            if(!confirm("Submissions count greater than rounds of reviews. Are you sure you want to change rounds of reviews?")){
+                jQuery('#assignment_form_assignment_rounds_of_reviews').val(original_round_count)
+                return
+            }
+        }
+
         if (new_round_count == current_round_count) {
             return
         }
@@ -453,6 +470,8 @@ function addDaysOrMonth(mul, type) {
 <%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:50px') %>
   <button type="button" id="set_rounds">Set</button><label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
 </div>
+
+<%= hidden_field(:set_pressed, :bool, :value => false) %>
 
 <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->

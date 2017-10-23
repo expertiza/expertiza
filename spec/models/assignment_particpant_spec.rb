@@ -165,7 +165,7 @@
       allow(Course).to receive(:find).and_return(course)
       allow(session[:user]).to receive(:id).and_return(1)
       row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
-      course_part = Participant.import(row, nil, session, 2)
+      course_part = Participant.p_import(row, nil, session, 2)
       expect(course_part).to be_an_instance_of(Participant)
     end
   end

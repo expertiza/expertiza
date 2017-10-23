@@ -210,7 +210,7 @@ class ReputationWebServiceController < ApplicationController
     response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
 
     # puts "Response #{response.code} #{response.message}:
-    #{response.body}"
+    # {response.body}"
     # puts
     @response = response
     @response_body = response.body

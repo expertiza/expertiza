@@ -62,13 +62,13 @@ describe AssignmentForm do
   describe '#add_to_delayed_queue' do
     context 'when the deadline type is review' do
       it 'adds two delayed jobs and changes the # of DelayedJob by 2' do
-        ob = DeadlineType.new(:name => 'review', :id => 1)
-        ob.save
+        ddtype = DeadlineType.new(:name => 'review', :id => 1)
+        ddtype.save
 
         assignment2 = build(:assignment, id:2)
         review_id = DeadlineType.where(:name => "review").first
 
-        ob = AssignmentDueDate.new(:parent_id => assignment2.id, :deadline_type => review_id, :due_at => Time.new(2111, 1, 1, 0, 0, 0, 0))
+        ob = AssignmentDueDate.new(:parent_id => assignment2.id, :deadline_type => review_id, :due_at => Time.now.utc.advance(weeks:1))
         ob.save
 
         num_delayedJob = DelayedJob.count
@@ -82,13 +82,13 @@ describe AssignmentForm do
 
     context 'when the deadline type is team formation and current assignment is team-based assignment' do
       it 'adds a delayed job and changes the # of DelayedJob by 2' do
-        ob = DeadlineType.new(:name => 'team_formation', :id => 2)
-        ob.save
+        ddtype = DeadlineType.new(:name => 'team_formation', :id => 2)
+        ddtype.save
 
         assignment3 = build(:assignment, id:3)
         review_id = DeadlineType.where(:name => "team_formation").first
 
-        ob = AssignmentDueDate.new(:parent_id => assignment3.id, :deadline_type => review_id, :due_at => Time.new(2111, 1, 1, 0, 0, 0, 0))
+        ob = AssignmentDueDate.new(:parent_id => assignment3.id, :deadline_type => review_id, :due_at => Time.now.utc.advance(weeks:1))
         ob.save
 
         num_delayedJob = DelayedJob.count

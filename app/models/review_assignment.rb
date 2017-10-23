@@ -144,7 +144,7 @@ module ReviewAssignment
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! {|contributor| contributor.has_user(User.find(reviewer.user_id)) }
+    contributor_set.reject! {|contributor| contributor.user?(User.find(reviewer.user_id)) }
     contributor_set
   end
 

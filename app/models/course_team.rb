@@ -71,7 +71,7 @@ class CourseTeam < Team
 
   # Add member to the course team
   def add_member(user)
-    if has_user(user)
+    if user?(user)
       raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
     end
 

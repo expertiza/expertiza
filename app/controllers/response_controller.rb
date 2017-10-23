@@ -19,7 +19,7 @@ class ResponseController < ApplicationController
       # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
       if map.is_a? ReviewResponseMap
         reviewee_team = AssignmentTeam.find(map.reviewee_id)
-        return current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || current_user.role.name == 'Administrator' || (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
+        return current_user_id?(response.map.reviewer.user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' || (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
       else
         return current_user_id?(response.map.reviewer.user_id)
       end

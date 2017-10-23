@@ -32,7 +32,7 @@ describe Team do
     it 'returns an array of author\'s name'
   end
 
-  describe '#has_user' do
+  describe '#user?' do
     context 'when users in current team includes the parameterized user' do
       it 'returns true'
     end

@@ -216,32 +216,40 @@ describe SignUpSheetController do
   end
 
   describe '#save_topic_deadlines' do
-    let(:params) { { assignment_id: 1, due_date: [due_date, due_date2] } }
-    let(:due_dates) { params[due_date] }
-    let(:topics) { Array.new(1 + rand(5)) { topic } }
+    let(:params) { { assignment_id: 1, due_date: Hash.new } }
+    let(:topics) { [topic] }
     context 'when topic_due_date cannot be found' do
       it 'creates a new topic_due_date record and redirects to assignment#edit page' do
         allow(TopicDueDate).to receive(:where).with(any_args).and_return nil
         allow(SignUpTopic).to receive(:where).with(any_args).and_return(topics)
-        allow(assignment).to receive(:num_review_rounds).and_return(1 + rand(3))
-        allow(due_dates).to receive(:[]).with(String).and_return(due_date)
-        expect(TopicDueDate).to receive(:create).with(any_args)
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        assignment.due_dates = assignment.due_dates.push(due_date2)
+        allow(DeadlineType).to receive_message_chain(:find_by_name, :id).with(String).with(no_args).and_return(1)
+        expect(TopicDueDate).to receive(:create).exactly(2).times.with(any_args)
         get :save_topic_deadlines, params
-        expect(response).to redirect_to_assignment_edit(params[:assignment_id])
-        allow(TopicDueDate).to receive(:where).with(any_args).and_return due_date
-        expect(due_date).to receive(:update_attributes).with(any_args)
-        get :save_topic_deadlines, params
-        expect(response).to redirect_to_assignment_edit(params[:assignment_id])
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
       end
     end
 
     context 'when topic_due_date can be found' do
-      it 'updates the existing topic_due_date record and redirects to assignment#edit page'
+      it 'updates the existing topic_due_date record and redirects to assignment#edit page' do
+        allow(TopicDueDate).to receive(:where).with(any_args).and_return([due_date])
+        allow(SignUpTopic).to receive(:where).with(any_args).and_return(topics)
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        assignment.due_dates = assignment.due_dates.push(due_date2)
+        allow(DeadlineType).to receive_message_chain(:find_by_name, :id).with(String).with(no_args).and_return(1)
+        expect(due_date).to receive(:update_attributes).exactly(2).times.with(any_args)
+        get :save_topic_deadlines, params
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+      end
     end
   end
 
   describe '#show_team' do
-    it 'renders show_team page'
+    let(:params) { { id: '1', assignment_id: 1 } }
+    it 'renders show_team page' do
+      allow(SignedUpTeam).to receive(:where).with(any_args).and_return([signed_up_team])
+    end
   end
 
   describe '#switch_original_topic_to_approved_suggested_topic' do

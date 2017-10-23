@@ -1,6 +1,7 @@
 class Dropdown < UnscoredQuestion
   include ActionView::Helpers
   validates :alternatives, presence: true
+  attr_accessible
 
   def edit(_count)
     html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'

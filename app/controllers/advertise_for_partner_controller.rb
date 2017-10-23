@@ -35,7 +35,10 @@ class AdvertiseForPartnerController < ApplicationController
   def update
     @team = Team.find(params[:id])
     # @team.comments_for_advertisement = params[:comments_for_advertisement]
-    Team.update(params[:id], comments_for_advertisement: params[:comments_for_advertisement])
+
+    ##Team.update(params[:id], comments_for_advertisement: params[:comments_for_advertisement])
+    Team.update(team_params(params[:id]), team_params(comments_for_advertisement: params[:comments_for_advertisement]))
+
     assignment = Assignment.find(Team.find(params[:id]).parent_id)
     participant = AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
     if @team.save
@@ -52,3 +55,9 @@ class AdvertiseForPartnerController < ApplicationController
     @team = Team.find(params[:team_id])
   end
 end
+
+  def team_params(params_hash)
+    params_local = params
+    params_local[:@team] = params_hash unless nil == params_hash
+    params_local.require(:team).permit(:id, :comments_for_advertisement)
+  end

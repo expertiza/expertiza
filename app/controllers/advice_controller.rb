@@ -34,7 +34,8 @@ class AdviceController < ApplicationController
     begin
       unless params[:advice].nil?
         for advice_key in params[:advice].keys
-          QuestionAdvice.update(advice_key, advice: params[:advice][advice_key.to_sym][:advice])
+          ##QuestionAdvice.update(advice_key, advice: params[:advice][advice_key.to_sym][:advice])
+          QuestionAdvice.update(advice_key, question_advice_params(advice: params[:advice][advice_key.to_sym][:advice]))
         end
         flash[:notice] = "The advice was successfully saved!"
       end
@@ -42,5 +43,11 @@ class AdviceController < ApplicationController
       render action: 'edit_advice', id: params[:id]
     end
     redirect_to action: 'edit_advice', id: params[:id]
+  end
+
+  def question_advice_params(params_hash)
+    params_local = params
+    params_local[:@question_advice] = params_hash unless nil == params_hash
+    params_local.require(:@question_advice).permit(:advice)
   end
 end

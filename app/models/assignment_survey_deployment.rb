@@ -1,6 +1,6 @@
 class AssignmentSurveyDeployment < SurveyDeployment
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
-
+  attr_accessible
   def parent_name
     assignment.name
   end

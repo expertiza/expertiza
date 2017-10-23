@@ -7,6 +7,7 @@ class ContentPage < ActiveRecord::Base
   belongs_to :permission
 
   attr_accessor :content_html
+  attr_accessible
 
   def url
     "/#{self.name}"

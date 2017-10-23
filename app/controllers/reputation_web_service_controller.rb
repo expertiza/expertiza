@@ -47,7 +47,7 @@ class ReputationWebServiceController < ApplicationController
   #
   #         result = ActiveRecord::Base.connection.select_all(query)
   # normal db query, return peer review grades
-  def db_query(assignment_id, another_assignment_id = 0, round_num, has_topic)
+  def db_query(assignment_id, round_num, has_topic,another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id

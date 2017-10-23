@@ -185,8 +185,7 @@ class Team < ActiveRecord::Base
 
     row_hash[:teammembers].each do |teammember|
     user = User.find_by_name(teammember.to_s)
-    puts "********************** user = #{user.name} *********************"
-    if user.nil?
+        if user.nil?
       raise ImportError, "The user \"" + teammember.to_s + "\" was not found. <a href='/users/new'>Create</a> this user?"
     else
       if TeamsUser.where(["team_id =? and user_id =?", id, user.id]).first.nil?
@@ -217,7 +216,7 @@ class Team < ActiveRecord::Base
   def self.import(row_hash, id, options, teamtype)
     raise ArgumentError, "Not enough fields on this line." if (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
     if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
-      name = row_hash[:teamname]
+      name = row_hash[:teamname].to_s
       team = where(["name =? && parent_id =?", name, id]).first
       team_exists = !team.nil?
       name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
@@ -281,13 +280,13 @@ class Team < ActiveRecord::Base
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
     return name if team.nil? # no duplicate
     if handle_dups == "ignore" # ignore: do not create the new team
-      p '>>>setting name to nil ...'
+      puts '>>>setting name to nil ...'
       return nil
     end
     if handle_dups == "rename" # rename: rename new team
-      if teamtype.is_a?(CourseTeam)
+      if teamtype.to_s == "CourseTeam"                 #teamtype.is_a?(CourseTeam)
         return self.generate_team_name(Course.find(id).name)
-      elsif teamtype.is_a?(AssignmentTeam)
+      elsif  teamtype.to_s == "AssignmentTeam"         #teamtype.is_a?(AssignmentTeam)
         return self.generate_team_name(Assignment.find(id).name)
       end
     end

@@ -255,6 +255,15 @@ describe SignUpSheetController do
   end
 
   describe '#switch_original_topic_to_approved_suggested_topic' do
-    it 'redirects to sign_up_sheet#list page'
+    let(:params) { { id: 1, topic_id: 1 } }
+    let(:session) { { user: student } }
+    it 'redirects to sign_up_sheet#list page' do
+      allow(TeamsUser).to receive(:team_id).with(any_args).and_return(1)
+      allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
+      allow(SignUpTopic).to receive(:exists?).with(any_args).and_return(false)
+      allow(SignedUpTeam).to receive(:where).with(any_args).and_return([])
+      get :switch_original_topic_to_approved_suggested_topic, params, session
+      expect(response).to redirect_to action: 'list', id: params[:id]
+    end
   end
 end

@@ -26,7 +26,7 @@ class Team < ActiveRecord::Base
   end
 
   # Get the node type of the tree structure
-  def get_node_type
+  def node_type
     "TeamNode"
   end
 

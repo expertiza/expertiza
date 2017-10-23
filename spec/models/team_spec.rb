@@ -24,7 +24,7 @@ describe Team do
     it 'deletes the current team and related objects and return self'
   end
 
-  describe '#get_node_type' do
+  describe '#node_type' do
     it 'always returns TeamNode'
   end
 

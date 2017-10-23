@@ -10,6 +10,7 @@ describe SignUpSheetController do
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
   let(:bid) { Bid.new(topic_id: 1, priority: 1) }
+  let(:team_user) { build(:team_user) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -19,9 +20,13 @@ describe SignUpSheetController do
     allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+    allow(AssignmentParticipant).to receive(:find_by).with(user_id: 8,  parent_id: 1).and_return(participant)
+    allow(Team).to receive(:find).with('1').and_return(team)
     allow(participant).to receive(:team).and_return(team)
     allow(participant.team).to receive(:submitted_files).and_return([])
     allow(participant.team).to receive(:hyperlinks).and_return([])
+    allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(team_user)
+    allow(team_user).to receive(:user).and_return(student)
   end
 
   describe '#new' do
@@ -114,6 +119,7 @@ describe SignUpSheetController do
         expect = proc {
           delete :delete_signup, params
           expect(flash.now[:error]).to eq("You have already submitted your work, so you are not allowed to drop your topic.")
+          expect(response).to redirect_to(action: 'list', id: params[:id])
         }
         expect.call
         allow(participant.team).to receive(:hyperlinks).and_return(['link'])
@@ -129,6 +135,7 @@ describe SignUpSheetController do
         allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return(due_date)
         delete :delete_signup, params
         expect(flash.now[:error]).to eq("You cannot drop your topic after the drop topic deadline!")
+        expect(response).to redirect_to(action: 'list', id: params[:id])
       end
     end
 
@@ -147,16 +154,44 @@ describe SignUpSheetController do
   end
 
   describe '#delete_signup_as_instructor' do
+    let(:params) { { id: 1, topic_id: 1 } }
     context 'when either submitted files or hyperlinks of current team are not empty' do
-      it 'shows a flash error message and redirects to assignment#edit page'
+      it 'shows a flash error message and redirects to assignment#edit page' do
+        allow(participant.team).to receive(:submitted_files).and_return(['file'])
+        expect = proc {
+          delete :delete_signup_as_instructor, params
+          expect(flash.now[:error]).to eq("The student has already submitted their work, so you are not allowed to remove them.")
+          expect(response).to redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+        }
+        expect.call
+        allow(participant.team).to receive(:hyperlinks).and_return(['link'])
+        expect.call
+        allow(participant.team).to receive(:submitted_files).and_return([])
+        expect.call
+      end
     end
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
-      it 'shows a flash error message and redirects to assignment#edit page'
+      it 'shows a flash error message and redirects to assignment#edit page' do
+        allow(due_date).to receive(:due_at).and_return(Time.now - 1.day)
+        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return(due_date)
+        delete :delete_signup_as_instructor, params
+        expect(flash.now[:error]).to eq("You cannot drop a student after the drop topic deadline!")
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+      end
     end
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
-      it 'shows a flash success message and redirects to assignment#edit page'
+      let(:session) { { user: instructor } }
+      it 'shows a flash success message and redirects to assignment#edit page' do
+        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return nil
+        allow(SignedUpTeam).to receive(:find_team_users).with(participant.assignment.id, session[:user].id).and_return([signed_up_team])
+        allow(signed_up_team).to receive(:t_id).and_return(1)
+        allow(SignedUpTeam).to receive_message_chain(:where, :first).with(topic_id: session[:topic_id], team_id: signed_up_team.t_id).with(no_args).and_return(signed_up_team2)
+        delete :delete_signup_as_instructor, params, session
+        expect(flash.now[:success]).to eq("You have successfully dropped the student from the topic!")
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+      end
     end
   end
 

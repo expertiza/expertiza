@@ -1,5 +1,4 @@
 class ColumnHeader < QuestionnaireHeader
-
   attr_accessible
 
   def complete(_count, _answer = nil)

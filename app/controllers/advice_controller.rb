@@ -34,7 +34,6 @@ class AdviceController < ApplicationController
     begin
       unless params[:advice].nil?
         for advice_key in params[:advice].keys
-          ##QuestionAdvice.update(advice_key, advice: params[:advice][advice_key.to_sym][:advice])
           QuestionAdvice.update(advice_key, question_advice_params(advice: params[:advice][advice_key.to_sym][:advice]))
         end
         flash[:notice] = "The advice was successfully saved!"

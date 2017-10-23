@@ -22,7 +22,11 @@ describe SignUpSheetController do
   end
 
   describe '#new' do
-    it 'builds a new sign up topic and renders sign_up_sheet#new page'
+    it 'builds a new sign up topic and renders sign_up_sheet#new page' do
+      params = {id: 1}
+      get :new, params
+      expect(response).to render_template(:new)
+    end
   end
 
   describe '#create' do
@@ -37,7 +41,14 @@ describe SignUpSheetController do
     end
 
     context 'when topic can be found' do
-      it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page'
+      it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page' do
+        new_topic = build(:topic, topic_name: 'new topic', topic_identifier:'120', category:'test', id:1)
+        params = {:id => 1, :topic => {topic_name: 'new topic', topic_identifier:'120', category:'test', id:1}}
+        # allow_any_instance_of(SignUpTopic).to receive(:topic_identifier=)
+        allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(new_topic)
+        post :create, params
+        expect(response).to redirect_to('/sign_up_sheet/add_signup_topics_staggered?id='+params[:id].to_s)
+      end
     end
   end
 

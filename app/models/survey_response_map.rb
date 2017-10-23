@@ -4,6 +4,8 @@
 # The reviewee_id is survey_deployment id.
 # (if global survey is required, the reviewee_id will also be survey_deployment id)
 class SurveyResponseMap < ResponseMap
+  attr_accessible
+
   def survey?
     true
   end

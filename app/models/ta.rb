@@ -1,4 +1,6 @@
 class Ta < User
+  attr_accessible
+
   has_many :ta_mappings, dependent: :destroy
 
   QUESTIONNAIRE = [['My questionnaires', 'list_mine'],

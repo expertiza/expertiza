@@ -3,6 +3,8 @@ class GlobalSurveyResponseMap < SurveyResponseMap
   belongs_to :questionnaire, class_name: 'Questionnaire', foreign_key: 'reviewed_object_id'
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
 
+  attr_accessible
+
   def questionnaire
     Questionnaire.find_by(id: self.reviewed_object_id)
   end

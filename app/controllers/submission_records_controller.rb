@@ -1,6 +1,6 @@
 class SubmissionRecordsController < ApplicationController
   before_action :set_submission_record, only: [:show, :edit, :update, :destroy]
-
+  GIT_HUB_REGEX = /https?:\/\/([w]{3}\.)?github.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)[\S]*/i
   def action_allowed?
     # currently we only have a index method which shows all the submission records given a team_id
     assignment_team = AssignmentTeam.find(params[:team_id])
@@ -16,5 +16,12 @@ class SubmissionRecordsController < ApplicationController
   # expects to get team_id from params
   def index
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
+    @submission_records.each do |record|
+      matches = GIT_HUB_REGEX.match(record.content)
+       if(matches.nil?)
+       else
+         redirect_to "/git_data/update_git_data?record="+record.id
+       end
+    end
   end
 end

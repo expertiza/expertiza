@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
 gem 'rails', '~> 4.2.6'
 
@@ -11,6 +11,7 @@ gem 'bind-it'
 gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
+gem 'chartkick'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
@@ -22,6 +23,7 @@ gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
 gem "googlecharts", require: "gchart"
 gem 'gdata', require: false
+gem 'groupdate'
 gem 'haml-rails'
 gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'

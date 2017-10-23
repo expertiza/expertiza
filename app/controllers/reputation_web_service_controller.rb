@@ -57,7 +57,7 @@ class ReputationWebServiceController < ApplicationController
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !hasTopic)
       last_valid_response = response_map.response.select {|r| r.round == round_num }.sort.last
-      val id_response = [last_valid_response] unless last_valid_response.nil?
+      valid_response = [last_valid_response] unless last_valid_response.nil?
       next unless topic_condition == true and !valid_response.nil? and !valid_response.empty?
       valid_response.each do |response|
         answers = Answer.where(response_id: response.id)

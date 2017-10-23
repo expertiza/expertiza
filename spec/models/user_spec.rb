@@ -112,8 +112,19 @@ describe User do
 
   describe '#get_user_list' do
     context 'when current user is super admin' do
-      it 'fetches all users'
-    end
+      it 'fetches all users' do
+        user_list=double.as_null_object
+        allow(user).to receive_message_chain("role.super_admin?"){ true }
+        allow(User).to receive_message_chain("all.find_each").and_yield(user1).and_yield(user2)
+        allow(user).to receive_message_chain("role.instructor?"){ false }
+        allow(user).to receive_message_chain("role.ta?"){false}
+        User.all.find_each do |user|
+          user_list<<user
+        end
+        user.get_user_list
+        end
+      end
+
 
     context 'when current user is an instructor' do
       it 'fetches all users in his/her course/assignment'

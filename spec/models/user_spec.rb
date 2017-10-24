@@ -115,8 +115,6 @@ describe User do
         expect(user1.is_recursively_parent_of(user)).to eq false
       end
 
-    end
-
     context 'when the parent of target user (user) is current user (user1)' do
       it 'returns true' do
         allow(user).to receive(:parent).and_return(user1)
@@ -149,11 +147,49 @@ describe User do
       end
 
     context 'when current user is an instructor' do
-      it 'fetches all users in his/her course/assignment'
+      before(:each) do
+        course = Course.new
+        assignment = Assignment.new
+      end
+      it 'fetches all users in his/her course/assignment' do
+        user_list = double
+        course = double
+        assignment = double
+        allow(user).to receive_message_chain("role.super_admin?"){ false }
+        allow(user).to receive_message_chain("role.instructor?"){ true }
+        allow(Course).to receive_message_chain(:where,:find_each).and_yield(course)
+        allow(course).to receive(:get_participants).and_return(user1)
+        allow(Assignment).to receive_message_chain(:where,:find_each).and_yield(assignment)
+        allow(assignment).to receive(:participants).and_return(user2)
+        allow_any_instance_of(User).to receive(:empty?).and_return(false)
+        allow_any_instance_of(User).to receive(:each).and_yield(user)
+        allow_any_instance_of(User).to receive(:user).and_return(user)
+        allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
+        allow(user).to receive_message_chain("role.ta?"){false}
+        expect(user.get_user_list).to eq ([user])
+      end
     end
 
     context 'when current user is a TA' do
-      it 'fetches all users in his/her courses'
+      before(:each) do
+        course = Course.new
+        end
+      it 'fetches all users in his/her courses'do
+        courses=double
+        course=double
+        allow(user).to receive_message_chain("role.super_admin?"){ false }
+        allow(user).to receive_message_chain("role.ta?"){ true }
+        allow(user).to receive_message_chain("role.instructor?"){ false }
+        allow(Ta).to receive(:get_mapped_courses).and_return(courses)
+        allow(courses).to receive(:each).and_yield(course)
+        allow(Course).to receive(:find).and_return(course)
+        allow(course).to receive(:get_participants).and_return(user1)
+        allow_any_instance_of(User).to receive(:empty?).and_return(false)
+        allow_any_instance_of(User).to receive(:each).and_yield(user)
+        allow_any_instance_of(User).to receive(:user).and_return(user)
+        allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
+        expect(user.get_user_list).to eq ([user])
+    end
     end
   end
 
@@ -388,7 +424,13 @@ describe User do
       expect(user1.is_teaching_assistant_for?(user)).to be_falsey
     end
 
-    it 'returns true if current user is a TA of target user'
+    it 'returns true if current user is a TA of target user'do
+    allow(Ta).to receive(:find).and_return(user1)
+    allow(user1).to receive_message_chain("role.ta?"){ true }
+    allow(user1).to receive_message_chain(:courses_assisted_with,:any?).and_yield(true)
+    allow_any_instance_of(User).to receive_message_chain(:assignments,:map,:flatten,:map,:include?,:user).and_return(true)
+    expect(user1.is_teaching_assistant_for?(user)).to be true
+    end
   end
 
   describe '#is_teaching_assistant?' do

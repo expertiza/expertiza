@@ -1,4 +1,5 @@
 require 'rails_helper'
+# Method is created to autofill all the fields required to create an assignment
 def create_new_assignment
   login_as("instructor6")
   visit "/assignments/new?private=0"
@@ -18,6 +19,7 @@ def create_new_assignment
   click_button 'Create'
 end
 
+# Method is created to autofill all the fields required to add topic to an assignment
 def add_topic_to_assignment assignment
   visit "/assignments/#{assignment.id}/edit"
   click_link 'Topics'

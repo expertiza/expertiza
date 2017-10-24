@@ -12,30 +12,6 @@ describe AssignmentsController do
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
-    params = {
-      assignment_form: {
-        assignment: {
-          course_id: 1,
-          max_team_size: 1,
-          instructor_id: 2,
-          id: 1,
-          name: 'test assignment',
-          directory_path: '/test',
-          spec_location: '',
-          show_teammate_reviews: false,
-          require_quiz: false,
-          num_quiz_questions: 0,
-          staggered_deadline: false,
-          microtask: false,
-          reviews_visible_to_all: false,
-          is_calibrated: false,
-          availability_flag: true,
-          reputation_algorithm: 'Lauw',
-          simicheck: -1,
-          simicheck_threshold: 100
-        }
-      }
-    }
   end
 
   describe '#action_allowed?' do
@@ -134,30 +110,30 @@ describe AssignmentsController do
   end
 
   describe '#create' do
-    # params = {
-    #   assignment_form: {
-    #     assignment: {
-    #       course_id: 1,
-    #       max_team_size: 1,
-    #       instructor_id: 2,
-    #       id: 1,
-    #       name: 'test assignment',
-    #       directory_path: '/test',
-    #       spec_location: '',
-    #       show_teammate_reviews: false,
-    #       require_quiz: false,
-    #       num_quiz_questions: 0,
-    #       staggered_deadline: false,
-    #       microtask: false,
-    #       reviews_visible_to_all: false,
-    #       is_calibrated: false,
-    #       availability_flag: true,
-    #       reputation_algorithm: 'Lauw',
-    #       simicheck: -1,
-    #       simicheck_threshold: 100
-    #     }
-    #   }
-    # }
+    params = {
+      assignment_form: {
+        assignment: {
+          course_id: 1,
+          max_team_size: 1,
+          instructor_id: 2,
+          id: 1,
+          name: 'test assignment',
+          directory_path: '/test',
+          spec_location: '',
+          show_teammate_reviews: false,
+          require_quiz: false,
+          num_quiz_questions: 0,
+          staggered_deadline: false,
+          microtask: false,
+          reviews_visible_to_all: false,
+          is_calibrated: false,
+          availability_flag: true,
+          reputation_algorithm: 'Lauw',
+          simicheck: -1,
+          simicheck_threshold: 100
+        }
+      }
+    }
     context 'when assignment_form is saved successfully' do
       it 'redirets to assignment#edit page' do
         # af = double('AssignmentForm', :save => true)
@@ -196,7 +172,8 @@ describe AssignmentsController do
         allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         params = {id: 1}
         get :edit, params
-        expect(flash.now[:error]).to eq("You did not specify all the necessary rubrics. You need <b>[AuthorFeedback, TeammateReview] </b> of assignment <b>test assignment</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
+        expect(flash.now[:error]).to eq("You did not specify all the necessary rubrics. \
+You need <b>[AuthorFeedback, TeammateReview] </b> of assignment <b>test assignment</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
         expect(response).to render_template(:edit)
       end
     end
@@ -229,34 +206,34 @@ describe AssignmentsController do
     end
 
     context 'when params has key :assignment_form' do
-      # params = {
-      #   id: 1,
-      #   course_id: 1,
-      #   assignment_form: {
-      #     assignment_questionnaire: [{"assignment_id" => "2", "questionnaire_id" => "666", "dropdown" => "true",
-      #                                 "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
-      #     assignment: {
-      #       instructor_id: 3,
-      #       course_id: 2,
-      #       max_team_size: 2,
-      #       id: 2,
-      #       name: 'test assignment',
-      #       directory_path: '/test',
-      #       spec_location: '',
-      #       show_teammate_reviews: false,
-      #       require_quiz: false,
-      #       num_quiz_questions: 0,
-      #       staggered_deadline: false,
-      #       microtask: false,
-      #       reviews_visible_to_all: false,
-      #       is_calibrated: false,
-      #       availability_flag: true,
-      #       reputation_algorithm: 'Lauw',
-      #       simicheck: -1,
-      #       simicheck_threshold: 100
-      #     }
-      #   }
-      # }
+      params = {
+        id: 1,
+        course_id: 1,
+        assignment_form: {
+          assignment_questionnaire: [{"assignment_id" => "2", "questionnaire_id" => "666", "dropdown" => "true",
+                                      "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          assignment: {
+            instructor_id: 3,
+            course_id: 2,
+            max_team_size: 2,
+            id: 2,
+            name: 'test assignment',
+            directory_path: '/test',
+            spec_location: '',
+            show_teammate_reviews: false,
+            require_quiz: false,
+            num_quiz_questions: 0,
+            staggered_deadline: false,
+            microtask: false,
+            reviews_visible_to_all: false,
+            is_calibrated: false,
+            availability_flag: true,
+            reputation_algorithm: 'Lauw',
+            simicheck: -1,
+            simicheck_threshold: 100
+          }
+        }
+      }
       context 'when the timezone preference of current user is nil and assignment form updates attributes successfully' do
         it 'shows an error message and redirects to assignments#edit page' do
           # admin2 = double(:admin, timezonepref: nil, )
@@ -277,7 +254,8 @@ describe AssignmentsController do
           allow(assignment_form).to receive(:assignment).and_return(double("Assignment", id: 2, name: "test assignment"))
           post :update, params
           expect(flash[:note]).to eq('The assignment was successfully saved....')
-          expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in UTC")
+          expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred \
+timezone to guarantee the correct display time. For now we assume you are in UTC")
           expect(response).to redirect_to edit_assignment_path assignment_form.assignment.id
         end
       end

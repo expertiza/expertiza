@@ -15,6 +15,22 @@ describe Assignment do
   end
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
 
+  describe '#calibrated?' do
+    context 'when assignment is calibrated' do
+      it 'return true' do
+        allow(assignment).to receive(:is_calibrated).and_return(true)
+        expect(assignment.calibrated?).to be(true)
+      end
+    end
+
+    context 'when assignment is not calibrated' do
+      it 'return false' do
+        allow(assignment).to receive(:is_calibrated).and_return(false)
+        expect(assignment.calibrated?).to be(false)
+      end
+    end
+  end
+
   describe '.max_outstanding_reviews' do
     it 'returns 2 by default'
   end

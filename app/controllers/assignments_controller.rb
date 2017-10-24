@@ -77,12 +77,12 @@ class AssignmentsController < ApplicationController
 
     # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
-      @due_date_nameurl_notempty = is_due_date_nameurl_notempty(dd)
+      @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
       @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
-      @metareview_allowed = is_meta_review_allowed?(dd)
-      @drop_topic_allowed = is_drop_topic_allowed?(dd)
-      @signup_allowed = is_signup_allowed?(dd)
-      @team_formation_allowed = is_team_formation_allowed?(dd)
+      @metareview_allowed = meta_review_allowed?(dd)
+      @drop_topic_allowed = drop_topic_allowed?(dd)
+      @signup_allowed = signup_allowed?(dd)
+      @team_formation_allowed = team_formation_allowed?(dd)
 
       if dd.due_at.present?
         dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
@@ -262,23 +262,23 @@ class AssignmentsController < ApplicationController
     needed_rub
   end
 
-  def is_due_date_nameurl_notempty(dd)
+  def due_date_nameurl_notempty?(dd)
     (!dd.deadline_name.nil? && !dd.deadline_name.empty?) || (!dd.description_url.nil? && !dd.description_url.empty?)
   end
 
-  def is_meta_review_allowed?(dd)
+  def meta_review_allowed?(dd)
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_METAREVIEW
   end
 
-  def is_drop_topic_allowed?(dd)
+  def drop_topic_allowed?(dd)
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC
   end
 
-  def is_signup_allowed?(dd)
+  def signup_allowed?(dd)
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SIGN_UP
   end
 
-  def is_team_formation_allowed?(dd)
+  def team_formation_allowed?(dd)
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
 

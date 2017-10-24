@@ -1,3 +1,4 @@
+include Rails.application.routes.url_helpers
 describe User do
   let(:user) do
     User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
@@ -69,7 +70,19 @@ describe User do
   end
 
   describe '#get_available_users' do
-    it 'returns the first 10 visible users'
+    before(:each) do
+      role = Role.new
+    end
+    it 'returns the first 10 visible users' do
+      all_users = double
+      user_mock1 = double(:role=>'Instructor')
+      user_mock2 = double(:role=>'Administrator')
+      user_mock3 = double(:role=>'Student')
+      allow(@role).to receive(:get_parents).and_return(['Instructor','Administrator'])
+      allow(User).to receive(:all).and_return([user_mock1,user_mock2,user_mock3])
+      allow(all_users).to receive(:select).and_yield(user_mock2).and_yield(user_mock2).and_yield(user_mock3)
+      expect(user.get_available_users("abc")).to eq ([user_mock1,user_mock2])
+    end
   end
 
   describe '#can_impersonate?' do
@@ -97,16 +110,26 @@ describe User do
 
   describe '#is_recursively_parent_of' do
     context 'when the parent of target user (user) is nil' do
+      it 'returns false' do
+        allow(user).to receive(:parent).and_return(nil)
+        expect(user1.is_recursively_parent_of(user)).to eq false
+      end
 
-      it 'returns false'
     end
 
     context 'when the parent of target user (user) is current user (user1)' do
-      it 'returns true'
+      it 'returns true' do
+        allow(user).to receive(:parent).and_return(user1)
+        expect(user1.is_recursively_parent_of(user)).to eq true
+      end
     end
 
     context 'when the parent of target user (user) is not current user (user1), but super admin (user2)' do
-      it 'returns false'
+      it 'returns false' do
+        allow(user).to receive(:parent).and_return(user2)
+        allow(user2).to receive_message_chain("role.super_admin?") { true }
+        expect(user1.is_recursively_parent_of(user)).to eq false
+      end
     end
   end
 
@@ -124,7 +147,6 @@ describe User do
         user.get_user_list
         end
       end
-
 
     context 'when current user is an instructor' do
       it 'fetches all users in his/her course/assignment'
@@ -162,26 +184,55 @@ describe User do
   end
 
   describe '.import' do
-    it 'raises error if import column does not equal to 3'
+    it 'raises error if import column does not equal to 3' do
+      row = ["abc","abc xyz"]
+      _row_header = double
+      seesion = {:user=>user}
+      _id = double
+      expect { User.import(row, _row_header,session,_id) }.to raise_error(ArgumentError,"Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email.")
+    end
+    it 'updates an existing user with info from impor file' do
+      row = ["abc","abc xyz","abcxyz@gamil.com"]
+      _row_header = double
+      seesion = {:user=>user}
+      _id = double
+      allow(User).to receive(:find_by_name).and_return(user)
+      allow_any_instance_of(User).to receive(:nil?).and_return(false)
+      allow_any_instance_of(User).to receive(:id).and_return(1)
+      expect_any_instance_of(User).to receive(:save)
+      User.import(row,_row_header,seesion,_id)
+    end
 
-    it 'updates an existing user with info from impor file'
   end
 
   describe '.yesorno' do
-    it 'returns yes when input is true'
-
-    it 'returns no when input is false'
-
-    it 'returns empty string when input is other content'
+    it 'returns yes when input is true' do
+      expect(User.yesorno(true)).to eq "yes"
+    end
+    it 'returns no when input is false' do
+      expect(User.yesorno(false)).to eq "no"
+    end
+    it 'returns empty string when input is other content' do
+      content = "TEXT"
+      expect(User.yesorno(content)).to eq ""
+    end
   end
 
   describe '.find_by_login' do
     context 'when user\'s email is stored in DB' do
-      it 'finds user by email'
+      it 'finds user by email' do
+        email = 'abcxyz@gmail.com'
+        allow(User).to receive(:find_by_email).with(email).and_return(user)
+        expect(User.find_by_login(email)).to eq user
+      end
     end
 
     context 'when user\'s email is not stored in DB' do
-      it 'finds user by email if the local part of email is the same as username'
+      it 'finds user by email if the local part of email is the same as username' do
+        allow(User).to receive(:find_by_email).and_return(nil)
+        allow(User).to receive(:where).and_return([{name: 'abc', fullname: 'abc bbc'}])
+        expect(User.find_by_login('abcxyz@gmail.com')).to eq ({:name=>"abc", :fullname=>"abc bbc"})
+      end
     end
   end
 
@@ -298,11 +349,31 @@ describe User do
   end
 
   describe '.from_params' do
-    it 'returns user by user_id fetching from params'
-
-    it 'returns user by user name fetching from params'
-
-    it 'raises an error when Expertiza cannot find user'
+    it 'returns user by user_id fetching from params' do
+      params = {
+        :user_id => 1,
+      }
+      allow(User).to receive(:find).and_return(user)
+      expect(User.from_params(params)).to eq user
+    end
+    it 'returns user by user name fetching from params' do
+      params = {
+        :user => {
+          :name => 'abc'
+        }
+      }
+      allow(User).to receive(:find_by_name).and_return(user)
+      expect(User.from_params(params)).to eq user
+    end
+    it 'raises an error when Expertiza cannot find user' do
+      params = {
+        :user => {
+          :name => 'ncsu'
+        }
+      }
+      allow(user).to receive(:nil?).and_return(true)
+      expect {User.from_params(params)}.to raise_error(NoimplementedError,"Please <a href='http://localhost:3000/users/new'>create an account</a> for this user to continue.")
+    end
   end
 
   describe '#is_teaching_assistant_for?' do

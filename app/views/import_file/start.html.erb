@@ -21,7 +21,6 @@
 
       <tr><td><br/></td></tr>
 
-      <!--< if !(@model == 'AssignmentTeam' or @model == 'CourseTeam') %>-->
       <tr>
         <td><strong>Header:</strong></td>
       </tr>
@@ -31,7 +30,6 @@
           <%= radio_button_tag 'has_header', 'false' %> File does not have a header<br/>
         </td>
       </tr>
-      <!--< end %>-->
 
     </table>
 
@@ -50,9 +48,6 @@
         </tr>
        </table>
         <br/>
-
-        <!--<= check_box 'options','has_column_names', {:checked => 'checked'},  "true", "false"  %>-->
-
         <br/>
 
         <label for="options[handle_dups]">If a duplicate team name is found in the roster,</label>
@@ -85,7 +80,6 @@
 
     <% end %>
 
-    <br/>
     <% if @model == 'MetareviewResponseMap' %>
         <br/>
         <table>

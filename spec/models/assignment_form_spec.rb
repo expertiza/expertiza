@@ -62,40 +62,24 @@ describe AssignmentForm do
   describe '#add_to_delayed_queue' do
     context 'when the deadline type is review' do
       it 'adds two delayed jobs and changes the # of DelayedJob by 2' do
-        ddtype = DeadlineType.new(:name => 'review', :id => 1)
-        ddtype.save
-
-        assignment2 = build(:assignment, id:2)
-        review_id = DeadlineType.where(:name => "review").first
-
-        ob = AssignmentDueDate.new(:parent_id => assignment2.id, :deadline_type => review_id, :due_at => Time.now.utc.advance(weeks:1))
-        ob.save
-
+        tmp_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks:1))
+        allow(AssignmentDueDate).to receive_message_chain(:where).and_return([tmp_due])
+        allow(DeadlineType).to receive_message_chain(:find, :name).and_return("review")
+        allow_any_instance_of(AssignmentDueDate).to receive(:update_attribute)
         num_delayedJob = DelayedJob.count
-        assignment_form2 = assignment_form()
-        assignment_form2.assignment = assignment2
-        assignment_form2.add_to_delayed_queue()
-
+        assignment_form.add_to_delayed_queue()
         expect(DelayedJob.count).to eq(num_delayedJob + 2)
       end
     end
 
     context 'when the deadline type is team formation and current assignment is team-based assignment' do
       it 'adds a delayed job and changes the # of DelayedJob by 2' do
-        ddtype = DeadlineType.new(:name => 'team_formation', :id => 2)
-        ddtype.save
-
-        assignment3 = build(:assignment, id:3)
-        review_id = DeadlineType.where(:name => "team_formation").first
-
-        ob = AssignmentDueDate.new(:parent_id => assignment3.id, :deadline_type => review_id, :due_at => Time.now.utc.advance(weeks:1))
-        ob.save
-
+        tmp_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks:1))
+        allow(AssignmentDueDate).to receive_message_chain(:where).and_return([tmp_due])
+        allow(DeadlineType).to receive_message_chain(:find, :name).and_return("team_formation")
+        allow_any_instance_of(AssignmentDueDate).to receive(:update_attribute)
         num_delayedJob = DelayedJob.count
-        assignment_form3 = assignment_form()
-        assignment_form3.assignment = assignment3
-        assignment_form3.add_to_delayed_queue()
-
+        assignment_form.add_to_delayed_queue()
         expect(DelayedJob.count).to eq(num_delayedJob + 2)
       end
     end

@@ -113,9 +113,9 @@ describe AssignmentsController do
     params = {
       assignment_form: {
         assignment: {
-          instructor_id: 2,
-          course_id: 1,
-          max_team_size: 1,
+            course_id: 1,
+            max_team_size: 1,
+            instructor_id: 2,
           id: 1,
           name: 'test assignment',
           directory_path: '/test',

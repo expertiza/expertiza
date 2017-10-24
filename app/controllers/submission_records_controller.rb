@@ -20,7 +20,7 @@ class SubmissionRecordsController < ApplicationController
       matches = GIT_HUB_REGEX.match(record.content)
        if(matches.nil?)
        else
-         redirect_to "/git_data/update_git_data?record="+record.id
+         GitDatum.update_git_data(record.id)
        end
     end
   end

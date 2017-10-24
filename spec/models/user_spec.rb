@@ -284,11 +284,11 @@ describe User do
     end
 
     it 'returns true if current user is a TA of target user'do
-    ta=double
-    allow(Ta).to receive(find).and_return(ta)
-    allow(ta).to receuve(:courses_assisted_with,:any?).and_return(true)
-    allow_any_instance_of(User).to receive_message_chain(:assignments,:map,:flatten,:map,:include?).and_return(true)
-    expect(user).to receive(:is_teaching_assistant_for).and_return(true)
+    allow(Ta).to receive(:find).and_return(user1)
+    allow(user1).to receive_message_chain("role.ta?"){ true }
+    allow(user1).to receive_message_chain(:courses_assisted_with,:any?).and_yield(true)
+    allow_any_instance_of(User).to receive_message_chain(:assignments,:map,:flatten,:map,:include?,:user).and_return(true)
+    expect(user1.is_teaching_assistant_for?(user)).to be true
     end
   end
 

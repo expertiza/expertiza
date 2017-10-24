@@ -154,12 +154,8 @@ Expertiza::Application.routes.draw do
   end
 
   get '/import_file/import', controller: :import_file, action: :import
-
   get '/import_file/show', controller: :import_file, action: :show
-
   post '/import_file/show', controller: :import_file, action: :show
-
-  post '/import_file/import_from_hash', controller: :import_file, action: :import_from_hash
 
   resources :institution do
     collection do

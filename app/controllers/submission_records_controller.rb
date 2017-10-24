@@ -15,12 +15,14 @@ class SubmissionRecordsController < ApplicationController
   # Show submission records.
   # expects to get team_id from params
   def index
+    puts params
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
     @submission_records.each do |record|
       matches = GIT_HUB_REGEX.match(record.content)
        if(matches.nil?)
        else
          GitDatum.update_git_data(record.id)
+         @git_data = GitDatum.where("submission_record_id = ?", record.id)
        end
     end
   end

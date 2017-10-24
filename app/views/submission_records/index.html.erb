@@ -29,4 +29,11 @@
       </tr>
   <% end %>
   </tbody>
+  <%= line_chart @git_data.map { |goal|
+    {:name=> goal.author, :data=> goal.author.group_by_date(:date).sum(:commits)}
+      } %>
+
+
+
+
 </table>

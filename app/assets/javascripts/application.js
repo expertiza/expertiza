@@ -29,7 +29,6 @@
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
 //= require awesome_input
-
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();
 

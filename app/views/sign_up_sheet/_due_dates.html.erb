@@ -1,4 +1,5 @@
 <table class="general">
+
   <tr>
 
     <th>#</th>
@@ -11,14 +12,13 @@
     <%end%>
   </tr>
   <% i=0 %>
+
   <% for i in 0..(@assignment.sign_up_topics.size - 1) %>
     <tr>
-      <% if @assignment.staggered_deadline == true %>
-          <td><%= check_box_tag 'selected_ids[]', i -%>
-       <%= @assignment.sign_up_topics[i].topic_identifier %></td>
-      <%else%>
-        <td><%= @assignment.sign_up_topics[i].topic_identifier %></td>
-      <%end%>
+      <td><%= @assignment.sign_up_topics[i].topic_identifier %><br/>
+        <%= check_box_tag 'selected_ids[]', value = i ,checked = false, class: 'chkbox' -%>
+      </td>
+
       <td><%= @assignment.sign_up_topics[i].topic_name %></td>
       <% for review_round in 1..review_rounds %>
         <% topic_id = @assignment.sign_up_topics[i].id %>
@@ -30,9 +30,8 @@
 </table>
 <br/>
 
-<% if @assignment.staggered_deadline == true %>
 
-<h1>New deadline for selected topics</h1>
+<h4>New deadline for selected topics</h4>
 <table class="general">
   <tr>
     <th> New submission deadline</th>
@@ -44,13 +43,37 @@
   </tr>
   <tr>
 <% for review_round in 1..review_rounds %>
-    <% topic_id = @assignment.sign_up_topics[1].id %>
+    <% topic_id = @assignment.sign_up_topics[get_latester_topic_deadline(assignment_submission_due_dates,@assignment.sign_up_topics)].id %>
     <td><%= text_field :due_date, ('selected_topics_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round) %></td>
     <td><%= text_field :due_date, ('selected_topics_review_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_review_due_dates, topic_id, 2, review_round) %></td>
 <%end%>
   </tr>
 </table>
 <br/>
-<%end%>
+
 
 <%= submit_tag "Save start/due dates" %>
+
+<script type="text/javascript">
+$(document).ready(function() {
+var $chkboxes = $('.chkbox');
+var lastChecked = null;
+
+$chkboxes.click(function(e) {
+if(!lastChecked) {
+lastChecked = this;
+return;
+}
+
+if(e.shiftKey) {
+var start = $chkboxes.index(this);
+var end = $chkboxes.index(lastChecked);
+
+$chkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).prop('checked', lastChecked.checked);
+
+}
+
+lastChecked = this;
+});
+});
+</script>

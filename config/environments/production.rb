@@ -89,4 +89,5 @@ Expertiza::Application.configure do
   config.log_formatter = ::Logger::Formatter.new
 
   config.react.variant = :production
+
 end

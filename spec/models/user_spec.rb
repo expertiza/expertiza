@@ -193,29 +193,39 @@ describe User do
 
     it 'exports all information setting in options' do
       options={"personal_details"=>"true", "role"=>"true","parent"=>"true","email_options"=>"true","handle"=>"true"}
-      expect(User.export([],0 , options)).to eq([user.name,user.fullname,user.email,
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.name,user.fullname,user.email,
                                                  user.role.name,user.parent.name,user.email_on_submission, user.email_on_review,
-                                                 user.email_on_review_of_review, user.copy_of_emails,user.handle])
+                                                 user.email_on_review_of_review, user.copy_of_emails,user.handle]])
     end
 
     it 'exports only personal_details'do
       options={"personal_details"=>"true", "role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"false"}
-      User.export([],0 , options)
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.name,user.fullname,user.email]])
     end
 
     it 'exports only current role and parent' do
       options={"personal_details"=>"false", "role"=>"true","parent"=>"true","email_options"=>"false","handle"=>"false"}
-      User.export([],0 , options)
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.role.name,user.parent.name]])
     end
 
     it 'exports only email_options' do
       options={"personal_details"=>"false", "role"=>"false","parent"=>"false","email_options"=>"true","handle"=>"false"}
-      User.export([],0 , options)
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.email_on_submission, user.email_on_review,user.email_on_review_of_review, user.copy_of_emails]])
     end
 
     it 'exports only handle' do
       options={"personal_details"=>"false", "role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"true"}
-      User.export([],0 , options)
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.handle]])
     end
   end
 

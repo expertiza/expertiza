@@ -30,6 +30,10 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
+    if @assignment.instructor.copy_of_all_emails
+      defn[:bcc] << @assignment.instructor.email
+    end
+
     # if Rails.env.development? || Rails.env.test?
     #   defn[:to] = 'expertiza.development@gmail.com'
     # end
@@ -96,6 +100,7 @@ class Mailer < ActionMailer::Base
     @type = @body[:type]
     @reviewee_name = @body[:reviewee_name]
     @new_score = @body[:new_score]
+    @avg_score = @body[:avg_score]
     @conflicting_response_url = @body[:conflicting_response_url]
     @summary_url = @body[:summary_url]
     @assignment_edit_url = @body[:assignment_edit_url]

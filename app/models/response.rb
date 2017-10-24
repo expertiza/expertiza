@@ -273,6 +273,9 @@ class Response < ActiveRecord::Base
     reviewee_name = User.find(reviewee_participant.user_id).fullname
 
     assignment = Assignment.find(reviewer_participanat.parent_id)
+    map_class = self.map.class
+    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    average_score, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
 
     Mailer.notify_grade_conflict_message({
       to: assignment.instructor.email,
@@ -282,6 +285,7 @@ class Response < ActiveRecord::Base
            type: "review",
            reviewee_name: reviewee_name,
            new_score: get_total_score.to_f / get_maximum_score,
+           avg_score: average_score,
            assignment: assignment,
            conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
            summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,

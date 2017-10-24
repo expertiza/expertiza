@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  attr_accessor :anonymous_mode 
+  attr_accessor :anonymous_mode
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -259,6 +259,7 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
+    @copy_of_all_emails = false
   end
 
   def self.export(csv, _parent_id, options)
@@ -271,7 +272,7 @@ class User < ActiveRecord::Base
       tcsv.push(user.role.name) if options["role"] == "true"
       tcsv.push(user.parent.name) if options["parent"] == "true"
       if options["email_options"] == "true"
-        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails)
+        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails, user.copy_of_all_emails)
       end
       tcsv.push(user.handle) if options["handle"] == "true"
       csv << tcsv

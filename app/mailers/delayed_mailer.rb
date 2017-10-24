@@ -138,7 +138,7 @@ class DelayedMailer
     Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
     @count += 1
     if @count % 3 == 0
-      if assignment.instructor.copy_of_emails
+      if assignment.instructor.copy_of_emails or assignment.instructor.copy_of_all_emails
         emails << assignment.instructor.email
       end
 

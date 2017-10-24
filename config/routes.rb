@@ -1,6 +1,5 @@
 Expertiza::Application.routes.draw do
 
-  resources :git_data
   resources :user_pastebins
   resources :track_notifications
   resources :notifications

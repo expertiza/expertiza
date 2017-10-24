@@ -186,43 +186,115 @@ describe User do
   end
 
   describe '#get_instructor' do
-    it 'gets the instructor id'
+    it 'gets the instructor id' do
+      allow(user).to receive(:id).and_return(123)
+      expect(user.get_instructor).to eq(123)
+      end
   end
 
   describe '#instructor_id' do
-    it 'returns id when role of current user is a super admin'
+    it 'returns id when role of current user is a super admin' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Super-Administrator')
+      allow(user).to receive(:id).and_return(1)
+      expect(user.instructor_id).to eq(1)
+    end
 
-    it 'returns id when role of current user is an Administrator'
+    it 'returns id when role of current user is an Administrator' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Administrator')
+      allow(user).to receive(:id).and_return(2)
+      expect(user.instructor_id).to eq(2)
+    end
 
-    it 'returns id when role of current user is an Instructor'
+    it 'returns id when role of current user is an Instructor' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Instructor')
+      allow(user).to receive(:id).and_return(3)
+      expect(user.instructor_id).to eq(3)
+    end
 
-    it 'returns instructor_id when role of current user is a TA'
+    it 'returns instructor_id when role of current user is a TA' do
+      allow(user).to receive_message_chain(:role,:name).and_return('Teaching Assistant')
+      allow(Ta).to receive(:get_my_instructor).and_return(4)
+      expect(user.instructor_id).to eq(4)
+    end
 
-    it 'raise an error when role of current user is other type'
+    it 'raise an error when role of current user is other type' do
+      allow(user).to receive_message_chain(:role,:name).and_return('abc')
+      expect{user.instructor_id}.to raise_error(NotImplementedError,"for role abc")
+    end
+
   end
 
   describe '.export' do
-    it 'exports all information setting in options'
+    before(:each) do
+      allow(user).to receive_message_chain(:role,:name).and_return('abc')
+      allow(user).to receive_message_chain(:parent,:name).and_return('abc')
+      allow(User).to receive(:all).and_return([user])
+      allow_any_instance_of(User).to receive(:each).and_yield(user)
+    end
 
-    it 'exports only personal_details'
+    it 'exports all information setting in options' do
+      options={"personal_details"=>"true", "role"=>"true","parent"=>"true","email_options"=>"true","handle"=>"true"}
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.name,user.fullname,user.email,
+                                                 user.role.name,user.parent.name,user.email_on_submission, user.email_on_review,
+                                                 user.email_on_review_of_review, user.copy_of_emails,user.handle]])
+    end
 
-    it 'exports only current role and parent'
+    it 'exports only personal_details'do
+      options={"personal_details"=>"true", "role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"false"}
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.name,user.fullname,user.email]])
+    end
 
-    it 'exports only email_options'
+    it 'exports only current role and parent' do
+      options={"personal_details"=>"false", "role"=>"true","parent"=>"true","email_options"=>"false","handle"=>"false"}
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.role.name,user.parent.name]])
+    end
 
-    it 'exports only handle'
+    it 'exports only email_options' do
+      options={"personal_details"=>"false", "role"=>"false","parent"=>"false","email_options"=>"true","handle"=>"false"}
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.email_on_submission, user.email_on_review,user.email_on_review_of_review, user.copy_of_emails]])
+    end
+
+    it 'exports only handle' do
+      options={"personal_details"=>"false", "role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"true"}
+      csv=[]
+      User.export(csv,0 , options)
+      expect(csv).to eq([[user.handle]])
+    end
   end
 
   describe '.export_fields' do
-    it 'exports all information setting in options'
+    it 'exports all information setting in options' do
+      options={"personal_details"=>"true","role"=>"true","parent"=>"true","email_options"=>"true","handle"=>"true"}
+      expect(User.export_fields(options)).to eq(["name","full name","email","role","parent","email on submission","email on review","email on metareview","handle"])
+    end
 
-    it 'exports only personal_details'
+    it 'exports only personal_details' do
+      options={"personal_details"=>"true","role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"false"}
+      expect(User.export_fields(options)).to eq(["name","full name","email"])
+    end
 
-    it 'exports only current role and parent'
+    it 'exports only current role and parent' do
+      options={"personal_details"=>"false","role"=>"true","parent"=>"true","email_options"=>"false","handle"=>"false"}
+      expect(User.export_fields(options)).to eq(["role","parent"])
+    end
 
-    it 'exports only email_options'
+    it 'exports only email_options' do
+      options={"personal_details"=>"false","role"=>"false","parent"=>"false","email_options"=>"true","handle"=>"false"}
+      expect(User.export_fields(options)).to eq(["email on submission","email on review","email on metareview"])
+    end
 
-    it 'exports only handle'
+    it 'exports only handle' do
+      options={"personal_details"=>"false","role"=>"false","parent"=>"false","email_options"=>"false","handle"=>"true"}
+      expect(User.export_fields(options)).to eq(["handle"])
+    end
   end
 
   describe '.from_params' do

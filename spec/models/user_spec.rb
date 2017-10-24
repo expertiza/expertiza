@@ -151,7 +151,20 @@ describe User do
     end
 
     context 'when current user is a TA' do
-      it 'fetches all users in his/her courses'
+      it 'fetches all users in his/her courses'do
+        courses=double
+        course=double
+        allow(user).to receive_message_chain("role.ta?"){ true }
+        allow(Ta).to receive(:get_mapped_courses).and_return(courses)
+        allow(courses).to receive(:each).and_yield(course)
+        allow(Course).to receive(:find).and_return(course)
+        allow(course).to receive(:get_participants).and_return(user1)
+        allow_any_instance_of(User).to receive(:empty?).and_return(false)
+        allow_any_instance_of(User).to receive(:each).and_yield(user)
+        allow_any_instance_of(User).to receive(:user).and_return(user)
+        allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
+        allow(user).to receive_message_chain("role.ta?"){false}
+        expect(user.get_user_list).to eq ([user])
     end
   end
 

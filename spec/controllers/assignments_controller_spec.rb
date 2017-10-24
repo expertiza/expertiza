@@ -271,9 +271,9 @@ describe AssignmentsController do
           allow(User).to receive(:find).and_return(parent)
           allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(admin)
           allow(assignment_form).to receive_message_chain(assignment, instructor).with(admin)
-          allow(assignment_form).to receive(:update_attributes).and_return(false)
-          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>2, :name=>"test assignment"))
-          allow(assignment_form).to receive_message_chain(:errors, :messages) {['Assignment not find.', 'Course not find.']}
+          allow_any_instance_of(AssignmentForm).to receive(:update_attributes).and_return(false)
+          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>1, :name=>"test assignment"))
+          allow_any_instance_of(AssignmentForm).to receive_message_chain(:errors, :get) {'Assignment not find. Course not find.'}
           post :update, params
           # expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")

@@ -30,10 +30,13 @@
   <% end %>
   </tbody>
   <%= line_chart @authors.map{ |goal|
-    {:name=> goal, :data=> GitDatum.where("author = ? and date <= ? and date >= ?", goal, '2017-04-22', '2017-03-21').group_by_day(:date).sum(:commits)}
+    {:name=> goal, :data=> GitDatum.where("author = ?", goal).group_by_day(:date).sum(:commits)}
       } %>
   <%= line_chart @authors.map{ |goal|
-    {:name=> goal, :data=> GitDatum.where("author = ? and date <= ? and date >= ?", goal, '2017-04-22', '2017-03-21').group_by_day(:date).sum(:files)}
+    {:name=> goal, :data=> GitDatum.where("author = ?", goal).group_by_day(:date).sum(:files)}
+  } %>
+  <%= line_chart @authors.map{ |goal|
+    {:name=> goal, :data=> GitDatum.where("author = ?", goal).group_by_day(:date).sum(:lines_modified)}
   } %>
 
 </table>

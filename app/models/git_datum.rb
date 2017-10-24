@@ -9,6 +9,7 @@ class GitDatum < ActiveRecord::Base
   validates :files, :presence => true
   validates :additions, :presence => true
   validates :deletions, :presence => true
+  validates :lines_modified, :presence => true
   validates :date, :presence => true
 
   def self.update_git_data(id)
@@ -37,6 +38,7 @@ class GitDatum < ActiveRecord::Base
             author_commit.files = single_commit.files.size
             author_commit.additions = single_commit.stats.additions
             author_commit.deletions = single_commit.stats.deletions
+            author_commit.lines_modified = author_commit.additions + author_commit.deletions
             author_commit.submission_record_id = id
             author_commit.date = res.created_at
             total_commits << author_commit
@@ -45,6 +47,7 @@ class GitDatum < ActiveRecord::Base
             author_commit.files = author_commit.files + single_commit.files.size
             author_commit.additions = author_commit.additions + single_commit.stats.additions
             author_commit.deletions = author_commit.deletions + single_commit.stats.deletions
+            author_commit.lines_modified = author_commit.additions + author_commit.deletions
           end
         end
         total_commits.each do |row|

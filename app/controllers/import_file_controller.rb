@@ -17,6 +17,19 @@ class ImportFileController < ApplicationController
     else
       @has_teamname = "nil"
     end
+    if (@model == 'ReviewResponseMap')
+      @has_reviewee = params[:has_reviewee]
+    else
+      @has_reviewee = nil
+    end
+
+    if (@model == 'MetareviewResponseMap')
+      @has_reviewee = params[:has_reviewee]
+      @has_reviewer = params[:has_reviewer]
+    else
+      @has_reviewee = "nil"
+      @has_reviewer = "nil"
+    end
     @current_file = params[:file]
     @current_file_contents = @current_file.read
     @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
@@ -30,11 +43,6 @@ class ImportFileController < ApplicationController
     @title = params[:title]
   end
 
-  ###############################################################
-  #                                                             #
-  #    CALL OUR NEW METHOD FROM import INSTEAD OF importFile    #
-  #                                                             #
-  ###############################################################
 
   def import
 
@@ -67,6 +75,7 @@ class ImportFileController < ApplicationController
 
 
   def import_from_hash(session, params)
+
     if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
 
       contents_hash = eval(params[:contents_hash])
@@ -91,6 +100,34 @@ class ImportFileController < ApplicationController
         puts errors.to_s
       end
 
+      elsif params[:model] == "ReviewResponseMap"
+        contents_hash = eval(params[:contents_hash])
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+        errors = []
+
+        begin
+          @header_integrated_body.each do |row_hash|
+            ReviewResponseMap.import(row_hash,session,params[:id])
+          end
+
+        rescue
+          errors << $ERROR_INFO
+          puts errors.to_s
+        end
+      elsif params[:model] == "MetareviewResponseMap"
+        contents_hash = eval(params[:contents_hash])
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+        errors = []
+
+        begin
+          @header_integrated_body.each do |row_hash|
+            MetareviewResponseMap.import(row_hash,session,params[:id])
+          end
+
+        rescue
+          errors << $ERROR_INFO
+          puts errors.to_s
+        end
     elsif params[:model] == 'SignUpTopic'
       session[:assignment_id] = params[:id]
       contents_hash[:body].each do |row|
@@ -149,6 +186,42 @@ class ImportFileController < ApplicationController
           h[header[0]] = row.shift
           h[header[1]] = row
         elsif params[:has_teamname] == "true_last"
+          h[header[1]] = row.pop
+          h[header[0]] = row
+        else
+          h[header[0]] = row
+        end
+        new_body << h
+      end
+
+    elsif params[:model] == "ReviewResponseMap"
+
+      header.map! { |column_name| column_name.to_sym }
+      body.each do |row|
+        h = Hash.new()
+        if params[:has_reviewee] == "true_first"
+          h[header[0]] = row.shift
+          h[header[1]] = row
+        elsif params[:has_reviewee] == "true_last"
+          h[header[1]] = row.pop
+          h[header[0]] = row
+        else
+          h[header[0]] = row
+        end
+        new_body << h
+      end
+
+    elsif params[:model] == "MetareviewResponseMap"
+
+      header.map! { |column_name| column_name.to_sym }
+      body.each do |row|
+        h = Hash.new()
+        if params[:has_reviewee] == "true_first"
+          h[header[0]] = row.shift
+          h[header[1]] = row.shift
+          h[header[2]] = row
+        elsif params[:has_reviewee] == "true_last"
+          h[header[2]] = row.pop
           h[header[1]] = row.pop
           h[header[0]] = row
         else

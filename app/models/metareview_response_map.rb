@@ -51,38 +51,37 @@ class MetareviewResponseMap < ResponseMap
     fields = ["contributor", "reviewed by", "metareviewed by"]
     fields
   end
-
-  def self.import(row, _session, id)
-    if row.length < 3
+  def self.import(row_hash, session, id)
+    if row_hash.length < 3
       raise ArgumentError.new("Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>")
     end
 
-    index = 2
-    while index < row.length
+    row_hash[:metareviewers].each do |row|
+
       # ACS Make All contributors as teams
-      contributor = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  id).first
+      contributor = AssignmentTeam.where(name: row_hash[:reviewee].to_s, parent_id:  id).first
 
       if contributor.nil?
-        raise ImportError, "Contributor, " + row[0].to_s + ", was not found."
+        raise ImportError, "Contributor, " + row_hash[:reviewee].to_s + ", was not found."
       end
 
-      ruser = User.find_by_name(row[1].to_s.strip)
+      ruser = User.find_by_name(row_hash[:reviewer].to_s)
       reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id:  id).first
       if reviewee.nil?
-        raise ImportError, "Reviewee,  " + row[1].to_s + ", for contributor, " + contributor.name + ", was not found."
+        raise ImportError, "Reviewee,  " + row_hash[:reviewer].to_s + ", for contributor, " + contributor.name + ", was not found."
         end
 
-      muser = User.find_by_name(row[index].to_s.strip)
+      muser = User.find_by_name(row.to_s)
       reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
       if reviewer.nil?
-        raise ImportError, "Metareviewer,  " + row[index].to_s + ", for contributor, " + contributor.name + ", and reviewee, " + row[1].to_s + ", was not found."
+        raise ImportError, "Metareviewer,  " + row.to_s + ", for contributor, " + contributor.name + ", and reviewee, " + row_hash[:reviewer].to_s + ", was not found."
         end
 
       # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
       if reviewmapping.nil?
-        raise ImportError, "No review mapping was found for contributor, " + contributor.name + ", and reviewee, " + row[1].to_s + "."
+        raise ImportError, "No review mapping was found for contributor, " + contributor.name + ", and reviewee, " + row_hash[:reviewer].to_s + "."
       end
 
       existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
@@ -93,9 +92,54 @@ class MetareviewResponseMap < ResponseMap
         MetareviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: reviewmapping.map_id)
       end
 
-      index += 1
-          end
+    end
   end
+
+  # Old Method
+  # def self.import(row, _session, id)
+  #   if row.length < 3
+  #     raise ArgumentError.new("Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>")
+  #   end
+  #
+  #   index = 2
+  #   while index < row.length
+  #     # ACS Make All contributors as teams
+  #     contributor = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  id).first
+  #
+  #     if contributor.nil?
+  #       raise ImportError, "Contributor, " + row[0].to_s + ", was not found."
+  #     end
+  #
+  #     ruser = User.find_by_name(row[1].to_s.strip)
+  #     reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id:  id).first
+  #     if reviewee.nil?
+  #       raise ImportError, "Reviewee,  " + row[1].to_s + ", for contributor, " + contributor.name + ", was not found."
+  #       end
+  #
+  #     muser = User.find_by_name(row[index].to_s.strip)
+  #     reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
+  #     if reviewer.nil?
+  #       raise ImportError, "Metareviewer,  " + row[index].to_s + ", for contributor, " + contributor.name + ", and reviewee, " + row[1].to_s + ", was not found."
+  #       end
+  #
+  #     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+  #     # to treat all assignments as team assignments
+  #     reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
+  #     if reviewmapping.nil?
+  #       raise ImportError, "No review mapping was found for contributor, " + contributor.name + ", and reviewee, " + row[1].to_s + "."
+  #     end
+  #
+  #     existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
+  #     # if no mappings have already been imported for this combination
+  #     # create it.
+  #
+  #     if existing_mappings.empty?
+  #       MetareviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: reviewmapping.map_id)
+  #     end
+  #
+  #     index += 1
+  #         end
+  # end
 
   def email(defn, _participant, assignment)
     defn[:body][:type] = "Metareview"

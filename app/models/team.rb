@@ -53,24 +53,18 @@ class Team < ActiveRecord::Base
   end
 
   # Add memeber to the team
-  def add_member(user, _assignment_id = nil )
-    puts "********************** add member starts*********************"
+  def add_member(user, _assignment_id)
+
     if has_user(user)
-      puts "********************** has_user if starts *********************"
-      raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
+         raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
     end
-    puts "********************** has_user end *********************"
+
     if can_add_member = !full?
-      puts "********************** can add member starts *********************"
       t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
       parent = TeamNode.find_by_node_object_id(self.id)
-      puts "********************** before teamusernode.create*********************"
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-      puts "********************** after teamusernode.node *********************"
       add_participant(self.parent_id, user)
-      puts "********************** add participate end *********************"
     end
-    puts "********************** add member ends = #{can_add_member.to_s} *********************"
     can_add_member
   end
 
@@ -214,6 +208,7 @@ class Team < ActiveRecord::Base
 
 
   def self.import(row_hash, id, options, teamtype)
+
     raise ArgumentError, "Not enough fields on this line." if (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
     if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
       name = row_hash[:teamname].to_s

@@ -4,10 +4,15 @@
 <% if @model == 'User' %>
     <%= render 'import_file/user' %>
     <a href="/import_file/start?expected_fields=username%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Bfull+name+%28first+%5Bmiddle%5D+last%29%26nbsp%3B%26nbsp%3B%7C%26nbsp%3B%26nbsp%3Be-mail+address&model=User">Back</a>
-<% else if @model == 'AssignmentTeam' || @model == "CourseTeam"%>
+<% elsif @model == 'AssignmentTeam' || @model == 'CourseTeam'%>
     <%= render 'import_file/team' %>
-        <a href="/import_file/start?expected_fields=%3CTeam+Name%3E+-+optional%2C+Team+Member+1%2C+Team+Member+2%2C+...%2C+Team+Member+n&id=772&model=AssignmentTeam&title=Teams" >Back</a>
-    <% else %>
+    <a href="/import_file/start?expected_fields=%3CTeam+Name%3E+-+optional%2C+Team+Member+1%2C+Team+Member+2%2C+...%2C+Team+Member+n&id=772&model=AssignmentTeam&title=Teams" >Back</a>
+<% elsif @model == 'ReviewResponseMap' %>
+    <%= render 'import_file/reviewer' %>
+    <a href="/import_file/start?expected_fields=Contributor%2C+Reviewer1%2C+Reviewer2%2C+...+%2C+ReviewerN&id=772&model=ReviewResponseMap&title=Reviewer+Mappings">Back</a>
+<% elsif @model == 'MetareviewResponseMap'%>
+    <%= render 'import_file/metareviewer' %>
+    <a href="/import_file/start?expected_fields=Contributor%2C+Reviewer%2C+Metareviewer1%2C+Metareviewer2%2C+...+MetareviewerN&id=772&model=MetareviewResponseMap&title=Metareviewer+Mappings">Back</a>
+<% else %>
     <h3 style="color:red">There was a problem with the @model in app/views/import_file/show.html.erb.</h3>
-<% end %>
 <% end %>

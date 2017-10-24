@@ -98,7 +98,7 @@ describe User do
   describe '#is_recursively_parent_of' do
     context 'when the parent of target user (user) is nil' do
 
-      it 'returns false'
+  it 'returns false'
     end
 
     context 'when the parent of target user (user) is current user (user1)' do
@@ -127,7 +127,22 @@ describe User do
 
 
     context 'when current user is an instructor' do
-      it 'fetches all users in his/her course/assignment'
+      before(:each) do
+        course = Course.new
+        assignment = Assignment.new
+      end
+      it 'fetches all users in his/her course/assignment' do
+        user_list = double
+        allow(user).to receive_message_chain("role.super_admin?"){ false }
+        allow(user).to receive_message_chain("role.instructor?"){ true }
+        allow(Course).to receive_message_chain(:where,:find_each).and_yield(course)
+        allow(course).to receive(:get_participants).and_return({:user=>"abc"})
+        allow(Assignment).to receive_message_chain(:where,:find_each).and_yield(assignment)
+        allow(assignment).to receive(:participants).and_return({:user=>"cba"})
+        allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
+        expect(user.get_user_list()).to eq (['abc','cba'])
+
+      end
     end
 
     context 'when current user is a TA' do

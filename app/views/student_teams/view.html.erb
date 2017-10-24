@@ -105,7 +105,7 @@
     <% end %>
 <br/>
 <!--Check if the assignment has topic, if not show the invitation functionality else check if the user has selected a topic if true show users invitation functionality >
-<% if has_topic?(@student.assignment.id) or user_has_topic?(current_user, @student.assignment.id) %>
+<% if topic?(@student.assignment.id) or user_has_topic?(current_user, @student.assignment.id) %>
   <!--send invitation-->
   <% if @student.team != nil && @student.assignment.max_team_size > 1 %>
        <% if @student.team == nil %> <!--dead code-->

@@ -283,7 +283,13 @@ describe User do
       expect(user1.is_teaching_assistant_for?(user)).to be_falsey
     end
 
-    it 'returns true if current user is a TA of target user'
+    it 'returns true if current user is a TA of target user'do
+    ta=double
+    allow(Ta).to receive(find).and_return(ta)
+    allow(ta).to receuve(:courses_assisted_with,:any?).and_return(true)
+    allow_any_instance_of(User).to receive_message_chain(:assignments,:map,:flatten,:map,:include?).and_return(true)
+    expect(user).to receive(:is_teaching_assistant_for).and_return(true)
+    end
   end
 
   describe '#is_teaching_assistant?' do

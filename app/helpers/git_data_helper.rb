@@ -3,7 +3,7 @@ require 'json'
 
 module GitDataHelper
 BASE_API = "https://api.github.com"
-Access_Token = "token 9dc59b866190e57ca7f36e28950d88f19e1a8976"
+Access_Token = "token 5c5a4a08b8c7ef8b4fad7262176e36dcc04608dc"
 
 def self.fetchPulls(owner, repo)
   resource = RestClient::Resource.new( "#{BASE_API}/repos/#{owner}/#{repo}/pulls?state=all")

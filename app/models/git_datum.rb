@@ -47,7 +47,6 @@ class GitDatum < ActiveRecord::Base
             author_commit.deletions = author_commit.deletions + single_commit.stats.deletions
           end
         end
-        puts total_commits.size
         total_commits.each do |row|
            row.save
         end

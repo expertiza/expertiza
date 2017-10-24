@@ -18,6 +18,19 @@ def create_new_assignment
   click_button 'Create'
 end
 
+def add_topic_to_assignment assignment
+  visit "/assignments/#{assignment.id}/edit"
+  click_link 'Topics'
+  click_link 'New topic'
+  fill_in 'topic_topic_identifier', with: '112'
+  fill_in 'topic_topic_name', with: 'test_topic_1'
+  fill_in 'topic_category', with: 'test_topic_1'
+  fill_in 'topic_max_choosers', with: 3
+  click_button 'Create'
+  create(:assignment_due_date)
+  create_list(:participant, 3)
+end
+
 describe "create group assignment"  do
   before(:each) do
     create(:deadline_type, name: "submission")
@@ -32,12 +45,14 @@ describe "create group assignment"  do
     (1..3).each do |i|
       create(:course, name: "Course #{i}")
     end
+    create_new_assignment
+    @assignment = Assignment.where(name: 'public assignment for test').first
+    add_topic_to_assignment @assignment
   end
 
   it "is able to create a public group assignment" do
-    create_new_assignment
-    assignment = Assignment.where(name: 'public assignment for test').first
-    expect(assignment).to have_attributes(
+    #assignment = Assignment.where(name: 'public assignment for test').first
+    expect(@assignment).to have_attributes(
                               name: 'public assignment for test',
                               course_id: Course.find_by(name: 'Course 2').id,
                               directory_path: 'testDirectory',
@@ -46,15 +61,8 @@ describe "create group assignment"  do
                               is_calibrated: true,
                               availability_flag: true
                           )
-    visit "/assignments/#{assignment.id}/edit"
-    click_link 'Topics'
-    click_link 'New topic'
-    fill_in 'topic_topic_identifier', with: '112'
-    fill_in 'topic_topic_name', with: 'test_topic_1'
-    fill_in 'topic_category', with: 'test_topic_1'
-    fill_in 'topic_max_choosers', with: 3
 
-    click_button 'Create'
+    #add_topic_to_assignment assignment
     sign_up_topics = SignUpTopic.where(topic_name: 'test_topic_1').first
     expect(sign_up_topics).to have_attributes(
                                   topic_name: 'test_topic_1',
@@ -63,8 +71,10 @@ describe "create group assignment"  do
                                   topic_identifier: '112',
                                   category: 'test_topic_1'
                               )
-    create(:assignment_due_date)
-    create_list(:participant, 3)
+  end
+
+  it "should impersonate as student" do
+
     user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
@@ -75,8 +85,6 @@ describe "create group assignment"  do
 
     click_link 'Signup sheet'
     expect(page).to have_content('Signup sheet for public assignment for test assignment')
-
-    # click Signup check button
     assignment_id = Assignment.first.id
     visit "/sign_up_sheet/sign_up?id=#{assignment_id}&topic_id=1"
     expect(page).to have_content('Your topic(s): test_topic_1')
@@ -85,23 +93,28 @@ describe "create group assignment"  do
     click_link 'public assignment for test'
     click_link 'Your team'
     expect(page).to have_content('public assignment for test_Team1')
-
     fill_in 'user_name', with: 'student2065'
     click_button 'Invite'
+    fill_in 'user_name', with: 'student2066'
+    click_button 'Invite'
     expect(page).to have_content('student2065')
+    end
+
+  it "Other users join/decline the team" do
 
     user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content('public assignment for test')
+    visit '/invitation/accept?inv_id=1&student_id=1&team_id=1'
+    visit '/student_teams/view?student_id=1'
+    expect(page).to have_content('Team Information for public assignment for test')
 
-    click_link 'public assignment for test'
-    click_link 'Your team'
-
-
-
+    # to test invalid case - student who is not part of the team does not have created assignment
+    user = User.find_by(name: "student2066")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    page.should has_no_content?('public assignment for test')
 
   end
-
-
 end

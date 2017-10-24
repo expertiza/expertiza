@@ -18,10 +18,11 @@ class SubmissionRecordsController < ApplicationController
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
     @submission_records.each do |record|
       matches = GIT_HUB_REGEX.match(record.content)
-       if(matches.nil?)
+       if(matches.nil? && record.operation == "Submit Hyperlink")
        else
          GitDatum.update_git_data(record.id)
          @authors = GitDatum.where("submission_record_id = ?", record.id).map(&:author).uniq{|x| x}
+         break
        end
     end
   end

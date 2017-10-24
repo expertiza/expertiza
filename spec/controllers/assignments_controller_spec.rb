@@ -87,7 +87,7 @@ describe AssignmentsController do
 
   describe '#toggle_access' do
     it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page' do
-      params = {  id: 1 }
+      params = {id: 1}
       # allow(Assignment).to receive(:find).with('').and_return(assignment)
       # allow(assignment).to receive(:private).and_return(true)
       # allow(assignment).to receive(:save).and_return(true)
@@ -163,9 +163,13 @@ describe AssignmentsController do
     context 'when assignment has staggered deadlines' do
       it 'shows an error flash message and renders edit page' do
         allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([
-                                                                                      double('SignUpTopic'), double('SignUpTopic')])
+                                                                                      double('SignUpTopic'), double('SignUpTopic')
+                                                                                  ])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([
-                                                                                                  double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+                                                                                                  double('AssignmentQuestionnaire',
+                                                                                                         questionnaire_id: 666,
+                                                                                                         used_in_round: 1)
+                                                                                              ])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
@@ -173,7 +177,8 @@ describe AssignmentsController do
         params = {id: 1}
         get :edit, params
         expect(flash.now[:error]).to eq("You did not specify all the necessary rubrics. \
-You need <b>[AuthorFeedback, TeammateReview] </b> of assignment <b>test assignment</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
+You need <b>[AuthorFeedback, TeammateReview] </b> of assignment <b>test assignment</b> before saving the assignment. \
+You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
         expect(response).to render_template(:edit)
       end
     end
@@ -196,7 +201,7 @@ You need <b>[AuthorFeedback, TeammateReview] </b> of assignment <b>test assignme
         it 'shoes an error flash message and redirects to assignments#edit page' do
           allow(Assignment).to receive(:find).with(id: '1').and_return(:assignment)
           allow(assignment).to receive(:save).and_return(false)
-          allow(assignment).to receive_message_chain(:errors, :full_messages){[  'Assignment not find.', 'Course not find.'  ]}
+          allow(assignment).to receive_message_chain(:errors, :full_messages){['Assignment not find.', 'Course not find.']}
           params = {id: 1, course_id: 1}
           post :update, params
           expect(flash.now[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")

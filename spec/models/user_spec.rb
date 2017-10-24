@@ -73,20 +73,14 @@ describe User do
       role = Role.new
     end
     it 'returns the first 10 visible users' do
-      lesser_roles = double
-      allow(@role).to receive(:get_parents).and_return(['Teaching Assistant','Instructor','Administrator'])
-      allow(User).to receive(:all).and_return([
-          {:name => 'abca'},{:name => 'abcb'},{:name => 'abcc'},{:name => 'abcd'},{:name => 'abce'},
-          {:name => 'abcf'},{:name => 'abcg'},{:name => 'abch'},{:name => 'abci'},{:name => 'abcj'},
-          {:name => 'abck'},{:name => 'abcl'},{:name => 'abcm'},{:name => 'abcn'},{:name => 'abco'},
-          {:name => 'abcp'},{:name => 'abcq'},{:name => 'abcr'},{:name => 'abcs'},{:name => 'abct'}
-        ])
-      allow(user).to receive(:role)
-      allow(lesser_roles).to receive(:include?)
-      expect(user.get_available_users("abc")).to eq ([
-        {:name => 'abca'},{:name => 'abcb'},{:name => 'abcc'},{:name => 'abcd'},{:name => 'abce'},
-        {:name => 'abcf'},{:name => 'abcg'},{:name => 'abch'},{:name => 'abci'},{:name => 'abcj'}
-        ])
+      all_users = double
+      user_mock1 = double(:role=>'Instructor')
+      user_mock2 = double(:role=>'Administrator')
+      user_mock3 = double(:role=>'Student')
+      allow(@role).to receive(:get_parents).and_return(['Instructor','Administrator'])
+      allow(User).to receive(:all).and_return([user_mock1,user_mock2,user_mock3])
+      allow(all_users).to receive(:select).and_yield(user_mock2).and_yield(user_mock2).and_yield(user_mock3)
+      expect(user.get_available_users("abc")).to eq ([user_mock1,user_mock2])
     end
   end
 
@@ -161,11 +155,23 @@ describe User do
   # xzhang72
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
-      row = [{:name=>"abc"},{:fullname=>'abc xyz'}]
-      allow(row).to receive(length).and_return(5)
+      row = ["abc","abc xyz"]
+      _row_header = double
+      seesion = {:user=>user}
+      _id = double
       expect { User.import(row, _row_header,session,_id) }.to raise_error("Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email.")
     end
-    it 'updates an existing user with info from impor file'
+    it 'updates an existing user with info from impor file' do
+      row = ["abc","abc xyz","abcxyz@gamil.com"]
+      _row_header = double
+      seesion = {:user=>user}
+      _id = double
+      allow(User).to receive(:find_by_name).and_return(user)
+      allow_any_instance_of(User).to receive(:nil?).and_return(false)
+      allow_any_instance_of(User).to receive(:id).and_return(1)
+      expect_any_instance_of(User).to receive(:save)
+      User.import(row,_row_header,seesion,_id)
+    end
 
   end
   # xzhang72

@@ -1,0 +1,9 @@
+<h1>Edit Controller</h1>
+
+<%= form_for @site_controller do |form| %>
+  <%= render :partial => 'form' %>
+  <%= form.submit 'Edit' %>
+<% end %>
+
+<%= link_to 'Show', @site_controller %> |
+<%= link_to 'Back', SiteController %>

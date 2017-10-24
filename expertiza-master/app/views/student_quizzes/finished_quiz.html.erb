@@ -1,0 +1,18 @@
+<h2>Answers</h2>
+<b>Quiz score: <%= @quiz_score %>%</b>
+
+<%  @assignment = Assignment.find(@participant.parent_id)%>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => ""} %>
+
+<br>
+<% i = 1 %>
+
+
+<% @questions.each do |question| %>
+  <b>Question <%= i %>: </b><%= label_tag "#{question.id}", question.txt %> <br>
+
+    <%user_answer=Answer.where(response_id: @response.id, question_id:  question.id)%>
+    <%= question.view_completed_question(user_answer).html_safe %><br>
+    <% i += 1 %>
+<%end%>
+<%= link_to "Back", student_quizzes_path(:id => @response_map.reviewer_id) %>

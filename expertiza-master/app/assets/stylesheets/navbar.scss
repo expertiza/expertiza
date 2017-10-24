@@ -1,0 +1,241 @@
+
+#paginate-button {
+  margin-left: 30px;
+}
+
+.well .form-inline input {
+  width: 80%;
+}
+
+.inner-table tr:not(.no-cursor-tr) {
+  cursor: pointer;
+}
+
+.compact-table {
+  margin: 3px;
+}
+
+.inner-table .table-hover tbody tr:hover:not(.no-color-tr) {
+  background: #F56E5E;
+}
+
+.search-box {
+  margin: 5px;
+}
+
+.main {
+  margin: 0 auto;
+}
+
+.nav.nav-center {
+  margin:0;
+  float:none;
+}
+
+.right-most {
+  margin-right: 20px;
+}
+
+.navbar {
+  background: #A90201;
+  height: 66px;
+}
+
+ul.nav li.first-level {
+  font-size: 100%;
+}
+
+li.first-level > a {
+  line-height: 10px;
+  padding: 0px 10px;
+}
+
+ul.nav li.dropdown:hover > ul.dropdown-menu {
+  display: block;
+}
+
+ul.nav > li.dropdown > a {
+  color: #EEEEEE;
+}
+
+ul.nav > li.dropdown > a:hover {
+  color: #BBBBBB;
+}
+
+ul.navbar-right > li.right-most > a {
+  color: #EEEEEE;
+  //  line-height: 36px;
+}
+
+ul.navbar-right > li.right-most > a:hover {
+  color: #BBBBBB;
+}
+
+.navbar .impersonate-box {
+  height: 13px;
+  padding: 0px 0;
+}
+
+
+
+.impersonate-box .input-group {
+  width: 170px;
+}
+
+#impersonate-user-info {
+  color: #EEEEEE;
+  padding-left: 13px;
+}
+
+#impersonate-button {
+  height: 30px;
+  line-height: 16px;
+  padding: 1px 5px;
+}
+
+#impersonate-form {
+  margin-top: 0px;
+  margin-bottom: 11px;
+  padding: 0;
+}
+
+#revert-button {
+  height: 18px;
+  line-height: 16px;
+  padding: 1px 5px;
+  float: left
+}
+
+#inputImpersonateBox {
+  height: 30px;
+  margin: 2px 0;
+}
+
+
+// Refer from http://stackoverflow.com/questions/19203816/vertical-divider-dont-work-in-bootstrap-3
+.navbar .divider-vertical {
+  height: 66px;
+  margin: 0 9px;
+  border-right: 1px solid #ffffff;
+  border-left: 1px solid #f2f2f2;
+}
+// end
+
+// Refer from http://bootsnipp.com/snippets/featured/multi-level-dropdown-menu-bs3
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  -webkit-border-radius: 0 6px 6px 6px;
+  -moz-border-radius: 0 6px 6px;
+  border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+
+.dropdown-submenu:hover>a:after {
+  border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+  float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  -webkit-border-radius: 6px 0 6px 6px;
+  -moz-border-radius: 6px 0 6px 6px;
+  border-radius: 6px 0 6px 6px;
+}
+
+.containerposition {
+  position: relative;
+  left: 43px;
+  margin-top: -30px;
+}
+
+.navbarposition {
+  margin-top: -70px;
+}
+
+.menuposition {
+  margin-top: 23px;
+}
+
+.containerposition {
+    position: relative;
+    left: 43px;
+    margin-top: -30px;
+}
+
+.navbarposition {
+  margin-top: -70px;
+}
+
+.menuposition {
+  margin-top: 23px;
+}
+// end
+
+
+// Refer from http://www.bootply.com/120604
+@media (max-width: 1170px) {
+  .navbar-header {
+    float: none;
+  }
+
+  .navbar-toggle {
+    display: block;
+  }
+  .navbar-collapse {
+    background: #A90201;
+    border-top: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .navbar-collapse.collapse {
+    display: none!important;
+  }
+  .navbar-nav {
+    float: none!important;
+    margin: 0px -15px;
+    background: #A90201;
+  }
+  .navbar .divider-vertical {
+    display: none;
+  }
+  .navbar-nav>li {
+    float: none;
+    margin-left: 50px;
+  }
+  .navbar-nav>li>a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .navbar-text {
+    float: none;
+    margin: 15px 0;
+  }
+  /* since 3.1.0 */
+  .navbar-collapse.collapse.in {
+    display: block!important;
+  }
+  .collapsing {
+    overflow: hidden!important;
+  }
+  .logout-box{
+    margin-top: 7px;
+    left: -2px;
+  }
+  .dropdown-menu.pull-left{
+    top: 25%;
+    left: 15%;
+  }
+}

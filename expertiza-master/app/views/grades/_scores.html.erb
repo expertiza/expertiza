@@ -1,0 +1,27 @@
+<% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)%>
+<% stage = participant.assignment.get_current_stage(topic_id) %>
+<% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
+
+  <% if stage == "Complete" %>
+    <% if participant.grade
+         total_score = participant.grade
+         title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant."
+    else
+      total_score = pscore[:total_score]
+      title = nil
+    end %>
+  <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= sprintf("%.2f",total_score) %><%= score_postfix %></div>
+  <% if controller.action_name != "view_my_scores" %>
+    <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
+  <% end %>
+<% else %>
+  <FONT SIZE="-1">(in <%= stage %>)</FONT>
+<% end %>
+
+<% else %>
+  <% if participant.grade %>
+    <%= text_field("participant", "grade", :size => 10) %><%= score_postfix %>
+  <% else %>
+    <%= text_field("participant", "grade", :size => 10, :value => sprintf("%.2f", pscore[:total_score])) %><%= score_postfix %>
+  <% end %>
+<% end %>

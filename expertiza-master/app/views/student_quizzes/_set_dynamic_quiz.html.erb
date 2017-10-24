@@ -1,0 +1,36 @@
+<SCRIPT LANGUAGE="JavaScript">
+  function toggleVis(value, id) {
+    var elem = document.getElementById(id);
+        if (value) {
+          elem.style.display = 'none';
+        } else {
+          elem.style.display = '';
+        }
+  }
+</SCRIPT>
+<%= form_tag :controller => 'review_mapping',
+  :action => 'assign_quiz_dynamically',
+  :assignment_id => assignment.id,
+  :reviewer_id => session[:user].id,
+  :participant_id => @participant.id do %>
+
+    <% candidate_quizzes = StudentQuizzesController.take_quiz(assignment.id, session[:user].id) %>
+
+    <% if !candidate_quizzes.empty? %>
+    <p><b>Select a topic below to take a new quiz:</b></p>
+
+    <table cellpadding="0" id="quiz_list">
+
+      <% candidate_quizzes.each do |candidate| %>
+        <tr>
+          <td><%= radio_button_tag :questionnaire_id,candidate.id %></td>
+          <td><%= candidate.name %></td>
+        </tr>
+      <% end %>
+
+    </table>
+
+    <p><input type='submit' value='Request a new quiz to take'/></p>
+  <% end %>
+
+<% end %>

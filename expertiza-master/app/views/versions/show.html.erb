@@ -1,0 +1,31 @@
+<h1>Version: <%=h @version ? @version.item_id : '' %></h1>
+
+<table>
+
+  <tr><th>ID:</th>
+    <td><%= @version ? @version.item_id : '' %></td>
+  </tr>
+  <tr><th>Type:</th>
+    <td><%= @version ? @version.item_type : '' %></td>
+  </tr>
+  <tr><th>Event:</th>
+    <td><%= @version ? @version.event : '' %></td>
+  </tr>
+  <tr><th>User:</th>
+    <td><%= @version ? @version.version_author : '' %></td>
+  </tr>
+  <tr><th>Created At:</th>
+    <td><%= @version ? @version.created_at : '' %></td>
+  </tr>
+
+</table>
+
+<% unless current_user_role? == "Student" %>
+    <hr/>
+    <p>
+      <%= link_to 'Delete', {:action => 'destroy', :id => @version},
+                  :confirm => 'Delete this version?', :method => :post %>
+    </p>
+<% end %>
+
+<p><%= link_to 'Back', :action => 'index' %> to Versions search</p>

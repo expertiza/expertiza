@@ -1,0 +1,60 @@
+<nav role="navigation" class="navbar navbar-default navbar-static-top navbarposition">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <%= image_tag "logo.jpg", height: '65'%>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse">
+
+      <ul class="nav navbar-nav menuposition">
+        <% if session[:menu] %>
+            <%= render :partial => 'menu_items/suckerfish',
+                       :locals => { items: session[:menu].get_menu(0), level: 0 } %>
+        <% end %>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <% if current_user %>
+            <li class="impersonate-box">
+              <span id="impersonate-user-info">User: <%= current_user.name %></span>
+              <% if session[:super_user] %>
+                  <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
+                      <div class="input-group">
+                        <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
+                        <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" id="impersonate-button">Revert</button>
+                        </span>
+                      </div>
+                  <% end %>
+              <% end %>
+            </li>
+            <li class="divider-vertical"></li>
+            <li class="right-most logout-box">
+              <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>
+            </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<script type="text/javascript">
+    jQuery("#impersonate-button").click(function(event) {
+        jQuery("#impersonate-form").submit()
+    });
+
+    $(function() {
+        $('button.navbar-toggle').click(function() {
+            if ($('.container').css('margin-top') === '-30px') {
+                $('.container').css('margin-top', '+=255');
+            } else {
+                $('.container').css('margin-top', '-30px');
+            }
+        });
+    });
+</script>

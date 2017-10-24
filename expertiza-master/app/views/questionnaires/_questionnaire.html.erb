@@ -1,0 +1,87 @@
+<%= error_messages_for 'questionnaire' %>
+<!--Questionnaire part-->
+<%= form_for @questionnaire do %>
+  <table>
+    <tr>
+      <td valign="top"><label for="questionnaire_name">Name:</label>
+        <%= text_field 'questionnaire', 'name'  %>
+        <%= hidden_field 'questionnaire', 'id' %>
+        <%= hidden_field 'questionnaire', 'type' %>
+      </td>
+    </tr>
+  </table>
+  <br/>
+  <table>
+     <tr>
+       <td>Min question score:</td>
+       <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0 %>&nbsp;&nbsp;</td>
+       <td>Max question score:</td>
+       <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5 %>&nbsp;&nbsp;</td>
+       <td>Is this <%= @questionnaire.display_type %> private:</td>
+       <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]])%>
+       </td>
+     </tr>
+  </table>
+  <% if params[:action] == 'new' %>
+    <%= submit_tag 'Create' %>
+  <% else %>
+    <%= submit_tag 'Update'%>
+  <% end %>
+<% end %>
+
+<!--Question part-->
+<hr/>
+<% if !params[:id].nil? and params[:action] == 'edit' %>
+  <table id="question_actions_table">
+    <tr>
+      <td>
+        <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
+          <%= submit_tag 'Add' %>
+          <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
+          <%= select "question", "type", 
+              {"Criterion" =>"Criterion",
+               "Scale"=>"Scale",
+               "Dropdown"=>"Dropdown",
+               "Checkbox"=>"Checkbox",
+               "TextArea"=>"TextArea",
+               "TextField"=>"TextField",
+               "UploadFile"=>"UploadFile",
+               "SectionHeader"=>"SectionHeader",
+               "TableHeader"=>"TableHeader",
+               "ColumnHeader"=>"ColumnHeader",
+               } %> question(s)
+        <% end %>
+      </td>
+    </tr>
+  </table>
+  
+  <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private] do %>
+    <table id="questions_table">
+      <tr>
+        <th class="head" align="center" width="30">Action</td>
+        <th class="head" align="center" width="30">Seq</td>
+        <th class="head" align="center" width="300">Question</td>
+        <th class="head" align="center" width="100">Type</td>
+        <th class="head" align="center">Weight</td>
+      </tr>
+      <% i = 1 %>
+      <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+      <% for @question in questions %>
+        <%=@question.edit(i)%>
+        <% i += 1 %>
+      <% end %>
+    </table>
+    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save" %>
+    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
+    <hr/>
+    <h4>Import/Export (from/to CSV format)</h4>
+    <input type="file" name="csv" />
+    <br />
+    <input type="submit" name="import" value="Import questions"/>
+    <br />
+    <input type="submit" name="export" value="Export questions to CSV"%>
+  <% end %>
+<% end %>
+
+<BR/>
+

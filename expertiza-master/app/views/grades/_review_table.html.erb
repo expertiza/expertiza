@@ -1,0 +1,66 @@
+<table class="grades">
+  <%if ctrl=='review' && @assignment.varying_rubrics_by_round? %>
+      <% reviews = reviews.select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id} %>
+  <%else%>
+      <% reviews = reviews.sort_by{|response| response.map_id} %>
+  <%end%>
+	<tr><th style="text-align:center;">&nbsp;</th>
+		<% for i in 0...reviews.size%>
+			<th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%>&nbsp;</th>
+		<% end %>
+	</tr>
+	<% if controller.action_name != "view_my_scores" || !@assignment.is_anonymous?%>
+	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
+		<% for review in reviews %>
+       <td align="center">
+       <% if controller.action_name != "view_my_scores"%>
+         &nbsp;<%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
+		   <% else %>
+         &nbsp;<%= review.map.reviewer.fullname%>&nbsp;
+		   <% end %>
+		   </td>	    
+    <% end %>
+	</tr>
+	<% end %>
+
+	<tr class="head">
+	<td align="right"><b>Average score</b></td>
+
+		<% for review in reviews %>
+		   <td align="center">
+             <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>
+             <% if controller.action_name != "view_my_scores" %>
+               <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">
+             <% end %>
+             <%if score==-1%>
+               <%= sprintf("--") %>% &nbsp;
+             <%else%>
+               <%= sprintf("%.2f",score) %>% &nbsp;
+             <%end%>
+	  	   </td>
+	    <% end %>
+	</tr>
+  &nbsp;
+
+  <!--Adding code for fetching the reputation -->
+  <% unless @assignment.reputation_algorithm == '' %>
+    <tr class="head">
+      <% if reviews.count > 0 and reviews[0].round == @assignment.rounds_of_reviews %>
+        <td align="right"><b>Reputation</b></td>
+        <% for review in reviews %>
+            <td align="center">
+              <% review_participant = Participant.find(review.map.reviewer.id) %>
+              <% case @assignment.reputation_algorithm %>
+              <% when 'Lauw' %>
+                  <p id = "reputation_score" class = <%= get_css_style_for_lauw_reputation(review_participant.Lauw)%> style = "width:60px;">
+                <%= review_participant.Lauw%>
+              <% when 'Hamer' %>
+                  <p id = "reputation_score" class = <%= get_css_style_for_hamer_reputation(review_participant.Hamer)%> style = "width:60px;">
+                <%= review_participant.Hamer%>
+              <% end %>
+            </td>
+        <% end %>
+      <% end %>
+    </tr>
+  <% end %>
+</table>

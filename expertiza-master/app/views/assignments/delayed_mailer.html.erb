@@ -1,0 +1,58 @@
+
+<% @assignment = Assignment.find(params[:id]) %>
+<h1>Delayed mailer for <%= @assignment.name %> assignment</h1>
+
+
+<% if flash[:notice] %>
+    <div class="flash_note"><%= flash_message :notice %></div>
+<% end %>
+
+<% @delayed_mailer = DelayedJob.all.sort{|a, b| a.run_at <=> b.run_at} %>
+
+<table class="general">
+  <th width="25%">Deadline type</th>
+  <th width="25%">Run time</th>
+  <th width="25%">Due date</th>
+  <th width="25 %">Action</th>
+  <th width="25 %">Delete</th>
+  <% i=1 %>
+  <% for delayed_job in @delayed_mailer %>
+      <tr>
+        <% if delayed_job.handler.include? "assignment_id: #{@assignment.id}"%>
+            <% handler = delayed_job.handler.split()%>
+            <td><%= handler[5] %></td>
+            <td><%= delayed_job.run_at %></td>
+            <td><%= handler[7][1..-1] + ":" + handler[8][0..-2]%></td>
+            <% if handler[5] == "submission" %>
+                <td><%= "Send reminder"%></td>
+            <%end%>
+            <% if handler[5] == "review" %>
+                <td><%= "Send reminder"%></td>
+            <%end%>
+            <% if handler[5] == "metareview" %>
+                <td><%= "Send reminder"%></td>
+            <%end%>
+            <% if handler[5] == "team_formation" %>
+                <td><%= "Send emails to remind students to form teams"%></td>
+            <%end%>
+            <% if handler[5] == "drop_outstanding_reviews" %>
+                <td><%= "Drop outstanding reviews and send emails to those students"%></td>
+            <%end%>
+            <% if handler[5] == "drop_one_member_topics" %>
+                <td><%= "Drop one member team topics"%></td>
+            <%end%>
+            <td><%= link_to image_tag('delete_icon.png', :title => 'Delete'),
+                            {:controller => 'assignments', :action => 'delete_delayed_mailer',
+                             :id => @assignment.id, :delayed_job_id => delayed_job.id}%></td>
+        <% end %>
+      </tr>
+      <% i=i+1 %>
+  <% end %>
+
+</table>
+
+<% session[:return_to] = request.url %>
+<br/><br/>
+
+
+<a href="javascript:history.back()">Back</a>

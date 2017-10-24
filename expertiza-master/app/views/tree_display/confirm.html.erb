@@ -1,0 +1,19 @@
+<% if @node_type == 'course' %>
+    <h1>Are you sure you want to delete this course?</h1>
+<% else %>
+    <h1>Are you sure you want to delete this assignment?</h1>
+<% end %>
+
+
+<table align="center">
+  <tr align="center"><tr></tr><tr></tr>
+    <td align="center" width="120px" style="font-size: xx-large"><%= link_to 'NO', list_tree_display_index_url %></td>
+    <td align="center" width="120px" style="font-size: xx-large">
+        <% if @node_type == 'course' %>
+            <%= link_to 'YES', :controller => :course, :action => :delete, :id => @id %>
+        <% else %>
+            <%= link_to 'YES', :controller => :assignments, :action => :delete, :id => @id %>
+        <% end %>
+    </td>
+  </tr>
+</table>

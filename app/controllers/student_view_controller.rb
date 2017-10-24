@@ -2,9 +2,9 @@ class StudentViewController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'set'
-  true
+      true
     when 'revert'
-  true
+      true
     end
   end
 

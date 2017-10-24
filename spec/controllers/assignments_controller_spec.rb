@@ -19,14 +19,14 @@ describe AssignmentsController do
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
           stub_current_user(admin, admin.role.name, admin.role)
-          controller.params = {:id => '1', :action => "edit"}
+          controller.params = {id: '1', action: "edit"}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
 
       context 'when current user is the instructor of current assignment' do
         it 'allows certain action' do
-          controller.params = {:id => '1', :action => "edit"}
+          controller.params = {id: '1', action: "edit"}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
@@ -35,7 +35,7 @@ describe AssignmentsController do
         it 'allows certain action' do
           stub_current_user(ta, ta.role.name, ta.role)
           allow(TaMapping).to receive(:exists?).and_return(true)
-          controller.params = {:id => '1', :action => "update"}
+          controller.params = {id: '1', action: "update"}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
@@ -45,14 +45,14 @@ describe AssignmentsController do
           ta2 = build(:teaching_assistant, id: 4)
           stub_current_user(ta2, ta2.role.name, ta2.role)
           allow(TaMapping).to receive(:exists?).and_return(false)
-          controller.params = {:id => '1', :action => "update"}
+          controller.params = {id: '1', action: "update"}
           expect(controller.send(:action_allowed?)).to be false
         end
       end
 
       context 'when current user is the instructor of the course which current assignment belongs to' do
         it 'allows certain action' do
-          controller.params = {:id => '1', :action => "edit"}
+          controller.params = {id: '1', action: "edit"}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
@@ -60,7 +60,7 @@ describe AssignmentsController do
       context 'when current user is an instructor but not the instructor of current course or current assignment' do
         it 'does not allow certain action' do
           stub_current_user(instructor2, instructor2.role.name, instructor2.role)
-          controller.params = {:id => '1', :action => "edit"}
+          controller.params = {id: '1', action: "edit"}
           expect(controller.send(:action_allowed?)).to be false
         end
       end
@@ -70,7 +70,7 @@ describe AssignmentsController do
       context 'when the role current user is super admin/admin/instractor/ta' do
         it 'allows certain action except edit and update' do
           stub_current_user(ta, ta.role.name, ta.role)
-          controller.params = {:id => '1', :action => "create"}
+          controller.params = {id: '1', action: "create"}
           expect(controller.send(:action_allowed?)).to be true
         end
       end
@@ -78,7 +78,7 @@ describe AssignmentsController do
       context 'when the role current user is student' do
         it 'does not allow certain action' do
           stub_current_user(student, student.role.name, student.role)
-          controller.params = {:id => '1', :action => "create"}
+          controller.params = {id: '1', action: "create"}
           expect(controller.send(:action_allowed?)).to be false
         end
       end
@@ -87,8 +87,7 @@ describe AssignmentsController do
 
   describe '#toggle_access' do
     it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page' do
-    # sleep(10000)
-      params = {:id => '1'}
+      params = {  id: 1 }
       # allow(Assignment).to receive(:find).with('').and_return(assignment)
       # allow(assignment).to receive(:private).and_return(true)
       # allow(assignment).to receive(:save).and_return(true)
@@ -143,7 +142,7 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(true)
         allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(true)
-        allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>1, :name=>"test assignment"))
+        allow(assignment_form).to receive(:assignment).and_return(double("Assignment", id: 1, name: "test assignment"))
         post :create, params
         expect(response).to redirect_to edit_assignment_path 1
       end
@@ -164,9 +163,9 @@ describe AssignmentsController do
     context 'when assignment has staggered deadlines' do
       it 'shows an error flash message and renders edit page' do
         allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([
-            double('SignUpTopic'), double('SignUpTopic')])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1')
-                                              .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+                                                                                      double('SignUpTopic'), double('SignUpTopic')])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([
+                                                                                                  double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
@@ -196,7 +195,7 @@ describe AssignmentsController do
         it 'shoes an error flash message and redirects to assignments#edit page' do
           allow(Assignment).to receive(:find).with(id: '1').and_return(:assignment)
           allow(assignment).to receive(:save).and_return(false)
-          allow(assignment).to receive_message_chain(:errors, :full_messages) {['Assignment not find.', 'Course not find.']}
+          allow(assignment).to receive_message_chain(:errors, :full_messages){[  'Assignment not find.', 'Course not find.'  ]}
           params = {id: 1, course_id: 1}
           post :update, params
           expect(flash.now[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")
@@ -210,12 +209,12 @@ describe AssignmentsController do
         id: 1,
         course_id: 1,
         assignment_form: {
-          assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+          assignment_questionnaire: [{"assignment_id" => "2", "questionnaire_id" => "666", "dropdown" => "true",
                                       "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
           assignment: {
-            instructor_id: 2,
-            course_id: 1,
-            max_team_size: 1,
+            instructor_id: 3,
+            course_id: 2,
+            max_team_size: 2,
             id: 2,
             name: 'test assignment',
             directory_path: '/test',
@@ -251,7 +250,7 @@ describe AssignmentsController do
           allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(admin)
           allow(assignment_form).to receive_message_chain(assignment, instructor).with(admin)
           allow(assignment_form).to receive(:update_attributes).and_return(true)
-          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>2, :name=>"test assignment"))
+          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", id: 2, name: "test assignment"))
           post :update, params
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in UTC")
@@ -272,8 +271,8 @@ describe AssignmentsController do
           allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(admin)
           allow(assignment_form).to receive_message_chain(assignment, instructor).with(admin)
           allow_any_instance_of(AssignmentForm).to receive(:update_attributes).and_return(false)
-          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", :id=>1, :name=>"test assignment"))
-          allow_any_instance_of(AssignmentForm).to receive_message_chain(:errors, :get) {'Assignment not find. Course not find.'}
+          allow(assignment_form).to receive(:assignment).and_return(double("Assignment", id: 1, name: "test assignment"))
+          allow_any_instance_of(AssignmentForm).to receive_message_chain(:errors, :get) { 'Assignment not find. Course not find.' }
           post :update, params
           # expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")

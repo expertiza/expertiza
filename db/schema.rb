@@ -239,6 +239,7 @@ ActiveRecord::Schema.define(version: 20171023185245) do
     t.integer  "files",                limit: 4
     t.integer  "additions",            limit: 4
     t.integer  "deletions",            limit: 4
+    t.integer  "lines_modified",       limit: 4
     t.datetime "date"
     t.datetime "created_at"
     t.datetime "updated_at"

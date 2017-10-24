@@ -8,6 +8,7 @@ class CreateGitData < ActiveRecord::Migration
       t.integer :files
       t.integer :additions
       t.integer :deletions
+      t.integer :lines_modified
       t.datetime :date
 
       t.timestamps

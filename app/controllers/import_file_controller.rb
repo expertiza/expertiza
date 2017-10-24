@@ -114,7 +114,7 @@ class ImportFileController < ApplicationController
           errors << $ERROR_INFO
           puts errors.to_s
         end
-      elsif params[:model] == "MetareviewResponseMap"
+    elsif params[:model] == "MetareviewResponseMap"
         contents_hash = eval(params[:contents_hash])
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
         errors = []
@@ -127,12 +127,46 @@ class ImportFileController < ApplicationController
         rescue
           errors << $ERROR_INFO
           puts errors.to_s
-        end
+          end
     elsif params[:model] == 'SignUpTopic'
       session[:assignment_id] = params[:id]
       contents_hash[:body].each do |row|
         SignUpTopic.import(row, session, params[:id])
       end
+
+    elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
+
+      contents_hash = eval(params[:contents_hash])
+
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+      else
+        new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      end
+
+      errors = []
+
+      begin
+
+        if params[:model] == 'AssignmentParticipant'
+
+          @header_integrated_body.each do |row_hash|
+            AssignmentParticipant.import(row_hash, session, params[:id])
+          end
+
+        elsif params[:model] == 'CourseParticipant'
+
+          @header_integrated_body.each do |row_hash|
+            CourseParticipant.import(row_hash, session, params[:id])
+          end
+
+        end
+
+      rescue
+        errors << $ERROR_INFO
+      end
+
 
     else    # params[:model] = "User"
       contents_hash = eval(params[:contents_hash])
@@ -171,7 +205,7 @@ class ImportFileController < ApplicationController
 
     new_body = []
 
-    if params[:model] == "User"
+    if params[:model] == "User" or params[:model] == "AssignmentParticipant" or params[:model] == "CourseParticipant"
       header.map! { |column_name| column_name.to_sym }
 
       body.each do |row|

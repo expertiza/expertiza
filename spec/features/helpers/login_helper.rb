@@ -28,7 +28,8 @@ module LogInHelper
                                                   "handle" => "",
                                                   "digital_certificate" => nil,
                                                   "timezonepref" => "Eastern Time (US & Canada)",
-                                                  "copy_of_emails" => false)
+                                                  "copy_of_emails" => false,
+                                                  "copy_of_all_emails" => false)
   end
 
   def instructor
@@ -49,6 +50,7 @@ module LogInHelper
                                                      handle: "",
                                                      digital_certificate: nil,
                                                      public_key: nil,
-                                                     copy_of_emails: false)
+                                                     copy_of_emails: false,
+                                                     copy_of_all_emails: false)
   end
 end

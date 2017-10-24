@@ -133,15 +133,20 @@ describe User do
       end
       it 'fetches all users in his/her course/assignment' do
         user_list = double
+        course = double
+        assignment = double
         allow(user).to receive_message_chain("role.super_admin?"){ false }
         allow(user).to receive_message_chain("role.instructor?"){ true }
         allow(Course).to receive_message_chain(:where,:find_each).and_yield(course)
-        allow(course).to receive(:get_participants).and_return({:user=>"abc"})
+        allow(course).to receive(:get_participants).and_return(user1)
         allow(Assignment).to receive_message_chain(:where,:find_each).and_yield(assignment)
-        allow(assignment).to receive(:participants).and_return({:user=>"cba"})
+        allow(assignment).to receive(:participants).and_return(user2)
+        allow_any_instance_of(User).to receive(:empty?).and_return(false)
+        allow_any_instance_of(User).to receive(:each).and_yield(user1)
+        allow_any_instance_of(User).to receive(:user).and_return(user1)
         allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
-        expect(user.get_user_list()).to eq (['abc','cba'])
-
+        allow(user).to receive_message_chain("role.ta?"){false}
+        expect(user.get_user_list).to eq ([user1])
       end
     end
 

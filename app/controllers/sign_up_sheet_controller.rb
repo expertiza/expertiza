@@ -80,6 +80,44 @@ class SignUpSheetController < ApplicationController
   def edit
     @topic = SignUpTopic.find(params[:id])
   end
+  
+  
+    def duplicate
+    @user = current_user
+    session[:copy_flag] = true
+    @topic = SignUpTopic.find(params[:id])
+    @assignment = Assignment.find(@topic.assignment_id)
+    @dup_topic = SignUpTopic.new
+    @dup_topic.assignment_id = @assignment.id
+    @dup_topic.topic_identifier = @topic.topic_identifier
+    @dup_topic.category = @topic.category
+    @dup_topic.topic_name = @topic.topic_name + " Copy"
+    @dup_topic.micropayment = @topic.micropayment
+    @dup_topic.description = @topic.description
+    @dup_topic.link = @topic.link
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    found_in_slots = false
+    for slot in @slots_filled
+      if slot.topic_id.to_s == @topic.id.to_s
+      available_slots = @topic.max_choosers.to_int - slot.count.to_i
+      found_in_slots = true
+      end
+    end
+    unless found_in_slots
+      available_slots = @topic.max_choosers
+    end
+    @dup_topic.max_choosers = available_slots
+    if available_slots == 0
+      redirect_to edit_assignment_path(@topic.assignment_id) + "#tabs-2"
+      flash[:error] = "The topic has all slots filled. Try duplicating the topic after increasing the number of slots."
+    elsif @topic.max_choosers == available_slots
+      redirect_to edit_assignment_path(@topic.assignment_id) + "#tabs-2"
+      flash[:error] = "The topic has all slots available. Instead of duplicating the topic extend the due date."
+    else
+      @dup_topic.save
+      redirect_to edit_assignment_path(@dup_topic.assignment_id) + "#tabs-2"
+    end
+  end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update

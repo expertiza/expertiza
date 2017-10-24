@@ -161,11 +161,12 @@ describe User do
   # xzhang72
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
-      row = double
+      row = [{:name=>"abc"},{:fullname=>'abc xyz'}]
       allow(row).to receive(length).and_return(5)
       expect { User.import(row, _row_header,session,_id) }.to raise_error("Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email.")
     end
     it 'updates an existing user with info from impor file'
+
   end
   # xzhang72
   describe '.yesorno' do

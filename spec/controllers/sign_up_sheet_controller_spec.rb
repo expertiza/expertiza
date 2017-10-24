@@ -196,20 +196,18 @@ describe SignUpSheetController do
   end
 
   describe '#set_priority' do
-    let(:params) { { participant_id: '1', id: 1, topic: Array.new(1 + rand(5)) { 1 }, assignment_id: 1 } }
+    let(:params) { { participant_id: '1', id: 1, topic: [1], assignment_id: 1 } }
     let(:team_id) { participant.team.try(:id) }
-    let(:bid) { Array.new(1 + rand(5)) { Bid.new } }
+    let(:bids) { [bid] }
     it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: params[:participant_id]).and_return(participant)
       allow(SignUpTopic).to receive_message_chain(:find, :assignment).with(params[:topic].first).with(no_args).and_return(assignment)
-      allow(Bid).to receive(:where).with(team_id: team_id).and_return(bid)
-      bid.each do |x|
-        allow(x).to receive(:topic_id).and_return(1)
-      end
-      allow(Bid).to receive(:where).with(topic_id: Integer, team_id: team_id).and_return(bid)
-      allow(Bid).to receive(:where).with(topic_id: String, team_id: team_id).and_return(bid)
-      allow(bid).to receive(:update_all).with(priority: Integer)
-      expect(bid).to receive(:update_all).with(priority: Integer)
+      allow(Bid).to receive(:where).with(team_id: team_id).and_return(bids)
+      allow(bid).to receive(:topic_id).and_return(1)
+      allow(Bid).to receive(:where).with(topic_id: Integer, team_id: team_id).and_return(bids)
+      allow(Bid).to receive(:where).with(topic_id: String, team_id: team_id).and_return(bids)
+      allow(bids).to receive(:update_all).with(priority: Integer)
+      expect(bids).to receive(:update_all).with(priority: Integer)
       get :set_priority, params
       expect(response).to redirect_to action: 'list', assignment_id: params[:assignment_id]
     end

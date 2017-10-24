@@ -142,11 +142,11 @@ describe User do
         allow(Assignment).to receive_message_chain(:where,:find_each).and_yield(assignment)
         allow(assignment).to receive(:participants).and_return(user2)
         allow_any_instance_of(User).to receive(:empty?).and_return(false)
-        allow_any_instance_of(User).to receive(:each).and_yield(user1).and_yield(user2)
-        allow_any_instance_of(User).to receive(:user).and_return([user1,user2])
+        allow_any_instance_of(User).to receive(:each).and_yield(user)
+        allow_any_instance_of(User).to receive(:user).and_return(user)
         allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
         allow(user).to receive_message_chain("role.ta?"){false}
-        expect(user.get_user_list).to eq ([user1,user2])
+        expect(user.get_user_list).to eq ([user])
       end
     end
 

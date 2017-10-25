@@ -45,7 +45,7 @@ class VmQuestionResponseRow
     row_average_score = 0.0
     actual_average_count = 0.0 # New variable used to count the number reviews given
     @score_row.each do |score|
-      next if score.score_value.is_a? Numeric
+      if score.score_value.is_a? Numeric
         # puts "This is the place to change  #{score.score_value.to_f}"
         row_average_score += score.score_value.to_f
         actual_average_count += 1 # Summing the number of reviews given

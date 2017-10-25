@@ -65,7 +65,12 @@ jQuery(document).ready(function() {
 <% if @responses_versions.empty? %>
     <I>No previous review was performed.</I><br/><hr/><br/>
 <% else %>
-    <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
+        <% @responses_versions.each do |response| %>
+        <%= response.display_as_html() %>
+            <br/>
+        <% end %>
+        <hr/>
+    <br/>
 <% end %>
 <h2>Directions for the reviewer</h2>
 

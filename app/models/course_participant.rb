@@ -14,7 +14,7 @@ class CourseParticipant < Participant
   end
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
-  def self.import(row_hash, session, id)
+  def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, "No user id has been specified." if row_hash.empty?
     user = User.find_by_name(row_hash[:name])
     if user.nil?

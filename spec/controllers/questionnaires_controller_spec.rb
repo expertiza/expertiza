@@ -1,4 +1,20 @@
-describe QuestionnairesController do
+extend RSpec::Matchers
+require 'spec_helper'
+
+RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    # Disable the `expect` sytax...
+    c.syntax = :should
+
+    # ...or disable the `should` syntax...
+    c.syntax = :expect
+
+    # ...or explicitly enable both
+    c.syntax = [:should, :expect]
+  end
+end
+
+describe QuestionnairesController, type: :controller do
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
@@ -27,7 +43,31 @@ describe QuestionnairesController do
   end
 
   describe '#create' do
-    it 'redirects to questionnaires#edit page after create a new questionnaire'
+    it 'redirects to questionnaires#edit page after create a new questionnaire' do
+
+      treeFolder1 = double('TreeFolder')
+      allow(treeFolder1).to receive(:id).and_return(1)
+      allow(treeFolder1).to receive(:node_object_id).and_return(1)
+
+      treeFolder2 = double('TreeFolder')
+      allow(treeFolder2).to receive(:id).and_return(1)
+      allow(treeFolder2).to receive(:node_object_id).and_return(1)
+
+      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([treeFolder1,treeFolder2])
+      
+      folderNode2 = double('FolderNode')
+      allow(folderNode2).to receive(:id).and_return(1)
+      allow(FolderNode).to receive(:find_by_node_object_id).and_return( folderNode2 )
+      
+      user = double("User")
+      allow(user).to receive(:id).and_return(1)
+      
+      get :create, { :questionnaire => { :private => "true", :type => "ReviewQuestionnaire", :name => "Random Name", :min_question_score => "0", :max_question_score => "5" } }, {user: user}
+      expect(flash[:success]).to eq("You have successfully created a questionnaire!")
+      
+      response.should redirect_to(edit_questionnaire_path({id: 1}))
+
+    end
   end
 
   describe '#create_quiz_questionnaire, #create_questionnaire and #save' do

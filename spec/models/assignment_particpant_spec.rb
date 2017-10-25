@@ -1,4 +1,4 @@
-﻿describe AssignmentParticipant do
+describe AssignmentParticipant do
   let(:response) { build(:response) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:team2) { build(:assignment_team, id: 2) }
@@ -269,7 +269,8 @@
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
           row = ["user_name", "user_fullname", "name@email.com"]
-          allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("The record containing #{row[0]} does not have enough items.")
+          allow(AssignmentParticipant).
+            to receive(:check_info_and_create).with(any_args).and_raise("The record containing #{row[0]} does not have enough items.")
           expect(AssignmentParticipant).to receive(:check_info_and_create)
           expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[0]} does not have enough items.")
         end
@@ -282,7 +283,8 @@
             session = {user: participant}
             allow(User).to receive(:find_by).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(nil)
-            expect { AssignmentParticipant.import(row, nil, session, 2) }.to raise_error("The assignment with id \"2\" was not found.").and change { User.count }.by(1)
+            expect { AssignmentParticipant.import(row, nil, session, 2) }.
+              to raise_error("The assignment with id \"2\" was not found.").and change { User.count }.by(1)
           end
         end
 
@@ -305,7 +307,7 @@
       csv = []
       expect(AssignmentParticipant).to receive_message_chain(:where, :find_each).with(any_args).and_yield(participant)
       expect(AssignmentParticipant.export(csv, 1, any_args)).
-          to eq([["student2064", "2064, student", "expertiza@mailinator.com", "Student", "instructor6", true, true, true, "handle"]])
+        to eq([["student2064", "2064, student", "expertiza@mailinator.com", "Student", "instructor6", true, true, true, "handle"]])
     end
   end
 

@@ -28,7 +28,7 @@ describe "CourseParticipant" do
     end
 
     it "raise error if record does not have enough items " do
-      row = ["user_name", "user_fullname", "name@email.com"]
+      row = { :name => "user_name", :fullname => "user_fullname", :email => "name@email.com" }
       expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[0]} does not have enough items.")
     end
 
@@ -48,7 +48,7 @@ describe "CourseParticipant" do
       row = []
       allow(Course).to receive(:find).and_return(course)
       allow(session[:user]).to receive(:id).and_return(1)
-      row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
+      row = { :name => "user_name", :fullname => "user_fullname", :email => "name@email.com", :role => "user_role_name", :parent => "user_parent_name" }
       course_part = CourseParticipant.import(row, nil, session, 2)
       expect(course_part).to be_an_instance_of(CourseParticipant)
     end

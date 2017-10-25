@@ -18,6 +18,7 @@
     allow(participant).to receive(:team).and_return(team)
     allow(participant).to receive(:user).and_return(student)
   end
+
   describe '#dir_path' do
     it 'returns the directory path of current assignment' do
       expect(participant.dir_path).to eq "final_test"
@@ -26,7 +27,7 @@
 
   describe '#assign_quiz' do
     it 'creates a new QuizResponseMap record' do
-      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(quiz_questionaire) #WHY CAN NOT DELETE THIS SENTENCE
+      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(quiz_questionaire) # WHY CAN NOT DELETE THIS SENTENCE
       expect {participant.assign_quiz(participant, participant2, nil)}.to change {QuizResponseMap.count}.from(0).to(1)
       expect(participant.assign_quiz(participant, participant2, nil)).to be_an_instance_of(QuizResponseMap)
     end
@@ -34,7 +35,7 @@
 
   describe '#reviewers' do
     it 'returns all the participants in this assignment who have reviewed the team where this participant belongs' do
-      allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([response_map]) #differences with .with(parameter)
+      allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([response_map]) # differences with .with(parameter)
       allow(AssignmentParticipant).to receive(:find).with(any_args).and_return(participant2)
       expect(participant.reviewers).to eq([participant2])
     end
@@ -42,7 +43,7 @@
 
   describe '#review_score' do
     it 'returns the review score' do
-      #diao yong de method tai duo le,er qie bu zhi dao sha yi si
+      # diao yong de method tai duo le,er qie bu zhi dao sha yi si
       allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
       allow(review_questionnaire).to receive(:questions).and_return(question)
       allow(Answer).to receive(:compute_scores).with([response], question).and_return({avg: 100})
@@ -90,7 +91,8 @@
       end
     end
   end
-# included method
+
+  # included method
   describe '#assignment_questionnaires' do
     context 'when the round of questionnaire is nil' do
       it 'record the result as review scores' do
@@ -118,6 +120,7 @@
       end
     end
   end
+
   describe '#merge_scores' do
     context 'when all of the review_n are nil' do
       it 'set max, min, avg of review score as 0' do

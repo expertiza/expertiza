@@ -77,7 +77,7 @@ class AssignmentParticipant < Participant
     # move lots of calculation from view(_participant.html.erb) to model
     caculate_scores(scores)
   end
-  
+
   # methods extracted from scores method:assignment_questionnaires, merge_scores, topic_total_scores, caculate_scores
   def assignment_questionnaires(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|

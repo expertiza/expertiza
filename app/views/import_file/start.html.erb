@@ -108,7 +108,7 @@
       <br/>
       The import process expects the following columns:
       <br/>
-      <%= @expected_fields.html_safe %>
+      <%= @expected_fields.html_safe unless @expected_fields.nil? %>
     </p>
 
     <button type="button" class='btn btn-primary' onclick='checkForFile()'>Import</button>

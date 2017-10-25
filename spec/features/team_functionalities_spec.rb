@@ -53,7 +53,6 @@ describe "create group assignment"  do
   end
 
   it "is able to create a public group assignment" do
-    #assignment = Assignment.where(name: 'public assignment for test').first
     expect(@assignment).to have_attributes(
                               name: 'public assignment for test',
                               course_id: Course.find_by(name: 'Course 2').id,
@@ -64,7 +63,8 @@ describe "create group assignment"  do
                               availability_flag: true
                           )
 
-    #add_topic_to_assignment assignment
+
+
     sign_up_topics = SignUpTopic.where(topic_name: 'test_topic_1').first
     expect(sign_up_topics).to have_attributes(
                                   topic_name: 'test_topic_1',
@@ -102,7 +102,7 @@ describe "create group assignment"  do
     expect(page).to have_content('student2065')
     end
 
-  it "Other users join/decline the team" do
+  it "joins the team" do
 
     user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)

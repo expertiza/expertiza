@@ -240,7 +240,7 @@ class Response < ActiveRecord::Base
     score = total_score.to_f / maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
     assignment = self.map.assignment
-    assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
+    assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
     # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
     allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
     # the range of average_score_on_same_artifact_from_others and score is [0,1]

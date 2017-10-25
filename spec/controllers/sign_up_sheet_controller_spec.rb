@@ -164,7 +164,7 @@ describe SignUpSheetController do
   end
 
   describe '#sign_up' do
-    let(:params) { { id: '1' } }
+    let(:params) {{id:'1'}}
     let(:session){{user:student}}
     context 'when SignUpSheet.signup_team method return nil' do
       it 'shows an error flash message and redirects to sign_up_sheet#list page' do
@@ -177,7 +177,7 @@ describe SignUpSheetController do
   end
 
   describe '#signup_as_instructor_action' do
-    let(:params) { { username: '1' } }
+    let(:params) {{username:'1'}}
     context 'when user cannot be found' do
       it 'shows an flash error message and redirects to assignment#edit page' do
         allow(User).to receive(:find_by).with(any_args).and_return(nil)
@@ -226,7 +226,7 @@ describe SignUpSheetController do
   end
 
   describe '#delete_signup' do
-    let(:params) { { id: 1, topic_id: 1 } }
+    let(:params) {{id:1,topic_id:1}}
     context 'when either submitted files or hyperlinks of current team are not empty' do
       it 'shows a flash error message and redirects to sign_up_sheet#list page' do
         allow(participant.team).to receive(:submitted_files).and_return(['file'])
@@ -245,7 +245,7 @@ describe SignUpSheetController do
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to sign_up_sheet#list page' do
-        allow(due_date).to receive(:due_at).and_return(Time.now - 1.day)
+        allow(due_date).to receive(:due_at).and_return(Time.zone.now - 1.day)
         allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return(due_date)
         delete :delete_signup, params
         expect(flash.now[:error]).to eq("You cannot drop your topic after the drop topic deadline!")
@@ -254,7 +254,7 @@ describe SignUpSheetController do
     end
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
-      let(:session) { { user: student } }
+      let(:session) {{user:student}}
       it 'shows a flash success message and redirects to sign_up_sheet#list page' do
         allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return nil
         allow(SignedUpTeam).to receive(:find_team_users).with(participant.assignment.id, session[:user].id).and_return([signed_up_team])
@@ -268,7 +268,7 @@ describe SignUpSheetController do
   end
 
   describe '#delete_signup_as_instructor' do
-    let(:params) { { id: 1, topic_id: 1 } }
+    let(:params) {{id:1,topic_id:1}}
     context 'when either submitted files or hyperlinks of current team are not empty' do
       it 'shows a flash error message and redirects to assignment#edit page' do
         allow(participant.team).to receive(:submitted_files).and_return(['file'])
@@ -287,7 +287,7 @@ describe SignUpSheetController do
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to assignment#edit page' do
-        allow(due_date).to receive(:due_at).and_return(Time.now - 1.day)
+        allow(due_date).to receive(:due_at).and_return(Time.zone.now - 1.day)
         allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return(due_date)
         delete :delete_signup_as_instructor, params
         expect(flash.now[:error]).to eq("You cannot drop a student after the drop topic deadline!")
@@ -296,7 +296,7 @@ describe SignUpSheetController do
     end
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
-      let(:session) { { user: instructor } }
+      let(:session) {{user:instructor}}
       it 'shows a flash success message and redirects to assignment#edit page' do
         allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return nil
         allow(SignedUpTeam).to receive(:find_team_users).with(participant.assignment.id, session[:user].id).and_return([signed_up_team])
@@ -310,9 +310,9 @@ describe SignUpSheetController do
   end
 
   describe '#set_priority' do
-    let(:params) { { participant_id: '1', id: 1, topic: [1], assignment_id: 1 } }
-    let(:team_id) { participant.team.try(:id) }
-    let(:bids) { [bid] }
+    let(:params) {{participant_id:'1',id:1,topic:[1],assignment_id:1}}
+    let(:team_id) {participant.team.try(:id)}
+    let(:bids) {[bid]}
     it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: params[:participant_id]).and_return(participant)
       allow(SignUpTopic).to receive_message_chain(:find, :assignment).with(params[:topic].first).with(no_args).and_return(assignment)
@@ -326,8 +326,8 @@ describe SignUpSheetController do
   end
 
   describe '#save_topic_deadlines' do
-    let(:params) { { assignment_id: 1, due_date: Hash.new } }
-    let(:topics) { [topic] }
+    let(:params) {{assignment_id:1,due_date:Hash.new}}
+    let(:topics) {[topic]}
     context 'when topic_due_date cannot be found' do
       it 'creates a new topic_due_date record and redirects to assignment#edit page' do
         allow(TopicDueDate).to receive(:where).with(any_args).and_return nil
@@ -356,7 +356,7 @@ describe SignUpSheetController do
   end
 
   describe '#show_team' do
-    let(:params) { { id: '1', assignment_id: 1 } }
+    let(:params) {{id:'1',assignment_id:1}}
     it 'renders show_team page' do
       allow(SignedUpTeam).to receive(:where).with(any_args).and_return([signed_up_team])
       get :show_team, params
@@ -365,8 +365,8 @@ describe SignUpSheetController do
   end
 
   describe '#switch_original_topic_to_approved_suggested_topic' do
-    let(:params) { { id: 1, topic_id: 1 } }
-    let(:session) { { user: student } }
+    let(:params) {{id:1,topic_id:1}}
+    let(:session) {{user:student}}
     it 'redirects to sign_up_sheet#list page' do
       allow(TeamsUser).to receive(:team_id).with(any_args).and_return(1)
       allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)

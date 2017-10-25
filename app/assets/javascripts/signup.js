@@ -55,7 +55,7 @@ jQuery( window ).resize(function() {
 
     var rowSize = rows.length
 
-    jQuery(".jsgrid-grid-body").css("height",rowSize*30+"px")
+    jQuery(".jsgrid-grid-body").css("height",400+"px")
 });
 
 
@@ -161,8 +161,8 @@ jQuery("#jsGrid").jsGrid({
 
 
                 fields: [
-                    { name: "topic_identifier", type: "text" ,title: "Topic #" },
-                    { name: "topic_name", type: "text" ,title: "Topic name(s)",width : "10%",
+                    { name: "topic_identifier", type: "text" ,title: "Topic #",width : "1.5%" },
+                    { name: "topic_name", type: "text" ,title: "Topic name(s)",width : "5%",
                         itemTemplate: function(value,topic) {
 
                             var linkText =  $("<a>").attr("href", topic.link).text(value);
@@ -218,14 +218,13 @@ jQuery("#jsGrid").jsGrid({
 
 
                 },
-                    { name: "category", type: "text",title: "Topic category" },
-                    { name: "max_choosers", type: "text" ,title: "Num of Slots"},
-                    { name: "slots_available", editing: false ,title: "Available Slots"},
-                    { name: "slots_waitlisted",  editing: false  ,title: "Num on Waitlist"},
+                    { name: "category", type: "text",title: "Topic category" ,width : "5%" },
+                    { name: "max_choosers", type: "text" ,title: "# Slots" ,width : "2%"},
+                    { name: "slots_available", editing: false ,title: "Available Slots",width : "2%"},
+                    { name: "slots_waitlisted",  editing: false  ,title: "Num on Waitlist"  , width : "2%"},
 
-                    { name: "link", type: "text",title: "Topic Link" ,width :"20%" },
-                    { name: "description", type: "textarea",title: "Topic Description",width :"20%" },
-                    { name: "id",title: "Bookmarks",width :"20%", editing: false,width :"4%",
+                   
+                    { name: "id",title: "Book marks",width :"20%", editing: false,width :"2%",
 
                         itemTemplate: function(value, topic) {
                         console.log("value ",value)
@@ -269,8 +268,12 @@ jQuery("#jsGrid").jsGrid({
                         deleteButton: true,                             // show delete button
                         clearFilterButton: true,                        // show clear filter button
                         modeSwitchButton: true,                         // show switching filtering/inserting button
+                        width : "3%"
                         
-                 }
+                 }  ,
+
+                  { name: "link", type: "text",title: "Topic Link" ,width :"12%" },
+                    { name: "description", type: "textarea",title: "Topic Description",width :"12%" }
                    
                 ]
             });

@@ -12,7 +12,7 @@
     <%end%>
   </tr>
   <% i=0 %>
-
+<!--Project E1763. Adding checkboxes against topics and allowing multiselect.-->
   <% for i in 0..(@assignment.sign_up_topics.size - 1) %>
     <tr>
       <td><%= @assignment.sign_up_topics[i].topic_identifier %><br/>
@@ -53,7 +53,7 @@
 
 
 <%= submit_tag "Save start/due dates" %>
-
+<!--Project E1763. JavaScript for multiselect.-->
 <script type="text/javascript">
 $(document).ready(function() {
 var $chkboxes = $('.chkbox');

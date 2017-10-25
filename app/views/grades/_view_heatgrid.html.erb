@@ -1,3 +1,6 @@
+<head>
+  <link rel="stylesheet" href="/assets/grades.scss">
+</head>
 <style>
 th.tablesorter-headerAsc{
   background-image: url(<%= asset_path("up-arrow.png") %>);
@@ -22,10 +25,37 @@ th.sorter-true.tablesorter-headerUnSorted{
   background-position: center right;
   padding-right: 15px;
 }
+.underlined{
+    text-decoration: underline;
+    font-weight:bold;
+  }
 </style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
-<h1>Summary Report for assignment: <%= @assignment.name %></h1>
+<script type = "text/javascript" language = "javascript">
+
+function toggleFunction(elementId) {
+    var target = document.getElementById(elementId);
+    if (target.style.display === 'none') {
+        target.style.display = 'block';
+    } else {
+        target.style.display = 'none';
+    }
+}
+      
+      </script>
+<h1>Review Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
+<button onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
+
+
+     <div id="<%= @type + @participant.id.to_s%>" style="display:none;">
+<% if @participant.team.hyperlinks.try(:length) %>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
+  <% else %>
+ <b>No Submission</b>
+<% end %>
+
+      </div><br>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
@@ -36,7 +66,7 @@ th.sorter-true.tablesorter-headerUnSorted{
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
-          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
+          <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
             <table class="tbl_questlist" >
               <thead>
               <th>#</th>
@@ -61,19 +91,18 @@ th.sorter-true.tablesorter-headerUnSorted{
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
           </span>
 
-          <table id="scoresTable" class="tbl_heat tablesorter">
+          <table id='<%="scoresTable"+@type + @participant.id.to_s%>' class="tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr>
               <th class="sorter-true">Criterion<span></span></th>
-              <th class="sorter-false">Max</th>
-
+              
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
@@ -104,14 +133,14 @@ th.sorter-true.tablesorter-headerUnSorted{
             <% vm.list_of_rows.each do |row| %>
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
-                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
-                  <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <%= j.to_s %>   </td>
-                  <td class = 'cf' > <%= row.question_max_score %>   </td>
+                <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + row.question_id.to_s + vm.round.to_s %>">
+                  <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
+      
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-                        <%= score.score_value.to_s %>
+                      <td class="<%= score.color_code %>" style="text-align:center;" data-toggle="tooltip" title="<%=score.comment%>">
+                        <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
 
@@ -133,7 +162,7 @@ th.sorter-true.tablesorter-headerUnSorted{
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
-                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
+                  <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= @type + @participant.id.to_s + row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
                     <div style="background-color:lightblue;padding:4px;"><%= row.questionText %></div>
                     <div>
                       <table class="tbl_questlist">
@@ -160,7 +189,7 @@ th.sorter-true.tablesorter-headerUnSorted{
             <!--displays the row for the add'l comments, by default: collapsed. -->
             <tr>
               <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
-                <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
+                <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                   <div style="background-color:#A9A9F5;padding:4px;">
                     <table class="tbl_addlcmt">
                       <thead>
@@ -189,23 +218,15 @@ th.sorter-true.tablesorter-headerUnSorted{
           <% table_count += 1%>
           <span> <%= vm.display_team_members %></span>
           <!-- this elsif terminates the heatgrid code.  -->
-        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
-            <div class="flash_warn">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
+        <%# elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
+            <!--<div class="flash_error">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>-->
         <% end %>
-        <br/>  
+        <br/> 
     <% end %>
 <% end %>
-<!-- termination of the main outer loop.-->
+
 
 <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
-<% if ['Student'].include? current_user.role.name %>
-  Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
-  Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
-<% else %>
-  <%= form_tag 'save_grade_and_comment_for_submission', remote: true do %>
-    <%= hidden_field_tag :participant_id, params[:id] %>
-    <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3,   placeholder: 'Grade' %><br/>
-    <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment' %>
-    <%= submit_tag 'Save' %>
-  <% end %>
-<% end %>
+Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
+<!-- termination of the main outer loop. -->

@@ -76,8 +76,8 @@ FactoryGirl.define do
   # quiz question and quiz response.
   factory :answer, class: Answer do
     question { Question.first || association(:question) }
-    response_id { Response.first.id || association(:response_id).id }
-    answer { 1 || assocaiton(:answer) }
+    response { Response.first || association(:response) }
+    answer 1
     comments 'Answer text'
   end
 end

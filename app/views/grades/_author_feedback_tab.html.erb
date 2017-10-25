@@ -3,12 +3,11 @@
     <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
     <tr style="background-color: #F7DC6F">
       <td>
-        <b> <%=participant.fullname %></b>
-        <a href="#" id="<%=prefix%>_<%=index.to_s%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_feedback','author feedbacks');return false;">show author feedback</a> (<%= pscore[:feedback][:assessments].size %>)
+        <a href="#" id="<%=prefix%>_<%=index.to_s%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_feedback','author feedbacks');return false;"><b> <%=participant.fullname %></b></a> (<%= pscore[:feedback][:assessments].size %>)
       </td>
     <tr id="<%=prefix%>_<%=index.to_s%>_feedback" style="display:none">
       <td>
-        <%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %>
+        <%= view_heatgrid(participant.id, "AuthorFeedbackQuestionnaire") %>
       </td>
     </tr>
   <% end %>

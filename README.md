@@ -27,8 +27,9 @@ and switch to another environment if you don't like the one you started with.
 See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information.
 
  * [OSX](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:OSX)
- * [Linux](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:Linux:RHEL)
- * [Docker](https://hub.docker.com/r/winbobob/expertiza-fall2016/)
+ * [RedHat Linux](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:Linux:RHEL)
+ * [Ubuntu](http://wiki.expertiza.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_Expertiza_-_Installation_Guide)
+ * [Docker-compose](https://hub.docker.com/r/winbobob/expertiza/)
 
 Contributing
 ------------

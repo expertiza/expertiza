@@ -17,6 +17,12 @@ FactoryGirl.define do
     description ""
   end
 
+  factory :role_of_teaching_assistant, class: Role do
+    name "Teaching Assistant"
+    parent_id nil
+    description ""
+  end
+
   factory :admin, class: User do
     sequence(:name) {|n| "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
@@ -84,6 +90,28 @@ FactoryGirl.define do
     copy_of_emails  false
   end
 
+  factory :teaching_assistant, class: Ta do
+    sequence(:name, 5888) {|n| n = 5888; "teaching_assistant#{n}" }
+    role { Role.where(name: 'Teaching Assistant').first || association(:role_of_teaching_assistant) }
+    password "password"
+    password_confirmation "password"
+    fullname "58888, teaching assistant"
+    email "expertiza@mailinator.com"
+    parent_id 1
+    private_by_default  false
+    mru_directory_path  nil
+    email_on_review true
+    email_on_submission true
+    email_on_review_of_review true
+    is_new_user false
+    master_permission_granted 0
+    handle "handle"
+    digital_certificate nil
+    timezonepref 'Eastern Time (US & Canada)'
+    public_key nil
+    copy_of_emails  false
+  end
+
   factory :course, class: Course do
     sequence(:name) {|n| "CSC517, test#{n}" }
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
@@ -127,6 +155,11 @@ FactoryGirl.define do
     use_bookmark false
     can_review_same_topic true
     can_choose_topic_to_review true
+    num_reviews_required 3
+    num_metareviews_required 3
+    num_reviews_allowed 3
+    num_metareviews_allowed 3
+    is_calibrated false
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -173,7 +206,7 @@ FactoryGirl.define do
   factory :signed_up_team, class: SignedUpTeam do
     topic { SignUpTopic.first || association(:topic) }
     team_id 1
-    is_waitlisted 0
+    is_waitlisted false
     preference_priority_number nil
   end
 
@@ -212,9 +245,11 @@ FactoryGirl.define do
   end
 
   factory :review_grade, class: ReviewGrade do
+    participant { Participant.first || association(:participant) }
     grade_for_reviewer 100
-    comment_for_reviewer "Good job!"
-    review_graded_at "2011-11-11 11:11:11"
+    comment_for_reviewer 'Good job!'
+    review_graded_at '2011-11-11 11:11:11'
+    reviewer_id 1
   end
 
   factory :assignment_due_date, class: AssignmentDueDate do
@@ -274,7 +309,7 @@ FactoryGirl.define do
   end
 
   factory :questionnaire, class: ReviewQuestionnaire do
-    name 'Test questionaire'
+    name 'Test questionnaire'
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
@@ -284,43 +319,10 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
-  factory :metareview_questionnaire, class: MetareviewQuestionnaire do
-    name 'Test questionaire'
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
-    private 0
-    min_question_score 0
-    max_question_score 5
-    type 'MetareviewQuestionnaire'
-    display_type 'Review'
-    instruction_loc nil
-  end
-
-  factory :author_feedback_questionnaire, class: AuthorFeedbackQuestionnaire do
-    name 'Test questionaire'
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
-    private 0
-    min_question_score 0
-    max_question_score 5
-    type 'AuthorFeedbackQuestionnaire'
-    display_type 'Review'
-    instruction_loc nil
-  end
-
-  factory :teammate_review_questionnaire, class: TeammateReviewQuestionnaire do
-    name 'Test questionaire'
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
-    private 0
-    min_question_score 0
-    max_question_score 5
-    type 'TeammateReviewQuestionnaire'
-    display_type 'Review'
-    instruction_loc nil
-  end
-
-  factory :question, class: Question do
+  factory :question, class: Criterion do
     txt 'Test question:'
     weight 1
-    questionnaire { ReviewQuestionnaire.first || association(:questionnaire) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'Criterion'
     size "70,1"
@@ -328,6 +330,12 @@ FactoryGirl.define do
     break_before 1
     max_label nil
     min_label nil
+  end
+
+  factory :question_advice, class: QuestionAdvice do
+    question { Question.first || association(:question) }
+    score 5
+    advice 'LGTM'
   end
 
   factory :assignment_questionnaire, class: AssignmentQuestionnaire do
@@ -347,11 +355,27 @@ FactoryGirl.define do
     calibrate_to 0
   end
 
+  factory :meta_review_response_map, class: MetareviewResponseMap do
+    review_mapping { ReviewResponseMap.first || association(:review_response_map) }
+    reviewee { AssignmentParticipant.first || association(:participant) }
+    reviewer_id 1
+    type 'MetareviewResponseMap'
+    calibrate_to 0
+  end
+
   factory :response, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
     round 1
     is_submitted false
+  end
+
+  factory :submission_record, class: SubmissionRecord do
+    team_id 666
+    operation 'create'
+    user 'student1234'
+    content 'www.wolfware.edu'
+    created_at Time.now
   end
 end

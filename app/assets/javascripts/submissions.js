@@ -101,7 +101,7 @@ function renameFile(){
 }
 
 function deleteSelectedFile(){     
-	if (confirm("Are you sure. If directory all its children will be deleted.  Do you want to delete?"))
+	if (confirm("Are you sure?"))
 		{
 	        	var form = $('#folder-action-form')[0];
 	        	input1 = document.createElement("input");

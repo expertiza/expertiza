@@ -73,9 +73,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :author_feedback_questionnaires, controller: 'questionnaires'
-
-
   resources :content_pages do
     collection do
       get :list
@@ -255,6 +252,7 @@ Expertiza::Application.routes.draw do
   resources :questionnaires do
     collection do
       get :copy
+      get :new
       get :edit
       get :list
       post :list_questionnaires
@@ -263,6 +261,7 @@ Expertiza::Application.routes.draw do
       get :toggle_access
       get :view
       get :delete
+      post :create
       post :create_quiz_questionnaire
       post :update_quiz
       post :add_new_questions
@@ -277,6 +276,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
@@ -369,6 +369,7 @@ Expertiza::Application.routes.draw do
       get :intelligent_sign_up
       get :intelligent_save
       get :signup_as_instructor
+      get :intelligent_topic_selection
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
@@ -512,6 +513,7 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
+      get 'set_anonymous_mode'
       get :keys
     end
   end
@@ -547,4 +549,5 @@ Expertiza::Application.routes.draw do
 
   get ':controller(/:action(/:id))(.:format)'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
+  match '*path' => 'content_pages#view', via: [:get, :post] unless Rails.env.development?
 end

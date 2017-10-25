@@ -416,7 +416,7 @@ describe "assignment function" do
       all(:xpath, '//img[@title="Delete Topic"]')[0].click
       click_button 'OK'
 
-      topics_exist = SignUpTopic.count(:all, assignment_id: assignment.id)
+      topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0
     end
   end
@@ -436,8 +436,8 @@ describe "assignment function" do
       create(:assignment_questionnaire)
       (1..3).each do |i|
         create(:questionnaire, name: "ReviewQuestionnaire#{i}")
-        create(:author_feedback_questionnaire, name: "AuthorFeedbackQuestionnaire#{i}")
-        create(:teammate_review_questionnaire, name: "TeammateReviewQuestionnaire#{i}")
+        create(:questionnaire, name: "AuthorFeedbackQuestionnaire#{i}", type: 'AuthorFeedbackQuestionnaire')
+        create(:questionnaire, name: "TeammateReviewQuestionnaire#{i}", type: 'TeammateReviewQuestionnaire')
       end
       login_as("instructor6")
       visit "/assignments/#{@assignment.id}/edit"

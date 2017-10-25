@@ -55,6 +55,10 @@ class Assignment < ActiveRecord::Base
     @has_topics ||= !sign_up_topics.empty?
   end
 
+  def is_calibrated?
+    self.is_calibrated
+  end
+
   def self.set_courses_to_assignment(user)
     @courses = Course.where(instructor_id: user.id).order(:name)
   end
@@ -98,7 +102,7 @@ class Assignment < ActiveRecord::Base
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
     response_map_set.reject! do |response_map|
-      (response_map.reviewee == metareviewer) or response_map.reviewer.includes?(metareviewer)
+      response_map.reviewee == metareviewer or response_map.reviewer == metareviewer
     end
     raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
 
@@ -213,10 +217,10 @@ class Assignment < ActiveRecord::Base
     end
     path_text = ""
     if !self.course_id.nil? && self.course_id > 0
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' +
-        FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/'
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
+        FileHelper.clean_path(self.course.directory_path) + '/'
     else
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
     end
     path_text += FileHelper.clean_path(self.directory_path)
     path_text
@@ -380,6 +384,7 @@ class Assignment < ActiveRecord::Base
     next_due_date
   end
 
+  # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
@@ -387,7 +392,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id).where(used_in_round: round)
+    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
     # for program 1 like assignment, if same rubric is used in both rounds,
     # the 'used_in_round' field in 'assignment_questionnaires' will be null,
     # since one field can only store one integer

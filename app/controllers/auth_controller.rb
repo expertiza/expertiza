@@ -1,11 +1,9 @@
 class AuthController < ApplicationController
   helper :auth
 
-  @@attempts = {}
-
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [:login, :logout],
-         redirect_to: {action: :list}
+  verify :method => :post, :only => [ :login, :logout ],
+    :redirect_to => { :action => :list }
 
   def action_allowed?
     case params[:action]
@@ -20,50 +18,24 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
-      @attempts = @@attempts
-      # let users do captcha when they fail to login 1x
-      @username = params[:login][:name]
-      if @@attempts.key?(params[:login][:name]) and @@attempts[params[:login][:name]] >= 1 and !verify_recaptcha(model: @user)
-        flash[:error] = "Please do reCAPTCHA before trying to login again."
-        render template: "auth/login"
-      else
-        user = User.find_by_login(params[:login][:name])
-        if user and user.valid_password?(params[:login][:password])
-          # remove this user from login attempt list after (s)he has succesfully login
-          if @@attempts.key?(params[:login][:name])
-            @@attempts.delete(params[:login][:name])
-          end
-          after_login(user)
-        else
-          if user.nil?
-            flash[:error] = "We can't find this username in our database, please try with another username"
-          else
-            # keep track of login attempts per valid username, and reset this when (s)he has succesfully login
-            @@attempts[params[:login][:name]] = if @@attempts.key?(params[:login][:name])
-                                                  @@attempts[params[:login][:name]] + 1
-                                                else
-                                                  1
-                                                end
-            logger.warn "Failed login attempt."
-            flash[:error] = "Incorrect password, please try again or click \'Forgot password?\' [" + @@attempts[params[:login][:name]].to_s + " attempt(s)]."
-            # force them to go to password retrieval after 5x (they can still try logging in when they press back button)
-            if @@attempts[params[:login][:name]] >= 5
-              redirect_to controller: 'password_retrieval', action: 'forgotten'
-            else
-              render template: "auth/login"
-            end
-          end
-        end
-      end
+      user = User.find_by_login(params[:login][:name])
+       if user and user.valid_password?(params[:login][:password])
+         after_login(user)
+       else
+         logger.warn "Failed login attempt."
+         flash[:error] = "Your username or password is incorrect."
+         redirect_to :controller => 'password_retrieval', :action => 'forgotten'
+       end
     end
-  end # def login
+  end  #def login
 
   # function to handle common functionality for conventional user login and google login
-  def after_login(user)
+  def after_login (user)
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
-    redirect_to controller: AuthHelper.get_home_controller(session[:user]),
-                action: AuthHelper.get_home_action(session[:user])
+
+    redirect_to :controller => AuthHelper::get_home_controller(session[:user]),
+                :action => AuthHelper::get_home_action(session[:user])
   end
 
   # Login functionality for google login feature using omniAuth2
@@ -75,13 +47,13 @@ class AuthController < ApplicationController
       flash[:error] = "This email is not authorized to use Expertiza!"
       redirect_to root_path
     else
-      after_login(user)
+     after_login(user)
     end
   end
 
   def login_failed
     flash.now[:error] = "Your username or password is incorrect."
-    # render action: 'forgotten'
+    render :action => 'forgotten'
   end
 
   def logout
@@ -90,12 +62,12 @@ class AuthController < ApplicationController
   end
 
   def self.authorised?(session, params)
-    authorised = false # default
+    authorised = false  # default
     check_controller = false
 
     if params[:controller] == 'content_pages' and
-        params[:action] == 'view'
-      if session[:credentials].pages.key?(params[:page_name].to_s)
+      params[:action] == 'view'
+      if session[:credentials].pages.has_key?(params[:page_name].to_s)
         if session[:credentials].pages[params[:page_name].to_s] == true
           logger.info "Page: authorised"
           authorised = true
@@ -103,12 +75,12 @@ class AuthController < ApplicationController
           logger.info "Page: NOT authorised"
         end
       else
-        logger.warn "(Unknown page? #{params[:page_name]})"
+        logger.warn "(Unknown page? #{params[:page_name].to_s})"
       end
     else
       # Check if there's a specific permission for an action
-      if session[:credentials].actions.key?(params[:controller])
-        if session[:credentials].actions[params[:controller]].key?(params[:action])
+      if session[:credentials].actions.has_key?(params[:controller])
+        if session[:credentials].actions[params[:controller]].has_key?(params[:action])
           if session[:credentials].actions[params[:controller]][params[:action]]
             logger.info "Action: authorised"
             authorised = true
@@ -124,20 +96,22 @@ class AuthController < ApplicationController
 
       # Check if there's a general permission for a controller
       if check_controller
-        if session[:credentials].controllers.key?(params[:controller])
+        if session[:credentials].controllers.has_key?(params[:controller])
           if session[:credentials].controllers[params[:controller]]
             logger.info "Controller: authorised"
             authorised = true
           else
             logger.info "Controller: NOT authorised"
           end
+        else
         end
       end
-    end # Check permissions
+    end  # Check permissions
 
-    logger.info "Authorised? #{authorised}"
-    authorised
+    logger.info "Authorised? #{authorised.to_s}"
+    return authorised
   end
+
 
   protected
 
@@ -170,13 +144,15 @@ class AuthController < ApplicationController
     session[:assignment_id] = nil
   end
 
-  # clears any identifying info from session
+  #clears any identifying info from session
   def self.clear_user_info(session, assignment_id)
     session[:user_id] = nil
-    session[:user] = "" # sets user to an empty string instead of nil, to show that the user was logged in
+    session[:user] = ""  #sets user to an empty string instead of nil, to show that the user was logged in
     role = Role.student
     if role
-      Role.rebuild_cache if !role.cache or !role.cache.key?(:credentials)
+      if not role.cache or not role.cache.has_key?(:credentials)
+        Role.rebuild_cache
+      end
       session[:credentials] = role.cache[:credentials]
       session[:menu] = role.cache[:menu]
     end

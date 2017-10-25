@@ -19,6 +19,8 @@ before_install:
     - tar -xf geckodriver-v0.18.0-linux64.tar.gz
     - sudo mv geckodriver /usr/local/bin/geckodriver
     - geckodriver --version
+    - redis-server --version
+    - redis-server &
 before_script:
     - mysql -u root < db/grant_expertiza.sql
     - cp config/database.yml.example config/database.yml

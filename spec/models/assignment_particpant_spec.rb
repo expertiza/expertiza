@@ -9,7 +9,7 @@
   let(:review_questionnaire) { build(:questionnaire, id: 1) } #what's the relationship between factory and let build
   let(:question) { double('Question') }
   let(:quiz_questionaire) { build(:questionnaire, id: 2) }
-  let(:student) { build(:student)}
+  let(:student) { build(:student, name:"student2064", fullname:"2064, student")}
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:assignment_questionnaire2) { build(:assignment_questionnaire, used_in_round:1) }
   let(:topic) {build(:topic)}
@@ -164,15 +164,14 @@
     end
     context 'when the participant has the grade and the total score more than 100' do
       it 'return the score of a given participant with total score 100' do
-        scores = {}
-        allow(scores[:total_score]).to receive(:>).and_return(true)
+        scores = {total_score:110}
+
         expect(participant.caculate_scores(scores)).to eq({total_score:100})
       end
     end
     context 'when the participant has the grade and the total score less than 100' do
       it 'return the score of a given participant with total score' do
         scores = {total_score:90}
-        allow(scores[:total_score]).to receive(:>).and_return(false)
         expect(participant.caculate_scores(scores)).to eq({total_score:90})
       end
     end
@@ -193,17 +192,15 @@
 
   describe '#reviews' do
     it 'returns corrsponding peer review responses given by current team' do
-      expect(participant).to receive(:team).and_return(team)
-      expect(ReviewResponseMap).to receive(:get_assessments_for).and_return([response])
+      allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
       expect(participant.reviews).to eq([response]) #make no sense
     end
   end
 
   describe '#reviews_by_reviewer' do
     it 'returns corrsponding peer review responses given by certain reviewer' do
-      expect(participant).to receive(:team).and_return(team)
-      expect(ReviewResponseMap).to receive(:get_reviewer_assessments_for).and_return([response])
-      expect(participant.reviews_by_reviewer).to eq([response])
+      allow(ReviewResponseMap).to receive(:get_reviewer_assessments_for).with(team, participant2).and_return([response])
+      expect(participant.reviews_by_reviewer(participant2)).to eq([response])
     end
   end
 
@@ -256,35 +253,41 @@
   end
 
   describe ".import" do
-    it "raise error if record is empty" do
-      row = []
-      expect { Participant.import(row, nil, nil, nil) }.to raise_error("No user id has been specified.")
+    context 'when record is empty' do
+      it 'raises an ArgumentError' do
+        row = []
+        expect {AssignmentParticipant.import(row,nil,nil,nil)}.to raise_error("No user id has been specified.")
+      end
     end
 
-    it "raise error if record does not have enough items " do
-      row = ["user_name", "user_fullname", "name@email.com"]
-      expect {Participant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[0]} does not have enough items.")
-    end
+    context 'when no user is found by offered username' do
+      context 'when the record has less than 4 items' do
+        it 'raises an ArgumentError' do
+          row = ["user_name","user_fullname","name@email.com"]
+          allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
+          expect {AssignmentParticipant.import(row,nil,nil,nil)}.to raise_error("The record containing #{row[0]} does not have enough items.")
+        end
+      end
 
-    it "raise error if course with id not found" do
-      course = build(:course)
-      session = {}
-      row = []
-      allow(Course).to receive(:find).and_return(nil)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
-      expect {Participant.import(row, nil, session, 2) }.to raise_error("The assignment with the id \"2\" was not found.")
-    end
+      context 'when the record has more than 4 items' do
+        context 'when certain assignment cannot be found' do
+          it 'creates a new user based on import information and raises an ImportError' do
+            row = ["user_name","user_fullname","name@email.com","user_role_name","user_parent_name"]
+            session = {user:participant}
+            allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
+            allow(Assignment).to receive(:find).with(2).and_return(nil)
+            expect {AssignmentParticipant.import(row,nil,session,2)}.to raise_error("The assignment with id \"2\" was not found.").and change {User.count}.by(1)
+          end
+        end
 
-    it "creates assignment participant form record" do
-      course = build(:course)
-      session = {}
-      row = []
-      allow(Course).to receive(:find).and_return(course)
-      allow(session[:user]).to receive(:id).and_return(1)
-      row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
-      course_part = Participant.p_import(row, nil, session, 2)
-      expect(course_part).to be_an_instance_of(Participant)
+        context 'when certain assignment can be found and assignment participant does not exists' do
+          it 'creates a new user, new participant and raises an ImportError' do
+            row = ["user_name","user_fullname","name@email.com","user_role_name","user_parent_name"]
+            allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
+            allow(Assignment).to receive(:find).with(2).and_return(assignment)
+          end
+        end
+      end
     end
   end
 
@@ -292,17 +295,17 @@
     it 'exports all participants in current assignment' do
       csv = []
       expect(AssignmentParticipant).to receive_message_chain(:where, :find_each).with(any_args).and_yield(participant)
-      expect(AssignmentParticipant.export(csv, 1, any_args)).to eq([["student2066", "2066, student", "expertiza@mailinator.com", "Student", "instructor6", true, true, true, "handle"]])
+      expect(AssignmentParticipant.export(csv, 1, any_args)).to eq([["student2064", "2064, student", "expertiza@mailinator.com", "Student", "instructor6", true, true, true, "handle"]])
     end
   end
 
   describe '#set_handle' do
     context 'when the user of current participant does not have handle' do
       it 'sets the user name as the handle of current participant' do
-        allow(participant).to receive_message_chain(:user, :handle, :nil?).and_return(true)
-        allow(participant).to receive_message_chain(:user, :handle).and_return("")
+        allow(student).to receive_message_chain(:handle, :nil?).and_return(true)
+        allow(student).to receive(:handle).and_return("")
         participant.set_handle
-        expect(participant.handle).to eq("student2066")
+        expect(participant.handle).to eq("student2064")
       end
     end
 
@@ -310,7 +313,7 @@
       it 'sets the user name as the name of current participant' do
         allow(AssignmentParticipant).to receive(:exists?).with(any_args).and_return(true)
         participant.set_handle
-        expect(participant.handle).to eq("student2066")
+        expect(participant.handle).to eq("student2064")
       end
     end
 
@@ -333,7 +336,7 @@
 
   describe '#current_stage' do
     it 'returns stage of current assignment' do
-      allow(SignedUpTeam).to receive_(:topic_id).with(any_args).and_return(1)
+      allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
       allow(assignment).to receive(:get_current_stage).with(1).and_return("Finished")
       expect(participant.current_stage).to eq("Finished")
     end

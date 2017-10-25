@@ -1,6 +1,6 @@
 require 'uri'
 require 'yaml'
-
+require 'TFD1770_refactor'
 # Code Review: Notice that Participant overloads two different concepts:
 #              contribution and participant (see fields of the participant table).
 #              Consider creating a new table called contributions.
@@ -24,12 +24,15 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
 
+  include Instance_method
+  extend Class_method
+
   def dir_path
     assignment.try :directory_path
   end
 
   def assign_quiz(contributor, reviewer, _topic = nil)
-    quiz = QuizQuestionnaire.find_by_instructor_id(contributor.id)
+    quiz = QuizQuestionnaire.find_by(instructor_id:contributor.id)
     QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
   end
 
@@ -181,19 +184,7 @@ class AssignmentParticipant < Participant
     BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
-  def files(directory)
-    files_list = Dir[directory + "/*"]
-    files = []
 
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each {|f| files << f }
-      end
-      files << file
-    end
-    files
-  end
 
   def team
     AssignmentTeam.team(self)
@@ -202,13 +193,9 @@ class AssignmentParticipant < Participant
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)
-    raise ArgumentError, "No user id has been specified." if row.empty?
-    user = User.find_by_name(row[0])
-    if user.nil?
-      raise ArgumentError, "The record containing #{row[0]} does not have enough items." if row.length < 4
-      attributes = ImportFileHelper.define_attributes(row)
-      user = ImportFileHelper.create_new_user(attributes, session)
-    end
+    user = AssignmentParticipant.check_info_and_create(row, _row_header = nil, session)
+
+    #end
     raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?
     unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
       new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
@@ -274,8 +261,8 @@ class AssignmentParticipant < Participant
   # zhewei: this is the file path for reviewer to upload files during peer review
   def review_file_path(response_map_id)
     response_map = ResponseMap.find(response_map_id)
-    first_user_id = TeamsUser.where(team_id: response_map.reviewee_id).first.user_id
-    participant = Participant.where(parent_id: response_map.reviewed_object_id, user_id: first_user_id).first
+    first_user_id = TeamsUser.find_by(team_id: response_map.reviewee_id).user_id
+    participant = Participant.find_by(parent_id: response_map.reviewed_object_id, user_id: first_user_id)
     self.assignment.path + "/" + participant.team.directory_num.to_s + "_review" + "/" + response_map_id.to_s
   end
 

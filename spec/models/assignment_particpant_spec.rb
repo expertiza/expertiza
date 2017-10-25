@@ -6,10 +6,10 @@ describe AssignmentParticipant do
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, grade:100) }
   let(:assignment) { build(:assignment, id: 1) }
-  let(:review_questionnaire) { build(:questionnaire, id: 1) } #what's the relationship between factory and let build
+  let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:question) { double('Question') }
   let(:quiz_questionaire) { build(:questionnaire, id: 2) }
-  let(:student) { build(:student, name:"student2064", fullname:"2064, student")}
+  let(:student) { build(:student, name:"student2064", fullname:"2064, student", handle:"handle")}
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:assignment_questionnaire2) { build(:assignment_questionnaire, used_in_round:1) }
   let(:topic) {build(:topic)}
@@ -26,7 +26,7 @@ describe AssignmentParticipant do
 
   describe '#assign_quiz' do
     it 'creates a new QuizResponseMap record' do
-      allow(QuizQuestionnaire).to receive(:find_by_instructor_id).with(any_args).and_return(quiz_questionaire)#WHY CAN NOT DELETE THIS SENTENCE
+      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id:1).and_return(quiz_questionaire)#WHY CAN NOT DELETE THIS SENTENCE
       expect{participant.assign_quiz(participant,participant2,nil)}.to change {QuizResponseMap.count}.from(0).to(1)
       expect(participant.assign_quiz(participant,participant2,nil)).to be_an_instance_of(QuizResponseMap)
     end
@@ -54,42 +54,39 @@ describe AssignmentParticipant do
   describe '#scores' do
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do
-        expect(participant).to receive(:assignment_questionnaires)#.with(any_args).and_return({avg:100})
-        expect(assignment).to receive(:compute_total_score)#.and_return(100)
+        expect(participant).to receive(:assignment_questionnaires)
+        expect(assignment).to receive(:compute_total_score)
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(assignment).to receive(:is_microtask?).and_return(false)
-        expect(assignment).to receive(:compute_total_score)#.and_return(100)
-        expect(participant).to receive(:caculate_scores)#with(any_args).and_return({participant:participant, review:{assesment:[response], scores:{avg:100}}, total_score:100})
+        expect(assignment).to receive(:compute_total_score)
+        expect(participant).to receive(:caculate_scores)
         participant.scores(question)
       end
     end
 
     context 'when assignment is varying rubric by round but not an microtask' do
       it 'calculates scores that this participant has been given' do
-        expect(participant).to receive(:assignment_questionnaires)#.with(any_args).and_return({avg:100})
-        expect(assignment).to receive(:compute_total_score)#.and_return(100).
+        expect(participant).to receive(:assignment_questionnaires)
+        expect(assignment).to receive(:compute_total_score)
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-        expect(participant).to receive(:merge_scores)#.with(any_args).and_return(0)
+        expect(participant).to receive(:merge_scores)
         allow(assignment).to receive(:is_microtask?).and_return(false)
-        expect(assignment).to receive(:compute_total_score)#.with(any_args).and_return(0)
+        expect(assignment).to receive(:compute_total_score)
         expect(participant).to receive(:caculate_scores)
         participant.scores(question)
-        #expect(participant.scores(question)).to eq({participant:participant, review:{assesment:[], scores:{max:0, min:0, avg:0}}, total_score:0})
       end
     end
 
     context 'when assignment is not varying rubric by round but an microtask' do
       it 'calculates scores that this participant has been given' do
-        expect(participant).to receive(:assignment_questionnaires)#.with(any_args).and_return({avg:100})
-        expect(assignment).to receive(:compute_total_score)#.and_return(100).
+        expect(participant).to receive(:assignment_questionnaires)
+        expect(assignment).to receive(:compute_total_score)
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
-        #expect(participant).to_not receive(:merge_scores).with(any_args)
         allow(assignment).to receive(:is_microtask?).and_return(true)
-        expect(participant).to receive(:topic_total_scores)#.and_return(0) #scores[:max_pts_available] = topic.micropayment=0
+        expect(participant).to receive(:topic_total_scores)
         expect(assignment).to receive(:compute_total_score)
         expect(participant).to receive(:caculate_scores)
         participant.scores(question)
-        #expect(participant.scores(question)).to eq({participant:participant, review:{assesment:[response], scores:{avg:100}}, total_score:0, max_pts_available:0})
       end
     end
   end
@@ -102,7 +99,7 @@ describe AssignmentParticipant do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(any_args).and_return(assignment_questionnaire)
         allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
         allow(Answer).to receive(:compute_scores).with(any_args).and_return({max:100, min:100, avg:100})
-        participant.assignment_questionnaires(question_hash, scores) #{review:{assessments:[response], scores:{max:100, min:100, avg:100}}}
+        participant.assignment_questionnaires(question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response])
         expect(scores[:review][:scores]).to eq({max:100, min:100, avg:100})
       end
@@ -185,15 +182,15 @@ describe AssignmentParticipant do
 
   describe '#feedback' do
     it 'returns corrsponding author feedback responses given by current participant' do
-      allow(FeedbackResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])  #make no sense
-      expect(participant.feedback).to eq([response]) #make no sense
+      allow(FeedbackResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])
+      expect(participant.feedback).to eq([response])
     end
   end
 
   describe '#reviews' do
     it 'returns corrsponding peer review responses given by current team' do
       allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
-      expect(participant.reviews).to eq([response]) #make no sense
+      expect(participant.reviews).to eq([response])
     end
   end
 
@@ -244,6 +241,8 @@ describe AssignmentParticipant do
     context 'when record is empty' do
       it 'raises an ArgumentError' do
         row = []
+        allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("No user id has been specified.")
+        expect(AssignmentParticipant).to receive(:check_info_and_create)
         expect {AssignmentParticipant.import(row,nil,nil,nil)}.to raise_error("No user id has been specified.")
       end
     end
@@ -252,7 +251,8 @@ describe AssignmentParticipant do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
           row = ["user_name","user_fullname","name@email.com"]
-          allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
+          allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("The record containing #{row[0]} does not have enough items.")
+          expect(AssignmentParticipant).to receive(:check_info_and_create)
           expect {AssignmentParticipant.import(row,nil,nil,nil)}.to raise_error("The record containing #{row[0]} does not have enough items.")
         end
       end
@@ -262,7 +262,7 @@ describe AssignmentParticipant do
           it 'creates a new user based on import information and raises an ImportError' do
             row = ["user_name","user_fullname","name@email.com","user_role_name","user_parent_name"]
             session = {user:participant}
-            allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
+            allow(User).to receive(:find_by).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(nil)
             expect {AssignmentParticipant.import(row,nil,session,2)}.to raise_error("The assignment with id \"2\" was not found.").and change {User.count}.by(1)
           end
@@ -271,8 +271,11 @@ describe AssignmentParticipant do
         context 'when certain assignment can be found and assignment participant does not exists' do
           it 'creates a new user, new participant and raises an ImportError' do
             row = ["user_name","user_fullname","name@email.com","user_role_name","user_parent_name"]
+            session = {user:participant}
             allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(assignment)
+            allow(AssignmentParticipant).to receive(:exists?).and_return(false)
+            expect {AssignmentParticipant.import(row,nil,session,2)}.to change {User.count}.by(1).and change {AssignmentParticipant.count}.by(1)
           end
         end
       end
@@ -316,8 +319,8 @@ describe AssignmentParticipant do
   describe '#review_file_path' do
     it 'returns the file path for reviewer to upload files during peer review' do
       allow(ResponseMap).to receive(:find).with(any_args).and_return(response_map)
-      allow(TeamsUser).to receive_message_chain(:where, :first, :user_id).with(any_args).and_return(1)
-      allow(Participant).to receive_message_chain(:where, :first).with(any_args).and_return(participant)
+      allow(TeamsUser).to receive_message_chain(:find_by, :user_id).with(any_args).and_return(1)
+      allow(Participant).to receive(:find_by).with(any_args).and_return(participant)
       expect(participant.review_file_path(1)).to eq("/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test/0_review/1")
     end
   end
@@ -333,8 +336,6 @@ describe AssignmentParticipant do
   describe '#stage_deadline' do
     context 'when stage of current assignment is not Finished' do
       it 'returns current stage' do
-        #allow(participant).to receive(:patent_id).and_return(1)
-        #allow(participant).to receive(:user_id).and_return(1)
         allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
         allow(assignment).to receive(:stage_deadline).with(1).and_return("Unknow")
         expect(participant.stage_deadline).to eq("Unknow")

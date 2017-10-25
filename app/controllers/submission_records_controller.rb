@@ -20,21 +20,29 @@ class SubmissionRecordsController < ApplicationController
     @submission_records.reverse.each do |record|
     matches = GIT_HUB_REGEX.match(record.content)
     if matches.nil?
-      puts "no match"
     else
-      puts "match"
       if record.operation == "Submit Hyperlink"
         if latest_record_counter.zero?
-          GitDatum.update_git_data(record.id)
-          @authors = GitDatum.where("submission_record_id = ?", record.id).map(&:author).uniq {|x| x }
-          @record_id = record.id
+          update_git_data(record.id)
         else
-          @git_data = GitDatum.where("submission_record_id = ?", record.id)
-          @git_data.each(&:destroy)
+          git_data_cleanup(record.id)
         end
       end
       latest_record_counter += 1
     end
     end
+  end
+
+  private
+
+  def update_git_data(id)
+    GitDatum.update_git_data(id)
+    @authors = GitDatum.where("submission_record_id = ?", id).map(&:author).uniq {|x| x }
+    @record_id = id
+  end
+
+  def git_data_cleanup(id)
+    @git_data = GitDatum.where("submission_record_id = ?", id)
+    @git_data.each(&:destroy)
   end
 end

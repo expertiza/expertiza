@@ -101,8 +101,6 @@ class AssignmentTeam < Team
   end
 
   # Return the files residing in the directory of team submissions
-
-
   # Main calling method to return the files residing in the directory of team submissions
   def submitted_files(path = self.path)
     files = []

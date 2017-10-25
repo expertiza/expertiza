@@ -31,9 +31,7 @@ class AssignmentParticipant < Participant
   end
 
   def assign_quiz(contributor, reviewer, _topic = nil)
-
     quiz = QuizQuestionnaire.find_by(instructor_id: contributor.id)
-
     QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
   end
 
@@ -59,7 +57,7 @@ class AssignmentParticipant < Participant
     scores[:participant] = self
     assignment_questionnaires(questions, scores)
     scores[:total_score] = self.assignment.compute_total_score(scores)
-    #merge scores[review#] (for each round) to score[review]  -Yang
+    # merge scores[review#] (for each round) to score[review]  -Yang
     merge_scores(scores) if self.assignment.varying_rubrics_by_round?
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
@@ -79,6 +77,7 @@ class AssignmentParticipant < Participant
     # move lots of calculation from view(_participant.html.erb) to model
     caculate_scores(scores)
   end
+  
   # methods extracted from scores method:assignment_questionnaires, merge_scores, topic_total_scores, caculate_scores
   def assignment_questionnaires(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|
@@ -150,6 +149,7 @@ class AssignmentParticipant < Participant
       scores
     end
   end
+
   # Copy this participant to a course
   def copy(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)
@@ -192,16 +192,13 @@ class AssignmentParticipant < Participant
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)
-
     user = AssignmentParticipant.check_info_and_create(row, _row_header = nil, session)
-
     raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?
     unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
       new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
       new_part.set_handle
     end
   end
-
 
   # provide export functionality for Assignment Participants
   def self.export(csv, parent_id, _options)

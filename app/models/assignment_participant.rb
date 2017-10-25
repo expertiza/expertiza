@@ -134,7 +134,7 @@ class AssignmentParticipant < Participant
   end
 
   def topic_total_scores(scores)
-    topic = SignUpTopic.find_by_assignment_id(self.assignment.id)
+    topic = SignUpTopic.find_by(assignment_id: self.assignment.id)
     unless topic.nil?
       scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
       scores[:max_pts_available] = topic.micropayment

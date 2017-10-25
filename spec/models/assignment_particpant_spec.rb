@@ -148,7 +148,7 @@
   describe '#topic_total_scores' do
     it 'set total_score and max_pts_available of score when topic is not nil' do
       scores = {total_score: 100}
-      allow(SignUpTopic).to receive(:find_by_assignment_id).and_return(topic)
+      allow(SignUpTopic).to receive(:find_by).with(any_args).and_return(topic)
       participant.topic_total_scores(scores)
       expect(scores[:total_score]).to eq(0)
       expect(scores[:max_pts_available]).to eq(0)

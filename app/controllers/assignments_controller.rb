@@ -6,7 +6,8 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if %w(edit update list_submissions).include? params[:action]
       assignment = Assignment.find(params[:id])
-      ['Super-Administrator', 'Administrator'].include? current_role_name or
+      ['Super-Administrator',
+       'Administrator'].include? current_role_name or
       assignment.instructor_id == current_user.try(:id) or
       TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
       assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
@@ -49,6 +50,7 @@ class AssignmentsController < ApplicationController
     if current_user.timezonepref.nil?
       flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
     end
+
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
@@ -87,6 +89,7 @@ class AssignmentsController < ApplicationController
       if dd.due_at.present?
         dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
       end
+
       if  @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
           (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
         break
@@ -99,6 +102,7 @@ class AssignmentsController < ApplicationController
         break
       end
     end
+
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
 
@@ -118,6 +122,7 @@ class AssignmentsController < ApplicationController
     unless params.key?(:assignment_form)
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]
+
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
         redirect_to list_tree_display_index_path
@@ -125,6 +130,7 @@ class AssignmentsController < ApplicationController
         flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
         redirect_to edit_assignment_path @assignment.id
       end
+
       return
     end
 
@@ -140,11 +146,13 @@ class AssignmentsController < ApplicationController
       flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
       current_user.timezonepref = parent_timezone
     end
+
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
+
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 
@@ -167,6 +175,7 @@ class AssignmentsController < ApplicationController
     # check new assignment submission directory and old assignment submission directory
     old_assign = Assignment.find(params[:id])
     new_assign_id = AssignmentForm.copy(params[:id], @user)
+
     if new_assign_id
       new_assign = Assignment.find(new_assign_id)
       if old_assign.directory_path == new_assign.directory_path
@@ -186,15 +195,18 @@ class AssignmentsController < ApplicationController
       @assignment_form = AssignmentForm.create_form_object(params[:id])
       @user = session[:user]
       id = @user.get_instructor
+
       if id != @assignment_form.assignment.instructor_id
         raise "You are not authorized to delete this assignment."
       else
         @assignment_form.delete(params[:force])
         flash[:success] = "The assignment was successfully deleted."
       end
+
     rescue => e
       flash[:error] = e.message
     end
+
     redirect_to list_tree_display_index_path
   end
 
@@ -238,25 +250,32 @@ class AssignmentsController < ApplicationController
                       TeammateReviewQuestionnaire BookmarkRatingQuestionnaire)
     @assignment_questionnaires.each do |aq|
       next if aq.questionnaire_id.nil?
+
       rubrics_list.reject! do |rubric|
         rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
       end
     end
+
     if @assignment_form.assignment.max_team_size == 1
       rubrics_list.delete("TeammateReviewQuestionnaire")
     end
+
     rubrics_list.delete("MetareviewQuestionnaire") unless @metareview_allowed
+
     unless @assignment_form.assignment.use_bookmark
       rubrics_list.delete("BookmarkRatingQuestionnaire")
     end
+
     rubrics_list
   end
 
   def needed_rubrics(empty_rubrics_list)
     needed_rub = "<b>["
+
     empty_rubrics_list.each do |item|
       needed_rub += item[0...-13] + ", "
     end
+
     needed_rub = needed_rub[0...-2]
     needed_rub += "] </b>"
     needed_rub
@@ -293,12 +312,13 @@ class AssignmentsController < ApplicationController
     due_date_all.each do |dd|
       dd.description_url ||= ''
     end
+
     due_date_all
   end
 
   private
 
-  def assignment_form_params
-    params.require(:assignment_form).permit!
-  end
+    def assignment_form_params
+      params.require(:assignment_form).permit!
+    end
 end

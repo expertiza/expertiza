@@ -27,6 +27,13 @@ module InstructorInterfaceHelperSpec
     set_deadline_right
     set_assignment_due_date
   end
+  
+   def course_setup
+    create(:course)
+    create_list(:course_participant, 5)
+    create(:course_node)    
+  end
+
 
   def import_topics(filepath)
     login_as("instructor6")

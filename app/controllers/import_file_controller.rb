@@ -130,6 +130,7 @@ class ImportFileController < ApplicationController
           end
     elsif params[:model] == 'SignUpTopic'
       session[:assignment_id] = params[:id]
+      contents_hash = eval(params[:contents_hash])
       contents_hash[:body].each do |row|
         SignUpTopic.import(row, session, params[:id])
       end

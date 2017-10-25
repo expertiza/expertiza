@@ -61,11 +61,27 @@ describe AssignmentForm do
 
   describe '#add_to_delayed_queue' do
     context 'when the deadline type is review' do
-      it 'adds two delayed jobs and changes the # of DelayedJob by 2'
+      it 'adds two delayed jobs and changes the # of DelayedJob by 2' do
+        tmp_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks:1))
+        allow(AssignmentDueDate).to receive_message_chain(:where).and_return([tmp_due])
+        allow(DeadlineType).to receive_message_chain(:find, :name).and_return("review")
+        allow_any_instance_of(AssignmentDueDate).to receive(:update_attribute)
+        num_delayedJob = DelayedJob.count
+        assignment_form.add_to_delayed_queue()
+        expect(DelayedJob.count).to eq(num_delayedJob + 2)
+      end
     end
 
     context 'when the deadline type is team formation and current assignment is team-based assignment' do
-      it 'adds a delayed job and changes the # of DelayedJob by 2'
+      it 'adds a delayed job and changes the # of DelayedJob by 2' do
+        tmp_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks:1))
+        allow(AssignmentDueDate).to receive_message_chain(:where).and_return([tmp_due])
+        allow(DeadlineType).to receive_message_chain(:find, :name).and_return("team_formation")
+        allow_any_instance_of(AssignmentDueDate).to receive(:update_attribute)
+        num_delayedJob = DelayedJob.count
+        assignment_form.add_to_delayed_queue()
+        expect(DelayedJob.count).to eq(num_delayedJob + 2)
+      end
     end
   end
 

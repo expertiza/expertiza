@@ -1,0 +1,2259 @@
+[33mcommit 39d508bbbbc4481bb4a0b12df3396050cc5f6d88[m
+Author: Wei Sun <njusunw@gmail.com>
+Date:   Sun Oct 22 18:29:07 2017 -0400
+
+    add test to add_to_delayed_queue
+
+[33mcommit a26cf3ac295633bdc82225984cdd48084bac66a1[m
+Author: Ed Gehringer <efg@ncsu.edu>
+Date:   Tue Oct 17 11:51:45 2017 -0400
+
+    Update README.md
+
+[33mcommit ae3957e8920988e0486820938bc9d7d40bff9aea[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Oct 16 14:35:32 2017 -0400
+
+    Fix issue #1005
+
+[33mcommit f73a81899635458633affe9623db5ee4e3da0760[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Oct 12 14:08:31 2017 -0400
+
+    Add destroy dependency between question and question_advice
+    [ci skip]
+
+[33mcommit c7e6ef90e7d9a9425742a5d891d2dc234ebf6328[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Oct 10 20:50:58 2017 -0400
+
+    Update pending tests for response.rb (E1756)
+
+[33mcommit 0c8122db68efc9c6c36836bc310ccb0ddb819b66[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Oct 10 20:12:58 2017 -0400
+
+    Add pending tests for grades_controller.rb (E1764)
+    Based on Deyu Du's work
+
+[33mcommit 9677b3f27b8e50e3f13e3efbcbc3e246249933b7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Oct 9 22:19:29 2017 -0400
+
+    Add pending tests for sign_up_sheet_controller.rb (E1747)
+
+[33mcommit f223c2e4956285d14af789c56dfcda2343a2768f[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Oct 9 14:56:56 2017 -0400
+
+    Refactor pull request #1013
+
+[33mcommit ba7c78bc96bd4e0c1b6466c7e1fdc3cb1980b213[m
+Merge: f9e5d7f 2630afe
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Oct 9 14:15:34 2017 -0400
+
+    Merge branch 'master' of https://github.com/saratkavuru/expertiza into saratkavuru-master
+
+[33mcommit f9e5d7f031976ed1373b2f57f84d92393ca81a7e[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Oct 8 23:04:42 2017 -0400
+
+    Add pending tests for response_controller.rb (E1745)
+
+[33mcommit 46ca62732eff0417833492a20b9659772c2d12d9[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Oct 8 22:59:24 2017 -0400
+
+    Temporarily commenting out several methods in response.rb which need refactoring.
+
+[33mcommit 74cedd3d0526e0da118d1ca9f51ca77d639d2a5b[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Oct 8 13:08:57 2017 -0400
+
+    Add pending tests for team.rb (E1771)
+
+[33mcommit 2f5c41a8d6f039012607e743442cd37baba1e3e1[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Oct 7 20:06:24 2017 -0400
+
+    Add pending tests for assignment_form.rb (E1769)
+
+[33mcommit 130141fc12d41e1f20405e7c27801038f0a97a08[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Oct 6 20:29:43 2017 -0700
+
+    Add pending tests for response.rb (E1756)
+
+[33mcommit 3ad0c218a7868086ffe02332328a8803bb619335[m
+Merge: 3b9e558 bded94c
+Author: Zhewei Hu <zhu6@ncsu.edu>
+Date:   Fri Sep 29 17:37:13 2017 -0400
+
+    Merge pull request #1014 from VivekBhat/master
+    
+    Updated setup script
+
+[33mcommit bded94ca87d24150ff0eac37e4005e23f1a0399a[m
+Author: Vivek Bhat <vivekbhat@live.com>
+Date:   Fri Sep 29 16:07:45 2017 -0400
+
+    Linux script updated
+
+[33mcommit 2705dbd84470e793e46502add7bb48b40a1f59cd[m
+Author: Vivek Bhat <vivekbhat@live.com>
+Date:   Fri Sep 29 16:07:13 2017 -0400
+
+    Mac script updated
+
+[33mcommit 3b9e55863a8046c3e8fc25074aefcbed74eba603[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Sep 29 11:38:43 2017 -0400
+
+    Refactor pull request #1010
+
+[33mcommit 6561893b0dc97cba2aa4236a15b37400c8becde9[m
+Merge: e819a3e 6a19427
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Sep 29 11:32:06 2017 -0400
+
+    Merge branch 'master' of https://github.com/Rui5/expertiza into Rui5-master
+
+[33mcommit 2630afe2db69006570e92aa06f82488a3c5ff122[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Sep 27 20:22:46 2017 -0400
+
+    Working after merge
+
+[33mcommit 6bdb1285c68dbcc02c3273c132ce43779fa65b4f[m
+Merge: c646f8b 74c1832
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Sep 27 19:50:13 2017 -0400
+
+    Trying to merge
+
+[33mcommit c646f8ba94e542120f835844e915c527cb2e067f[m
+Merge: 7d07303 e819a3e
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Sep 27 19:42:57 2017 -0400
+
+    Merge branch 'master' of https://github.com/saratkavuru/expertiza
+    
+    Conflicts:
+    	db/schema.rb
+
+[33mcommit 74c1832fcda9f6e8e9eed103fa8d1078d68f02e6[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Sep 27 19:23:35 2017 -0400
+
+    minor changes for pull request
+
+[33mcommit e819a3ef93687dd5928936d5102066c2457df50c[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 27 16:18:15 2017 -0400
+
+    Finish refactoring bidding functionality
+
+[33mcommit 6a194270b261c1a2dad0dfe823b299fbde3bca40[m
+Author: Rui Liu <ruiliu@Ruis-MacBook-Air.local>
+Date:   Tue Sep 26 22:15:03 2017 -0400
+
+    react with code climate
+
+[33mcommit 74ae376b3f83f3fa0f76550b6c2ead6dbe60458d[m
+Author: Rui Liu <ruiliu@Ruis-MacBook-Air.local>
+Date:   Tue Sep 26 22:01:33 2017 -0400
+
+    fix issue #1006
+
+[33mcommit a5900a92f214c6b80a8fde8ac731e0256a044d51[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Sep 26 21:52:02 2017 -0400
+
+    Change the logic of run_intelligent_assignment method
+    topic bidding web service can only accept bidding info for individual user right now.
+
+[33mcommit b90f9cb684ace30fb8734bd3063485ac53a826e6[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 25 22:44:33 2017 -0400
+
+    Fix travis ci
+
+[33mcommit eec51e12e18528a92542b7593634b65fd1ba9ee1[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 25 21:46:09 2017 -0400
+
+    Partially fix bidding functionality
+
+[33mcommit c0c7d08274115840012b29f775a6e4202bf32cf4[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 25 18:58:35 2017 -0400
+
+    Fix bidding issues: cannot save drag-and-dropped topics.
+
+[33mcommit f571ba6b91b34c1094f1a2d4e2f6edabc9bb649d[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 25 18:07:53 2017 -0400
+
+    Remove uneless reserve_topic partials
+    [ci skip]
+
+[33mcommit 1d429e3bf9d2c9e68d4e01d9f7d0afe1381796cc[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 25 14:57:46 2017 -0400
+
+    Fix airbrake-2045201446196478453
+
+[33mcommit 5e741b390547ae684dafedbbca3ec12f0df9f2c7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 25 14:56:59 2017 -0400
+
+    Simplify submission record creation in submitted_content_controller.rb
+
+[33mcommit c5fd470f2c6d512586f34d1526c0e6f42483931f[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 25 14:55:40 2017 -0400
+
+    Fix bug: anonymized view will mess the file submission folder on server.
+
+[33mcommit 0b78f0761fffb90337771e0ee2e927875ac1efdd[m
+Author: Zhewei Hu <zhu6@ncsu.edu>
+Date:   Fri Sep 22 14:26:29 2017 -0400
+
+    Update user_spec.rb
+    
+    [ci skip]
+
+[33mcommit 04039cef69ca8c283be7dbdd6359ddda6a826631[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Sep 21 16:42:27 2017 -0400
+
+    Switch the link of 'your score' and 'alternative view'
+    [skip ci]
+
+[33mcommit d2be062163e32602215fb9a1df2550ae910c2a49[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Sep 21 16:37:53 2017 -0400
+
+    Add 'Assign grades and comments for submissions' back:
+    Instructors and TAs can assign grades from list submission page;
+    Related commit: 0f759a281580b279ccb5bcaaabeb78472f7e92e3
+
+[33mcommit fe28ee7270577c9e17f91c90d77bf184413b7984[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 20 18:54:37 2017 -0400
+
+    Update setup.sh
+    [ci skip]
+
+[33mcommit ca7b05222386f49ebc089215526cb61c420008fc[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 20 17:18:43 2017 -0400
+
+    Docker-compose is online now. :smile:
+    [ci skip]
+
+[33mcommit fabc0d16c77e7add20ac124a80a16475d3fddf10[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 20 17:14:43 2017 -0400
+
+    Add Expertiza setup script
+
+[33mcommit 7141024516d7c8f3212a7511090d4029925df686[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 20 14:25:30 2017 -0400
+
+    Add finished docker-compose.yml.example
+    [ci skip]
+    
+    Simplify database.yml.example file
+
+[33mcommit 19162c978350ceea6829504065396d0bf786b11e[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 20 14:23:36 2017 -0400
+
+    Redis creation comes from env variable 'REDIS_HOST' if it exists;
+    otherwise Redis creation comes from localhost
+    [ci skip]
+
+[33mcommit 1bed326c8e309c33e14e0c35392cf89220de0f19[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Sep 19 21:58:25 2017 -0400
+
+    Update .gitignore
+
+[33mcommit 13d2d0036761eed70f84b1889b27dc2e03c74646[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Sep 17 20:11:16 2017 -0400
+
+    Correct syntax for spec/models/assignment_spec.rb
+
+[33mcommit 26a75fc65a844ab5ce198696266020b3530de0df[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Sep 17 20:07:18 2017 -0400
+
+    Add pending tests for assignment.rb based on Deyu Du's independent study.
+
+[33mcommit 928ba52fed81257716be899fe8383cf2c490fd25[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Sep 17 19:57:46 2017 -0400
+
+    Remove spec/factories/submission_records.rb
+
+[33mcommit caa80755710bed0ea1f0fb9237ab7e6c2fa91fdb[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Sep 17 19:57:05 2017 -0400
+
+    Modify existing factory files.
+
+[33mcommit 586a39fcda4e5d930c61433d6ddc58ae903bec86[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Sep 17 19:55:39 2017 -0400
+
+    Remove 2 useless factory files.
+
+[33mcommit e100cb1a5eb0388c7d38624b5e9046777fd732a7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Sep 15 14:35:39 2017 -0400
+
+    Add pending tests for assignment_participant.rb
+
+[33mcommit cbb303d689c8da0c3b726f217bdf3cdae90e0925[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 13 15:29:29 2017 -0400
+
+    Add pending tests for assignments_controller.rb
+
+[33mcommit 0282e618ccb6528e69d58cdc612091ee94b29918[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 13 15:21:38 2017 -0400
+
+    Clean assignments_controller.rb file
+
+[33mcommit 57bb48b757d8d5a338d1a2748d9520b18693e3fa[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 11 23:40:12 2017 -0400
+
+    Finish adding pending tests for review_mapping_controller
+
+[33mcommit c66ef21270baffd153a28d7894d21c762de44497[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Sep 8 17:18:21 2017 -0400
+
+    Tiny change
+    [ci skip]
+
+[33mcommit 975e5d65aa26ac5640615a3d5576c0946d541052[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Sep 7 23:35:31 2017 -0400
+
+    Fix bug: cannot delete uploaded files.
+
+[33mcommit 807d373a2b02ce5c1bc08caf6fe7dfd9cde0e2c2[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Sep 7 17:10:08 2017 -0400
+
+    Add more pending tests in questionnaires_controller_spec.rb
+    [ci skip]
+
+[33mcommit 2fc53ac50447081d403264deeebecf5153008eb3[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Sep 7 14:29:01 2017 -0400
+
+    Delete useless test fixture file.
+    [ci skip]
+
+[33mcommit 3efde5980dbdf3e672d9bbec650ac96d22744ec7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Sep 6 20:37:25 2017 -0400
+
+    Add pending tests for review mapping controller
+
+[33mcommit bdff0fe9b8853b602cbbc5d143a95764569262f0[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 4 14:44:34 2017 -0400
+
+    Fix e9a001e617caaa092256baf1f6f23d05c066c7df
+
+[33mcommit e9a001e617caaa092256baf1f6f23d05c066c7df[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Sep 4 14:25:34 2017 -0400
+
+    Fix remaining SQL injection issues.
+
+[33mcommit fdebd63ccb29a67bbed1ec0baee15e8feb72b9ea[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Aug 31 12:04:55 2017 -0700
+
+    Change test expectation msg.
+
+[33mcommit a1ff0946a94a31de24114f44570512dc8173e10b[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Aug 31 12:04:04 2017 -0700
+
+    Rename 'anonymous view' to 'Anonymized view'
+
+[33mcommit 98d3525e8bc514152e51a4aca1148c39b454b223[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Aug 31 12:02:18 2017 -0700
+
+    Rails production: Rails: redirect all unknown routes to root_url
+
+[33mcommit ff3cc7e65511ee601a0ce207936d093913397d60[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 10:39:48 2017 -0700
+
+    Update Gemfile.lock and .travis.yml
+
+[33mcommit 220d555bec94faf3b0cdc47705ef64ae5819f6fa[m
+Merge: 4aca0c9 3aebc6f
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 10:21:50 2017 -0700
+
+    Merge branch 'saratkavuru-master'
+    
+    Well, actually I redo 'Anonymous View' project.
+
+[33mcommit 3aebc6f08b8d7d424de82e16aa7f44e25eef2740[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 10:21:28 2017 -0700
+
+    Remove anonymous links in different views
+
+[33mcommit 9cc7cc7c5fd6a33bb5ff8dbad2d199fce63fddfc[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 10:20:49 2017 -0700
+
+    Use strong paramsters in 2 controllers
+
+[33mcommit f397c89dc3f9eeb393a8bda6921d5944ff2491ad[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 10:19:50 2017 -0700
+
+    Use redis store as production cache store
+
+[33mcommit 114ec962bab118ddecf8169924041aa13d3ca7b3[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 10:18:39 2017 -0700
+
+    Add 'Anonymous View' to menu list
+
+[33mcommit 548a8295946ad3fd7e41af8c15ad400c805d8632[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 08:36:37 2017 -0700
+
+    Use redis to handle cache including the value of 'anonymous_mode'
+
+[33mcommit 4aca0c9eb0647c6e032f27b93f3f000f7ee362d5[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 06:58:25 2017 -0700
+
+    If one student does not have team right now, he/she is able to create a new one.
+    Prerequisite: current assgt allow one team has more than 1 member.
+
+[33mcommit 140fcb4d5ae66d9ce1d2ff07c4d19d5a41563180[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 30 06:13:13 2017 -0700
+
+    Overriding attribute getters in ActiveRecord models could be a better way for anonymous view
+
+[33mcommit 329c1472b2e3e7ddb55d92e17246b0a782aa016d[m
+Merge: 974ff39 5aa9879
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 29 15:29:26 2017 -0700
+
+    Merge branch 'master' of https://github.com/saratkavuru/expertiza into saratkavuru-master
+
+[33mcommit 974ff39a441709454285f766247b8889532993b5[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 29 08:45:08 2017 -0700
+
+    Fix Travis Ci
+
+[33mcommit dd94ac7e47d6b4fe5ba1cca9199738b0f5d6489e[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 29 08:20:26 2017 -0700
+
+    Clean factories.rb a bit.
+
+[33mcommit 46c418130b82ed17ad37dc40205f8cf73dffd05b[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 29 08:08:41 2017 -0700
+
+    Add pending RSpec tests for questionnaires_controller.rb for E1749
+
+[33mcommit 18e00e28689ce493fad9c3be9ad091741571f113[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 29 08:06:21 2017 -0700
+
+    Remove questionnaires#edit_advice page,
+    use advice#edit_advice page instead.
+
+[33mcommit 6747fb0a48ddbe4c997481e3f191376e7f9522bc[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 29 08:05:32 2017 -0700
+
+    Rename 2 RSpec controller files.
+
+[33mcommit fc52cb9a6fd1905195df83ccdb7aa6f5d437f00c[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Fri Aug 25 00:37:54 2017 -0400
+
+    External CSS working
+
+[33mcommit 4966f503414b0ed942eeba14c541b5f4bc68da69[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Aug 24 17:35:38 2017 -0700
+
+    Fix failed Travis Ci
+
+[33mcommit 3450d200379d04ef67a214cc9f852a6d23ec16b7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu Aug 24 14:52:29 2017 -0700
+
+    Fix stage deadline in student task page.
+
+[33mcommit 5aa9879ef5fd094a958abb6bf434351a57a46152[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 12:03:56 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit ed10b822771e8510be252360fae747c242ae7908[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 12:01:17 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit 3eaa34999cb23d4b7d8fc8d11c044c94264bde98[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 01:01:56 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit 0812fd7602a1ab1d823342f1e43ec75430a1a4d2[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 00:51:52 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit a911fa54eac18ec06136ac202e7c7823025917a8[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 00:47:05 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit 0e8d0e530454f6a913827204cd9bbfec514d59e5[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 00:44:19 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit ba245641bc86743787c727ccf9d404804c3b3de2[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 00:34:51 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit 1f4c0ff8b390a494ec471874122f74a9bffaf0e9[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Aug 24 00:28:32 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit 228ade96379a41efaaf699c869477c68d067e459[m
+Merge: 1068846 40e0789
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Aug 23 22:17:04 2017 -0400
+
+    Merge remote-tracking branch 'upstream/master'
+
+[33mcommit 106884628621ed1f810f13d673645081ed067529[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Aug 23 22:16:26 2017 -0400
+
+    Minor
+
+[33mcommit 40e078948c4b58c0e60493a9e96a24fb377eaafc[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 23 18:48:20 2017 -0700
+
+    Fix Airbrake #2023173201762716056
+
+[33mcommit 2fefad37d0bb98fe99439bb28e6590ca0bbb6e4b[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Aug 23 21:48:08 2017 -0400
+
+    Removing minor Code Climate issues
+
+[33mcommit 402c2f09c6d31a185cf74bd1079aefdc5aa2f815[m
+Merge: 2191810 4a82edd
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Aug 23 21:12:33 2017 -0400
+
+    Merge remote-tracking branch 'upstream/master'
+
+[33mcommit 21918101f6dd47d92a8833b5231eb3085d6335ff[m
+Merge: c205cb2 db83ee3
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Aug 23 21:00:46 2017 -0400
+
+    Merge branch 'master' of https://github.com/saratkavuru/expertiza
+
+[33mcommit 4a82edde8c9daa889b5997d04b4141e999c89ea7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 23 13:34:51 2017 -0700
+
+    Fix SQL injection related security issues.
+
+[33mcommit e271857e580808c6615081b3c66fdd858c684429[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Aug 21 19:57:08 2017 -0700
+
+    Partially fix SQL injection
+
+[33mcommit c87185da815fa0c0ec23fe2bb928d7c96adc0da4[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Aug 21 19:14:12 2017 -0700
+
+    Both hash parameters and parameterized statement can avoid SQL injection:
+    Users.where(id: params[:id]) # hash parameters
+    Users.where('id = ?', params[:id]) # parameterized statement
+    
+    Reference: https://stackoverflow.com/questions/21886170/best-way-to-go-about-sanitizing-user-input-in-rails/21886874
+
+[33mcommit 1c3dd6dced4cd6add6ae62762bc7f634fc4a3869[m
+Merge: b530eb1 04515f1
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Aug 21 18:30:22 2017 -0700
+
+    Merge branch 'zhewei'
+
+[33mcommit b530eb19c826770e49f79d5223db3ae063569879[m
+Merge: 81f5101 b327ec9
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon Aug 21 18:26:40 2017 -0700
+
+    Clean unnecessary integer check.
+
+[33mcommit 006f6ace875333ea475c3b88064959b7df369f56[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Mon Aug 21 00:05:51 2017 -0400
+
+    CSS working
+
+[33mcommit c205cb2089eee63c56b3a33c10b779d32f0b848d[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Sun Aug 20 19:52:52 2017 -0400
+
+    Course views covered
+
+[33mcommit 04515f11c92a26f615a0d30b30470e47a7b85b63[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Aug 20 14:04:34 2017 -0700
+
+    Correct code syntax based on Rubocop
+    [ci skip]
+
+[33mcommit d070d3c9cd59df6bced97ed83bc7e80c9b4042c9[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Aug 20 12:45:47 2017 -0700
+
+    Add pending tests for E1746. [TDD] Refactor user.rb
+
+[33mcommit b9386cd732f9805572df282bdfb14c0701893fa1[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Sun Aug 20 01:45:57 2017 -0400
+
+    Unique ID figured out
+
+[33mcommit bb5cf2a74bcd9719cf046b043878a0bcb1594497[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Sat Aug 19 21:18:50 2017 -0400
+
+    Reuse same partial
+
+[33mcommit d3a5457d67a3018f8bf825b3b528da049470dbe7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Aug 18 12:47:11 2017 -0700
+
+    Optimize tests.
+
+[33mcommit 4f00722f32580c4489904d4029bc261a29dec965[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Aug 18 08:42:08 2017 -0700
+
+    Change RSpec configuration
+
+[33mcommit 142f403afa704ba0669faa1ff4dbc5bdb5bf0aa2[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Fri Aug 18 02:45:26 2017 -0400
+
+    Commit before screenshots
+
+[33mcommit 1a8a0d5388096ff8b6f1bd89ae6ca024fd1ea2a6[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Fri Aug 18 02:40:57 2017 -0400
+
+    Theory continues
+
+[33mcommit bdec8f2bcb44ead2c350e740565399d157da8b03[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Fri Aug 18 00:47:45 2017 -0400
+
+     A theory
+
+[33mcommit 81f51013d69695d0d0073c7a4ff5e6ad03a5ed73[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Wed Aug 16 06:53:21 2017 -0700
+
+    Skip simicheck tests temporarily.
+
+[33mcommit 2d327a445a41374ee99f85a53cd0a111866a62fc[m
+Merge: fff7f98 7dce100
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 15 18:57:42 2017 -0700
+
+    Merge branch 'zhewei'
+    Fix TravisCI tests
+
+[33mcommit fff7f98bfd8916ad35a2de835acfc85d201d3bee[m
+Merge: b16dadf 6577d56
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 15 18:57:20 2017 -0700
+
+    Merge branch 'master' of github.com:expertiza/expertiza
+
+[33mcommit 7dce100088f72f9b5795057e6af22e1dc69b9c17[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 15 12:37:18 2017 -0700
+
+    Update .travis.yml
+    
+    Fix one test in staggered_deadline_spec.rb
+    
+    Use fixed seed
+
+[33mcommit ac4972f85f11f1b4a214d8332d7bb5a6c94074f4[m
+Merge: b16dadf 6577d56
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 15 12:35:02 2017 -0700
+
+    Merge branch 'zhewei' of github.com:expertiza/expertiza into zhewei
+
+[33mcommit 6577d56a87047123739959bb26a474f8a7c5b01b[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Aug 11 17:50:25 2017 -0400
+
+    Fix code climate issues.
+
+[33mcommit 91d6a53979f12a64a87c7fa326eb1230f8d1ab2e[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri Aug 11 16:54:09 2017 -0400
+
+    Update .travis.yml to exclude feature tests temporily
+    There are some compatiability issues related to Selenium and Firefox, not from our side.
+    
+    Skip feature tests in grades_helper_spec.rb
+
+[33mcommit b16dadfeacd18f16d8090997f96b841ed2b2a3e0[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 8 19:14:46 2017 -0700
+
+    Update .travis.yml
+
+[33mcommit e3e85f05cbb57e5b60f344f80dc1836a2f406954[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 8 19:14:23 2017 -0700
+
+    Fix codeclimate issue.
+
+[33mcommit 955e3a67d1878dca642ac20a47d53270a6639231[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 8 17:53:15 2017 -0700
+
+    Update 'selenium-webdriver'
+
+[33mcommit 728191edc0a3b4cd4bd826ebb007d367a388b070[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue Aug 8 11:40:38 2017 -0700
+
+    Modify submit_hyperlink method
+
+[33mcommit 64da1fadf12d43c9a2f083276230c90320aab235[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri Jul 28 12:26:08 2017 -0400
+
+    fix issue #988
+
+[33mcommit 47a413ae4376d6f04ca4dff986e6e2d007dda4d3[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jul 26 11:27:30 2017 -0400
+
+    Cherry-pick: Merge Ajay's pull request.
+
+[33mcommit fdd531e31c4496c1496357787e0c9e4d30fc59f1[m
+Author: Ajay <ajaychandrapendyala@gmail.com>
+Date:   Tue Jul 25 15:43:52 2017 +0530
+
+    Moved the "Submit file" prompt into the if stmt
+
+[33mcommit 0c589f033b4cdf05befce1f77b481d3475873bf7[m
+Author: Ajay <ajaychandrapendyala@gmail.com>
+Date:   Tue Jul 25 09:03:33 2017 +0530
+
+    changed <BR/> to <br/>
+    
+    Apparently XTML is case sensitive. Maybe that's the reason why "-->" was showing up? I don't see any stray comments tags <!-- --> in the code as well.
+
+[33mcommit adede73c9a0d7152d96d36d0383ece4bf9b3a601[m
+Author: Ajay <ajaychandrapendyala@gmail.com>
+Date:   Tue Jul 25 08:23:26 2017 +0530
+
+    Removed the unnecessary quote and backslash
+
+[33mcommit 5532383bafd36f3b74c8f9289843d1a59a67e637[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri Jul 21 12:21:16 2017 -0400
+
+    issue fix #980
+
+[33mcommit 5497185ebc52c7787608d6b3cb0fc269bbb57f4c[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Jul 15 20:58:44 2017 -0700
+
+    Fix failed tests.
+
+[33mcommit ced889bbd8517a30f145954cc51463fc83ccede6[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Jul 15 20:58:29 2017 -0700
+
+    Update .travis.yml
+
+[33mcommit c6e84d359f607d68329773c6d70676144ea455e0[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Mon Aug 7 00:08:29 2017 -0400
+
+    Minor edits and starting author feedbacks
+
+[33mcommit b327ec9c079d7e91101b9092aa9d593de89ef196[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:57:02 2017 -0400
+
+    Added type checks for security update
+    
+    Line 38:
+    
+    if !user_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+    
+    Line 50:
+    
+    if !user_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 94012bccfd205c70ab345a3ba02c0eef53a8a80b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:45:34 2017 -0400
+
+    Added type check for security update
+    
+    Line 446:
+    
+    if !questionnaire_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit b7985fb1de78e377eed448a692e724ee6efda4e1[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:44:00 2017 -0400
+
+    Added type checks for security update
+    
+    Line 416:
+    
+    if !params[:topic_id].is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 9587956633685aea73e3ba4fe4c340551ec1af38[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:43:23 2017 -0400
+
+    Added type check for security update
+    
+    Line 400:
+    
+    if !params[:topic_id].is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit ea722632abb8ec52cddef37eb9bfabf1867af97b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:39:22 2017 -0400
+
+    Added type checks for security update
+
+[33mcommit 74a7c21158a123cfaeebe34370f76ee38e777e39[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:38:02 2017 -0400
+
+    Added type check for security update
+    
+    Line 55:
+    
+    if !assignment_ids.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 4696fc66a4305a4219b8b2592dfa867e3e609d82[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:34:51 2017 -0400
+
+    Added type check for security update
+    
+    Line 164:
+    
+    if !id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 61885db7b59974ae7c121b1326e58121d1086ea7[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:32:35 2017 -0400
+
+    Added type check for security update
+    
+    Line 62:
+    
+    if !(contributor.id.is_a? Integer and reviewer.id.is_a? Integer and quiz_id.is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 7aae0621f7d278d242ae5006c43b6230e7f19a7b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:31:02 2017 -0400
+
+    Added type check for security update
+    
+    Line 47:
+    
+    if !id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 23c9c4e6e371b2ccfe6fc3aaa0cb5903f75b8ef7[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:29:42 2017 -0400
+
+    Added type check for security update
+    
+    Line 43:
+    
+    if !session[:user].id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 78263126abf80f6a7c3b98b3af5576ac1e6bdd01[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:27:44 2017 -0400
+
+    Added type check for security update
+    
+    Line 85:
+    
+    if !id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit f01a4335c6d0f7a8924c9121746e7b73da4dbee3[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:26:41 2017 -0400
+
+    Added type check for security update
+    
+    Line 23:
+    
+    if !params[:id].is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit aa75685159fdd33f1ecbae7e88d6ff80e38b9e2a[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:25:34 2017 -0400
+
+    Added type check for security update
+    
+    Line 108:
+    
+    if !content_page.id.is_a? Integer
+            flash[:error] = "Illegal parameter."
+
+[33mcommit 872f59b30863e6f73d7c955ec1810583bf193803[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:23:30 2017 -0400
+
+    Added type checks for security update
+    
+    Line 93:
+    
+    if !(id.is_a? Integer and instructor_id.is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit b5970d2f1e0cade648435694385cef40ac867643[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:19:05 2017 -0400
+
+    Added type checks for security update
+    
+    Line 60:
+    
+    if !(user.id.is_a? Integer and params[:course_id].is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 5a164be7b614342b4c838d43f77c20acfaf316cb[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:17:48 2017 -0400
+
+    Added type checks for security update
+    
+    Line 50:
+    
+    if !(user.id.is_a? Integer and assignment.id.is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 3e7e19bba080cc222c25e0dd49388a84a69d3a54[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:16:15 2017 -0400
+
+    Added type checks for security update
+    
+    Line 31:
+    
+    if !(participant.id.is_a? Integer and params[:team_id].is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 597de7919c64bc7d5cbf7d8b5714ee18df9f1ea6[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:14:33 2017 -0400
+
+    Added type check for security update
+    
+    Line 40:
+    
+    if !user.id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 5eb14b138452c410357feff4ad062b7103b639a3[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:11:40 2017 -0400
+
+    Added type check for security update
+    
+    Line 4:
+    
+    if !assignment.instructor_id.is_a? Integer
+        flash[:error] = "Illegal parameter."
+
+[33mcommit fa2b735b3c4989091e11e5c279ee0a2ff88fd89b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:10:14 2017 -0400
+
+    Added type check for security update
+    
+    Line 20:
+    
+    if !id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit cd1df9298d97501e5c3c61db6c615ab4a53b1ffd[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:08:44 2017 -0400
+
+    Added type checks for security update
+    
+    Line 14:
+    
+    if !id.is_a? Integer
+            flash[:error] = "Illegal parameter."
+    
+    Line 21:
+    
+    if !id.is_a? Integer
+            flash[:error] = "Illegal parameter."
+    
+    Line 39:
+    
+    if !review_questionnaire_id.is_a? Integer
+              flash[:error] = "Illegal parameter."
+    
+    Line 54:
+    
+    if !review_questionnaire_id.is_a? Integer
+            flash[:error] = "Illegal parameter."
+
+[33mcommit d3eea5139c85dc073624531369b43402b07f6443[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:02:47 2017 -0400
+
+    Added type check for security update
+    
+    Line 8:
+    
+    if !user_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 66a7bed173b9b31c11bceec1e61b929f344ed78b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 20:01:08 2017 -0400
+
+    Added type checks for security update
+    
+    Line 22:
+    
+     if !user_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+    
+    Line 31:
+    
+    if !(id.is_a? Integer or user_id.is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 10f561c6cf7bebcc587e95ab985836bd8847bafd[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 10:51:23 2017 -0400
+
+    Added type check for security update
+    
+    Line 18:
+    
+    if !(user_id.is_a? Integer and assignment_id.is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 3a92bf7754b247757ce4be40b421e19f3e21d3b9[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Aug 6 10:47:02 2017 -0400
+
+    Added type check for security update
+    
+    Line 22:
+    
+    if !id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 5392178be07152b68755133638f61e7e76f89589[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:57:43 2017 -0400
+
+    Added type check for security update
+    
+    Line 24:
+    
+    if !(user_id.is_a? Integer and team_id.is_a? Integer)
+          flash[:error] = "Illegal parameter."
+    
+    Line 34:
+    
+    if !team_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 18c29e9181387314b881ac6cda248c6d4fa80cb6[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:57:02 2017 -0400
+
+    Update teams_user.rb
+
+[33mcommit 701165ddd578052984acfeec6b12e903e0e97f5b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:56:19 2017 -0400
+
+    Added type checks for security update
+    
+    Line 24:
+
+[33mcommit c1a1ebd2c4dfc44a7e2b3d68afbedb572ddc0b92[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:55:19 2017 -0400
+
+    Added type checks for security update
+    
+    Line 24:
+    
+    if !(user_id.is_a? Integer and team_id.is_a? Integer)
+          flash[:error] = "Illegal parameter."
+
+[33mcommit ce0ea1b14b58e1f034a59d8dbda117017ade359b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:47:56 2017 -0400
+
+    Added type check for security update
+    
+    Line 8:
+    
+    if !team_id.is_a? Integer
+        flash[:error] = "Illegal parameter."
+
+[33mcommit 583d0ab808a2ea86093a6dbe3c3285ea657281c8[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:46:33 2017 -0400
+
+    Added type check for security update
+    
+    Line 12:
+    
+    if !id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 8a7d4fbb29c0adc7013bee0db4d8835ea5302d0e[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:44:30 2017 -0400
+
+    Added type check for security update
+    
+    Line 10:
+    
+    if !user_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit 9f544bb75a6828378dae5a9eb83f4334ce0bdb43[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:42:51 2017 -0400
+
+    Added type check for security update
+    
+    Line 22:
+    
+    if !id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit ae250a325defde5f157286ec5d071bc25d7bc43a[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:35:32 2017 -0400
+
+    Added type checks for security update
+    
+    Line 12:
+    
+    ```ruby
+    if !current_user.id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+    ```
+    
+    Line 34:
+    
+    ```ruby
+    if !current_user.id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+    ```
+
+[33mcommit 15e281129c9afa439e95f6fb355d35e3496e579b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:31:13 2017 -0400
+
+    Update instructor.rb
+
+[33mcommit 164b248ee079adf0c48ee227c6079e91f37a430a[m
+Merge: 4dd7823 6068915
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:30:12 2017 -0400
+
+    Merge pull request #6 from joydeepm02/joydeepm02-typechecks
+    
+    Added type check for security update
+
+[33mcommit 4dd7823555b66cc0d9946e7f0cf88100d2d0c51d[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:29:52 2017 -0400
+
+    Added type check for security update
+    
+    Line 3:
+    if !assignment_id.is_a? Integer
+           flash[:error] = "Illegal parameter."
+
+[33mcommit 60689154b49dedf96c49a32c8469b4e61a8b1f6e[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sat Aug 5 17:25:07 2017 -0400
+
+    Added type check for security update
+    
+    Line 14 and 21:
+    if !user_id.is_a? Integer
+          flash[:error] = "Illegal parameter."
+
+[33mcommit fdfd1257a4da485f486772e389095681e3b78254[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 22:00:45 2017 -0400
+
+    Removed code from Lines 91-98
+    
+    Removed code from Lines 91-98:
+    
+    # Convert keys to integers (for braindead DB backends)
+              #           item.menu_item_id         &&= item.menu_item_id.to_i
+              #           item.menu_item_seq        &&= item.menu_item_seq.to_i
+              #           item.menu_item_parent_id  &&= item.menu_item_parent_id.to_i
+              #           item.site_controller_id   &&= item.site_controller_id.to_i
+              #           item.controller_action_id &&= item.controller_action_id.to_i
+              #           item.content_page_id      &&= item.content_page_id.to_i
+              #           item.permission_id        &&= item.permission_id.to_i
+
+[33mcommit 794093984197782c028b92adb616a5896ef91a6f[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 21:59:53 2017 -0400
+
+    Removed commented code on Line 20
+    
+    Removed commented code on Line 20:
+    
+    # topic_deadline.late_policy_id = nil
+
+[33mcommit a491215cb57be6dbde706af1821df4c582fc290d[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 21:59:09 2017 -0400
+
+    Removed commented code on Lines 19-20
+    
+    Removed commented code on Lines 19-20:
+    
+    # @system_settings_pages, @system_settings = paginate :system_settings,
+        # :class_name => 'SystemSettings', :per_page => 10
+
+[33mcommit 668f6b174edcccf5b4503a97036c828d2ad755ce[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 21:58:04 2017 -0400
+
+    Removed commented code on Lines 151 and 153-154
+    
+    Removed commented code on Line 151:
+    
+    # folder_name = FileHelper::sanitize_folder(@current_folder.name)
+    
+    and commented code on Lines 153-154:
+    
+    # This code removed on 4/10/09 was breaking downloads of files with hyphens in them
+          # file_name = FileHelper::sanitize_filename(params['download'])
+
+[33mcommit c62b9bb5d8471f8c1a71aff8652b08d689ca48cb[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 21:56:36 2017 -0400
+
+    Removed commented code on Line 176
+    
+    Removed commented code on Line 176:
+    
+    # flash[:note] = "All participants were successfully copied to \""+course.name+"\""
+
+[33mcommit e6ef4aef2602f25ee3aaad2354d8f9811a22952e[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 21:55:43 2017 -0400
+
+    Removed commented code on Lines 120-125, 185-188
+    
+    Removed code on Lines 120-125:
+    
+    # already taken care of in association declaration
+        # @course.ta_mappings.each{
+        #  | map |
+        #  map.destroy
+        # }
+    
+    and code on Lines 185-188:
+    
+      # generate the undo link
+      # def undo_link
+      #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => @course.versions.last.id)}>undo</a>"
+      # end
+
+[33mcommit 51c6b8dccf6fc686b20eebfc5d4cfa627d0796aa[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 21:52:56 2017 -0400
+
+    Removed commented code on Line 132
+    
+    Removed commented code  "# SignedUpTeam.where(:topic=>b.topic_id).first.team_id" on Line 132.
+
+[33mcommit db83ee3ed505e33e984f563149331810d0c9fd77[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Jul 27 11:38:58 2017 -0500
+
+    50 entries can be used now
+
+[33mcommit fef7bbf90c7ac39617c24079620d31f8bd667b63[m
+Merge: 69c0fad 1f0ca3e
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Jul 27 12:13:45 2017 -0400
+
+    Merge branch 'master' of https://github.com/saratkavuru/expertiza
+
+[33mcommit 779f8bb6e8041f5e92e3484ea0d9dfced38f2ade[m
+Merge: 846a1f3 1f0ca3e
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Thu Jul 27 09:13:32 2017 -0400
+
+    Merge pull request #5 from expertiza/master
+    
+    Merge from original
+
+[33mcommit 69c0fad312a2f1718d143653566bf3ac9d455936[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Jul 27 01:58:20 2017 -0400
+
+    Review Reports amd scores done but find a way for response.rb
+
+[33mcommit 6a22764835d6fbf44a34a4136bd26a9197b1bf79[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Thu Jul 27 00:27:14 2017 -0400
+
+    Response.rb and team names in heat grid should be taken care of
+
+[33mcommit 0fd5e3e6deaa93b2020331775dbb4cbd53d61bad[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Jul 26 21:50:06 2017 -0400
+
+    Changed the order of names in full name
+
+[33mcommit fd568b34d48e70a962ce4a045eb71f22978b956d[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Jul 26 21:45:44 2017 -0400
+
+    Anonymize Views completely working
+
+[33mcommit 1f0ca3e8447d1a21e2fd18d8b115dfff8a19252c[m
+Merge: 975ac92 5fc8308
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jul 26 11:47:02 2017 -0400
+
+    Merge branch 'master' of https://github.com/expertiza/expertiza
+
+[33mcommit 975ac92aac57455d8f320edf4b47cefa42aeeabd[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jul 26 11:46:42 2017 -0400
+
+    Fix a broken "-->"
+
+[33mcommit 2135c9646c1932e2ec7397f09913e2d24d49777b[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jul 26 11:46:20 2017 -0400
+
+    Put menu_items_controller back
+
+[33mcommit 5fc8308339c7fb0d41e3b3727d7198ebc76b0002[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jul 26 11:40:15 2017 -0400
+
+    Put menu_items_controller back
+
+[33mcommit ada755379a1d2748fba48a073dc96f85e561fe67[m
+Merge: a1b5af8 6fb7723
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jul 26 11:27:30 2017 -0400
+
+    Merge Ajay's pull request.
+
+[33mcommit 364af34ecd361d5695c47900335dc047efc8a27d[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Wed Jul 26 01:36:43 2017 -0400
+
+    add option in menu and change views.
+
+[33mcommit 6fb77232961decf598681ca7c1e5bd388ff21aee[m
+Author: Ajay <ajaychandrapendyala@gmail.com>
+Date:   Tue Jul 25 15:43:52 2017 +0530
+
+    Moved the "Submit file" prompt into the if stmt
+
+[33mcommit c40068cc26e8558a938fd1dc96b25ab2df358d87[m
+Author: Ajay <ajaychandrapendyala@gmail.com>
+Date:   Tue Jul 25 09:03:33 2017 +0530
+
+    changed <BR/> to <br/>
+    
+    Apparently XTML is case sensitive. Maybe that's the reason why "-->" was showing up? I don't see any stray comments tags <!-- --> in the code as well.
+
+[33mcommit ade0dd47e5d78a995f598395162b8a9ef98761b7[m
+Author: Ajay <ajaychandrapendyala@gmail.com>
+Date:   Tue Jul 25 08:23:26 2017 +0530
+
+    Removed the unnecessary quote and backslash
+
+[33mcommit 846a1f3b8420a7145e97fb5e3e694d128deb37c1[m
+Merge: 709d698 a1b5af8
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 21 14:04:25 2017 -0400
+
+    Merge pull request #4 from expertiza/master
+    
+    Kill menu_items_controller.
+
+[33mcommit a1b5af80f5067e33fdf002dcc890956a61f8ef25[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri Jul 21 13:30:03 2017 -0400
+
+    Kill menu_items_controller.
+
+[33mcommit 709d698bc669aeff520ec28d81914476157a49ba[m
+Merge: 77604bd 299e16c
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 21 13:18:08 2017 -0400
+
+    Merge pull request #3 from expertiza/master
+    
+    From original
+
+[33mcommit 299e16c0fa48496535038cc0266fd6c18770fee8[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri Jul 21 12:21:16 2017 -0400
+
+    issue fix #980
+
+[33mcommit 7d89a9054c7b126596b8ec050561e794904bc585[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Mon Jul 17 07:33:00 2017 -0400
+
+    Removed max
+
+[33mcommit 69fbcf558d97c5d3b6f5f10a161eacb2a67d58d9[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Mon Jul 17 04:13:29 2017 -0400
+
+    Removed unused partial
+
+[33mcommit 9abea7afefccb4c9fb293bc427c6a1e13193f2da[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Sun Jul 16 07:10:05 2017 -0400
+
+    Reducing whitespace
+
+[33mcommit 1c6e4619398419e7096dec99795063fc83feafda[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Jul 15 20:58:44 2017 -0700
+
+    Fix failed tests.
+
+[33mcommit a8aa691958140bd13b44e984a7fa820bb7fbf878[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Jul 15 20:58:29 2017 -0700
+
+    Update .travis.yml
+
+[33mcommit 788dada104bfc44d5a81995ff3dd8fa4c455d960[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Jul 15 20:39:15 2017 -0700
+
+    Fix ActiveRecord Associations - part 1. Fixed models are listed below:
+    'assignment', 'assignment_due_date', 'assignment_node', 'assignment_questionnaire', 'assignment_team', 'course', 'course_node', 'course_participant', 'course_team', 'institution', 'instructor', 'inviation', 'join_team_request', 'questionnaire', 'questionnaire_node', 'quiz_assignment', 'sign_up_topic', 'signed_up_team', 'ta', 'ta_mapping', 'team', 'team_node', 'team_user_node', 'teams_user', 'user'
+
+[33mcommit c54aa35bc003b7b48739505be0f9d64b95c1562a[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Jul 15 16:47:00 2017 -0700
+
+    Remove deprecated courses_users.
+
+[33mcommit eefc2209ac3f121d069515412bb0390f4730357c[m
+Merge: b2178af 83aa911
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sat Jul 15 15:46:51 2017 -0700
+
+    Merge branch 'master' of github.com:expertiza/expertiza
+
+[33mcommit 77604bdb04cf79861361a018e2774cc033688bec[m
+Merge: 025fad0 83aa911
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 14 11:42:00 2017 -0400
+
+    Merge pull request #2 from expertiza/master
+    
+    Minor fix for calibration report
+
+[33mcommit 83aa91124113ba24547274eeb76c41c072da6a82[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri Jul 14 11:31:03 2017 -0400
+
+    Minor fix for calibration report
+
+[33mcommit 025fad02d495417d5bff2a38bb53ab97f9767fb1[m
+Merge: cd9edea 9c3d9af
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 14 11:12:58 2017 -0400
+
+    Merge pull request #1 from expertiza/master
+    
+    From original
+
+[33mcommit 9c3d9afd2608fbd7462c186600d15f276005db8e[m
+Merge: 03dcedd cd9edea
+Author: Yang Song <ysong8@ncsu.edu>
+Date:   Mon Jul 10 13:22:19 2017 -0400
+
+    Merge pull request #976 from joydeepm02/master
+    
+    Changes to messages in controller files (by Joydeep)
+
+[33mcommit b2178af46bfdf058e3e8e4dc361c7ab1e105d45c[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Jul 9 21:59:47 2017 -0700
+
+    Delete table 'plugin_schema_info'
+
+[33mcommit 03dcedd5d11437f1b08b8961574b287a5d382a85[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Jul 9 18:27:56 2017 -0700
+
+    Remove several deprecated rake files:
+    1.we use RSpec instead of cucumber;
+    2.we do not use goldberg anymore;
+    3.hoptoad is airbrake now;
+    4.we need a rake file for update to rails 5.
+    [ci skip]
+
+[33mcommit c25957e0dc368717bfadfacf655c906aa5caacd8[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Jul 9 17:17:09 2017 -0700
+
+    Update db/schema.rb
+    [ci skip]
+
+[33mcommit 1b061766d404ed33516291be4a27862fce4a7cc1[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Jul 9 17:02:35 2017 -0700
+
+    Fix a bidding bug occurred by E1727.
+
+[33mcommit cd9edea8c5d7a5ce998f961f45a6a0090edbac71[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Sun Jul 9 19:11:39 2017 -0400
+
+    Changes to error message
+    
+    Changes on line 57: Changed "not valid" to "invalid"
+
+[33mcommit 6992b63c532e3912a0bbf4a36472e3b5cb9596df[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 7 13:38:35 2017 -0400
+
+    Changes to error message
+    
+    Changes on line 110: Changed "artifact" to "artifacts"
+
+[33mcommit b36d665ba19aeeff0b4132f6bb0717424d56e7e8[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 7 13:28:22 2017 -0400
+
+    Changes to messages
+    
+    Changes on:
+    Line 187: Changed "teh" to "the"
+    Line 309: Changed "editing cannot be done any more." to "you cannot edit it anymore."
+
+[33mcommit d8dcd29d89d3f8ddab21b06ecab0eedcde59ef27[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 7 13:11:47 2017 -0400
+
+    Changes to messages
+    
+    Changes on line 70: Changed "Reset password success" to "Password was successfully reset"
+
+[33mcommit b1e82742cf35842752296421b74c19030be3edc1[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 7 12:57:02 2017 -0400
+
+    Changes to error message
+    
+    Changes on line 77: Added "is" after "action". Changed "enabled" to "enable".
+
+[33mcommit 2cd13bd601fc4506bca33f227de4ee9f8cc8c07f[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 7 12:38:50 2017 -0400
+
+    Changes to error messages
+    
+    Changes on lines 18 and 38: Added a space before "does not currently exist" for better readability.
+
+[33mcommit e1df509d8bf038e87a1b4bb355142b83b463383b[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 7 12:19:36 2017 -0400
+
+    Changes to error message
+    
+    Change on line 39: changed "other" to "another"
+
+[33mcommit 87c78377613df2d6a7a32a71e06b2ac485d73b68[m
+Author: joydeepm02 <joydeepm02@gmail.com>
+Date:   Fri Jul 7 11:57:37 2017 -0400
+
+    Changed error messages
+    
+    Changes on lines 9, 32, and 38. Added a space before "does not currently exist" for better readability.
+
+[33mcommit 5853603670381fe9adbf83d88c8a17ef98aa644a[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Mon Jul 3 04:45:27 2017 -0400
+
+    Reviews tab completely done
+
+[33mcommit 213e58e51c548afd59d9a34e0c7c08d004739ea4[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Mon Jul 3 01:27:12 2017 -0400
+
+    Taking care of deleted view
+
+[33mcommit a76fe564e5f8699d83b6a6c99e2fb0a6f42d2951[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Mon Jul 3 01:25:08 2017 -0400
+
+    Reviews Tab working.Moving to submission content
+
+[33mcommit 7d0730340821a14eb605489aca05650ed163a14f[m
+Author: saratkavuru <kavurusarat@gmail.com>
+Date:   Sun Jul 2 22:18:06 2017 -0400
+
+    Double render error
+
+[33mcommit 17dbf56eb61dc85c8f2a6a538ef99343787cde36[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Jul 2 15:40:29 2017 -0700
+
+    Fix an error from c5b962de6a4f5b448699f15be83ddff68044ea5a
+
+[33mcommit c5b962de6a4f5b448699f15be83ddff68044ea5a[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun Jul 2 15:02:30 2017 -0700
+
+    Use Rubocop change code style.
+
+[33mcommit 240504063e1a3b4fc5f63580450511abba5baeb8[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jun 14 12:19:12 2017 -0400
+
+    Cherry-pick: Add partials back for teams/teams_users.
+
+[33mcommit 901e3b560c0088146c383b9e2b3d6d15d02beecf[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jun 14 11:47:50 2017 -0400
+
+    Cherry-pick: Wording changes.
+
+[33mcommit 60d7f1e5c9c888aec87eff8b359db5b7ed6c647f[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon Jun 12 13:35:56 2017 -0400
+
+    Cherry-pick: Fix issue in user/list page.
+
+[33mcommit 2c9ad4350c6734ae573f97a87289f568dbdaa957[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Thu Jun 8 20:22:00 2017 -0400
+
+    Cherry-pick: Fix some pending migrations (mainly to please postgresql)
+
+[33mcommit 0124977998cd831603efe8eff02732d96bdbe30e[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri Jun 23 11:26:28 2017 -0400
+
+    Fix issue #973
+
+[33mcommit 2e9cb9aa770fdc02a1b09d59ab906ac57e919de6[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jun 14 12:19:12 2017 -0400
+
+    Add partials back for teams/teams_users.
+
+[33mcommit 5a32ad53ee208dcf9029bce93f8c397282300c25[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jun 14 11:47:50 2017 -0400
+
+    Wording changes.
+
+[33mcommit c48c75c93d1655ec2e3c642b5502859157d1e9c1[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon Jun 12 13:35:56 2017 -0400
+
+    Fix issue in user/list page.
+
+[33mcommit dcb64b9121697cebddc345cd8c548109bdf1f002[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Thu Jun 8 20:22:00 2017 -0400
+
+    Fix some pending migrations (mainly to please postgresql)
+
+[33mcommit b4caed1a473f85de475f90fff65ad0b3e067b9f5[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed Jun 7 11:45:36 2017 -0400
+
+    Fix issue #959: submitters should be able to sign up
+
+[33mcommit eafacbea72a536f7fbdb501b449e4e238d2fddab[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri May 26 11:55:56 2017 -0400
+
+    Refactor E1734: remove dead code.
+
+[33mcommit a12489a8e9f41e39746bec67241f2b8e3947c75a[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed May 24 21:02:15 2017 -0400
+
+    Fix E1734: the delete of survey deployment.
+
+[33mcommit 1ef2bb80fe68d5e315f38d18e218bd478996c486[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed May 24 20:40:58 2017 -0400
+
+    Add a comment to explain how global survey works.
+
+[33mcommit 9d3bd6fd67b1811abed40d3db7b5bf2cd7615687[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Tue May 23 21:30:16 2017 -0400
+
+    Refactor E1734: Show the course/assignment that each survey is associated to.
+
+[33mcommit 7d5a65f806b0b09239772673583e4a563ac6bc92[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Tue May 23 21:29:41 2017 -0400
+
+    Refactor E1734: Add foreign keys to AssignmentSurveyDeployment and CourseSurveyDeployment
+
+[33mcommit 43631dcf2d4829d557003ac8d2a59de80c6512d4[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Tue May 23 21:19:44 2017 -0400
+
+    Refactor E1734: Change variable name.
+
+[33mcommit 7ba4dae585767e76a0cbe4cdee71a4cf658a11ed[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Tue May 23 21:17:11 2017 -0400
+
+    Fix E1734: wording changes on survey_deployment/list page.
+
+[33mcommit 631209ef70f360cc354bc8054f0d8e505c93c3e3[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon May 22 10:27:45 2017 -0400
+
+    Refactor E1734: make a method private
+
+[33mcommit 49d616cf8d154ce0fe5095318ba3aab962aebdb9[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon May 22 10:26:56 2017 -0400
+
+    Fix E1734 test.
+
+[33mcommit 6e30b16afe55c3eb573b3d1f5de32fb5d8922f9f[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon May 22 09:56:48 2017 -0400
+
+    Refactor E1734: Move view_responses from response_controller to survey_deployment_controller.
+
+[33mcommit 11816c475ec52ba86b9835fa5648135aea623ec2[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon May 22 09:49:59 2017 -0400
+
+    Add comments to E1734 code.
+
+[33mcommit f7e21b5ce7d09ffd908864dc8aef0fbb86bc903c[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri May 19 12:54:48 2017 -0400
+
+    Wording change.
+
+[33mcommit 70c66d36e609beeb4bcd9fd8eefda5fb4d41c8f1[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri May 19 11:35:23 2017 -0400
+
+    Fix a mistake in the comment.
+
+[33mcommit 3edd03f7c342af74739e938ec66fb70b6613c672[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Fri May 19 11:10:48 2017 -0400
+
+    Add comments to E1734 changes.
+
+[33mcommit 167cd7893e2c7eab660495ea29ff2678024d9c47[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Thu May 18 10:13:20 2017 -0400
+
+    remove unused tree display partials
+
+[33mcommit 0ad4c6772c7dc4743a8d1353647ac8eba6db7a25[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Thu May 18 10:01:26 2017 -0400
+
+    fix E1734: remove num_of_students field
+
+[33mcommit 87b4c4dc94af2ab3ae610e8f64874d31e8363385[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Thu May 18 09:59:26 2017 -0400
+
+    fix E1734: remove unused controller
+
+[33mcommit 5f26bb934e71b9f3e46d0bbb89910ac34e5213af[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed May 17 13:09:02 2017 -0400
+
+    Remove an unused partial.
+
+[33mcommit a43147e8ac2f624baa09574b5cb7a4341f0f2e2f[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed May 17 12:17:15 2017 -0400
+
+    Update my E1734 change (hopefully fixes the build)
+
+[33mcommit baaeb909f514ac8ab46ebf0828ee40a015a6d169[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed May 17 11:06:56 2017 -0400
+
+    Update my test for E1734
+
+[33mcommit de768143fc005b1f81e6c395758d7bc587ff481b[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Wed May 17 00:14:26 2017 -0400
+
+    Add unit tests for E1734.
+
+[33mcommit 82a5005194d37121f9991763fc2ab65fd992fae8[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Tue May 16 17:39:16 2017 -0400
+
+    Fix E1734: get rid of survey response model.
+
+[33mcommit d5101f3c9fbe46c773cc9456e6db6ac38a0dcb90[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Tue May 16 17:38:50 2017 -0400
+
+    Fix E1734: get rid of survey response table.
+
+[33mcommit c1e69cc6d3868f158f6b226c689438d0c1059b58[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Tue May 16 17:16:04 2017 -0400
+
+    Fix E1734 test.
+
+[33mcommit b585381b405beea55224aa4174db2584b651920a[m
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon May 15 22:49:29 2017 -0400
+
+    Fix E1734: the start time of a survey can be a past time.
+
+[33mcommit 266292cb6ec1e81c935c50609ff75c4dabf7daa7[m
+Merge: 9eebf9c 4893554
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon May 15 11:46:36 2017 -0400
+
+    Merge E1734
+
+[33mcommit 48935547082de46101624d4553124ec5af6b80f7[m
+Merge: 9eebf9c 9a5b2b0
+Author: yangsong8 <ysong8@ncsu.edu>
+Date:   Mon May 15 11:45:51 2017 -0400
+
+    Merge branch 'master' of https://github.com/trichmon91/expertiza into trichmon91-master
+    
+    Conflicts:
+    	app/assets/javascripts/tree_display.jsx
+    	db/schema.rb
+
+[33mcommit 9eebf9cdf5d4ed44d2d73b510cf501e8f9dba161[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu May 11 19:45:43 2017 -0400
+
+    Try to shorten the waiting time of tests in simi_check_webservice_spec.rb.
+    [ci skip]
+
+[33mcommit 21df6cc2020a5b47522f9c0dbbc79b5edefbd958[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Thu May 11 17:31:21 2017 -0400
+
+    Remove useless files in cddfe977fc38da44ad95a93a0544f8ec5daabf93
+
+[33mcommit cddfe977fc38da44ad95a93a0544f8ec5daabf93[m
+Merge: 17fdb9e 1c6d1cd
+Author: ferryxo <fferry@ncsu.edu>
+Date:   Thu May 11 14:42:15 2017 -0400
+
+    Merge pull request #949 from totallybradical/master
+    
+    E1738. Integrate Simicheck Web Service into Expertiza
+
+[33mcommit 17fdb9e27bcf396969c4048ea253815044e049e9[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Tue May 9 14:41:10 2017 -0400
+
+    Fix a bug in grades/view page.
+    [ci skip]
+
+[33mcommit 1c6d1cd495517159449fbd239fd8a95e96d913eb[m
+Merge: 45a3d3f 16359f3
+Author: ferryxo <fferry@ncsu.edu>
+Date:   Tue May 9 10:25:11 2017 -0400
+
+    Merge branch 'master' into master
+
+[33mcommit 16359f360a283ba4123d34174b232e818fa572d0[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 21:39:13 2017 -0400
+
+    Add one new route for impersonate.
+
+[33mcommit a631605de8e4062647e859fde17cdce3079ced27[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 21:16:31 2017 -0400
+
+    Refactor E1743.Click and impersonate and only merge impersonate part.
+
+[33mcommit 430e38bc801333fbf28e11e7b57a6056cf6c5bef[m
+Merge: e6ed4eb f119c80
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 18:03:31 2017 -0400
+
+    Partially merge E1743-Click and impersonate
+
+[33mcommit e6ed4eb1e895783409a71e11f1facdaba379f9d8[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 17:18:48 2017 -0400
+
+    Production db is correct now, remove migration file.
+
+[33mcommit f4b4a1c6c5d9e57d40bf26b902b4757d649038fa[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 17:09:17 2017 -0400
+
+    Add migration to correct assignment_id in submission_records table.
+    [ci skip]
+
+[33mcommit a735b708146e7abf8367e416c40c021cc81576d6[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 16:56:23 2017 -0400
+
+    Refactor app/controllers/submitted_content_controller.rb and correct one SubmissionRecord creation error.
+    [ci skip]
+
+[33mcommit f119c8072f7d0df8557c0276606d6e75f2bbac96[m
+Author: apan255 <apandey6@ncsu.edu>
+Date:   Mon May 8 15:42:03 2017 -0400
+
+    Added negative test case for users list
+
+[33mcommit 69b36fda0bccb965cf8db020e5e6768cc3fb7001[m
+Author: apan255 <apandey6@ncsu.edu>
+Date:   Mon May 8 13:29:51 2017 -0400
+
+    removed unnecessary variables from super admin object
+
+[33mcommit 7fdc67ae54702318b151c61db4fee615f629a4f7[m
+Merge: 1ebb5c2 0bf0aa5
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 11:56:24 2017 -0400
+
+    Merge and refactor E1735. UI changes for review and score reports
+
+[33mcommit 0bf0aa55d8db679ae26e05ae241e4e25ad26f2e5[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Mon May 8 11:55:57 2017 -0400
+
+    Refactor E1735 and remove useless partials, still have 2 issues:
+    1. On student-end, Expertiza use 'grades/_reviews.html.erb' partial to display reviewers, scores and review details; on instructor-end, since Expertiza uses tabbed view, so 'grades/_reviews.html.erb' is separated into two. One is 'grades/tabbed_reviews' (display review details) in 'Reviews' tab. Another one is 'grades/_team_statistics.html.erb'(display reviewers and scores) in 'Statistics' tab. We need to use same kinds of partials in instructor-end and student-end.
+    2. 'Give Feedback' link at 'view_my_score' at student-end should not appear at folded view. The link should appear at the bottom of expended view.
+    PS. I keep 'grades/_tabbed_participant.html.erb', since it is different from 'grades/_participant.html.erb'.
+
+[33mcommit e0be6239e67da72c91340c5766a474bffb3326d7[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Sun May 7 23:41:09 2017 -0400
+
+    Refactor E1735. UI changes for review and score reports
+
+[33mcommit e94a14a66817711fd7dc2d716b0bbd2d758bd0e6[m
+Author: apan255 <apandey6@ncsu.edu>
+Date:   Sun May 7 20:03:50 2017 -0400
+
+    Assigned admin object to variable
+
+[33mcommit 786e25e5d708b51514364c0cdf7d97aa207f95a0[m
+Author: apan255 <apandey6@ncsu.edu>
+Date:   Sun May 7 19:31:53 2017 -0400
+
+    Removed unnecessary line
+
+[33mcommit 4c60e08d2488e5caa08bc48376e065dec61aba08[m
+Merge: 8da0668 1ebb5c2
+Author: Aditya Pandey <apandey6@ncsu.edu>
+Date:   Sun May 7 19:18:58 2017 -0400
+
+    Merge branch 'master' into E1743
+
+[33mcommit 8da066839ffe4813cd017df30c1571822d4178ad[m
+Author: Akhshay Sridhar <asridha4@ncsu.edu>
+Date:   Sun May 7 19:11:41 2017 -0400
+
+    added userid and impersonate links for author feedback report and teammate review report
+
+[33mcommit c62805aef38f7aaf9f0bac882ef03d715f4e7ec6[m
+Author: apan255 <apandey6@ncsu.edu>
+Date:   Sun May 7 18:32:22 2017 -0400
+
+    Fixed code climate issues
+
+[33mcommit f9653cdb545705e32061759dd1ddd42b476b01df[m
+Author: Expertiza Developer <fuzailm1@gmail.com>
+Date:   Sat May 6 18:52:21 2017 -0400
+
+    Added impersonate link on Review Report page
+
+[33mcommit 21cc35fb763fc6c4fe2b8800e6cc22d5690f4fc1[m
+Author: Expertiza Developer <fuzailm1@gmail.com>
+Date:   Sat May 6 18:39:08 2017 -0400
+
+    added impersonate links to view submission page
+
+[33mcommit 5e8929818972d2249d3e24aa6ceb57f9c45faecc[m
+Author: apan255 <apandey6@ncsu.edu>
+Date:   Sat May 6 13:57:06 2017 -0400
+
+    Adding test cases and few comments for get_user_list method
+
+[33mcommit 1ebb5c29e2bd958505b1b57383657c328a2dd599[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri May 5 17:28:21 2017 -0400
+
+    Temporarily remove assessment360/one_course_all_assignments,
+    since all infomation can be found in assessment360/all_students_all_reviews. And assessment360/one_course_all_assignments has some visulizations, but the code had been removed. I think redo the view (if necessary) will be much faster than recover it.
+    [ci skip]
+
+[33mcommit 5a2f74f14835d5341f0ad459c4699e014ad0da83[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri May 5 16:42:22 2017 -0400
+
+    Remove assessment360/one_student_all_reviews.html.erb:
+    Since it only show the bar chart of avg grades one student received, I think it is superfluous.
+
+[33mcommit d2ea01fd7c43862bd73b7132946c5d5cb0a52ef5[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri May 5 16:40:28 2017 -0400
+
+    Remove flaky feature tests features/heat_map_spec.rb
+
+[33mcommit c4bd7887f6d8d4ede8c844dda6e8899b8082727f[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri May 5 16:39:27 2017 -0400
+
+    Fix bug in assessment360/all_students_all_reviews.html.erb:
+    1. If there is no course participant, view will redirect to tree_display#list and show flash error msg;
+    2. If one assignment w/o participants, this assignment will be excluded.
+
+[33mcommit 638f5f0134442cfacb7f8d7157799fafbb795e25[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri May 5 12:47:16 2017 -0400
+
+    Keep Refactor assessment360/all_students_all_reviews.html.erb
+
+[33mcommit 13ddc6f4441c0c8fe79d2af520a2aef16cf25b64[m
+Author: Winbobob <zhu6@ncsu.edu>
+Date:   Fri May 5 10:42:19 2017 -0400
+
+    Refactor assessment360/all_students_all_reviews.html.erb
+
+[33mcommit 45a3d3f2376cde8b1c3b699fde6ddf0bb974ebea[m
+Author: David Gutierrez <djgutier@ncsu.edu>
+Date:   Thu May 4 00:40:54 2017 -0400
+
+    Removed empty file
+
+[33mcommit 2ca959c7750fe9eb72c418a8406476f1ed7a0a17[m
+Author: remcelfr <remcelfr@ncsu.edu>
+Date:   Mon May 1 20:17:02 2017 -0400
+
+    Fix issue in response.rb introduced by previous code climate fix
+
+[33mcommit 1873155425ab9af4b9d6986efa251c61084a9c71[m
+Author: remcelfr <remcelfr@ncsu.edu>
+Date:   Mon May 1 18:20:06 2017 -0400
+
+    Fix checkbox_spec test and address some code climate issues in response model
+
+[33mcommit 63a1af17f942e30f66b72db2364665f9c3cb6b44[m
+Author: Mohammed Hasibul Hassan <mhhassan@ncsu.edu>
+Date:   Mon May 1 17:06:24 2017 -0400
+
+    Code climate fix
+
+[33mcommit a9a46686e499e5db8a66995aa06d5b2c32fce007[m
+Author: djgutier <djgutier@ncsu.edu>
+Date:   Mon May 1 16:59:02 2017 -0400
+
+    Update http_request.rb
+
+[33mcommit 70fa87d709f598098329b5f26cb0293d6fb26c0d[m
+Merge: 2042abd b8ddaa6
+Author: redsock88 <athasket@gmail.com>
+Date:   Mon May 1 16:19:15 2017 -0400
+
+    Merge remote-tracking branch 'origin/feature/E1735_With_Tabs' into feature/E1735_With_Tabs
+
+[33mcommit 2042abdf0de1c406561fea06153b4f4dfdecfb25[m
+Author: redsock88 <athasket@gmail.com>
+Date:   Mon May 1 16:18:35 2017 -0400
+
+    search bar initial commit
+
+[33mcommit ce97c4a9ab997248215c51cfbbbbfe002fccff08[m
+Merge: 27bfb54 9919ebf
+Author: balesj <jabales@ncsu.edu>
+Date:   Sun Apr 30 21:16:55 2017 -0400
+
+    Merge branch 'E1743' of https://github.com/apan255/expertiza into E1743
+
+[33mcommit 27bfb5477acfea68100d609b51c614db8dc571ca[m
+Author: balesj <jabales@ncsu.edu>
+Date:   Sun Apr 30 21:13:48 2017 -0400
+
+    Added the two example files that were mistakenly removed in a prior commit.
+
+[33mcommit b8ddaa6bd24a21531b4153ed2f60a796f433cef0[m
+Author: Mohammed Hasibul Hassan <mhhassan@ncsu.edu>
+Date:   Sun Apr 30 19:12:17 2017 -0400
+
+    Cleaning up un-used code
+
+[33mcommit 9a5b2b00d579c90c6b4445942c7259f445c8005c[m
+Author: Siddharth Singh <sid5788@gmail.com>
+Date:   Sun Apr 30 03:05:16 2017 -0400
+
+    Fixing issues for code
+
+[33mcommit 7031b0135ecf5277a4cac72b4e9cc47302ad2985[m
+Author: Nephi Grant <nephdog@gmail.com>
+Date:   Sun Apr 30 02:42:05 2017 -0400
+
+    removed trailing whitespace
+
+[33mcommit 4f2401cac4d55beafa33673946de13e831eb6325[m
+Merge: a77c0af 68053a5
+Author: Nephi Grant <nephdog@gmail.com>
+Date:   Sun Apr 30 02:39:36 2017 -0400
+
+    Merge branch 'master' of https://github.com/totallybradical/expertiza-simicheck-integration
+
+[33mcommit a77c0afe6685cfa0e7822445400ba0dac8d50a17[m
+Author: Nephi Grant <nephdog@gmail.com>
+Date:   Sun Apr 30 02:38:45 2017 -0400
+
+    added semicolon
+
+[33mcommit 68053a59bc23acece7b35f1329f1cc4028b1df7a[m
+Author: David Gutierrez <djgutier@ncsu.edu>
+Date:   Sun Apr 30 02:37:45 2017 -0400
+
+    Fixes for code climate
+
+[33mcommit 6677075f496264918af92d817325597f271a2f35[m
+Author: Siddharth Singh <sid5788@gmail.com>
+Date:   Sun Apr 30 02:35:32 2017 -0400
+
+    Code Climate fixes
+
+[33mcommit fee32488cf9211c9d246b5624f5e162271142618[m
+Merge: a30da1c 96efa73
+Author: David Gutierrez <djgutier@ncsu.edu>
+Date:   Sun Apr 30 02:34:36 2017 -0400
+
+    Merge branch 'master' of https://github.com/totallybradical/expertiza-simicheck-integration
+
+[33mcommit a30da1ceb0298997cf23fe7b2c87e9a6e1f3de42[m
+Author: David Gutierrez <djgutier@ncsu.edu>
+Date:   Sun Apr 30 02:34:32 2017 -0400
+
+    Fixes for code climate
+
+[33mcommit 96efa73e358d5d590960b0382ffe87e2cccdaa50[m
+Merge: 3b7d566 915b3f5
+Author: Nephi Grant <nephdog@gmail.com>
+Date:   Sun Apr 30 02:33:30 2017 -0400
+
+    Merge branch 'master' of https://github.com/totallybradical/expertiza-simicheck-integration

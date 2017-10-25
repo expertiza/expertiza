@@ -43,9 +43,6 @@ describe QuestionnairesController, type: :controller do
   end
 
   describe '#create' do
-
-    #before { questionnaire = Object.const_get(params[:model].split.join).new }
-
     it 'redirects to questionnaires#edit page after create a new questionnaire' do
 
       treeFolder1 = double('TreeFolder')
@@ -56,23 +53,20 @@ describe QuestionnairesController, type: :controller do
       allow(treeFolder2).to receive(:id).and_return(1)
       allow(treeFolder2).to receive(:node_object_id).and_return(1)
 
-      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).
-      and_return([treeFolder1,treeFolder2])
-
-      #allow(FolderNode).to receive(:where).with(node_object_id: '1').and_return(double('FolderNode'))
+      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([treeFolder1,treeFolder2])
+      
       folderNode2 = double('FolderNode')
       allow(folderNode2).to receive(:id).and_return(1)
       allow(FolderNode).to receive(:find_by_node_object_id).and_return( folderNode2 )
-
-      #params = { :questionnaire => { :private => "true", :type => "1", :name => "Random Name", :min_question_score => "0", :max_question_score => "5" } }
+      
       user = double("User")
       allow(user).to receive(:id).and_return(1)
+      
       get :create, { :questionnaire => { :private => "true", :type => "ReviewQuestionnaire", :name => "Random Name", :min_question_score => "0", :max_question_score => "5" } }, {user: user}
-
       expect(flash[:success]).to eq("You have successfully created a questionnaire!")
-
+      
       response.should redirect_to(edit_questionnaire_path({id: 1}))
-      #expect(response).to render_template(:edit)
+
     end
   end
 

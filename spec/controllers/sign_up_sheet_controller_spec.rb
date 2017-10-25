@@ -22,11 +22,11 @@ describe SignUpSheetController do
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: student.id,  parent_id: 1).and_return(participant)
     allow(Team).to receive(:find).with('1').and_return(team)
+    allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(team_user)
+    allow(team_user).to receive(:user).and_return(student)
     allow(participant).to receive(:team).and_return(team)
     allow(participant.team).to receive(:submitted_files).and_return([])
     allow(participant.team).to receive(:hyperlinks).and_return([])
-    allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(team_user)
-    allow(team_user).to receive(:user).and_return(student)
   end
 
   describe '#new' do
@@ -202,10 +202,8 @@ describe SignUpSheetController do
     it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: params[:participant_id]).and_return(participant)
       allow(SignUpTopic).to receive_message_chain(:find, :assignment).with(params[:topic].first).with(no_args).and_return(assignment)
-      allow(Bid).to receive(:where).with(team_id: team_id).and_return(bids)
+      allow(Bid).to receive(:where).with(any_args).and_return(bids)
       allow(bid).to receive(:topic_id).and_return(1)
-      allow(Bid).to receive(:where).with(topic_id: Integer, team_id: team_id).and_return(bids)
-      allow(Bid).to receive(:where).with(topic_id: String, team_id: team_id).and_return(bids)
       allow(bids).to receive(:update_all).with(priority: Integer)
       expect(bids).to receive(:update_all).with(priority: Integer)
       get :set_priority, params

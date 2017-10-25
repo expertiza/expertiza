@@ -41,4 +41,10 @@ class StudentReviewController < ApplicationController
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
   end
+
+  def show_authors_Feedback
+    @map = FeedbackResponseMap.find_by_reviewed_object_id(params[:id])
+
+  end
+
 end

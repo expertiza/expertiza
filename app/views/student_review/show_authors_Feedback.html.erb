@@ -1,0 +1,14 @@
+
+<% if @map and !@map.response.empty?
+   then %>
+    <%= @map.response.last.display_as_html %>
+
+<%  else %>
+    <h3>Feedback from author</h3>
+    <h4> No feedback done yet.</h4>
+
+<%
+  end%>
+
+
+<a href="javascript:window.history.back()">Back</a>

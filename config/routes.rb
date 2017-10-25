@@ -7,6 +7,8 @@ Expertiza::Application.routes.draw do
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
+  get '/show_authors_Feedback', to:'student_review#show_authors_Feedback'
+
 
   resources :bookmarks do
     collection do

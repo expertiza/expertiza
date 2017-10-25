@@ -75,6 +75,7 @@ describe "create group assignment"  do
                               )
   end
 
+  # Test for login as student and selecting topic of assignment
   it "should impersonate as student" do
 
     user = User.find_by(name: "student2064")
@@ -100,8 +101,9 @@ describe "create group assignment"  do
     fill_in 'user_name', with: 'student2066'
     click_button 'Invite'
     expect(page).to have_content('student2065')
-    end
+  end
 
+# Test for Other users to join the team and to verify that topic is assigned to all the users.
   it "joins the team" do
 
     user = User.find_by(name: "student2065")

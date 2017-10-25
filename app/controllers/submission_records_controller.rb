@@ -15,14 +15,23 @@ class SubmissionRecordsController < ApplicationController
   # Show submission records.
   # expects to get team_id from params
   def index
+    latest_record_counter = 0
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
-    @submission_records.each do |record|
+    @submission_records.reverse.each do |record|
       matches = GIT_HUB_REGEX.match(record.content)
-       if(matches.nil? && record.operation == "Submit Hyperlink")
+       if(matches.nil?)
        else
-         GitDatum.update_git_data(record.id)
-         @authors = GitDatum.where("submission_record_id = ?", record.id).map(&:author).uniq{|x| x}
-         break
+         if record.operation == "Submit Hyperlink"
+            if latest_record_counter == 0
+              GitDatum.update_git_data(record.id)
+              @authors = GitDatum.where("submission_record_id = ?", record.id).map(&:author).uniq{|x| x}
+              @record_id = record.id
+            else
+              @git_data = GitDatum.where("submission_record_id = ?", record.id)
+              @git_data.each{|data| data.destroy}
+            end
+         end
+         latest_record_counter = latest_record_counter + 1;
        end
     end
   end

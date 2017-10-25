@@ -68,18 +68,18 @@ describe AssignmentForm do
     context 'when the deadline type is review' do
       it 'adds two delayed jobs and changes the # of DelayedJob by 2' do
         allow(DeadlineType).to receive_message_chain(:find, :name).and_return("review")
-        num_delayedJob = DelayedJob.count
-        assignment_form.add_to_delayed_queue()
-        expect(DelayedJob.count).to eq(num_delayedJob + 2)
+        num_delayed_job = DelayedJob.count
+        assignment_form.add_to_delayed_queue
+        expect(DelayedJob.count).to eq(num_delayed_job + 2)
       end
     end
 
     context 'when the deadline type is team formation and current assignment is team-based assignment' do
       it 'adds a delayed job and changes the # of DelayedJob by 2' do
         allow(DeadlineType).to receive_message_chain(:find, :name).and_return("team_formation")
-        num_delayedJob = DelayedJob.count
-        assignment_form.add_to_delayed_queue()
-        expect(DelayedJob.count).to eq(num_delayedJob + 2)
+        num_delayed_job = DelayedJob.count
+        assignment_form.add_to_delayed_queue
+        expect(DelayedJob.count).to eq(num_delayed_job + 2)
       end
     end
   end

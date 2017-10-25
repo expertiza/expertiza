@@ -1,11 +1,16 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 
+<!--Changing statements to display on the others work screen-->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
+    <h4>Your instructor expects you to do <%= @assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
 
+<% elsif @assignment.num_reviews_allowed == @assignment.num_reviews_required %>
+    <h4>You should perform exactly <%= @assignment.num_reviews_allowed %> reviews </h4>
 <% else %>
-    <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
+
+    <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
 <% end %>
-<h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
+
 
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>

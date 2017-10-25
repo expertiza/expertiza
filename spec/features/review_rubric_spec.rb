@@ -40,6 +40,24 @@ describe "Edit rubric advice" do
     click_button "Add"
   end
 
+  describe "Edit a review advice" do
+    it "is able to edit a public review advice" do
+      # creating a new rubric adive
+      load_question 'Criterion'
+      click_button "Edit/View advice"
+      expect(page).to have_content('Edit an existing questionnaire')
+      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Initial advice") #setting intital advice in the field
+      click_button "Save and redisplay advice"
+      expect(page).to have_content('advice was successfully saved')
+      expect(page).to have_content('Initial advice')
+      # editing a review rubric
+      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Edited the advice") #Setting any element with new data
+      click_button "Save and redisplay advice"
+      expect(page).to have_content('advice was successfully saved')
+      expect(page).to have_content('Edited the advice')
+    end
+  end
+
   describe "Remove a rubric advice", :js => true do
     it "should be able to delete a rubric advice" do
       load_question 'Criterion'
@@ -49,7 +67,7 @@ describe "Edit rubric advice" do
       click_button "Save and redisplay advice"
       expect(page).to have_content('advice was successfully saved')
       expect(page).to have_content('Initial advice')
-      # edit review advice to set to blank
+      # edit review advice to set to blank i.e. delete rubric advice
       first(:css, "textarea[id^='horizontal_'][id$='advice']").set("")
       click_button "Save and redisplay advice"
       expect(page).to have_content('advice was successfully saved')

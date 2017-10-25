@@ -1,4 +1,5 @@
 <% @assignment = Assignment.find(params[:id]) %>
+<!--Project E1763. Sorting the topics in a assignment on the basis of :topic_identifier-->
 <% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]).order(:topic_identifier) %>
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>

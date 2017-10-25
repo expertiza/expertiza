@@ -1,17 +1,17 @@
 ﻿﻿describe AssignmentParticipant do
-  let(:response) { build(:response) }
-  let(:team) { build(:assignment_team, id: 1) }
-  let(:team2) { build(:assignment_team, id: 2) }
-  let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response]) }
-  let(:participant) { build(:participant, id: 1, assignment: assignment) }
-  let(:participant2) { build(:participant, id: 2, grade:100) }
-  let(:assignment) { build(:assignment, id: 1) }
-  let(:review_questionnaire) { build(:questionnaire, id: 1) }
-  let(:question) { double('Question') }
-  let(:quiz_questionaire) { build(:questionnaire, id: 2) }
-  let(:student) { build(:student, name:"student2064", fullname:"2064, student", handle:"handle")}
-  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
-  let(:assignment_questionnaire2) { build(:assignment_questionnaire, used_in_round:1) }
+  let(:response) {build(:response)}
+  let(:team) {build(:assignment_team, id: 1)}
+  let(:team2) {build(:assignment_team, id: 2)}
+  let(:response_map) {build(:review_response_map, reviewer_id: 2, response: [response])}
+  let(:participant) {build(:participant, id: 1, assignment: assignment)}
+  let(:participant2) {build(:participant, id: 2, grade: 100)}
+  let(:assignment) {build(:assignment, id: 1)}
+  let(:review_questionnaire) {build(:questionnaire, id: 1)}
+  let(:question) {double('Question')}
+  let(:quiz_questionaire) {build(:questionnaire, id: 2)}
+  let(:student) {build(:student, name: "student2064", fullname: "2064, student", handle: "handle")}
+  let(:assignment_questionnaire) {build(:assignment_questionnaire)}
+  let(:assignment_questionnaire2) {build(:assignment_questionnaire, used_in_round: 1)}
   let(:topic) {build(:topic)}
   before(:each) do
     allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
@@ -26,9 +26,9 @@
 
   describe '#assign_quiz' do
     it 'creates a new QuizResponseMap record' do
-      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id:1).and_return(quiz_questionaire)#WHY CAN NOT DELETE THIS SENTENCE
-      expect{participant.assign_quiz(participant,participant2,nil)}.to change {QuizResponseMap.count}.from(0).to(1)
-      expect(participant.assign_quiz(participant,participant2,nil)).to be_an_instance_of(QuizResponseMap)
+      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(quiz_questionaire) #WHY CAN NOT DELETE THIS SENTENCE
+      expect {participant.assign_quiz(participant, participant2, nil)}.to change {QuizResponseMap.count}.from(0).to(1)
+      expect(participant.assign_quiz(participant, participant2, nil)).to be_an_instance_of(QuizResponseMap)
     end
   end
 
@@ -45,7 +45,7 @@
       #diao yong de method tai duo le,er qie bu zhi dao sha yi si
       allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
       allow(review_questionnaire).to receive(:questions).and_return(question)
-      allow(Answer).to receive(:compute_scores).with([response], question).and_return({avg:100})
+      allow(Answer).to receive(:compute_scores).with([response], question).and_return({avg: 100})
       allow(review_questionnaire).to receive(:max_possible_score).and_return(100)
       expect(participant.review_score).to eq(100)
     end
@@ -95,26 +95,26 @@
     context 'when the round of questionnaire is nil' do
       it 'record the result as review scores' do
         scores = {}
-        question_hash = {review:question}
+        question_hash = {review: question}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(any_args).and_return(assignment_questionnaire)
         allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max:100, min:100, avg:100})
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max: 100, min: 100, avg: 100})
         participant.assignment_questionnaires(question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response])
-        expect(scores[:review][:scores]).to eq({max:100, min:100, avg:100})
+        expect(scores[:review][:scores]).to eq({max: 100, min: 100, avg: 100})
       end
     end
 
     context 'when the round of questionnaire is not nil' do
       it 'record the result as review#{n} scores' do
         scores = {}
-        question_hash = {review1:question}
+        question_hash = {review1: question}
         allow(AssignmentQuestionnaire).to receive(:find_by).and_return(assignment_questionnaire2)
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(any_args).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max:100, min:100, avg:100})
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max: 100, min: 100, avg: 100})
         participant.assignment_questionnaires(question_hash, scores)
         expect(scores[:review1][:assessments]).to eq([response])
-        expect(scores[:review1][:scores]).to eq({max:100, min:100, avg:100})
+        expect(scores[:review1][:scores]).to eq({max: 100, min: 100, avg: 100})
       end
     end
   end
@@ -132,7 +132,7 @@
 
     context 'when the review_n is not nil' do
       it 'merge the score of review_n to the score of review' do
-        scores = {review1:{scores:{max:100, min:100, avg:100}, assessments:[response]}}
+        scores = {review1: {scores: {max: 100, min: 100, avg: 100}, assessments: [response]}}
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         participant.merge_scores(scores)
         expect(scores[:review][:scores][:max]).to eq(100)
@@ -144,12 +144,12 @@
 
   describe '#topic_total_scores' do
     it 'set total_score and max_pts_available of score when topic is not nil' do
-      scores = {total_score:100}
+      scores = {total_score: 100}
       allow(SignUpTopic).to receive(:find_by_assignment_id).and_return(topic)
       participant.topic_total_scores(scores)
       expect(scores[:total_score]).to eq(0)
       expect(scores[:max_pts_available]).to eq(0)
-      end
+    end
   end
 
   describe '#caculate_scores' do
@@ -161,15 +161,15 @@
     end
     context 'when the participant has the grade and the total score more than 100' do
       it 'return the score of a given participant with total score 100' do
-        scores = {total_score:110}
+        scores = {total_score: 110}
 
-        expect(participant.caculate_scores(scores)).to eq({total_score:100})
+        expect(participant.caculate_scores(scores)).to eq({total_score: 100})
       end
     end
     context 'when the participant has the grade and the total score less than 100' do
       it 'return the score of a given participant with total score' do
-        scores = {total_score:90}
-        expect(participant.caculate_scores(scores)).to eq({total_score:90})
+        scores = {total_score: 90}
+        expect(participant.caculate_scores(scores)).to eq({total_score: 90})
       end
     end
   end
@@ -255,39 +255,39 @@
         row = []
         allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("No user id has been specified.")
         expect(AssignmentParticipant).to receive(:check_info_and_create)
-        expect {AssignmentParticipant.import(row,nil,nil,nil)}.to raise_error("No user id has been specified.")
+        expect {AssignmentParticipant.import(row, nil, nil, nil)}.to raise_error("No user id has been specified.")
       end
     end
 
     context 'when no user is found by offered username' do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
-          row = ["user_name","user_fullname","name@email.com"]
+          row = ["user_name", "user_fullname", "name@email.com"]
           allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("The record containing #{row[0]} does not have enough items.")
           expect(AssignmentParticipant).to receive(:check_info_and_create)
-          expect {AssignmentParticipant.import(row,nil,nil,nil)}.to raise_error("The record containing #{row[0]} does not have enough items.")
+          expect {AssignmentParticipant.import(row, nil, nil, nil)}.to raise_error("The record containing #{row[0]} does not have enough items.")
         end
       end
 
       context 'when the record has more than 4 items' do
         context 'when certain assignment cannot be found' do
           it 'creates a new user based on import information and raises an ImportError' do
-            row = ["user_name","user_fullname","name@email.com","user_role_name","user_parent_name"]
-            session = {user:participant}
+            row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
+            session = {user: participant}
             allow(User).to receive(:find_by).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(nil)
-            expect {AssignmentParticipant.import(row,nil,session,2)}.to raise_error("The assignment with id \"2\" was not found.").and change {User.count}.by(1)
+            expect {AssignmentParticipant.import(row, nil, session, 2)}.to raise_error("The assignment with id \"2\" was not found.").and change {User.count}.by(1)
           end
         end
 
         context 'when certain assignment can be found and assignment participant does not exists' do
           it 'creates a new user, new participant and raises an ImportError' do
-            row = ["user_name","user_fullname","name@email.com","user_role_name","user_parent_name"]
-            session = {user:participant}
+            row = ["user_name", "user_fullname", "name@email.com", "user_role_name", "user_parent_name"]
+            session = {user: participant}
             allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(assignment)
             allow(AssignmentParticipant).to receive(:exists?).and_return(false)
-            expect {AssignmentParticipant.import(row,nil,session,2)}.to change {User.count}.by(1).and change {AssignmentParticipant.count}.by(1)
+            expect {AssignmentParticipant.import(row, nil, session, 2)}.to change {User.count}.by(1).and change {AssignmentParticipant.count}.by(1)
           end
         end
       end

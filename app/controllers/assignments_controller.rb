@@ -39,7 +39,7 @@ class AssignmentsController < ApplicationController
       @assignment_form.create_assignment_node
 
       redirect_to edit_assignment_path @assignment_form.assignment.id
-      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+      undo_link("Assignment \"#{ @assignment_form.assignment.name }\" has been created successfully. ")
     else
       render 'new'
     end
@@ -73,8 +73,8 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 1 }
-      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 2 }
+      @assignment_submission_due_dates = @due_date_all.select { |due_date| due_date.deadline_type_id == 1 }
+      @assignment_review_due_dates = @due_date_all.select { |due_date| due_date.deadline_type_id == 2 }
     end
 
     # Check if name and url in database is empty before webpage displays
@@ -110,7 +110,7 @@ class AssignmentsController < ApplicationController
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
       flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+          " of assignment <b>#{ @assignment_form.assignment.name }</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
 
     if @assignment_form.assignment.directory_path.nil? || @assignment_form.assignment.directory_path.empty?
@@ -127,7 +127,7 @@ class AssignmentsController < ApplicationController
         flash[:note] = 'The assignment was successfully saved.'
         redirect_to list_tree_display_index_path
       else
-        flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
+        flash[:error] = "Failed to save the assignment: #{ @assignment.errors.full_messages.join(' ') }"
         redirect_to edit_assignment_path @assignment.id
       end
 
@@ -150,7 +150,7 @@ class AssignmentsController < ApplicationController
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      flash[:error] = "Failed to save the assignment: #{ @assignment_form.errors.get(:message) }"
     end
 
     redirect_to edit_assignment_path @assignment_form.assignment.id

@@ -29,17 +29,23 @@
       </tr>
   <% end %>
   </tbody>
+
+  <%
+     if @authors.nil?
+     else
+  %>
   <h4> Commits Over Project Timeline </h4>
   <%= line_chart @authors.map{ |goal|
-    {:name=> goal, :data=> GitDatum.where("author = ?", goal).group_by_day(:date).sum(:commits)}
+    {:name=> goal, :data=> GitDatum.where("author = ? and submission_record_id = ?", goal, @record_id).group_by_day(:date).sum(:commits)}
       } %>
   <h4> Files Changed Over Project Timeline </h4>
   <%= line_chart @authors.map{ |goal|
-    {:name=> goal, :data=> GitDatum.where("author = ?", goal).group_by_day(:date).sum(:files)}
+    {:name=> goal, :data=> GitDatum.where("author = ? and submission_record_id = ?", goal, @record_id).group_by_day(:date).sum(:files)}
   } %>
   <h4> Lines Modified Over Project Timeline </h4>
   <%= line_chart @authors.map{ |goal|
-    {:name=> goal, :data=> GitDatum.where("author = ?", goal).group_by_day(:date).sum(:lines_modified)}
+    {:name=> goal, :data=> GitDatum.where("author = ? and submission_record_id = ?", goal, @record_id).group_by_day(:date).sum(:lines_modified)}
   } %>
+  <% end %>
 
 </table>

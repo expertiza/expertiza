@@ -114,6 +114,7 @@ describe User do
         allow(user).to receive(:parent).and_return(nil)
         expect(user1.is_recursively_parent_of(user)).to eq false
       end
+    end
 
     context 'when the parent of target user (user) is current user (user1)' do
       it 'returns true' do
@@ -225,7 +226,7 @@ describe User do
       _row_header = double
       seesion = {:user=>user}
       _id = double
-      expect { User.import(row, _row_header,session,_id) }.to raise_error(ArgumentError,"Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email.")
+      expect { User.import(row, _row_header,seesion,_id) }.to raise_error("Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email.")
     end
     it 'updates an existing user with info from impor file' do
       row = ["abc","abc xyz","abcxyz@gamil.com"]
@@ -408,7 +409,7 @@ describe User do
         }
       }
       allow(user).to receive(:nil?).and_return(true)
-      expect {User.from_params(params)}.to raise_error(NoimplementedError,"Please <a href='http://localhost:3000/users/new'>create an account</a> for this user to continue.")
+      expect {User.from_params(params)}.to raise_error("Please <a href='http://localhost:3000/users/new'>create an account</a> for this user to continue.")
     end
   end
 
@@ -427,8 +428,10 @@ describe User do
     it 'returns true if current user is a TA of target user'do
     allow(Ta).to receive(:find).and_return(user1)
     allow(user1).to receive_message_chain("role.ta?"){ true }
-    allow(user1).to receive_message_chain(:courses_assisted_with,:any?).and_yield(true)
-    allow_any_instance_of(User).to receive_message_chain(:assignments,:map,:flatten,:map,:include?,:user).and_return(true)
+    allow(user).to receive_message_chain("role.name").and_return('Student')
+    c1=Course.new
+    allow(user1).to receive_message_chain(:courses_assisted_with,:any?).and_yield(c1)
+    allow_any_instance_of(Course).to receive_message_chain(:assignments,:map,:flatten,:map,:include?,:user).and_return(true)
     expect(user1.is_teaching_assistant_for?(user)).to be true
     end
   end

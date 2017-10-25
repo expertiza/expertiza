@@ -86,7 +86,13 @@ describe AssignmentForm do
   end
 
   describe '#change_item_type' do
-    it 'changes the item_type displayes in the log'
+    let(:log) { double(Version) }
+    it 'changes the item_type displayes in the log' do
+      allow(Version).to receive(:find_by).with(any_args).and_return(log)
+      allow(log).to receive(:update_attribute).with(any_args)
+      expect(log).to receive(:update_attribute).with(:item_type, String)
+      assignment_form.change_item_type(1)
+    end
   end
 
   describe '#find_min_from_now' do

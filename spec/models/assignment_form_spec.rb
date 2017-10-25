@@ -61,16 +61,38 @@ describe AssignmentForm do
 
   describe '#add_to_delayed_queue' do
     context 'when the deadline type is review' do
-      it 'adds two delayed jobs and changes the # of DelayedJob by 2'
+      it 'adds two delayed jobs and changes the # of DelayedJob by 2' do
+        tmp_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks:1))
+        allow(AssignmentDueDate).to receive_message_chain(:where).and_return([tmp_due])
+        allow(DeadlineType).to receive_message_chain(:find, :name).and_return("review")
+        allow_any_instance_of(AssignmentDueDate).to receive(:update_attribute)
+        num_delayedJob = DelayedJob.count
+        assignment_form.add_to_delayed_queue()
+        expect(DelayedJob.count).to eq(num_delayedJob + 2)
+      end
     end
 
     context 'when the deadline type is team formation and current assignment is team-based assignment' do
-      it 'adds a delayed job and changes the # of DelayedJob by 2'
+      it 'adds a delayed job and changes the # of DelayedJob by 2' do
+        tmp_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks:1))
+        allow(AssignmentDueDate).to receive_message_chain(:where).and_return([tmp_due])
+        allow(DeadlineType).to receive_message_chain(:find, :name).and_return("team_formation")
+        allow_any_instance_of(AssignmentDueDate).to receive(:update_attribute)
+        num_delayedJob = DelayedJob.count
+        assignment_form.add_to_delayed_queue()
+        expect(DelayedJob.count).to eq(num_delayedJob + 2)
+      end
     end
   end
 
   describe '#change_item_type' do
-    it 'changes the item_type displayes in the log'
+    let(:log) { double(Version) }
+    it 'changes the item_type displayes in the log' do
+      allow(Version).to receive(:find_by).with(any_args).and_return(log)
+      allow(log).to receive(:update_attribute).with(any_args)
+      expect(log).to receive(:update_attribute).with(:item_type, String)
+      assignment_form.change_item_type(1)
+    end
   end
 
   describe '#find_min_from_now' do

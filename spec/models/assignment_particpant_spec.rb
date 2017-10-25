@@ -46,7 +46,7 @@
       # diao yong de method tai duo le,er qie bu zhi dao sha yi si
       allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
       allow(review_questionnaire).to receive(:questions).and_return(question)
-      allow(Answer).to receive(:compute_scores).with([response], question).and_return({avg: 100})
+      allow(Answer).to receive(:compute_scores).with([response], question).and_return(avg: 100)
       allow(review_questionnaire).to receive(:max_possible_score).and_return(100)
       expect(participant.review_score).to eq(100)
     end
@@ -169,13 +169,13 @@
       it 'return the score of a given participant with total score 100' do
         scores = {total_score: 110}
 
-        expect(participant.caculate_scores(scores)).to eq({total_score: 100})
+        expect(participant.caculate_scores(scores)).to eq(total_score: 100)
       end
     end
     context 'when the participant has the grade and the total score less than 100' do
       it 'return the score of a given participant with total score' do
         scores = {total_score: 90}
-        expect(participant.caculate_scores(scores)).to eq({total_score: 90})
+        expect(participant.caculate_scores(scores)).to eq(total_score: 90)
       end
     end
   end

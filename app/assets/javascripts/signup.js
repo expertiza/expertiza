@@ -178,6 +178,8 @@ jQuery("#jsGrid").jsGrid({
                             
                             //participants
                             var participants_temp = topic.partipants;
+                            if(participants_temp == null)
+                                participants_temp = []
 
                             var participants_div = $("<div>");
 

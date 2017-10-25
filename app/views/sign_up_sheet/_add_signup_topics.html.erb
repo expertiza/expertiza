@@ -8,6 +8,14 @@
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id)  %>
 
+<!-- 1781 -->
+<%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id }  do %>
+<% end %>
+
+<br><br>
+
+
+
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>
     <table class="general">

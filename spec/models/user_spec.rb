@@ -447,4 +447,37 @@ describe User do
       expect(user.is_teaching_assistant?).to be_falsey
     end
   end
+
+  descirbe '.search_users' do
+    before(:each) do
+        role = double
+        user_id = double
+        letter = 'search_filter'
+        allow(User).to receive_message_chain(:order,:where).and_return(user)
+    end
+
+    it 'when the search_by is 1' do
+      search_by = 1
+      expect(User).to receive_message_chain(:order,:where).with("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
+      expect(User.search_users(role,user_id,letter,search_by)).to eq user
+    end
+
+    it 'when the search_by is 2' do
+      search_by = 2
+      expect(User).to receive_message_chain(:order,:where).with("(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, user_id, search_filter)
+      expect(User.search_users(role,user_id,letter,search_by)).to eq user
+    end
+
+    it 'when the search_by is 3' do
+      search_by = 3
+      expect(User).to receive_message_chain(:order,:where).with("(role_id in (?) or id = ?) and email like ?", role.get_available_roles, user_id, search_filter)
+      expect(User.search_users(role,user_id,letter,search_by)).to eq user
+    end
+
+    it 'when the search_by is default value' do
+      search_by = nil
+      expect(User).to receive_message_chain(:order,:where).with("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
+      expect(User.search_users(role,user_id,letter,search_by)).to eq user
+    end
+  end
 end

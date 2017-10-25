@@ -1,4 +1,4 @@
-describe AssignmentParticipant do
+﻿﻿describe AssignmentParticipant do
   let(:response) { build(:response) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:team2) { build(:assignment_team, id: 2) }

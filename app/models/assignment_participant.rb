@@ -23,7 +23,6 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
-
   include Instance_method
   extend Class_method
 
@@ -32,7 +31,9 @@ class AssignmentParticipant < Participant
   end
 
   def assign_quiz(contributor, reviewer, _topic = nil)
-    quiz = QuizQuestionnaire.find_by(instructor_id:contributor.id)
+
+    quiz = QuizQuestionnaire.find_by(instructor_id: contributor.id)
+
     QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
   end
 
@@ -184,8 +185,6 @@ class AssignmentParticipant < Participant
     BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
-
-
   def team
     AssignmentTeam.team(self)
   end
@@ -193,15 +192,16 @@ class AssignmentParticipant < Participant
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)
+
     user = AssignmentParticipant.check_info_and_create(row, _row_header = nil, session)
 
-    #end
     raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?
     unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
       new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
       new_part.set_handle
     end
   end
+
 
   # provide export functionality for Assignment Participants
   def self.export(csv, parent_id, _options)

@@ -292,7 +292,11 @@ class ReviewMappingController < ApplicationController
       end
     end
     student_review_num = params[:num_reviews_per_student].to_i
-    submission_review_num = params[:num_reviews_per_submission].to_i
+
+    ############# number of reviews submitted should only be the number of reviews completed.
+    reviews_per_submission = StudentReviewController.get_num_reviews_complete
+    submission_review_num = params[reviews_per_submission].to_i
+    #submission_review_num = params[:num_reviews_per_submission].to
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
 
@@ -333,7 +337,9 @@ class ReviewMappingController < ApplicationController
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
       student_review_num = student_review_num
       exact_num_of_review_needed = participants.size * student_review_num
-    elsif student_review_num == 0 and submission_review_num != 0
+
+      #The number of submissions per document should be within
+    elsif student_review_num == 0 and submission_review_num != 0 and
       num_reviews_per_team = submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
       exact_num_of_review_needed = teams.size * submission_review_num

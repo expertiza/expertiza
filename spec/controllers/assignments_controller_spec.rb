@@ -203,7 +203,7 @@ You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
         it 'shoes an error flash message and redirects to assignments#edit page' do
           allow(Assignment).to receive(:find).with(id: '1').and_return(:assignment)
           allow(assignment).to receive(:save).and_return(false)
-          allow(assignment).to receive_message_chain(:errors, :full_messages){ ['Assignment not find.', 'Course not find.'] }
+          allow(assignment).to receive_message_chain(:errors, :full_messages) { ['Assignment not find.', 'Course not find.'] }
           params = {id: 1, course_id: 1}
           post :update, params
           expect(flash.now[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")

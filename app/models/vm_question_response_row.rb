@@ -43,12 +43,21 @@ class VmQuestionResponseRow
 
   def average_score_for_row
     row_average_score = 0.0
+    actual_average_score = 0.0 # added new variable to fix the bug
     @score_row.each do |score|
       if score.score_value.is_a? Numeric
         row_average_score += score.score_value.to_f
+        actual_average_score += 1   # counting the # of actual given reviews discarding null 
       end
     end
-    row_average_score /= @score_row.length.to_f
+    #############  addition of if logic #################
+    if actual_average_score==0
+      row_average_score
+    else
+      row_average_score/=actual_average_score
+    end
+    #############   end of aadded logic #################
+    #row_average_score /= @score_row.length.to_f      ##commented this as it considers unreviewed scores too.
     row_average_score.round(2)
   end
 end

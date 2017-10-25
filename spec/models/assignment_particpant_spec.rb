@@ -1,18 +1,18 @@
 ﻿describe AssignmentParticipant do
-  let(:response) {build(:response)}
-  let(:team) {build(:assignment_team, id: 1)}
-  let(:team2) {build(:assignment_team, id: 2)}
-  let(:response_map) {build(:review_response_map, reviewer_id: 2, response: [response])}
-  let(:participant) {build(:participant, id: 1, assignment: assignment)}
-  let(:participant2) {build(:participant, id: 2, grade: 100)}
-  let(:assignment) {build(:assignment, id: 1)}
-  let(:review_questionnaire) {build(:questionnaire, id: 1)}
-  let(:question) {double('Question')}
-  let(:quiz_questionaire) {build(:questionnaire, id: 2)}
-  let(:student) {build(:student, name: "student2064", fullname: "2064, student", handle: "handle")}
-  let(:assignment_questionnaire) {build(:assignment_questionnaire)}
-  let(:assignment_questionnaire2) {build(:assignment_questionnaire, used_in_round: 1)}
-  let(:topic) {build(:topic)}
+  let(:response) { build(:response) }
+  let(:team) { build(:assignment_team, id: 1) }
+  let(:team2) { build(:assignment_team, id: 2) }
+  let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response]) }
+  let(:participant) { build(:participant, id: 1, assignment: assignment) }
+  let(:participant2) { build(:participant, id: 2, grade: 100) }
+  let(:assignment) { build(:assignment, id: 1) }
+  let(:review_questionnaire) { build(:questionnaire, id: 1) }
+  let(:question) { double('Question') }
+  let(:quiz_questionaire) { build(:questionnaire, id: 2) }
+  let(:student) { build(:student, name: "student2064", fullname: "2064, student", handle: "handle") }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, used_in_round: 1) }
+  let(:topic) { build(:topic) }
   before(:each) do
     allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
     allow(participant).to receive(:team).and_return(team)
@@ -28,7 +28,7 @@
   describe '#assign_quiz' do
     it 'creates a new QuizResponseMap record' do
       allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(quiz_questionaire) # WHY CAN NOT DELETE THIS SENTENCE
-      expect {participant.assign_quiz(participant, participant2, nil)}.to change {QuizResponseMap.count}.from(0).to(1)
+      expect { participant.assign_quiz(participant, participant2, nil) }.to change { QuizResponseMap.count }.from(0).to(1)
       expect(participant.assign_quiz(participant, participant2, nil)).to be_an_instance_of(QuizResponseMap)
     end
   end
@@ -258,7 +258,7 @@
         row = []
         allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("No user id has been specified.")
         expect(AssignmentParticipant).to receive(:check_info_and_create)
-        expect {AssignmentParticipant.import(row, nil, nil, nil)}.to raise_error("No user id has been specified.")
+        expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error("No user id has been specified.")
       end
     end
 
@@ -268,7 +268,7 @@
           row = ["user_name", "user_fullname", "name@email.com"]
           allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("The record containing #{row[0]} does not have enough items.")
           expect(AssignmentParticipant).to receive(:check_info_and_create)
-          expect {AssignmentParticipant.import(row, nil, nil, nil)}.to raise_error("The record containing #{row[0]} does not have enough items.")
+          expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[0]} does not have enough items.")
         end
       end
 
@@ -279,7 +279,7 @@
             session = {user: participant}
             allow(User).to receive(:find_by).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(nil)
-            expect {AssignmentParticipant.import(row, nil, session, 2)}.to raise_error("The assignment with id \"2\" was not found.").and change {User.count}.by(1)
+            expect { AssignmentParticipant.import(row, nil, session, 2) }.to raise_error("The assignment with id \"2\" was not found.").and change { User.count }.by(1)
           end
         end
 
@@ -290,7 +290,7 @@
             allow(User).to receive(:find_by_name).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(assignment)
             allow(AssignmentParticipant).to receive(:exists?).and_return(false)
-            expect {AssignmentParticipant.import(row, nil, session, 2)}.to change {User.count}.by(1).and change {AssignmentParticipant.count}.by(1)
+            expect { AssignmentParticipant.import(row, nil, session, 2) }.to change { User.count }.by(1).and change { AssignmentParticipant.count }.by(1)
           end
         end
       end

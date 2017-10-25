@@ -62,7 +62,7 @@ class Response < ActiveRecord::Base
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score
-      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+      questions = questionnaire.questions.sort_by{|a| a.seq}
       code = add_table_rows questionnaire_max,questions,answers,code
     end
 

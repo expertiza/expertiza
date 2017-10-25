@@ -268,7 +268,7 @@ describe SignUpSheetController do
   end
 
   describe '#delete_signup_as_instructor' do
-    let(:params) {{id:1,topic_id:1}}
+    let(:params) { {id:1,topic_id:1} }
     context 'when either submitted files or hyperlinks of current team are not empty' do
       it 'shows a flash error message and redirects to assignment#edit page' do
         allow(participant.team).to receive(:submitted_files).and_return(['file'])

@@ -61,8 +61,8 @@ describe AssignmentForm do
 
   describe '#add_to_delayed_queue' do
     before(:each) do
-      tmp_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks:1))
-      allow(AssignmentDueDate).to receive_message_chain(:where).and_return([tmp_due])
+      future_due = build(:assignment_due_date, due_at:Time.now.utc.advance(weeks: 1))
+      allow(AssignmentDueDate).to receive_message_chain(:where).and_return([future_due])
       allow_any_instance_of(AssignmentDueDate).to receive(:update_attribute)
     end
     context 'when the deadline type is review' do

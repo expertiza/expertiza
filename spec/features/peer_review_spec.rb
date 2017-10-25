@@ -1,4 +1,4 @@
-describe "peer review testing", :js => true do
+describe "peer review testing" do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
     create_list(:participant, 3)
@@ -47,65 +47,66 @@ describe "peer review testing", :js => true do
     click_link "Begin"
   end
 
-  # it "fills in a single textbox and saves" do
-  #   # Load questionnaire with generic setup
-  #   load_questionnaire
-  #
-  #   # Fill in a textbox and a dropdown
-  #   fill_in "responses[0][comment]", with: "HelloWorld"
-  #   select 5, from: "responses[0][score]"
-  #   click_button "Submit Review"
-  #   expect(page).to have_content "Your response was successfully saved."
-  # end
-  #
-  # it "fills in a single comment with multi word text and saves" do
-  #   # Load questionnaire with generic setup
-  #   load_questionnaire
-  #   # Fill in a textbox with a multi word comment
-  #   fill_in "responses[0][comment]", with: "Excellent Work"
-  #   click_button "Submit Review"
-  #   expect(page).to have_content "Your response was successfully saved."
-  # end
-  #
-  # it "fills in a single comment with single word and saves" do
-  #   # Load questionnaire with generic setup
-  #   load_questionnaire
-  #   # Fill in a textbox with a single word comment
-  #   fill_in "responses[0][comment]", with: "Excellent"
-  #   click_button "Submit Review"
-  #   expect(page).to have_content "Your response was successfully saved."
-  # end
-  #
-  # it "fills in only points and saves" do
-  #   # Load questionnaire with generic setup
-  #   load_questionnaire
-  #   # Fill in a dropdown with some points
-  #   select 5, from: "responses[0][score]"
-  #   click_button "Submit Review"
-  #   expect(page).to have_content "Your response was successfully saved."
-  # end
-  #
-  # it "saves an empty review without any points and comments" do
-  #   # Load questionnaire with generic setup
-  #   load_questionnaire
-  #   click_button "Submit Review"
-  #   expect(page).to have_content "Your response was successfully saved."
-  # end
-  #
-  # it "saves a review with only additional comments" do
-  #   # Load questionnaire with generic setup
-  #   load_questionnaire
-  #
-  #   # Filling in Additional Comments only
-  #   fill_in "review[comments]", with: "Excellent work done!"
-  #   click_button "Submit Review"
-  #   expect(page).to have_content "Your response was successfully saved."
-  # end
+  it "fills in a single textbox and saves" do
+    # Load questionnaire with generic setup
+    load_questionnaire
+
+    # Fill in a textbox and a dropdown
+    fill_in "responses[0][comment]", with: "HelloWorld"
+    select 5, from: "responses[0][score]"
+    click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
+
+  it "fills in a single comment with multi word text and saves" do
+    # Load questionnaire with generic setup
+    load_questionnaire
+    # Fill in a textbox with a multi word comment
+    fill_in "responses[0][comment]", with: "Excellent Work"
+    click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
+
+  it "fills in a single comment with single word and saves" do
+    # Load questionnaire with generic setup
+    load_questionnaire
+    # Fill in a textbox with a single word comment
+    fill_in "responses[0][comment]", with: "Excellent"
+    click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
+
+  it "fills in only points and saves" do
+    # Load questionnaire with generic setup
+    load_questionnaire
+    # Fill in a dropdown with some points
+    select 5, from: "responses[0][score]"
+    click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
+
+  it "saves an empty review without any points and comments" do
+    # Load questionnaire with generic setup
+    load_questionnaire
+    click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
+
+  it "saves a review with only additional comments" do
+    # Load questionnaire with generic setup
+    load_questionnaire
+
+    # Filling in Additional Comments only
+    fill_in "review[comments]", with: "Excellent work done!"
+    click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
 
   it "able to view and use rubric advice" do
     load_questionnaire
     expect(page).to have_content "Show advice"
     page.find('#showAdivce_1').click
+    expect(page).to have_content "Hide advice"
     expect(page).to have_content "5 - Good"
     page.find("a", :text => "5 - Good").click
     click_button "Save Review"

@@ -266,11 +266,9 @@
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
           row = ["user_name", "user_fullname", "name@email.com"]
-          allow(AssignmentParticipant).
-              to receive(:check_info_and_create).with(any_args).and_raise("The record containing #{row[0]} does not have enough items.")
+          allow(AssignmentParticipant).to receive(:check_info_and_create).with(any_args).and_raise("The record containing #{row[0]} does not have enough items.")
           expect(AssignmentParticipant).to receive(:check_info_and_create)
-          expect { AssignmentParticipant.import(row, nil, nil, nil) }.
-              to raise_error("The record containing #{row[0]} does not have enough items.")
+          expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[0]} does not have enough items.")
         end
       end
 
@@ -281,8 +279,7 @@
             session = {user: participant}
             allow(User).to receive(:find_by).with(any_args).and_return(nil)
             allow(Assignment).to receive(:find).with(2).and_return(nil)
-            expect { AssignmentParticipant.import(row, nil, session, 2) }.
-                to raise_error("The assignment with id \"2\" was not found.").and change { User.count }.by(1)
+            expect { AssignmentParticipant.import(row, nil, session, 2) }.to raise_error("The assignment with id \"2\" was not found.").and change { User.count }.by(1)
           end
         end
 

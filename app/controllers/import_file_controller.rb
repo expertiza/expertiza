@@ -184,7 +184,7 @@ class ImportFileController < ApplicationController
       begin
 
         @header_integrated_body.each do |row_hash|
-          User.import(row_hash, session)
+          User.import(row_hash, nil,session)
         end
 
       rescue

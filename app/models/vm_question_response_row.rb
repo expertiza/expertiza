@@ -61,4 +61,3 @@ class VmQuestionResponseRow
     # row_average_score /= @score_row.length.to_f # This was the previous code for calculating the review average
     row_average_score.round(2)
   end
-end

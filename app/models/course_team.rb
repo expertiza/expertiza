@@ -39,7 +39,7 @@ class CourseTeam < Team
 
   # deprecated: the functionality belongs to course
   def add_participant(course_id, user)
-    if CourseParticipant.where(parent_id: course_id, user_id: user.id).first.nil?
+    if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
       CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
     end
   end
@@ -76,7 +76,7 @@ class CourseTeam < Team
     end
 
     t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
-    parent = TeamNode.find_by_node_object_id(self.id)
+    parent = TeamNode.find_by(node_object_id: self.id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
     add_participant(self.parent_id, user)
   end

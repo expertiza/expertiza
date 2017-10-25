@@ -61,7 +61,7 @@ class Team < ActiveRecord::Base
     unless full?
       can_add_member = true
       t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
-      parent = TeamNode.find_by_node_object_id(self.id)
+      parent = TeamNode.find_by(node_object_id: self.id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(self.parent_id, user)
     end
@@ -162,7 +162,7 @@ class Team < ActiveRecord::Base
     counter = 1
     loop do
       team_name = team_name_prefix + "_Team#{counter}"
-      return team_name unless Team.find_by_name(team_name)
+      return team_name unless Team.find_by(name: team_name)
       counter += 1
     end
   end
@@ -171,11 +171,11 @@ class Team < ActiveRecord::Base
   def import_team_members(starting_index, row)
     index = starting_index
     while index < row.length
-      user = User.find_by_name(row[index].to_s.strip)
+      user = User.find_by(name: row[index].to_s.strip)
       if user.nil?
         raise ImportError, "The user #{row[index].to_s.strip} was not found. <a href='/users/new'>Create</a> this user?"
       else
-        if TeamsUser.where(team_id: id, user_id: user.id).first.nil?
+        if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
           add_member(user)
         end
       end
@@ -190,7 +190,7 @@ class Team < ActiveRecord::Base
 
     if options[:has_column_names] == "true"
       name = row[0].to_s.strip
-      team = where(name: name, parent_id: id).first
+      team = find_by(name: name, parent_id: id)
       team_exists = !team.nil?
       name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
       index = 1

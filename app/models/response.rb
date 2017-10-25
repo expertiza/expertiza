@@ -209,15 +209,21 @@ class Response < ActiveRecord::Base
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
-        comments_in_round_1, counter_in_round_1,
-        comments_in_round_2, counter_in_round_2,
-        comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+        @comments_in_round_1, @counter_in_round_1,
+        @comments_in_round_2, @counter_in_round_2,
+        @comments_in_round_3, @counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
 
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
-    avg_vol_in_round_1 = (Lingua::EN::Readability.new(comments_in_round_1).num_words / (counter_in_round_1.zero? ? 1 : counter_in_round_1)).round(0)
-    avg_vol_in_round_2 = (Lingua::EN::Readability.new(comments_in_round_2).num_words / (counter_in_round_2.zero? ? 1 : counter_in_round_2)).round(0)
-    avg_vol_in_round_3 = (Lingua::EN::Readability.new(comments_in_round_3).num_words / (counter_in_round_3.zero? ? 1 : counter_in_round_3)).round(0)
-    [overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3]
+
+    review_comments_volume = Array.new
+    review_comments_volume.push(overall_avg_vol)
+
+    (1..3).each do |i|
+      avg_vol_in_round = (Lingua::EN::Readability.new(instance_variable_get('@comments_in_round_'+i.to_s)).num_words / (instance_variable_get('@counter_in_round_'+i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round_'+i.to_s))).round(0)
+      review_comments_volume.push(avg_vol_in_round)
+    end
+
+    return review_comments_volume
   end
 
   # compare the current response score with other scores on the same artifact, and test if the difference

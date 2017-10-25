@@ -26,21 +26,21 @@ describe Response do
     end
   end
 
-  describe '#get_total_score' do
+  describe '#total_score' do
     it 'computes the total score of a review'
   end
 
-  describe '#get_average_score' do
-    context 'when get_maximum_score returns 0' do
+  describe '#average_score' do
+    context 'when maximum_score returns 0' do
       it 'returns N/A'
     end
 
-    context 'when get_maximum_score does not return 0' do
+    context 'when maximum_score does not return 0' do
       it 'calculates the maximum score'
     end
   end
 
-  describe '#get_maximum_score' do
+  describe '#maximum_score' do
     it 'returns the maximum possible score for current response'
   end
 

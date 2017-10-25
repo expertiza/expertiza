@@ -13,13 +13,13 @@ class CollusionCycle
       if assignment_participant.reviews_by_reviewer(ap).nil?
         next
       else
-        s01 = assignment_participant.reviews_by_reviewer(ap).get_total_score
+        s01 = assignment_participant.reviews_by_reviewer(ap).total_score
       end
 
       if ap.reviews_by_reviewer(assignment_participant).nil?
         next
       else
-        s10 = ap.reviews_by_reviewer(assignment_participant).get_total_score
+        s10 = ap.reviews_by_reviewer(assignment_participant).total_score
       end
 
       collusion_cycles.push([[assignment_participant, s01], [ap, s10]])
@@ -35,19 +35,19 @@ class CollusionCycle
         if assignment_participant.reviews_by_reviewer(ap1).nil?
           next
         else
-          s01 = assignment_participant.reviews_by_reviewer(ap1).get_total_score
+          s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
         end
 
         if ap1.reviews_by_reviewer(ap2).nil?
           next
         else
-          s12 = ap1.reviews_by_reviewer(ap2).get_total_score
+          s12 = ap1.reviews_by_reviewer(ap2).total_score
         end
 
         if ap2.reviews_by_reviewer(assignment_participant).nil?
           next
         else
-          s20 = ap2.reviews_by_reviewer(assignment_participant).get_total_score
+          s20 = ap2.reviews_by_reviewer(assignment_participant).total_score
         end
         collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s20]])
       end
@@ -66,25 +66,25 @@ class CollusionCycle
           if assignment_participant.reviews_by_reviewer(ap1).nil?
             next
           else
-            s01 = assignment_participant.reviews_by_reviewer(ap1).get_total_score
+            s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
           end
 
           if ap1.reviews_by_reviewer(ap2).nil?
             next
           else
-            s12 = ap1.reviews_by_reviewer(ap2).get_total_score
+            s12 = ap1.reviews_by_reviewer(ap2).total_score
           end
 
           if ap2.reviews_by_reviewer(ap3).nil?
             next
           else
-            s23 = ap2.reviews_by_reviewer(ap3).get_total_score
+            s23 = ap2.reviews_by_reviewer(ap3).total_score
           end
 
           if ap3.reviews_by_reviewer(assignment_participant).nil?
             next
           else
-            s30 = ap3.reviews_by_reviewer(assignment_participant).get_total_score
+            s30 = ap3.reviews_by_reviewer(assignment_participant).total_score
           end
 
           collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s23], [ap3, s30]])

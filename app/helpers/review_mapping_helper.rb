@@ -97,6 +97,7 @@ module ReviewMappingHelper
       r.avg_vol_in_round_2,
       r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
+    puts "In Helper method."
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
@@ -132,7 +133,7 @@ module ReviewMappingHelper
       user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
       author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
       feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.get_total_score} / #{feedback_response.get_maximum_score}"
+      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
     end
     author_feedback_avg_score
   end

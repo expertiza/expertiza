@@ -2,7 +2,7 @@
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash_message :notice %></div>
 <% end %>
-
+<!--Project E1763. Sorting the topics on basis of :topic_identifier for assignments with no staggered deadlines.-->
 <% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]).order(:topic_identifier) %>
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>

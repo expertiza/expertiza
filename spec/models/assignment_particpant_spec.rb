@@ -98,12 +98,13 @@
       it 'record the result as review scores' do
         scores = {}
         question_hash = {review: question}
+        score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(any_args).and_return(assignment_questionnaire)
         allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max: 100, min: 100, avg: 100})
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.assignment_questionnaires(question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response])
-        expect(scores[:review][:scores]).to eq({max: 100, min: 100, avg: 100})
+        expect(scores[:review][:scores]).to eq(score_map)
       end
     end
 
@@ -111,12 +112,13 @@
       it 'record the result as review#{n} scores' do
         scores = {}
         question_hash = {review1: question}
+        score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).and_return(assignment_questionnaire2)
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(any_args).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return({max: 100, min: 100, avg: 100})
+        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.assignment_questionnaires(question_hash, scores)
         expect(scores[:review1][:assessments]).to eq([response])
-        expect(scores[:review1][:scores]).to eq({max: 100, min: 100, avg: 100})
+        expect(scores[:review1][:scores]).to eq(score_map)
       end
     end
   end
@@ -135,7 +137,8 @@
 
     context 'when the review_n is not nil' do
       it 'merge the score of review_n to the score of review' do
-        scores = {review1: {scores: {max: 100, min: 100, avg: 100}, assessments: [response]}}
+        score_map = {max: 100, min: 100, avg: 100}
+        scores = {review1: {scores: score_map}, assessments: [response]}}
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         participant.merge_scores(scores)
         expect(scores[:review][:scores][:max]).to eq(100)

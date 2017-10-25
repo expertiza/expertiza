@@ -1,36 +1,35 @@
 class GitDatum < ActiveRecord::Base
   include GitDataHelper
-
+  attr_accessible :pull_request, :submission_record_id, :author, :commits, :files, :additions, :deletions, :lines_modified, :date
   belongs_to :SubmissionRecord
-  validates :pull_request, :presence => true
-  validates :submission_record_id, :presence => true
-  validates :author, :presence => true
-  validates :commits, :presence => true
-  validates :files, :presence => true
-  validates :additions, :presence => true
-  validates :deletions, :presence => true
-  validates :lines_modified, :presence => true
-  validates :date, :presence => true
+  validates :pull_request, presence: true
+  validates :submission_record_id, presence: true
+  validates :author, presence: true
+  validates :commits, presence: true
+  validates :files, presence: true
+  validates :additions, presence: true
+  validates :deletions, presence: true
+  validates :lines_modified, presence: true
+  validates :date, presence: true
 
   def self.update_git_data(id)
     submission_record = id
-    record = SubmissionRecord.where("id = ?", submission_record).first
+    record = SubmissionRecord.find_by(id: submission_record)
     git_url = record.content
     url_parts = git_url.split('/')
 
-    pulls = GitDataHelper.fetchPulls(url_parts[3],url_parts[4])
-    gitData = GitDatum.where("submission_record_id = ?", submission_record).map(&:pull_request)
+    pulls = GitDataHelper.fetch_Pulls(url_parts[3], url_parts[4])
+    git_Data = GitDatum.where("submission_record_id = ?", submission_record).map(&:pull_request)
 
     pulls.each do |res|
-      if gitData.include?(res.number)
-
+      if git_Data.include?(res.number)
       else
-        commits = GitDataHelper.fetchCommits(url_parts[3],url_parts[4], res.number)
-        total_commits = Array.new
+        commits = GitDataHelper.fetch_Commits(url_parts[3], url_parts[4], res.number)
+        total_commits = []
         commits.each do |commit|
-          single_commit = GitDataHelper.fetchCommit(url_parts[3],url_parts[4], commit.sha)
-          author_commit = total_commits.select{|row| row.author == single_commit.commit.author.email}.first
-          if(author_commit.nil?)
+          single_commit = GitDataHelper.fetch_Commit(url_parts[3], url_parts[4], commit.sha)
+          author_commit = total_commits.select {|row| row.author == single_commit.commit.author.email }.first
+          if author_commit.nil?
             author_commit = GitDatum.new
             author_commit.pull_request = res.number
             author_commit.author = single_commit.commit.author.email
@@ -50,9 +49,7 @@ class GitDatum < ActiveRecord::Base
             author_commit.lines_modified = author_commit.additions + author_commit.deletions
           end
         end
-        total_commits.each do |row|
-           row.save
-        end
+        total_commits.each(&:save)
       end
     end
   end

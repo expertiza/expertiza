@@ -25,65 +25,85 @@ class Response < ActiveRecord::Base
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
-    if prefix # has prefix means view_score page in instructor end
-      identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
-      identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
-      str = prefix + '_' + self.id.to_s
-      code = identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' \
-          "'review_" + str + "','review'" + ');return false;">show review</a><BR/>'
-    else # in student end
-      # identifier += '<B>Review ' + count.to_s + ' Round ' + self.round.to_s + '</B>'
-      str = self.id.to_s
-      identifier += '<table width="100%">'\
-                    '<tr>'\
-                    '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
-                    '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'\
-                    '</td>'\
-                    '<td align="left"><b>Last Reviewed:</b>'\
-                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
-                    '</tr></table>'
-      code = identifier
+
+    if prefix
+      self_id = prefix + '_' + self.id.to_s
+      code = construct_instructor_html identifier,self_id,count
+    else
+      self_id = self.id.to_s
+      code = construct_student_html identifier,self_id,count
     end
 
-    code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
-    count = 0
-    answers = Answer.where(response_id: self.response_id)
-
-    unless answers.empty?
-      questionnaire = self.questionnaire_by_answer(answers.first)
-
-      questionnaire_max = questionnaire.max_question_score
-      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
-      # loop through questions so the the questions are displayed in order based on seq (sequence number)
-      questions.each do |question|
-        count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-        answer = answers.find {|a| a.question_id == question.id }
-        row_class = count.even? ? "info" : "warning"
-        row_class = "" if question.is_a? QuestionnaireHeader
-        code += '<tr class="' + row_class + '"><td>'
-        if !answer.nil? or question.is_a? QuestionnaireHeader
-          code += if question.instance_of? Criterion or question.instance_of? Scale
-                    question.view_completed_question(count, answer, questionnaire_max)
-                  else
-                    question.view_completed_question(count, answer)
-                  end
-        end
-        code += '</td></tr>'
-      end
-
-      comment = if !self.additional_comment.nil?
-                  self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
-                else
-                  ''
-                end
-      code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
-    end
-    code += '</table>'
+    code = construct_review_response code,self_id
     code.html_safe
   end
 
+  def construct_instructor_html identifier, self_id,count
+    identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
+    identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
+    return identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
+           "'review_" + self_id + "','review'" + ');return false;">show review</a><BR/>'
+  end
+
+  def construct_student_html identifier, self_id,count
+    return identifier += '<table width="100%">'\
+						 '<tr>'\
+						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
+						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">show review</a>'\
+						 '</td>'\
+						 '<td align="left"><b>Last Reviewed:</b>'\
+						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+						 '</tr></table>'
+  end
+
+  def construct_review_response code,self_id
+    code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
+    answers = Answer.where(response_id: self.response_id)
+    unless answers.empty?
+      questionnaire = self.questionnaire_by_answer(answers.first)
+      questionnaire_max = questionnaire.max_question_score
+      questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
+      code = add_table_rows questionnaire_max,questions,answers,code
+    end
+
+    code += '<tr><td><b>Additional Comment: </b>' + get_additional_comment + '</td></tr>'
+
+    return code += '</table>'
+  end
+
+  def add_table_rows questionnaire_max,questions,answers,code
+    count = 0
+
+    # loop through questions so the the questions are displayed in order based on seq (sequence number)
+    questions.each do |question|
+      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
+      answer = answers.find {|a| a.question_id == question.id }
+      row_class = count.even? ? "info" : "warning"
+      row_class = "" if question.is_a? QuestionnaireHeader
+      code += '<tr class="' + row_class + '"><td>'
+      if !answer.nil? or question.is_a? QuestionnaireHeader
+        code += if question.instance_of? Criterion or question.instance_of? Scale
+                  question.view_completed_question(count, answer, questionnaire_max)
+                else
+                  question.view_completed_question(count, answer)
+                end
+      end
+      code += '</td></tr>'
+    end
+    return code
+  end
+
+  def get_additional_comment
+    comment = if !self.additional_comment.nil?
+                self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+              else
+                ''
+              end
+    return comment
+  end
+
   # Computes the total score awarded for a review
-  def get_total_score
+  def total_score
     # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
     sum = 0
     scores.each do |s|
@@ -102,16 +122,16 @@ class Response < ActiveRecord::Base
 
   # bug fixed
   # Returns the average score for this response as an integer (0-100)
-  def get_average_score
-    if get_maximum_score != 0
-      ((get_total_score.to_f / get_maximum_score.to_f) * 100).round
+  def average_score
+    if maximum_score != 0
+      ((total_score.to_f / maximum_score.to_f) * 100).round
     else
       "N/A"
     end
   end
 
   # Returns the maximum possible score for this response
-  def get_maximum_score
+  def maximum_score
     # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
     total_weight = 0
     scores.each do |s|
@@ -189,9 +209,9 @@ class Response < ActiveRecord::Base
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
-    comments_in_round_1, counter_in_round_1,
-    comments_in_round_2, counter_in_round_2,
-    comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+        comments_in_round_1, counter_in_round_1,
+        comments_in_round_2, counter_in_round_2,
+        comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
 
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     avg_vol_in_round_1 = (Lingua::EN::Readability.new(comments_in_round_1).num_words / (counter_in_round_1.zero? ? 1 : counter_in_round_1)).round(0)
@@ -211,7 +231,7 @@ class Response < ActiveRecord::Base
     # if this response is the first on this artifact, there's no grade conflict
     return false if count == 0
     # This score has already skipped the unfilled scorable question(s)
-    score = get_total_score.to_f / get_maximum_score
+    score = total_score.to_f / maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
     assignment = self.map.assignment
     assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id).first
@@ -228,7 +248,7 @@ class Response < ActiveRecord::Base
     existing_responses.each do |existing_response|
       if existing_response.id != current_response.id # the current_response is also in existing_responses array
         count += 1
-        scores_assigned << existing_response.get_total_score.to_f / existing_response.get_maximum_score
+        scores_assigned << existing_response.total_score.to_f / existing_response.maximum_score
       end
     end
     [scores_assigned.sum / scores_assigned.size.to_f, count]
@@ -250,7 +270,7 @@ class Response < ActiveRecord::Base
          reviewer_name: reviewer_name,
            type: "review",
            reviewee_name: reviewee_name,
-           new_score: get_total_score.to_f / get_maximum_score,
+           new_score: total_score.to_f / maximum_score,
            assignment: assignment,
            conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
            summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,

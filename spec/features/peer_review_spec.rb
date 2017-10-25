@@ -106,7 +106,6 @@ describe "peer review testing" do
     load_questionnaire
     expect(page).to have_content "Show advice"
     page.find('#showAdivce_1').click
-    expect(page).to have_content "Hide advice"
     expect(page).to have_content "5 - Good"
     page.find("a", :text => "5 - Good").click
     click_button "Save Review"

@@ -40,25 +40,26 @@ describe "Edit rubric advice" do
     click_button "Add"
   end
 
-  describe "Edit a review advice" do
+  describe "Edit a rubric advice" do
     it "is able to edit a public review advice" do
-      # creating a new rubric adive
+      # creating a new rubric advice
       load_question 'Criterion'
       click_button "Edit/View advice"
       expect(page).to have_content('Edit an existing questionnaire')
-      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Initial advice") #setting intital advice in the field
+      # setting intital advice in the field
+      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Initial advice")
       click_button "Save and redisplay advice"
       expect(page).to have_content('advice was successfully saved')
       expect(page).to have_content('Initial advice')
-      # editing a review rubric
-      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Edited the advice") #Setting any element with new data
+      # editing a review rubric - Setting any element with new data
+      first(:css, "textarea[id^='horizontal_'][id$='advice']").set("Edited the advice")
       click_button "Save and redisplay advice"
       expect(page).to have_content('advice was successfully saved')
       expect(page).to have_content('Edited the advice')
     end
   end
 
-  describe "Remove a rubric advice", :js => true do
+  describe "Remove a rubric advice" do
     it "should be able to delete a rubric advice" do
       load_question 'Criterion'
       click_button "Edit/View advice"
@@ -71,14 +72,6 @@ describe "Edit rubric advice" do
       first(:css, "textarea[id^='horizontal_'][id$='advice']").set("")
       click_button "Save and redisplay advice"
       expect(page).to have_content('advice was successfully saved')
-
     end
   end
-
-
-
-
-
-
-
 end

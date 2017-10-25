@@ -384,6 +384,4 @@ FactoryGirl.define do
     score 5
     advice "Good work"
   end
-
-
 end

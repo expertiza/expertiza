@@ -81,22 +81,22 @@ class Participant < ActiveRecord::Base
   end
 
   # email does not work. It should be made to work in the future
-  def email(pw, home_page)
-    user = User.find(self.user_id)
-    assignment = Assignment.find(self.assignment_id)
+  #def email(pw, home_page)
+  #  user = User.find(self.user_id)
+  #  assignment = Assignment.find(self.assignment_id)
 
-    Mailer.sync_message(
-      recipients: user.email,
-      subject: "You have been registered as a participant in the Assignment #{assignment.name}",
-      body: {
-        home_page: home_page,
-        first_name: ApplicationHelper.get_user_first_name(user),
-        name: user.name,
-        password: pw,
-        partial_name: "register"
-      }
-    ).deliver
-  end
+  #  Mailer.sync_message(
+  #    recipients: user.email,
+  #    subject: "You have been registered as a participant in the Assignment #{assignment.name}",
+  #    body: {
+  #      home_page: home_page,
+  #      first_name: ApplicationHelper.get_user_first_name(user),
+  #      name: user.name,
+  #      password: pw,
+  #      partial_name: "register"
+  #    }
+  #  ).deliver
+  #end
 
   # Return scores that this participant for the given questions
   def scores(questions)

@@ -203,6 +203,10 @@ class AssignmentParticipant < Participant
     unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
       new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
       new_part.set_handle
+#change fall17
+      password = "password"#user.password
+      prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", password)
+      prepared_mail.deliver
     end
   end
 

@@ -1,10 +1,10 @@
 class Mailer < ActionMailer::Base
-  if Rails.env.development? || Rails.env.test?
-    default from: 'expertiza.development@gmail.com'
-  else
-    default from: 'expertiza-support@lists.ncsu.edu'
-  end
-
+  #if Rails.env.development? || Rails.env.test?
+  #  default from: 'expertiza.development@gmail.com'
+  #else
+  #  default from: 'expertiza-support@lists.ncsu.edu'
+  #end
+  default from: 'expertiza.development@gmail.com'
   def generic_message(defn)
     @partial_name = defn[:body][:partial_name]
     @user = defn[:body][:user]

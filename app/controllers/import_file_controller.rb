@@ -60,6 +60,7 @@ class ImportFileController < ApplicationController
           else
             Object.const_get(params[:model]).import(row, nil, session, params[:id])
           end
+          
         end
       end
     rescue

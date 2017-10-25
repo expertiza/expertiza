@@ -13,6 +13,10 @@ class InvitationsController < ApplicationController
     # check if the invited user is already invited (i.e. awaiting reply)
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       create_utility
+      MailerHelper.send_mail_to_invitee(@user, "You have been invited to join a team", "user_invite").deliver
+      #password = "password"
+      #prepared_mail = MailerHelper.send_mail_to_user(@user, "You have been invited to join a team", "user_welcome", password)
+      #prepared_mail.deliver
     else
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end
@@ -40,6 +44,7 @@ class InvitationsController < ApplicationController
 
   def accept
     # Accept the invite and check whether the add was successful
+    MailerHelper.send_mail_to_invitee(@user, "Invitation accepted. #{@student.parent_id} #{@inv.from_id} #{@inv.to_id}", "user_invite").deliver
     unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
       flash[:error] = 'The system failed to add you to the team that invited you.'
     end

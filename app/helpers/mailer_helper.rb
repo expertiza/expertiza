@@ -24,6 +24,15 @@ module MailerHelper
     })
   end
 
+  # def self.send_mail_to_instructor()
+  #   mail(to:'expertiza.development@gmail.com',subject: "A new topic suggestion by student")
+    
+
+  # end
+
+
+
+
   def self.send_mail_to_all_super_users(super_user, user, subject)
     Mailer.request_user_message ({
       to: super_user.email,

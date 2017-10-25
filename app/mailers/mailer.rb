@@ -22,6 +22,10 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
+  def send_mail_to_instructor()
+    mail(to:'expertiza.development@gmail.com',subject: "A new topic suggestion by student")
+  end
+
   def request_user_message(defn)
     @user = defn[:body][:user]
     @super_user = defn[:body][:super_user]

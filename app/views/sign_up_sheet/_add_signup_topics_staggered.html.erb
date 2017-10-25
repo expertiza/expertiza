@@ -1,5 +1,5 @@
 <% @assignment = Assignment.find(params[:id]) %>
-<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
+<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]).order(:topic_identifier) %>
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id)  %>
@@ -12,17 +12,6 @@
 <% end %>
 
   <% if @sign_up_topics.size != 0 %>
-    <% n=@sign_up_topics.size %>
-    <% loop do%>
-        <% swapped = false %>
-        <% (n-1).times do |i|%>
-            <% if @sign_up_topics[i].topic_identifier>@sign_up_topics[i+1].topic_identifier %>
-                <% @sign_up_topics[i], @sign_up_topics[i+1] = @sign_up_topics[i+1], @sign_up_topics[i] %>
-                <% swapped = true %>
-                <% end %>
-            <% end %>
-        <% break if not swapped %>
-        <% end %>
     <table class="general" id="topics">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
       <% i=1 %>

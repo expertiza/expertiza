@@ -6,7 +6,7 @@ module SignUpSheetHelper
     DateTime.parse(due_date.to_s).strftime("%Y-%m-%d %H:%M").in_time_zone
   end
 
-
+#Project E1763. It gets the id of the topic with the latest deadline.
   def get_latester_topic_deadline(assignment_due_dates, sign_up_topics)
     lastest_deadline_id = 0
     latest_due_date = get_topic_deadline(assignment_due_dates, sign_up_topics[0].id).to_datetime

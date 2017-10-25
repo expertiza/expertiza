@@ -138,7 +138,7 @@
     context 'when the review_n is not nil' do
       it 'merge the score of review_n to the score of review' do
         score_map = {max: 100, min: 100, avg: 100}
-        scores = {review1: {scores: score_map}, assessments: [response]}}
+        scores = {review1: {scores: score_map, assessments: [response]}}
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         participant.merge_scores(scores)
         expect(scores[:review][:scores][:max]).to eq(100)

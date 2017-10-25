@@ -169,8 +169,8 @@ describe AssignmentsController do
                                                                                   ])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([
                                                                                                 double('AssignmentQuestionnaire',
-                                                                                                        questionnaire_id: 666,
-                                                                                                        used_in_round: 1)
+                                                                                                  questionnaire_id: 666,
+                                                                                                  used_in_round: 1)
                                                                                               ])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])

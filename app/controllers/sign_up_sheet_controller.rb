@@ -81,7 +81,7 @@ class SignUpSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
   end
   
-  
+  #Project E1763. Duplicates topics controller method. Called from sign_up_sheet_all_actions.html.erb. It creates a copy of the topic selected. 
     def duplicate
     @user = current_user
     session[:copy_flag] = true

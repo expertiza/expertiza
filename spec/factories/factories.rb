@@ -347,6 +347,14 @@ FactoryGirl.define do
     dropdown 1
   end
 
+  factory :response_map, class: ResponseMap do
+    reviewed_object_id 1
+    reviewer_id 1
+    reviewee_id 1
+    type 'ResponseMap'
+    calibrate_to 0
+  end
+
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
@@ -365,8 +373,9 @@ FactoryGirl.define do
 
   factory :response, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
-    additional_comment nil
-    version_num nil
+    additional_comment "abc"
+    version_num 1
+    created
     round 1
     is_submitted false
   end

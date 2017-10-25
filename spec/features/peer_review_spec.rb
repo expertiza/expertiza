@@ -23,6 +23,7 @@ describe "peer review testing" do
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
     create(:assignment_questionnaire)
     create(:question)
+    create(:question_advices)
     # create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
     # create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
     # sleep(10000)
@@ -98,6 +99,17 @@ describe "peer review testing" do
     # Filling in Additional Comments only
     fill_in "review[comments]", with: "Excellent work done!"
     click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
+
+  it "able to view and use rubric advice" do
+    load_questionnaire
+    expect(page).to have_content "Show advice"
+    page.find('#showAdivce_1').click
+    expect(page).to have_content "Hide advice"
+    expect(page).to have_content "5 - Good"
+    page.find("a", :text => "5 - Good").click
+    click_button "Save Review"
     expect(page).to have_content "Your response was successfully saved."
   end
 end

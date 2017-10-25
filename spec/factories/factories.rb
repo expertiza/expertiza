@@ -378,4 +378,12 @@ FactoryGirl.define do
     content 'www.wolfware.edu'
     created_at Time.now
   end
+
+  factory :question_advices, class: QuestionAdvice do
+    question_id 1
+    score 5
+    advice "Good work"
+  end
+
+
 end

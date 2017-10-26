@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  attr_accessor :anonymous_mode 
+  attr_accessor :anonymous_mode
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -325,15 +325,10 @@ class User < ActiveRecord::Base
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    if search_by == '1' # search by user name
+    key_word = {'1'=>'name','2'=>'fullname','3'=>'email'}
+    if key_word.include? search_by
       search_filter = '%' + letter + '%'
-      users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
-    elsif search_by == '2' # search by full name
-      search_filter = '%' + letter + '%'
-      users = User.order('name').where("(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, user_id, search_filter)
-    elsif search_by == '3' # search by email
-      search_filter = '%' + letter + '%'
-      users = User.order('name').where("(role_id in (?) or id = ?) and email like ?", role.get_available_roles, user_id, search_filter)
+      users = User.order('name').where("(role_id in (?) or id = ?) and #{key_word[search_by]} like ?", role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
       search_filter = letter + '%'
       users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)

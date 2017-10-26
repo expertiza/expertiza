@@ -18,7 +18,7 @@ class CourseParticipant < Participant
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)
-    CourseParticipant.check_info_and_create(row, _row_header = nil, session)
+    user = CourseParticipant.check_info_and_create(row, _row_header = nil, session)
     course = Course.find(id)
     if course.nil?
       raise ImportError, "The course with the id \"" + id.to_s + "\" was not found."

@@ -102,7 +102,7 @@ describe "peer review testing" do
     expect(page).to have_content "Your response was successfully saved."
   end
 
-  it "able to view and use rubric advice" do
+  it "able to view and use rubric advice", :js => true do
     load_questionnaire
     expect(page).to have_content "Show advice"
     page.find('#showAdivce_1').click

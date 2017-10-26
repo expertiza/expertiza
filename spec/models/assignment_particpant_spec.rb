@@ -342,7 +342,8 @@ describe AssignmentParticipant do
       allow(ResponseMap).to receive(:find).with(any_args).and_return(response_map)
       allow(TeamsUser).to receive_message_chain(:find_by, :user_id).with(any_args).and_return(1)
       allow(Participant).to receive(:find_by).with(any_args).and_return(participant)
-      expect(participant.review_file_path(1)).to eq("/home/expertiza_developer/expertiza/pg_data/instructor6/csc517/test/final_test/0_review/1")
+      file_path = Rails.root.to_s + "/pg_data/instructor6/csc517/test/final_test/0_review/1"
+      expect(participant.review_file_path(1)).to eq(file_path)
     end
   end
 

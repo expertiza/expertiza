@@ -7,7 +7,7 @@ describe "Edit rubric advice" do
   end
 
   # Login test
-  describe "Instructor login" do
+  describe "Login as instructor" do
     it "logs in with valid username and password" do
       login_as("instructor6")
       visit '/tree_display/list'

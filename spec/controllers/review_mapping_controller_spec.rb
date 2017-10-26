@@ -15,6 +15,7 @@ describe ReviewMappingController do
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
+  let(:response) { double('Response', is_submitted: false) }
 
 
 
@@ -133,25 +134,29 @@ describe ReviewMappingController do
   describe '#unsubmit_review' do
     context 'when attributes of response are updated successfully' do
       it 'shows a success flash.now message and renders a .js.erb file' do
-        response= build (:Response)
         allow(Response).to receive(:where).and_return([response])
         allow(ReviewResponseMap).to receive(:find_by).and_return(review_response_map)
         allow(response).to receive(:update_attribute).and_return(true)
-         get :unsubmit_review
-        # expect(flash[:success]).to eq("The review by \"" +
-        #                                   review_response_map.reviewer.name +
-        #                                   "\" for \"" + review_response_map.reviewee.name +
-        #                                   "\" has been unsubmitted.")
-        # expect(response).to render_template("unsubmit_review.js.erb")
+
+        xhr :get, :unsubmit_review, format: :js
+
+         expect(flash[:success]).to eq("The review by \"" +
+                                          review_response_map.reviewer.name +
+                                           "\" for \"" + review_response_map.reviewee.name +
+                                           "\" has been unsubmitted.")
+         #expect(response).to render_template()
       end
     end
 
     context 'when attributes of response are not updated successfully' do
       it 'shows an error flash.now message and renders a .js.erb file' do
-        response= build (:Response)
       allow(Response).to receive(:where).and_return([response])
       allow(ReviewResponseMap).to receive(:find_by).and_return(review_response_map)
       allow(response).to receive(:update_attribute).and_return(false)
+        xhr :get, :unsubmit_review, format: :js
+        expect(flash[:error]).to eq("The review by \"" + review_response_map.reviewer.name +
+                                        "\" for \"" + review_response_map.reviewee.name +
+                                        "\" could not be unsubmitted.")
     end
     end
   end
@@ -274,7 +279,8 @@ describe ReviewMappingController do
       it 'creates a new record and redirects to submitted_content#edit page' do
         allow(Assignment).to receive(:find).and_return(assignment)
         allow(TeamsUser).to receive(:find_by_sql).and_return([team])
-        allow(SelfReviewResponseMap).to receive(:where).and_return(true)
+        allow(SelfReviewResponseMap).to receive(:where).with(reviewee_id: team.id,
+                                                             reviewer_id: params[:reviewer_id]).and_return ([review_response_map])
         allow(SelfReviewResponseMap).to receive(:create)
         get :start_self_review
         #expect(response).to redirect_to ('/submitted_content/edit?id=' +team.id.to_s)

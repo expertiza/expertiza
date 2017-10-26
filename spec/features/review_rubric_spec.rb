@@ -8,13 +8,13 @@ describe "Edit rubric advice" do
 
   # Login test
   describe "Instructor login" do
-    it "with valid username and password" do
+    it "logs in with valid username and password" do
       login_as("instructor6")
       visit '/tree_display/list'
       expect(page).to have_content("Manage content")
     end
 
-    it "with invalid username and password" do
+    it "logs in with invalid username and password" do
       visit root_path
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'wrongpassword'
@@ -41,7 +41,7 @@ describe "Edit rubric advice" do
   end
 
   describe "Edit a rubric advice" do
-    it "is able to edit a public review advice" do
+    it "is able to edit a review rubric advice" do
       # creating a new rubric advice
       load_question 'Criterion'
       click_button "Edit/View advice"

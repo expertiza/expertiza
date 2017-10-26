@@ -87,4 +87,62 @@ class Question < ActiveRecord::Base
     end
     question_ids
   end
+
+  def self.import(row, _row_header, session, _id = nil)
+    if row.length != 5
+      raise ArgumentError, "Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email."
+    end
+    questionnaire = Questionnaire.find_by_id(_id)
+    questions = questionnaire.questions
+    qid = 0
+    for q in questions
+      if q.seq == row[2].strip.to_f
+        qid = q.id
+        break
+      end
+    end
+    if questionnaire.nil?
+      raise ArgumentError, "Questionnaire Not Found"
+    elsif qid > 0
+      question = Question.find_by_id(qid)
+      attributes = {}
+      attributes["txt"] = row[0].strip
+      attributes["type"] = row[1].strip
+      attributes["seq"] = row[2].strip.to_f
+      attributes["size"] = row[3].strip
+      attributes["break_before"] = row[4].strip
+      question.questionnaire_id=_id
+      question.update(attributes)
+    else
+      attributes = {}
+      attributes["txt"] = row[0].strip
+      attributes["type"] = row[1].strip
+      attributes["seq"] = row[2].strip.to_f
+      attributes["size"] = row[3].strip
+      #attributes["break_before"] = row[4].strip
+      question = Question.new(attributes)
+      question.questionnaire_id=_id
+      question.save
+    end
+  end
+
+  def self.export_fields(options)
+    fields = []
+    User.columns.each do |column|
+      fields.push(column.name)
+    end
+    fields
+  end
+
+  def self.export(csv, _parent_id, options)
+    questionnaire = Questionnaire.find_by_id(_parent_id)
+    questions = questionnaire.questions
+    for question in questions
+      tcsv = []
+      question.attributes.each_pair do |name,value|
+        tcsv.push(value)
+      end
+      csv << tcsv
+    end
+  end
 end

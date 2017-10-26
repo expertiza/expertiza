@@ -69,6 +69,7 @@ class ExportFileController < ApplicationController
                         CourseParticipant
                         CourseTeam
                         MetareviewResponseMap
+                        Question
                         ReviewResponseMap
                         User
                         Team)

@@ -18,6 +18,7 @@ describe AssignmentParticipant do
     allow(participant).to receive(:team).and_return(team)
     allow(participant).to receive(:user).and_return(student)
     allow(ResponseMap).to receive(:get_assessments_for).with(any_args).and_return([response])
+    allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
   end
 
   describe '#dir_path' do
@@ -169,7 +170,6 @@ describe AssignmentParticipant do
     context 'when the participant has the grade and the total score more than 100' do
       it 'return the score of a given participant with total score 100' do
         scores = {total_score: 110}
-
         expect(participant.caculate_scores(scores)).to eq(total_score: 100)
       end
     end
@@ -344,7 +344,6 @@ describe AssignmentParticipant do
 
   describe '#current_stage' do
     it 'returns stage of current assignment' do
-      allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
       allow(assignment).to receive(:get_current_stage).with(1).and_return("Finished")
       expect(participant.current_stage).to eq("Finished")
     end
@@ -353,7 +352,6 @@ describe AssignmentParticipant do
   describe '#stage_deadline' do
     context 'when stage of current assignment is not Finished' do
       it 'returns current stage' do
-        allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
         allow(assignment).to receive(:stage_deadline).with(1).and_return("Unknow")
         expect(participant.stage_deadline).to eq("Unknow")
       end
@@ -362,7 +360,6 @@ describe AssignmentParticipant do
     context 'when stage of current assignment not Finished' do
       context 'current assignment is not a staggered deadline assignment' do
         it 'returns the due date of current assignment' do
-          allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
           allow(assignment).to receive(:stage_deadline).with(1).and_return("Finished")
           allow(assignment).to receive(:staggered_deadline?).and_return(false)
           allow(assignment).to receive_message_chain(:due_dates, :last, :due_at).and_return(1)
@@ -372,7 +369,6 @@ describe AssignmentParticipant do
 
       context 'current assignment is a staggered deadline assignment' do
         it 'returns the due date of current topic' do
-          allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
           allow(assignment).to receive(:stage_deadline).with(1).and_return("Finished")
           allow(assignment).to receive(:staggered_deadline?).and_return(true)
           allow(TopicDueDate).to receive_message_chain(:find_by, :last, :due_at).and_return(1)

@@ -40,7 +40,7 @@ class VmQuestionResponseRow
       "N/A"
     end
   end
-  
+
   def average_score_for_row
     row_average_score = 0.0
     # E1787 changes

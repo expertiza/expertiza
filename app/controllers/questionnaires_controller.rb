@@ -6,12 +6,18 @@ class QuestionnairesController < ApplicationController
 
   before_action :authorize
 
-  def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant', 'Student'].include? current_role_name
-  end
+  if action_name == "edit"
+    @questionnaire = Questionnaire.find(params[:id])
+    (['Super-Administrator',
+     'Administrator'
+     ].include? current_role_name)  ||
+        ((['Instructor'].include? current_role_name) && current_user_id?( @questionnaire.instructor_id))
+  else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant', 'Student'].include? current_role_name
+ end
 
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.

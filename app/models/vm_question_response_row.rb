@@ -51,10 +51,8 @@ class VmQuestionResponseRow
         not_null_reviews += 1 # Summing the number of non null reviews
       end
     end
-    unless not_null_reviews.zero? # checking if there are not_null_reviews
-      row_average_score /= not_null_reviews # updates row_average_scores iff and only if, few reviews are null
-      row_average_score.round(2)
-    end
+    row_average_score /= not_null_reviews unless not_null_reviews.zero? # updates row_average_scores iff and only if, few reviews are null
+    row_average_score.round(2) unless not_null_reviews.zero? # checking if there are not_null_reviews
     # returning null => displaying null, if all the reviews are null
   end
 end

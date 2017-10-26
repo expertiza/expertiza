@@ -42,9 +42,7 @@ class StudentReviewController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
   end
 
-  def show_authors_Feedback
-    @map = FeedbackResponseMap.find_by_reviewed_object_id(params[:id])
-
+  def show_authors_feedback
+    @map = FeedbackResponseMap.find_by(reviewed_object_id: params[:id])
   end
-
 end

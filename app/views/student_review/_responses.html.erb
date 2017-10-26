@@ -79,11 +79,8 @@
                 <% review_no += 1 %></td>
             <% end %>
             <% if map.type.to_s == "MetareviewResponseMap" %>
-
-                <td> <%= link_to "Author's Feedback", {controller: 'student_review', action: 'show_authors_Feedback',:id => map.reviewed_object_id} %></td>
-
-            <% end
-            %>
+                <td> <%= link_to "Author's Feedback", {controller: 'student_review', action: 'show_authors_feedback',:id => map.reviewed_object_id} %></td>
+            <% end %>
             <% review_no+=1 %>
 
             <!--[zhewei, 1/20/2016]: show calibration results-->

@@ -48,11 +48,15 @@ class VmQuestionResponseRow
     @score_row.each do |score|
       if score.score_value.is_a? Numeric
         row_average_score += score.score_value.to_f
-        not_null_reviews += 1 # Summing the number of reviews given
+        not_null_reviews += 1 # Summing the number of non null reviews
       end
     end
-    row_average_score /= not_null_reviews unless actual_average_count.zero? # updates row_average_scores iff and only if, few reviews are null
-    row_average_score.round(2)
+    unless not_null_reviews.zero? # checking if there are not_null_reviews
+      row_average_score /= not_null_reviews # updates row_average_scores iff and only if, few reviews are null
+      row_average_score.round(2)
+    else
+      row_average_score="-" # displaying '-' if all the reviews are null
+    end
     # E1787 changes end
   end
 end

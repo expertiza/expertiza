@@ -115,6 +115,7 @@ class QuestionnairesController < ApplicationController
   def edit
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
+    session[:return_to] = request.original_url
   end
 
   def update

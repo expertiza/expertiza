@@ -53,7 +53,7 @@ class Team < ActiveRecord::Base
   end
 
   # Add memeber to the team
-  def add_member(user, _assignment_id)
+  def add_member(user, _assignment_id = nil)
 
     if has_user(user)
          raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""

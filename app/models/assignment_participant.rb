@@ -104,10 +104,7 @@ class AssignmentParticipant < Participant
     review_sym = "review".to_sym
     scores[review_sym] = {}
     scores[review_sym][:assessments] = []
-    scores[review_sym][:scores] = {}
-    scores[review_sym][:scores][:max] = -999_999_999
-    scores[review_sym][:scores][:min] = 999_999_999
-    scores[review_sym][:scores][:avg] = 0
+    scores[review_sym][:scores] = {max: -999_999_999, min: 999_999_999, avg: 0}
     total_score = 0
     for i in 1..self.assignment.num_review_rounds
       round_sym = ("review" + i.to_s).to_sym

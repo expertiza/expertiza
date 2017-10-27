@@ -38,7 +38,7 @@ describe "CourseParticipant" do
       row = []
       allow(Course).to receive(:find).and_return(nil)
       allow(session[:user]).to receive(:id).and_return(1)
-      row = { :name => 'user_name', :fullname => 'user_fullname', :email => 'name@gmail.com' }
+      row = { :name => 'user_name', :fullname => 'user_fullname', :email => 'name@gmail.com', :password => 'user_password' }
       expect { CourseParticipant.import(row, nil, session, 2) }.to raise_error("The course with the id \"2\" was not found.")
     end
 

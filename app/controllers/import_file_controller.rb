@@ -45,20 +45,15 @@ class ImportFileController < ApplicationController
 
 
   def import
-
     errors = import_from_hash(session, params)
-
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
-
     errors.each do |error|
       err_msg = err_msg + "<li>" + error.to_s + "<br/>"
     end
-
     err_msg += "</ul>"
     flash[:error] = err_msg unless errors.empty?
     undo_link("The file has been successfully imported.")
     redirect_to session[:return_to]
-
   end
 
   # def import

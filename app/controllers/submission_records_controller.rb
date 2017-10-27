@@ -18,18 +18,18 @@ class SubmissionRecordsController < ApplicationController
     latest_record_counter = 0
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
     @submission_records.reverse.each do |record|
-    matches = GIT_HUB_REGEX.match(record.content)
-    if matches.nil?
-    else
-      if record.operation == "Submit Hyperlink"
-        if latest_record_counter.zero?
-          update_git_data(record.id)
-        else
-          git_data_cleanup(record.id)
+      matches = GIT_HUB_REGEX.match(record.content)
+      if matches.nil?
+      else
+        if record.operation == "Submit Hyperlink"
+          if latest_record_counter.zero?
+            update_git_data(record.id)
+          else
+            git_data_cleanup(record.id)
+          end
         end
+        latest_record_counter += 1
       end
-      latest_record_counter += 1
-    end
     end
   end
 

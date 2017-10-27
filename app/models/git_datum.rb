@@ -1,6 +1,6 @@
 class GitDatum < ActiveRecord::Base
   include GitDataHelper
-  attr_accessible :pull_request, :submission_record_id, :author, :commits, :files, :additions, :deletions, :lines_modified, :date
+  attr_accessible
   belongs_to :SubmissionRecord
   validates :pull_request, presence: true
   validates :submission_record_id, presence: true
@@ -40,8 +40,6 @@ class GitDatum < ActiveRecord::Base
     end
   end
 
-  private
-
   def self.create_git_data(res, single_commit, id)
     author_commit = GitDatum.new
     author_commit.pull_request = res.number
@@ -53,7 +51,7 @@ class GitDatum < ActiveRecord::Base
     author_commit.lines_modified = author_commit.additions + author_commit.deletions
     author_commit.submission_record_id = id
     author_commit.date = res.created_at
-    return author_commit
+    author_commit
   end
 
   def self.update_git_array(author_commit, single_commit)
@@ -62,6 +60,8 @@ class GitDatum < ActiveRecord::Base
     author_commit.additions = author_commit.additions + single_commit.stats.additions
     author_commit.deletions = author_commit.deletions + single_commit.stats.deletions
     author_commit.lines_modified = author_commit.additions + author_commit.deletions
-    return author_commit
+    author_commit
   end
+
+  private_class_method :create_git_data, :update_git_array
 end

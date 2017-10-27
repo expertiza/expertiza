@@ -10,6 +10,8 @@ class BookmarksController < ApplicationController
   end
 
   def list
+    puts params[:id]
+    puts params[:assignment_id]
     @bookmarks = Bookmark.where(topic_id: params[:id])
     @topic = SignUpTopic.find(params[:id])
   end
@@ -23,12 +25,15 @@ class BookmarksController < ApplicationController
     params[:url] = params[:url].gsub!(/http:\/\//, "") if params[:url].start_with?('http://')
     params[:url] = params[:url].gsub!(/https:\/\//, "") if params[:url].start_with?('https://')
     begin
-      Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
+      @bookmark = Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
+      if @bookmark.save
       flash[:success] = 'Your bookmark has been successfully created!'
-    rescue
-      flash[:error] = $ERROR_INFO
+      redirect_to action: 'list', id: params[:topic_id]
+      else
+      flash[:error] = 'Error while creating the bookmark. Please make sure you entered data in all Fields'
+      redirect_to action: 'new', id: params[:topic_id]
+      end
     end
-    redirect_to action: 'list', id: params[:topic_id]
   end
 
   def edit

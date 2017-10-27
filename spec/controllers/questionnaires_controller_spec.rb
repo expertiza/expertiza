@@ -51,11 +51,11 @@ describe QuestionnairesController, type: :controller do
       allow(tree_folder2).to receive(:id).and_return(1)
       allow(tree_folder2).to receive(:node_object_id).and_return(1)
       allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([tree_folder1, tree_folder2])
-      folderNode2 = double('FolderNode')
-      allow(folderNode2).to receive(:id).and_return(1)
-      allow(FolderNode).to receive(:find_by_node_object_id).and_return(folderNode2)
+      folder_node2 = double('FolderNode')
+      allow(folder_node2).to receive(:id).and_return(1)
+      allow(FolderNode).to receive(:find_by_node_object_id).and_return(folder_node2)
       user = double("User")
-      allow(user).to receive(:id).and_return(1)      
+      allow(user).to receive(:id).and_return(1)
       params = {
         questionnaire: {
           private: "true",
@@ -63,7 +63,7 @@ describe QuestionnairesController, type: :controller do
           name: "Random Name",
           min_question_score: "0",
           max_question_score: "5"
-          }
+        }
       }
       session = {user: user}
       get :create, params, session

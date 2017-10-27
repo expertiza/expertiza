@@ -26,4 +26,20 @@ describe 'Response Map' do
       expect(ResponseMap.get_assessments_for(team1)).to eql [@response1,@response2]
     end
   end
+
+  describe '#survey' do
+    it 'should return false survey' do
+      expect(@response_map.survey?).to eql (false)
+    end
+  end
+
+  #checks if delete mappings can take an empty array
+  describe '.delete_mappings' do
+    it 'should return failed count zero' do
+      mappings=Array.new
+      expect(ResponseMap.delete_mappings(mappings,nil)).to eql (0)
+    end
+  end
+
+
 end

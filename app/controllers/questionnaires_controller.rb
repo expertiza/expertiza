@@ -290,7 +290,7 @@ class QuestionnairesController < ApplicationController
 
   # save an updated quiz questionnaire to the database
   def update_quiz
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_by(id: params[:id])
     if @questionnaire.nil?
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid] 
       return

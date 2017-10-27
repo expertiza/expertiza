@@ -13,7 +13,7 @@ class StudentTaskController < ApplicationController
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
-    @pastdueassignments = @student_tasks.select(&:late_tasks?)
+    @pastdueassignments = @student_tasks.select(&:overdue_tasks?)
     @taskrevisions = @student_tasks.select(&:revision?)
 
     ######## Students Teamed With###################

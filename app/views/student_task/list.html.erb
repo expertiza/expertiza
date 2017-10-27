@@ -5,7 +5,9 @@
   <div class="taskbox">
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
     <% r=255 %>
-    <% step = (255/ @tasknotstarted.size).floor %>
+    <% if @tasknotstarted.size >0 %>
+    <% step = (255/@tasknotstarted.size).floor %>
+    <% end %>
     <% @tasknotstarted.each do |student_task|
       participant = student_task.participant
       stage = student_task.current_stage
@@ -42,9 +44,9 @@
 
           <%= link_to student_task.assignment.name + " " + student_task.current_stage, {:controller => controller, :action => action, :id => participant.id},
                       {:style=> "color: rgb(" + r.to_s + ",0,0);" } %>
-          (<%= student_task.relative_deadline %> left)
+          (<%= student_task.stage_deadline %> left)
 
-          <% r=r -step %>
+          <% r= r-step %>
 
     </span><br/>
     <%end%>

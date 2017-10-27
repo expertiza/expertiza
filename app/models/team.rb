@@ -54,6 +54,8 @@ class Team < ActiveRecord::Base
 
   # Add memeber to the team
   def add_member(user, _assignment_id = nil)
+    puts '*****'
+    puts _assignment_id
     if has_user(user)
       raise "The user #{user.name} is already a member of the team #{self.name}"
     end
@@ -103,9 +105,9 @@ class Team < ActiveRecord::Base
     teams_num = teams.size
     i = 0
     teams_num.times do
-      teams_users = TeamsUser.where(team_id: teams[i].id)
-      teams_users.each do |teams_user|
-        users.delete(User.find(teams_user.user_id))
+      team_users = TeamsUser.where(team_id: teams[i].id)
+      team_users.each do |team_user|
+        users.delete(User.find(team_user.user_id))
       end
       if Team.size(teams.first.id) >= min_team_size
         teams.delete(teams.first)
@@ -114,35 +116,47 @@ class Team < ActiveRecord::Base
       end
     end
     # sort teams by decreasing team size
-    teams.sort_by {|team| Team.size(team.id) }.reverse!
+    teams = sort_teams_by_members_reverse(teams)
     # insert users who are not in any team to teams still need team members
     if !users.empty? and !teams.empty?
-      teams.each do |team|
-        curr_team_size = Team.size(team.id)
-        member_num_difference = min_team_size - curr_team_size
-        for i in (1..member_num_difference).to_a
-          team.add_member(users.first, parent.id)
-          users.delete(users.first)
-          break if users.empty?
-        end
-        break if users.empty?
-      end
+      assign_single_users_to_teams(min_team_size, parent, teams, users)
     end
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
     unless users.empty?
-      num_of_teams = users.length.fdiv(min_team_size).ceil
-      nextTeamMemberIndex = 0
-      for i in (1..num_of_teams).to_a
-        team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
-        TeamNode.create(parent_id: parent.id, node_object_id: team.id)
-        min_team_size.times do
-          break if nextTeamMemberIndex >= users.length
-          user = users[nextTeamMemberIndex]
-          team.add_member(user, parent.id)
-          nextTeamMemberIndex += 1
-        end
+      create_team_from_single_users(min_team_size, parent, team_type, users)
+    end
+  end
+
+  def self.create_team_from_single_users(min_team_size, parent, team_type, users)
+    num_of_teams = users.length.fdiv(min_team_size).ceil
+    nextTeamMemberIndex = 0
+    for i in (1..num_of_teams).to_a
+      team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
+      TeamNode.create(parent_id: parent.id, node_object_id: team.id)
+      min_team_size.times do
+        break if nextTeamMemberIndex >= users.length
+        user = users[nextTeamMemberIndex]
+        team.add_member(user, parent.id)
+        nextTeamMemberIndex += 1
       end
     end
+  end
+
+  def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
+    teams.each do |team|
+      curr_team_size = Team.size(team.id)
+      member_num_difference = min_team_size - curr_team_size
+      for i in (1..member_num_difference).to_a
+        team.add_member(users.first, parent.id) #,parent.id
+        users.delete(users.first)
+        break if users.empty?
+      end
+      break if users.empty?
+    end
+  end
+
+  def self.sort_teams_by_members_reverse(teams)
+    teams.sort_by {|team| Team.size(team.id)}.reverse!
   end
 
   # Generate the team name

@@ -1,8 +1,9 @@
 # represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
   def initialize(questionText, question_id, weight, question_max_score, seq, default_score = []) 
-  # Added default_score variable as a parameter to constructor to enhance the code dymnamically. 
-  # The extra variable, default_score in the constructor 
+  # Added default_score variable as a parameter to constructor to enhance the code dymnamically.
+  # The extra variable, default_score in the constructor is an optional parameter
+  # and is defaulted to null if not provided
     @questionText = questionText
     @weight = weight
 
@@ -11,7 +12,7 @@ class VmQuestionResponseRow
 
     @question_max_score = question_max_score
 
-    @score_row = default_score
+    @score_row = default_score # default_value added to score_row
 
     @countofcomments = 0
   end

@@ -2,8 +2,7 @@
 class VmQuestionResponseRow
   def initialize(questionText, question_id, weight, question_max_score, seq, default_score = [])
   # Added default_score variable as a parameter to constructor to enhance the code dymnamically.
-  # The extra variable, default_score in the constructor is an optional parameter
-  # and is defaulted to null if not provided
+  # The extra variable, default_score in the constructor is an optional parameter and is defaulted to null if not provided
     @questionText = questionText
     @weight = weight
 

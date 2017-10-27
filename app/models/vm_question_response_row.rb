@@ -41,24 +41,22 @@ class VmQuestionResponseRow
     end
   end
 
+  #E1787 changes
   def average_score_for_row
     row_average_score = 0.0
-    actual_average_count = 0.0 # New variable used to count the number reviews given
+    not_null_reviews = 0.0 # variable added by E1787 to makesure not null reviews are ignored
     @score_row.each do |score|
       if score.score_value.is_a? Numeric
-        # puts "This is the place to change  #{score.score_value.to_f}"
         row_average_score += score.score_value.to_f
-        actual_average_count += 1 # Summing the number of reviews given
+        not_null_reviews += 1 # added by E1787, Summing the number of reviews given
       end
     end
-    ############# Function for calculating the review
-    if actual_average_count.zero?
+    # Function for calculating the review
+    next unless actual_average_count.zero?
       row_average_score
-    else
-      row_average_score /= actual_average_count
-    end
-    ############ End of function
-    # row_average_score /= @score_row.length.to_f # This was the previous code for calculating the review average
+    #else
+    row_average_score /= not_null_reviews
+    #end
+    # End of function
     row_average_score.round(2)
   end
-end

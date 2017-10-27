@@ -75,15 +75,11 @@ class ImportFileController < ApplicationController
 
 
   def import_from_hash(session, params)
-
     if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
-
       contents_hash = eval(params[:contents_hash])
       @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
       errors = []
-
       begin
-
         @header_integrated_body.each do |row_hash|
           if params[:model] == "AssignmentTeam"
             teamtype = AssignmentTeam
@@ -94,104 +90,76 @@ class ImportFileController < ApplicationController
           options[:has_teamname] = params[:has_teamname]
           Team.import(row_hash,params[:id], options, teamtype)
         end
-
       rescue
         errors << $ERROR_INFO
-        puts errors.to_s
       end
-
       elsif params[:model] == "ReviewResponseMap"
         contents_hash = eval(params[:contents_hash])
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
         errors = []
-
         begin
           @header_integrated_body.each do |row_hash|
             ReviewResponseMap.import(row_hash,session,params[:id])
           end
-
         rescue
           errors << $ERROR_INFO
-          puts errors.to_s
         end
     elsif params[:model] == "MetareviewResponseMap"
-        contents_hash = eval(params[:contents_hash])
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-        errors = []
-
-        begin
-          @header_integrated_body.each do |row_hash|
-            MetareviewResponseMap.import(row_hash,session,params[:id])
-          end
-
-        rescue
-          errors << $ERROR_INFO
-          puts errors.to_s
-          end
+      contents_hash = eval(params[:contents_hash])
+      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          MetareviewResponseMap.import(row_hash,session,params[:id])
+        end
+      rescue
+        errors << $ERROR_INFO
+        end
     elsif params[:model] == 'SignUpTopic'
       session[:assignment_id] = params[:id]
       contents_hash = eval(params[:contents_hash])
       contents_hash[:body].each do |row|
         SignUpTopic.import(row, session, params[:id])
       end
-
     elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
-
       contents_hash = eval(params[:contents_hash])
-
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
       else
         new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
         @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
       end
-
       errors = []
-
       begin
-
         if params[:model] == 'AssignmentParticipant'
-
           @header_integrated_body.each do |row_hash|
             AssignmentParticipant.import(row_hash, session, params[:id])
           end
-
         elsif params[:model] == 'CourseParticipant'
-
           @header_integrated_body.each do |row_hash|
             CourseParticipant.import(row_hash, session, params[:id])
           end
-
         end
-
       rescue
         errors << $ERROR_INFO
       end
-
-
-    else    # params[:model] = "User"
+    else # params[:model] = "User"
       contents_hash = eval(params[:contents_hash])
-
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
       else
         new_header = [params[:select1], params[:select2], params[:select3]]
         @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
       end
-
       errors = []
-
       begin
-
         @header_integrated_body.each do |row_hash|
-          User.import(row_hash, nil,session)
+          User.import(row_hash, nil, session)
         end
-
       rescue
         errors << $ERROR_INFO
-        puts errors.to_s
       end
-   end
+    end
     errors
   end
 
@@ -200,8 +168,10 @@ class ImportFileController < ApplicationController
 
   # Produces an array, where each entry in the array is a hash.
   # The hash keys are the column titles, and the hash values are the associated values.
+  #
   # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
   #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
+  #
   def hash_rows_with_headers(header, body)
 
     new_body = []
@@ -272,6 +242,11 @@ class ImportFileController < ApplicationController
   # Produces a hash where :header refers to the header (may be nil)
   # and :body refers to the contents of the file except the header.
   # :header is an array, and :body is a two-dimensional array.
+  #
+  # E.G. { :header => ['name', 'fullname', 'email'],
+  #        :body => [ ['jsmith', 'John Smith', 'jsmith@gmail.com'],
+  #                   ['jdoe', 'Jane Doe', 'jdoe@gmail.com' ] ] }
+  #
   def parse_to_hash(import_grid, has_header)
     file_hash = Hash.new
     if has_header == 'true'
@@ -288,6 +263,11 @@ class ImportFileController < ApplicationController
   # Produces a two-dimensional array.
   # The outer array contains "rows".
   # The inner arrays contain "elements of rows" or "columns".
+  #
+  # E.G. [ [ 'name', 'fullname', 'email' ],
+  #        [ 'jsmith', 'John Smith', 'jsmith@gmail.com' ],
+  #        [ 'jdoe', 'Jane Doe', 'jdoe@gmail.com' ] ]
+  #
   def parse_to_grid(contents, delimiter)
     contents_grid = []
     contents.each_line do |line|

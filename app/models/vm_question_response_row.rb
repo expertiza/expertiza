@@ -1,6 +1,6 @@
 # represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
-  def initialize(questionText, question_id, weight, question_max_score, seq, default=[])
+  def initialize(questionText, question_id, weight, question_max_score, seq, default_score=[])
     @questionText = questionText
     @weight = weight
 
@@ -9,7 +9,7 @@ class VmQuestionResponseRow
 
     @question_max_score = question_max_score
 
-    @score_row = default
+    @score_row = default_score
 
     @countofcomments = 0
   end

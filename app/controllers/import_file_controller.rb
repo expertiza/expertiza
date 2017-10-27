@@ -164,8 +164,7 @@ class ImportFileController < ApplicationController
   end
 
   protected
-
-
+  
   # Produces an array, where each entry in the array is a hash.
   # The hash keys are the column titles, and the hash values are the associated values.
   #

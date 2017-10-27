@@ -190,16 +190,20 @@ describe QuestionnairesController, type: :controller do
 
   describe '#update_quiz' do
     context 'when @questionnaire is nil' do
-      it 'redirects to submitted_content#view page'
-        expect(response).to redirect_to(:submitted_content)
+      it 'redirects to submitted_content#view page' do
+        params = {
+          id: 1,
+          pid: 1
+        }
+        get :update_quiz, params
+        response.should redirect_to(view_submitted_content_index_path(id: params[:pid]))
+      end
     end
 
     context 'when @questionnaire is not nil' do
-      it 'updates all quiz questions and redirects to submitted_content#view page'
-
-        
+      it 'updates all quiz questions and redirects to submitted_content#view page' do
         params = {
-          id: 1,
+          id: 3,
           pid: 1,
           save: true,
           questionnaire: {
@@ -226,9 +230,9 @@ describe QuestionnairesController, type: :controller do
                      '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
           }
         }
-
         get :update_quiz, params
-        response.should redirect_to(controller: 'submitted_content', action: 'view', id: params[:pid])
+        response.should redirect_to(view_submitted_content_index_path(id: params[:pid]))
+      end
     end
   end
 

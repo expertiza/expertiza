@@ -1,3 +1,5 @@
+require 'fileutils'
+
 class AssignmentsController < ApplicationController
   include AssignmentHelper
   autocomplete :user, :name
@@ -118,6 +120,29 @@ class AssignmentsController < ApplicationController
     unless params.key?(:assignment_form)
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]
+      puts "hi there"
+      if params[:course_id] != nil
+        #@assignment.course_id = params[:course_id]
+        @assignment_new_path = @assignment.directory_path
+        @course = Course.find(params[:course_id])
+        @assignment.directory_path = @course.directory_path + "/" + @assignment.directory_path
+        @destination_path = "/home/expertiza_developer/pg_data/" + @assignment.directory_path.to_s
+        FileUtils.makedirs(@destination_path)
+        my_dir = Dir.glob("/home/expertiza_developer/pg_data/" + @assignment.instructor.to_s + "/" + @assignment_new_path.to_s + "/*")
+#puts my_dir
+        dest_folder = @destination_path
+
+#name = File.basename(filename)
+        my_dir.each do |filename|
+          puts filename
+          name = File.basename(filename, '*')
+          puts name
+          dest_folder = @destination_path + name
+          #puts dest_folder
+          FileUtils.mv(filename, dest_folder)
+        end
+        @assignment.save
+      end
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
         redirect_to list_tree_display_index_path

@@ -78,8 +78,11 @@ describe ReviewMappingController do
         expect(Assignment).to receive(:find).and_return(assignment)
         expect(AssignmentParticipant).to receive(:where).and_return([participant])
         expect(assignment).to receive(:has_topics?).and_return(false)
-        expect(assignment).to receive(:candidate_assignment_teams_to_review).and_return(team)
-        get :assign_reviewer_dynamically
+        dummy_topic = double()
+        expect(SignUpTopic).to receive(:find).and_return(dummy_topic)
+        allow(dummy_topic).to receive(:nil?).and_return(false)
+        expect(assignment).to receive(:assign_reviewer_dynamically).with(any_args)
+        get :assign_reviewer_dynamically, :topic_id => '1'
         expect(response).to redirect_to ('/student_review/list?id=' +participant.id.to_s)
       end
     end

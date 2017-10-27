@@ -233,7 +233,7 @@ describe User do
       _row_header = double
       seesion = {:user=>user}
       _id = double
-      allow(User).to receive(:find_by_name).and_return(user)
+      allow(User).to receive(:find_by).and_return(user)
       allow_any_instance_of(User).to receive(:nil?).and_return(false)
       allow_any_instance_of(User).to receive(:id).and_return(1)
       expect_any_instance_of(User).to receive(:save)
@@ -259,14 +259,14 @@ describe User do
     context 'when user\'s email is stored in DB' do
       it 'finds user by email' do
         email = 'abcxyz@gmail.com'
-        allow(User).to receive(:find_by_email).with(email).and_return(user)
+        allow(User).to receive(:find_by).with(email).and_return(user)
         expect(User.find_by_login(email)).to eq user
       end
     end
 
     context 'when user\'s email is not stored in DB' do
       it 'finds user by email if the local part of email is the same as username' do
-        allow(User).to receive(:find_by_email).and_return(nil)
+        allow(User).to receive(:find_by).and_return(nil)
         allow(User).to receive(:where).and_return([{name: 'abc', fullname: 'abc bbc'}])
         expect(User.find_by_login('abcxyz@gmail.com')).to eq ({:name=>"abc", :fullname=>"abc bbc"})
       end
@@ -399,7 +399,7 @@ describe User do
           :name => 'abc'
         }
       }
-      allow(User).to receive(:find_by_name).and_return(user)
+      allow(User).to receive(:find_by).and_return(user)
       expect(User.from_params(params)).to eq user
     end
     it 'raises an error when Expertiza cannot find user' do

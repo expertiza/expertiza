@@ -50,25 +50,24 @@ describe QuestionnairesController, type: :controller do
       tree_folder2 = double('TreeFolder')
       allow(tree_folder2).to receive(:id).and_return(1)
       allow(tree_folder2).to receive(:node_object_id).and_return(1)
-      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([tree_folder1, tree_folder2]) 
+      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([tree_folder1, tree_folder2])
       folderNode2 = double('FolderNode')
       allow(folderNode2).to receive(:id).and_return(1)
       allow(FolderNode).to receive(:find_by_node_object_id).and_return(folderNode2)
       user = double("User")
       allow(user).to receive(:id).and_return(1)      
       params = {
-        :questionnaire => {
-          :private => "true", 
-          :type => "ReviewQuestionnaire", 
-          :name => "Random Name", 
-          :min_question_score => "0", 
-          :max_question_score => "5"
-          } 
+        questionnaire: {
+          private: "true",
+          type: "ReviewQuestionnaire",
+          name: "Random Name",
+          min_question_score: "0",
+          max_question_score: "5"
+          }
       }
-      session = {:user => user}
+      session = {user: user}
       get :create, params, session
       expect(flash[:success]).to eq("You have successfully created a questionnaire!")
-      
       response.should redirect_to(edit_questionnaire_path(id: 1))
     end
   end

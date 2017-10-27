@@ -127,8 +127,8 @@ describe Team do
   describe '.import_team_members' do
     context 'when cannot find a user by name' do
       it 'raises an ImportError' do
-        var errorMessage = "The user TestUser was not found. <a href='/users/new'>Create</a> this user?"
-        expect { team.import_team_members(0, ['TestUser']) }.to raise_error(ImportError, errorMessage)
+        error_message = "The user TestUser was not found. <a href='/users/new'>Create</a> this user?"
+        expect { team.import_team_members(0, ['TestUser']) }.to raise_error(ImportError, error_message)
       end
     end
 

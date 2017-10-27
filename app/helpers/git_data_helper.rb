@@ -3,7 +3,7 @@ require 'json'
 
 module GitDataHelper
   BASE_API = "https://api.github.com".freeze
-  ACCESS_TOKEN = "token 33be925846924a8e9db516cca896ff314248903f".freeze
+  ACCESS_TOKEN = 'token %s'%ENV['EXPERTIZA_GITHUB_TOKEN']
 
   def self.fetch_pulls(owner, repo)
     fetch("#{BASE_API}/repos/#{owner}/#{repo}/pulls?state=all")

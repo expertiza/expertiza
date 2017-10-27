@@ -32,7 +32,7 @@ class GitDatum < ActiveRecord::Base
           if author_commit.nil?
             total_commits << create_git_data(res, single_commit, id)
           else
-            author_commit = update_git_array(author_commit, single_commit)
+            update_git_array(author_commit, single_commit)
           end
         end
         total_commits.each(&:save)

@@ -189,43 +189,44 @@ describe QuestionnairesController, type: :controller do
   describe '#update_quiz' do
     context 'when @questionnaire is nil' do
       it 'redirects to submitted_content#view page'
-
         expect(response).to redirect_to(:submitted_content)
-
     end
 
     context 'when @questionnaire is not nil' do
       it 'updates all quiz questions and redirects to submitted_content#view page'
 
         
-        # params = {
-        #   id: 1,
-        #   pid: 1,
-        #   save: true,
-        #   questionnaire: {
-        #     name: 'test questionnaire',
-        #     instructor_id: 6,
-        #     private: 0,
-        #     min_question_score: 0,
-        #     max_question_score: 5,
-        #     type: 'ReviewQuestionnaire',
-        #     display_type: 'Review',
-        #     instructor_loc: ''
-        #   },
-        #   question: {
-        #     '1' => {txt: 'Q1'},
-        #     '2' => {txt: 'Q2'},
-        #     '3' => {txt: 'Q3'}
-        #   },
-        #   quiz_question_choices: {
-        #     '1' => {MultipleChoiceRadio:
-        #             {:correctindex => 1, '1' => {txt: 'a11'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-        #     '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
-        #     '3' => {MultipleChoiceCheckbox:
-        #             {'1' => {iscorrect: '1', txt: 'a31'}, '2' => {iscorrect: '0', txt: 'a32'},
-        #              '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
-        #   }
-        # }
+        params = {
+          id: 1,
+          pid: 1,
+          save: true,
+          questionnaire: {
+            name: 'test questionnaire',
+            instructor_id: 6,
+            private: 0,
+            min_question_score: 0,
+            max_question_score: 5,
+            type: 'ReviewQuestionnaire',
+            display_type: 'Review',
+            instructor_loc: ''
+          },
+          question: {
+            '1' => {txt: 'Q1'},
+            '2' => {txt: 'Q2'},
+            '3' => {txt: 'Q3'}
+          },
+          quiz_question_choices: {
+            '1' => {MultipleChoiceRadio:
+                    {:correctindex => 1, '1' => {txt: 'a11'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
+            '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
+            '3' => {MultipleChoiceCheckbox:
+                    {'1' => {iscorrect: '1', txt: 'a31'}, '2' => {iscorrect: '0', txt: 'a32'},
+                     '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
+          }
+        }
+
+        get :update_quiz, params
+        response.should redirect_to(controller: 'submitted_content', action: 'view', id: params[:pid])
     end
   end
 

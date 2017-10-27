@@ -29,6 +29,6 @@ module GitDataHelper
     resource = RestClient::Resource.new(api)
     response = resource.get(Authorization: ACCESS_TOKEN)
     return nil unless response.code == 200
-    return JSON.parse(response, object_class: OpenStruct)
+    JSON.parse(response, object_class: OpenStruct)
   end
 end

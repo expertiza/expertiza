@@ -52,7 +52,22 @@ class AssignmentsController < ApplicationController
 
     assignment_form_assignment_staggered_deadline?
 
-    due_date_all_nameurl_notempty_check
+    #due_date_all_nameurl_notempty_check
+    @due_date_all.each do |dd|
+      # @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
+      # @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
+      # @metareview_allowed = meta_review_allowed?(dd)
+      # @drop_topic_allowed = drop_topic_allowed?(dd)
+      # @signup_allowed = signup_allowed?(dd)
+      # @team_formation_allowed = team_formation_allowed?(dd)
+      due_date_nameurl_notempty_check(dd)
+
+      due_date_present(dd)
+
+      if due_date_validation
+        break
+      end
+    end
 
     assignment_questionnaires_usage_check
 
@@ -278,25 +293,26 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.staggered_deadline == true
   end
 
-  def due_date_all_nameurl_notempty_check
-    @due_date_all.each do |dd|
-      @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
-      @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
-      @metareview_allowed = meta_review_allowed?(dd)
-      @drop_topic_allowed = drop_topic_allowed?(dd)
-      @signup_allowed = signup_allowed?(dd)
-      @team_formation_allowed = team_formation_allowed?(dd)
+  def due_date_nameurl_notempty_check(dd)
+    @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
+    @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
+    @metareview_allowed = meta_review_allowed?(dd)
+    @drop_topic_allowed = drop_topic_allowed?(dd)
+    @signup_allowed = signup_allowed?(dd)
+    @team_formation_allowed = team_formation_allowed?(dd)
+  end
 
+  def due_date_present(dd)
       if dd.due_at.present?
         dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
       end
-
-      if  @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
-          (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
-        break
-      end
-    end
   end
+
+  def due_date_validation
+    return @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+        (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+  end
+
 
   def assignment_questionnaires_usage_check
     @assignment_questionnaires.each do |aq|

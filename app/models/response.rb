@@ -40,7 +40,7 @@ class Response < ActiveRecord::Base
                     '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'\
                     '</td>'\
                     '<td align="left"><b>Last Reviewed:</b>'\
-                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at)}</span></td>"\
                     '</tr></table>'
       code = identifier
     end
@@ -257,5 +257,57 @@ class Response < ActiveRecord::Base
            assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
        }
     }).deliver_now
+  end
+
+  # Get latest commit time of submitted link-to content
+  require 'octokit'
+  require 'uri'
+
+  def check_update (participant_id)
+    @participant = participant_id
+
+    team = @participant.team
+    team_hyperlinks = team.hyperlinks
+
+    github_time = nil
+    team_hyperlinks.each do |link|
+
+    github_time = get_latest_update_time(link)
+    break unless github_time.nil?
+    end
+
+    return github_time if(github_time <=> self.updated_at)==1
+
+    nil
+  end
+
+  def get_latest_update_time(submitted_link)
+
+    # check validity of link
+    url = URI.extract(submitted_link, 'https')
+    return nil if url.empty?
+
+    # recognize url type
+    parsed_url = URI(url[0])
+
+    # url is a GitHub link
+    return get_latest_commit_time(parsed_url) if parsed_url.host =~ /^github(.*)/
+
+    nil
+  end
+
+  def get_latest_commit_time(github_url)
+    client = Octokit::Client.new(per_page: 1)
+
+    case github_url.host
+      when 'github.ncsu.edu'
+        client.access_token = '8289b47fe8db5c8bceb2f84b2e0c56fc31c5d9e5'
+        client.api_endpoint = 'https://github.ncsu.edu/api/v3'
+    end
+
+    repo = github_url.path[1..-1]
+    res = client.commits(repo)
+    latest_commit = res[0].to_h
+    latest_commit[:commit][:author][:date]
   end
 end

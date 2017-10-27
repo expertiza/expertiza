@@ -1,6 +1,19 @@
 <h1>New Assignment</h1>
 
+    <% if @assignment_form.assignment.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@assignment_form.assignment.errors.count, "error") %> prohibited this assignment from being saved:</h2>
+
+          <ul>
+            <% @assignment_form.assignment.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
 <%= form_tag @assignment_form.assignment do %>
+
     <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
     <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
     <%= hidden_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size) %>

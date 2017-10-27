@@ -169,7 +169,7 @@ class User < ActiveRecord::Base
     if row.length != 3
       raise ArgumentError, "Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email."
     end
-    user = User.find_by_name(row[0])
+    user = User.find_by name: row[0]
 
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row)
@@ -198,7 +198,7 @@ class User < ActiveRecord::Base
   # If user supplies e-mail or name, the
   # helper will try to find that User account.
   def self.find_by_login(login)
-    user = User.find_by_email(login)
+    user = User.find_by email: login
     if user.nil?
       items = login.split("@")
       shortName = items[0]
@@ -300,7 +300,7 @@ class User < ActiveRecord::Base
     user = if params[:user_id]
              User.find(params[:user_id])
            else
-             User.find_by_name(params[:user][:name])
+             User.find_by name: params[:user][:name]
            end
     if user.nil?
       newuser = url_for controller: 'users', action: 'new'

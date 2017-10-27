@@ -44,29 +44,32 @@ describe QuestionnairesController, type: :controller do
 
   describe '#create' do
     it 'redirects to questionnaires#edit page after create a new questionnaire' do
-
-      treeFolder1 = double('TreeFolder')
-      allow(treeFolder1).to receive(:id).and_return(1)
-      allow(treeFolder1).to receive(:node_object_id).and_return(1)
-
-      treeFolder2 = double('TreeFolder')
-      allow(treeFolder2).to receive(:id).and_return(1)
-      allow(treeFolder2).to receive(:node_object_id).and_return(1)
-
-      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([treeFolder1,treeFolder2])
-      
+      tree_folder1 = double('TreeFolder')
+      allow(tree_folder1).to receive(:id).and_return(1)
+      allow(tree_folder1).to receive(:node_object_id).and_return(1)
+      tree_folder2 = double('TreeFolder')
+      allow(tree_folder2).to receive(:id).and_return(1)
+      allow(tree_folder2).to receive(:node_object_id).and_return(1)
+      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([tree_folder1, tree_folder2]) 
       folderNode2 = double('FolderNode')
       allow(folderNode2).to receive(:id).and_return(1)
-      allow(FolderNode).to receive(:find_by_node_object_id).and_return( folderNode2 )
-      
+      allow(FolderNode).to receive(:find_by_node_object_id).and_return(folderNode2)
       user = double("User")
-      allow(user).to receive(:id).and_return(1)
-      
-      get :create, { :questionnaire => { :private => "true", :type => "ReviewQuestionnaire", :name => "Random Name", :min_question_score => "0", :max_question_score => "5" } }, {user: user}
+      allow(user).to receive(:id).and_return(1)      
+      params = {
+        :questionnaire => {
+          :private => "true", 
+          :type => "ReviewQuestionnaire", 
+          :name => "Random Name", 
+          :min_question_score => "0", 
+          :max_question_score => "5"
+          } 
+      }
+      session = {:user => user}
+      get :create, params, session
       expect(flash[:success]).to eq("You have successfully created a questionnaire!")
       
-      response.should redirect_to(edit_questionnaire_path({id: 1}))
-
+      response.should redirect_to(edit_questionnaire_path(id: 1))
     end
   end
 

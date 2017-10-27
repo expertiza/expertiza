@@ -259,7 +259,7 @@ describe User do
     context 'when user\'s email is stored in DB' do
       it 'finds user by email' do
         email = 'abcxyz@gmail.com'
-        allow(User).to receive(:find_by).with(email).and_return(user)
+        allow(User).to receive(:find_by).and_return(user)
         expect(User.find_by_login(email)).to eq user
       end
     end

@@ -43,13 +43,13 @@ describe Team do
   describe '#user?' do
     context 'when users in current team includes the parameterized user' do
       it 'returns true' do
-        expect(team.user? user).to be true
+        expect(team.user?(user)).to be true
       end
     end
 
     context 'when users in current team does not include the parameterized user' do
       it 'returns false' do
-        expect(team.user? user2).to be false
+        expect(team.user?(user2)).to be false
       end
     end
   end
@@ -127,7 +127,8 @@ describe Team do
   describe '.import_team_members' do
     context 'when cannot find a user by name' do
       it 'raises an ImportError' do
-        expect { team.import_team_members(0, ['TestUser']) }.to raise_error(ImportError, "The user TestUser was not found. <a href='/users/new'>Create</a> this user?")
+        var errorMessage = "The user TestUser was not found. <a href='/users/new'>Create</a> this user?"
+        expect { team.import_team_members(0, ['TestUser']) }.to raise_error(ImportError, errorMessage)
       end
     end
 
@@ -139,7 +140,7 @@ describe Team do
   describe '.import' do
     context 'when row is empty and has_column_names option is not true' do
       it 'raises an ArgumentError' do
-        expect { Team.import([], 1, { has_column_names: true}, AssignmentTeam) }.to raise_error(ArgumentError, 'Not enough fields on this line.')
+        expect { Team.import([], 1, {has_column_names: true}, AssignmentTeam) }.to raise_error(ArgumentError, 'Not enough fields on this line.')
       end
     end
 

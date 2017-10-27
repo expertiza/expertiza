@@ -15,7 +15,7 @@ describe ReviewMappingController do
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
-
+  let(:teamsuser) {'TeamsUser'}
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     instructor = build(:instructor)
@@ -34,11 +34,29 @@ describe ReviewMappingController do
 
   describe '#add_reviewer and #get_reviewer' do
     context 'when team_user does not exist' do
-      it 'shows an error message and redirects to review_mapping#list_mappings page'
+      it 'shows an error message and redirects to review_mapping#list_mappings page' do
+
+        expect(User).to receive_message_chain("where.first.id").with(any_args).and_return(user.id)
+        expect(TeamsUser).to receive(:exists?).with(any_args).and_return(true)
+        #expect(flash[:error]).to match "You cannot assign this student to review his/her own artifact"
+        post :add_reviewer, :contributor_id => '1', :id =>'1', :topic_id =>'2', user: {name: '2'}
+        expect(flash[:error]) =~ /you cannot assign this student to review his.*her own artifact/i
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id
+      end
     end
 
     context 'when team_user exists and get_reviewer method returns a reviewer' do
-      it 'creates a whole bunch of objects and redirects to review_mapping#list_mappings page'
+      it 'creates a whole bunch of objects and redirects to review_mapping#list_mappings page' do
+        expect(User).to receive_message_chain("where.first.id").with(any_args).and_return(user.id)
+        expect(TeamsUser).to receive(:exists?).with(any_args).and_return(false)
+        expect(SignUpSheet).to receive(:signup_team).with(any_args)
+        expect(User).to receive(:from_params).with(any_args).and_return(user)
+        expect(AssignmentParticipant).to receive_message_chain("where.first").with(any_args).and_return(participant)
+        #expect(ReviewResponseMap).to receive_message_chain("where.first.nil").with(any_args).and_return(true)
+        expect(ReviewResponseMap).to receive(:create).with(any_args)
+        post :add_reviewer, :contributor_id => '1', :id =>'1', :topic_id =>'2', user: {name: '2'}
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id, msg: ''
+      end
     end
   end
 
@@ -69,7 +87,7 @@ describe ReviewMappingController do
     it 'redirects to review_mapping#list_mappings page'
   end
 
-  describe '#assign_metareviewer_dynamically' do9
+  describe '#assign_metareviewer_dynamically' do
     it  'redirects to student_review#list page' do
       param = Hash.new
       param[:assignment_id] = assignment.id

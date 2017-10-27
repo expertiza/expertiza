@@ -189,10 +189,15 @@ describe QuestionnairesController, type: :controller do
   describe '#update_quiz' do
     context 'when @questionnaire is nil' do
       it 'redirects to submitted_content#view page'
+
+        expect(response).to redirect_to(:submitted_content)
+
     end
 
     context 'when @questionnaire is not nil' do
       it 'updates all quiz questions and redirects to submitted_content#view page'
+
+        
         # params = {
         #   id: 1,
         #   pid: 1,

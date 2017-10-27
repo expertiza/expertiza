@@ -81,7 +81,7 @@ class SignUpSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
   end
   
-  #Project E1763. Duplicates topics controller method. Called from sign_up_sheet_all_actions.html.erb. It creates a copy of the topic selected. 
+  # Project E1763. Duplicates topics controller method. Called from sign_up_sheet_all_actions.html.erb. It creates a copy of the topic selected. 
     def duplicate
     @user = current_user
     session[:copy_flag] = true
@@ -91,7 +91,7 @@ class SignUpSheetController < ApplicationController
     @dup_topic.assignment_id = @assignment.id
     @dup_topic.topic_identifier = @topic.topic_identifier
     @dup_topic.category = @topic.category
-    @dup_topic.topic_name = @topic.topic_name + " Copy"
+    @dup_topic.topic_name = @topic.topic_name + " copy"
     @dup_topic.micropayment = @topic.micropayment
     @dup_topic.description = @topic.description
     @dup_topic.link = @topic.link
@@ -107,15 +107,16 @@ class SignUpSheetController < ApplicationController
       available_slots = @topic.max_choosers
     end
     @dup_topic.max_choosers = available_slots
-    if available_slots == 0
+    if available_slots.zero?
       redirect_to edit_assignment_path(@topic.assignment_id) + "#tabs-2"
-      flash[:error] = "The topic has all slots filled. Try duplicating the topic after increasing the number of slots."
+      flash[:error] = "Try duplicating the topic " + @topic.topic_identifier + " after increasing the number of slots since all slots are currently filled."
     elsif @topic.max_choosers == available_slots
       redirect_to edit_assignment_path(@topic.assignment_id) + "#tabs-2"
-      flash[:error] = "The topic has all slots available. Instead of duplicating the topic extend the due date."
+      flash[:error] = "Instead of duplicating the topic " + @topic.topic_identifier + " extend the due date since the topic has all slots available."
     else
       @dup_topic.save
       redirect_to edit_assignment_path(@dup_topic.assignment_id) + "#tabs-2"
+      flash[:success] = "Topic " + @topic.topic_identifier + " has been successfully duplicated."
     end
   end
 

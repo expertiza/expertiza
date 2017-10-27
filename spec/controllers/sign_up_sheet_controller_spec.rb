@@ -67,7 +67,9 @@ describe SignUpSheetController do
 
   describe '#list' do
     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
-      it 'renders sign_up_sheet#intelligent_topic_selection page'
+      it 'renders sign_up_sheet#intelligent_topic_selection page' do
+
+      end
     end
 
     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do

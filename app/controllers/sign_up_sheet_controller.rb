@@ -150,6 +150,31 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
+  def find_signed_up_topics student_bids
+      signed_up_topics = []
+      student_bids.each do |bid|
+        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+        signed_up_topics << sign_up_topic if sign_up_topic
+      end
+     # signed_up_topics &= sign_up_topics
+      return signed_up_topics
+  end
+
+  def find_selected_topics assignment
+
+    # Find whether the user has signed up for any topics; if so the user won't be able to
+    # sign up again unless the former was a waitlisted topic
+    # if team assignment, then team id needs to be passed as parameter else the user's id
+    users_team = SignedUpTeam.find_team_users(assignment.id, session[:user].id)
+    selected_topics = if users_team.empty?
+                         nil
+                       else
+                         # TODO: fix this; cant use 0
+                         SignedUpTeam.find_user_signup_topics(assignment.id, users_team.first.t_id)
+                       end
+    return selected_topics
+  end
+
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -157,42 +182,27 @@ class SignUpSheetController < ApplicationController
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
+    @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
 
     if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority) 
-      signed_up_topics = []
-      @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-      signed_up_topics &= @sign_up_topics
-      @sign_up_topics -= signed_up_topics
-      @bids = signed_up_topics
+      @bids = find_signed_up_topics @student_bids
+      @sign_up_topics = @bids
+    else
+      @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     end
 
     @num_of_topics = @sign_up_topics.size
     @signup_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(7)
     @drop_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(6)
-    @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
+
 
     unless @assignment.due_dates.find_by_deadline_type_id(1).nil?
       if !@assignment.staggered_deadline? and @assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
         @show_actions = false
       end
-
-      # Find whether the user has signed up for any topics; if so the user won't be able to
-      # sign up again unless the former was a waitlisted topic
-      # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
-      @selected_topics = if users_team.empty?
-                           nil
-                         else
-                           # TODO: fix this; cant use 0
-                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
-                         end
+      @selected_topics = find_selected_topics @assignment
     end
     if @assignment.is_intelligent
       render 'sign_up_sheet/intelligent_topic_selection' and return

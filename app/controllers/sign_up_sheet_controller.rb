@@ -82,7 +82,7 @@ class SignUpSheetController < ApplicationController
   end
   
   # Project E1763. Duplicates topics controller method. Called from sign_up_sheet_all_actions.html.erb. It creates a copy of the topic selected. 
-    def duplicate
+  def duplicate
     @user = current_user
     session[:copy_flag] = true
     @topic = SignUpTopic.find(params[:id])
@@ -99,13 +99,13 @@ class SignUpSheetController < ApplicationController
     found_in_slots = false
     for slot in @slots_filled
       if slot.topic_id.to_s == @topic.id.to_s
-      available_slots = @topic.max_choosers.to_int - slot.count.to_i
-      found_in_slots = true
+        available_slots = @topic.max_choosers.to_int - slot.count.to_i
+        found_in_slots = true
       end
     end
-    unless found_in_slots
-      available_slots = @topic.max_choosers
-    end
+
+    available_slots = @topic.max_choosers unless found_in_slots
+
     @dup_topic.max_choosers = available_slots
     if available_slots.zero?
       redirect_to edit_assignment_path(@topic.assignment_id) + "#tabs-2"
@@ -353,7 +353,6 @@ class SignUpSheetController < ApplicationController
   # This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic and per round basis
   def save_topic_deadlines
-
     assignment = Assignment.find(params[:assignment_id])
     @assignment_submission_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 1 }
     @assignment_review_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 2 }
@@ -389,12 +388,11 @@ class SignUpSheetController < ApplicationController
               type:                       'TopicDueDate'
             )
           else # update an existed record
-            #E1763, added new due dates for selected topics
+            # E1763, added new due dates for selected topics
             current_topic_due_date = instance_variable_get('@topic_' + deadline_type + '_due_date')
-            if !params[:selected_ids].nil?
-              if params[:selected_ids].include? index.to_s
-                current_topic_due_date = due_dates['selected_topics' + '_' + deadline_type + '_'+ i.to_s + '_due_date']
-              end
+
+            if !params[:selected_ids].nil? and params[:selected_ids].include? index.to_s
+              current_topic_due_date = due_dates['selected_topics' + '_' + deadline_type + '_' + i.to_s + '_due_date']
             end
 
             topic_due_date.update_attributes(

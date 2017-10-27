@@ -6,11 +6,11 @@ module SignUpSheetHelper
     DateTime.parse(due_date.to_s).strftime("%Y-%m-%d %H:%M").in_time_zone
   end
 
-#Project E1763. It gets the id of the topic with the latest deadline.
+  # Project E1763. It gets the id of the topic with the latest deadline.
   def get_latester_topic_deadline(assignment_due_dates, sign_up_topics)
     lastest_deadline_id = 0
     latest_due_date = get_topic_deadline(assignment_due_dates, sign_up_topics[0].id).to_datetime
-    for i in 1..(sign_up_topics.size - 1)
+    (1..(sign_up_topics.size - 1)).each do |i|
       due_date = get_topic_deadline(assignment_due_dates, sign_up_topics[i].id).to_datetime
       if due_date.to_f > latest_due_date.to_f
         latest_due_date = due_date
@@ -19,6 +19,7 @@ module SignUpSheetHelper
     end
     lastest_deadline_id
   end
+
   def get_topic_deadline(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
     topic_due_date = TopicDueDate.where(parent_id: topic_id,
                                         deadline_type_id: deadline_type_id,

@@ -12,6 +12,7 @@ class CourseParticipant < Participant
       return nil # return nil so we can tell a copy is not made
     end
   end
+
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row_hash, _row_header = nil, session, id)
@@ -20,14 +21,6 @@ class CourseParticipant < Participant
     if user.nil?
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
       attributes = ImportFileHelper.define_attributes(row_hash)
-
-      #########################################################################################
-      #                                                                                       #
-      #    THIS DOES NOT SET THE PASSWORD TO WHAT THE FILE SPECIFIES IF THEY ARE NEW USERS    #
-      #    IN FACT, THE PASSWORD COLUMN DOES NOT SEEM TO BE USED AT ALL                       #
-      #                                                                                       #
-      #########################################################################################
-
       user = ImportFileHelper.create_new_user(attributes, session)
     end
     course = Course.find(id)
@@ -38,6 +31,9 @@ class CourseParticipant < Participant
       CourseParticipant.create(user_id: user.id, parent_id: course.id)
     end
   end
+
+  # The old method is commented out below.
+  #
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
   # def self.import(row, _row_header = nil, session, id)

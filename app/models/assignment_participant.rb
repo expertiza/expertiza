@@ -192,11 +192,11 @@ class AssignmentParticipant < Participant
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row_hash, _row_header = nil, session, id)
-    raise ArgumentError, "No user id has been specified." if row.empty?
+    raise ArgumentError, "No user id has been specified." if row_hash.empty?
     user = User.find_by_name(row_hash[:name])
     if user.nil?
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-      attributes = ImportFileHelper.define_attributes(row)
+      attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     end
     raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?
@@ -206,6 +206,8 @@ class AssignmentParticipant < Participant
     end
   end
 
+  # The old method is commented out below.
+  #
   # # provide import functionality for Assignment Participants
   # # if user does not exist, it will be created and added to this assignment
   # def self.import(row, _row_header = nil, session, id)

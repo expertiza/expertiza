@@ -70,42 +70,18 @@ class User < ActiveRecord::Base
     user_list = []
     # If the user is a super admin, fetch all users
     if self.role.super_admin?
-      User.all.find_each do |user|
-        user_list << user
-      end
+       return SuperAdministrator.get_user_list
     end
+
 
     # If the user is an instructor, fetch all users in his course/assignment
     if self.role.instructor?
-      participants = []
-      Course.where(instructor_id: self.id).find_each do |course|
-        participants << course.get_participants
-      end
-      Assignment.where(instructor_id: self.id).find_each do |assignment|
-        participants << assignment.participants
-      end
-      participants.each do |p_s|
-        next if p_s.empty?
-        p_s.each do |p|
-          user_list << p.user if self.role.hasAllPrivilegesOf(p.user.role)
-        end
-      end
+      return Instructor.get_user_list
     end
 
     # If the user is a TA, fetch all users in his courses
     if self.role.ta?
-      courses = Ta.get_mapped_courses(self.id)
-      participants = []
-      courses.each do |course_id|
-        course = Course.find(course_id)
-        participants << course.get_participants
-      end
-      participants.each do |p_s|
-        next if p_s.empty?
-        p_s.each do |p|
-          user_list << p.user if self.role.hasAllPrivilegesOf(p.user.role)
-        end
-      end
+      return Ta.get_user_list
     end
 
     # Add the children to the list

@@ -32,4 +32,20 @@ class Instructor < User
     end
     ta_ids
   end
+
+  def self.get_user_list
+    participants = []
+    Course.where(instructor_id: self.id).find_each do |course|
+      participants << course.get_participants
+    end
+    Assignment.where(instructor_id: self.id).find_each do |assignment|
+      participants << assignment.participants
+    end
+    participants.each do |p_s|
+      next if p_s.empty?
+      p_s.each do |p|
+        user_list << p.user if self.role.hasAllPrivilegesOf(p.user.role)
+      end
+    end
+  end
 end

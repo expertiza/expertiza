@@ -135,61 +135,30 @@ describe User do
   describe '#get_user_list' do
     context 'when current user is super admin' do
       it 'fetches all users' do
-        user_list=double.as_null_object
         allow(user).to receive_message_chain("role.super_admin?"){ true }
-        allow(User).to receive_message_chain("all.find_each").and_yield(user1).and_yield(user2)
         allow(user).to receive_message_chain("role.instructor?"){ false }
         allow(user).to receive_message_chain("role.ta?"){false}
-        User.all.find_each do |user|
-          user_list<<user
-        end
-        user.get_user_list
-        end
+        allow(SuperAdministrator).to receive(:get_user_list).and_return([user1,user2])
+        expect(user.get_user_list).to eq ([user1,user2])
       end
-
+  end
     context 'when current user is an instructor' do
-      before(:each) do
-        course = Course.new
-        assignment = Assignment.new
-      end
       it 'fetches all users in his/her course/assignment' do
-        user_list = double
-        course = double
-        assignment = double
         allow(user).to receive_message_chain("role.super_admin?"){ false }
         allow(user).to receive_message_chain("role.instructor?"){ true }
-        allow(Course).to receive_message_chain(:where,:find_each).and_yield(course)
-        allow(course).to receive(:get_participants).and_return(user1)
-        allow(Assignment).to receive_message_chain(:where,:find_each).and_yield(assignment)
-        allow(assignment).to receive(:participants).and_return(user2)
-        allow_any_instance_of(User).to receive(:empty?).and_return(false)
-        allow_any_instance_of(User).to receive(:each).and_yield(user)
-        allow_any_instance_of(User).to receive(:user).and_return(user)
-        allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
         allow(user).to receive_message_chain("role.ta?"){false}
-        expect(user.get_user_list).to eq ([user])
+        allow(Instructor).to receive(:get_user_list).and_return([user1,user2])
+        expect(user.get_user_list).to eq ([user1,user2])
       end
     end
 
     context 'when current user is a TA' do
-      before(:each) do
-        course = Course.new
-        end
       it 'fetches all users in his/her courses'do
-        courses=double
-        course=double
         allow(user).to receive_message_chain("role.super_admin?"){ false }
         allow(user).to receive_message_chain("role.ta?"){ true }
         allow(user).to receive_message_chain("role.instructor?"){ false }
-        allow(Ta).to receive(:get_mapped_courses).and_return(courses)
-        allow(courses).to receive(:each).and_yield(course)
-        allow(Course).to receive(:find).and_return(course)
-        allow(course).to receive(:get_participants).and_return(user1)
-        allow_any_instance_of(User).to receive(:empty?).and_return(false)
-        allow_any_instance_of(User).to receive(:each).and_yield(user)
-        allow_any_instance_of(User).to receive(:user).and_return(user)
-        allow_any_instance_of(User).to receive_message_chain(:role,:hasAllPrivilegesOf).and_return(true)
-        expect(user.get_user_list).to eq ([user])
+        allow(Ta).to receive(:get_user_list).and_return([user1,user2])
+        expect(user.get_user_list).to eq ([user1,user2])
     end
     end
   end

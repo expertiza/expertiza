@@ -1,8 +1,8 @@
 # represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
   def initialize(questionText, question_id, weight, question_max_score, seq, default_score = [])
-   # Added default_score variable as a parameter to constructor to enhance the code dymnamically.
-   # The extra variable, default_score in the constructor is an optional parameter and is defaulted to null if not provided
+# Added default_score variable as a parameter to constructor to enhance the code dymnamically.
+# The extra variable, default_score in the constructor is an optional parameter and is defaulted to null if not provided
     @questionText = questionText
     @weight = weight
 
@@ -57,4 +57,5 @@ class VmQuestionResponseRow
     row_average_score.round(2) unless not_null_reviews.zero? # checking if there are not_null_reviews
     # returning null => displaying null, if all the reviews are null
   end
+
 end

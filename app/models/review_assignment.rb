@@ -115,12 +115,11 @@ module ReviewAssignment
     contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
     min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
     contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
-
     contributor_set
   end
 
   def reject_by_max_reviews_per_submission(contributor_set)
-    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count >= max_reviews_per_submission }
+    contributor_set.reject! {|contributor| contributor.responses.reject {|response|  !response.is_submitted }.count >= max_reviews_per_submission }
     contributor_set
   end
 

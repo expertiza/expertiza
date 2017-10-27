@@ -292,11 +292,7 @@ class ReviewMappingController < ApplicationController
       end
     end
     student_review_num = params[:num_reviews_per_student].to_i
-
-    ############# number of reviews submitted should only be the number of reviews completed.
-    reviews_per_submission = StudentReviewController.get_num_reviews_complete
-    submission_review_num = params[reviews_per_submission].to_i
-    #submission_review_num = params[:num_reviews_per_submission].to
+    submission_review_num = params[:num_reviews_per_submission].to
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
 

@@ -136,4 +136,58 @@ describe TreeDisplayController do
       expect(response.body).to match /csc517\/test/
     end
   end
+
+  describe "POST #children_node_ng for TA" do
+    before(:each) do
+      @treefolder = TreeFolder.new
+      @treefolder.parent_id = nil
+      @treefolder.name = "Courses"
+      @treefolder.child_type = "CourseNode"
+      @treefolder.save
+      @foldernode = FolderNode.new
+      @foldernode.parent_id = nil
+      @foldernode.type = "FolderNode"
+      @foldernode.node_object_id = 1
+      @foldernode.save
+      @course = create(:course)
+
+      # make sure the course is not private
+      @course.private = false
+      @course.save
+      create(:assignment)
+      create(:assignment_node)
+      create(:course_node)
+
+      # make a teaching assistant
+      user = build(:teaching_assistant)
+      puts user.attributes
+      @ta = User.new(user.attributes)
+      @ta.save!
+
+      # make sure it's the current user
+      stub_current_user(@ta, user.role.name, user.role)
+
+      # create ta-course mapping
+      ta_mapping = TaMapping.new
+      ta_mapping.ta_id = User.where(role_id: 2).first.id
+      ta_mapping.course_id = Course.find(1).id
+      ta_mapping.save!
+    end
+
+    it "returns a list of course objects ta is supposed to ta in as json" do
+      params = FolderNode.all
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      expect(response.body).to match /csc517\/test/
+    end
+
+    it "returns an empty list when there are no mapping between ta and course" do
+      params = FolderNode.all
+
+      # delete ta-mapping so that the course returned is 0
+      # do not delete course
+      TaMapping.delete(1)
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      expect(response.body).to eq "{\"Courses\":[]}"
+    end
+  end
 end

@@ -10,7 +10,7 @@ describe SignUpSheetController do
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
   let(:bid) { Bid.new(topic_id: 1, priority: 1) }
-
+  let(:team_user) { build(:team_user) }
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
@@ -19,6 +19,11 @@ describe SignUpSheetController do
     allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+    allow(AssignmentParticipant).to receive(:find_by).with(user_id: student.id, parent_id: 1).and_return(participant)
+    allow(participant).to receive(:team).and_return(team)
+   allow(Team).to receive(:find).with('1').and_return(team)
+    allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(team_user)
+    allow(team_user).to receive(:user).and_return(student)
   end
 
   describe '#new' do
@@ -110,7 +115,7 @@ describe SignUpSheetController do
     end
   end
 
-  describe '#list' do   
+  describe '#list' do
     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
       it 'renders sign_up_sheet#intelligent_topic_selection page' do
         allow(assignment).to receive(:is_intelligent).and_return(true)
@@ -127,12 +132,6 @@ describe SignUpSheetController do
       end
     end
   end
-
-    context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
-      it 'renders sign_up_sheet#list page'
-    end
-  end
-
 
   describe '#sign_up' do
 	let(:session) { {user: student } }
@@ -195,7 +194,6 @@ describe SignUpSheetController do
     end
   end
 
-
   describe '#delete_signup' do
     let(:params) { {id: 1, topic_id: 1} }
     context 'when either submitted files or hyperlinks of current team are not empty' do
@@ -242,16 +240,47 @@ describe SignUpSheetController do
   end
 
   describe '#delete_signup_as_instructor' do
+    let(:params) { {id: 1, topic_id: 1} }
     context 'when either submitted files or hyperlinks of current team are not empty' do
-      it 'shows a flash error message and redirects to assignment#edit page'
+      it 'shows a flash error message and redirects to assignment#edit page' do
+          allow(team).to receive(:submitted_files).and_return([])
+	  allow(team).to receive(:hyperlinks ).and_return(['test'])
+          delete :delete_signup_as_instructor, params
+          expect(flash.now[:error]).to eq("The student has already submitted their work, so you are not allowed to remove them.")
+          expect(response).to redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+          allow(team).to receive(:submitted_files).and_return([])
+	  allow(team).to receive(:hyperlinks ).and_return(['test'])
+          delete :delete_signup_as_instructor, params
+          expect(flash.now[:error]).to eq("The student has already submitted their work, so you are not allowed to remove them.")
+          expect(response).to redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+      end
     end
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
-      it 'shows a flash error message and redirects to assignment#edit page'
+      it 'shows a flash error message and redirects to assignment#edit page' do
+        allow(team).to receive(:submitted_files).and_return([])
+	allow(team).to receive(:hyperlinks ).and_return([])
+        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return(due_date)
+        allow(due_date).to receive(:due_at).and_return(Time.now - 1.second)
+        delete :delete_signup_as_instructor, params
+        expect(flash.now[:error]).to eq("You cannot drop a student after the drop topic deadline!")
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+      end
     end
 
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
-      it 'shows a flash success message and redirects to assignment#edit page'
+      let(:session) { {user: instructor} }
+      it 'shows a flash success message and redirects to assignment#edit page' do
+        allow(team).to receive(:submitted_files).and_return([])
+	allow(team).to receive(:hyperlinks ).and_return([])
+        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return nil
+        allow(SignedUpTeam).to receive(:reassign_topic).with(any_args)
+        allow(SignedUpTeam).to receive(:find_team_users).with(participant.assignment.id, session[:user].id).and_return([signed_up_team2])
+        allow(signed_up_team2).to receive(:t_id).and_return(2)
+        delete :delete_signup_as_instructor, params, session
+        expect(flash.now[:success]).to eq("You have successfully dropped the student from the topic!")
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: assignment.id
+      end
     end
   end
 

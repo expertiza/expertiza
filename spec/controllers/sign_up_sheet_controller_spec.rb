@@ -3,7 +3,7 @@ describe SignUpSheetController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
-  let(:topic) { build(:topic, id: 1) }
+  let(:topic) { build(:topic, id: 1, topic_name: 'new topic', micropayment: 0, category: 'test',topic_identifier: '1', micropayment: 0, description: 'test', link: 'test') }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
@@ -29,7 +29,7 @@ describe SignUpSheetController do
   end
 
   describe '#create' do
-   let(:params) { {id: 1, topic: {topic_name: 'not found topic'}}}
+   let(:params) { {id: 1, topic: {}}}
     context 'when topic cannot be found' do
       context 'when new topic can be saved successfully' do
         it 'sets up a new topic and redirects to assignment#edit page' do
@@ -53,13 +53,15 @@ describe SignUpSheetController do
 
     context 'when topic can be found' do
       it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page' do
-        new_topic = build(:topic, topic_name: 'new topic', topic_identifier: '120', category: 'test', id: 1)
         allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(topic)
         post :create, params
         expect(response).to  redirect_to action: 'add_signup_topics_staggered', id: 1
       end
     end
   end
+
+
+
 
   describe '#destroy' do
     let(:params) { {id: 1, assignment_id: 1} }
@@ -81,18 +83,30 @@ describe SignUpSheetController do
     end
   end
 
-
   describe '#edit' do
-    it 'renders sign_up_sheet#edit page'
+    it 'renders sign_up_sheet#edit page' do
+      get :edit, id: 1
+      expect(response).to render_template(:edit)
+    end
   end
 
   describe '#update' do
+    let(:params) { {id: 1, assignment_id: 1, topic: {}} }
     context 'when topic cannot be found' do
-      it 'shows an error flash message and redirects to assignment#edit page'
+      it 'shows an error flash message and redirects to assignment#edit page' do
+        allow(SignUpTopic).to receive(:find).with('1').and_return(nil)
+        post :update, params
+        expect(flash[:error]).to eq("The topic could not be updated.")
+        expect(response).to redirect_to(edit_assignment_path(1.to_s) + "#tabs-5")
+      end
     end
 
     context 'when topic can be found' do
-      it 'updates current topic and redirects to assignment#edit page'
+      it 'updates current topic and redirects to assignment#edit page' do
+        session[:user] = participant
+        post :update, params
+        expect(response).to redirect_to(edit_assignment_path(1.to_s) + "#tabs-5")
+      end
     end
   end
 

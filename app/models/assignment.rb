@@ -369,6 +369,13 @@ class Assignment < ActiveRecord::Base
     (due_date.nil? || due_date == 'Finished') ? due_date : due_date.due_at.to_s
   end
 
+  # E1758 Fall 17
+  def review_deadline(topic_id = nil, num_review_rounds)
+    return false if topic_id.nil? and self.staggered_deadline?
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    return !(next_due_date.round == num_review_rounds && next_due_date.deadline_type_id == 2)
+  end
+
   def num_review_rounds
     due_dates = AssignmentDueDate.where(parent_id: self.id)
     rounds = 0

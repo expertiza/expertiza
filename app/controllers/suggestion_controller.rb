@@ -86,6 +86,7 @@ class SuggestionController < ApplicationController
 
 
     end
+    # E1758 Fall 17
     Mailer.send_mail_to_instructor().deliver_now
     redirect_to action: 'new', id: @suggestion.assignment_id
   end

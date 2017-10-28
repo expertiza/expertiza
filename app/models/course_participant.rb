@@ -29,7 +29,7 @@ class CourseParticipant < Participant
     end
     unless CourseParticipant.exists?(user_id: user.id, parent_id: course.id)
       CourseParticipant.create(user_id: user.id, parent_id: course.id)
-#change Fall17
+    # E1758 Fall 17
       password = "password"#user.password
       prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", password)
       prepared_mail.deliver

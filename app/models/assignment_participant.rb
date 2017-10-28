@@ -203,7 +203,7 @@ class AssignmentParticipant < Participant
     unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
       new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
       new_part.set_handle
-#change fall17
+     # E1758 Fall17 
       password = "password"#user.password
       prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", password)
       prepared_mail.deliver
@@ -285,5 +285,11 @@ class AssignmentParticipant < Participant
       return (assignment.staggered_deadline? ? TopicDueDate.find_by(parent_id: topic_id).try(:last).try(:due_at) : assignment.due_dates.last.due_at).to_s
     end
     return stage
+  end
+
+  # E1758 Fall 17
+  def is_round_valid_for_mail?
+    topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
+    return assignment.review_deadline(topic_id, assignment.num_review_rounds)
   end
 end

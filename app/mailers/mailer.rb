@@ -22,7 +22,9 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
+  # E1758 Fall 17
   def send_mail_to_instructor()
+    #just for development purpose, else parameters can be passed accordingly
     mail(to:'expertiza.development@gmail.com',subject: "A new topic suggestion by student")
   end
 

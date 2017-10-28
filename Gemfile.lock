@@ -520,3 +520,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.15.1

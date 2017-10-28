@@ -103,9 +103,9 @@ class Team < ActiveRecord::Base
     teams_num = teams.size
     i = 0
     teams_num.times do
-      team_users = TeamsUser.where(team_id: teams[i].id)
-      team_users.each do |team_user|
-        users.delete(User.find(team_user.user_id))
+      teams_users = TeamsUser.where(team_id: teams[i].id)
+      teams_users.each do |teams_user|
+        users.delete(User.find(teams_user.user_id))
       end
       if Team.size(teams.first.id) >= min_team_size
         teams.delete(teams.first)

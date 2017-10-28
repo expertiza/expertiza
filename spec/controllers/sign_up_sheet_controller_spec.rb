@@ -285,24 +285,71 @@ describe SignUpSheetController do
   end
 
   describe '#set_priority' do
-    it 'sets priority of bidding topic and redirects to sign_up_sheet#list page'
+    let(:params) { {participant_id: '1', id: 1, topic: [1], assignment_id: 1} }
+    let(:team_id) { participant.team.try(:id) }
+    let(:bids) { [bid] }
+    it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
+      allow(AssignmentParticipant).to receive(:find_by).with(id: params[:participant_id]).and_return(participant)
+      allow(SignUpTopic).to receive_message_chain(:find, :assignment).with(params[:topic].first).with(no_args).and_return(assignment)
+      allow(Bid).to receive(:where).with(any_args).and_return(bids)
+      allow(bid).to receive(:topic_id).and_return(1)
+      allow(bids).to receive(:update_all).with(priority: Integer)
+      expect(bids).to receive(:update_all).with(priority: Integer)
+      post :set_priority, params
+      expect(response).to redirect_to action: 'list', assignment_id: params[:assignment_id]
+    end
   end
 
   describe '#save_topic_deadlines' do
+    let(:params) { {assignment_id: 1, due_date: {}} }
+    let(:topics) { [topic] }
     context 'when topic_due_date cannot be found' do
-      it 'creates a new topic_due_date record and redirects to assignment#edit page'
+      it 'creates a new topic_due_date record and redirects to assignment#edit page' do
+        allow(TopicDueDate).to receive(:where).with(any_args).and_return nil
+        allow(SignUpTopic).to receive(:where).with(any_args).and_return(topics)
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        assignment.due_dates = assignment.due_dates.push(due_date2)
+        allow(DeadlineType).to receive_message_chain(:find_by_name, :id).with(String).with(no_args).and_return(1)
+        expect(TopicDueDate).to receive(:create).exactly(2).times.with(any_args)
+        post :save_topic_deadlines, params
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+      end
     end
 
     context 'when topic_due_date can be found' do
-      it 'updates the existing topic_due_date record and redirects to assignment#edit page'
+      it 'updates the existing topic_due_date record and redirects to assignment#edit page' do
+        allow(TopicDueDate).to receive(:where).with(any_args).and_return([due_date])
+        allow(SignUpTopic).to receive(:where).with(any_args).and_return(topics)
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        assignment.due_dates = assignment.due_dates.push(due_date2)
+        allow(DeadlineType).to receive_message_chain(:find_by_name, :id).with(String).with(no_args).and_return(1)
+        expect(due_date).to receive(:update_attributes).exactly(2).times.with(any_args)
+        get :save_topic_deadlines, params
+        expect(response).to redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+      end
     end
   end
 
   describe '#show_team' do
-    it 'renders show_team page'
+    let(:params) { {id: '1', assignment_id: 1} }
+    it 'renders show_team page' do
+      allow(SignedUpTeam).to receive(:where).with(any_args).and_return([signed_up_team])
+      get :show_team, params
+      expect(response).to render_template(:show_team)
+    end
   end
 
   describe '#switch_original_topic_to_approved_suggested_topic' do
-    it 'redirects to sign_up_sheet#list page'
+    let(:params) { {id: 1, topic_id: 1} }
+    let(:session) { {user: student} }
+    it 'redirects to sign_up_sheet#list page' do
+      allow(TeamsUser).to receive(:team_id).with(any_args).and_return(1)
+      allow(SignedUpTeam).to receive(:topic_id).with(any_args).and_return(1)
+      allow(SignUpTopic).to receive(:exists?).with(any_args).and_return(false)
+      allow(SignedUpTeam).to receive(:where).with(any_args).and_return([])
+      get :switch_original_topic_to_approved_suggested_topic, params, session
+      expect(response).to redirect_to action: 'list', id: params[:id]
+    end
   end
 end
+

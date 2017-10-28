@@ -111,9 +111,24 @@ describe SignUpSheetController do
   end
 
   describe '#list' do
+    let(:params) { {id: '1'} }
+   
     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
-      it 'renders sign_up_sheet#intelligent_topic_selection page'
+      it 'renders sign_up_sheet#intelligent_topic_selection page' do
+        allow(assignment).to receive(:is_intelligent).and_return(true)
+        get :list, id: 1
+        expect(response).to render_template(:intelligent_topic_selection)
+      end
     end
+
+    context 'when current assignment is not intelligent assignment and has submission duedate (deadline_type_id 1)' do
+      it 'renders sign_up_sheet#list page' do
+        allow(assignment).to receive(:is_intelligent).and_return(false)
+        get :list, id: 1
+        expect(response).to render_template(:list)
+      end
+    end
+  end
 
     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
       it 'renders sign_up_sheet#list page'

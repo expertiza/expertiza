@@ -145,7 +145,7 @@ class Team < ActiveRecord::Base
       curr_team_size = Team.size(team.id)
       member_num_difference = min_team_size - curr_team_size
       for i in (1..member_num_difference).to_a
-        team.add_member(users.first, parent.id) #,parent.id
+        team.add_member(users.first, parent.id)
         users.delete(users.first)
         break if users.empty?
       end
@@ -154,7 +154,7 @@ class Team < ActiveRecord::Base
   end
 
   def self.sort_teams_by_members_reverse(teams)
-    teams.sort_by {|team| Team.size(team.id)}.reverse!
+    teams.sort_by { |team| Team.size(team.id) }.reverse!
   end
 
   # Generate the team name

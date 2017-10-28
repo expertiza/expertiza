@@ -375,7 +375,8 @@ FactoryGirl.define do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment "abc"
     version_num 1
-    created
+    created_at DateTime.new(2017,10,26)
+    updated_at DateTime.new(2017,10,27)
     round 1
     is_submitted false
   end

@@ -17,13 +17,22 @@ describe 'Response Map' do
 
 
   describe '.get_assessments_for' do
-    let(:team1) { Team.new name: 'team1',id: 1, parent_id: 1, type: nil }
+    let(:team) { Team.create name: 'team',id: 2, parent_id: 1, type: "AssignmentTeam" }
     it 'should return the responses given to them by all the reviewers' do
-      @response_map1 = build(:response_map, id: 1, reviewer_id: 1, reviewee_id: team1.id, type: "ReviewResponseMap")
-      @response_map2 = build(:response_map, id: 2, reviewer_id: 2, reviewee_id: team1.id, type: "ReviewResponseMap")
-      @response1 = build(:response, id: 1, response_map: @response_map1, is_submitted: true)
-      @response2 = build(:response, id: 2,response_map: @response_map2, is_submitted: true)
-      expect(ResponseMap.get_assessments_for(team1)).to eql [@response1,@response2]
+      @response_map1 = create(:response_map, id: 1, reviewer_id: 5, reviewed_object_id: 1, reviewee_id: 2, type: "ReviewResponseMap")
+      @response1 = create(:response, id: 1, map_id: 1, is_submitted: true)
+      expect(ResponseMap.get_assessments_for(team)).to eql [@response1]
     end
   end
+
+  describe '.get_reviewer_assessments_for' do
+    let(:team) { Team.create name: 'team',id: 2, parent_id: 1, type: "AssignmentTeam" }
+    it 'should return the responses given to the team by the reviewer' do
+      @reviewer = create(:student,id: 5)
+      @response_map1 = create(:response_map, id: 1, reviewer_id: 5, reviewed_object_id: 1, reviewee_id: 2, type: "ReviewResponseMap")
+      @response1 = create(:response, id: 1, map_id: 1, is_submitted: true)
+      expect(ResponseMap.get_reviewer_assessments_for(team,@reviewer)).to eql @response1
+    end
+  end
+
 end

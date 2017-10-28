@@ -62,14 +62,25 @@ describe SignUpSheetController do
   end
 
   describe '#destroy' do
+    let(:params) { {id: 1, assignment_id: 1} }
     context 'when topic can be found' do
-      it 'redirects to assignment#edit page'
+      it 'redirects to assignment#edit page' do
+        session[:user] = participant
+        post :destroy, params
+        expect(response).to redirect_to(edit_assignment_path(1.to_s) + "#tabs-5")
+      end
     end
 
     context 'when topic cannot be found' do
-      it 'shows an error flash message and redirects to assignment#edit page'
+      it 'shows an error flash message and redirects to assignment#edit page' do
+        allow(SignUpTopic).to receive(:find).with('1').and_return(nil)
+        get :destroy, params
+        expect(flash[:error]).to eq("The topic could not be deleted.")
+        expect(response).to redirect_to(edit_assignment_path(1.to_s) + "#tabs-5")
+      end
     end
   end
+
 
   describe '#edit' do
     it 'renders sign_up_sheet#edit page'

@@ -57,7 +57,7 @@ class AssignmentsController < ApplicationController
 
       due_date_present(dd)
 
-      if due_date_validation then break end
+      break if due_date_validation
     end
 
     assignment_questionnaires_usage_check

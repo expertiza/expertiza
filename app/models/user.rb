@@ -53,17 +53,17 @@ class User < ActiveRecord::Base
 
   def can_impersonate?(user)
     return true if self.role.super_admin?
-    return true if self.is_teaching_assistant_for?(user)
-    return true if self.is_recursively_parent_of(user)
+    return true if self.teaching_assistant_for?(user)
+    return true if self.recursively_parent_of(user)
     false
   end
 
-  def is_recursively_parent_of(user)
+  def recursively_parent_of(user)
     p = user.parent
     return false if p.nil?
     return true if p == self
     return false if p.role.super_admin?
-    self.is_recursively_parent_of(p)
+    self.recursively_parent_of(p)
   end
 
   def get_user_list
@@ -87,7 +87,7 @@ class User < ActiveRecord::Base
     # Add the children to the list
     unless self.role.super_admin?
       User.all.find_each do |u|
-        if is_recursively_parent_of(u)
+        if recursively_parent_of(u)
           user_list << u unless user_list.include?(u)
         end
       end
@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
 
   delegate :student?, to: :role
 
-  def is_creator_of?(user)
+  def creator_of?(user)
     self == user.creator
   end
 
@@ -285,8 +285,8 @@ class User < ActiveRecord::Base
     user
   end
 
-  def is_teaching_assistant_for?(student)
-    return false unless is_teaching_assistant?
+  def teaching_assistant_for?(student)
+    return false unless teaching_assistant?
     return false if student.role.name != 'Student'
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
@@ -296,7 +296,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def is_teaching_assistant?
+  def teaching_assistant?
     return true if self.role.ta?
   end
 

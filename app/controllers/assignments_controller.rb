@@ -120,15 +120,14 @@ class AssignmentsController < ApplicationController
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]
 
-      if params[:course_id] != nil
+      if !params[:course_id].nil?
         @assignment_new_path = @assignment.directory_path
         @course = Course.find(params[:course_id])
         @assignment.directory_path = @course.directory_path + "/" + @assignment.directory_path
         @destination_path = "/home/expertiza_developer/expertiza/pg_data/" + @assignment.directory_path.to_s
         FileUtils.makedirs(@destination_path)
         my_dir = Dir.glob("/home/expertiza_developer/expertiza/pg_data/" + @assignment.instructor.name.to_s + "/" + @assignment_new_path.to_s + "/*")
-        puts @assignment.instructor.name.to_s
-
+       
         dest_folder = @destination_path
 
         my_dir.each do |filename|

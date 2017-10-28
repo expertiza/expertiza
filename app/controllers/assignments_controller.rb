@@ -132,11 +132,8 @@ class AssignmentsController < ApplicationController
         dest_folder = @destination_path
 
         my_dir.each do |filename|
-          
           name = File.basename(filename, '*')
-          
-          dest_folder = @destination_path +"/"+ name
-          
+          dest_folder = @destination_path + "/" + name
           FileUtils.mv(filename, dest_folder)
         end
 

@@ -17,9 +17,10 @@ class SuggestionController < ApplicationController
     end
   end
 
-  def add_comment
-    @suggestioncomment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
-    @suggestioncomment.suggestion_id = params[:id]
+  def add_comment 
+
+     @suggestioncomment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
+     @suggestioncomment.suggestion_id = params[:id]
     @suggestioncomment.commenter = session[:user].name
     if @suggestioncomment.save
       flash[:notice] = "Your comment has been successfully added."
@@ -89,12 +90,16 @@ class SuggestionController < ApplicationController
   def submit
     if !params[:add_comment].nil?
       add_comment
-    elsif !params[:approve_suggestion].nil?
+    end   
+    if !params[:approve_suggestion].nil?
       approve_suggestion
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
     end
   end
+
+
+
 
   # this is a method for lazy team creation. Here may not be the right place for this method.
   # should be refactored into a static method in AssignmentTeam class. --Yang
@@ -163,12 +168,27 @@ class SuggestionController < ApplicationController
   end
 
   def approve_suggestion
+    #1781 - 718 issue
+
+
+
     approve
     notification
+
     redirect_to action: 'show', id: @suggestion
   end
 
   def reject_suggestion
+    
+     #1781 - 718 issue
+
+    if(params[:suggestion_comment][:comments] && params[:suggestion_comment][:comments] != "" ) 
+    @suggestioncomment = SuggestionComment.new(vote: 'D', comments: params[:suggestion_comment][:comments])
+    @suggestioncomment.suggestion_id = params[:id]
+    @suggestioncomment.commenter = session[:user].name
+    @suggestioncomment.save
+    end
+
     @suggestion = Suggestion.find(params[:id])
 
     if @suggestion.update_attribute('status', 'Rejected')
@@ -176,6 +196,9 @@ class SuggestionController < ApplicationController
     else
       flash[:error] = 'An error occurred when rejecting the suggestion.'
     end
+
+
+
     redirect_to action: 'show', id: @suggestion
   end
 
@@ -187,6 +210,14 @@ class SuggestionController < ApplicationController
   end
 
   def approve
+
+    if(params[:suggestion_comment][:comments] && params[:suggestion_comment][:comments] != "" )
+    @suggestioncomment = SuggestionComment.new(vote: 'A', comments: params[:suggestion_comment][:comments])
+    @suggestioncomment.suggestion_id = params[:id]
+    @suggestioncomment.commenter = session[:user].name
+    @suggestioncomment.save
+    end
+
     @suggestion = Suggestion.find(params[:id])
     @user_id = User.where(name: @suggestion.unityID).first.id
     @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)

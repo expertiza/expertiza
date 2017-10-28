@@ -22,22 +22,42 @@ describe SignUpSheetController do
   end
 
   describe '#new' do
-    it 'builds a new sign up topic and renders sign_up_sheet#new page'
+    it 'builds a new sign up topic and renders sign_up_sheet#new page' do
+      get :new,  id:  1.to_s
+      expect(response).to render_template(:new)
+    end
   end
 
   describe '#create' do
+   let(:params) { {id: 1, topic: {topic_name: 'not found topic'}}}
     context 'when topic cannot be found' do
       context 'when new topic can be saved successfully' do
-        it 'sets up a new topic and redirects to assignment#edit page'
+        it 'sets up a new topic and redirects to assignment#edit page' do
+          session[:user] = participant
+          allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(nil)
+          allow_any_instance_of(SignUpTopic).to receive(:save).and_return(true)
+          post :create, params
+          expect(response).to redirect_to(edit_assignment_path(1.to_s) + "#tabs-5")
+        end
       end
 
       context 'when new topic cannot be saved successfully' do
-        it 'sets up a new topic and renders sign_up_sheet#new page'
+        it 'sets up a new topic and renders sign_up_sheet#new page' do
+          allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(nil)
+          allow_any_instance_of(SignUpTopic).to receive(:save).and_return(false)
+          post :create, params
+          expect(response).to render_template(:new)
+        end
       end
     end
 
     context 'when topic can be found' do
-      it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page'
+      it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page' do
+        new_topic = build(:topic, topic_name: 'new topic', topic_identifier: '120', category: 'test', id: 1)
+        allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(topic)
+        post :create, params
+        expect(response).to  redirect_to action: 'add_signup_topics_staggered', id: 1
+      end
     end
   end
 

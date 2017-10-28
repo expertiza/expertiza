@@ -39,7 +39,7 @@ class AssignmentsController < ApplicationController
       @assignment_form.create_assignment_node
 
       redirect_to edit_assignment_path @assignment_form.assignment.id
-      undo_link("Assignment \"#{ @assignment_form.assignment.name }\" has been created successfully. ")
+      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else
       render 'new'
     end
@@ -57,9 +57,7 @@ class AssignmentsController < ApplicationController
 
       due_date_present(dd)
 
-      if due_date_validation
-        break
-      end
+      if due_date_validation then break end
     end
 
     assignment_questionnaires_usage_check
@@ -280,8 +278,8 @@ class AssignmentsController < ApplicationController
   def assignment_form_assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select { |due_date| due_date.deadline_type_id == 1 }
-      @assignment_review_due_dates = @due_date_all.select { |due_date| due_date.deadline_type_id == 2 }
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_SUBMISSION}
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_REVIEW}
     end
     @assignment_form.assignment.staggered_deadline == true
   end
@@ -296,14 +294,14 @@ class AssignmentsController < ApplicationController
   end
 
   def due_date_present(dd)
-      if dd.due_at.present?
-        dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
-      end
+    if dd.due_at.present?
+      dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
+    end
   end
 
   def due_date_validation
-     @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
-        (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+   @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
   def assignment_questionnaires_usage_check
@@ -331,7 +329,6 @@ class AssignmentsController < ApplicationController
 
   # helper methods for update
   def assignment_form_key_nonexist_case_handler
-    # unless params.key?(:assignment_form)
     @assignment = Assignment.find(params[:id])
     @assignment.course_id = params[:course_id]
 
@@ -339,7 +336,7 @@ class AssignmentsController < ApplicationController
       flash[:note] = 'The assignment was successfully saved.'
       redirect_to list_tree_display_index_path
     else
-      flash[:error] = "Failed to save the assignment: #{ @assignment.errors.full_messages.join(' ') }"
+      flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
       redirect_to edit_assignment_path @assignment.id
     end
   end
@@ -371,7 +368,7 @@ class AssignmentsController < ApplicationController
 
   private
 
-    def assignment_form_params
-      params.require(:assignment_form).permit!
-    end
+  def assignment_form_params
+    params.require(:assignment_form).permit!
+  end
 end

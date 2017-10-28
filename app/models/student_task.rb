@@ -84,7 +84,7 @@ class StudentTask
   end
 
   def reviews_given_in_current_stage?
-    current_stage == 'review'
+    current_stage == 'review' && reviews_given?
   end
 
   def in_work_stage?

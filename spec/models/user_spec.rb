@@ -92,13 +92,13 @@ describe User do
     end
     it 'can impersonate target user if current user is the TA of target user'do
       allow(user1).to receive_message_chain("role.super_admin?"){false}
-      allow(user1).to receive(:is_teaching_assistant_for?).and_return(user)
+      allow(user1).to receive(:teaching_assistant_for?).and_return(user)
       expect(user1.can_impersonate?(user)).to be true
 
     end
     it 'can impersonate target user if current user is the recursively parent of target user'do
       allow(user1).to receive_message_chain("role.super_admin?"){true}
-      allow(user1).to receive(:is_recursively_parent_of).and_return(user)
+      allow(user1).to receive(:recursively_parent_of).and_return(user)
       expect(user1.can_impersonate?(user)).to be true
     end
     it 'cannot impersonate target user if current user does not satisfy all requirements'do
@@ -108,18 +108,18 @@ describe User do
     end
   end
 
-  describe '#is_recursively_parent_of' do
+  describe '#recursively_parent_of' do
     context 'when the parent of target user (user) is nil' do
       it 'returns false' do
         allow(user).to receive(:parent).and_return(nil)
-        expect(user1.is_recursively_parent_of(user)).to eq false
+        expect(user1.recursively_parent_of(user)).to eq false
       end
     end
 
     context 'when the parent of target user (user) is current user (user1)' do
       it 'returns true' do
         allow(user).to receive(:parent).and_return(user1)
-        expect(user1.is_recursively_parent_of(user)).to eq true
+        expect(user1.recursively_parent_of(user)).to eq true
       end
     end
 
@@ -127,7 +127,7 @@ describe User do
       it 'returns false' do
         allow(user).to receive(:parent).and_return(user2)
         allow(user2).to receive_message_chain("role.super_admin?") { true }
-        expect(user1.is_recursively_parent_of(user)).to eq false
+        expect(user1.recursively_parent_of(user)).to eq false
       end
     end
   end
@@ -175,16 +175,16 @@ describe User do
     end
   end
 
-  describe '#is_creator_of?' do
+  describe '#creator_of?' do
     it 'returns true of current user (user) is the creator of target user (user1)' do
       allow(user1).to receive(:creator).and_return(user)
-      expect(user.is_creator_of?(user1)).to be true
+      expect(user.creator_of?(user1)).to be true
     end
 
     it 'returns false of current user (user) is not the creator of target user (user1)' do
       allow(user1).to receive(:creator).and_return(user2)
-      expect(user.is_creator_of?(user1)).to be false
-      expect(user2.is_creator_of?(user1)).to be true
+      expect(user.creator_of?(user1)).to be false
+      expect(user2.creator_of?(user1)).to be true
 
     end
   end
@@ -382,16 +382,16 @@ describe User do
     end
   end
 
-  describe '#is_teaching_assistant_for?' do
+  describe '#teaching_assistant_for?' do
     it 'returns false if current user is not a TA' do
       allow(user1).to receive_message_chain("role.ta?"){ false }
-      expect(user1.is_teaching_assistant_for?(user)).to be_falsey
+      expect(user1.teaching_assistant_for?(user)).to be_falsey
     end
 
     it 'returns false if current user is a TA, but target user is not a student'do
       allow(user1).to receive_message_chain("role.ta?"){true }
       allow(user).to receive_message_chain("role.name").and_return('teacher')
-      expect(user1.is_teaching_assistant_for?(user)).to be_falsey
+      expect(user1.teaching_assistant_for?(user)).to be_falsey
     end
 
     it 'returns true if current user is a TA of target user'do
@@ -401,23 +401,23 @@ describe User do
     c1=Course.new
     allow(user1).to receive_message_chain(:courses_assisted_with,:any?).and_yield(c1)
     allow_any_instance_of(Course).to receive_message_chain(:assignments,:map,:flatten,:map,:include?,:user).and_return(true)
-    expect(user1.is_teaching_assistant_for?(user)).to be true
+    expect(user1.teaching_assistant_for?(user)).to be true
     end
   end
 
-  describe '#is_teaching_assistant?' do
+  describe '#teaching_assistant?' do
     it 'returns true if current user is a TA' do
       allow(user).to receive_message_chain("role.ta?"){ true }
-      expect(user.is_teaching_assistant?).to be true
+      expect(user.teaching_assistant?).to be true
     end
 
     it 'returns false if current user is not a TA' do
       allow(user).to receive_message_chain("role.ta?"){ false }
-      expect(user.is_teaching_assistant?).to be_falsey
+      expect(user.teaching_assistant?).to be_falsey
     end
   end
 
-  descirbe '.search_users' do
+  describe '.search_users' do
 
     let(:role) { Role.new }
     before(:each) do

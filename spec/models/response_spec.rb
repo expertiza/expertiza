@@ -1,12 +1,12 @@
 describe Response do
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
-
   let(:participant) { build(:participant, id: 1, parent_id: 1, assignment: assignment, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:answer5) { build(:answer5) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer5]) }
+  let(:response1) { build(:response, id: 2, map_id: 1, response_map: review_response_map, scores: [answer2]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
@@ -26,11 +26,15 @@ describe Response do
 
   describe '#display_as_html' do
     context 'when prefix is not nil, which means view_score page in instructor end' do
-      it 'returns corresponding html code'
+      it 'returns corresponding html code' do
+        
+      end
     end
 
     context 'when prefix is nil, which means view_score page in student end and question type is TextArea' do
-      it 'returns corresponding html code'
+      it 'returns corresponding html code' do
+
+      end
     end
   end
 
@@ -109,19 +113,28 @@ describe Response do
 
   describe '#significant_difference?' do
     context 'when count is 0' do
-      it 'returns false'
+      it 'returns false' do
+
+      end
     end
 
     context 'when count is not 0' do
       context 'when the difference between average score on same artifact from others and current score is bigger thatn allowed percentage' do
-        it 'returns true'
+        it 'returns true' do
+
+        end
       end
     end
   end
 
   describe '.avg_scores_and_count_for_prev_reviews' do
     context 'when current response is not in current response array' do
-      it 'returns the average score and count of previous reviews'
+      it 'returns the average score and count of previous reviews' do
+        existingResponse = [response]
+        result_array = [1.0,1]
+        allow(Question).to receive(:find).and_return(question3)
+        expect(Response.avg_scores_and_count_for_prev_reviews(existingResponse,response1)).to eq result_array
+      end
     end
   end
 end

@@ -278,8 +278,8 @@ class AssignmentsController < ApplicationController
   def assignment_form_assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_SUBMISSION}
-      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_REVIEW}
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_SUBMISSION }
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_REVIEW }
     end
     @assignment_form.assignment.staggered_deadline == true
   end
@@ -300,7 +300,7 @@ class AssignmentsController < ApplicationController
   end
 
   def due_date_validation
-   @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+    @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 

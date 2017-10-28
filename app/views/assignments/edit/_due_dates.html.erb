@@ -471,7 +471,7 @@ function addDaysOrMonth(mul, type) {
   <button type="button" id="set_rounds">Set</button><label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
 </div>
 
-<%= hidden_field(:set_pressed, :bool, :value => false) %>
+<%= hidden_field(:set_pressed, :bool, :value => true) %>
 
 <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->

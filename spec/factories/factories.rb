@@ -381,6 +381,13 @@ FactoryGirl.define do
     is_submitted false
   end
 
+  factory :feedback_response_map, class: FeedbackResponseMap do
+    reviewed_object_id 1
+    reviewer_id 1
+    reviewee_id 1
+    type 'FeedbackResponseMap'
+    calibrate_to 0
+  end
   factory :submission_record, class: SubmissionRecord do
     team_id 666
     operation 'create'

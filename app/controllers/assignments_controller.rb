@@ -38,7 +38,6 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else
@@ -122,7 +121,6 @@ class AssignmentsController < ApplicationController
       @assignment.course_id = params[:course_id]
 
       if params[:course_id] != nil
-        #@assignment.course_id = params[:course_id]
         @assignment_new_path = @assignment.directory_path
         @course = Course.find(params[:course_id])
         @assignment.directory_path = @course.directory_path + "/" + @assignment.directory_path
@@ -134,11 +132,11 @@ class AssignmentsController < ApplicationController
         dest_folder = @destination_path
 
         my_dir.each do |filename|
-          puts filename
+          
           name = File.basename(filename, '*')
-          puts name
+          
           dest_folder = @destination_path +"/"+ name
-          #puts dest_folder
+          
           FileUtils.mv(filename, dest_folder)
         end
 
@@ -168,7 +166,7 @@ class AssignmentsController < ApplicationController
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else
-      #flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end

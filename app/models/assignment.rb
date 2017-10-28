@@ -38,9 +38,8 @@ class Assignment < ActiveRecord::Base
   def check_directory_path
     @assignments = Assignment.all
     @assignments.each do |assignment|
-
-      if(assignment.directory_path != nil && self.directory_path != nil && assignment.directory_path.include?(self.directory_path))
-        errors.add(:directory_path,"The directory is already in use")
+      if (assignment.directory_path != nil && self.directory_path != nil && assignment.directory_path.include?(self.directory_path))
+        errors.add(:directory_path, "The directory is already in use")
         return false
       end
     end

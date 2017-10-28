@@ -52,14 +52,7 @@ class AssignmentsController < ApplicationController
 
     assignment_form_assignment_staggered_deadline?
 
-    #due_date_all_nameurl_notempty_check
     @due_date_all.each do |dd|
-      # @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
-      # @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
-      # @metareview_allowed = meta_review_allowed?(dd)
-      # @drop_topic_allowed = drop_topic_allowed?(dd)
-      # @signup_allowed = signup_allowed?(dd)
-      # @team_formation_allowed = team_formation_allowed?(dd)
       due_date_nameurl_notempty_check(dd)
 
       due_date_present(dd)
@@ -309,10 +302,9 @@ class AssignmentsController < ApplicationController
   end
 
   def due_date_validation
-    return @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+     @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
         (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
-
 
   def assignment_questionnaires_usage_check
     @assignment_questionnaires.each do |aq|
@@ -327,7 +319,7 @@ class AssignmentsController < ApplicationController
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
       flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-          " of assignment <b>#{ @assignment_form.assignment.name }</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
   end
 
@@ -373,7 +365,7 @@ class AssignmentsController < ApplicationController
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else
-      flash[:error] = "Failed to save the assignment: #{ @assignment_form.errors.get(:message) }"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
   end
 

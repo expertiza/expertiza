@@ -263,10 +263,9 @@ class Response < ActiveRecord::Base
   require 'octokit'
   require 'uri'
 
-  def check_update (participant_id)
-    @participant = participant_id
+  def check_update (participant)
 
-    team = @participant.team
+    team = participant.team
     team_hyperlinks = team.hyperlinks
 
     github_time = nil
@@ -310,4 +309,7 @@ class Response < ActiveRecord::Base
     latest_commit = res[0].to_h
     latest_commit[:commit][:author][:date]
   end
+
 end
+
+

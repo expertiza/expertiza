@@ -45,18 +45,35 @@ jQuery("input[id^='due_date_']").datetimepicker({
 
 
 
+
+function setSize(){
+    console.log("setsize");
+    /*var rows = jQuery(".jsgrid-grid-body").find("tr")
+    var rowSize = rows.length
+    jQuery(".jsgrid-grid-body").css("height",75 * rowSize+"px")*/
+}
+
+
+
+
+
+
+
+// after document is ready
 //1781
 jQuery(function(){
 
 
-
+setSize();
 jQuery( window ).resize(function() {
-    var rows = jQuery(".jsgrid-grid-body").find("tr")
+    // var rows = jQuery(".jsgrid-grid-body").find("tr")
 
-    var rowSize = rows.length
+    // var rowSize = rows.length
 
-    jQuery(".jsgrid-grid-body").css("height",400+"px")
+    // jQuery(".jsgrid-grid-body").css("height",75 * rowSize+"px")
+    setSize();
 });
+
 
 
 jQuery('.jsgrid-header-row th:first-child, .jsgrid-filter-row td:first-child, .jsgrid-insert-row td:first-child, .jsgrid-grid-body tr td:first-child')
@@ -67,13 +84,17 @@ left: "1px"
 jQuery('.jsgrid-grid-header, .jsgrid-grid-body').css('margin-left', '100px');
 
 
+
+
+
+
 var assignmentId = jQuery("#jsGrid").data("assignmentid");
 
 jQuery("#jsGrid").jsGrid({  
                 width: "100%",
-                height : "400%",
+                height : "auto",
 
-                filtering: true,
+                filtering: false,
                 inserting: true,
                 editing: true,
                 sorting: true,
@@ -87,6 +108,8 @@ jQuery("#jsGrid").jsGrid({
                 deleteConfirm: "Do you really want to delete client?",
                 controller: {
                     loadData: function (filter) {
+
+                    setSize();    
                     var data = $.Deferred();
                         $.ajax({
                             type: "GET",
@@ -95,8 +118,15 @@ jQuery("#jsGrid").jsGrid({
                               // url: "/sign_up_sheet/847/load_add_signup_topics",
                             dataType: "json"
                             }).done(function(response){
+                               setSize();
                                var sign_up_topics =  response.sign_up_topics;
                                data.resolve(sign_up_topics);
+
+                                jQuery(".jsgrid-header-sortable").click(function () {
+                                // code here
+                                
+                                setSize();
+                                });
                         });
                     return data.promise();
                     },
@@ -104,14 +134,15 @@ jQuery("#jsGrid").jsGrid({
                     console.log("testing")
                     console.log(topic)   
                     topic.id = jQuery("#jsGrid").data("assignmentid")
-                    var data = $.Deferred();
+
+                     var data = $.Deferred();
                         $.ajax({
                             type: "POST",
                             url: "/sign_up_sheet/",
                               // url: "/sign_up_sheet/847/load_add_signup_topics",
                             data: topic
                             }).done(function(response){
-
+                              setSize();
                               data.resolve(response);
                         });
                     return data.promise();
@@ -120,7 +151,9 @@ jQuery("#jsGrid").jsGrid({
 
                     updateItem: function (topic) {
                     console.log("testing")
-                    console.log(topic)   
+                    console.log(topic)
+                    if(topic.max_choosers == 0)
+
                     var data = $.Deferred();
                         $.ajax({
                             type: "PUT",
@@ -142,24 +175,6 @@ jQuery("#jsGrid").jsGrid({
                         });
                     }
                 },
-
-
-
-                
-            /*        
-                data : [
-                    {name : "raga" , age : 24 , address : "avery close"}
-
-                ],
-               */
-
-               /*
-                    <a href="/sign_up_sheet/signup_as_instructor?assignment_id=843&amp;topic_id=3958">
-                    <img border="0" title="Sign Up Student" align="middle" src="/assets/signup-806fc3d5ffb6923d8f5061db243bf1afd15ec4029f1bac250793e6ceb2ab22bf.png" alt="Signup"></a>
-        
-               */
-
-
                 fields: [
                     { name: "topic_identifier", type: "text" ,title: "Topic #",width : "1.5%" },
                     { name: "topic_name", type: "text" ,title: "Topic name(s)",width : "5%",
@@ -219,7 +234,17 @@ jQuery("#jsGrid").jsGrid({
 
                 },
                     { name: "category", type: "text",title: "Topic category" ,width : "5%" },
-                    { name: "max_choosers", type: "text" ,title: "# Slots" ,width : "2%"},
+                    { name: "max_choosers", type: "text" ,title: "# Slots" ,width : "2%",
+                        validate: {
+                        message: "Choose Num of slots greater than or equal to 1",
+                        validator: function(value, item) {
+                        return value > 0;
+                        }
+
+                        }
+
+
+                    },
                     { name: "slots_available", editing: false ,title: "Available Slots",width : "2%"},
                     { name: "slots_waitlisted",  editing: false  ,title: "Num on Waitlist"  , width : "2%"},
 
@@ -265,10 +290,13 @@ jQuery("#jsGrid").jsGrid({
 
                     { type: "control",                      
                         editButton: true,                               // show edit button
-                        deleteButton: true,                             // show delete button
-                        clearFilterButton: true,                        // show clear filter button
-                        modeSwitchButton: true,                         // show switching filtering/inserting button
-                        width : "3%"
+                        deleteButton: true,     
+                        searching : false,
+                           
+                            filtering: false,                         // show delete button
+                      //  clearFilterButton: true,                        // show clear filter button
+                        modeSwitchButton: false,                         // show switching filtering/inserting button
+                        width : "2%"
                         
                  }  ,
 

@@ -25,7 +25,7 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 .jsgrid-grid-body {
 
     overflow-x: scroll;
-    overflow-y: scroll;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     
 }
@@ -45,7 +45,12 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 
 .jsgrid-header-row{
 	font-size: 10px;
+  overflow-y: auto;
 
+}
+
+.jsgrid-grid-header {
+overflow-y: auto;
 }
 
 .jsgrid-cell {

@@ -89,14 +89,11 @@ describe ReviewMappingController do
 
   describe '#assign_metareviewer_dynamically' do
     it  'redirects to student_review#list page' do
-      param = Hash.new
-      param[:assignment_id] = assignment.id
-
-      expect(AssignmentParticipant).to receive_message_chain("where.first").and_return(participant)
-      expect(Assignment).to receive(:assign_metareviewer_dynamically).with(participant)
+      expect(AssignmentParticipant).to receive_message_chain("where.first").with(any_args).and_return(participant)
+      expect(assignment).to receive(:assign_metareviewer_dynamically).with(participant)
       get :assign_metareviewer_dynamically, :assignment_id=> assignment.id, :metareviewer_id=>participant.id
 
-      expect(response).to redirect_to controller: 'student_review', action: 'list'
+      expect(response).to redirect_to controller: 'student_review', action: 'list', id: participant.id
     end
   end
 
@@ -112,11 +109,37 @@ describe ReviewMappingController do
 
   describe '#delete_all_metareviewers' do
     context 'when failed times are bigger than 0' do
-      it 'shows an error flash message and redirects to review_mapping#list_mappings page'
+      it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
+        dummy_response_map = double()
+        expect(ResponseMap).to receive(:find).with(any_args).and_return(dummy_response_map)
+        allow(dummy_response_map).to receive(:map_id).and_return('1')
+        allow(dummy_response_map).to receive(:assignment).and_return(assignment)
+        expect(MetareviewResponseMap).to receive(:where).with(any_args).and_return(metareview_response_map)
+        expect(ResponseMap).to receive(:delete_mappings).with(any_args).and_return(1)
+        get :delete_all_metareviewers
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id
+      end
     end
 
     context 'when failed time is equal to 0' do
-      it 'shows a note flash message and redirects to review_mapping#list_mappings page'
+      it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
+        dummy_response_map = double()
+        expect(ResponseMap).to receive(:find).with(any_args).and_return(dummy_response_map)
+        allow(dummy_response_map).to receive(:map_id).and_return('1')
+        allow(dummy_response_map).to receive(:assignment).and_return(assignment)
+        dummy_reviewee = double
+        allow(dummy_reviewee).to receive(:name).and_return('test_reviewee')
+        dummy_reviewer = double
+        allow(dummy_reviewer).to receive(:name).and_return('test_reviewer')
+        allow(dummy_response_map).to receive(:reviewee).and_return(dummy_reviewee)
+        allow(dummy_response_map).to receive(:reviewer).and_return(dummy_reviewer)
+        expect(MetareviewResponseMap).to receive(:where).with(any_args).and_return(metareview_response_map)
+        expect(ResponseMap).to receive(:delete_mappings).with(any_args).and_return(0)
+        get :delete_all_metareviewers
+        expect(flash[:note]).to be_present
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id
+      end
     end
   end
 
@@ -151,7 +174,10 @@ describe ReviewMappingController do
   end
 
   describe '#delete_metareview' do
-    it 'redirects to review_mapping#list_mappings page after deletion'
+    it 'redirects to review_mapping#list_mappings page after deletion' do
+      dummy_mapping = double
+      expect(MetareviewResponseMap).to receive(:find).and_return()
+    end
   end
 
   describe '#list_mappings' do

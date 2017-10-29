@@ -133,9 +133,9 @@ class AssignmentForm
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)
     due_at = Time.parse(due_at)
-    time_diff_in_min = find_min_from_now(due_at)
-    diff_btw_time_left_and_threshold = time_diff_in_min - due_date.threshold * 60
-    [diff_btw_time_left_and_threshold, time_diff_in_min]
+    time_left_in_min = find_min_from_now(due_at)
+    diff_btw_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
+    [diff_btw_time_left_and_threshold, time_left_in_min]
   end
 
   # add DelayedJob into queue and return it

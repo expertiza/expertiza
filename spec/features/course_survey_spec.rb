@@ -1,6 +1,5 @@
 include InstructorInterfaceHelperSpec
 
-
 def create_course_questionnaire survey_name
   visit '/questionnaires/new?model=Course+SurveyQuestionnaire&private=0'
   fill_in 'questionnaire_name', with: survey_name
@@ -22,7 +21,6 @@ def deploy_course_survey(start_date, end_date, survey_name)
   select survey.name, from: "survey_deployment_questionnaire_id"
   find('input[name="commit"]').click
 end
-
 
 describe "Course Survey questionnaire tests for instructor interface" do
   before(:each) do
@@ -48,9 +46,9 @@ describe "Course Survey questionnaire tests for instructor interface" do
   it "is able to add and edit questions to a course survey" do
     survey_name = 'Course Survey Questionnaire 1'
     deploy_course_survey(@next_day, @next_to_next_day, survey_name)
-    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
+    survey_questionnaire_course = Questionnaire.where(name: survey_name).first
     # adding some questions for the deployed survey
-    visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
+    visit '/questionnaires/' + survey_questionnaire_course.id.to_s + '/edit'
     fill_in('question_total_num', with: '1')
     select('Criterion', from: 'question_type')
     click_button "Add"
@@ -59,14 +57,13 @@ describe "Course Survey questionnaire tests for instructor interface" do
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')
-
   end
   
   it "is able to delete question from a course survey" do
     survey_name = 'Course Survey Questionnaire 1'
     deploy_course_survey(@next_day, @next_to_next_day, survey_name)
-    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
-    visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
+    survey_questionnaire_course = Questionnaire.where(name: survey_name).first
+    visit '/questionnaires/' + survey_questionnaire_course.id.to_s + '/edit'
     fill_in('question_total_num', with: '1')
     select('Criterion', from: 'question_type')
     click_button "Add"
@@ -76,12 +73,12 @@ describe "Course Survey questionnaire tests for instructor interface" do
     click_button "Save course survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')
 
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
+    # We can use the following line if we want to use an instance of survey_deployment.
+    # survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
 
-    question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire_1.id.to_s)
+    question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire_course.id.to_s)
     print question
     click_link('Remove')
-    #expect(page).to_have_content("You have successfully deleted the question!") 
+    # expect(page).to_have_content("You have successfully deleted the question!") 
   end
-
 end

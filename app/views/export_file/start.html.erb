@@ -15,7 +15,7 @@
   <% if @model == 'Assignment' %>
     <%= render :partial => 'scores' %>
   <% end %>
-  <% if @model == 'CourseParticipant' %>
+  <% if @model == 'CourseParticipant' || @model == 'AssignmentParticipant' %>
     <%= render :partial => 'course_participants' %>
   <% end %>
   <% if @model == 'User' %>

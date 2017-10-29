@@ -206,28 +206,6 @@ class AssignmentParticipant < Participant
     end
   end
 
-  # provide export functionality for Assignment Participants
-  def self.export(csv, parent_id, _options)
-    where(parent_id: parent_id).find_each do |part|
-      user = part.user
-      csv << [
-        user.name,
-        user.fullname,
-        user.email,
-        user.role.name,
-        user.parent.name,
-        user.email_on_submission,
-        user.email_on_review,
-        user.email_on_review_of_review,
-        part.handle
-      ]
-    end
-  end
-
-  def self.export_fields(_options)
-    ["name", "full name", "email", "role", "parent", "email on submission", "email on review", "email on metareview", "handle"]
-  end
-
   # grant publishing rights to one or more assignments. Using the supplied private key,
   # digital signatures are generated.
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/

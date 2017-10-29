@@ -207,7 +207,20 @@ class Team < ActiveRecord::Base
     if handle_dups == "ignore" # ignore: do not create the new team
       return nil
     end
-    if handle_dups == "rename" # rename: rename new team
+    if handle_dups == "rename" && !team.nil? # rename old team and retain name of new team
+      if teamtype.is_a?(CourseTeam)
+        s = name
+        team.name  = self.generate_team_name(Course.find(id).name)
+        team.save
+        return s
+      elsif teamtype.is_a?(AssignmentTeam)
+        s = name
+        team.name = self.generate_team_name(Assignment.find(id).name)
+        team.save
+        return s
+      end
+    end
+    if handle_dups == "new_name" # find a new name for the new team
       if teamtype.is_a?(CourseTeam)
         return self.generate_team_name(Course.find(id).name)
       elsif teamtype.is_a?(AssignmentTeam)

@@ -40,7 +40,7 @@ class Response < ActiveRecord::Base
                     '<a href="#" name= "review_' + str + 'Link" onClick="toggleElement(' + "'review_" + str + "','review'" + ');return false;">show review</a>'\
                     '</td>'\
                     '<td align="left"><b>Last Reviewed:</b>'\
-                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at)}</span></td>"\
+                    "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
                     '</tr></table>'
       code = identifier
     end

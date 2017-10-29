@@ -49,8 +49,6 @@ class StudentReviewController < ApplicationController
     @response = response
     @last_review_time = response.updated_at
     @team = @response.map.contributor
-    # @participant_of_response = AssignmentParticipant.find(participant_of_response.id)
-    # @team = @participant_of_response.team
 
     update_times = {submission: nil, link_to_content: nil}
     update_times[:submission] = @latest_submisstion_time if submission_updated?
@@ -102,8 +100,6 @@ class StudentReviewController < ApplicationController
   def get_latest_commit_time(github_url)
     client = Octokit::Client.new
     # client.access_token = ENV['GITHUB_TOKEN']
-    # Using literal value of access_token temporarily. This value should be stored in ENV.
-    client.access_token = '15bad233e15570ba43b743fe3e9f402c64419a9f'
 
     case github_url.host
     when 'github.ncsu.edu'

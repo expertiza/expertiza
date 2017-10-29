@@ -1,6 +1,6 @@
 class SubmissionRecordsController < ApplicationController
   before_action :set_submission_record, only: [:show, :edit, :update, :destroy]
-
+  GIT_HUB_REGEX = %r{https?:\/\/([w]{3}\.)?github.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)[\S]*}i
   def action_allowed?
     # currently we only have a index method which shows all the submission records given a team_id
     assignment_team = AssignmentTeam.find(params[:team_id])
@@ -15,6 +15,34 @@ class SubmissionRecordsController < ApplicationController
   # Show submission records.
   # expects to get team_id from params
   def index
+    latest_record_counter = 0
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
+    @submission_records.reverse.each do |record|
+      matches = GIT_HUB_REGEX.match(record.content)
+      if matches.nil?
+      else
+        if record.operation == "Submit Hyperlink"
+          if latest_record_counter.zero?
+            update_git_data(record.id)
+          else
+            git_data_cleanup(record.id)
+          end
+        end
+        latest_record_counter += 1
+      end
+    end
+  end
+
+  private
+
+  def update_git_data(id)
+    GitDatum.update_git_data(id)
+    @authors = GitDatum.where("submission_record_id = ?", id).map(&:author).uniq {|x| x }
+    @record_id = id
+  end
+
+  def git_data_cleanup(id)
+    @git_data = GitDatum.where("submission_record_id = ?", id)
+    @git_data.each(&:destroy)
   end
 end

@@ -86,6 +86,7 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    chartkick (2.2.4)
     childprocess (0.5.6)
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.0)
@@ -145,6 +146,8 @@ GEM
     globalid (0.3.6)
       activesupport (>= 4.1.0)
     googlecharts (1.6.12)
+    groupdate (3.2.0)
+      activesupport (>= 3)
     guard (2.13.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, <= 4.0)
@@ -454,6 +457,7 @@ DEPENDENCIES
   capistrano-db-tasks
   capistrano-rails
   capybara (~> 2.7, >= 2.7.1)
+  chartkick
   coffee-rails
   coveralls
   daemons
@@ -470,6 +474,7 @@ DEPENDENCIES
   gdata
   gherkin
   googlecharts
+  groupdate
   guard-rails
   guard-rspec
   haml-rails

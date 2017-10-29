@@ -103,7 +103,7 @@ class StudentReviewController < ApplicationController
     client = Octokit::Client.new
     # client.access_token = ENV['GITHUB_TOKEN']
     # Using literal value of access_token temporarily. This value should be stored in ENV.
-    client.access_token = '03939b771194430c70563ebc8e98373c1999d9f0'
+    client.access_token = '6d0af0c34ced8846f03387cb301ee13ca8528152'
 
     case github_url.host
     when 'github.ncsu.edu'

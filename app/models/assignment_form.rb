@@ -115,36 +115,35 @@ class AssignmentForm
     duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
-      diff, mi = get_diff_from_now(due_date)
-      next unless diff > 0
-      dj = add_delayed_job(@assignment, deadline_type, due_date, diff)
-      due_date.update_attribute(:delayed_job_id, dj.id)
+      diff_btw_time_left_and_threshold, min_left = get_time_diff_btw_due_date_and_now(due_date)
+      next unless diff_btw_time_left_and_threshold > 0
+      delayed_job = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
+      due_date.update_attribute(:delayed_job_id, delayed_job.id)
       # If the deadline type is review, add a delayed job to drop outstanding review
       if deadline_type == "review"
-        add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, mi)
+        add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left)
       end
       # If the deadline type is team_formation, add a delayed job to drop one member team
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
-      add_delayed_job(@assignment, "drop_one_member_topics", due_date, mi)
+      add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left)
     end
   end
 
-  # get time difference between due_date and now
-  def get_diff_from_now(due_date)
+  def get_time_diff_btw_due_date_and_now(due_date)
     due_at = due_date.due_at.to_s(:db)
     Time.parse(due_at)
     due_at = Time.parse(due_at)
-    mi = find_min_from_now(due_at)
-    diff = mi - due_date.threshold * 60
-    [diff, mi]
+    time_diff_in_min = find_min_from_now(due_at)
+    diff_btw_time_left_and_threshold = time_diff_in_min - due_date.threshold * 60
+    [diff_btw_time_left_and_threshold, time_diff_in_min]
   end
 
   # add DelayedJob into queue and return it
-  def add_delayed_job(assignment, deadline_type, due_date, diff)
-    dj = DelayedJob.enqueue(DelayedMailer.new(assignment.id, deadline_type, due_date.due_at.to_s(:db)),
-                            1, diff.minutes.from_now)
-    change_item_type(dj.id)
-    dj
+  def add_delayed_job(assignment, deadline_type, due_date, min_left)
+    delayed_job = DelayedJob.enqueue(DelayedMailer.new(assignment.id, deadline_type, due_date.due_at.to_s(:db)),
+                            1, min_left.minutes.from_now)
+    change_item_type(delayed_job.id)
+    delayed_job
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue

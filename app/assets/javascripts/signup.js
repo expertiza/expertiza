@@ -143,7 +143,7 @@ jQuery("#jsGrid").jsGrid({
                               // url: "/sign_up_sheet/847/load_add_signup_topics",
                             data: topic
                             }).done(function(response){
-
+                              jQuery("#jsGrid").jsGrid("loadData");
                               data.resolve(response);
 
                         }).fail(function(response){
@@ -251,10 +251,7 @@ jQuery("#jsGrid").jsGrid({
 
 
                 },
-                    { name: "category", type: "text",title: "Topic category" ,width : "5%",  validate: { 
-                        validator: "required" ,
-                        message : "Category should not be empty " }
-                         },
+                    { name: "category", type: "text",title: "Topic category" ,width : "5%"},
                     { name: "max_choosers", type: "text" ,title: "# Slots" ,width : "2%",
                         validate: {
                         message: "Choose Num of slots greater than or equal to 1",

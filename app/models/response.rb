@@ -9,7 +9,7 @@ class Response < ActiveRecord::Base
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
   alias map response_map
-  attr_accessor :difficulty_rating, :hyperlinks_snap, :files_snap
+  attr_accessor :difficulty_rating
   delegate :questionnaire, :reviewee, :reviewer, to: :map
 
   def response_id

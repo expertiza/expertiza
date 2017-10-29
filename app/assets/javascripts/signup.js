@@ -46,33 +46,12 @@ jQuery("input[id^='due_date_']").datetimepicker({
 
 
 
-function setSize(){
-    console.log("setsize");
-    /*var rows = jQuery(".jsgrid-grid-body").find("tr")
-    var rowSize = rows.length
-    jQuery(".jsgrid-grid-body").css("height",75 * rowSize+"px")*/
-}
-
-
-
-
-
-
 
 // after document is ready
 //1781
 jQuery(function(){
 
 
-setSize();
-jQuery( window ).resize(function() {
-    // var rows = jQuery(".jsgrid-grid-body").find("tr")
-
-    // var rowSize = rows.length
-
-    // jQuery(".jsgrid-grid-body").css("height",75 * rowSize+"px")
-    setSize();
-});
 
 
 
@@ -105,11 +84,11 @@ jQuery("#jsGrid").jsGrid({
                 
 
                 
-                deleteConfirm: "Do you really want to delete client?",
+                deleteConfirm: "Do you really want to delete the Topic?",
                 controller: {
                     loadData: function (filter) {
 
-                    setSize();    
+                   
                     var data = $.Deferred();
                         $.ajax({
                             type: "GET",
@@ -118,18 +97,17 @@ jQuery("#jsGrid").jsGrid({
                               // url: "/sign_up_sheet/847/load_add_signup_topics",
                             dataType: "json"
                             }).done(function(response){
-                               setSize();
+                               
                                var sign_up_topics =  response.sign_up_topics;
                                data.resolve(sign_up_topics);
-
-                                jQuery(".jsgrid-header-sortable").click(function () {
-                                // code here
-                                
-                                setSize();
-                                });
+                        }).fail(function(response){
+                             alert("Issue on Loading Topics");
+                             data.resolve(respomse);
                         });
                     return data.promise();
                     },
+
+
                     insertItem: function (topic) {
                     console.log("testing")
                     console.log(topic)   
@@ -142,9 +120,13 @@ jQuery("#jsGrid").jsGrid({
                               // url: "/sign_up_sheet/847/load_add_signup_topics",
                             data: topic
                             }).done(function(response){
-                              setSize();
+                              jQuery("#jsGrid").jsGrid("loadData");
                               data.resolve(response);
-                        });
+                        }).fail(function(response){
+                            alert("Issue on inserting Topic");
+                            data.resolve(response);
+                        }
+                        );
                     return data.promise();
                     },
 
@@ -152,7 +134,7 @@ jQuery("#jsGrid").jsGrid({
                     updateItem: function (topic) {
                     console.log("testing")
                     console.log(topic)
-                    if(topic.max_choosers == 0)
+                    
 
                     var data = $.Deferred();
                         $.ajax({
@@ -163,6 +145,10 @@ jQuery("#jsGrid").jsGrid({
                             }).done(function(response){
 
                               data.resolve(response);
+
+                        }).fail(function(response){
+                             alert("Issue on Update Topic");
+                            data.resolve(previousItem);
                         });
                     return data.promise();
                     },
@@ -175,12 +161,44 @@ jQuery("#jsGrid").jsGrid({
                         });
                     }
                 },
+
+
+
+
                 fields: [
-                    { name: "topic_identifier", type: "text" ,title: "Topic #",width : "1.5%" },
-                    { name: "topic_name", type: "text" ,title: "Topic name(s)",width : "5%",
+                      {
+                       title : "Actions",
+                       type: "control",                      
+                        editButton: true,                               // show edit button
+                        deleteButton: true,     
+                        searching : false,
+                         filtering: false,                         // show delete button
+                      //  clearFilterButton: true,                        // show clear filter button
+                        modeSwitchButton: false,                         // show switching filtering/inserting button
+                        width : "2%"
+                        
+                        
+                 }  ,
+                    { name: "topic_identifier", type: "text" ,title: "Topic #",width : "1.5%" ,  validate: { 
+                        validator: "required" ,
+                        message : "Topic Number should not be empty " }
+
+                },
+                    { name: "topic_name", type: "text" ,title: "Topic name(s)",width : "5%" ,  validate: { 
+                        validator: "required" ,
+                        message : "Topic Name should not be empty " },
                         itemTemplate: function(value,topic) {
 
+                            if(topic.link !=null && topic.link != "")
+                            {
                             var linkText =  $("<a>").attr("href", topic.link).text(value);
+                            }
+                            else
+                            {
+                            var linkText =  $("<span>").text(value);
+                           // console.log("value : "+value, " link : "+topic.link)
+                            }
+
                             var signupUrl = "/sign_up_sheet/signup_as_instructor?assignment_id=" + assignmentId + "&topic_id="+topic.id;
                             var signUpUser = $("<a>").attr("href", signupUrl);
 
@@ -233,7 +251,10 @@ jQuery("#jsGrid").jsGrid({
 
 
                 },
-                    { name: "category", type: "text",title: "Topic category" ,width : "5%" },
+                    { name: "category", type: "text",title: "Topic category" ,width : "5%",  validate: { 
+                        validator: "required" ,
+                        message : "Category should not be empty " }
+                         },
                     { name: "max_choosers", type: "text" ,title: "# Slots" ,width : "2%",
                         validate: {
                         message: "Choose Num of slots greater than or equal to 1",
@@ -271,40 +292,43 @@ jQuery("#jsGrid").jsGrid({
 
                         return $("<div>").attr("align","center").append(set1).append(set2);
                      }
-
-
-                     /*   itemTemplate: function(value, topic) {
-                        console.log("value ",value)
-                        console.log("topic ",topic)
-                      
-
-                        return $customBookmarkSetButton.append($BookmarkSetButton);
-
-                     }*/
-
                      ,filtering: true 
-
-
                       },
-                    
-
-                    { type: "control",                      
-                        editButton: true,                               // show edit button
-                        deleteButton: true,     
-                        searching : false,
-                           
-                            filtering: false,                         // show delete button
-                      //  clearFilterButton: true,                        // show clear filter button
-                        modeSwitchButton: false,                         // show switching filtering/inserting button
-                        width : "2%"
-                        
-                 }  ,
-
                   { name: "link", type: "text",title: "Topic Link" ,width :"12%" },
                     { name: "description", type: "textarea",title: "Topic Description",width :"12%" }
                    
-                ]
-            });
+                ],
+                // for freezing the first column
+                onItemUpdated: function (args) {
+                UpdateColPos(1);
+                },
+                onItemEditing: function (args) {
+                setTimeout(function () { UpdateColPos(1); }, 1);
+                },
+                onRefreshed: function (args) {
+                UpdateColPos(1);
+                },
+                 onItemUpdating: function(args) {
+                  previousItem = args.previousItem;
+                 },
+
+            }); // jsgrid
+//freezing columns
+$('.jsgrid-grid-body').scroll(function () {
+    UpdateColPos(1);
+});
+
+function UpdateColPos(cols) {
+    var left = $('.jsgrid-grid-body').scrollLeft() < $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16
+        ? $('.jsgrid-grid-body').scrollLeft() : $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16;
+    $('.jsgrid-header-row th:nth-child(-n+' + cols + '), .jsgrid-filter-row td:nth-child(-n+' + cols + '), .jsgrid-insert-row td:nth-child(-n+' + cols + '), .jsgrid-grid-body tr td:nth-child(-n+' + cols + ')')
+        .css({
+            "position": "relative",
+            "left": left
+        });
+}
+
+
 
 });
 

@@ -45,8 +45,7 @@
             <input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][use_bookmark]', 'true', @assignment_form.assignment.use_bookmark, {:onChange => 'useBookmarkChanged()'})%>
             <%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
-          <br><br><br><br><br><br><br><br>
-
+            <br><br>  
           <% if @assignment_form.assignment.staggered_deadline == true %>
            <!-- 1781 the table that is shown -->
               <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>

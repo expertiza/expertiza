@@ -70,3 +70,12 @@ overflow-y: auto;
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+   .jsgrid-table {
+        border-collapse: separate;
+    }
+
+    .jsgrid-grid-body td, .jsgrid-grid-header td, .jsgrid-grid-header th {
+        border-left: 0;
+        border-top: 0;
+    }

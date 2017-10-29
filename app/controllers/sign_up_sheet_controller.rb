@@ -70,7 +70,7 @@ class SignUpSheetController < ApplicationController
       @topic.destroy
      # undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
     else
-        render json: {status: 'FAIL'}
+        render json: {status: 'FAIL'} , :status => 404
     end
     # changing the redirection url to topics tab in edit assignment view.
       render json: {status: 'STATUS'}
@@ -122,7 +122,7 @@ class SignUpSheetController < ApplicationController
         @topic.save
       #  undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
-        render json: {status: 'FAIL'}
+        render json: {status: 'FAIL'}, :status => 404
       end
     # changing the redirection url to topics tab in edit assignment view.
     # redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
@@ -521,7 +521,7 @@ class SignUpSheetController < ApplicationController
     if !@sign_up_topic.save
      # undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       # changing the redirection url to topics tab in edit assignment view.
-      render json: {status: 'FAIL'}
+      render json: {status: 'FAIL'}, :status => 404
     else
       render json: @sign_up_topic.as_json
     end
@@ -557,7 +557,7 @@ class SignUpSheetController < ApplicationController
         topic.update_waitlisted_users params[:max_choosers]
         topic.max_choosers = params[:max_choosers]
       else
-        render json: {status: 'FAIL'}
+        render json: {status: 'FAIL'}, :status => 404
       end
     end
   end

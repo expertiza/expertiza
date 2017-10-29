@@ -1,7 +1,6 @@
 <table>
   <% review_no = 1 %>
   <% mappings.each do |map| %>
-      <%@sorted_responses=[]%>
       <%- # ACS Have metareviews done for all teams   -%>
       <%- # removed code that handles team and individual assignments differently   -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
@@ -33,14 +32,9 @@
             <td>&nbsp;</td>
             <% if !map.response.empty? %>
                 <% array_not_empty = 0 %>
-                <% @sorted_responses = Array.new %>
-                <% @prev = Response.where(:map_id => map.id) %>
-                <% for element in @prev %>
-                    <% array_not_empty = 1 %>
-                    <% @sorted_responses << element %>
-                <% end %>
+                <% @sorted_responses = Response.where(:map_id => map.id) %>
 
-                <% if (array_not_empty == 1) %>
+                <% if !(@sorted_responses.empty?) %>
                     <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
                     <% @latest_response = @sorted_responses.last %>
 
@@ -93,15 +87,22 @@
        <% if @sorted_responses !=nil %>
          <table class="grades" style=" font-style: italic; margin-left: 90px;">
          <% if (@sorted_responses.size > 1) %>
-           <%@sorted_responses = @sorted_responses.reverse%>
+           <% @sorted_responses = @sorted_responses.reverse %>
+
+               <% update_time = get_update_time(@sorted_responses[1]) %>
+               <% unless update_time[:submission].nil? %>
+                   <tr>
+                     <td colspan="10">Update on links or files was detected. Latest update at <%= update_time[:submission].to_s %></td>
+                   </tr>
+               <% end %>
+              <% unless update_time[:link_to_content].nil? %>
+                   <tr>
+                     <td colspan="10">Update on GitHub was detected. Latest update at <%= update_time[:link_to_content].to_s %></td>
+                   </tr>
+               <% end %>
+
            <% for i in 1..@sorted_responses.size-1 %>
              <tr>
-               <% participant_of_response = Response.find(@sorted_responses[i].id).map.contributor.participants.first %>
-               <% latest_update_time = @sorted_responses[i].check_update(AssignmentParticipant.find(participant_of_response.id)) %>
-                <% unless latest_update_time.nil? %>
-                   <td colspan="10">Updated at <%= latest_update_time.to_s %></td>
-                <% end %>
-               <br></br>
                <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].created_at}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
              </tr>
            <% end %>

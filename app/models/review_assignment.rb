@@ -119,7 +119,7 @@ module ReviewAssignment
   end
 
   def reject_by_max_reviews_per_submission(contributor_set)
-    contributor_set.reject! {|contributor| contributor.responses.reject {|response|  !response.is_submitted }.count >= max_reviews_per_submission }
+    contributor_set.reject! {|contributor| contributor.responses.reject {|response| !response.is_submitted }.count >= max_reviews_per_submission }
     contributor_set
   end
 

@@ -334,9 +334,8 @@ class ReviewMappingController < ApplicationController
       student_review_num = student_review_num
       exact_num_of_review_needed = participants.size * student_review_num
 
-      #The number of submissions per document should be within
-    elsif student_review_num == 0 and submission_review_num != 0 and
-      num_reviews_per_team = submission_review_num
+    # The number of submissions per document should be within max submissions per document
+    elsif student_review_num == 0 and submission_review_num != 0 and num_reviews_per_team == submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
       exact_num_of_review_needed = teams.size * submission_review_num
     end

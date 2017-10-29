@@ -1,5 +1,4 @@
 class StudentReviewController < ApplicationController
-
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',

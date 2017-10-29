@@ -92,18 +92,18 @@
                <% update_time = get_update_time(@sorted_responses[1]) %>
                <% unless update_time[:submission].nil? %>
                    <tr>
-                     <td colspan="10">Update on links or files was detected. Latest update at <%= update_time[:submission].to_s %></td>
+                     <td colspan="10">Update on links or files was detected. Latest update at -- <%= update_time[:submission].getlocal("-05:00") %></td>
                    </tr>
                <% end %>
               <% unless update_time[:link_to_content].nil? %>
                    <tr>
-                     <td colspan="10">Update on GitHub was detected. Latest update at <%= update_time[:link_to_content].to_s %></td>
+                     <td colspan="10">Update on GitHub was detected. Latest update at -- <%= update_time[:link_to_content].getlocal("-05:00") %></td>
                    </tr>
                <% end %>
 
            <% for i in 1..@sorted_responses.size-1 %>
              <tr>
-               <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].created_at}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
+               <td colspan="10"><%= link_to "Review done at -- #{@sorted_responses[i].updated_at.getlocal("-05:00")}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
              </tr>
            <% end %>
          <% else %>

@@ -48,9 +48,9 @@ class StudentReviewController < ApplicationController
   def get_update_time(response)
     @response = response
     @last_review_time = response.updated_at
-    @participant_of_response = Response.find(@response.id).map.contributor.participants.first
+    @team = @response.map.contributor
     # @participant_of_response = AssignmentParticipant.find(participant_of_response.id)
-    @team = @participant_of_response.team
+    # @team = @participant_of_response.team
 
     update_times = {submission: nil, link_to_content: nil}
     update_times[:submission] = @latest_submisstion_time if submission_updated?

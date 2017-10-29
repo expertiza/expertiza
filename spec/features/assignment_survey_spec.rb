@@ -24,10 +24,10 @@ end
 
 describe "Survey questionnaire tests for instructor interface" do
   before(:each) do
-    assignment_setup
     @previous_day = (Time.now.getlocal - 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
     @next_day = (Time.now.getlocal + 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
     @next_to_next_day = (Time.now.getlocal + 2 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
+    assignment_setup
   end
 
   it "is able to create an assignment survey" do

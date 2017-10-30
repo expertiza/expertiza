@@ -1,20 +1,7 @@
 extend RSpec::Matchers
 require 'spec_helper'
 
-RSpec.configure do |config|
-  config.expect_with :rspec do |c|
-    # Disable the `expect` sytax...
-    c.syntax = :should
-
-    # ...or disable the `should` syntax...
-    c.syntax = :expect
-
-    # ...or explicitly enable both
-    c.syntax = [:should, :expect]
-  end
-end
-
-describe QuestionnairesController, type: :controller do
+describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
@@ -68,7 +55,7 @@ describe QuestionnairesController, type: :controller do
       session = {user: user}
       get :create, params, session
       expect(flash[:success]).to eq("You have successfully created a questionnaire!")
-      response.should redirect_to(edit_questionnaire_path(id: 1))
+      expect(response).to redirect_to(edit_questionnaire_path(id: 1))
     end
   end
 
@@ -196,7 +183,7 @@ describe QuestionnairesController, type: :controller do
           pid: 1
         }
         get :update_quiz, params
-        response.should redirect_to(view_submitted_content_index_path(id: params[:pid]))
+        expect(response).to redirect_to(view_submitted_content_index_path(id: params[:pid]))
       end
     end
 
@@ -231,7 +218,7 @@ describe QuestionnairesController, type: :controller do
           }
         }
         get :update_quiz, params
-        response.should redirect_to(view_submitted_content_index_path(id: params[:pid]))
+        expect(response).to redirect_to(view_submitted_content_index_path(id: params[:pid]))
       end
     end
   end

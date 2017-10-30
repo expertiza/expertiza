@@ -7,6 +7,7 @@ def create_course_questionnaire survey_name
 end
 
 def deploy_course_survey(start_date, end_date, survey_name)
+  # Here we login as an instructor to deploy a course survey.
   login_as('instructor6')
   expect(page).to have_content('Manage content')
   create_course_questionnaire survey_name
@@ -24,6 +25,7 @@ end
 
 describe "Course Survey questionnaire tests for instructor interface" do
   before(:each) do
+    # Here we create our new course for the tests
     course_setup
     @previous_day = (Time.now.getlocal - 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
     @next_day = (Time.now.getlocal + 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
@@ -31,6 +33,7 @@ describe "Course Survey questionnaire tests for instructor interface" do
   end
 
   it "is able to create a Course survey" do
+    # Here we test the functionality of creating a course survey.
     login_as('instructor6')
     survey_name = "Course Survey Questionnaire 1"
     create_course_questionnaire survey_name

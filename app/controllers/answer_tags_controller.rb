@@ -4,7 +4,7 @@ class AnswerTagsController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'index', 'create_edit'
+    when 'index', 'create_edit'
         ['Instructor',
          'Teaching Assistant',
          'Student',
@@ -25,7 +25,7 @@ class AnswerTagsController < ApplicationController
     end
 
     tag_deployments.each do |tag_dep|
-      stored_tags_records = AnswerTag.where(:tag_prompt_deployment_id => tag_dep.id)
+      stored_tags_records = AnswerTag.where(tag_prompt_deployment_id: tag_dep.id)
       if params.key?(:user_id)
         stored_tags_records = stored_tags_records.where(user_id: params[:user_id])
       end
@@ -37,21 +37,17 @@ class AnswerTagsController < ApplicationController
     render json: @tag_prompts
   end
 
-
   # POST /answer_tags/create_edit
   def create_edit
     @tag = AnswerTag.where(user_id: current_user,
-                                           answer_id: params[:answer_id],
-                                           tag_prompt_deployment_id: params[:tag_prompt_deployment_id]).first_or_create
-               .update_attributes!(value: params[:value])
+                           answer_id: params[:answer_id],
+                           tag_prompt_deployment_id: params[:tag_prompt_deployment_id]).first_or_create
+                    .update_attributes!(value: params[:value])
 
     render json: @tag
   end
 
-
-
   # DELETE /answer_tags/1
   def destroy
-
   end
 end

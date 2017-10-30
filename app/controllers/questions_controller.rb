@@ -80,7 +80,7 @@ class QuestionsController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
   end
 
-  #required for answer tagging
+  # required for answer tagging
   def types
     types = Question.distinct.pluck(:type)
     render json: types.to_a

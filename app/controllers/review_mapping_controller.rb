@@ -427,7 +427,7 @@ class ReviewMappingController < ApplicationController
       @questionnaire_tagging_report = {}
 
       tag_prompt_deployments.each do |tag_dep|
-        @questionnaire_tagging_report[tag_dep] = tag_dep.get_assignment_tagging_progress()
+        @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
       end
     end
 

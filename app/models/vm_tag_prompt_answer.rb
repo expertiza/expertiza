@@ -10,5 +10,4 @@ class VmTagPromptAnswer
   attr_reader :tag_prompt
 
   attr_reader :tag_dep
-
 end

@@ -16,5 +16,4 @@ class VmUserAnswerTagging
   attr_reader :no_not_tagged
 
   attr_reader :no_tagable
-
 end

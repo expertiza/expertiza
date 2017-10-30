@@ -206,9 +206,7 @@ class Criterion < ScoredQuestion
       unless tag_prompt_deployments.nil?
         # show check boxes for answer tagging
         resp = Response.find(answer.response_id)
-        map = ResponseMap.find(resp.map_id)
         question = Question.find(answer.question_id)
-
         if tag_prompt_deployments.count > 0
           html += '<tr><td colspan="2">'
           tag_prompt_deployments.each do |tag_dep|

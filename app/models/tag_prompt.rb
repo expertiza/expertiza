@@ -5,7 +5,7 @@ class TagPrompt < ActiveRecord::Base
 
   def get_html_control(tag_prompt_deployment, answer)
     html = ""
-    if not answer.nil?
+    if !answer.nil?
       stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id)
 
       length_valid = false
@@ -38,7 +38,7 @@ class TagPrompt < ActiveRecord::Base
       value = tag.value.to_s
     end
 
-    element_id = answer.id.to_s + '_'+ self.id.to_s
+    element_id = answer.id.to_s + '_' + self.id.to_s
     control_id = "tag_prompt_" + element_id
 
     html += '<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
@@ -46,8 +46,6 @@ class TagPrompt < ActiveRecord::Base
     html += '<label for="' + control_id + '">&nbsp;'
     html += self.prompt.to_s + '</label>'
     html += '</div>'
-
-
     return html
   end
 
@@ -58,7 +56,7 @@ class TagPrompt < ActiveRecord::Base
       tag = stored_tags.first
       value = tag.value.to_s
     end
-    element_id = answer.id.to_s + '_'+ self.id.to_s
+    element_id = answer.id.to_s + '_' + self.id.to_s
     control_id = "tag_prompt_" + element_id
     no_text_class = "toggle-false-msg"
     yes_text_class = "toggle-true-msg"
@@ -71,11 +69,11 @@ class TagPrompt < ActiveRecord::Base
     end
 
     html += '<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
-    html += ' <div class="' + no_text_class +'" id="no_text_' + element_id + '">No</div>'
+    html += ' <div class="' + no_text_class + '" id="no_text_' + element_id + '">No</div>'
     html += ' <div class="range-field" style=" width:60px">'
     html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id + '" min="-1" class="rangeAll" max="1" value="' + value + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
     html += ' </div>'
-    html += ' <div class="' + yes_text_class +'" id="yes_text_' + element_id + '">Yes</div>'
+    html += ' <div class="' + yes_text_class + '" id="yes_text_' + element_id + '">Yes</div>'
     html += ' <div class="toggle-caption">' + self.prompt.to_s + '</div>'
     html += '</div>'
 

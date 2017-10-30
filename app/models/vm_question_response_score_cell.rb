@@ -1,6 +1,6 @@
 # represents each score cell of the heatgrid table.
 class VmQuestionResponseScoreCell
-  def initialize(score_value, color_code, comments, vmprompts=nil)
+  def initialize(score_value, color_code, comments, vmprompts = nil)
     @score_value = score_value
     @color_code = color_code
     @comment = comments

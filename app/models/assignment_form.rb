@@ -86,15 +86,16 @@ class AssignmentForm
 
   # s required by answer tagging
   def update_tag_prompt_deployments(attributes)
-    if not attributes.nil?
+    if !attributes.nil?
       attributes.each do |key, value|
         if value.key?('deleted')
           TagPromptDeployment.where(id: value['deleted']).delete_all
         end
-        if value.key?('tag_prompt') # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
-          for i in 0..value['tag_prompt'].count-1
+        # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
+        if value.key?('tag_prompt')
+          for i in 0..value['tag_prompt'].count - 1
             tag_dep = nil
-            if not(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
+            if !(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
               tag_dep = TagPromptDeployment.find(value['id'][i])
               if tag_dep
                 tag_dep.update(assignment_id: @assignment.id,

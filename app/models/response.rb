@@ -52,8 +52,7 @@ class Response < ActiveRecord::Base
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
       # get the tag settings this questionnaire
-      tag_prompt_deployments = TagPromptDeployment.where({questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id })
-
+      tag_prompt_deployments = TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id)
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
       # loop through questions so the the questions are displayed in order based on seq (sequence number)
@@ -65,7 +64,7 @@ class Response < ActiveRecord::Base
         code += '<tr class="' + row_class + '"><td>'
         if !answer.nil? or question.is_a? QuestionnaireHeader
           code += if question.instance_of? Criterion
-                    #Answer Tags are enabled only for Criterion questions at the moment.
+                    # Answer Tags are enabled only for Criterion questions at the moment.
                     question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
                   elsif question.instance_of? Scale
                     question.view_completed_question(count, answer, questionnaire_max)

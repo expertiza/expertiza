@@ -17,13 +17,13 @@ class TagPromptsController < ApplicationController
 
   def index
     @tagprompts = TagPrompt.all.order("prompt asc")
-    if params.key?(:prompt) and not params[:prompt]== ""
+    if params.key?(:prompt) and !params[:prompt] == ""
       @tagprompts.where!("prompt LIKE ?", "%#{params[:prompt]}%")
     end
-    if params.key?(:desc) and not params[:desc]== ""
+    if params.key?(:desc) and !params[:desc] == ""
       @tagprompts.where!("desc LIKE ?", "%#{params[:desc]}%")
     end
-    if params.key?(:control_type) and not params[:control_type]== ""
+    if params.key?(:control_type) and !params[:control_type] == ""
       @tagprompts.where!("control_type LIKE ?", "%#{params[:control_type]}%")
     end
     render json:@tagprompts
@@ -46,5 +46,4 @@ class TagPromptsController < ApplicationController
     @tagprompt.destroy
     render nothing: true, status: 200
   end
-
 end

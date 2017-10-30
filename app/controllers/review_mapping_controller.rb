@@ -132,7 +132,8 @@ class ReviewMappingController < ApplicationController
         @map = QuizResponseMap.new
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
-        @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+        #@map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+        @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save
       end
 
@@ -272,7 +273,8 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
-    @items.sort {|a, b| a.name <=> b.name }
+    #@items.sort {|a, b| a.name <=> b.name }
+    @items.sort_by {|a| a.name}
   end
 
   def automatic_review_mapping

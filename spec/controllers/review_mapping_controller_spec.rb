@@ -94,7 +94,9 @@ describe ReviewMappingController do
 
   describe '#assign_quiz_dynamically' do
     context 'when corresponding response map exists' do
-      it 'shows a flash error and redirects to student_quizzes page'
+      it 'shows a flash error and redirects to student_quizzes page' do
+
+      end
 
     end
 
@@ -223,7 +225,15 @@ describe ReviewMappingController do
   end
 
   describe '#list_mappings' do
-    it 'renders review_mapping#list_mappings page'
+    it 'renders review_mapping#list_mappings page' do
+      expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+      items =  double{}
+      expect(AssignmentTeam).to receive(:where).with(any_args).and_return(items)
+      expect(items).to receive(:sort_by).with(any_args)
+      get :list_mappings
+      expect(response).to render_template (:list_mappings)
+
+    end
   end
 
   describe '#automatic_review_mapping' do

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  answer_id: 
+  tag_prompt_deployment_id: 
+  user_id: 
+  value: MyString
+
+two:
+  answer_id: 
+  tag_prompt_deployment_id: 
+  user_id: 
+  value: MyString

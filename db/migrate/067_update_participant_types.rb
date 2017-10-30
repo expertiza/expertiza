@@ -23,11 +23,11 @@ class UpdateParticipantTypes < ActiveRecord::Migration
       participant.save
     }
     
-    # course_users = CoursesUsers.all
-    # course_users.each{
-    #   |user|
-    #   CourseParticipant.create(:user_id => user.user_id, :parent_id => user.course_id)
-    # }
+    course_users = CoursesUsers.all
+    course_users.each{
+      |user|
+      CourseParticipant.create(:user_id => user.user_id, :parent_id => user.course_id)
+    }
     drop_table :courses_users
   end
 

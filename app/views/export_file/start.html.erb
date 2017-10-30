@@ -27,6 +27,9 @@
   <% if @model == 'CourseTeam' %>
     <%= render :partial => 'course_teams' %>
   <% end %>
+  <% if @model == 'ReviewResponseMap' %>
+    <%= render :partial => 'reviewer_mapping' %>
+  <% end %>
   <br/>
   <%= hidden_field_tag('model', @model) %>
   <%= hidden_field_tag('id', @id) %>

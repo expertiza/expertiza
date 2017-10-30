@@ -212,7 +212,7 @@ class Criterion < ScoredQuestion
           tag_prompt_deployments.each do |tag_dep|
             tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
             if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
-              html += tag_prompt.get_html_control(tag_dep, answer)
+              html += tag_prompt.html_control(tag_dep, answer)
             end
           end
           html += '</td></tr>'

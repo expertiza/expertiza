@@ -144,7 +144,7 @@
                                 <% if row.score_row[index].vm_prompts.count > 0 %>
                                     <div id="tag_prompt_container" class="tag_prompt_container">
                                       <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
-                                          <%= vm_tag_prompt.tag_prompt.get_html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
+                                          <%= vm_tag_prompt.tag_prompt.html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
                                       <% end %>
                                     </div>
                                 <% end %>

@@ -24,34 +24,34 @@ describe TagPrompt do
     tp = TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")
     tag_dep = TagPromptDeployment.new id: 1, tag_prompt: tp, question_type: "Criterion", answer_length_threshold: 5
 
-    expect(tp.get_html_control(tag_dep, an_long)).to include("input type=\"checkbox\"")
+    expect(tp.html_control(tag_dep, an_long)).to include("input type=\"checkbox\"")
   end
 
   it "returns a slider when the control_type is slider" do
     tp = TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Slider")
     tag_dep = TagPromptDeployment.new id: 1, tag_prompt: tp, question_type: "Criterion", answer_length_threshold: 5
 
-    expect(tp.get_html_control(tag_dep, an_long)).to include("input type=\"range\"")
+    expect(tp.html_control(tag_dep, an_long)).to include("input type=\"range\"")
   end
 
   it "returns an empty string when the question_type is not Criterion" do
     tp = TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")
     tag_dep = TagPromptDeployment.new id: 1, tag_prompt: tp, question_type: "Criterion", answer_length_threshold: 5
 
-    expect(tp.get_html_control(tag_dep, an_cb)).to eql("")
+    expect(tp.html_control(tag_dep, an_cb)).to eql("")
   end
 
   it "returns an empty string when the answer is too short" do
     tp = TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Slider")
     tag_dep = TagPromptDeployment.new id: 1, tag_prompt: tp, question_type: "Criterion", answer_length_threshold: 5
 
-    expect(tp.get_html_control(tag_dep, an_short)).to eql("")
+    expect(tp.html_control(tag_dep, an_short)).to eql("")
   end
 
   it "returns an empty string when the answer is long but the control type is not Criterion" do
     tp = TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Slider")
     tag_dep = TagPromptDeployment.new id: 1, tag_prompt: tp, question_type: "Criterion", answer_length_threshold: 5
 
-    expect(tp.get_html_control(tag_dep, an_long_text)).to eql("")
+    expect(tp.html_control(tag_dep, an_long_text)).to eql("")
   end
 end

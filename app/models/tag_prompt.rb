@@ -3,7 +3,7 @@ class TagPrompt < ActiveRecord::Base
   validates :desc, presence: true
   validates :control_type, presence: true
 
-  def get_html_control(tag_prompt_deployment, answer)
+  def html_control(tag_prompt_deployment, answer)
     html = ""
     if !answer.nil?
       stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id)
@@ -20,16 +20,16 @@ class TagPrompt < ActiveRecord::Base
       if length_valid and answer.question.type.eql?(tag_prompt_deployment.question_type)
         case self.control_type.downcase
           when "slider"
-            html = get_slider_control(answer, tag_prompt_deployment, stored_tags)
+            html = slider_control(answer, tag_prompt_deployment, stored_tags)
           when "checkbox"
-            html = get_checkbox_control(answer, tag_prompt_deployment, stored_tags)
+            html = checkbox_control(answer, tag_prompt_deployment, stored_tags)
         end
       end
     end
     return html.html_safe
   end
 
-  def get_checkbox_control(answer, tag_prompt_deployment, stored_tags)
+  def checkbox_control(answer, tag_prompt_deployment, stored_tags)
     html = ""
     value = "0"
 
@@ -49,7 +49,7 @@ class TagPrompt < ActiveRecord::Base
     return html
   end
 
-  def get_slider_control(answer, tag_prompt_deployment, stored_tags)
+  def slider_control(answer, tag_prompt_deployment, stored_tags)
     html = ""
     value = "0"
     if stored_tags.count > 0

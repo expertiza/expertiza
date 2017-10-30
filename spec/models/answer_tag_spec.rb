@@ -23,16 +23,16 @@ describe AnswerTag do
 
   it "returns a corresponding tag_prompt" do
     ans_tag = AnswerTag.create answer: answer, tag_prompt_deployment_id: tag_deploy.id, value: 0, user_id: user.id
-    expect(ans_tag.get_tag_prompt).to eql tag_prompt
+    expect(ans_tag.tag_prompt).to eql tag_prompt
   end
 
   it "returns a slider when its associated tag_prompt is a slider" do
     ans_tag = AnswerTag.create answer: answer, tag_prompt_deployment_id: tag_deploy.id, value: 0, user_id: user.id
-    expect(ans_tag.get_tag_prompt_html_control).to include("input type=\"range\"")
+    expect(ans_tag.tag_prompt_html_control).to include("input type=\"range\"")
   end
 
   it "returns a checkbox when its associated tag_prompt is a checkbox" do
     ans_tag = AnswerTag.create answer: answer, tag_prompt_deployment_id: tag_deploy_cb.id, value: 0, user_id: user.id
-    expect(ans_tag.get_tag_prompt_html_control).to include("input type=\"checkbox\"")
+    expect(ans_tag.tag_prompt_html_control).to include("input type=\"checkbox\"")
   end
 end

@@ -15,15 +15,15 @@
 
 1. Mac:
 
-  * Clone your forked Expertiza github repository 
-  * Go to the `expertiza/docker` folder
-  * Run the following command: `bash setup_mac.sh`
+  * Clone your forked Expertiza github repository: `git clone YOUR_REPO_LINK.git` 
+  * Go to the expertiza/docker folder: `cd expertiza/docker`
+  * Run the `setup_mac.sh` script : `bash setup_mac.sh`
 
 2. Linux: 
 
-  * Clone your forked Expertiza github repository 
-  * Go to the `expertiza/docker` folder
-  * Run the following command: `bash setup_linux.sh`
+  * Clone your forked Expertiza github repository: `git clone YOUR_REPO_LINK.git` 
+  * Go to the expertiza/docker folder: `cd expertiza/docker`
+  * Run the `setup_linux.sh` script: `bash setup_linux.sh`
 
 #### After you run the script you need to do the following: 
 

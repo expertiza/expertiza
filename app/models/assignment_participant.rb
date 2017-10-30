@@ -63,8 +63,6 @@ class AssignmentParticipant < Participant
                              end
 
       scores[questionnaire_symbol] = {}
-      puts("Hello______________________________________________")
-      puts(questionnaire_symbol)
       scores[questionnaire_symbol][:assessments] = if round.nil?
                                                      questionnaire.get_assessments_for(self)
                                                    else

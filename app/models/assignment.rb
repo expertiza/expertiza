@@ -29,7 +29,6 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
-
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
@@ -94,10 +93,7 @@ class Assignment < ActiveRecord::Base
 
   # Returns a review (response) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
-    puts "-------------------------------------->"
-    #puts review_mapppings
     response_map_set = Array.new(review_mappings)
-
     # Reject response maps without responses
     response_map_set.reject! {|response_map| response_map.response.empty? }
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
@@ -185,16 +181,7 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        (1..self.num_review_rounds).each do |i|
-          round_sym = ("review" + i.to_s).to_sym
-          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
-            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
-          end
-          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
-            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
-          end
-        end
-
+        scores_min_max()
         if total_num_of_assessments != 0
           scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
@@ -202,7 +189,6 @@ class Assignment < ActiveRecord::Base
           scores[:teams][index.to_s.to_sym][:scores][:max] = 0
           scores[:teams][index.to_s.to_sym][:scores][:min] = 0
         end
-
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
@@ -212,6 +198,19 @@ class Assignment < ActiveRecord::Base
     end
     scores
   end
+
+  def scores_min_max
+    (1..self.num_review_rounds).each do |i|
+          round_sym = ("review" + i.to_s).to_sym
+          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
+            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
+          end
+          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
+            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
+          end
+        end
+    end
+
 
   def path
     if self.course_id.nil? && self.instructor_id.nil?
@@ -576,11 +575,14 @@ class Assignment < ActiveRecord::Base
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-
+      export_fields(csv, scores,parent_id, options)
+      csv << tcsv
+    end
+  end
+  def self.export_fields (csv, scores,parent_id, options)    
       team[:scores] ?
         tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
         tcsv.push('---', '---', '---') if options['team_score'] == 'true'
-
       
       pscore[:review] ?
         tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
@@ -599,9 +601,8 @@ class Assignment < ActiveRecord::Base
         tcsv.push('---', '---', '---') if options['teammate_review_score']
 
       tcsv.push(pscore[:total_score])
-      csv << tcsv
-    end
-  end
+ end
+  
 
   # This method is used for export contents of grade#view.  -Zhewei
   def self.export_fields(options)

@@ -21,7 +21,6 @@ describe Assignment do
   end
   describe '#team_assignment?' do
     it 'checks an assignment has team' do
-      # @assignment = build(:assignment)
       expect(assignment.team_assignment).to eql(true)
     end
   end
@@ -32,26 +31,20 @@ describe Assignment do
         @assignment = create(:assignment)
         expect(@assignment.sign_up_topics.empty?).to eql(true)
         @topic = create(:topic,assignment: @assignment)
-        # or @topic.assignment = @assignment
         expect(@assignment.sign_up_topics.empty?).to eql(false)
       end
     end
     context 'when sign_up_topics array is empty' do
       it 'says current assignment does not have a topic' do
-        # @assignment = create(:assignment)
         expect(assignment.sign_up_topics.empty?).to eql(true)
       end
     end
   end
-  # Ask guide -> Build not working in this case
   describe '.set_courses_to_assignment' do
     it 'fetches all courses belong to current instructor and with the order of course names' do
-      # @instructor = create(:instructor)
-      # @assignment = create(:assignment, instructor: @instructor)
       @course1 = create(:course, instructor: instructor, name: 'C')
       @cours2 = create(:course, instructor: instructor, name: 'B')
       @cours3 = create(:course, instructor: instructor, name: 'A')
-      # expect(Assignment.set_courses_to_assignment(@instructor).map {|x| x.name}).to be_an_instance_of(Array)
       @arr = Assignment.set_courses_to_assignment(instructor).map {|x| x.name}
       expect(@arr).to match_array(['A','B','C'])
     end
@@ -100,7 +93,6 @@ describe Assignment do
     it 'does not raise any errors and returns the first review response map' do
       @assignment=create(:assignment)
       @participant=create(:participant,assignment:@assignment)
-      #@review_response_map=create(:review_response_map,assignment:@assignment)
       @meta_review_response_map=create(:meta_review_response_map,review_mapping:review_response_map,reviewee:@participant)
       @assignment.review_mappings << review_response_map
       expect(@assignment.response_map_to_metareview(@participant)).to eq(review_response_map)
@@ -140,7 +132,7 @@ describe Assignment do
         @response=create(:response,response_map: @review_response_map)
         allow(Assignment).to receive(:num_review_rounds).and_return(2)
         allow(Answer).to receive(:compute_scores).with(any_args).and_return({min: 0, max: 5, avg: 4})
-        (ReviewResponseMap).to receive(:get_responses_for_team_round).with(any_args).and_return([response])
+        allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(any_args).and_return([response])
         expect(@assignment.scores(@questions)["participants".to_sym][123.to_s.to_sym]["review2".to_sym]["scores".to_sym]["max".to_sym]).to eql(5)
       end
     end
@@ -164,7 +156,6 @@ describe Assignment do
   describe '#path' do
     context 'when both course_id and instructor_id are nil' do
       it 'raises an error' do
-        # assignment=create(:assignment)
         assignment.course_id= nil
         assignment.instructor_id= nil
         expect{assignment.path}.to raise_error(RuntimeError,"The path cannot be created. The assignment must be associated with either a course or an instructor.")
@@ -172,14 +163,12 @@ describe Assignment do
     end
     context 'when course_id is not nil and course_id is larger than 0' do
       it 'returns path with course directory path' do
-        # assignment=create(:assignment)
         assignment.course_id= 1
         expect(assignment.path).to be == "#{Rails.root}/pg_data/instructor6/csc517/test/final_test"
       end
     end
     context 'when course_id is nil' do
       it 'returns path without course directory path' do
-        # assignment=create(:assignment)
         assignment.course_id=nil
         expect(assignment.path).to be == "#{Rails.root}/pg_data/instructor6/final_test"
       end
@@ -188,31 +177,20 @@ describe Assignment do
   describe '#check_condition' do
     context 'when the next due date is nil' do
       it 'returns false ' do
-        # assignment=create(:assignment)
-        # dead_rigth=create(:deadline_right)
-        # ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
-        #ass_due_date=AssignmentDueDate.where(:parent_id => assignment.id).first
-        # ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
         expect(assignment.check_condition(:id)).to equal(false)
       end
     end
     # Changing to build gives active record not found error
     context 'when the next due date is allowed to review submissions' do
       it 'returns true' do
-        # assignment=create(:assignment)
         dead_rigth=create(:deadline_right ,:name=> 'OK')
-        #dead_rigth.id=3
-        #dead_rigth.name='OK'
         ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
-        #ass_due_date=AssignmentDueDate.where(:parent_id => assignment.id).first
-        #ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
         expect(assignment.check_condition(:id)).to equal(true) 
       end
     end
   end
   describe '#submission_allowed' do
     it 'returns true when the next topic due date is allowed to submit sth'do
-      # assignment=create(:assignment)
       dead_rigth=create(:deadline_right ,:name=> 'OK')
       ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
       expect(assignment.submission_allowed).to equal (true)
@@ -220,7 +198,6 @@ describe Assignment do
   end
   describe '#quiz_allowed' do
     it 'returns false when the next topic due date is not allowed to do quiz' do
-      # assignment=create(:assignment)
       dead_rigth=create(:deadline_right ,:name=> 'NO')
       ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
       expect(assignment.submission_allowed).to equal (false)    
@@ -228,7 +205,6 @@ describe Assignment do
   end
   describe '#can_review' do
     it "returns false when the next assignment due date is not allowed to review other's work" do
-      # assignment=create(:assignment)
       dead_rigth=create(:deadline_right ,:name=> 'NO')
       ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
       expect(assignment.submission_allowed).to equal (false)
@@ -236,7 +212,6 @@ describe Assignment do
   end
   describe '#metareview_allowed' do
     it 'returns true when the next assignment due date is not allowed to do metareview' do
-      # assignment=create(:assignment)
       dead_rigth=create(:deadline_right ,:name=> 'NO')
       ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)        
       expect(!assignment.submission_allowed).to equal (true)
@@ -261,9 +236,6 @@ describe Assignment do
     end
     context 'when ReviewResponseMap and TeammateReviewResponseMap can be deleted successfully' do
       it 'deletes other corresponding db records and current assignment' do
-        # @assignment = create(:assignment)
-        # @assignment_team = create(:assignment_team, assignment: @assignment)
-        # @team_user = create(:team_user,team: @assignment_team)
         expect(!assignment.delete.blank?).to eql(true)
       end
     end
@@ -272,7 +244,6 @@ describe Assignment do
     context 'when microtask is not nil' do
       it 'returns microtask status (false by default)' do
           assignment = build(:assignment, microtask: true)
-          # assignment = create(:assignment)
           expect(assignment.microtask?).to eql(true)
       end 
     end
@@ -286,7 +257,6 @@ describe Assignment do
   describe '#add_participant' do
     context 'when user is nil' do
       it 'raises an error' do
-          # @assignment = create(:assignment)
           expect{assignment.add_participant('',true,true,true)}.to raise_error(NoMethodError)
       end
     end
@@ -312,7 +282,6 @@ describe Assignment do
 
   describe '#create_node' do
     it 'will save node' do
-      # @assignment = create(:assignment)
       expect(assignment.create_node).to eql(true)
     end
   end
@@ -320,7 +289,6 @@ describe Assignment do
   describe '#number_of_current_round' do
     context 'when next_due_date is nil' do
       it 'returns 0' do
-        # @assignment = create(:assignment)
         expect(assignment.number_of_current_round(nil)).to eql(0)
       end
     end
@@ -336,8 +304,6 @@ describe Assignment do
       end
     end
   end
-
-
   #Active record mysql record not unique error
   describe '#current_stage_name' do
    context 'when assignment has staggered deadline' do
@@ -412,7 +378,6 @@ describe Assignment do
   describe '#stage_deadline' do
     context 'when topic id is nil and current assignment has staggered deadline' do
       it 'returns Unknown' do
-        # assignment=create(:assignment)
         assignment.staggered_deadline=true
         expect(assignment.stage_deadline()).to eq("Unknown")  
       end
@@ -420,20 +385,14 @@ describe Assignment do
     context 'when current assignment does not have staggered deadline' do
       context 'when due date is nil' do
         it 'returns nil' do
-          # assignment=create(:assignment)
-          # dead_rigth=create(:deadline_right)
-          # ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id,:due_at=> DateTime.now.in_time_zone - 1.day)
-          #ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
           expect(assignment.stage_deadline).not_to be_nil    
         end
       end
       # We do require create over here
       context 'when due date is not nil and due date is not equal to Finished' do
         it 'returns due date' do
-          # assignment=create(:assignment)
           dead_rigth=create(:deadline_right)
           ass_due_date=create(:assignment_due_date,:parent_id => assignment.id,:review_allowed_id=>dead_rigth.id,:review_of_review_allowed_id=>dead_rigth.id,:submission_allowed_id=>dead_rigth.id)
-          #ass_due_date.due_at= DateTime.now.in_time_zone - 1.day
           expect(assignment.stage_deadline).to eq(ass_due_date.due_at.to_s)
         end
       end

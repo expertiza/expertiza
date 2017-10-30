@@ -21,13 +21,8 @@ class ReviewQuestionnaire < Questionnaire
     responses = []
     if participant
       maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
-      # puts("Maps +++++++")
-      # puts(maps)
-      puts "maps response"
       maps.each do |map|
         next if map.response.empty?
-        # puts map.response.inspect
-        puts map.response.round
         map.response.each do |response|
           if response.round == round && response.is_submitted
             responses << response

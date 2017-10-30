@@ -1,8 +1,7 @@
 extend RSpec::Matchers
 require 'spec_helper'
 
-
-describe QuestionnairesController, type: :controller do
+describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }

@@ -46,29 +46,29 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
-    current_user_timezonepref_nil_message
+    handle_current_user_timezonepref_nil
 
     edit_params_setting
 
     assignment_form_assignment_staggered_deadline?
 
     @due_date_all.each do |dd|
-      due_date_nameurl_notempty_check(dd)
+      check_due_date_nameurl_notempty(dd)
 
-      due_date_present(dd)
+      adjust_timezone_when_due_date_present(dd)
 
-      break if due_date_validation
+      break if validate_due_date
     end
 
-    assignment_questionnaires_usage_check
+    check_assignment_questionnaires_usage
 
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
 
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
-    rubrics_not_assigned_message
+    handle_rubrics_not_assigned_case
 
-    assignment_directory_path_nonexist_message
+    handle_assignment_directory_path_nonexist_case
   end
 
   def update
@@ -77,11 +77,11 @@ class AssignmentsController < ApplicationController
       return
     end
 
-    assignment_form_retrieval
+    retrieve_assignment_form
 
-    current_user_timezonepref_nil_handler
+    handle_current_user_timezonepref_nil
 
-    assignment_form_update_attributes_message
+    feedback_assignment_form_attributes_update
 
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
@@ -247,7 +247,7 @@ class AssignmentsController < ApplicationController
   end
 
   # helper methods for edit
-  def current_user_timezonepref_nil_message
+  def handle_current_user_timezonepref_nil
     if current_user.timezonepref.nil?
       flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
     end
@@ -284,7 +284,7 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.staggered_deadline == true
   end
 
-  def due_date_nameurl_notempty_check(dd)
+  def check_due_date_nameurl_notempty(dd)
     @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
     @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
     @metareview_allowed = meta_review_allowed?(dd)
@@ -293,18 +293,18 @@ class AssignmentsController < ApplicationController
     @team_formation_allowed = team_formation_allowed?(dd)
   end
 
-  def due_date_present(dd)
+  def adjust_timezone_when_due_date_present(dd)
     if dd.due_at.present?
       dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
     end
   end
 
-  def due_date_validation
+  def validate_due_date
     @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
-  def assignment_questionnaires_usage_check
+  def check_assignment_questionnaires_usage
     @assignment_questionnaires.each do |aq|
       unless aq.used_in_round.nil?
         @reviewvarycheck = 1
@@ -313,7 +313,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def rubrics_not_assigned_message
+  def handle_rubrics_not_assigned_case
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
       flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
@@ -321,7 +321,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def assignment_directory_path_nonexist_message
+  def handle_assignment_directory_path_nonexist_case
     if @assignment_form.assignment.directory_path.nil? || @assignment_form.assignment.directory_path.empty?
       flash.now[:error] = "You did not specify your submission directory."
     end
@@ -341,7 +341,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def assignment_form_retrieval
+  def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
@@ -349,7 +349,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def current_user_timezonepref_nil_handler
+  def handle_current_user_timezonepref_nil
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref
@@ -358,7 +358,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def assignment_form_update_attributes_message
+  def feedback_assignment_form_attributes_update
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else

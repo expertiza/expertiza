@@ -1,3 +1,50 @@
+function checkForFile() {
+    var file_value = $('#import_file').val();
+    $(document).ready(function() {
+        if (file_value.length <= 0) {
+            alert('Please select a file before clicking Import.');
+        } else {
+            import_form.submit();
+        };
+    });
+}
+
+function checkIfUserColumnDuplicate() {
+
+    var sel1 = document.getElementById("select1");
+    var sel2 = document.getElementById("select2");
+    var sel3 = document.getElementById("select3");
+
+    var val1 = sel1.options[sel1.selectedIndex].value;
+    var val2 = sel2.options[sel2.selectedIndex].value;
+    var val3 = sel3.options[sel3.selectedIndex].value;
+
+    if(val1 == val2 || val2 == val3 || val1 == val3) {
+        alert("No two columns can have same value.")
+    } else {
+      column_form.submit();
+    }
+}
+function checkForParticipantColumnDuplicate() {
+
+    var sel1 = document.getElementById("select1");
+    var sel2 = document.getElementById("select2");
+    var sel3 = document.getElementById("select3");
+    var sel4 = document.getElementById("select4");
+
+    var val1 = sel1.options[sel1.selectedIndex].value;
+    var val2 = sel2.options[sel2.selectedIndex].value;
+    var val3 = sel3.options[sel3.selectedIndex].value;
+    var val4 = sel4.options[sel4.selectedIndex].value;
+
+    if(val1 == val2 || val1 == val3 || val1 == val4 || val2 == val3 || val2 == val4 || val3 == val4) {
+        alert("No two columns can have same value.")
+    } else {
+        column_form.submit();
+    }
+}
+
+
 function checkIfFileExists(filename, flag)
 {
     if(filename=='')

@@ -75,15 +75,18 @@ class GradesController < ApplicationController
     @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
     retrieve_questions questionnaires
+
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
+
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
+
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
@@ -125,25 +128,35 @@ class GradesController < ApplicationController
 
   def instructor_review
     participant = AssignmentParticipant.find(params[:id])
+
     reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
     if reviewer.nil?
       reviewer = AssignmentParticipant.create(user_id: session[:user].id, parent_id: participant.assignment.id)
       reviewer.set_handle
     end
+
     review_exists = true
-    reviewee = participant.team
-    review_mapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-    if review_mapping.nil?
-      review_exists = false
-      review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
-    else
-      review = Response.find_by_map_id(review_mapping.map_id)
+
+    if participant.assignment.team_assignment?
+      reviewee = participant.team
+      review_mapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+
+      if review_mapping.nil?
+        review_exists = false
+        review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
+        review = Response.find_by_map_id(review_mapping.map_id)
+
+        if review_exists
+          redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
+        else
+          redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
+        end
+      end
     end
-    if review_exists
-      redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
-    else
-      redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
-    end
+  end
+
+  def open
+    send_file(params['fname'], disposition: 'inline')
   end
 
   # This method is used from edit methods
@@ -182,7 +195,7 @@ class GradesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
-  end 
+  end
 
   private
 
@@ -206,6 +219,19 @@ class GradesController < ApplicationController
       return true unless current_user_id?(reviewer.try(:user_id))
     end
     false
+  end
+
+  def get_body_text(submission)
+    if submission
+      role = "reviewer"
+      item = "submission"
+    else
+      role = "metareviewer"
+      item = "review"
+    end
+    "Hi ##[recipient_name],
+        You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another " + role + "'s score for the same " + item + ".
+        The Expertiza system has brought this to my attention."
   end
 
   def calculate_all_penalties(assignment_id)
@@ -329,5 +355,11 @@ class GradesController < ApplicationController
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
+  end
+
+  def mean_and_standard_deviation(array)
+    m = mean(array)
+    variance = array.inject(0) {|variance, x| variance += (x - m)**2 }
+    [m, Math.sqrt(variance / (array.size - 1))]
   end
 end

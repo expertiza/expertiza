@@ -1,0 +1,27 @@
+<strong>Contents Hash:</strong>
+<br/>
+<%= @contents_hash %>
+<br/><br/>
+
+<strong>Contents Hash Header:</strong>
+<br/>
+<%= @contents_hash[:header] %>
+<br/><br/>
+
+<strong>Contents Hash Body (Iterated):</strong>
+<br/>
+<% @contents_hash[:body].each do |row| %>
+    <%= row %><br/>
+<% end %>
+<br/><br/>
+
+<strong>New Body:</strong>
+<br/>
+<%= @header_integrated_body %>
+<br/><br/>
+
+<strong>New Body (Iterated):</strong>
+<br/>
+<% @header_integrated_body.each do |entry| %>
+    <%= entry %><br/>
+<% end %>

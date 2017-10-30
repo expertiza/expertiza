@@ -53,7 +53,7 @@ class AssignmentForm
   # Code to update values of assignment
   def update_assignment(attributes)
     unless @assignment.update_attributes(attributes)
-      @errors = @assignment.errors.to_s
+      @errors = @assignment.errors
       @has_errors = true
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
@@ -69,13 +69,13 @@ class AssignmentForm
       if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
         aq = AssignmentQuestionnaire.new(assignment_questionnaire)
         unless aq.save
-          @errors = @assignment.errors.to_s
+          @errors = @assignment.errors
           @has_errors = true
         end
       else
         aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
         unless aq.update_attributes(assignment_questionnaire)
-          @errors = @assignment.errors.to_s
+          @errors = @assignment.errors
           @has_errors = true
         end
       end
@@ -106,7 +106,7 @@ class AssignmentForm
         # get deadline for review
         @has_errors = true unless dd.update_attributes(due_date)
       end
-      @errors += @assignment.errors.to_s if @has_errors
+      @errors += @assignment.errors if @has_errors
     end
   end
 
@@ -120,11 +120,14 @@ class AssignmentForm
       due_at = Time.parse(due_at)
       mi = find_min_from_now(due_at)
       diff = mi - due_date.threshold * 60
+      # diff = 1
+      # mi = 2
       next unless diff > 0
       dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
                               1, diff.minutes.from_now)
       change_item_type(dj.id)
       due_date.update_attribute(:delayed_job_id, dj.id)
+
       # If the deadline type is review, add a delayed job to drop outstanding review
       if deadline_type == "review"
         dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
@@ -188,7 +191,7 @@ class AssignmentForm
     reviews = @assignment.find_due_dates('review')
     @assignment.rounds_of_reviews = [@assignment.rounds_of_reviews, submissions.count, reviews.count].max
 
-    @assignment.directory_path = nil if @assignment.directory_path.empty?
+    @assignment.directory_path = nil if @assignment.directory_path.try :empty?
   end
 
   def staggered_deadline
@@ -204,18 +207,26 @@ class AssignmentForm
   end
 
   def reviews_visible_to_all
-    @assignment.reviews_visible_to_all = false if @assignment.reviews_visible_to_all.nil?
+    if @assignment.reviews_visible_to_all.nil?
+      @assignment.reviews_visible_to_all = false
+      end
   end
 
   def review_assignment_strategy
-    @assignment.review_assignment_strategy = '' if @assignment.review_assignment_strategy.nil?
+    if @assignment.review_assignment_strategy.nil?
+      @assignment.review_assignment_strategy = ''
+      end
   end
 
   def require_quiz
     if @assignment.require_quiz.nil?
       @assignment.require_quiz = false
       @assignment.num_quiz_questions = 0
-    end
+      end
+  end
+
+  def is_calibrated
+    @assignment.is_calibrated = false if @assignment.is_calibrated?
   end
 
   # NOTE: unfortunately this method is needed due to bad data in db @_@

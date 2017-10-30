@@ -1,79 +1,122 @@
 describe GradesController do
-  let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
-  let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
-  let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
-  let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  let(:admin) { build(:admin) }
-  let(:instructor) { build(:instructor, id: 6) }
-  let(:question) { build(:question) }
-  let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
-  let(:student) { build(:student) }
-  let(:review_response_map) { build(:review_response_map, id: 1) }
-  let(:assignment_due_date) { build(:assignment_due_date) }
-
-  before(:each) do
-    allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
-    allow(participant).to receive(:team).and_return(team)
-    stub_current_user(instructor, instructor.role.name, instructor.role)
-    allow(Assignment).to receive(:find).with('1').and_return(assignment)
-    allow(Assignment).to receive(:find).with(1).and_return(assignment)
+  before :each do
+    controller.class.skip_before_filter :authorize
   end
 
-  describe '#view' do
-    context 'when current assignment varys rubric by round' do
-      it 'retrieves questions, calculates scores and renders grades#view page'
-    end
-
-    context 'when current assignment does not vary rubric by round' do
-      it 'calculates scores and renders grades#view page'
-    end
+  xit 'returns the score for an assignment' do
+    assignmentParticipant = double(AssignmentParticipant)
+    assignment = double(Assignment)
+    # questionnaires=double(Questionnaire)
+    allow(AssignmentParticipant).to receive("find").and_return(assignmentParticipant)
+    allow(assignmentParticipant).to receive(:assignment).and_return(assignment)
+    allow(assignment).to receive("questionnaires").and_return([])
+    allow(assignmentParticipant).to receive("scores").and_return([1, 2])
+    @params = {id: 1}
+    expect { get :edit, @params }.to eq([1, 2])
   end
 
-  describe '#view_my_scores' do
-    before(:each) do
-      allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
-      allow(Participant).to receive(:find).with('1').and_return(participant)
-    end
+  xit 'prepares the email content for a conflict notification email when user is instructor' do
+    user = double(Assignment)
+    allow(user).to receive(:timezonepref) { nil }
+    allow(user).to receive(:super_admin?) { true }
+    participant = double(AssignmentParticipant)
+    allow(participant).to receive(:parent_id) { 15 }
+    allow(user).to receive(:role_id) { 4 }
+    session[:user] = user
 
-    context 'when view_my_scores page is not allow to access' do
-      it 'shows a flash errot message and redirects to rot path (/)'
-    end
+    allow(AssignmentParticipant).to receive(:find) { participant }
+    assignment = double(Assignment)
+    allow(assignment).to receive(:name) { "assignment name" }
+    allow(Assignment).to receive("find") { assignment }
 
-    context 'when view_my_scores page is allow to access' do
-      it 'renders grades#view_my_scores page'
-    end
+    questionnaire = double(Questionnaire)
+    allow(questionnaire).to receive(:symbol) { "a" }
+    allow(questionnaire).to receive(:questions) { [] }
+
+    user1 = double(User)
+    user2 = double(User)
+    allow(user1).to receive(:super_admin?) { true }
+    allow(user2).to receive(:super_admin?) { true }
+    allow(user1).to receive(:timezonepref) { nil }
+    # allow(user1).to receive(:super_admin?){true}
+    allow(user2).to receive(:timezonepref) { nil }
+    # allow(user2).to receive(:super_admin?){true}
+    allow(user1).to receive(:fullname) { "full name" }
+    allow(user2).to receive(:fullname) { "name full" }
+    allow(user1).to receive(:email) { "abc@xyz.com" }
+    allow(user2).to receive(:email) { "xyz@abc.com" }
+
+    review1 = double(User)
+    allow(review1).to receive(:map) { review1 }
+    allow(review1).to receive(:reviewer) { review1 }
+    allow(review1).to receive(:user) { user1 }
+
+    review2 = double(User)
+    allow(review2).to receive(:map) { review2 }
+    allow(review2).to receive(:reviewer) { review2 }
+    allow(review2).to receive(:user) { user2 }
+
+    allow(participant).to receive(:reviews) { [review1, review2] }
+
+    allow(assignment).to receive(:questionnaires).and_return([questionnaire])
+    allow(questionnaire).to receive(:find_by_type) { questionnaire }
+
+    @params = {submission: "review", id: 5}
+
+    get :conflict_notification, @params
   end
 
-  describe '#view_team' do
-    it 'renders grades#view_team page'
-  end
+  xit 'prepares the email content for a conflict notification email when user is a TA' do
+    user = double(Assignment)
+    allow(user).to receive(:timezonepref) { nil }
+    allow(user).to receive(:super_admin?) { true }
+    participant = double(AssignmentParticipant)
+    allow(participant).to receive(:parent_id) { 15 }
+    allow(user).to receive(:role_id) { 6 }
+    session[:user] = user
 
-  describe '#edit' do
-    it 'renders grades#edit page'
-  end
+    instructor = double(Instructor)
+    allow(Ta).to receive(:get_my_instructor) { instructor }
 
-  describe '#instructor_review' do
-    context 'when review does not exist' do
-      it 'redirects to grades#new page'
-    end
+    allow(AssignmentParticipant).to receive(:find) { participant }
+    assignment = double(Assignment)
+    allow(assignment).to receive(:name) { "assignment name" }
+    allow(Assignment).to receive("find") { assignment }
 
-    context 'when review does not exist' do
-      it 'redirects to grades#edit page'
-    end
-  end
+    questionnaire = double(Questionnaire)
+    allow(questionnaire).to receive(:symbol) { "a" }
+    allow(questionnaire).to receive(:questions) { [] }
 
-  describe '#update' do
-    context 'when total is not equal to participant\'s grade' do
-      it 'updates grades and redirects to grades#edit page'
-    end
+    user1 = double(User)
+    user2 = double(User)
+    allow(user1).to receive(:super_admin?) { true }
+    allow(user2).to receive(:super_admin?) { true }
+    allow(user1).to receive(:timezonepref) { nil }
+    allow(user1).to receive(:super_admin?) { true }
+    allow(user2).to receive(:timezonepref) { nil }
+    allow(user2).to receive(:super_admin?) { true }
+    allow(user1).to receive(:fullname) { "full name" }
+    allow(user2).to receive(:fullname) { "name full" }
+    allow(user1).to receive(:email) { "abc@xyz.com" }
+    allow(user2).to receive(:email) { "xyz@abc.com" }
 
-    context 'when total is equal to participant\'s grade' do
-      it 'redirects to grades#edit page'
-    end
-  end
+    review1 = double(User)
+    allow(review1).to receive(:map) { review1 }
+    allow(review1).to receive(:reviewer) { review1 }
+    allow(review1).to receive(:user) { user1 }
 
-  describe '#save_grade_and_comment_for_submission' do
-    it 'saves grade and comment for submission and redirects to assignments#list_submissions page'
+    review2 = double(User)
+    allow(review2).to receive(:map) { review2 }
+    allow(review2).to receive(:reviewer) { review2 }
+    allow(review2).to receive(:user) { user2 }
+
+    allow(participant).to receive(:reviews) { [review1, review2] }
+
+    allow(assignment).to receive(:questionnaires).and_return([questionnaire])
+    allow(questionnaire).to receive(:find_by_type) { questionnaire }
+
+    @params = {submission: "review", id: 5}
+
+    get :conflict_notification, @params
   end
 end

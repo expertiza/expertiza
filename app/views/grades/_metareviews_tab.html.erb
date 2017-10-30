@@ -4,16 +4,14 @@
     <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
     <tr style="background-color: #F7DC6F">
       <td>
-        <a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_mreviews','metareviews');return false;"> <b> <%=participant.fullname %></b></a> (<%= pscore[:metareview][:assessments].size %>)
+        <b> <%= participant.fullname %></b>
+        <a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)
       </td>
     <tr id="<%=prefix%>_<%=index.to_s%>_mreviews" style="display:none">
       <td>
-        <%= view_heatgrid(participant.id, "MetaReviewQuestionnaire") %>
+        <%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %>
       </td>
     </tr>
   <% end %>
 </table>
-
-<% else %>
-<span style="color:red">There are no metareviews for this assignment.</span>
 <% end %>

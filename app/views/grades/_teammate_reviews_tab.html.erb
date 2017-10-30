@@ -6,13 +6,14 @@
         <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
         <tr style="background-color: #F7DC6F">
           <td>
-            <a href="#" id="<%=prefix%>_<%=index.to_s%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_teammate_reviews','teammate reviews');return false;"> <b> <%=participant.fullname %></b></a> (<%= pscore[:teammate][:assessments].size %>)
+            <b> <%= participant.fullname %></b>
+            <a href="#" id="<%=prefix%>_<%=index.to_s%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)
           </td>
         </tr>
         <tr id="<%=prefix%>_<%=index.to_s%>_teammate_reviews" style="display:none">
-           <td>
-        <%= view_heatgrid(participant.id, "TeammateReviewQuestionnaire") %>
-      </td>
+          <td>
+            <%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %>
+          </td>
         </tr>
       <% end %>
     </table>

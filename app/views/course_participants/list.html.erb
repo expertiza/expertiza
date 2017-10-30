@@ -21,7 +21,7 @@
                           :action=>'start',
                           :model => 'Participant',
                           :title => @title+' Participants',
-                          :expected_fields => 'username, full name (first[ middle] last), e-mail address, password',
+                          :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address&nbsp;&nbsp;|&nbsp;&nbsp;password',
                           :id => @parent.id %>
                         | <%= render :partial => '/shared_scripts/back' %>
                       <hr/>

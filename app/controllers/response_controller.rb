@@ -28,6 +28,16 @@ class ResponseController < ApplicationController
     end
   end
 
+  def scores
+    @review_scores = []
+    @questions.each do |question|
+      @review_scores << Answer.where(
+        response_id: @response.id,
+        question_id:  question.id
+      ).first
+    end
+  end
+
   def delete
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
@@ -45,6 +55,7 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
+
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
@@ -52,10 +63,14 @@ class ResponseController < ApplicationController
       @sorted = @review_scores.sort {|m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
+
     @modified_object = @response.response_id
+
     # set more handy variables for the view
     set_content
+
     @review_scores = []
+
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
@@ -65,23 +80,31 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     return unless action_allowed?
+
     # the response to be updated
     @response = Response.find(params[:id])
+
     msg = ""
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
+
       questions = sort_questions(@questionnaire.questions)
+
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      if params['isSubmit'] && params['isSubmit'] == 'Yes'
+
+      if params['isSubmit'] && (params['isSubmit'].eql?'Yes')
+        # Update the submission flag.
         @response.update_attribute('is_submitted', true)
       else
         @response.update_attribute('is_submitted', false)
       end
+
       if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
         @response.notify_instructor_on_difference
       end
+
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -95,7 +118,10 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
+
+    # set more handy variables for the view
     set_content(true)
+
     if @assignment
       @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     end
@@ -125,15 +151,24 @@ class ResponseController < ApplicationController
   end
 
   def create
-    @map = ResponseMap.find(params[:id])
+    @map = ResponseMap.find(params[:id]) # assignment/review/metareview id is in params id
+
     set_all_responses
+
+    # to save the response for ReviewResponseMap, a questionnaire_id is wrapped in the params
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
     else
       @round = nil
     end
-    is_submitted = (params[:isSubmit] == 'Yes')
+
+    # create the response
+    is_submitted = if params[:isSubmit].eql?('Yes')
+                     true
+                   else
+                     false
+                   end
     @response = Response.create(
       map_id: @map.id,
       additional_comment: params[:review][:comments],
@@ -141,20 +176,26 @@ class ResponseController < ApplicationController
       is_submitted: is_submitted
     )
     # ,:version_num=>@version)
+
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
+
     create_answers(params, questions) if params[:responses]
+
     msg = "Your response was successfully saved."
     error_msg = ""
+
     if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
       @response.notify_instructor_on_difference
     end
+
     @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
   def saving
     @map = ResponseMap.find(params[:id])
+
     @return = params[:return]
     @map.save
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
@@ -179,6 +220,7 @@ class ResponseController < ApplicationController
       redirect_to controller: 'response', action: 'pending_surveys'
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+
     end
   end
 
@@ -256,17 +298,34 @@ class ResponseController < ApplicationController
   # if false: we figure out which questionnaire to display base on @response object
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
+    # handy reference to response title for view
     @title = @map.get_title
+
+    # handy reference to response assignment for ???
+
     if @map.survey?
       @survey_parent = @map.survey_parent
     else
       @assignment = @map.assignment
     end
+
+    # handy reference to the reviewer for ???
     @participant = @map.reviewer
+
+    # handy reference to the contributor (should always be a Team)
     @contributor = @map.contributor
+
+    # set a handy reference to the response questionnaire for the view
     new_response ? set_questionnaire_for_new_response : set_questionnaire
+
+    # set a handy reference to the dropdown_or_scale property to be used in the view
     set_dropdown_or_scale
+
+    # set a handy reference to the response questionnaire's questions
+    # sorted in a special way for the view
     @questions = sort_questions(@questionnaire.questions)
+
+    # set a handy refence to the min/max question  for the view
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
@@ -288,16 +347,6 @@ class ResponseController < ApplicationController
     end
   end
 
-  def scores
-    @review_scores = []
-    @questions.each do |question|
-      @review_scores << Answer.where(
-        response_id: @response.id,
-        question_id:  question.id
-      ).first
-    end
-  end
-
   def set_questionnaire
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
@@ -309,7 +358,7 @@ class ResponseController < ApplicationController
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
                                           .first.try(:dropdown)
-    @dropdown_or_scale = (use_dropdown == true ? 'dropdown' : 'scale')
+    @dropdown_or_scale = use_dropdown == true ? 'dropdown' : 'scale'
   end
 
   def sort_questions(questions)

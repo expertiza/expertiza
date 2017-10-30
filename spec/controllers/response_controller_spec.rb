@@ -1,127 +1,107 @@
-describe ResponseController do
-  let(:assignment) { build(:assignment, instructor_id: 6) }
-  let(:instructor) { build(:instructor, id: 6) }
-  let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
-  let(:review_response) { build(:response, id: 1, map_id: 1) }
-  let(:review_response_map) { build(:review_response_map, id: 1, reviewer: participant) }
-  let(:questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
-  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
-  let(:answer) { double('Answer') }
-  let(:assignment_due_date) { build(:assignment_due_date) }
+include LogInHelper
 
-  before(:each) do
-    allow(Assignment).to receive(:find).with('1').and_return(assignment)
-    stub_current_user(instructor, instructor.role.name, instructor.role)
-    allow(Response).to receive(:find).with('1').and_return(review_response)
-    allow(review_response).to receive(:map).and_return(review_response_map)
-  end
-
-  describe '#action_allowed?' do
-    context 'when params action is edit' do
-      context 'when response is not submitted and current_user is the reviewer of the response' do
-        it 'allows certain action'
-      end
-
-      context 'when response is submitted' do
-        it 'does not allow certain action'
+RSpec.describe ResponseController do
+  context "user not logged in" do
+    let(:response) do
+      Response.create(map_id: 1, additional_comment: 'hello', round: 1)
+    end
+    # user not logged in
+    describe "GET #new_feedback" do
+      it "returns http success" do
+        get :new_feedback
+        expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
       end
     end
 
-    context 'when params action is delete or update' do
-      context 'when current_user is the reviewer of the response' do
-        it 'allows certain action'
+    describe "GET #saving" do
+      it "returns http success" do
+        get :saving
+        expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
       end
     end
 
-    context 'when params action is view' do
-      context 'when response_map is a ReviewResponseMap and current user is the instructor of current assignment' do
-        it 'allows certain action'
+    describe "GET #redirection" do
+      it "returns http success" do
+        get :redirection
+        expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
+      end
+    end
+
+    describe "POST #custom_create" do
+      it "returns http success" do
+        post :create
+        expect(response).to redirect_to(request.env['HTTP_REFERER'] ? :back : :root)
       end
     end
   end
 
-  describe '#delete' do
-    it 'deletes current response and redirects to response#redirection page'
-  end
-
-  describe '#edit' do
-    it 'renders response#response page'
-  end
-
-  describe '#update' do
-    context 'when something is wrong during response updating' do
-      it 'raise an error and redirects to response#saving page'
+  context 'logged in as student' do
+    let(:review) { Response.create(map_id: 1, additional_comment: 'hello', round: 1) }
+    let(:map) { FeedbackResponseMap.create(reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
+    let(:assignment) { AssignmentParticipant.new }
+    let(:responsemap) { ResponseMap.new }
+    before(:each) do
+      student.save
+      @user = User.find_by_name('student')
+      @role = double('role', super_admin?: false)
+      stub_current_user(@user, 'Student', @role)
     end
 
-    context 'when response is updated successfully' do
-      it 'redirects to response#saving page'
-    end
-  end
+    describe "GET #new_feedback" do
+      it "redirects to new if review object is found" do
+        allow(Response).to receive(:find).and_return(review)
+        allow(session[:user]).to receive(:id).and_return(1)
+        allow(review).to receive_message_chain(:map, :assignment, :id).and_return(1)
+        allow(review).to receive_message_chain(:map, :reviewer, :id).and_return(1)
+        allow_any_instance_of(AssignmentParticipant).to receive_message_chain(:where, :first).and_return(assignment)
+        allow_any_instance_of(FeedbackResponseMap).to receive_message_chain(:where, :first).and_return(map)
+        allow_any_instance_of(FeedbackResponseMap).to receive(:create).and_return(map)
 
-  describe '#new' do
-    it 'renders response#response page'
-  end
+        get :new_feedback
 
-  describe '#new_feedback' do
-    context 'when current response is nil' do
-      it 'redirects to response#new page'
-    end
-
-    context 'when current response is not nil' do
-      it 'redirects to previous page'
-    end
-  end
-
-  describe '#view' do
-    it 'renders response#view page'
-  end
-
-  describe '#create' do
-    it 'creates a new response and redirects to response#saving page'
-  end
-
-  describe '#saving' do
-    it 'save current response map and redirects to response#redirection page'
-  end
-
-  describe '#redirection' do
-    context 'when params[:return] is feedback' do
-      it 'redirects to grades#view_my_scores page'
+        expect(response).to redirect_to action: :new, id: map.id, return: "feedback"
+      end
+      it "redirects to same page if no review is found" do
+        allow(Response).to receive(:find).and_return(false)
+        expect(response).to have_http_status(200)
+      end
     end
 
-    context 'when params[:return] is teammate' do
-      it 'redirects to student_teams#view page'
+    describe "GET #saving" do
+      it "redirect to redirection" do
+        allow(ResponseMap).to receive(:find).and_return(responsemap)
+        allow(ResponseMap).to receive(:save).and_return(true)
+
+        get :saving
+        expect(response).to have_http_status(302)
+      end
     end
 
-    context 'when params[:return] is instructor' do
-      it 'redirects to grades#view page'
+    describe "GET #redirection" do
+      it "returns http success" do
+        allow(Response).to receive(:find_by_map_id).and_return(review)
+        allow(review).to receive_message_chain(:reviewer, :id).and_return(1)
+        get :redirection
+        expect(response).to have_http_status(302)
+      end
     end
 
-    context 'when params[:return] is assignment_edit' do
-      it 'redirects to assignment#edit page'
-    end
+    describe "#update" do
+      let!(:first_review) { Response.create(map_id: 1, additional_comment: 'hello', round: 1) }
+      before do
+        allow(Response).to receive(:find).and_return(first_review)
+        allow(first_review).to receive_message_chain(:map, :reviewer, :user_id).and_return(1)
+        allow_any_instance_of(ApplicationController).to receive(:current_user_id?).and_return(true)
+        allow(first_review).to receive(:map).and_return(map)
+        allow(map).to receive(:reviewer).and_return(@user)
+        allow(@user).to receive(:user_id).and_return(1)
+        allow(map).to receive(:map_id).and_return(1)
+        put :update, review: {additional_comment: "Update Title", map_id: "2", round: '1'}, id: first_review.id
+      end
 
-    context 'when params[:return] is selfreview' do
-      it 'redirects to submitted_content#edit page'
-    end
-
-    context 'when params[:return] is survey' do
-      it 'redirects to response#pending_surveys page'
-    end
-
-    context 'when params[:return] is other content' do
-      it 'redirects to student_review#list page'
-    end
-  end
-
-  describe '#pending_surveys' do
-    context 'when session[:user] is nil' do
-      it 'redirects to root path (/)'
-    end
-
-    context 'when session[:user] is not nil' do
-      it 'renders pending_surveys page'
+      it "located the requested response" do
+        expect(assigns(:response)).to eq(first_review)
+      end
     end
   end
 end

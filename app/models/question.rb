@@ -77,6 +77,22 @@ class Question < ActiveRecord::Base
     0
   end
 
+  def set_appropriate_type
+    if type == "MultipleChoiceCheckbox"
+      @type_object = MultipleChoiceCheckbox.new
+    elsif type == "MultipleChoiceRadio"
+      @type_object = MultipleChoiceRadio.new
+    elsif type == "TrueFalse"
+      @type_object = TrueFalse.new
+    end
+  end
+
+  def update_attributes(quiz_question_choice,parameters,option_number)
+    
+    @type_object.update_attributes(quiz_question_choice,parameters,@id,option_number)
+
+  end
+
   # this method return questions (question_ids) in one assignment whose comments field are meaningful (ScoredQuestion and TextArea)
   def self.get_all_questions_with_comments_available(assignment_id)
     question_ids = []

@@ -30,7 +30,7 @@ describe "Course Survey questionnaire tests for instructor interface" do
     @next_to_next_day = (Time.now.getlocal + 2 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
   end
 
- it "is able to create a Global survey" do
+  it "is able to create a global survey" do
     login_as('instructor6')
     survey_name = "Global Course Survey Questionnaire 1"
     create_course_questionnaire survey_name

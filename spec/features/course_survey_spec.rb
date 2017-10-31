@@ -40,10 +40,17 @@ describe "Course Survey questionnaire tests for instructor interface" do
     expect(Questionnaire.where(name: survey_name)).to exist
   end
   
-  it "is able to deploy a course survey" do
+  it "is able to deploy a course survey with valid dates" do
     survey_name = 'Course Survey Questionnaire 1'
     deploy_course_survey(@next_day, @next_to_next_day, survey_name)
     expect(page).to have_content(survey_name)
+  end
+  
+  it "is not able to deploy a assignment survey with invalid dates" do
+    	survey_name = 'Course Survey Questionnaire 1'
+    	# Passing current time - 1 day for start date and current time + 2 days for end date
+    	deploy_course_survey(@previous_day, @next_day, survey_name)
+    	expect(page).to have_content(survey_name)
   end
   
   it "is able to add and edit questions to a course survey" do
@@ -56,7 +63,6 @@ describe "Course Survey questionnaire tests for instructor interface" do
     select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
-
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')
@@ -71,7 +77,6 @@ describe "Course Survey questionnaire tests for instructor interface" do
     select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
-
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')

@@ -56,10 +56,10 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_name = 'Assignment Survey Questionnaire 1'
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
+    survey_questionnaire_assignment = Questionnaire.where(name: survey_name).first
 
     # adding some questions for the deployed survey
-    visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
+    visit '/questionnaires/' + survey_questionnaire_assignment.id.to_s + '/edit'
     fill_in('question_total_num', with: '1')
     select('Criterion', from: 'question_type')
     click_button "Add"
@@ -83,8 +83,8 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_name = 'Assignment Survey Questionnaire 1'
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
+    survey_questionnaire_assignment = Questionnaire.where(name: survey_name).first
+    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_assignment.id).first
 
     # after adding a response:
     visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s

@@ -1,0 +1,58 @@
+<script>
+  $(function () {
+    /*Function for sorting the table */
+    $(".sortable").tablesorter({
+      sortList: [[0,0]] //sort First Column by default when page loads
+    });
+  });
+
+  /*Function to create tabs of the rubric-tag_prompt pairs */
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
+</script>
+
+<% if @questionnaire_tagging_report.nil? or @questionnaire_tagging_report.count < 1 %>
+      <h1 align="center">No answer tags are found for this assignment</h1>
+<% else %>
+    <div class="text-center">
+      <h4>Tagging report for assignment "<%= @assignment.name %>"</h4>
+    </div>
+
+    <div class= "chart-table" id="tabs">
+      <ul>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+        <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.questionnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
+      <% end %>
+      </ul>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+        <p>
+        <div id="tab-<%= tag_dep.id %>">
+          <h4  align="center">Tagging Report for questionnaire "<%= tag_dep.questionnaire.name %>" and Tag "<%= tag_dep.tag_prompt.prompt %>"</h4>
+          <table class="table table-striped sortable">
+            <thead>
+            <tr>
+              <th class="sorter-true">Username</th>
+              <th class="sorter-true">Name</th>
+              <th class="sorter-true">Percentage of answers tagged</th>
+              <th class="sorter-true"># answers tagged</th>
+              <th class="sorter-true"># answers not tagged</th>
+              <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.question_type %> question type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
+            </tr>
+            </thead>
+            <% report_lines.each do |report_line| %>
+                <tr>
+                  <td><%= report_line.user.name %></td>
+                  <td><%= report_line.user.fullname %></td>
+                  <td><%= report_line.percentage.to_s %>%</td>
+                  <td><%= report_line.no_tagged.to_s %></td>
+                  <td><%= report_line.no_not_tagged.to_s %></td>
+                  <td><%= report_line.no_tagable %></td>
+                </tr>
+            <% end %>
+          </table>
+        </div>
+        </p>
+      <% end %>
+    </div>
+<% end %>

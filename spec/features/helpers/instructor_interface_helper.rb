@@ -29,9 +29,9 @@ module InstructorInterfaceHelperSpec
   end
 
   def course_setup
-   create(:course)
-   create_list(:course_participant, 5)
-   create(:course_node)
+    create(:course)
+    create_list(:course_participant, 5)
+    create(:course_node)
   end
 
   def import_topics(filepath)

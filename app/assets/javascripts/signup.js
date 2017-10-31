@@ -294,8 +294,9 @@ jQuery("#jsGrid").jsGrid({
                      }
                      ,filtering: true 
                       },
-                  { name: "link", type: "text",title: "Topic Link" ,width :"12%" },
-                    { name: "description", type: "textarea",title: "Topic Description",width :"12%" }
+
+                    { name: "description", type: "textarea",title: "Topic Description",width :"12%" },
+                  { name: "link", type: "text",title: "Topic Link" ,width :"12%" }
                    
                 ],
                 // for freezing the first column

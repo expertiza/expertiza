@@ -89,7 +89,7 @@ class Question < ActiveRecord::Base
 
   def update_option_attributes(quiz_question_choice,parameters,option_number)
     
-    @type_object.update_attributes(quiz_question_choice, parameters, @id, option_number)
+    @type_object.update_option_attributes(quiz_question_choice, parameters, @id, option_number)
 
   end
 

@@ -287,10 +287,11 @@ class ReviewMappingController < ApplicationController
     # Create teams if its an individual assignment.
 
     team_size teams,max_team_size
-    calibrated_artifacts_num params[:num_reviews_per_student].to_i,
+    artifacts_num params[:num_reviews_per_student].to_i,
                              params[:num_reviews_per_submission].to_i,
                              params[:num_calibrated_artifacts].to_i,
-                             params[:num_uncalibrated_artifacts].to_i,teams
+                             params[:num_uncalibrated_artifacts].to_i,
+                             teams
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
@@ -308,16 +309,9 @@ class ReviewMappingController < ApplicationController
 
   end
 
-  def calibrated_artifacts_num calibrated_artifacts_num, uncalibrated_artifacts_num, student_review_num, submission_review_num, teams
+  def artifacts_num calibrated_artifacts_num, uncalibrated_artifacts_num, student_review_num, submission_review_num, teams
     if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
-      if student_review_num == 0 and submission_review_num == 0
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
-        # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
-      else
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-      end
+      review_num student_review_num, submission_review_num, teams
     else
       teams_with_calibrated_artifacts = []
       teams_with_uncalibrated_artifacts = []
@@ -331,6 +325,18 @@ class ReviewMappingController < ApplicationController
       # since after first mapping, participants (delete_at) will be nil
       participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject {|p| p.can_review == false}.shuffle!
       automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
+    end
+
+  end
+
+  def review_num student_review_num, submission_review_num, teams
+    if student_review_num == 0 and submission_review_num == 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+    elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
+      # REVIEW: mapping strategy
+      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+    else
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
     end
 
   end

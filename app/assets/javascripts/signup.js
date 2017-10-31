@@ -191,7 +191,7 @@ jQuery("#jsGrid").jsGrid({
 
                             if(topic.link !=null && topic.link != "")
                             {
-                            var linkText =  $("<a>").attr("href", topic.link).text(value);
+                            var linkText =  $("<a>").attr("href", topic.link).attr("target", "_blank").text(value);
                             }
                             else
                             {

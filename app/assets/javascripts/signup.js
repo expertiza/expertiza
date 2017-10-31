@@ -51,22 +51,12 @@ jQuery("input[id^='due_date_']").datetimepicker({
 //1781
 jQuery(function(){
 
-
-
-
-
 jQuery('.jsgrid-header-row th:first-child, .jsgrid-filter-row td:first-child, .jsgrid-insert-row td:first-child, .jsgrid-grid-body tr td:first-child')
 .css({
 position: "absolute",
 left: "1px"
 });
 jQuery('.jsgrid-grid-header, .jsgrid-grid-body').css('margin-left', '100px');
-
-
-
-
-
-
 var assignmentId = jQuery("#jsGrid").data("assignmentid");
 
 jQuery("#jsGrid").jsGrid({  
@@ -109,8 +99,7 @@ jQuery("#jsGrid").jsGrid({
 
 
                     insertItem: function (topic) {
-                    console.log("testing")
-                    console.log(topic)   
+              
                     topic.id = jQuery("#jsGrid").data("assignmentid")
 
                      var data = $.Deferred();
@@ -123,8 +112,17 @@ jQuery("#jsGrid").jsGrid({
                               jQuery("#jsGrid").jsGrid("loadData");
                               data.resolve(response);
                         }).fail(function(response){
-                            alert("Issue on inserting Topic");
-                            data.resolve(response);
+                            var responseJson = response;
+                             data.resolve(response);
+                             console.log(JSON.stringify(responseJson));
+                             console.log(responseJson.responseJSON.flash);
+                             if(responseJson.responseJSON.flash == "The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.")
+                            {
+                             jQuery(document).scrollTop(0);
+                             location.reload();
+                             }
+                             else
+                                alert(responseJson.responseText);
                         }
                         );
                     return data.promise();
@@ -132,9 +130,7 @@ jQuery("#jsGrid").jsGrid({
 
 
                     updateItem: function (topic) {
-                    console.log("testing")
-                    console.log(topic)
-                    
+                 
 
                     var data = $.Deferred();
                         $.ajax({
@@ -147,8 +143,15 @@ jQuery("#jsGrid").jsGrid({
                               data.resolve(response);
 
                         }).fail(function(response){
-                             alert("Issue on Update Topic");
-                            data.resolve(previousItem);
+                             var responseJson = response;
+                             data.resolve(previousItem);
+                             if(responseJson.responseJSON.flash == "The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.")
+                            {
+                             jQuery(document).scrollTop(0);
+                             location.reload();
+                             }
+                             else
+                                 alert(responseJson.responseText);
                         });
                     return data.promise();
                     },

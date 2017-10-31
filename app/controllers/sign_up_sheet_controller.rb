@@ -13,6 +13,21 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
+
+
+  rescue_from ::ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from ::NameError, with: :error_occurred
+
+  def record_not_found(exception)
+   render json: {error: exception.message}.to_json, status: 404
+   return
+  end
+
+  def error_occurred(exception)
+    render json: {error: exception.message}.to_json, status: 500
+    return
+  end
+
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
@@ -70,12 +85,12 @@ class SignUpSheetController < ApplicationController
       @topic.destroy
      # undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
     else
-        render json: {status: 'FAIL'} , :status => 404
+        render json: {error: 'FAIL'} , :status => 404
     end
     # changing the redirection url to topics tab in edit assignment view.
-      render json: {status: 'STATUS'}
+      render json: {status: 'PASS'}
 
-        end
+  end
 
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
   def edit
@@ -83,36 +98,15 @@ class SignUpSheetController < ApplicationController
   end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
-=begin 
-
   def update
-    @topic = SignUpTopic.find(params[:id])
-    if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
-      update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
-      undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
-    else
-      flash[:error] = "The topic could not be updated."
-    end
-    # changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
-<<<<<<< HEAD
-    end
-=end
-
-    def update
    # puts("received params : "+params)
    @topic = SignUpTopic.find(params[:id])
 
     if @topic
         @topic.topic_identifier = params[:topic_identifier]
-        update_max_choosers @topic
+        if !update_max_choosers @topic
+           render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 404 
+        else
         # update tables
         @topic.category = params[:category]
         @topic.topic_name = params[:topic_name]
@@ -120,14 +114,16 @@ class SignUpSheetController < ApplicationController
         @topic.description = params[:description]
         @topic.link = params[:link]
         @topic.save
+        render :json => @topic.as_json
+      end
       #  undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
-        render json: {status: 'FAIL'}, :status => 404
+      render json: {error: 'FAIL'}, :status => 404
       end
     # changing the redirection url to topics tab in edit assignment view.
     # redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
 
-    render :json => @topic.as_json
+    
     end
 
 
@@ -521,7 +517,7 @@ class SignUpSheetController < ApplicationController
     if !@sign_up_topic.save
      # undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
       # changing the redirection url to topics tab in edit assignment view.
-      render json: {status: 'FAIL'}, :status => 404
+      render json: {error: 'FAIL'}, :status => 404
     else
       render json: @sign_up_topic.as_json
     end
@@ -535,8 +531,12 @@ class SignUpSheetController < ApplicationController
 
     topic.topic_identifier = params[:topic_identifier]
 
-    update_max_choosers topic
 
+    if !update_max_choosers topic
+      render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 404 
+    else
+
+  
     topic.category = params[:category]
 
     # topic.assignment_id = params[:id]
@@ -544,6 +544,7 @@ class SignUpSheetController < ApplicationController
 
     render json: topic.as_json
     end
+  end
 
   def update_max_choosers(topic)
     # While saving the max choosers you should be careful; if there are users who have signed up for this particular
@@ -557,9 +558,12 @@ class SignUpSheetController < ApplicationController
         topic.update_waitlisted_users params[:max_choosers]
         topic.max_choosers = params[:max_choosers]
       else
-        render json: {status: 'FAIL'}, :status => 404
+        puts "cant be set to less value"
+        flash[:error] = "The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers."
+        return false
       end
     end
+    true
   end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant

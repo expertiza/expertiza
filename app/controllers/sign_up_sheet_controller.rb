@@ -82,20 +82,37 @@ class SignUpSheetController < ApplicationController
   end
   
   # Project E1763. Duplicates topics controller method. Called from sign_up_sheet_all_actions.html.erb. It creates a copy of the topic selected. 
-  def duplicate
+  def duplicate_topic
     @user = current_user
     session[:copy_flag] = true
     @topic = SignUpTopic.find(params[:id])
-    @assignment = Assignment.find(@topic.assignment_id)
-    @dup_topic = SignUpTopic.new
-    @dup_topic.assignment_id = @assignment.id
-    @dup_topic.topic_identifier = @topic.topic_identifier
-    @dup_topic.category = @topic.category
-    @dup_topic.topic_name = @topic.topic_name + " copy"
-    @dup_topic.micropayment = @topic.micropayment
-    @dup_topic.description = @topic.description
-    @dup_topic.link = @topic.link
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    assignment_id = @topic.assignment_id
+    max_choosers = @topic.max_choosers
+    available_slots = get_available_slots(assignment_id)
+    save_duplicate_topic(@topic, assignment_id, available_slots, max_choosers)
+  end
+
+  def save_duplicate_topic(topic, assignment_id, available_slots, max_choosers)
+    if available_slots.zero? || available_slots == max_choosers
+      redirect_to edit_assignment_path(assignment_id) + "#tabs-2"
+      display_error(available_slots, topic.topic_identifier)
+    else
+      assign_values_for_duplicate_topic(topic, assignment_id, available_slots)
+      redirect_to edit_assignment_path(assignment_id) + "#tabs-2"
+      display_success(topic.topic_identifier)
+    end
+  end
+
+  def display_error(available_slots, topic_identifier)
+    flash[:error] = available_slots.zero? ? "Try duplicating the topic " + topic_identifier + " after increasing the number of slots since all slots are currently filled." : "Instead of duplicating the topic " + topic_identifier + " extend the due date since the topic has all slots available."
+  end
+
+  def display_success(topic_identifier)
+    flash[:success] = "Topic " + topic_identifier + " has been successfully duplicated."
+  end
+
+  def get_available_slots(assignment_id)
+    @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     found_in_slots = false
     for slot in @slots_filled
       if slot.topic_id.to_s == @topic.id.to_s
@@ -103,21 +120,22 @@ class SignUpSheetController < ApplicationController
         found_in_slots = true
       end
     end
-
     available_slots = @topic.max_choosers unless found_in_slots
+    available_slots
+  end
 
-    @dup_topic.max_choosers = available_slots
-    if available_slots.zero?
-      redirect_to edit_assignment_path(@topic.assignment_id) + "#tabs-2"
-      flash[:error] = "Try duplicating the topic " + @topic.topic_identifier + " after increasing the number of slots since all slots are currently filled."
-    elsif @topic.max_choosers == available_slots
-      redirect_to edit_assignment_path(@topic.assignment_id) + "#tabs-2"
-      flash[:error] = "Instead of duplicating the topic " + @topic.topic_identifier + " extend the due date since the topic has all slots available."
-    else
-      @dup_topic.save
-      redirect_to edit_assignment_path(@dup_topic.assignment_id) + "#tabs-2"
-      flash[:success] = "Topic " + @topic.topic_identifier + " has been successfully duplicated."
-    end
+  def assign_values_for_duplicate_topic(topic, assignment_id, available_slots)
+    @topic = topic
+    @duplicate_topic = SignUpTopic.new
+    @duplicate_topic.assignment_id = assignment_id
+    @duplicate_topic.topic_identifier = @topic.topic_identifier
+    @duplicate_topic.category = @topic.category
+    @duplicate_topic.topic_name = @topic.topic_name + " copy"
+    @duplicate_topic.max_choosers = available_slots
+    @duplicate_topic.micropayment = @topic.micropayment
+    @duplicate_topic.description = @topic.description
+    @duplicate_topic.link = @topic.link
+    @duplicate_topic.save
   end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit

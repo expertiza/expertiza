@@ -38,7 +38,8 @@ describe ReviewMappingController do
 
   describe '#add_reviewer and #get_reviewer' do
     context 'when team_user does not exist' do
-      it 'shows an error message and redirects to review_mapping#list_mappings page'
+      it 'shows an error message and redirects to review_mapping#list_mappings page' do
+      end
 
     end
 
@@ -239,7 +240,9 @@ describe ReviewMappingController do
   describe '#automatic_review_mapping' do
     context 'when teams is not empty' do
       context 'when all nums in params are 0' do
-        it 'shows an error flash message and redirects to review_mapping#list_mappings page'
+        it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
+
+        end
       end
 
       context 'when all nums in params are 0 except student_review_num' do
@@ -270,8 +273,6 @@ describe ReviewMappingController do
   describe 'response_report' do
     context 'when type is SummaryByRevieweeAndCriteria' do
       it 'renders response_report page with corresponding data' do
-        expect(Assignment).to receive(:find).and_return(assignment)
-        type = double()
       end
     end
 

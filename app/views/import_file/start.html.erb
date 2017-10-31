@@ -1,4 +1,4 @@
-<h2>Import <%= @model %> List</h2>
+<h2>Import <strong><em><%= @model %></em></strong> List</h2>
 
 <br/>
 
@@ -31,6 +31,23 @@
         </td>
       </tr>
 
+      <% if @model == 'SignUpTopic' %>
+
+          <tr><td><br/></td></tr>
+
+          <tr>
+            <td><strong>Optional Columns:</strong></td>
+          </tr>
+          <tr>
+            <td>
+              <%= check_box_tag('category', 'true') %> Topic Category<br/>
+              <%= check_box_tag('description', 'true') %> Topic Description<br/>
+              <%= check_box_tag('link', 'true') %> Topic Link<br/>
+            </td>
+          </tr>
+
+      <% end %>
+
     </table>
 
     <% if @model == 'AssignmentTeam' or @model == 'CourseTeam' %>
@@ -62,6 +79,7 @@
     <% end %>
 
     <br/>
+
     <% if @model == 'ReviewResponseMap' %>
         <table>
           <tr>
@@ -75,7 +93,6 @@
           </tr>
         </table>
         <br/>
-
     <% end %>
 
     <% if @model == 'MetareviewResponseMap' %>
@@ -91,10 +108,9 @@
           </tr>
         </table>
         <br/>
-
     <% end %>
 
-        <label for="file">File to import: </label>
+    <label for="file">File to import: </label>
     <%= file_field_tag 'file', :size => 40, :id => 'import_file' %>
 
     <br/>

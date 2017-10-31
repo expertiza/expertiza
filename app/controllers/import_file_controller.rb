@@ -22,13 +22,26 @@ class ImportFileController < ApplicationController
     else
       @has_reviewee = nil
     end
-
     if (@model == 'MetareviewResponseMap')
       @has_reviewee = params[:has_reviewee]
       @has_reviewer = params[:has_reviewer]
     else
       @has_reviewee = "nil"
       @has_reviewer = "nil"
+    end
+    if (@model == 'SignUpTopic')
+      @optional_count = 0;
+      if (params[:category] == 'true')
+        @optional_count += 1
+      end
+      if (params[:description] == 'true')
+        @optional_count += 1
+      end
+      if (params[:link] == 'true')
+        @optional_count += 1
+      end
+    else
+      @optional_count = 0
     end
     @current_file = params[:file]
     @current_file_contents = @current_file.read

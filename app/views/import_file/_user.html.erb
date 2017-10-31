@@ -1,11 +1,10 @@
 <%= form_tag( { :controller => 'import_file', :action => 'import' },
               { :method => 'post', :name => 'column_form', :id => 'column_form'} ) do %>
 
-
     <table class="table table-bordered table-striped">
 
-  <thead>
-  <tr>
+      <thead>
+      <tr>
 
     <% if @has_header == 'true' %>
 
@@ -44,8 +43,6 @@
             <option value="fullname">Fullname</option>
           </select>
         </th>
-
-
 
     <% end %>
 

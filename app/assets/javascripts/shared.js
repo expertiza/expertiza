@@ -25,6 +25,7 @@ function checkIfUserColumnDuplicate() {
       column_form.submit();
     }
 }
+
 function checkForParticipantColumnDuplicate() {
 
     var sel1 = document.getElementById("select1");
@@ -44,6 +45,44 @@ function checkForParticipantColumnDuplicate() {
     }
 }
 
+function checkTopicForDuplicatesAndRequiredColumns(optional_count) {
+
+    var sel1 = document.getElementById("select1");
+    var sel2 = document.getElementById("select2");
+    var sel3 = document.getElementById("select3");
+
+    var val1 = sel1.options[sel1.selectedIndex].value;
+    var val2 = sel2.options[sel2.selectedIndex].value;
+    var val3 = sel3.options[sel3.selectedIndex].value;
+
+    var val_array = [val1, val2, val3];
+
+    for (var i = 0; i < optional_count; i++) {
+        var sel = document.getElementById("select" + (i + 4).toString());
+        console.log("\n\n********** " + sel + " **********\n\n");
+        val_array[i + 3] = sel.options[sel.selectedIndex].value;
+    }
+
+    var sorted_val_array = val_array.slice().sort();
+    console.log("\n\n********** " + sorted_val_array + " **********\n\n");
+    var has_duplicates = false;
+
+    for (var i = 0; i < sorted_val_array.length - 1; i++) {
+        if (sorted_val_array[i + 1] == sorted_val_array[i]) {
+            has_duplicates = true;
+        }
+    }
+
+    console.log("\n\n********** " + val_array + " **********\n\n");
+
+    if (!val_array.includes('topic_identifier') || !val_array.includes('topic_name') || !val_array.includes('max_choosers')) {
+        alert("Topic Identifier, Topic Name, and Max Choosers are required columns.");
+    } else if (has_duplicates) {
+        alert("No two columns can have the same value.");
+    } else {
+        column_form.submit();
+    }
+}
 
 function checkIfFileExists(filename, flag)
 {

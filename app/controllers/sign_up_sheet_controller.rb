@@ -104,10 +104,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def display_error(available_slots, topic_identifier)
-    if available_slots.zero?
-      flash[:error] = "Try duplicating the topic " + topic_identifier + " after increasing the number of slots since all slots are currently filled."
-    else
-      flash[:error]="Instead of duplicating the topic " + topic_identifier + " extend the due date since the topic has all slots available."
+    flash[:error] = available_slots.zero? ? "Try duplicating the topic " + topic_identifier + " after increasing the number of slots since all slots are currently filled." : "Instead of duplicating the topic " + topic_identifier + " extend the due date since the topic has all slots available."
   end
 
   def display_success(topic_identifier)

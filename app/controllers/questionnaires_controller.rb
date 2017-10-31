@@ -378,6 +378,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     @questionnaire.save
   end
+  
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!

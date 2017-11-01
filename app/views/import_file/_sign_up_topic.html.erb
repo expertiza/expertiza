@@ -19,12 +19,12 @@
             <%= @contents_hash[:header][2].to_s.capitalize %>
           </th>
 
-          <% (1..@optional_count).each do |i| %>
-
-              <th style="text-align:center">
-                <%= @contents_hash[:header][2 + i].to_s.capitalize %>
-              </th>
-
+          <% if @optional_count > 0 %>
+              <% (1..@optional_count).each do |i| %>
+                  <th style="text-align:center">
+                    <%= @contents_hash[:header][2 + i].to_s.capitalize %>
+                  </th>
+              <% end %>
           <% end %>
 
         </tr>
@@ -67,17 +67,19 @@
             </select>
           </th>
 
-          <% (1..@optional_count).each do |i| %>
-              <th>
-                <select name="select<%= i + 3 %>" id="select<%= i + 3 %>" class="form-control" style="background-color:lightgrey">
-                  <option value="category">Category (optional)</option>
-                  <option value="description">Description (optional)</option>
-                  <option value="link">Link (optional)</option>
-                  <option value="max_choosers">Max Choosers (required)</option>
-                  <option value="topic_identifier">Topic Identified (required)</option>
-                  <option value="topic_name">Topic Name (required)</option>
-                </select>
-              </th>
+          <% if @optional_count > 0 %>
+              <% (1..@optional_count).each do |i| %>
+                  <th>
+                    <select name="select<%= i + 3 %>" id="select<%= i + 3 %>" class="form-control" style="background-color:lightgrey">
+                      <option value="category">Category (optional)</option>
+                      <option value="description">Description (optional)</option>
+                      <option value="link">Link (optional)</option>
+                      <option value="max_choosers">Max Choosers (required)</option>
+                      <option value="topic_identifier">Topic Identifier (required)</option>
+                      <option value="topic_name">Topic Name (required)</option>
+                    </select>
+                  </th>
+              <% end %>
           <% end %>
 
         </tr>
@@ -100,9 +102,11 @@
 
     </table>
 
+    <%= hidden_field_tag('optional_count', @optional_count) %>
     <%= hidden_field_tag('contents_hash', @contents_hash) %>
     <%= hidden_field_tag('has_header', @has_header) %>
     <%= hidden_field_tag('model', @model) %>
+    <%= hidden_field_tag('id', @id) %>
 
     <div style="text-align:center">
       <% if @has_header == 'true' %>

@@ -81,7 +81,6 @@ class ImportFileController < ApplicationController
   #   redirect_to session[:return_to]
   # end
 
-
   def import_from_hash(session, params)
     if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
       contents_hash = eval(params[:contents_hash])
@@ -122,12 +121,35 @@ class ImportFileController < ApplicationController
         end
       rescue
         errors << $ERROR_INFO
-        end
+      end
+
     elsif params[:model] == 'SignUpTopic'
-      session[:assignment_id] = params[:id]
       contents_hash = eval(params[:contents_hash])
-      contents_hash[:body].each do |row|
-        SignUpTopic.import(row, session, params[:id])
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+      else
+        if params[:optional_count] == '0'
+          new_header = [params[:select1], params[:select2], params[:select3]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        elsif params[:optional_count] == '1'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        elsif params[:optional_count] == '2'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        elsif params[:optional_count] == '3'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        end
+      end
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          session[:assignment_id] = params[:id]
+          SignUpTopic.import(row_hash, session, params[:id])
+        end
+      rescue
+        errors << $ERROR_INFO
       end
     elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
       contents_hash = eval(params[:contents_hash])
@@ -180,16 +202,12 @@ class ImportFileController < ApplicationController
   #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
   #
   def hash_rows_with_headers(header, body)
-
     new_body = []
-
-    if params[:model] == "User" or params[:model] == "AssignmentParticipant" or params[:model] == "CourseParticipant"
+    if params[:model] == "User" or params[:model] == "AssignmentParticipant" or params[:model] == "CourseParticipant" or params[:model] == "SignUpTopic"
       header.map! { |column_name| column_name.to_sym }
-
       body.each do |row|
         new_body << header.zip(row).to_h
       end
-
     elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
       header.map! { |column_name| column_name.to_sym }
       body.each do |row|
@@ -205,9 +223,7 @@ class ImportFileController < ApplicationController
         end
         new_body << h
       end
-
     elsif params[:model] == "ReviewResponseMap"
-
       header.map! { |column_name| column_name.to_sym }
       body.each do |row|
         h = Hash.new()
@@ -222,9 +238,7 @@ class ImportFileController < ApplicationController
         end
         new_body << h
       end
-
     elsif params[:model] == "MetareviewResponseMap"
-
       header.map! { |column_name| column_name.to_sym }
       body.each do |row|
         h = Hash.new()
@@ -242,7 +256,6 @@ class ImportFileController < ApplicationController
         new_body << h
       end
     end
-
     new_body
   end
 
@@ -263,7 +276,6 @@ class ImportFileController < ApplicationController
       file_hash[:header] = nil
       file_hash[:body] = import_grid
     end
-    puts file_hash
     file_hash
   end
 
@@ -283,46 +295,49 @@ class ImportFileController < ApplicationController
     contents_grid
   end
 
-  def importFile(session, params)
-    delimiter = get_delimiter(params)
-    file = params['file'].try(:tempfile)
-
-    errors = []
-    first_row_read = false
-    row_header = {}
-    begin
-      file.each_line do |line|
-        line.chomp!
-        if first_row_read == false # I don't like the logic here. The code in this if only need to run once. --Yang
-          row_header = parse_line(line.downcase, delimiter)
-          first_row_read = true
-          if row_header.include?("email")
-            # skip if first row contains header. In case of user information, it will contain name of user (mandatory
-            next
-          else
-            row_header = {}
-          end
-        end
-        next if line.empty?
-        row = parse_line(line, delimiter)
-        if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
-          Object.const_get(params[:model]).import(row, params[:id], params[:options])
-        elsif params[:model] == 'SignUpTopic'
-          session[:assignment_id] = params[:id]
-          Object.const_get(params[:model]).import(row, session, params[:id])
-        else
-          if row_header.count > 0
-            Object.const_get(params[:model]).import(row, row_header, session, params[:id])
-          else
-            Object.const_get(params[:model]).import(row, nil, session, params[:id])
-          end
-        end
-      end
-    rescue
-      errors << $ERROR_INFO
-    end
-    errors
-  end
+  # The old method is commented out below.
+  # We have replaced this method with import_from_hash
+  #
+  # def importFile(session, params)
+  #   delimiter = get_delimiter(params)
+  #   file = params['file'].try(:tempfile)
+  #
+  #   errors = []
+  #   first_row_read = false
+  #   row_header = {}
+  #   begin
+  #     file.each_line do |line|
+  #       line.chomp!
+  #       if first_row_read == false # I don't like the logic here. The code in this if only need to run once. --Yang
+  #         row_header = parse_line(line.downcase, delimiter)
+  #         first_row_read = true
+  #         if row_header.include?("email")
+  #           # skip if first row contains header. In case of user information, it will contain name of user (mandatory
+  #           next
+  #         else
+  #           row_header = {}
+  #         end
+  #       end
+  #       next if line.empty?
+  #       row = parse_line(line, delimiter)
+  #       if params[:model] == 'AssignmentTeam' or params[:model] == 'CourseTeam'
+  #         Object.const_get(params[:model]).import(row, params[:id], params[:options])
+  #       elsif params[:model] == 'SignUpTopic'
+  #         session[:assignment_id] = params[:id]
+  #         Object.const_get(params[:model]).import(row, session, params[:id])
+  #       else
+  #         if row_header.count > 0
+  #           Object.const_get(params[:model]).import(row, row_header, session, params[:id])
+  #         else
+  #           Object.const_get(params[:model]).import(row, nil, session, params[:id])
+  #         end
+  #       end
+  #     end
+  #   rescue
+  #     errors << $ERROR_INFO
+  #   end
+  #   errors
+  # end
 
   def get_delimiter(params)
     delim_type = params[:delim_type]

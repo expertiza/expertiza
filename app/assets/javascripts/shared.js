@@ -59,12 +59,10 @@ function checkTopicForDuplicatesAndRequiredColumns(optional_count) {
 
     for (var i = 0; i < optional_count; i++) {
         var sel = document.getElementById("select" + (i + 4).toString());
-        console.log("\n\n********** " + sel + " **********\n\n");
         val_array[i + 3] = sel.options[sel.selectedIndex].value;
     }
 
     var sorted_val_array = val_array.slice().sort();
-    console.log("\n\n********** " + sorted_val_array + " **********\n\n");
     var has_duplicates = false;
 
     for (var i = 0; i < sorted_val_array.length - 1; i++) {
@@ -72,8 +70,6 @@ function checkTopicForDuplicatesAndRequiredColumns(optional_count) {
             has_duplicates = true;
         }
     }
-
-    console.log("\n\n********** " + val_array + " **********\n\n");
 
     if (!val_array.includes('topic_identifier') || !val_array.includes('topic_name') || !val_array.includes('max_choosers')) {
         alert("Topic Identifier, Topic Name, and Max Choosers are required columns.");

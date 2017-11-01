@@ -28,25 +28,25 @@ class Response < ActiveRecord::Base
 
     if prefix
       self_id = prefix + '_' + self.id.to_s
-      code = construct_instructor_html identifier,self_id,count
+      code = construct_instructor_html identifier, self_id, count
     else
       self_id = self.id.to_s
-      code = construct_student_html identifier,self_id,count
+      code = construct_student_html identifier, self_id, count
     end
 
-    code = construct_review_response code,self_id
+    code = construct_review_response code, self_id
     code.html_safe
   end
 
-  def construct_instructor_html identifier, self_id,count
+  def construct_instructor_html identifier, self_id, count
     identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
     identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
-    return identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
+    identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
            "'review_" + self_id + "','review'" + ');return false;">show review</a><BR/>'
   end
 
-  def construct_student_html identifier, self_id,count
-    return identifier += '<table width="100%">'\
+  def construct_student_html identifier, self_id, count
+    identifier += '<table width="100%">'\
 						 '<tr>'\
 						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
 						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">show review</a>'\
@@ -56,19 +56,18 @@ class Response < ActiveRecord::Base
 						 '</tr></table>'
   end
 
-  def construct_review_response code,self_id
+  def construct_review_response code, self_id
     code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score
-      questions = questionnaire.questions.sort_by{|a| a.seq}
-      code = add_table_rows questionnaire_max,questions,answers,code
+      questions = questionnaire.questions.sort_by(&:seq)
+      code = add_table_rows questionnaire_max, questions, answers, code
     end
 
-    code += '<tr><td><b>Additional Comment: </b>' + get_additional_comment + '</td></tr>'
-
-    return code += '</table>'
+    code += '<tr><td><b>Additional Comment: </b>' + additional_comment + '</td></tr>'
+    code += '</table>'
   end
 
   def add_table_rows questionnaire_max,questions,answers,code
@@ -90,16 +89,16 @@ class Response < ActiveRecord::Base
       end
       code += '</td></tr>'
     end
-    return code
+    code
   end
 
-  def get_additional_comment
+  def additional_comment
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''
               end
-    return comment
+    comment
   end
 
   # Computes the total score awarded for a review
@@ -181,8 +180,8 @@ class Response < ActiveRecord::Base
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
     counter = 0
-    @comments_in_round_1 = @comments_in_round_2 = @comments_in_round_3 = ''
-    @counter_in_round_1 = @counter_in_round_2 = @counter_in_round_3 = 0
+    @comments_in_round1 = @comments_in_round2 = @comments_in_round3 = ''
+    @counter_in_round1 = @counter_in_round2 = @counter_in_round3 = 0
     assignment = Assignment.find(assignment_id)
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
 
@@ -192,38 +191,38 @@ class Response < ActiveRecord::Base
         next if last_response_in_current_round.nil?
         last_response_in_current_round.scores.each do |answer|
           comments += answer.comments if question_ids.include? answer.question_id
-          instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + answer.comments ||= '')
+          instance_variable_set('@comments_in_round' + round.to_s, instance_variable_get('@comments_in_round' + round.to_s) + answer.comments ||= '')
         end
         additional_comment = last_response_in_current_round.additional_comment
         comments += additional_comment
         counter += 1
-        instance_variable_set('@comments_in_round_' + round.to_s, instance_variable_get('@comments_in_round_' + round.to_s) + additional_comment)
-        instance_variable_set('@counter_in_round_' + round.to_s, instance_variable_get('@counter_in_round_' + round.to_s) + 1)
+        instance_variable_set('@comments_in_round' + round.to_s, instance_variable_get('@comments_in_round' + round.to_s) + additional_comment)
+        instance_variable_set('@counter_in_round' + round.to_s, instance_variable_get('@counter_in_round' + round.to_s) + 1)
       end
     end
     [comments, counter,
-     @comments_in_round_1, @counter_in_round_1,
-     @comments_in_round_2, @counter_in_round_2,
-     @comments_in_round_3, @counter_in_round_3]
+     @comments_in_round1, @counter_in_round1,
+     @comments_in_round2, @counter_in_round2,
+     @comments_in_round3, @counter_in_round3]
   end
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
-        @comments_in_round_1, @counter_in_round_1,
-        @comments_in_round_2, @counter_in_round_2,
-        @comments_in_round_3, @counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+        @comments_in_round1, @counter_in_round1,
+        @comments_in_round2, @counter_in_round2,
+        @comments_in_round3, @counter_in_round3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
 
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
 
-    review_comments_volume = Array.new
+    review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
 
     (1..3).each do |i|
-      avg_vol_in_round = (Lingua::EN::Readability.new(instance_variable_get('@comments_in_round_'+i.to_s)).num_words / (instance_variable_get('@counter_in_round_'+i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round_'+i.to_s))).round(0)
+      avg_vol_in_round = (Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words / (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))).round(0)
       review_comments_volume.push(avg_vol_in_round)
     end
 
-    return review_comments_volume
+    review_comments_volume
   end
 
   # compare the current response score with other scores on the same artifact, and test if the difference
@@ -263,25 +262,25 @@ class Response < ActiveRecord::Base
   def notify_instructor_on_difference
     response_map = self.map
     reviewer_participant_id = response_map.reviewer_id
-    reviewer_participanat = AssignmentParticipant.find(reviewer_participant_id)
-    reviewer_name = User.find(reviewer_participanat.user_id).fullname
+    reviewer_participant = AssignmentParticipant.find(reviewer_participant_id)
+    reviewer_name = User.find(reviewer_participant.user_id).fullname
     reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
     reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
     reviewee_name = User.find(reviewee_participant.user_id).fullname
-    assignment = Assignment.find(reviewer_participanat.parent_id)
-    Mailer.notify_grade_conflict_message({
-      to: assignment.instructor.email,
-       subject: "Expertiza Notification: A review score is outside the acceptable range",
+    assignment = Assignment.find(reviewer_participant.parent_id)
+    Mailer.notify_grade_conflict_message(
+       to: assignment.instructor.email,
+       subject: 'Expertiza Notification: A review score is outside the acceptable range',
        body: {
          reviewer_name: reviewer_name,
-           type: "review",
-           reviewee_name: reviewee_name,
-           new_score: total_score.to_f / maximum_score,
-           assignment: assignment,
-           conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
-           summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-           assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+         type: 'review',
+         reviewee_name: reviewee_name,
+         new_score: total_score.to_f / maximum_score,
+         assignment: assignment,
+         conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
+         summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+         assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
        }
-    }).deliver_now
+    ).deliver_now
   end
 end

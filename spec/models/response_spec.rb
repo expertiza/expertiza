@@ -21,19 +21,16 @@ describe Response do
     it 'returns the id of current response' do
       expect(response.response_id).to eq 1
     end
-
   end
 
   describe '#display_as_html' do
     context 'when prefix is not nil, which means view_score page in instructor end' do
       it 'returns corresponding html code' do
-        
       end
     end
 
     context 'when prefix is nil, which means view_score page in student end and question type is TextArea' do
       it 'returns corresponding html code' do
-
       end
     end
   end
@@ -102,8 +99,8 @@ describe Response do
 
   describe '.get_volume_of_review_comments' do
     it 'returns volumes of review comments in each round' do
-      question_ids = [1,5]
-      result_array = [0,0,0,0]
+      question_ids = [1, 5]
+      result_array = [0, 0, 0, 0]
       allow(Assignment).to receive(:find).and_return(assignment)
       allow(Question).to receive(:get_all_questions_with_comments_available).and_return(question_ids)
       allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).and_return(review_response_map)
@@ -114,14 +111,12 @@ describe Response do
   describe '#significant_difference?' do
     context 'when count is 0' do
       it 'returns false' do
-
       end
     end
 
     context 'when count is not 0' do
       context 'when the difference between average score on same artifact from others and current score is bigger thatn allowed percentage' do
         it 'returns true' do
-
         end
       end
     end
@@ -130,10 +125,10 @@ describe Response do
   describe '.avg_scores_and_count_for_prev_reviews' do
     context 'when current response is not in current response array' do
       it 'returns the average score and count of previous reviews' do
-        existingResponse = [response]
-        result_array = [1.0,1]
+        existing_response = [response]
+        result_array = [1.0, 1]
         allow(Question).to receive(:find).and_return(question3)
-        expect(Response.avg_scores_and_count_for_prev_reviews(existingResponse,response1)).to eq result_array
+        expect(Response.avg_scores_and_count_for_prev_reviews(existing_response, response1)).to eq result_array
       end
     end
   end

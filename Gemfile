@@ -81,6 +81,7 @@ group :test do
   gem 'launchy'
   gem 'rspec-rails'
   gem 'shoulda'
+  gem 'rspec-json_expectations'
 end
 
 group :assets do

@@ -1,9 +1,10 @@
 describe SignUpSheetController do
+  render_views 
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
-  let(:topic) { build(:topic, id: 1) }
+  let(:topic) { build(:topic, id: 1 ) }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
@@ -58,7 +59,7 @@ describe SignUpSheetController do
   describe '#update' do
     context 'when topic cannot be found' do
       it 'shows an error flash message and redirects to assignment#edit page'
-    end
+       end
 
     context 'when topic can be found' do
       it 'updates current topic and redirects to assignment#edit page'
@@ -151,5 +152,54 @@ describe SignUpSheetController do
 
   describe '#switch_original_topic_to_approved_suggested_topic' do
     it 'redirects to sign_up_sheet#list page'
+  end
+
+  describe '#load_add_signup_topics' do
+
+
+
+      context 'when assignment is found' do
+        
+        it 'should render json successfully' do 
+          allow(SignUpTopic).to receive(:where).and_return([topic])
+          get :load_add_signup_topics, id: "#{assignment.id}"
+           expect(response).to have_http_status(:ok)
+           expect(response.content_type).to eq "application/json"
+           expect(response.body).to include_json({
+            id: assignment.id.to_s,
+            sign_up_topics: [{
+              id: topic.id,
+              topic_name: "#{topic.topic_name}",
+              assignment_id: assignment.id,
+              max_choosers: topic.max_choosers,
+              topic_identifier: "#{topic.topic_identifier}",
+              micropayment: topic.micropayment,
+              slots_filled_value: 0,
+              slots_waitlisted: 0,
+              slots_available: 1,
+              partipants: []
+              }],
+            slots_waitlisted: [],
+            assignment: {
+              id: assignment.id
+             }
+           }
+          )
+
+
+
+       end
+      end
+
+      context 'when assignment is not found' do
+        it 'should render empty json successfully' do
+           allow(Assignment).to receive(:find).and_raise(ActiveRecord::RecordNotFound)
+           get :load_add_signup_topics, id: "#{assignment.id}"
+           puts response.body
+           expect(response.content_type).to eq "application/json"
+           expect(response).to have_http_status(:not_found)
+      end
+     end
+
   end
 end

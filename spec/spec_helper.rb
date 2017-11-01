@@ -5,6 +5,8 @@ Coveralls.wear! 'rails'
 require 'capybara'
 require 'capybara/dsl'
 require 'selenium-webdriver'
+require 'rspec/expectations'
+require 'rspec/json_expectations'
 
 # Record code coverage with simplecov locally
 require 'simplecov'

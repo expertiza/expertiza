@@ -34,7 +34,7 @@
           <%= "Declined"  %>
         <% end %>
       </td>
-      #User will be able to cancle the request that he/she sends using this functionality
+      # User will be able to cancle the request that he/she sends using this functionality
       <td>
         <% if request.status == 'P' %>
             <%= button_to 'Cancel Request', :controller => 'join_team_requests', :action => 'decline', :id=>request.id, :teams_user_id=>teams_user_id %>

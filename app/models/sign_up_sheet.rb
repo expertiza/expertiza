@@ -124,6 +124,8 @@ class SignUpSheet < ActiveRecord::Base
     !teams.empty?
   end
 
+  # this method will return 0 if the user has not yet responded to a advertisemnet or the user's response has been
+  # declined. Or it will return 1 if there is a entry with Pending or Approved status.
   def self.respond_to_ads_successful?(user_id, assignment_id)
     participant = Participant.where("user_id = ? and type = ? and parent_id = ?", user_id, "AssignmentParticipant", assignment_id).ids
     has_pending = JoinTeamRequest.select("id").where("participant_id = ? and (status = 'P' or status = 'A')", participant)

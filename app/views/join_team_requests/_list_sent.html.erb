@@ -8,6 +8,7 @@
       <th class="head">Team</th>
       <th class="head">Comments</th>
       <th class="head">Status</th>
+      <th></th>
       <th class="head">Sent at</th>
    </tr>
 
@@ -31,6 +32,12 @@
           <%= "Accepted" %>
         <% else %>
           <%= "Declined"  %>
+        <% end %>
+      </td>
+      #User will be able to cancle the request that he/she sends using this functionality
+      <td>
+        <% if request.status == 'P' %>
+            <%= button_to 'Cancel Request', :controller => 'join_team_requests', :action => 'decline', :id=>request.id, :teams_user_id=>teams_user_id %>
         <% end %>
       </td>
       <td>

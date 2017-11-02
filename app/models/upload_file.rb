@@ -1,5 +1,5 @@
 class UploadFile < Question
-  # attr_protected
+  attr_accessible
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(_count)

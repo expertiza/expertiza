@@ -558,8 +558,6 @@ describe ReviewMappingController do
         expect(Assignment).to receive(:find).and_return(assignment)
         expect(TeamsUser).to receive(:find_by_sql).and_return('1')
         self_resp = double()
-        #expect(SelfReviewResponseMap).to receive_message_chain("where.first.nil?").with(any_args).and_return(true)
-        #expect(SelfReviewResponseMap).to receive(:create).with(any_args)
         get :start_self_review
         expect(response.location).to match(%r"http://test.host/submitted_content/edit.*")
       end

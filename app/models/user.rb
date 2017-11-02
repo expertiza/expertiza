@@ -17,7 +17,7 @@ class User < ActiveRecord::Base
   belongs_to :parent, class_name: 'User'
   belongs_to :role
   attr_accessor :anonymous_mode
-  attr_accessible
+  attr_protected
   validates_presence_of :name
   validates_uniqueness_of :name
 

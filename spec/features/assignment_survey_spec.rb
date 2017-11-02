@@ -11,10 +11,7 @@ def deploy_assignment_survey(start_date, end_date, survey_name)
   expect(page).to have_content('Manage content')
   create_assignment_questionnaire survey_name
   survey = Questionnaire.where(name: survey_name)
-
-  instructor = User.where(name: 'instructor6').first
-  assignment = Assignment.where(instructor_id: instructor.id).first
-  visit '/survey_deployment/new?id=' + assignment.id.to_s + '&type=AssignmentSurveyDeployment'
+  visit '/survey_deployment/new?id=' + Assignment.where(instructor_id: User.where(name: 'instructor6').first.id).first.id.to_s + '&type=AssignmentSurveyDeployment'
   expect(page).to have_content('New Survey Deployment')
   fill_in 'survey_deployment_start_date', with: start_date
   fill_in 'survey_deployment_end_date', with: end_date

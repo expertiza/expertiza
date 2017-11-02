@@ -113,7 +113,7 @@ describe "Staggered deadline test" do
     user = User.find_by_name('student2065')
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
-    expect(page).to have_content "submission"
+    expect(page).to have_content "Stage Deadline"
     click_link 'Assignment1665'
     expect(page).to have_content "Others' work"
     click_link "Others' work"

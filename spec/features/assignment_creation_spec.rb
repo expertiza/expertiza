@@ -421,7 +421,7 @@ describe "assignment function" do
       visit "/assignments/#{assignment.id}/edit"
       click_link 'Topics'
       all(:xpath, '//input[@title="Delete Topic"]')[0].click
-      click_button 'OK'
+      page.driver.browser.switch_to.alert.accept
 
       topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0

@@ -71,7 +71,7 @@ describe "Airbrake expection errors" do
     # Delete first topic
     first("input[title='Delete Topic']").click
     # page.execute_script 'window.confirm = function () { return true }'
-    click_button 'OK'
+    page.driver.browser.switch_to.alert.accept
     find_link('Topics').click
     expect(page).to have_content('TestReview')
     expect(page).not_to have_content('Hello world!')

@@ -1,11 +1,13 @@
 class MultipleChoiceRadioType
 	
-	@question_type = "MultipleChoiceRadio"
+	def initialize
+    	@question_type = "MultipleChoiceRadio"
+  	end
 
 	def update_option_type(quiz_question_choice,parameters,question_id,option_number)
 		puts "SSZ 1: #{parameters}"
 		puts "SSZ 1: #{parameters[:quiz_question_choices]}"
-		puts "#{question_id.to_s}"
+		puts "#{@question_type}"
 		puts "SSZ 1: #{parameters[:quiz_question_choices][question_id.to_s]}"
 		puts "SSZ 1: #{parameters[:quiz_question_choices][question_id.to_s][@question_type]}"
 		puts "SSZ 1: #{parameters[:quiz_question_choices][question_id.to_s][@question_type][:correctindex]}"

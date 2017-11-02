@@ -1,6 +1,8 @@
 class TrueFalseType
 
-	@question_type = "TrueFalse"
+    def initialize
+        @question_type = "TrueFalse"
+    end
 
 	def update_option_type(quiz_question_choice,parameters,question_id,option_number)
 		if parameters[:quiz_question_choices][question_id.to_s][@question_type][1.to_s][:iscorrect] == "True" # the statement is correct

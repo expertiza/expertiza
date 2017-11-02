@@ -1,6 +1,8 @@
 class MultipleChoiceCheckboxType
 
-	@question_type = "MultipleChoiceCheckbox"
+	def initialize
+    	@question_type = "MultipleChoiceCheckbox"
+  	end
 
 	def update_option_type(quiz_question_choice,parameters,question_id,option_number)
 		#parameters[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s]

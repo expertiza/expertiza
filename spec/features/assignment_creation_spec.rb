@@ -420,7 +420,7 @@ describe "assignment function" do
       create(:topic, assignment_id: assignment.id)
       visit "/assignments/#{assignment.id}/edit"
       click_link 'Topics'
-      all(:xpath, '//img[@title="Delete Topic"]')[0].click
+      all(:xpath, '//input[@title="Delete Topic"]')[0].click
       click_button 'OK'
 
       topics_exist = SignUpTopic.where(assignment_id: assignment.id).count

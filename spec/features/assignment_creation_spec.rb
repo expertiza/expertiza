@@ -422,7 +422,7 @@ describe "assignment function" do
       click_link 'Topics'
       all(:xpath, '//input[@title="Delete Topic"]')[0].click
       page.driver.browser.switch_to.alert.accept
-
+      wait_for_ajax
       topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0
     end

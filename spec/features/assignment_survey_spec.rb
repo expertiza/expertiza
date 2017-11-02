@@ -69,8 +69,8 @@ describe "Survey questionnaire tests for instructor interface" do
     click_button "Save assignment survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')
 
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
-    question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire_1.id.to_s + " and (type = 'Criterion' OR type = 'Checkbox')")
+    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_assignment.id).first
+    question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire_assignment.id.to_s + " and (type = 'Criterion' OR type = 'Checkbox')")
 
     visit '/survey_deployment/generate_statistics/' + survey_deployment.id.to_s
     question.each do |q|

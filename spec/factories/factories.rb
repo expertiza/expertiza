@@ -158,7 +158,7 @@ FactoryGirl.define do
   end
 
   factory :assignment_mapping, class: Assignment do
-    sequence(:name) {|n| "final#{n+100}" }
+    sequence(:name) {|n| "final#{n + 100}" }
     directory_path "final_test"
     submitter_count 0
     course { Course.first || association(:course) }

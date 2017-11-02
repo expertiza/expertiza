@@ -28,13 +28,16 @@ class Response < ActiveRecord::Base
 
     if prefix
       self_id = prefix + '_' + self.id.to_s
+      puts "In Instructor"
       code = construct_instructor_html identifier, self_id, count
     else
       self_id = self.id.to_s
+      puts "In Student"
       code = construct_student_html identifier, self_id, count
     end
 
     code = construct_review_response code, self_id
+    puts code.html_safe
     code.html_safe
   end
 
@@ -66,7 +69,7 @@ class Response < ActiveRecord::Base
       code = add_table_rows questionnaire_max, questions, answers, code
     end
 
-    code += '<tr><td><b>Additional Comment: </b>' + additional_comment + '</td></tr>'
+    #code += '<tr><td><b>Additional Comment: </b>' + additional_comment + '</td></tr>'
     code += '</table>'
   end
 
@@ -165,6 +168,7 @@ class Response < ActiveRecord::Base
   end
 
   def questionnaire_by_answer(answer)
+
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
     else

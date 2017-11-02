@@ -333,28 +333,6 @@ FactoryGirl.define do
     min_label nil
   end
 
-  factory :answer5, class: Answer do
-    id 1
-    question_id 5
-    answer 5
-    comments 'Test Answer'
-    response_id 1
-  end
-
-  factory :question3, class: ScoredQuestion do
-    id 5
-    txt 'Test Scored question:'
-    weight 2
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'Criterion'
-    size "70,1"
-    alternatives nil
-    break_before 1
-    max_label nil
-    min_label nil
-  end
-
   factory :question_advice, class: QuestionAdvice do
     question { Question.first || association(:question) }
     score 5

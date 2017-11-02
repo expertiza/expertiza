@@ -4,18 +4,19 @@ describe Response do
   let(:participant) { build(:participant, id: 1, parent_id: 1, assignment: assignment, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
-  let(:answer5) { build(:answer5) }
+  let(:answer5) { build(:answer, id:1, question_id: 5, answer: 5) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer5]) }
   let(:response1) { build(:response, id: 2, map_id: 1, response_map: review_response_map, scores: [answer2]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
-  let(:question3) { build(:question3) }
-  let(:question4) { build(:question3, weight: 0) }
+  let(:question3) { ScoredQuestion.new(id: 5, weight: 2, questionnaire: questionnaire1) }
+  let(:question4) { ScoredQuestion.new(id: 3, weight: 0, questionnaire: questionnaire1) }
   let(:questionnaire1) { build(:questionnaire) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+
 
   describe '#response_id' do
     it 'returns the id of current response' do

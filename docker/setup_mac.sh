@@ -8,7 +8,7 @@ DIR=`pwd`
 bash setup.sh
 
 # Go back to docker folder
-cd $DIR/docker/db
+cd $DIR/docker/scrubbed_db
 
 # Checking the scrubbed_db
 

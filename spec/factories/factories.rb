@@ -122,7 +122,7 @@ FactoryGirl.define do
   end
 
   factory :assignment, class: Assignment do
-    sequence(:name, 2) {|n| n = 2; "final#{n}" }
+    sequence(:name) {|n| "final#{n}" }
     directory_path "final_test"
     submitter_count 0
     course { Course.first || association(:course) }

@@ -67,6 +67,17 @@ th.sorter-true.tablesorter-headerUnSorted{
 
           </span>
 
+            <!--
+              Changes to this was done as part of E1788_OSS_project_Maroon_Heatmap_fixes
+
+              scoreTable was previously assigned as id for all the table which required to be sortable
+              change was made to keep it unique by adding round number at the end
+              also scoreTable was added as class to each of the table to make it sortable
+
+              remaining changes could be found in app/assets/javascripts/view_team_in_grades.js
+
+              fix comment end
+            -->
           <table id="scoresTable<%= vm.round.to_s  %>" class="scoresTable tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>

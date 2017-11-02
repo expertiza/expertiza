@@ -151,6 +151,22 @@ class TreeDisplayController < ApplicationController
   end
 
   # getting result nodes for child
+
+  # Changes to this method were done as part of E1788_OSS_project_Maroon_Heatmap_fixes
+  #
+  # courses_assignments_obj method makes a call to update_in_ta_course_listing which
+  # separates out courses based on if he/she is the TA for the course passed
+  # by marking private to be true in that case
+  #
+  # this also ensures that instructors (who are not ta) would have update_in_ta_course_listing
+  # not changing the private value if he/she is not TA which was set to true for all courses before filtering
+  # in update_tmp_obj in courses_assignments_obj
+  #
+  # below objects/variable names were part of the project as before and
+  # refactoring could have affected other functionalities too, so it was avoided in this fix
+  #
+  # fix comment end
+  #
   def res_node_for_child(tmp_res)
     res = {}
     tmp_res.keys.each do |node_type|
@@ -164,6 +180,12 @@ class TreeDisplayController < ApplicationController
         if node_type == 'Courses' || node_type == "Assignments"
           courses_assignments_obj(node_type, tmp_object, node)
         end
+
+        # below logic makes sure that only courses/assignments for the instructor/ta
+        # which were marked private = true
+        # based on the filtering criteria of ta seeing courses he/she is ta of &
+        # instructor seeing all courses he/she is instructor of,
+        # is added to the list which is returned
         if tmp_object['private']
           res[node_type] << tmp_object
         end

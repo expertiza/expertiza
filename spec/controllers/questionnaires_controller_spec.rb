@@ -12,11 +12,13 @@ describe QuestionnairesController do
   end
 
   describe '#copy,  #copy_questionnaire_details and #assign_instructor_id' do
-    it 'redirects to view page of copied questionnaire'
+    it 'redirects to view page of copied questionnaire' do
+    end
   end
 
   describe '#view' do
-    it 'renders questionnaires#view page'
+    it 'renders questionnaires#view page' do
+    end
   end
 
   describe '#new' do
@@ -77,11 +79,19 @@ describe QuestionnairesController do
 
   describe '#edit' do
     context 'when @questionnaire is not nil' do
-      it 'renders the questionnaires#edit page'
+      it 'renders the questionnaires#edit page' do
+        allow(Questionnaire).to receive(:find).and_return(double('Questionnaire'))
+        params = {
+            id: 1
+        }
+        get :edit, params
+        expect(response).to render_template(:edit)
+      end
     end
 
     context 'when @questionnaire is nil' do
-      it 'redirects to /questionnaires page'
+      it 'redirects to /questionnaires page' do
+      end
     end
   end
 
@@ -249,21 +259,27 @@ describe QuestionnairesController do
   end
 
   describe '#save_choices' do
-    it 'is able to save different kinds of quiz questions'
-      # controller.params = {
-      #   new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
-      #   new_choices:
-      #   {'1' =>
-      #     {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-      #    '2' =>
-      #     {TrueFalse: {'1' => {iscorrect: '1'}}},
-      #    '3' =>
-      #     {MultipleChoiceCheckbox:
-      #       {'1' => {iscorrect: '1', txt: 'a31'},
-      #        '2' => {iscorrect: '0', txt: 'a32'},
-      #        '3' => {iscorrect: '1', txt: 'a33'},
-      #        '4' => {iscorrect: '0', txt: 'a34'}}}},
-      #   question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
-      # }
+    it 'is able to save different kinds of quiz questions' do
+
+      controller.params = {
+         new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
+         new_choices:
+         {'1' =>
+           {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
+          '2' =>
+           {TrueFalse: {'1' => {iscorrect: '1'}}},
+          '3' =>
+           {MultipleChoiceCheckbox:
+             {'1' => {iscorrect: '1', txt: 'a31'},
+              '2' => {iscorrect: '0', txt: 'a32'},
+              '3' => {iscorrect: '1', txt: 'a33'},
+              '4' => {iscorrect: '0', txt: 'a34'}}}},
+         question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
+      }
+
+      #allow(QuestionnairesController).to receive(:params).with(:id => "1").and_return(true)
+      #@save_questions = QuestionnairesController.new
+      #@save_questions.send(:save_all_questions_questionnaires_path).should == true
+    end
   end
 end

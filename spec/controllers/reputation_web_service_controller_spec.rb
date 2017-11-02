@@ -17,4 +17,6 @@ describe ReputationWebServiceController do
     expect(controller.db_query(41,2,has_topic,0)).should_not be(nil)
     expect(raw_data_array).should_not be(nil)
   end
+
+
 end

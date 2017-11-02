@@ -11,7 +11,7 @@ class ReputationWebServiceController < ApplicationController
   @another_assignment_id = ''
   @round_num = ''
   @algorithm = ''
-  @additional_info = ''
+  @@additional_info = ''
   @response = ''
 
   def action_allowed?
@@ -127,7 +127,7 @@ class ReputationWebServiceController < ApplicationController
     @another_assignment = Assignment.find(@another_assignment_id) rescue nil
     @round_num = @round_num
     @algorithm = @algorithm
-    @additional_info = @additional_info
+    @additional_info = @@additional_info
     @response = @response
   end
 

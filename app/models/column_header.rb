@@ -1,4 +1,6 @@
 class ColumnHeader < QuestionnaireHeader
+  attr_accessible
+
   def complete(_count, _answer = nil)
     html = '<tr>'
     html += '<th style="width: 15%">' + self.txt + '</th>'

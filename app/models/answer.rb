@@ -4,6 +4,7 @@ class Answer < ActiveRecord::Base
   include ScoreAnalytic
   belongs_to :question
   belongs_to :response
+  attr_accessible
 
   attr_accessible
 

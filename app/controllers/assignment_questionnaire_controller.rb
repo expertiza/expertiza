@@ -39,11 +39,15 @@ class AssignmentQuestionnaireController < ApplicationController
       return
     end
 
-    @assignment_questionnaire = AssignmentQuestionnaire.new(params)
+    @assignment_questionnaire = AssignmentQuestionnaire.new(assignment_questionnaire_params)
     @assignment_questionnaire.save
 
     respond_to do |format|
       format.json { render json: @assignment_questionnaire }
     end
+  end
+
+  def assignment_questionnaire_params
+    params.permit(:assignment_id, :questionnaire_id, :user_id, :notification_limit, :questionnaire_weight, :used_in_round, :dropdown)
   end
 end

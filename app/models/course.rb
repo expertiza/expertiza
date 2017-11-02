@@ -9,6 +9,7 @@ class Course < ActiveRecord::Base
   has_one :course_node, foreign_key: "node_object_id", dependent: :destroy
   has_paper_trail
   validates_presence_of :name
+  attr_accessible
   # Return any predefined teams associated with this course
   # Author: ajbudlon
   # Date: 7/21/2008

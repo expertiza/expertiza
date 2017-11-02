@@ -194,13 +194,13 @@ describe User do
 
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
-      row = ["abc","abc xyz"]
+      row = ["abc", "abc xyz"]
       seesion = {user: user}
-      expect { User.import(row, '',seesion,1) }.to raise_error("Not enough items:" \
+      expect { User.import(row, '', seesion, 1) }.to raise_error("Not enough items:" \
         " expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email.")
     end
     it 'updates an existing user with info from impor file' do
-      row = ["abc","abc xyz","abcxyz@gamil.com"]
+      row = ["abc", "abc xyz", "abcxyz@gamil.com"]
       seesion = {user: user}
       allow(User).to receive(:find_by).and_return(user)
       allow_any_instance_of(User).to receive(:nil?).and_return(false)
@@ -288,11 +288,11 @@ describe User do
     end
 
     it 'exports all information setting in options' do
-      options = {"personal_details"  =>  "true",
-                 "role"  =>  "true",
-                 "parent"  =>  "true",
-                 "email_options"  =>  "true",
-                 "handle"  =>  "true"}
+      options = {"personal_details" => "true",
+                 "role" => "true",
+                 "parent" => "true",
+                 "email_options" => "true",
+                 "handle" => "true"}
       csv = []
       User.export(csv, 0, options)
       expect(csv).to eq([[user.name,
@@ -308,30 +308,30 @@ describe User do
     end
 
     it 'exports only personal_details' do
-      options = {"personal_details"  =>  "true",
-                 "role"  =>  "false",
-                 "parent"  =>  "false",
-                 "email_options"  =>  "false",
-                 "handle"  =>  "false"}
+      options = {"personal_details" => "true",
+                 "role" => "false",
+                 "parent" => "false",
+                 "email_options" => "false",
+                 "handle" => "false"}
       csv = []
       User.export(csv, 0, options)
       expect(csv).to eq([[user.name, user.fullname, user.email]])
     end
 
     it 'exports only current role and parent' do
-      options = {"personal_details"  =>  "false",
-                 "role"  =>  "true",
-                 "parent"  =>  "true",
-                 "email_options"  =>  "false",
-                 "handle"  =>  "false"}
+      options = {"personal_details" => "false",
+                 "role" => "true",
+                 "parent" => "true",
+                 "email_options" => "false",
+                 "handle" => "false"}
       csv = []
       User.export(csv, 0, options)
       expect(csv).to eq([[user.role.name, user.parent.name]])
     end
 
     it 'exports only email_options' do
-      options = {"personal_details"  =>  "false",
-                "role"  => "false",
+      options = {"personal_details" => "false",
+                "role" => "false",
                 "parent" => "false",
                 "email_options" => "true",
                 "handle" => "false"}
@@ -377,7 +377,7 @@ describe User do
 
     it 'exports only current role and parent' do
       options = {"personal_details" => "false", "role" => "true", "parent" => "true", "email_options" => "false", "handle" => "false"}
-      expect(User.export_fields(options)).to eq(["role", "parent"])
+      expect(User.export_fields(options)).to eq(%w(role parent))
     end
 
     it 'exports only email_options' do

@@ -27,22 +27,57 @@ describe ReviewMappingController do
 
   describe '#add_calibration' do
     context 'when both participant and review_response_map have already existed' do
-      it 'does not need to create new objects and redirects to responses#new maps'
+      it 'does not need to create new objects and redirects to responses#new maps' do
+        expect(AssignmentParticipant).to receive_message_chain("where.first").with(any_args).and_return(participant)
+        allow(participant).to receive(:nil?).and_return(false)
+        expect(ReviewResponseMap).to receive_message_chain("where.first").with(any_args).and_return(review_response_map)
+        params = {id: 1, team_id: 1}
+        session[:user] = user
+        post :add_calibration, params, session
+        expect(response).to redirect_to controller: 'response', action: 'new', id: review_response_map.id, assignment_id: params[:id], return: 'assignment_edit'
+      end
     end
 
     context 'when both participant and review_response_map have not been created' do
-      it 'creates new objects and redirects to responses#new maps'
+      it 'creates new objects and redirects to responses#new maps' do
+        expect(AssignmentParticipant).to receive_message_chain("where.first").with(any_args).and_return(participant)
+        allow(participant).to receive(:nil?).and_return(true)
+        expect(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
+        expect(ReviewResponseMap).to receive_message_chain("where.first").with(any_args).and_return(review_response_map)
+        expect(review_response_map).to receive(:nil?).and_return(true)
+        expect(ReviewResponseMap).to receive(:create).with(any_args).and_return(review_response_map)
+        params = {id: 1, team_id: 1}
+        session[:user] = user
+        post :add_calibration, params, session
+        expect(response).to redirect_to controller: 'response', action: 'new', id: review_response_map.id, assignment_id: params[:id], return: 'assignment_edit'
+      end
     end
   end
 
   describe '#add_reviewer and #get_reviewer' do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
+        expect(User).to receive_message_chain("where.first.id").with(any_args).and_return(user.id)
+        expect(TeamsUser).to receive(:exists?).with(any_args).and_return(true)
+        #expect(flash[:error]).to match "You cannot assign this student to review his/her own artifact"
+        post :add_reviewer, :contributor_id => '1', :id =>'1', :topic_id =>'2', user: {name: '2'}
+        expect(flash[:error]) =~ /you cannot assign this student to review his.*her own artifact/i
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id
       end
     end
 
     context 'when team_user exists and get_reviewer method returns a reviewer' do
-      it 'creates a whole bunch of objects and redirects to review_mapping#list_mappings page'
+      it 'creates a whole bunch of objects and redirects to review_mapping#list_mappings page' do
+        expect(User).to receive_message_chain("where.first.id").with(any_args).and_return(user.id)
+        expect(TeamsUser).to receive(:exists?).with(any_args).and_return(false)
+        expect(SignUpSheet).to receive(:signup_team).with(any_args)
+        expect(User).to receive(:from_params).with(any_args).and_return(user)
+        expect(AssignmentParticipant).to receive_message_chain("where.first").with(any_args).and_return(participant)
+        #expect(ReviewResponseMap).to receive_message_chain("where.first.nil").with(any_args).and_return(true)
+        expect(ReviewResponseMap).to receive(:create).with(any_args)
+        post :add_reviewer, :contributor_id => '1', :id =>'1', :topic_id =>'2', user: {name: '2'}
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id, msg: ''
+      end
     end
   end
 
@@ -93,12 +128,26 @@ describe ReviewMappingController do
 
   describe '#assign_quiz_dynamically' do
     context 'when corresponding response map exists' do
-      it 'shows a flash error and redirects to student_quizzes page' do
+      it 'shows a flash error and redirects to student_quizzes page'do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        expect(AssignmentParticipant).to receive_message_chain("where.first").with(any_args).and_return(participant)
+        expect(ResponseMap).to receive_message_chain("where.first").with(any_args).and_return(response)
+        get :assign_quiz_dynamically
+        expect(flash[:error]).to eq("You have already taken that quiz.")
+        expect(response).to redirect_to ('/student_quizzes?id='+participant.id.to_s)
       end
     end
 
     context 'when corresponding response map does not exist' do
-      it 'creates a new QuizResponseMap and redirects to student_quizzes page'
+      it 'creates a new QuizResponseMap and redirects to student_quizzes page' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        expect(AssignmentParticipant).to receive_message_chain("where.first").with(any_args).and_return(participant)
+        expect(ResponseMap).to receive_message_chain("where.first").with(any_args).and_return(nil)
+        expect(QuizResponseMap).to receive(:new)
+        get :assign_quiz_dynamically
+        #expect(flash[:error]).to eq("You have already taken that quiz.")
+        expect(response).to redirect_to ('/student_quizzes?id='+participant.id.to_s)
+      end
     end
   end
 
@@ -120,21 +169,68 @@ describe ReviewMappingController do
   describe '#delete_outstanding_reviewers' do
     context 'when review response map has corresponding responses' do
       it 'shows a flash error and redirects to review_mapping#list_mappings page' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        expect(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
+        review_response_maps = double(id: 1)
+        expect(team).to receive(:review_mappings).with(any_args).and_return(review_response_maps)
+        num_remain_review_response_maps = double()
+        expect(review_response_maps).to receive(:size).and_return(2)
+        expect(review_response_maps).to receive(:each).with(any_args).and_yield(review_response_map)
+        expect(ReviewResponseMap).to receive_message_chain('find.destroy').with(any_args)
+        get :delete_outstanding_reviewers
+        expect(flash[:error]).to eq("1 reviewer(s) cannot be deleted because they have already started a review.")
       end
     end
 
     context 'when review response map does not have corresponding responses' do
-      it 'shows a flash success and redirects to review_mapping#list_mappings page'
+      it 'shows a flash success and redirects to review_mapping#list_mappings page' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        expect(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
+        review_response_maps = double(id: 1)
+        expect(team).to receive(:review_mappings).with(any_args).and_return(review_response_maps)
+        num_remain_review_response_maps = double()
+        expect(review_response_maps).to receive(:size).and_return(-1)
+        expect(review_response_maps).to receive(:each).with(any_args).and_yield(review_response_map)
+        expect(ReviewResponseMap).to receive_message_chain('find.destroy').with(any_args)
+        get :delete_outstanding_reviewers
+        expect(flash[:success]).to eq("All review mappings for \"#{team.name}\" have been deleted.")
+      end
     end
   end
 
   describe '#delete_all_metareviewers' do
     context 'when failed times are bigger than 0' do
-      it 'shows an error flash message and redirects to review_mapping#list_mappings page'
+      it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
+        dummy_response_map = double()
+        expect(ResponseMap).to receive(:find).with(any_args).and_return(dummy_response_map)
+        allow(dummy_response_map).to receive(:map_id).and_return('1')
+        allow(dummy_response_map).to receive(:assignment).and_return(assignment)
+        expect(MetareviewResponseMap).to receive(:where).with(any_args).and_return(metareview_response_map)
+        expect(ResponseMap).to receive(:delete_mappings).with(any_args).and_return(1)
+        get :delete_all_metareviewers
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id
+      end
     end
 
     context 'when failed time is equal to 0' do
-      it 'shows a note flash message and redirects to review_mapping#list_mappings page'
+      it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
+        dummy_response_map = double()
+        expect(ResponseMap).to receive(:find).with(any_args).and_return(dummy_response_map)
+        allow(dummy_response_map).to receive(:map_id).and_return('1')
+        allow(dummy_response_map).to receive(:assignment).and_return(assignment)
+        dummy_reviewee = double
+        allow(dummy_reviewee).to receive(:name).and_return('test_reviewee')
+        dummy_reviewer = double
+        allow(dummy_reviewer).to receive(:name).and_return('test_reviewer')
+        allow(dummy_response_map).to receive(:reviewee).and_return(dummy_reviewee)
+        allow(dummy_response_map).to receive(:reviewer).and_return(dummy_reviewer)
+        expect(MetareviewResponseMap).to receive(:where).with(any_args).and_return(metareview_response_map)
+        expect(ResponseMap).to receive(:delete_mappings).with(any_args).and_return(0)
+        get :delete_all_metareviewers
+        expect(flash[:note]).to be_present
+        expect(response).to redirect_to action: 'list_mappings', id: assignment.id
+      end
     end
   end
 
@@ -220,12 +316,14 @@ describe ReviewMappingController do
 
   describe '#list_mappings' do
     it 'renders review_mapping#list_mappings page' do
+      params = {msg: 'error', id: 1}
       expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
-      items = double {}
+      items = double()
       expect(AssignmentTeam).to receive(:where).with(any_args).and_return(items)
-      expect(items).to receive(:sort_by).with(any_args)
-      get :list_mappings
-      expect(response).to render_template (:list_mappings)
+      expect(items).to receive(:sort)
+      get :list_mappings, params
+      expect(flash[:error]).to eq(params[:msg])
+      expect(response).to render_template('review_mapping/list_mappings')
     end
   end
 
@@ -233,22 +331,53 @@ describe ReviewMappingController do
     context 'when teams is not empty' do
       context 'when all nums in params are 0' do
         it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
-          expect(AssignmentParticipant).to receive_message_chain("where.shuffle!").with(any_args).and_return(participants)
-          expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").and_return(team)
+          expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+          expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow(team).to receive(:empty?).and_return(false)
+          get :automatic_review_mapping, :id =>1, :student_review_num =>0, :submission_review_num=>0, :calibrated_artifacts_num=>0,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>0
+          expect(flash[:error]) =~ /Please choose either the number of reviews per student or the number of reviewers per team (student), not both./i
+          expect(response).to redirect_to action: 'list_mappings', id: 1
         end
       end
 
       context 'when all nums in params are 0 except student_review_num' do
-        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page'
+        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page'do
+          expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+          expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow(team).to receive(:empty?).and_return(false)
+          get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>0, :calibrated_artifacts_num=>0,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>0
+          allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args)
+          expect(response).to redirect_to action: 'list_mappings', id:1
+        end
       end
 
       context 'when calibrated params are not 0' do
-        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page'
+        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
+          expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+          expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow(team).to receive(:empty?).and_return(false)
+          get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>0, :calibrated_artifacts_num=>1,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>0
+          allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args)
+          expect(response).to redirect_to action: 'list_mappings', id:1
+        end
       end
     end
 
     context 'when teams is empty, max team size is 1 and when review params are not 0' do
-      it 'shows an error flash message and redirects to review_mapping#list_mappings page'
+      it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
+        expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+        expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+        allow(team).to receive(:empty?).and_return(true)
+        expect(participant).to receive(:each).and_return(participant)
+        #expect(participant).to receive(:user).and_return(user)
+        get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>1, :calibrated_artifacts_num=>1,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>1
+        expect(flash[:error]) =~ /Please choose either the number of reviews per student or the number of reviewers per team (student), not both./i
+        expect(response).to redirect_to action: 'list_mappings', id: 1
+      end
     end
   end
 
@@ -264,8 +393,7 @@ describe ReviewMappingController do
 
   describe 'response_report' do
     context 'when type is SummaryByRevieweeAndCriteria' do
-      it 'renders response_report page with corresponding data' do
-      end
+      it 'renders response_report page with corresponding data'
     end
 
     context 'when type is SummaryByCriteria' do
@@ -301,6 +429,17 @@ describe ReviewMappingController do
 
   describe '#save_grade_and_comment_for_reviewer' do
     it 'redirects to review_mapping#response_report page' do
+      review_grade = double()
+      expect(ReviewGrade).to receive(:find_by).with(any_args).and_return(review_grade)
+      allow(review_grade).to receive(:nil?).and_return(false)
+      allow(review_grade).to receive(:grade_for_reviewer=).with(any_args)
+      allow(review_grade).to receive(:comment_for_reviewer=).with(any_args)
+      allow(review_grade).to receive(:review_graded_at=).with(any_args)
+      allow(review_grade).to receive(:reviewer_id=).with(any_args)
+      allow(review_grade).to receive(:save)
+      allow_any_instance_of(ApplicationController).to receive(:session).and_return( user: user )
+      get :save_grade_and_comment_for_reviewer, :assignment_id => 1
+      expect(response).to redirect_to controller: 'review_mapping', action: 'response_report', id:1
     end
   end
 

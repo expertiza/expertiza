@@ -46,40 +46,41 @@ class StudentReviewController < ApplicationController
   end
 
   def get_update_time(response)
-    @response = response
     @last_review_time = response.updated_at
-    @team = @response.map.contributor
+    @team = response.map.contributor
 
+    # check update for both submission content(include links and files) and link-to content(GitHub)
     update_times = {submission: nil, link_to_content: nil}
-    update_times[:submission] = @latest_submisstion_time if submission_updated?
+    update_times[:submission] = @latest_submission_time if submission_updated?
     update_times[:link_to_content] = @link_to_content_update_time if link_to_content_updated?
+
     update_times
-    # @update_time = update_times.sort.last
   end
 
   def submission_updated?
-    @submisstion_records = SubmissionRecord.where(@team.id)
-    @latest_submisstion_time = nil
+    @latest_submission_time = nil
+    @submission_records = SubmissionRecord.where(team_id: @team.id)
 
     record_times = []
-    @submisstion_records.each do |record|
+    @submission_records.each do |record|
       record_times << record.created_at
     end
-    @latest_submisstion_time = record_times.sort.last
-    (@latest_submisstion_time <=> @last_review_time) == 1
+    @latest_submission_time = record_times.sort.last
+
+    (@latest_submission_time <=> @last_review_time) == 1
   end
 
   def link_to_content_updated?
-    @hyperlinks = @team.hyperlinks
     @link_to_content_update_time = nil
+    hyperlinks = @team.hyperlinks
 
     update_times = []
-    @hyperlinks.each do |link|
+    hyperlinks.each do |link|
       time = get_link_update_time(link)
       update_times << time unless time.nil?
     end
-
     @link_to_content_update_time = update_times.sort.last
+
     (@link_to_content_update_time <=> @last_review_time) == 1
   end
 
@@ -104,26 +105,43 @@ class StudentReviewController < ApplicationController
     case github_url.host
     when 'github.ncsu.edu'
       # client.access_token = ENV['GITHUB_NCSU_TOKEN']
-      # Using literal value of access_token temporarily. This value should be stored in ENV.
       client.access_token = '8289b47fe8db5c8bceb2f84b2e0c56fc31c5d9e5'
       client.api_endpoint = 'https://github.ncsu.edu/api/v3'
     end
 
     begin
       path = github_url.path.split('/')
-      repo = path[1] + '/' + path[2]
-      repo.slice!('.git')
+      repo = (path[1] + '/' + path[2]).slice!('.git')
       res = client.commit(repo, 'master')
-      latest_commit = res.to_h
-      latest_commit[:commit][:author][:date]
-    rescue
-      nil
+      res.to_h[:commit][:author][:date]
+    rescue => e
+      logger.error e.message
+      logger.error e.backtrace.join("\n")
     end
   end
 
   def file_updated? # this function hasn't been implemented
     @file_update_time = nil
     false
+  end
+
+  def email(partial="submission update")
+    defn={}
+    defn[:body] = {}
+    defn[:body][:partial_name] = partial
+    response_map = ResponseMap.find map_id
+    reviewer = Participant.find(response_map.reviewer_id)
+    assignment= Assignment.find(reviewer.parent_id)
+    defn[:subject] = "A submission update is available for " + assignment.name
+                                                                   .email(defn,reviewer,parent)
+  end
+
+  def email(defn,reviewer,assignment)
+    defn[:body][:type] = "submission"
+    defn[:body][:obj_name] = assignment.name
+    defn[:body][:first_name] =defn[:body][:first_name] = User.find(reviewer.id).fullname
+    defn[:to] = User.find(reviewer.id).email
+    Mailer.sync_message(defn).deliver_now
   end
 
   helper_method :get_update_time

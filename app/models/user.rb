@@ -69,20 +69,13 @@ class User < ActiveRecord::Base
   def get_user_list
     user_list = []
     # If the user is a super admin, fetch all users
-    if self.role.super_admin?
-       return SuperAdministrator.get_user_list
-    end
-
+    return SuperAdministrator.get_user_list if self.role.super_admin?
 
     # If the user is an instructor, fetch all users in his course/assignment
-    if self.role.instructor?
-      return Instructor.get_user_list
-    end
+    return Instructor.get_user_list if self.role.instructor?
 
     # If the user is a TA, fetch all users in his courses
-    if self.role.ta?
-      return Ta.get_user_list
-    end
+    return Ta.get_user_list if self.role.ta?
 
     # Add the children to the list
     unless self.role.super_admin?
@@ -301,7 +294,7 @@ class User < ActiveRecord::Base
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
+    key_word = {'1' => 'name', '2' => 'fullname', '3' => 'email'}
     if key_word.include? search_by
       search_filter = '%' + letter + '%'
       users = User.order('name').where("(role_id in (?) or id = ?) and #{key_word[search_by]} like ?", role.get_available_roles, user_id, search_filter)

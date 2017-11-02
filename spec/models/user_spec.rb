@@ -236,7 +236,7 @@ describe User do
       it 'finds user by email if the local part of email is the same as username' do
         allow(User).to receive(:find_by).and_return(nil)
         allow(User).to receive(:where).and_return([{name: 'abc', fullname: 'abc bbc'}])
-        expect(User.find_by_login('abcxyz@gmail.com')).to eq({name: "abc", fullname: "abc bbc"})
+        expect(User.find_by_login('abcxyz@gmail.com')).to eq([{name: "abc", fullname: "abc bbc"}])
       end
     end
   end
@@ -331,10 +331,10 @@ describe User do
 
     it 'exports only email_options' do
       options = {"personal_details" => "false",
-                "role" => "false",
-                "parent" => "false",
-                "email_options" => "true",
-                "handle" => "false"}
+                 "role" => "false",
+                 "parent" => "false",
+                 "email_options" => "true",
+                 "handle" => "false"}
       csv = []
       User.export(csv, 0, options)
       expect(csv).to eq([[user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails]])
@@ -432,13 +432,13 @@ describe User do
     end
 
     it 'returns true if current user is a TA of target user' do
-    allow(Ta).to receive(:find).and_return(user1)
-    allow(user1).to receive_message_chain("role.ta?") { true }
-    allow(user).to receive_message_chain("role.name").and_return('Student')
-    c1 = Course.new
-    allow(user1).to receive_message_chain(:courses_assisted_with, :any?).and_yield(c1)
-    allow_any_instance_of(Course).to receive_message_chain(:assignments, :map, :flatten, :map, :include?, :user).and_return(true)
-    expect(user1.teaching_assistant_for?(user)).to be true
+      allow(Ta).to receive(:find).and_return(user1)
+      allow(user1).to receive_message_chain("role.ta?") { true }
+      allow(user).to receive_message_chain("role.name").and_return('Student')
+      c1 = Course.new
+      allow(user1).to receive_message_chain(:courses_assisted_with, :any?).and_yield(c1)
+      allow_any_instance_of(Course).to receive_message_chain(:assignments, :map, :flatten, :map, :include?, :user).and_return(true)
+      expect(user1.teaching_assistant_for?(user)).to be true
     end
   end
 
@@ -469,16 +469,19 @@ describe User do
 
     it 'when the search_by is 2' do
       search_by = "2"
-      expect(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, @user_id, '%fullname%')
+      expect(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and fullname like ?", 
+                                                                 role.get_available_roles, 
+                                                                 @user_id, 
+                                                                 '%fullname%')
       expect(User.search_users(role, @user_id, 'fullname', search_by)).to eq user
     end
 
     it 'when the search_by is 3' do
       search_by = "3"
       expect(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and email like ?",
-                                                                role.get_available_roles,
-                                                                @user_id,
-                                                                '%email%')
+                                                                 role.get_available_roles,
+                                                                 @user_id,
+                                                                 '%email%')
       expect(User.search_users(role, @user_id, 'email', search_by)).to eq user
     end
 

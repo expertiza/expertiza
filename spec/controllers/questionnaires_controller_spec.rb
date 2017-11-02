@@ -16,7 +16,15 @@ describe QuestionnairesController do
   end
 
   describe '#view' do
-    it 'renders questionnaires#view page'
+    it 'renders questionnaires#view page' do
+      questionnaires = double('Questionnaire')
+      allow(Questionnaire).to receive(:find).and_return(questionnaires)
+      params = {
+        id: 11
+      }
+      get :view, params
+      expect(response).to render_template(:view)
+    end
   end
 
   describe '#new' do

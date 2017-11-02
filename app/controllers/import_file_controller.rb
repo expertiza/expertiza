@@ -30,7 +30,7 @@ class ImportFileController < ApplicationController
       @has_reviewer = "nil"
     end
     if (@model == 'SignUpTopic')
-      @optional_count = 0;
+      @optional_count = 0
       if (params[:category] == 'true')
         @optional_count += 1
       end
@@ -55,7 +55,6 @@ class ImportFileController < ApplicationController
     @model = params[:model]
     @title = params[:title]
   end
-
 
   def import
     errors = import_from_hash(session, params)
@@ -122,7 +121,6 @@ class ImportFileController < ApplicationController
       rescue
         errors << $ERROR_INFO
       end
-
     elsif params[:model] == 'SignUpTopic'
       contents_hash = eval(params[:contents_hash])
       if params[:has_header] == 'true'

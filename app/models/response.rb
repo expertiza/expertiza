@@ -129,20 +129,31 @@ class Response < ActiveRecord::Base
   end
 
   # only two types of responses more should be added
-  def email(partial = "new_submission")
-    defn = {}
+  # def email(partial = "new_submission")
+  #   defn = {}
+  #   defn[:body] = {}
+  #   defn[:body][:partial_name] = partial
+  #   response_map = ResponseMap.find map_id
+  #   participant = Participant.find(response_map.reviewer_id)
+  #   # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
+  #   parent = if response_map.survey?
+  #             response_map.survey_parent
+  #           else
+  #             Assignment.find(participant.parent_id)
+  #           end
+  #   defn[:subject] = "A new submission is available for " + parent.name
+  #   response_map.email(defn, participant, parent)
+  # end
+
+  def email(partial="update")
+    defn={}
     defn[:body] = {}
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
-    participant = Participant.find(response_map.reviewer_id)
-    # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
-    parent = if response_map.survey?
-              response_map.survey_parent
-            else
-              Assignment.find(participant.parent_id)
-            end
-    defn[:subject] = "A new submission is available for " + parent.name
-    response_map.email(defn, participant, parent)
+    reviewer = Participant.find(response_map.reviewer_id)
+    assignment= Assignment.find(reviewer.parent_id)
+    defn[:subject] = "A submission update is available for " + assignment.name
+    response_map.email(defn, reviewer, assignment)
   end
 
   def questionnaire_by_answer(answer)

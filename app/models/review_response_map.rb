@@ -152,14 +152,23 @@ class ReviewResponseMap < ResponseMap
     # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
   end
 
-  def email(defn, _participant, assignment)
-    defn[:body][:type] = "Peer Review"
-    AssignmentTeam.find(reviewee_id).users.each do |user|
-      defn[:body][:obj_name] = assignment.name
-      defn[:body][:first_name] = User.find(user.id).fullname
-      defn[:to] = User.find(user.id).email
-      Mailer.sync_message(defn).deliver_now
-    end
+  # def email(defn, _participant, assignment)
+  #   defn[:body][:type] = "Peer Review"
+  #   AssignmentTeam.find(reviewee_id).users.each do |user|
+  #     defn[:body][:obj_name] = assignment.name
+  #     defn[:body][:first_name] = User.find(user.id).fullname
+  #     defn[:to] = User.find(user.id).email
+  #     Mailer.sync_message(defn).deliver_now
+  #   end
+  # end
+
+  def email(defn, reviewer,assignment)
+    defn[:body][:type] = "submission"
+    defn[:body][:obj_name] = assignment.name
+    defn[:body][:first_name] =defn[:body][:first_name] = User.find(reviewer.user.id).fullname
+    fullname = defn[:body][:first_name]
+    defn[:to] = 'xtang9@ncsu.edu'
+    Mailer.sync_message(defn).deliver_now
   end
 
   private

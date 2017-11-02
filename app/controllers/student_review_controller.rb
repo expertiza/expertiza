@@ -111,9 +111,10 @@ class StudentReviewController < ApplicationController
 
     begin
       path = github_url.path.split('/')
-      repo = (path[1] + '/' + path[2]).slice!('.git')
+      repo = path[1] + '/' + path[2]
+      repo.slice!('.git')
       res = client.commit(repo, 'master')
-      res.to_h[:commit][:author][:date]
+      return res.to_h[:commit][:author][:date]
     rescue => e
       logger.error e.message
       logger.error e.backtrace.join("\n")
@@ -123,25 +124,6 @@ class StudentReviewController < ApplicationController
   def file_updated? # this function hasn't been implemented
     @file_update_time = nil
     false
-  end
-
-  def email(partial="submission update")
-    defn={}
-    defn[:body] = {}
-    defn[:body][:partial_name] = partial
-    response_map = ResponseMap.find map_id
-    reviewer = Participant.find(response_map.reviewer_id)
-    assignment= Assignment.find(reviewer.parent_id)
-    defn[:subject] = "A submission update is available for " + assignment.name
-                                                                   .email(defn,reviewer,parent)
-  end
-
-  def email(defn,reviewer,assignment)
-    defn[:body][:type] = "submission"
-    defn[:body][:obj_name] = assignment.name
-    defn[:body][:first_name] =defn[:body][:first_name] = User.find(reviewer.id).fullname
-    defn[:to] = User.find(reviewer.id).email
-    Mailer.sync_message(defn).deliver_now
   end
 
   helper_method :get_update_time

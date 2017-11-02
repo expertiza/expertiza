@@ -35,6 +35,7 @@ module InstructorInterfaceHelperSpec
     click_link "Import topics"
     file_path = Rails.root + filepath
     attach_file('file', file_path)
+    wait_for_ajax
     click_button "Import"
     click_link "Topics"
   end

@@ -13,3 +13,5 @@ end
 RSpec.configure do |config|
   config.include WaitForAjax, type: :feature
 end
+
+

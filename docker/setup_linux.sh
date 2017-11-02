@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Create a directory named scrubbed_db to store the scrubbed_db
-mkdir -p scrubbed_db
-
 cd ..
 
 DIR=`pwd`
@@ -13,8 +10,18 @@ bash setup.sh
 # Go back to docker folder
 cd $DIR/docker/scrubbed_db
 
-# Downloading the scrubbed_db
-wget -nc {LINK}
+# Checking the scrubbed_db
+
+if [ -f expertiza_scrubbed_db.sql.tar.gz ]; then
+   echo "The file expertiza_scrubbed_db.sql.tar.gz exists."
+else
+   echo
+   echo "The file expertiza_scrubbed_db.sql.tar.gz not found."
+   echo "Download the scrubbed database here, from: https://goo.gl/60RnWx"
+   echo "EXITING..."
+   echo
+   exit 0
+fi
 
 # Untar it
 tar -xzf expertiza_scrubbed_db.sql.tar.gz 
@@ -32,8 +39,7 @@ sed -i "s/.*MYSQL_ROOT_PASSWORD.*/      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWOR
 
 cd  $DIR/config
 
-
-# Modify config/database.yml
+## Modify config/database.yml
 
 # Update database.yml with the MYSQL_ROOT_PASSWORD
 sed -i "s/.*password.*/  password: $MYSQL_ROOT_PASSWORD/" database.yml

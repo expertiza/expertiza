@@ -48,6 +48,7 @@ describe "Integration tests for instructor interface" do
   # E1776 (Fall 2017)
   #
   # The tests below are no longer reflective of the current import process for topics.
+  #
   # 1. There is now an additional intermediary page during the import process.
   # 2. There are now checkbox options on the initial import page to specify optional columns.
   # 3. The intermediary data structures for imports have changed (see the pull request notes).

@@ -36,24 +36,30 @@ describe TeamsController do
   end
 end
 
-describe ImportFileController do
-  # Airbrake-1774360945974838307
-  describe '#importFile' do
-    it 'will catch the error info if the tempfile cannot be obtained from params[:file]' do
-      controller.params = {
-        id: 1,
-        options: {"has_column_names" => "true", "handle_dups" => "ignore"},
-        model: 'AssignmentTeam',
-        file: nil
-      }
-      session = {
-        assignment_id: 1
-      }
-      expect { controller.send(:importFile, session, controller.params) }.not_to raise_error
-      expect(controller.send(:importFile, session, controller.params).inspect).to eq("[#<NoMethodError: undefined method `each_line' for nil:NilClass>]")
-    end
-  end
-end
+# E1776 (Fall 2017)
+#
+# The tests below are no longer reflective of the current import process.
+#
+# 1. The method importFile has been replaced with import_from_hash in import_file_controller.rb
+#
+# describe ImportFileController do
+#   # Airbrake-1774360945974838307
+#   describe '#importFile' do
+#     it 'will catch the error info if the tempfile cannot be obtained from params[:file]' do
+#       controller.params = {
+#         id: 1,
+#         options: {"has_column_names" => "true", "handle_dups" => "ignore"},
+#         model: 'AssignmentTeam',
+#         file: nil
+#       }
+#       session = {
+#         assignment_id: 1
+#       }
+#       expect { controller.send(:importFile, session, controller.params) }.not_to raise_error
+#       expect(controller.send(:importFile, session, controller.params).inspect).to eq("[#<NoMethodError: undefined method `each_line' for nil:NilClass>]")
+#     end
+#   end
+# end
 
 describe MenuItemsController do
   # Airbrake-1766139777878852159

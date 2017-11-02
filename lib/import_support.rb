@@ -1,20 +1,4 @@
-module Instance_method
-  def files(directory)
-    files_list = Dir[directory + "/*"]
-    files = []
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each {|f| files << f }
-      end
-      files << file
-    end
-    files
-  end
-end
-
-module Class_method
+module Import_support
   def check_info_and_create(row, _row_header = nil, session)
     raise ArgumentError, "No user id has been specified." if row.empty?
     user = User.find_by(name:row[0])
@@ -25,4 +9,3 @@ module Class_method
     end
   end
 end
-

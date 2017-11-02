@@ -1,6 +1,6 @@
 require 'uri'
 require 'yaml'
-require 'TFD1770_refactor'
+require 'import_support'
 # Code Review: Notice that Participant overloads two different concepts:
 #              contribution and participant (see fields of the participant table).
 #              Consider creating a new table called contributions.
@@ -23,8 +23,8 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
-  include Instance_method
-  extend Class_method
+  include File_support
+  extend Import_support
 
   def dir_path
     assignment.try :directory_path
@@ -52,10 +52,11 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has been given
+  # methods extracted from scores method:assignment_questionnaires, merge_scores, topic_total_scores, caculate_scores
   def scores(questions)
     scores = {}
     scores[:participant] = self
-    assignment_questionnaires(questions, scores)
+    compute_assignment_score(questions, scores)
     scores[:total_score] = self.assignment.compute_total_score(scores)
     # merge scores[review#] (for each round) to score[review]  -Yang
     merge_scores(scores) if self.assignment.varying_rubrics_by_round?
@@ -78,8 +79,7 @@ class AssignmentParticipant < Participant
     caculate_scores(scores)
   end
 
-  # methods extracted from scores method:assignment_questionnaires, merge_scores, topic_total_scores, caculate_scores
-  def assignment_questionnaires(questions, scores)
+  def compute_assignment_score(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
       # create symbol for "varying rubrics" feature -Yang

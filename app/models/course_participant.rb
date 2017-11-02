@@ -1,7 +1,7 @@
-require 'TFD1770_refactor'
+require 'import_support'
 class CourseParticipant < Participant
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
-  extend Class_method
+  extend Import_support
 
   # Copy this participant to an assignment
   def copy(assignment_id)

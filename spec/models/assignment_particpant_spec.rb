@@ -57,7 +57,7 @@ describe AssignmentParticipant do
   describe '#scores' do
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do
-        expect(participant).to receive(:assignment_questionnaires)
+        expect(participant).to receive(:compute_assignment_score)
         expect(assignment).to receive(:compute_total_score)
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(assignment).to receive(:is_microtask?).and_return(false)
@@ -69,7 +69,7 @@ describe AssignmentParticipant do
 
     context 'when assignment is varying rubric by round but not an microtask' do
       it 'calculates scores that this participant has been given' do
-        expect(participant).to receive(:assignment_questionnaires)
+        expect(participant).to receive(:compute_assignment_score)
         expect(assignment).to receive(:compute_total_score)
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         expect(participant).to receive(:merge_scores)
@@ -82,7 +82,7 @@ describe AssignmentParticipant do
 
     context 'when assignment is not varying rubric by round but an microtask' do
       it 'calculates scores that this participant has been given' do
-        expect(participant).to receive(:assignment_questionnaires)
+        expect(participant).to receive(:compute_assignment_score)
         expect(assignment).to receive(:compute_total_score)
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(assignment).to receive(:is_microtask?).and_return(true)
@@ -95,7 +95,7 @@ describe AssignmentParticipant do
   end
 
   # included method
-  describe '#assignment_questionnaires' do
+  describe '#compute_assignment_score' do
     context 'when the round of questionnaire is nil' do
       it 'record the result as review scores' do
         scores = {}
@@ -104,7 +104,7 @@ describe AssignmentParticipant do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(any_args).and_return(assignment_questionnaire)
         allow(review_questionnaire).to receive(:get_assessments_for).with(any_args).and_return([response])
         allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
-        participant.assignment_questionnaires(question_hash, scores)
+        participant.compute_assignment_score(question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response])
         expect(scores[:review][:scores]).to eq(score_map)
       end
@@ -118,7 +118,7 @@ describe AssignmentParticipant do
         allow(AssignmentQuestionnaire).to receive(:find_by).and_return(assignment_questionnaire2)
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(any_args).and_return([response])
         allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
-        participant.assignment_questionnaires(question_hash, scores)
+        participant.compute_assignment_score(question_hash, scores)
         expect(scores[:review1][:assessments]).to eq([response])
         expect(scores[:review1][:scores]).to eq(score_map)
       end

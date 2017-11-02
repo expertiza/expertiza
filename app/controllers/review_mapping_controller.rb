@@ -284,28 +284,28 @@ class ReviewMappingController < ApplicationController
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
     # Create teams if its an individual assignment.
-    team_size teams, max_team_size
-    artifacts_num params[:num_reviews_per_student].to_i,
+    team_size(teams, max_team_size)
+    artifacts_num(params[:num_reviews_per_student].to_i,
                   params[:num_reviews_per_submission].to_i,
                   params[:num_calibrated_artifacts].to_i,
-                  params[:num_uncalibrated_artifacts].to_i,
-                  teams
+                  params[:num_uncalibrated_artifacts].to_i, teams)
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
-  def team_size teams, max_team_size
+  def team_size (teams, max_team_size)
     if teams.empty? and max_team_size == 1
       participants.each do |participant|
         user = participant.user
         next if TeamsUser.team_id(assignment_id, user.id)
         team = AssignmentTeam.create_team_and_node(assignment_id)
         ApplicationController.helpers.create_team_users(participant.user, team.id)
-        teams << team
+          teams << team
+        return teams
       end
     end
   end
 
-  def artifacts_num calibrated_artifacts_num, uncalibrated_artifacts_num, student_review_num, submission_review_num, teams
+  def artifacts_num (calibrated_artifacts_num, uncalibrated_artifacts_num, student_review_num, submission_review_num, teams)
     if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
       review_num student_review_num, submission_review_num, teams
     else
@@ -324,7 +324,7 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  def review_num student_review_num, submission_review_num, teams
+  def review_num (student_review_num, submission_review_num, teams)
     if student_review_num == 0 and submission_review_num == 0
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
     elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)

@@ -15,24 +15,12 @@ describe ResponseController do
 
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
-    allow(Assignment).to receive(:find).with('1').and_return(assignment)
-    allow(Assignment).to receive(:find).and_return(assignment)
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(Response).to receive(:find).and_return(review_response)
-    allow(Response).to receive(:find_by).and_return(review_response)
     allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
     allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
-    allow(Participant).to receive(:find).with(1).and_return(participant)
-    allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-    allow(assignment).to receive(:number_of_current_round).and_return(current_round)
-    allow(assignment).to receive(:get_current_stage).and_return(stage)
-    allow(review_response).to receive(:delete).and_return(success_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
     allow(review_response).to receive(:questionnaire_by_answer).and_return(questionnaire)
-    allow(review_response_map).to receive(:assignment).and_return(assignment)
-    allow(review_response_map).to receive(:save).and_return(true)
-    allow(review_response_map).to receive(:questionnaire).with(current_round).and_return(questionnaire)
-    request.env['HTTP_REFERER'] = 'www.google.com'
   end
 
   describe '#action_allowed?' do
@@ -125,6 +113,10 @@ describe ResponseController do
 
   describe '#new' do
     it 'renders response#response page' do
+      allow(assignment).to receive(:number_of_current_round).and_return(current_round)
+      allow(assignment).to receive(:get_current_stage).and_return(stage)
+      allow(review_response_map).to receive(:assignment).and_return(assignment)
+      allow(review_response_map).to receive(:questionnaire).with(current_round).and_return(questionnaire)
       params = {id: review_response.id, feedback: ''}
       post :new, params
       expect(response).to render_template("response")
@@ -147,6 +139,7 @@ describe ResponseController do
 
     context 'when current response is not nil' do
       it 'redirects to previous page' do
+        request.env['HTTP_REFERER'] = 'www.google.com'
         session[:user] = participant
         params = {id: review_response.id}
         allow(Response).to receive(:find).and_return(nil)
@@ -167,6 +160,9 @@ describe ResponseController do
 
   describe '#create' do
     it 'creates a new response and redirects to response#saving page' do
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
       params = {id: review_response.id, review: {questionnaire_id: questionnaire.id}}
       post :create, params
       # fetching correct message embedded in response to check while redirection
@@ -177,6 +173,7 @@ describe ResponseController do
 
   describe '#saving' do
     it 'save current response map and redirects to response#redirection page' do
+      allow(review_response_map).to receive(:save).and_return(true)
       params = {id: review_response_map.id}
       post :saving, params
       expect(response).to redirect_to('/response/redirection?id=' + review_response.id.to_s)
@@ -184,6 +181,11 @@ describe ResponseController do
   end
 
   describe '#redirection' do
+
+    before(:each) do
+      allow(Response).to receive(:find_by).and_return(review_response)
+    end
+
     context 'when params[:return] is feedback' do
       it 'redirects to grades#view_my_scores page' do
         params = {return: "feedback"}

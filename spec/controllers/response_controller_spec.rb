@@ -13,6 +13,7 @@ describe ResponseController do
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
+    allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
   end
 

@@ -2,13 +2,7 @@ $=jQuery;
 
 $(function () {
     $("[data-toggle='tooltip']").tooltip();
-
-    // Changes to this was done as part of E1788_OSS_project_Maroon_Heatmap_fixes
-    //
-    // scoreTable was assigned to as classes for the table which required to be sortable
-    // tablesorter is initialised on all the elements having class scoreTable
-    //
-    // fix comment end
+    // Change to this was done as part of E1788_OSS_project_Maroon_Heatmap_fixes
     $(".scoresTable").tablesorter();
 });
 

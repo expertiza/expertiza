@@ -186,9 +186,7 @@ class TreeDisplayController < ApplicationController
         # based on the filtering criteria of ta seeing courses he/she is ta of &
         # instructor seeing all courses he/she is instructor of,
         # is added to the list which is returned
-        if tmp_object['private']
-          res[node_type] << tmp_object
-        end
+        res[node_type] << tmp_object if tmp_object['private']
       end
     end
     res

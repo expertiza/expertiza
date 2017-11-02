@@ -139,7 +139,6 @@ describe TreeDisplayController do
 
   describe "POST #children_node_ng for TA" do
     before(:each) do
-
       @treefolder = TreeFolder.new
       @treefolder.parent_id = nil
       @treefolder.name = "Courses"
@@ -165,12 +164,12 @@ describe TreeDisplayController do
       @foldernode.save!
 
       # create a new course
-      @course_1 = create(:course)
+      @course1 = create(:course)
       # make sure the course is not private
-      @course_1.private = false
-      @course_1.save
+      @course1.private = false
+      @course1.save
 
-      @assignment_node_1 = create(:assignment_node)
+      @assignment_node1 = create(:assignment_node)
       create(:course_node)
 
       # make a teaching assistant
@@ -178,11 +177,9 @@ describe TreeDisplayController do
       @role = user_ta.role
       @ta = User.new(user_ta.attributes)
       @ta.save!
-
     end
 
     it "returns empty array if the logged in user is not ta" do
-
       # make a student for testing edge case
       user_student = build(:student)
       student = User.new(user_student.attributes)
@@ -191,7 +188,7 @@ describe TreeDisplayController do
       # create ta-course mapping for the student
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: student.role_id).first.id
-      ta_mapping.course_id = Course.find(@course_1.id).id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       params = FolderNode.all
@@ -200,15 +197,13 @@ describe TreeDisplayController do
       # service should not return anything as the user is student
       output = JSON.parse(response.body)['Courses']
       expect(output.length).to eq 0
-
     end
 
     it "returns a list of course objects ta is supposed to ta in as json" do
-
       # create ta-course mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course_1.id).id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
@@ -220,7 +215,7 @@ describe TreeDisplayController do
       # service should return the course as per the ta-course mapping
       output = JSON.parse(response.body)['Courses']
       expect(output.length).to eq 1
-      expect(output[0]['name']).to eq @course_1.name
+      expect(output[0]['name']).to eq @course1.name
     end
 
     it "returns an empty list when there are no mapping between ta and course" do
@@ -241,27 +236,27 @@ describe TreeDisplayController do
       params = FolderNode.all
 
       # create a new course
-      @course_2 = create(:course)
+      @course2 = create(:course)
       # make sure the course is not private
-      @course_2.private = false
-      @course_2.save
+      @course2.private = false
+      @course2.save
 
       # make ta student of that course
       # create assignment against course_2
-      @assignment_1 = create(:assignment)
-      @assignment_1.course_id = @course_2.id
-      @assignment_1.save
+      @assignment1 = create(:assignment_mapping)
+      @assignment1.course_id = @course2.id
+      @assignment1.save
 
       # make ta participant of that assigment
-      @participant_1 = create(:participant)
-      @participant_1.parent_id = @assignment_1.id
-      @participant_1.user_id = @ta.id
-      @participant_1.save
+      @participant1 = create(:participant)
+      @participant1.parent_id = @assignment1.id
+      @participant1.user_id = @ta.id
+      @participant1.save
 
       # create a ta mapping for the other existing course (other than in which he is ta of)
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course_1.id).id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
@@ -272,8 +267,8 @@ describe TreeDisplayController do
       output = JSON.parse(response.body)['Courses']
       # service should return 1 course and should be course 1 not course 2
       expect(output.length).to eq 1
-      expect(output[0]['name']).to eq @course_1.name
-      expect(output[0]['name']).not_to eq @course_2.name
+      expect(output[0]['name']).to eq @course1.name
+      expect(output[0]['name']).not_to eq @course2.name
     end
 
     it "returns only the course he is ta of when ta is a student of same course at the same time" do
@@ -281,20 +276,20 @@ describe TreeDisplayController do
 
       # make ta student of the existing course he is ta of
       # create assignment against course_1
-      @assignment_1 = create(:assignment)
-      @assignment_1.course_id = @course_1.id
-      @assignment_1.save
+      @assignment1 = create(:assignment_mapping)
+      @assignment1.course_id = @course1.id
+      @assignment1.save
 
       # make ta participant of that assigment
-      @participant_1 = create(:participant)
-      @participant_1.parent_id = @assignment_1.id
-      @participant_1.user_id = @ta.id
-      @participant_1.save
+      @participant1 = create(:participant)
+      @participant1.parent_id = @assignment1.id
+      @participant1.user_id = @ta.id
+      @participant1.save
 
       # create a ta mapping for the same course he is ta of
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course_1.id).id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
@@ -305,7 +300,7 @@ describe TreeDisplayController do
       # service should return 1 course
       output = JSON.parse(response.body)['Courses']
       expect(output.length).to eq 1
-      expect(output[0]['name']).to eq @course_1.name
+      expect(output[0]['name']).to eq @course1.name
     end
 
     it "returns only the assignments which belongs to the course he is ta of" do
@@ -313,18 +308,18 @@ describe TreeDisplayController do
 
       # create assignment against course_1
       # this is 2nd assignment added to course_1, other being in "before" method
-      @assignment_2 = create(:assignment)
-      @assignment_2.course_id = @course_1.id
-      @assignment_2.save!
+      @assignment2 = create(:assignment_mapping)
+      @assignment2.course_id = @course1.id
+      @assignment2.save!
 
-      @assignment_node_2 = create(:assignment_node)
-      @assignment_node_2.node_object_id = @assignment_2.id
-      @assignment_node_2.save!
+      @assignment_node2 = create(:assignment_node)
+      @assignment_node2.node_object_id = @assignment2.id
+      @assignment_node2.save!
 
       # create ta-course mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course_1.id).id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
@@ -342,12 +337,12 @@ describe TreeDisplayController do
       params = FolderNode.all
 
       # delete the assignment node
-      Node.delete(@assignment_node_1.id)
+      Node.delete(@assignment_node1.id)
 
       # create ta-course mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course_1.id).id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
@@ -359,6 +354,5 @@ describe TreeDisplayController do
       output = JSON.parse(response.body)['Assignments']
       expect(output.length).to eq 0
     end
-
   end
 end

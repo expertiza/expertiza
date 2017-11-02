@@ -100,7 +100,8 @@ class SuggestionController < ApplicationController
     new_team = AssignmentTeam.create(name: 'Team' + @user_id.to_s + '_' + rand(1000).to_s,
                                      parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
     t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
-    SignedUpTeam.create(signed_up_team_params(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0))
+    params[:signed_up_team] = {topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0}
+    SignedUpTeam.create(signed_up_team_params)
     parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
@@ -188,10 +189,8 @@ class SuggestionController < ApplicationController
     params.require(:suggestion_comment).permit(:vote, :comments)
   end
 
-  def signed_up_team_params(params_hash)
-    params_local = params
-    params_local[:signed_up_team] = params_hash
-    params_local.require(:signed_up_team).permit(:topic_id, :team_id, :is_waitlisted)
+  def signed_up_team_params
+    params.require(:signed_up_team).permit(:topic_id, :team_id, :is_waitlisted)
   end
 
   def approve

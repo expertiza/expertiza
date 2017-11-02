@@ -7,7 +7,7 @@ module SignUpSheetHelper
   end
 
   # Project E1763. It gets the id of the topic with the latest deadline.
-  def get_latester_topic_deadline(assignment_due_dates, sign_up_topics)
+  def get_latest_topic_deadline(assignment_due_dates, sign_up_topics)
     lastest_deadline_id = 0
     latest_due_date = get_topic_deadline(assignment_due_dates, sign_up_topics[0].id).to_datetime
     (1..(sign_up_topics.size - 1)).each do |i|

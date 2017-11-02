@@ -301,7 +301,7 @@ class User < ActiveRecord::Base
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    key_word = {'1'=>'name','2'=>'fullname','3'=>'email'}
+    key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
     if key_word.include? search_by
       search_filter = '%' + letter + '%'
       users = User.order('name').where("(role_id in (?) or id = ?) and #{key_word[search_by]} like ?", role.get_available_roles, user_id, search_filter)

@@ -71,6 +71,8 @@ class QuestionnairesController < ApplicationController
     else # if it is not a quiz questionnaire
       if session[:user].role.name == "Teaching Assistant"
         @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id)
+        @questionnaire.min_question_score = 0
+        @questionnaire.max_question_score = 1
       end
       save
 
@@ -378,6 +380,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
     @questionnaire.save
   end
+  
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!

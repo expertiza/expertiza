@@ -332,7 +332,7 @@ describe TreeDisplayController do
       output = JSON.parse(response.body)['Assignments']
       expect(output.length).to eq 2
 
-      newParams = Node.find_by_node_object_id(@course1.id)
+      newParams = Node.find_by!(node_object_id: @course1.id)
       post :children_node_2_ng, {reactParams2: {child_nodes: newParams.to_json, nodeType: "CourseNode"}}, user: @ta
       output = JSON.parse(response.body)
       expect(output.length).to eq 2

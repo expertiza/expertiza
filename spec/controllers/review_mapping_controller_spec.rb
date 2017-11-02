@@ -366,8 +366,8 @@ describe ReviewMappingController do
   describe 'response_report' do
     context 'when type is SummaryByRevieweeAndCriteria' do
       it 'renders response_report page with corresponding data' do
-        expect(SummaryHelper::Summary).to receive_message_chain('new.summarize_reviews_by_reviewees').with(any_args).and_return(sum)
-        
+        expect(Assignment).to receive(:find).and_return(assignment)
+        type = double()
       end
     end
 

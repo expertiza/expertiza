@@ -1,7 +1,6 @@
 class SignedUpTeam < ActiveRecord::Base
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team, class_name: 'Team'
-  attr_protected
   attr_accessible :topic_id, :team_id, :is_waitlisted
 
   # the below has been added to make is consistent with the database schema

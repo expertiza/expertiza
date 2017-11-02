@@ -69,7 +69,7 @@ describe "Airbrake expection errors" do
 
     find_link('Topics').click
     # Delete first topic
-    first("img[title='Delete Topic']").click
+    first("input[title='Delete Topic']").click
     # page.execute_script 'window.confirm = function () { return true }'
     click_button 'OK'
     find_link('Topics').click

@@ -331,6 +331,11 @@ describe TreeDisplayController do
       # the sequence of assignments could be random so just checking for array size
       output = JSON.parse(response.body)['Assignments']
       expect(output.length).to eq 2
+
+      newParams = Node.find_by_node_object_id(@course1.id)
+      post :children_node_2_ng, {reactParams2: {child_nodes: newParams.to_json, nodeType: "CourseNode"}}, user: @ta
+      output = JSON.parse(response.body)
+      expect(output.length).to eq 2
     end
 
     it "returns empty assignments list if none of the assignments belong to course he is ta of" do

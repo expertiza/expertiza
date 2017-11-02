@@ -333,6 +333,8 @@ describe ReviewMappingController do
         it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
           expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
           expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+          allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
           allow(team).to receive(:empty?).and_return(false)
           get :automatic_review_mapping, :id =>1, :student_review_num =>0, :submission_review_num=>0, :calibrated_artifacts_num=>0,
               :uncalibrated_artifacts_num=>0, :max_team_size=>0
@@ -345,6 +347,8 @@ describe ReviewMappingController do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page'do
           expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
           expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+          allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
           allow(team).to receive(:empty?).and_return(false)
           get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>0, :calibrated_artifacts_num=>0,
               :uncalibrated_artifacts_num=>0, :max_team_size=>0
@@ -357,6 +361,8 @@ describe ReviewMappingController do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
           expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+          allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
           allow(team).to receive(:empty?).and_return(false)
           get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>0, :calibrated_artifacts_num=>1,
               :uncalibrated_artifacts_num=>0, :max_team_size=>0
@@ -370,6 +376,8 @@ describe ReviewMappingController do
       it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
         expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
         expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+        allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+        allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
         allow(team).to receive(:empty?).and_return(true)
         expect(participant).to receive(:each).and_return(participant)
         #expect(participant).to receive(:user).and_return(user)

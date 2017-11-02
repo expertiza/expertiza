@@ -177,6 +177,7 @@ jQuery("#jsGrid").jsGrid({
                         searching : false,
                          filtering: false,                         // show delete button
                          deleteButtonTooltip: "Delete Topic",
+                         editButtonTooltip: "Edit Topic",
                       //  clearFilterButton: true,                        // show clear filter button
                         modeSwitchButton: false,                         // show switching filtering/inserting button
                         width : "2%"

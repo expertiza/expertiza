@@ -155,9 +155,12 @@ describe ReviewMappingController do
 
   describe '#add_metareviewer' do
     it 'redirects to review_mapping#list_mappings page' do
-
+      expect(ResponseMap).to receive(:find).with(any_args).and_return(review_response_map)
+      expect(User).to receive(:from_params).with(any_args).and_return(user)
+      expect(user).to receive(:name).and_return("test")
+      get :add_metareviewer
+      expect(response.location).to match(/http:\/\/test.host\/review_mapping\/list_mappings\?id=1&msg/)
     end
-
   end
 
   describe '#assign_metareviewer_dynamically' do
@@ -315,7 +318,14 @@ describe ReviewMappingController do
   end
 
   describe '#delete_metareview' do
-    it 'redirects to review_mapping#list_mappings page after deletion'
+    it 'redirects to review_mapping#list_mappings page after deletion' do
+      dummy_mapping = double
+      expect(MetareviewResponseMap).to receive(:find).and_return(dummy_mapping)
+      expect(dummy_mapping).to receive(:assignment).and_return(assignment)
+      expect(dummy_mapping).to receive(:delete)
+      get :delete_metareview
+      expect(response).to redirect_to action: 'list_mappings', id: assignment.id
+    end
   end
 
   describe '#list_mappings' do
@@ -366,39 +376,125 @@ describe ReviewMappingController do
   describe 'response_report' do
     context 'when type is SummaryByRevieweeAndCriteria' do
       it 'renders response_report page with corresponding data' do
-        expect(Assignment).to receive(:find).and_return(assignment)
-        type = double()
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        sum = double()
+        expect(SummaryHelper::Summary).to receive_message_chain('new.summarize_reviews_by_reviewees').with(any_args).and_return(sum)
+        summary = double()
+        expect(sum).to receive(:summary).with(any_args).and_return(summary)
+        reviewers = double()
+        expect(sum).to receive(:reviewers).with(any_args).and_return(reviewers)
+        avg_scores_by_reviewee = double()
+        expect(sum).to receive(:avg_scores_by_reviewee).with(any_args).and_return(avg_scores_by_reviewee)
+        avg_scores_by_round = double()
+        expect(sum).to receive(:avg_scores_by_round).with(any_args).and_return(avg_scores_by_round)
+        avg_scores_by_criterion = double()
+        expect(sum).to receive(:avg_scores_by_criterion).with(any_args).and_return(avg_scores_by_criterion)
+        params = {id: 1, report: {type: 'SummaryByRevieweeAndCriteria'}}
+        get :response_report, params
+        expect(response).to render_template('response_report')
       end
     end
 
     context 'when type is SummaryByCriteria' do
-      it 'renders response_report page with corresponding data'
+      it 'renders response_report page with corresponding data' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        sum = double()
+        expect(SummaryHelper::Summary).to receive_message_chain('new.summarize_reviews_by_criterion').with(any_args).and_return(sum)
+        summary = double()
+        expect(sum).to receive(:summary).with(any_args).and_return(summary)
+        avg_scores_by_round = double()
+        expect(sum).to receive(:avg_scores_by_round).with(any_args).and_return(avg_scores_by_round)
+        avg_scores_by_criterion = double()
+        expect(sum).to receive(:avg_scores_by_criterion).with(any_args).and_return(avg_scores_by_criterion)
+        params = {id: 1, report: {type: 'SummaryByCriteria'}}
+        get :response_report, params
+        expect(response).to render_template('response_report')
+      end
     end
 
     context 'when type is ReviewResponseMap' do
-      it 'renders response_report page with corresponding data'
+      it 'renders response_report page with corresponding data' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        reviewers = double()
+        expect(ReviewResponseMap).to receive(:review_response_report).with(any_args).and_return(reviewers)
+        review_scores = double()
+        expect(assignment).to receive(:compute_reviews_hash).with(any_args).and_return(review_scores)
+        avg_and_ranges = double()
+        expect(assignment).to receive(:compute_avg_and_ranges_hash).with(any_args).and_return(avg_and_ranges)
+        params = {id: 1, report: {type: 'ReviewResponseMap'}, user: 1}
+        get :response_report, params
+        expect(response).to render_template('response_report')
+      end
     end
 
     context 'when type is FeedbackResponseMap' do
       context 'when assignment has varying_rubrics_by_round feature' do
-        it 'renders response_report page with corresponding data'
+        it 'renders response_report page with corresponding data' do
+          expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+          expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(true)
+          expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(true)
+          expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(true)
+          params = {id: 1, report: {type: 'FeedbackResponseMap'}}
+          get :response_report, params
+          expect(response).to render_template('response_report')
+        end
       end
 
       context 'when assignment does not have varying_rubrics_by_round feature' do
-        it 'renders response_report page with corresponding data'
+        it 'renders response_report page with corresponding data' do
+          expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+          expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(false)
+          expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(false)
+          expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(false)
+          params = {id: 1, report: {type: 'FeedbackResponseMap'}}
+          get :response_report, params
+          expect(response).to render_template('response_report')
+        end
       end
     end
 
     context 'when type is TeammateReviewResponseMap' do
-      it 'renders response_report page with corresponding data'
+      it 'renders response_report page with corresponding data' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        reviewers = double()
+        expect(TeammateReviewResponseMap).to receive(:teammate_response_report).with(any_args).and_return(reviewers)
+        params = {id: 1, report: {type: 'TeammateReviewResponseMap'}}
+        get :response_report, params
+        expect(response).to render_template('response_report')
+      end
     end
 
     context 'when type is Calibration and participant variable is nil' do
-      it 'renders response_report page with corresponding data'
+      it 'renders response_report page with corresponding data' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        expect(AssignmentParticipant).to receive_message_chain('where.first').with(any_args).and_return(participant)
+        allow(participant).to receive(:nil?).with(any_args).and_return(true)
+        expect(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
+        assignment_questionnaire = double()
+        expect(AssignmentQuestionnaire).to receive_message_chain('where.first').with(any_args).and_return(assignment_questionnaire)
+        questions = double()
+        expect(assignment_questionnaire).to receive_message_chain('questionnaire.questions.select').with(any_args).and_return(questions)
+        calibration_response_maps = double()
+        expect(ReviewResponseMap).to receive(:where).with(any_args).and_return(calibration_response_maps)
+        responses = double()
+        expect(Response).to receive(:where).with(any_args).and_return(responses)
+        params = {id: 1, report: {type: 'Calibration'}}
+        session[:user] = user
+        get :response_report, params, session
+        expect(response).to render_template('response_report')
+      end
     end
 
     context 'when type is PlagiarismCheckerReport' do
-      it 'renders response_report page with corresponding data'
+      it 'renders response_report page with corresponding data' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        plagiarism_checker_comparisons = double()
+        expect(PlagiarismCheckerComparison).to receive(:where).with(any_args).and_return(plagiarism_checker_comparisons)
+        params = {id: 1, report: {type: 'PlagiarismCheckerReport'}}
+        session[:user] = user
+        get :response_report, params, session
+        expect(response).to render_template('response_report')
+      end
     end
   end
 

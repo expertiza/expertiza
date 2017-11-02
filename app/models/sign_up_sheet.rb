@@ -1,5 +1,5 @@
 class SignUpSheet < ActiveRecord::Base
-  attr_accessible
+  attr_protected
 
   # Team lazy initialization method [zhewei, 06/27/2015]
   def self.signup_team(assignment_id, user_id, topic_id = nil)

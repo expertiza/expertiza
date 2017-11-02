@@ -29,11 +29,23 @@ describe QuestionnairesController do
 
   describe '#new' do
     context 'when params[:model] has whitespace in it' do
-      it 'creates new questionnaire object and renders questionnaires#new page'
+      it 'creates new questionnaire object and renders questionnaires#new page' do
+        params = {
+          model: "ReviewQuestionnaire"
+        }
+        get :new, params
+        expect(response).to render_template(:new)
+      end
     end
 
     context 'when params[:model] does not have whitespace in it' do
-      it 'creates new questionnaire object and renders questionnaires#new page'
+      it 'creates new questionnaire object and renders questionnaires#new page' do
+        params = {
+          model: "Teammate ReviewQuestionnaire"
+        }
+        get :new, params
+        expect(response).to render_template(:new)
+      end
     end
   end
 

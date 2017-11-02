@@ -34,35 +34,8 @@ class QuestionnairesController < ApplicationController
   end
 
   def create
-    questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
-    display_type = params[:questionnaire][:type].split('Questionnaire')[0]
-    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
-      @questionnaire = Object.const_get(params[:questionnaire][:type]).new
-    end
     begin
-      @questionnaire.private = questionnaire_private
-      @questionnaire.name = params[:questionnaire][:name]
-      @questionnaire.instructor_id = session[:user].id
-      @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-      @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-      @questionnaire.type = params[:questionnaire][:type]
-      # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-      # In the future, we need to write migration files to make them consistency.
-      case display_type
-      when 'AuthorFeedback'
-        display_type = 'Author%Feedback'
-      when 'CourseSurvey'
-        display_type = 'Course%Survey'
-      when 'TeammateReview'
-        display_type = 'Teammate%Review'
-      when 'GlobalSurvey'
-        display_type = 'Global%Survey'
-      when 'AssignmentSurvey'
-        display_type = 'Assignment%Survey'
-      end
-      @questionnaire.display_type = display_type
-      @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-      @questionnaire.save
+      save_questionnaire_create
       # Create node
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
       parent = FolderNode.find_by_node_object_id(tree_folder.id)
@@ -290,7 +263,7 @@ class QuestionnairesController < ApplicationController
 
   # save an updated quiz questionnaire to the database
   def update_quiz
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_by(id: params[:id])
     if @questionnaire.nil?
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid] 
       return
@@ -303,39 +276,12 @@ class QuestionnairesController < ApplicationController
         @question.txt = params[:question][qid.to_sym][:txt]
         @question.save
 
+        @question.set_appropriate_type
+
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i = 1
         for quiz_question_choice in @quiz_question_choices
-          if @question.type == "MultipleChoiceCheckbox"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s]
-              quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            else
-              quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-            end
-          end
-          if @question.type == "MultipleChoiceRadio"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == i.to_s
-              quiz_question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            else
-              quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            end
-          end
-          if @question.type == "TrueFalse"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
-              if quiz_question_choice.txt == "True"
-                quiz_question_choice.update_attributes(iscorrect: '1') # the statement is correct so "True" is the right answer
-              else
-                quiz_question_choice.update_attributes(iscorrect: '0')
-              end
-            else # the statement is not correct
-              if quiz_question_choice.txt == "True"
-                quiz_question_choice.update_attributes(iscorrect: '0')
-              else
-                quiz_question_choice.update_attributes(iscorrect: '1') # the statement is not correct so "False" is the right answer
-              end
-            end
-          end
-
+          @question.update_option_attributes(quiz_question_choice,params,qid,i)
           i += 1
         end
       end
@@ -375,6 +321,37 @@ class QuestionnairesController < ApplicationController
 
   private
 
+  def save_questionnaire_create
+    questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
+    display_type = params[:questionnaire][:type].split('Questionnaire')[0]
+    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+      @questionnaire = Object.const_get(params[:questionnaire][:type]).new
+    end
+    @questionnaire.private = questionnaire_private
+    @questionnaire.name = params[:questionnaire][:name]
+    @questionnaire.instructor_id = session[:user].id
+    @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    @questionnaire.type = params[:questionnaire][:type]
+    # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
+    # In the future, we need to write migration files to make them consistency.
+    case display_type
+    when 'AuthorFeedback'
+      display_type = 'Author%Feedback'
+    when 'CourseSurvey'
+      display_type = 'Course%Survey'
+    when 'TeammateReview'
+      display_type = 'Teammate%Review'
+    when 'GlobalSurvey'
+      display_type = 'Global%Survey'
+    when 'AssignmentSurvey'
+      display_type = 'Assignment%Survey'
+    end
+    @questionnaire.display_type = display_type
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    @questionnaire.save
+  end
+  
   # save questionnaire object after create or edit
   def save
     @questionnaire.save!

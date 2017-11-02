@@ -30,7 +30,7 @@ module InstructorInterfaceHelperSpec
 
   def course_setup
     create(:course)
-    create_list(:course_participant, 5)
+    create_list(:participant, 3)
     create(:course_node)
   end
 

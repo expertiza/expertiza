@@ -1,12 +1,15 @@
 describe Response do
   let(:participant2) { build(:participant, id: 2) }
+  let(:user) { User.new(id: 1, role: build(:role_of_student), name: 'no name', fullname: 'no one')}
+  let(:participant1) {Participant.new(id: 2, user: user)}
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:participant) { build(:participant, id: 1, parent_id: 1, assignment: assignment, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:team) { build(:assignment_team, id: 1) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
+  let(:review_response_map1) { build(:review_response_map, id: 2, assignment: assignment, reviewer: participant1, reviewee: team) }
   let(:answer5) { build(:answer, id:1, question_id: 5, answer: 5) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer5]) }
-  let(:response1) { build(:response, id: 2, map_id: 1, response_map: review_response_map, scores: [answer2]) }
+  let(:response1) { build(:response, id: 2, map_id: 2, response_map: review_response_map1, scores: [answer2]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
@@ -16,7 +19,7 @@ describe Response do
   let(:questionnaire1) { build(:questionnaire) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
-
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, notification_limit: 50) }
 
   describe '#response_id' do
     it 'returns the id of current response' do
@@ -27,11 +30,15 @@ describe Response do
   describe '#display_as_html' do
     context 'when prefix is not nil, which means view_score page in instructor end' do
       it 'returns corresponding html code' do
+        output = "<h4><B>Review </B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_instructor_2Link\" onClick=\"toggleElement('review_instructor_2','review');return false;\">show review</a><BR/><table id=\"review_instructor_2\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional Comment: </b></td></tr></table>"
+        expect(response1.display_as_html('instructor')).to eq output
       end
     end
 
     context 'when prefix is nil, which means view_score page in student end and question type is TextArea' do
       it 'returns corresponding html code' do
+        output = "<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false;\">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional Comment: </b></td></tr></table>"
+        expect(response.display_as_html).to eq output
       end
     end
   end
@@ -68,7 +75,8 @@ describe Response do
 
   describe '#email' do
     it 'calls email method in corresponding response maps' do
-      # We need not test this method, as it calls email method of ReviewResponseMap.rb model.
+      expect(response).to receive(:email)
+      response.email
     end
   end
 
@@ -112,12 +120,22 @@ describe Response do
   describe '#significant_difference?' do
     context 'when count is 0' do
       it 'returns false' do
+        existingResponse = [response]
+        allow(Response).to receive(:get_assessments_for).and_return(existingResponse)
+        allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).and_return([0,0])
+        expect(response.significant_difference?).to eq false
       end
     end
 
     context 'when count is not 0' do
       context 'when the difference between average score on same artifact from others and current score is bigger thatn allowed percentage' do
         it 'returns true' do
+          existingResponse = [response]
+          allow(Response).to receive(:get_assessments_for).and_return(existingResponse)
+          allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).and_return([2.0,1])
+          allow(Question).to receive(:find).and_return(question3)
+          allow(AssignmentQuestionnaire).to receive(:find_by).and_return(assignment_questionnaire)
+          expect(response.significant_difference?).to eq true
         end
       end
     end

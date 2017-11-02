@@ -28,16 +28,16 @@ class Response < ActiveRecord::Base
 
     if prefix
       self_id = prefix + '_' + self.id.to_s
-      puts "In Instructor"
+						  
       code = construct_instructor_html identifier, self_id, count
     else
       self_id = self.id.to_s
-      puts "In Student"
+					   
       code = construct_student_html identifier, self_id, count
     end
 
     code = construct_review_response code, self_id
-    puts code.html_safe
+					   
     code.html_safe
   end
 
@@ -68,8 +68,12 @@ class Response < ActiveRecord::Base
       questions = questionnaire.questions.sort_by(&:seq)
       code = add_table_rows questionnaire_max, questions, answers, code
     end
-
-    #code += '<tr><td><b>Additional Comment: </b>' + additional_comment + '</td></tr>'
+    comment = if !self.additional_comment.nil?
+                self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
+              else
+                ''
+              end
+    code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
     code += '</table>'
   end
 
@@ -95,14 +99,14 @@ class Response < ActiveRecord::Base
     code
   end
 
-  def additional_comment
-    comment = if !self.additional_comment.nil?
-                self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
-              else
-                ''
-              end
-    comment
-  end
+						
+											  
+																		  
+				  
+				  
+				 
+		   
+	 
 
   # Computes the total score awarded for a review
   def total_score
@@ -162,7 +166,7 @@ class Response < ActiveRecord::Base
               response_map.survey_parent
             else
               Assignment.find(participant.parent_id)
-            end
+             end
     defn[:subject] = "A new submission is available for " + parent.name
     response_map.email(defn, participant, parent)
   end

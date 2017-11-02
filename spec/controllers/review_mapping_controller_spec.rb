@@ -1,22 +1,21 @@
 require 'rails_helper'
 describe ReviewMappingController do
-  let(:assignment) { double('Assignment', id: 1) }
+  let(:assignment) {double('Assignment', id: 1)}
   let(:review_response_map) do
     double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+           reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:metareview_response_map) do
     double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                    reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+           reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
-  let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
-  let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
-  let(:user) { double('User', id: 3) }
-  let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
-  let(:team) { double('AssignmentTeam', name: 'no one') }
-  let(:team1) { double('AssignmentTeam', name: 'no one1') }
-  let(:resp) { double('Response', is_submitted: false) }
-
+  let(:participant) {double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1))}
+  let(:participant1) {double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2))}
+  let(:user) {double('User', id: 3)}
+  let(:participant2) {double('AssignmentParticipant', id: 3, can_review: true, user: user)}
+  let(:team) {double('AssignmentTeam', name: 'no one')}
+  let(:team1) {double('AssignmentTeam', name: 'no one1')}
+  let(:resp) {double('Response', is_submitted: false)}
 
 
   before(:each) do
@@ -65,7 +64,6 @@ describe ReviewMappingController do
         expect(flash[:error]) =~ /you cannot assign this student to review his.*her own artifact/i
         expect(response).to redirect_to action: 'list_mappings', id: assignment.id
       end
-
     end
 
     context 'when team_user exists and get_reviewer method returns a reviewer' do
@@ -248,10 +246,10 @@ describe ReviewMappingController do
         expect(ReviewResponseMap).to receive(:find_by).and_return(review_response_map)
         expect(resp).to receive(:update_attribute).and_return(true)
         xhr :get, :unsubmit_review, format: :json
-         expect(flash.now[:success]).to eq("The review by \"" +
-                                          review_response_map.reviewer.name +
-                                           "\" for \"" + review_response_map.reviewee.name +
-                                           "\" has been unsubmitted.")
+        expect(flash.now[:success]).to eq("The review by \"" +
+                                              review_response_map.reviewer.name +
+                                              "\" for \"" + review_response_map.reviewee.name +
+                                              "\" has been unsubmitted.")
         expect(response).to render_template('unsubmit_review.js.erb')
       end
     end
@@ -263,10 +261,10 @@ describe ReviewMappingController do
         expect(resp).to receive(:update_attribute).and_return(false)
         xhr :get, :unsubmit_review, format: :json
         expect(flash.now[:error]).to eq("The review by \"" + review_response_map.reviewer.name +
-                                        "\" for \"" + review_response_map.reviewee.name +
-                                        "\" could not be unsubmitted.")
-      expect(response).to render_template('unsubmit_review.js.erb')
-    end
+                                            "\" for \"" + review_response_map.reviewee.name +
+                                            "\" could not be unsubmitted.")
+        expect(response).to render_template('unsubmit_review.js.erb')
+      end
     end
   end
 
@@ -279,7 +277,7 @@ describe ReviewMappingController do
         get :delete_reviewer
         expect(flash[:success]).to be_present
         expect(response).to redirect_to (:back)
-        end
+      end
     end
 
     context 'when corresponding response exists to current review response map' do
@@ -338,27 +336,68 @@ describe ReviewMappingController do
       get :list_mappings, params
       expect(flash[:error]).to eq(params[:msg])
       expect(response).to render_template('review_mapping/list_mappings')
-
     end
   end
 
   describe '#automatic_review_mapping' do
     context 'when teams is not empty' do
       context 'when all nums in params are 0' do
-        it 'shows an error flash message and redirects to review_mapping#list_mappings page'
+        it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
+          expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+          expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+          allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
+          allow(team).to receive(:empty?).and_return(false)
+          get :automatic_review_mapping, :id =>1, :student_review_num =>0, :submission_review_num=>0, :calibrated_artifacts_num=>0,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>0
+          expect(flash[:error]) =~ /Please choose either the number of reviews per student or the number of reviewers per team (student), not both./i
+          expect(response).to redirect_to action: 'list_mappings', id: 1
+        end
       end
 
       context 'when all nums in params are 0 except student_review_num' do
-        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page'
+        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page'do
+          expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+          expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+          allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
+          allow(team).to receive(:empty?).and_return(false)
+          get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>0, :calibrated_artifacts_num=>0,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>0
+          allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args)
+          expect(response).to redirect_to action: 'list_mappings', id:1
+        end
       end
 
       context 'when calibrated params are not 0' do
-        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page'
+        it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
+          expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+          expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+          allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+          allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
+          allow(team).to receive(:empty?).and_return(false)
+          get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>0, :calibrated_artifacts_num=>1,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>0
+          allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args)
+          expect(response).to redirect_to action: 'list_mappings', id:1
+        end
       end
     end
 
     context 'when teams is empty, max team size is 1 and when review params are not 0' do
-      it 'shows an error flash message and redirects to review_mapping#list_mappings page'
+      it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
+        expect(AssignmentParticipant).to receive_message_chain("where.to_a.reject.shuffle!").with(any_args).and_return(participant)
+        expect(AssignmentTeam).to receive_message_chain("where.to_a.shuffle!").with(any_args).and_return(team)
+        allow_any_instance_of(ReviewMappingController).to receive(:team_size).with(any_args)
+        allow_any_instance_of(ReviewMappingController).to receive(:artifacts_num).with(any_args)
+        allow(team).to receive(:empty?).and_return(true)
+        expect(participant).to receive(:each).and_return(participant)
+        #expect(participant).to receive(:user).and_return(user)
+        get :automatic_review_mapping, :id =>1, :student_review_num =>1, :submission_review_num=>1, :calibrated_artifacts_num=>1,
+              :uncalibrated_artifacts_num=>0, :max_team_size=>1
+        expect(flash[:error]) =~ /Please choose either the number of reviews per student or the number of reviewers per team (student), not both./i
+        expect(response).to redirect_to action: 'list_mappings', id: 1
+      end
     end
   end
 
@@ -366,11 +405,10 @@ describe ReviewMappingController do
     it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
       expect(Assignment).to receive(:find).and_return(assignment)
       allow(assignment).to receive(:assign_reviewers_staggered).with(any_args).and_return("check")
-      get :automatic_review_mapping_staggered,  id: assignment.id, assignment: {num_reviews: '1', num_metareviews:'2' }
+      get :automatic_review_mapping_staggered, id: assignment.id, assignment: {num_reviews: '1', num_metareviews: '2'}
       expect(flash[:note]).to be_present
       expect(response).to redirect_to ('/review_mapping/list_mappings?id=' +assignment.id.to_s)
-
-   end
+    end
   end
 
   describe 'response_report' do
@@ -500,7 +538,17 @@ describe ReviewMappingController do
 
   describe '#save_grade_and_comment_for_reviewer' do
     it 'redirects to review_mapping#response_report page' do
-
+      review_grade = double()
+      expect(ReviewGrade).to receive(:find_by).with(any_args).and_return(review_grade)
+      allow(review_grade).to receive(:nil?).and_return(false)
+      allow(review_grade).to receive(:grade_for_reviewer=).with(any_args)
+      allow(review_grade).to receive(:comment_for_reviewer=).with(any_args)
+      allow(review_grade).to receive(:review_graded_at=).with(any_args)
+      allow(review_grade).to receive(:reviewer_id=).with(any_args)
+      allow(review_grade).to receive(:save)
+      allow_any_instance_of(ApplicationController).to receive(:session).and_return( user: user )
+      get :save_grade_and_comment_for_reviewer, :assignment_id => 1
+      expect(response).to redirect_to controller: 'review_mapping', action: 'response_report', id:1
     end
   end
 
@@ -530,5 +578,5 @@ describe ReviewMappingController do
       end
     end
   end
-  end
+end
 

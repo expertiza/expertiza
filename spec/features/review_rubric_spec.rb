@@ -6,23 +6,6 @@ describe "Edit rubric advice" do
     assignment_setup
   end
 
-  # Login test
-  describe "Login as instructor" do
-    it "logs in with valid username and password" do
-      login_as("instructor6")
-      visit '/tree_display/list'
-      expect(page).to have_content("Manage content")
-    end
-
-    it "logs in with invalid username and password" do
-      visit root_path
-      fill_in 'login_name', with: 'instructor6'
-      fill_in 'login_password', with: 'wrongpassword'
-      click_button 'SIGN IN'
-      expect(page).to have_text('Your username or password is incorrect.')
-    end
-  end
-
   def load_questionnaire
     login_as("instructor6")
     visit '/questionnaires/new?model=ReviewQuestionnaire&private=0'

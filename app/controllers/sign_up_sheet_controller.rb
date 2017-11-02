@@ -93,6 +93,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def save_duplicate_topic(topic, assignment_id, available_slots, max_choosers)
+    # If the available slots are 0 or max, do not duplicate topic else call assign_values method and duplicate topic
     if available_slots.zero? || available_slots == max_choosers
       redirect_to edit_assignment_path(assignment_id) + "#tabs-2"
       display_error(available_slots, topic.topic_identifier)
@@ -104,6 +105,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def display_error(available_slots, topic_identifier)
+    # decide the error message to be displayed according the number of available slots
     flash[:error] = "Instead of duplicating the topic " + topic_identifier + " extend the due date since all slots are available." unless available_slots.zero?
     flash[:error] = "Try duplicating the topic " + topic_identifier + " after increasing number of slots since all slots are filled." if available_slots.zero?
   end
@@ -113,31 +115,36 @@ class SignUpSheetController < ApplicationController
   end
 
   def get_available_slots(assignment_id)
+    # get slots that are taken up by participants
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     found_in_slots = false
     for slot in @slots_filled
+      # subtract one from max_choosers for every occupied slot of topic to be duplicated
       if slot.topic_id.to_s == @topic.id.to_s
         available_slots = @topic.max_choosers.to_int - slot.count.to_i
         found_in_slots = true
       end
     end
+    # if no slots are occupied, it means all slots are available
     available_slots = @topic.max_choosers unless found_in_slots
     available_slots
   end
 
   def assign_values_for_duplicate_topic(topic, assignment_id, available_slots)
+    # populate topic attributes for the dulpicate topic
     @topic = topic
     @duplicate_topic = SignUpTopic.new
     @duplicate_topic.assignment_id = assignment_id
     @duplicate_topic.topic_identifier = @topic.topic_identifier
     @duplicate_topic.category = @topic.category
-    @duplicate_topic.topic_name = @topic.topic_name + " copy"
-    @duplicate_topic.max_choosers = available_slots
+    @duplicate_topic.topic_name = @topic.topic_name + " copy" # Append "copy" to topic name
+    @duplicate_topic.max_choosers = available_slots # since max_choosers for copy will be no of available slots in the original topic
     @duplicate_topic.micropayment = @topic.micropayment
     @duplicate_topic.description = @topic.description
     @duplicate_topic.link = @topic.link
     @duplicate_topic.save
   end
+  # Project E1763. End of duplicate topic method.
 
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
   def update
@@ -408,9 +415,13 @@ class SignUpSheetController < ApplicationController
             )
           else # update an existed record
             # E1763, added new due dates for selected topics
+
+            # current deadline from the topics table
             current_topic_due_date = instance_variable_get('@topic_' + deadline_type + '_due_date')
 
+            # check if this topic is selected.
             if !params[:selected_ids].nil? and params[:selected_ids].include? index.to_s
+              # set the deadline to the new deadline that was input by the instructor
               current_topic_due_date = due_dates['selected_topics' + '_' + deadline_type + '_' + i.to_s + '_due_date']
             end
 

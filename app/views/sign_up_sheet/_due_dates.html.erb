@@ -30,7 +30,7 @@
 </table>
 <br/>
 
-
+<!--Project E1763. Add a table for new deadlines -->
 <h4>New deadline for selected topics</h4>
 <table class="general">
   <tr>
@@ -42,6 +42,7 @@
     <%end%>
   </tr>
   <tr>
+<!-- set the new deadline to the lastest deadline among all the topics-->
 <% for review_round in 1..review_rounds %>
     <% topic_id = @assignment.sign_up_topics[get_latest_topic_deadline(assignment_submission_due_dates,@assignment.sign_up_topics)].id %>
     <td><%= text_field :due_date, ('selected_topics_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round) %></td>
@@ -53,26 +54,28 @@
 
 
 <%= submit_tag "Save start/due dates" %>
-<!--Project E1763. JavaScript for SHIIF + multiselect.-->
+<!--Project E1763. JavaScript for SHIFT + multiselect.-->
 <script type="text/javascript">
 $(document).ready(function() {
 var $chkboxes = $('.chkbox');
 var lastChecked = null;
 
+// save last checked checkbox
 $chkboxes.click(function(e) {
 if(!lastChecked) {
 lastChecked = this;
 return;
 }
 
+// check if shift key is pressed and save index of start and end checkbox
 if(e.shiftKey) {
 var start = $chkboxes.index(this);
 var end = $chkboxes.index(lastChecked);
 
+// change state of selected checkbox to true
 $chkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).prop('checked', lastChecked.checked);
 
 }
-
 lastChecked = this;
 });
 });

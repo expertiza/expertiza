@@ -10,6 +10,7 @@ module SignUpSheetHelper
   def get_latest_topic_deadline(assignment_due_dates, sign_up_topics)
     lastest_deadline_id = 0
     latest_due_date = get_topic_deadline(assignment_due_dates, sign_up_topics[0].id).to_datetime
+    # loop through all the topics and save the id of the topic with the latest deadline
     (1..(sign_up_topics.size - 1)).each do |i|
       due_date = get_topic_deadline(assignment_due_dates, sign_up_topics[i].id).to_datetime
       if due_date.to_f > latest_due_date.to_f
@@ -17,6 +18,7 @@ module SignUpSheetHelper
         lastest_deadline_id = i
       end
     end
+
     lastest_deadline_id
   end
 

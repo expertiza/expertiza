@@ -349,6 +349,7 @@ FactoryGirl.define do
   end
 
   factory :review_response_map, class: ReviewResponseMap do
+    reviewer { AssignmentParticipant.first || association(:participant) }
     assignment { Assignment.first || association(:assignment) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
     reviewer_id 1

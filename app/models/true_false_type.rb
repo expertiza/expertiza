@@ -1,4 +1,4 @@
-class TrueFalse
+class TrueFalseType
 
 	@question_type = "TrueFalse"
 

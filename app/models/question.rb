@@ -79,11 +79,11 @@ class Question < ActiveRecord::Base
 
   def set_appropriate_type
     if type == "MultipleChoiceCheckbox"
-      @type_object = MultipleChoiceCheckbox.new
+      @type_object = MultipleChoiceCheckboxType.new
     elsif type == "MultipleChoiceRadio"
-      @type_object = MultipleChoiceRadio.new
+      @type_object = MultipleChoiceRadioType.new
     elsif type == "TrueFalse"
-      @type_object = TrueFalse.new
+      @type_object = TrueFalseType.new
     end
   end
 

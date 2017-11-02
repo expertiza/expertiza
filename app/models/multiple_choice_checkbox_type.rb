@@ -1,4 +1,4 @@
-class MultipleChoiceCheckbox
+class MultipleChoiceCheckboxType
 
 	@question_type = "MultipleChoiceCheckbox"
 

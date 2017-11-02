@@ -1,4 +1,4 @@
-class MultipleChoiceRadio
+class MultipleChoiceRadioType
 	
 	@question_type = "MultipleChoiceRadio"
 

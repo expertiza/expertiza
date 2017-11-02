@@ -33,7 +33,7 @@ describe ReviewMappingController do
         allow(participant).to receive(:nil?).and_return(false)
         expect(ReviewResponseMap).to receive_message_chain("where.first").with(any_args).and_return(review_response_map)
         params = {id: 1, team_id: 1}
-        session[:user] = 1
+        session[:user] = user
         post :add_calibration, params, session
         expect(response).to redirect_to controller: 'response', action: 'new', id: review_response_map.id, assignment_id: params[:id], return: 'assignment_edit'
       end
@@ -47,8 +47,10 @@ describe ReviewMappingController do
         expect(ReviewResponseMap).to receive_message_chain("where.first").with(any_args).and_return(review_response_map)
         expect(review_response_map).to receive(:nil?).and_return(true)
         expect(ReviewResponseMap).to receive(:create).with(any_args).and_return(review_response_map)
-        post :add_calibration
-        expect(response).to redirect_to controller: 'response', action: 'new'
+        params = {id: 1, team_id: 1}
+        session[:user] = user
+        post :add_calibration, params, session
+        expect(response).to redirect_to controller: 'response', action: 'new', id: review_response_map.id, assignment_id: params[:id], return: 'assignment_edit'
       end
     end
   end
@@ -171,20 +173,32 @@ describe ReviewMappingController do
   describe '#delete_outstanding_reviewers' do
     context 'when review response map has corresponding responses' do
       it 'shows a flash error and redirects to review_mapping#list_mappings page' do
-        #num_remain_review_response_maps=double()
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
         expect(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
-        review_response_maps = double()
+        review_response_maps = double(id: 1)
         expect(team).to receive(:review_mappings).with(any_args).and_return(review_response_maps)
-        num_remain_review_response_maps = double(id: -1)
-        expect(review_response_maps).to receive(:size).with(any_args).and_return(num_remain_review_response_maps)
-        expect(num_remain_review_response_maps.id).to eq(-1)
+        num_remain_review_response_maps = double()
+        expect(review_response_maps).to receive(:size).and_return(2)
+        expect(review_response_maps).to receive(:each).with(any_args).and_yield(review_response_map)
+        expect(ReviewResponseMap).to receive_message_chain('find.destroy').with(any_args)
         get :delete_outstanding_reviewers
-        expect(flash[:error]).to eq("#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they have already started a review.")
+        expect(flash[:error]).to eq("1 reviewer(s) cannot be deleted because they have already started a review.")
       end
     end
 
     context 'when review response map does not have corresponding responses' do
-      it 'shows a flash success and redirects to review_mapping#list_mappings page'
+      it 'shows a flash success and redirects to review_mapping#list_mappings page' do
+        expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        expect(AssignmentTeam).to receive(:find).with(any_args).and_return(team)
+        review_response_maps = double(id: 1)
+        expect(team).to receive(:review_mappings).with(any_args).and_return(review_response_maps)
+        num_remain_review_response_maps = double()
+        expect(review_response_maps).to receive(:size).and_return(-1)
+        expect(review_response_maps).to receive(:each).with(any_args).and_yield(review_response_map)
+        expect(ReviewResponseMap).to receive_message_chain('find.destroy').with(any_args)
+        get :delete_outstanding_reviewers
+        expect(flash[:success]).to eq("All review mappings for \"#{team.name}\" have been deleted.")
+      end
     end
   end
 
@@ -305,7 +319,17 @@ describe ReviewMappingController do
   end
 
   describe '#list_mappings' do
-    it 'renders review_mapping#list_mappings page'
+    it 'renders review_mapping#list_mappings page' do
+      params = {msg: 'error', id: 1}
+      expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
+      items = double()
+      expect(AssignmentTeam).to receive(:where).with(any_args).and_return(items)
+      expect(items).to receive(:sort)
+      get :list_mappings, params
+      expect(flash[:error]).to eq(params[:msg])
+      expect(response).to render_template('review_mapping/list_mappings')
+
+    end
   end
 
   describe '#automatic_review_mapping' do
@@ -342,8 +366,8 @@ describe ReviewMappingController do
   describe 'response_report' do
     context 'when type is SummaryByRevieweeAndCriteria' do
       it 'renders response_report page with corresponding data' do
-        expect(Assignment).to receive(:find).and_return(assignment)
-        type = double()
+        expect(SummaryHelper::Summary).to receive_message_chain('new.summarize_reviews_by_reviewees').with(any_args).and_return(sum)
+        
       end
     end
 

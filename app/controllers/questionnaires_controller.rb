@@ -281,7 +281,7 @@ class QuestionnairesController < ApplicationController
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i = 1
         for quiz_question_choice in @quiz_question_choices
-          @question.update_option_attributes(quiz_question_choice,params,i)
+          @question.update_option_attributes(quiz_question_choice,params,qid,i)
           i += 1
         end
       end

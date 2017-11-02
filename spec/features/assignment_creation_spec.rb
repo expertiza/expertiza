@@ -385,15 +385,27 @@ describe "assignment function" do
     end
 
     it "Add new topic" do
-      click_link 'New topic'
-      click_button 'OK'
-      fill_in 'topic_topic_identifier', with: '1'
-      fill_in 'topic_topic_name', with: 'Test'
-      fill_in 'topic_category', with: 'Test Category'
-      fill_in 'topic_max_choosers', with: 2
-      click_button 'Create'
+      #click_link 'New topic'
+      #click_button 'OK'
+      
+      #fill_in 'topic_topic_identifier', with: '1'
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[1]").set("1")
+
+      #fill_in 'topic_topic_name', with: 'Test'
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[2]").set("Test")
+
+      #fill_in 'topic_category', with: 'Test Category'
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[3]").set("Test Category")
+
+
+      #fill_in 'topic_max_choosers', with: 2
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[4]").set("2")
+
+      #click_button 'Create'
+       all(:xpath, '//input[@title="Insert"]')[0].click
 
       sign_up_topics = SignUpTopic.where(topic_name: 'Test').first
+
       expect(sign_up_topics).to have_attributes(
         topic_name: 'Test',
         assignment_id: 1,

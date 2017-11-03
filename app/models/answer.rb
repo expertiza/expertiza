@@ -2,6 +2,7 @@ require 'analytic/score_analytic'
 
 class Answer < ActiveRecord::Base
   include ScoreAnalytic
+  include ActiveModel::ForbiddenAttributesProtection
   belongs_to :question
   belongs_to :response
 

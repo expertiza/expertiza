@@ -1,0 +1,19 @@
+<h1>Sending request to join team "<%= Team.find(params[:team_id]).name %>" </h1>
+<%= form_tag :action => 'create', :assignment_id=>params[:assignment_id],:team_id=>params[:team_id],:controller => 'join_team_requests' do %>
+  <%= form_for(@join_team_request) do |f| %>
+    <p>
+      <b>Desired Qualification</b>   <br>
+      <%= Team.find(params[:team_id]).comments_for_advertisement %>
+    </p>
+    <p>
+      <p>Comments <img src="/assets/info.png" title="Please specify why you are qualified."></p>
+      <br>
+      <%= text_area 'comments', "" %>
+    </p>
+    <p>
+      <%= f.submit 'Create' %>
+    </p>
+  <% end %>
+<% end %>
+
+

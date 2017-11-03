@@ -1,0 +1,804 @@
+development:
+  :credentials: !ruby/object:Credentials
+    actions:
+      content_pages:
+        view_default: true
+        view: true
+        list: false
+      roles:
+        list: false
+      permissions:
+        list: false
+      auth:
+        login: true
+        logout: true
+        login_failed: true
+      menu_items:
+        link: true
+        list: false
+      site_controllers:
+        list: false
+      controller_actions:
+        list: false
+      system_settings:
+        list: false
+      users:
+        list: false
+        keys: false
+      admin:
+        list_instructors: false
+        list_administrators: false
+        list_super_administrators: false
+      course:
+        list_folders: false
+        add_ta: false
+        destroy_course: false
+        edit_course: false
+        new_course: false
+        new_folder: false
+        remove_ta: false
+        update_course: false
+        view_teaching_assistants: false
+        create_course: false
+        list: false
+      suggestion:
+        create: false
+        new: false
+      questionnaire:
+        list: false
+        create_questionnaire: false
+        edit_questionnaire: false
+        copy_questionnaire: false
+        save_questionnaire: false
+        new_quiz: false
+        create_quiz_questionnaire: false
+        update_quiz: false
+        edit_quiz: false
+        view_quiz: false
+      participants:
+        add_student: false
+        edit_team_members: false
+        list_students: false
+        list_courses: false
+        list_assignments: false
+        change_handle: false
+      assignment:
+        list: false
+      institution:
+        list: false
+      student_task:
+        list: false
+      profile:
+        edit: false
+      survey_response:
+        create: true
+        submit: true
+      team:
+        list: false
+        list_assignments: false
+      teams_users:
+        list: false
+      course_evaluation:
+        list: false
+      survey_deployment:
+        list: false
+      statistics:
+        list_surveys: false
+      impersonate:
+        start: false
+        impersonate: false
+      review_mapping:
+        list: false
+        assign_reviewer_dynamically: false
+        release_reservation: false
+        show_available_submissions: false
+        assign_metareviewer_dynamically: false
+        add_self_reviewer: false
+        assign_quiz_dynamically: false
+      tree_display:
+        list: false
+        drill: false
+        goto_questionnaires: false
+        goto_author_feedbacks: false
+        goto_review_rubrics: false
+        goto_global_survey: false
+        goto_surveys: false
+        goto_course_evaluations: false
+        goto_courses: false
+        goto_assignments: false
+        goto_teammate_reviews: false
+        goto_metareview_rubrics: false
+        goto_teammatereview_rubrics: false
+      grades:
+        view_my_scores: false
+      sign_up_sheet:
+        signup_topics: false
+        signup: false
+        delete_signup: false
+        team_details: false
+      review_files:
+        show_code_file: false
+        show_code_file_diff: false
+        show_all_submitted_files: false
+        submit_comment: false
+        submit_review_file: false
+      popup:
+        automated_metareview_details_popup: false
+      advice:
+        edit_advice: false
+        save_advice: false
+      response:
+        delete: false
+      analytic:
+        assignment_list: false
+        course_list: false
+        get_graph_data_bundle: false
+        graph_data_type_list: false
+        index: false
+        init: false
+        render_sample: false
+        team_list: false
+      advertise_for_partner:
+        remove: false
+      versions:
+        revert: true
+    controllers:
+      content_pages: false
+      controller_actions: false
+      auth: false
+      markup_styles: false
+      menu_items: false
+      permissions: false
+      roles: false
+      site_controllers: false
+      system_settings: false
+      users: false
+      roles_permissions: false
+      admin: false
+      course: false
+      assignment: false
+      questionnaire: false
+      participants: false
+      reports: false
+      institution: false
+      student_task: false
+      profile: false
+      survey_response: true
+      team: false
+      teams_users: false
+      import_file: false
+      course_evaluation: false
+      participant_choices: false
+      survey_deployment: false
+      statistics: false
+      impersonate: false
+      review_mapping: false
+      grades: false
+      tree_display: false
+      student_team: false
+      invitation: false
+      survey: false
+      password_retrieval: true
+      submitted_content: false
+      eula: false
+      student_review: false
+      publishing: false
+      export_file: false
+      response: false
+      popup: false
+      sign_up_sheet: false
+      suggestion: false
+      delete_object: false
+      assessment360: false
+      review_files: false
+      advertise_for_partners: false
+      join_team_requests: false
+      advertise_for_partner: false
+      automated_metareviews: false
+      advice: false
+      analytic: false
+      versions: true
+      student_quiz: false
+    pages:
+      home: true
+      expired: true
+      notfound: true
+      denied: true
+      contact_us: true
+      site_admin: false
+      adminpage: false
+      credits: true
+      wiki: true
+    permission_ids:
+    - 4
+    - 3
+    role_id: 5
+    role_ids:
+    - 5
+    updated_at: 2015-06-11 15:23:44.000000000 Z
+  :menu: !ruby/object:Menu
+    by_id:
+      1: &1 !ruby/object:Menu::Node
+        content_page_id: 1
+        controller_action_id:
+        id: 1
+        label: Home
+        name: home
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/home"
+      2: &2 !ruby/object:Menu::Node
+        content_page_id: 6
+        controller_action_id:
+        id: 2
+        label: Contact Us
+        name: contact_us
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/contact_us"
+        children:
+        - 14
+      14: &4 !ruby/object:Menu::Node
+        content_page_id: 10
+        controller_action_id:
+        id: 14
+        label: Credits &amp; Licence
+        name: credits
+        parent:
+        parent_id: 2
+        site_controller_id:
+        url: "/credits"
+    by_name:
+      home: *1
+      contact_us: *2
+      credits: *4
+    crumbs:
+    - 1
+    root: &5 !ruby/object:Menu::Node
+      parent:
+      children:
+      - 1
+      - 2
+    selected:
+      1: *1
+    vector:
+    - *5
+    - *1
+test:
+  :credentials: !ruby/object:Credentials
+    actions:
+      content_pages:
+        view_default: true
+        view: true
+        list: false
+      roles:
+        list: false
+      permissions:
+        list: false
+      auth:
+        login: true
+        logout: true
+        login_failed: true
+      menu_items:
+        link: true
+        list: false
+      site_controllers:
+        list: false
+      controller_actions:
+        list: false
+      system_settings:
+        list: false
+      users:
+        list: false
+        keys: false
+      admin:
+        list_instructors: false
+        list_administrators: false
+        list_super_administrators: false
+      course:
+        list_folders: false
+        add_ta: false
+        destroy_course: false
+        edit_course: false
+        new_course: false
+        new_folder: false
+        remove_ta: false
+        update_course: false
+        view_teaching_assistants: false
+        create_course: false
+        list: false
+      suggestion:
+        create: false
+        new: false
+      questionnaire:
+        list: false
+        create_questionnaire: false
+        edit_questionnaire: false
+        copy_questionnaire: false
+        save_questionnaire: false
+        new_quiz: false
+        create_quiz_questionnaire: false
+        update_quiz: false
+        edit_quiz: false
+        view_quiz: false
+      participants:
+        add_student: false
+        edit_team_members: false
+        list_students: false
+        list_courses: false
+        list_assignments: false
+        change_handle: false
+      assignment:
+        list: false
+      institution:
+        list: false
+      student_task:
+        list: false
+      profile:
+        edit: false
+      survey_response:
+        create: true
+        submit: true
+      team:
+        list: false
+        list_assignments: false
+      teams_users:
+        list: false
+      course_evaluation:
+        list: false
+      survey_deployment:
+        list: false
+      statistics:
+        list_surveys: false
+      impersonate:
+        start: false
+        impersonate: false
+      review_mapping:
+        list: false
+        assign_reviewer_dynamically: false
+        release_reservation: false
+        show_available_submissions: false
+        assign_metareviewer_dynamically: false
+        add_self_reviewer: false
+        assign_quiz_dynamically: false
+      tree_display:
+        list: false
+        drill: false
+        goto_questionnaires: false
+        goto_author_feedbacks: false
+        goto_review_rubrics: false
+        goto_global_survey: false
+        goto_surveys: false
+        goto_course_evaluations: false
+        goto_courses: false
+        goto_assignments: false
+        goto_teammate_reviews: false
+        goto_metareview_rubrics: false
+        goto_teammatereview_rubrics: false
+      grades:
+        view_my_scores: false
+      sign_up_sheet:
+        signup_topics: false
+        signup: false
+        delete_signup: false
+        team_details: false
+      review_files:
+        show_code_file: false
+        show_code_file_diff: false
+        show_all_submitted_files: false
+        submit_comment: false
+        submit_review_file: false
+      popup:
+        automated_metareview_details_popup: false
+      advice:
+        edit_advice: false
+        save_advice: false
+      response:
+        delete: false
+      analytic:
+        assignment_list: false
+        course_list: false
+        get_graph_data_bundle: false
+        graph_data_type_list: false
+        index: false
+        init: false
+        render_sample: false
+        team_list: false
+      advertise_for_partner:
+        remove: false
+      versions:
+        revert: true
+    controllers:
+      content_pages: false
+      controller_actions: false
+      auth: false
+      markup_styles: false
+      menu_items: false
+      permissions: false
+      roles: false
+      site_controllers: false
+      system_settings: false
+      users: false
+      roles_permissions: false
+      admin: false
+      course: false
+      assignment: false
+      questionnaire: false
+      participants: false
+      reports: false
+      institution: false
+      student_task: false
+      profile: false
+      survey_response: true
+      team: false
+      teams_users: false
+      import_file: false
+      course_evaluation: false
+      participant_choices: false
+      survey_deployment: false
+      statistics: false
+      impersonate: false
+      review_mapping: false
+      grades: false
+      tree_display: false
+      student_team: false
+      invitation: false
+      survey: false
+      password_retrieval: true
+      submitted_content: false
+      eula: false
+      student_review: false
+      publishing: false
+      export_file: false
+      response: false
+      popup: false
+      sign_up_sheet: false
+      suggestion: false
+      delete_object: false
+      assessment360: false
+      review_files: false
+      advertise_for_partners: false
+      join_team_requests: false
+      advertise_for_partner: false
+      automated_metareviews: false
+      advice: false
+      analytic: false
+      versions: true
+      student_quiz: false
+    pages:
+      home: true
+      expired: true
+      notfound: true
+      denied: true
+      contact_us: true
+      site_admin: false
+      adminpage: false
+      credits: true
+      wiki: true
+    permission_ids:
+    - 4
+    - 3
+    role_id: 5
+    role_ids:
+    - 5
+    updated_at: 2015-06-11 15:23:44.000000000 Z
+  :menu: !ruby/object:Menu
+    by_id:
+      1: &1 !ruby/object:Menu::Node
+        content_page_id: 1
+        controller_action_id:
+        id: 1
+        label: Home
+        name: home
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/home"
+      2: &2 !ruby/object:Menu::Node
+        content_page_id: 6
+        controller_action_id:
+        id: 2
+        label: Contact Us
+        name: contact_us
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/contact_us"
+        children:
+        - 14
+      14: &4 !ruby/object:Menu::Node
+        content_page_id: 10
+        controller_action_id:
+        id: 14
+        label: Credits &amp; Licence
+        name: credits
+        parent:
+        parent_id: 2
+        site_controller_id:
+        url: "/credits"
+    by_name:
+      home: *1
+      contact_us: *2
+      credits: *4
+    crumbs:
+    - 1
+    root: &5 !ruby/object:Menu::Node
+      parent:
+      children:
+      - 1
+      - 2
+    selected:
+      1: *1
+    vector:
+    - *5
+    - *1
+production:
+  :credentials: !ruby/object:Credentials
+    actions:
+      content_pages:
+        view_default: true
+        view: true
+        list: false
+      roles:
+        list: false
+      permissions:
+        list: false
+      auth:
+        login: true
+        logout: true
+        login_failed: true
+      menu_items:
+        link: true
+        list: false
+      site_controllers:
+        list: false
+      controller_actions:
+        list: false
+      system_settings:
+        list: false
+      users:
+        list: false
+        keys: false
+      admin:
+        list_instructors: false
+        list_administrators: false
+        list_super_administrators: false
+      course:
+        list_folders: false
+        add_ta: false
+        destroy_course: false
+        edit_course: false
+        new_course: false
+        new_folder: false
+        remove_ta: false
+        update_course: false
+        view_teaching_assistants: false
+        create_course: false
+        list: false
+      suggestion:
+        create: false
+        new: false
+      questionnaire:
+        list: false
+        create_questionnaire: false
+        edit_questionnaire: false
+        copy_questionnaire: false
+        save_questionnaire: false
+        new_quiz: false
+        create_quiz_questionnaire: false
+        update_quiz: false
+        edit_quiz: false
+        view_quiz: false
+      participants:
+        add_student: false
+        edit_team_members: false
+        list_students: false
+        list_courses: false
+        list_assignments: false
+        change_handle: false
+      assignment:
+        list: false
+      institution:
+        list: false
+      student_task:
+        list: false
+      profile:
+        edit: false
+      survey_response:
+        create: true
+        submit: true
+      team:
+        list: false
+        list_assignments: false
+      teams_users:
+        list: false
+      course_evaluation:
+        list: false
+      survey_deployment:
+        list: false
+      statistics:
+        list_surveys: false
+      impersonate:
+        start: false
+        impersonate: false
+      review_mapping:
+        list: false
+        assign_reviewer_dynamically: false
+        release_reservation: false
+        show_available_submissions: false
+        assign_metareviewer_dynamically: false
+        add_self_reviewer: false
+        assign_quiz_dynamically: false
+      tree_display:
+        list: false
+        drill: false
+        goto_questionnaires: false
+        goto_author_feedbacks: false
+        goto_review_rubrics: false
+        goto_global_survey: false
+        goto_surveys: false
+        goto_course_evaluations: false
+        goto_courses: false
+        goto_assignments: false
+        goto_teammate_reviews: false
+        goto_metareview_rubrics: false
+        goto_teammatereview_rubrics: false
+      grades:
+        view_my_scores: false
+      sign_up_sheet:
+        signup_topics: false
+        signup: false
+        delete_signup: false
+        team_details: false
+      review_files:
+        show_code_file: false
+        show_code_file_diff: false
+        show_all_submitted_files: false
+        submit_comment: false
+        submit_review_file: false
+      popup:
+        automated_metareview_details_popup: false
+      advice:
+        edit_advice: false
+        save_advice: false
+      response:
+        delete: false
+      analytic:
+        assignment_list: false
+        course_list: false
+        get_graph_data_bundle: false
+        graph_data_type_list: false
+        index: false
+        init: false
+        render_sample: false
+        team_list: false
+      advertise_for_partner:
+        remove: false
+      versions:
+        revert: true
+    controllers:
+      content_pages: false
+      controller_actions: false
+      auth: false
+      markup_styles: false
+      menu_items: false
+      permissions: false
+      roles: false
+      site_controllers: false
+      system_settings: false
+      users: false
+      roles_permissions: false
+      admin: false
+      course: false
+      assignment: false
+      questionnaire: false
+      participants: false
+      reports: false
+      institution: false
+      student_task: false
+      profile: false
+      survey_response: true
+      team: false
+      teams_users: false
+      import_file: false
+      course_evaluation: false
+      participant_choices: false
+      survey_deployment: false
+      statistics: false
+      impersonate: false
+      review_mapping: false
+      grades: false
+      tree_display: false
+      student_team: false
+      invitation: false
+      survey: false
+      password_retrieval: true
+      submitted_content: false
+      eula: false
+      student_review: false
+      publishing: false
+      export_file: false
+      response: false
+      popup: false
+      sign_up_sheet: false
+      suggestion: false
+      delete_object: false
+      assessment360: false
+      review_files: false
+      advertise_for_partners: false
+      join_team_requests: false
+      advertise_for_partner: false
+      automated_metareviews: false
+      advice: false
+      analytic: false
+      versions: true
+      student_quiz: false
+    pages:
+      home: true
+      expired: true
+      notfound: true
+      denied: true
+      contact_us: true
+      site_admin: false
+      adminpage: false
+      credits: true
+      wiki: true
+    permission_ids:
+    - 4
+    - 3
+    role_id: 5
+    role_ids:
+    - 5
+    updated_at: 2015-06-11 15:23:44.000000000 Z
+  :menu: !ruby/object:Menu
+    by_id:
+      1: &1 !ruby/object:Menu::Node
+        content_page_id: 1
+        controller_action_id:
+        id: 1
+        label: Home
+        name: home
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/home"
+      2: &2 !ruby/object:Menu::Node
+        content_page_id: 6
+        controller_action_id:
+        id: 2
+        label: Contact Us
+        name: contact_us
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/contact_us"
+        children:
+        - 14
+      14: &4 !ruby/object:Menu::Node
+        content_page_id: 10
+        controller_action_id:
+        id: 14
+        label: Credits &amp; Licence
+        name: credits
+        parent:
+        parent_id: 2
+        site_controller_id:
+        url: "/credits"
+    by_name:
+      home: *1
+      contact_us: *2
+      credits: *4
+    crumbs:
+    - 1
+    root: &5 !ruby/object:Menu::Node
+      parent:
+      children:
+      - 1
+      - 2
+    selected:
+      1: *1
+    vector:
+    - *5
+    - *1

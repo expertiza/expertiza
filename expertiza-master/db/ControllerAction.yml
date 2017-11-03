@@ -1,0 +1,91 @@
+--- 
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: view_default
+    permission_id: "3"
+    id: "1"
+    site_controller_id: "1"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: view
+    permission_id: "3"
+    id: "2"
+    site_controller_id: "1"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "3"
+    site_controller_id: "7"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "4"
+    site_controller_id: "6"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: login
+    permission_id: "4"
+    id: "5"
+    site_controller_id: "3"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: logout
+    permission_id: "4"
+    id: "6"
+    site_controller_id: "3"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: link
+    permission_id: "4"
+    id: "7"
+    site_controller_id: "5"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "8"
+    site_controller_id: "1"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "9"
+    site_controller_id: "8"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "10"
+    site_controller_id: "2"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "11"
+    site_controller_id: "5"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "12"
+    site_controller_id: "9"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: forgotten
+    permission_id: "4"
+    id: "13"
+    site_controller_id: "3"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: login_failed
+    permission_id: "4"
+    id: "14"
+    site_controller_id: "3"
+- !ruby/object:ControllerAction 
+  attributes: 
+    name: list
+    permission_id: 
+    id: "15"
+    site_controller_id: "10"

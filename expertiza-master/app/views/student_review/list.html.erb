@@ -1,0 +1,49 @@
+<h2>Reviews for "<%= @assignment.name %>"</h2>
+
+<% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
+
+<% else %>
+    <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
+<% end %>
+<h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
+
+
+<% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+    <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
+    <% if @assignment.dynamic_reviewer_assignment? %>
+        <% if @num_reviews_in_progress >= Assignment.max_outstanding_reviews %>
+            <br><br>
+            <span>Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another.</span>
+        <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_reviews_total > @assignment.num_reviews%>
+            <br><br>
+            <span>Note: You can't do more than <%=@assignment.num_reviews%> reviews according to assignment policy.</span>
+        <%else%>
+          <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment, :participant => @participant} %>
+        <% end %>
+
+    <% end %>
+<% else %>
+    <p><em>Reviews cannot be performed at this time</em></p>
+<% end %>
+
+<% if @assignment.metareview_allowed(@topic_id) or @assignment.get_current_stage() == "Complete" %>
+    <h2>Metareviews for "<%= @assignment.name %>"</h2>
+
+    <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1%>
+
+    <% else %>
+        <h4>Number of Meta-Reviews Allowed: "<%= @assignment.num_metareviews_allowed %>"</h4>
+    <% end %>
+    <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
+
+    <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
+    <br/>
+    <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
+        <% if @num_metareviews_in_progress == 0 %>
+            <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
+        <% end %>
+    <% end %>
+<% end %>
+
+<br><br>
+<a href="javascript:window.history.back()">Back</a>

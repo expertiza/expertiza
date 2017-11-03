@@ -1,0 +1,22 @@
+%h3 Individual Reviews Distribution
+%div
+  %img{:src => "#{@chart2  "=0,0,100,10"}"}/
+%br/
+%div
+  - j=0
+  %table{:border => "1", :cellpadding => "3", :cellspacing => "0", :style => "font-size:small;"}
+    %tr{:bgcolor => "#cccccc"}
+      %th Range
+      - @review_distribution.each do |s|
+        - if s != 0
+          %td{:align => "center"}
+            (#{j*10}-#{(j+1) * 10})%
+        - j+= 1
+      %td{:align => "center"} Not done
+    %tr
+      %th Count
+      - @review_distribution.each do |s|
+        - if  s != 0
+          %td{:align => "center"}= s
+      %td{:align => "center"}
+        = @reviews_not_done

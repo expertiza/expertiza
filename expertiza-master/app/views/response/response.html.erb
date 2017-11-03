@@ -1,0 +1,131 @@
+<script>
+jQuery(document).ready(function() {
+    jQuery('#Submit').click(function(e){
+    if(!confirm('Once a review has been submitted, you cannot edit it again')){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }else{
+        jQuery('#isSubmit').val('Yes');
+    }
+    })
+    $(function(){
+        $("form").sisyphus({
+            locationBased: true,
+            autoRelease: true
+        }); 
+    });
+})
+</script>
+
+<% if @map.survey? %>
+    <h1><%= @header %> <%= @title %> for <%= @map.survey_parent.name %></h1>
+<% else %>
+    <h1><%= @header %> <%= @title %> for <%= @map.assignment.name %></h1>
+
+    <% if !@map.contributor.nil? && !@map.instance_of?(FeedbackResponseMap) %>
+        <% if @map.assignment.team_assignment? %>
+            <% team_member = TeamsUser.find_by_team_id(@map.contributor).user_id%>
+            <% topic_id = SignedUpTeam.topic_id(@map.assignment.id, team_member) %>
+        <% else %>
+            <% participant = Participant.find(TeamsUser.find_by_team_id(@map.contributor).user_id) %>
+            <% topic_id = SignedUpTeam.where(participant.parent_id, participant.user_id) %>
+        <% end %>
+        <% if !topic_id.nil? %>
+            <% topic = SignUpTopic.find(topic_id)%>
+            <h2>You are reviewing <%= topic.topic_name %></h2>
+            <% if !topic.description.nil? %>
+              <b>Description &nbsp;&nbsp;&nbsp;</b>
+              <% if topic.description.to_s.length>90 %>
+                <%= topic.description.to_s[0..90]+'...'%>
+                <a style="cursor: pointer" onclick="show_alert('<%= topic.description%>')">more...</a>
+              <% else %>
+                <%= topic.description.to_s%>
+              <% end %>
+              <% if topic.link != nil then %>
+                  <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
+              <% end%>
+            <% end %>
+        <% end %>
+
+        <%if @assignment.has_teams?%>
+            <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
+        <%else%>
+            <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id)} %>
+        <%end%>
+        <hr/>
+    <% end %>
+<% end %>
+<!-- display all versions available -->
+<% @responses_versions = Array.new %>
+<% @responses_versions = @map.get_all_versions() %>
+
+<% if @responses_versions.empty? %>
+    <I>No previous review was performed.</I><br/><hr/><br/>
+<% else %>
+    <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
+<% end %>
+<h2>Directions for the reviewer</h2>
+
+<%= form_tag :action => @next_action, :id => @modified_object do %>
+    <% if @next_action.eql?'update' %>
+        <input name="_method" type="hidden" value="put" />
+    <%end%>
+    <% i = 0 %>
+    <%@questions.each do |question| %>
+       <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
+       <% if question.instance_of? Criterion%>
+            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+       <% elsif question.instance_of? Scale %>
+            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
+       <% elsif question.instance_of? UploadFile %>
+            <!--One form had better not in another form-->
+            <!--Zhewei: I move the Uploadfile question to the end of questionnaire. So multiple forms will not been overlapped.-->
+       <% else %>
+            <%= question.complete(i, answer) %>
+       <% end %>
+       <% i += 1%>
+    <% end %>
+
+    <p>
+      <label for="review_comments">Additional Comments</label><BR/>
+      <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;">
+        <% if controller.action_name != 'new' and @response.additional_comment != nil %><%= @response.additional_comment.strip if !@response.nil?%>
+        <% end %></textarea>
+    </p>
+
+    <%if @current_round%>
+      <%= hidden_field_tag "review[round]", @current_round %>
+    <%end%>
+    <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
+
+    <br/>
+    <br>
+    <%= submit_tag "Save "+@title, :name => "save" %>
+    <!--#E1600 check title for selfreview to show submit button-->
+    <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
+        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
+        <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
+    <% end %>
+    <%= hidden_field_tag('return', @return) %>
+    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+<% end %>
+<!--Check whether there is a UploadFile question.-->
+<%@questions.each do |question| %>
+    <% if question.instance_of? UploadFile %>
+        <!--params[:origin] means from where do the files upload-->
+        <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
+        <!--If the files uploaded from peer review, params[:origin] will be 'review'-->
+        <% if params[:action] == 'new' %>
+            <% response_map_id = params[:id] %>
+        <% elsif params[:action] == 'edit' %>
+            <% response_map_id = Response.find(params[:id]).response_map.id %>
+        <% end %>
+        <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage, origin: 'review', response_map_id: response_map_id} %>
+    <% end %>
+<% end %>
+<%= @map.show_feedback(@response) %>
+<a href="javascript:window.history.back()">Back</a>
+<div id="dialog-message" style="word-wrap: normal"></div>

@@ -1,0 +1,61 @@
+<h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+<div style="display:block">
+  <h3 style="width: 40%; float: left">Topics</h3>
+  <h3 style="width: 40%; float:right">Selections</h3>
+</div>
+
+<div style="display:block">
+  <div style="display:inline-block" >
+    <!--Topics table-->
+    <table style="width: 48%; float: left" class="general">
+      <tr><%= render :partial => 'table_header' %></tr>
+      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+          <b>Your topic(s):</b>
+          <% for selected_topic in @selected_topics %>
+              <br/><%= selected_topic.topic_name %>
+              <% if selected_topic.is_waitlisted == true %>
+                  <font color='red'>(waitlisted)</font>
+              <% end %>
+          <% end %>
+      <% end %>
+      <br/><br/>
+      <% i=1 %>
+      <tbody id="topics"  class="connectedSortable">
+      <tr class="sort-disabled"><td></td><td></td></tr>
+      <% for topic in @sign_up_topics %>
+          <%= get_intelligent_topic_row(topic, @selected_topics, @max_team_size) %>
+          <% is_suggested_topic = false %>
+          <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+
+    <!--Selections table-->
+    <table style="width: 48%; display:block" class="general" align="right">
+      <% i=1 %>
+      <tr><%= render :partial => 'table_header' %></tr>
+      <tbody id="selections" data-update-url=<%= "/sign_up_sheet/set_priority?participant_id=#{@participant.id}" %> class="connectedSortable">
+        <tr class="sort-disabled"><td></td><td></td></tr>
+        <% for topic in @bids %>
+          <tr style= "background-color:<%= get_topic_bg_color(topic, @max_team_size) %>" id="topic_<%= topic.id %>">
+             <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <% if SignUpTopic.has_suggested_topic?(@assignment.id) %>
+        <%= render :partial => '/sign_up_sheet/suggested_topic' %>
+    <% end %>
+    <% session[:return_to] = request.url %>
+    <br/>
+    <br/>
+    <a href="javascript:history.back()">Back</a>
+    <br/>
+  </div>
+</div>

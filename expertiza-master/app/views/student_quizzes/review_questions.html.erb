@@ -1,0 +1,50 @@
+<h1 xmlns="http://www.w3.org/1999/html"> Listing of All Quiz Questions for <%= Assignment.find(@assignment_id).name %> </h1>
+<table>
+  <%@quiz_questionnaires.each do |questionnaire|%>
+      <%author_team = Team.find(questionnaire.instructor_id)%>
+      <h2> Quiz create by <%=author_team.name%></h2>
+
+      <%topic_id = SignedUpTeam.topic_id_by_team_id(author_team.id)%>
+      <%if topic_id.nil?%>
+          <%topic_name=nil%>
+      <%else%>
+          <%topic_name = SignUpTopic.find(topic_id).topic_name%>
+          <h4> Topic: <%=topic_name%></h4>
+      <%end%>
+
+      <% response_maps = QuizResponseMap.where(reviewed_object_id:questionnaire.id) %>
+      <% if !response_maps.empty? %>
+        <table border="2">
+          <tr>
+            <th> quiz taker </th>
+            <% response_maps.each do |response_map| %>
+              <% reviewer_paritcipant_id = response_map.reviewer_id%>
+              <% reviewer_user_id = Participant.find(reviewer_paritcipant_id).user_id%>
+              <td> <%=User.find(reviewer_user_id).fullname%></td>
+            <%end%>
+          </tr>
+          <% quiz_scores = [] %>
+          <tr>
+            <th> quiz score </th>
+            <% response_maps.each do |response_map| %>
+                <% quiz_score = response_map.quiz_score%>
+                <%quiz_scores.push(quiz_score) if !quiz_score.eql?('N/A')%>
+                <td> <%=quiz_score%></td>
+            <%end%>
+
+          </tr>
+        </table>
+        <br>
+        <% if quiz_scores.size!= 0 %>
+          Average score for quiz takers: <%= (quiz_scores.sum / quiz_scores.size).round(2) %>
+          <br><br>
+        <% end %>
+      <% end %>
+
+      <%questions = questionnaire.questions%>
+      <% questions.each do |question| %>
+        <%= question.view_question_text%>
+
+      <% end %><hr>
+  <% end %>
+</table>

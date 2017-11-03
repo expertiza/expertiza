@@ -1,0 +1,35 @@
+<h1><%= @questionnaire.display_type %>: <%= @questionnaire.name %></h1>
+<BR/>
+<B>Created by:</B> <%= link_to @questionnaire.instructor_id,"mailto:"+@questionnaire.instructor_id.to_s %><BR/>
+<B>Created at:</B> <%= @questionnaire.created_at %><BR/>
+<B>Last modified at:</B> <%= @questionnaire.updated_at %>
+<BR/><BR/>
+
+<TABLE>
+  <TR>
+    <TH align="left" width="60%"> Question </TH>
+    <TH align="left">&nbsp Type &nbsp</TH>
+    <TH align="left">&nbsp Weight &nbsp</TH>
+    <TH align="left">&nbsp Score Range &nbsp</TH>
+  </TR>
+  <%questions=@questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
+  <%questions.each do |question| %>
+
+    <%if question.is_a? Question%>
+      <%=question.view_question_text.html_safe%>
+    <%end%>
+
+  <% end %>
+</TABLE>
+
+<BR/>
+
+    <BR/>
+    <% if @questionnaire.type == "QuizQuestionnaire" %>
+      <%= link_to 'Edit', :controller => :questionnaires, :action => :edit_quiz, :id => @questionnaire.id, :pid => @participant.id %>|
+    <% else %>
+      <!--The following line may have bugs when @questionnaire.type != "QuizQuestionnaire"-->
+      <!--The bug will be invoked when click Save button in edit page-->
+      <%= link_to 'Edit', :action => 'edit', :id => @questionnaire %> |
+    <% end %>
+    <%= link_to "Back", :controller => 'tree_display', :action => 'list' %>

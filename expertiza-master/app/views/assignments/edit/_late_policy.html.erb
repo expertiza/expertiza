@@ -1,0 +1,24 @@
+<% if session[:user].role.name == "Teaching Assistant" && TaMapping.find_by_ta_id(session[:user])
+     user_id = Ta.get_my_instructor(session[:user].id)
+else
+  user_id = session[:user].id
+end %>
+
+<table>
+  <tr>
+    <td><%= check_box 'assignment_form[assignment]', 'calculate_penalty', {}, true, false %></td>
+    <td><label for="penalty_flag">Apply penalty policy:</label><img src="/assets/info.png" title='If this is checked, students are penalized if they perform the specified action (e.g., submission or review) after the due date.'></td>
+    <td>
+      <% selected = @assignment_form.assignment.late_policy_id %>
+      <select name="assignment_form[assignment][late_policy_id]">
+        <option value="0" <%if selected.nil?%>selected="yes"<%end%>>--None--</option>
+        <% LatePolicy.where(['instructor_id = ?', user_id]).order("times_used DESC").each{| late_policy | %>
+          <option value="<%=late_policy.id%>" <% if selected != nil && selected == late_policy.id %>selected="yes"<%end%>>
+          <%=late_policy.policy_name %>
+          </option>
+        <% } %>
+      </select>
+    </td>
+    <td><%= link_to 'New late policy', :controller => 'late_policies', :action => 'new' %></td>
+  </tr>
+</table>

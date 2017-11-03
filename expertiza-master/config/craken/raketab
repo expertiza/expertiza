@@ -1,0 +1,1 @@
+0 * * * * send_email_reminders > /dev/null 2>&1

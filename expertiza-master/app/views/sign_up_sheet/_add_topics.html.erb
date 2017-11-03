@@ -1,0 +1,7 @@
+<% if @sign_up_topics.count == 0%>
+<%= link_to 'New topic',{:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]}, :confirm => "You are adding a topic to this assignment.  Students will now have to select a topic before they submit their work.", :topic => @topics, :method => :get%> |
+<%= link_to 'Import topics', {:controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id]}, :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category', :confirm => "You are adding topics to this assignment.  Students will now have to select a topic before they submit their work.", :topic => @topics, :method => :get %>|
+<% else %>
+<%= link_to 'New topic',:controller => 'sign_up_sheet', :action => 'new', :id => params[:id]%> |
+<%= link_to 'Import topics', :controller=>'import_file', :action=>'start', :model => 'SignUpTopic', :id => params[:id], :expected_fields => 'Topic identifier, Topic name, Max choosers, Topic Category' %>|
+<% end %>

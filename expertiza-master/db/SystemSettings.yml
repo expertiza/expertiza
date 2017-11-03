@@ -1,0 +1,15 @@
+--- 
+- !ruby/object:SystemSettings 
+  attributes: 
+    session_expired_page_id: "2"
+    session_timeout: "7200"
+    menu_depth: "3"
+    site_default_page_id: "1"
+    permission_denied_page_id: "4"
+    id: "1"
+    not_found_page_id: "3"
+    default_markup_style_id: "1"
+    public_role_id: "1"
+    footer_message: A <a href="http://research.csc.ncsu.edu/efg/expertiza/papers">Expertiza</a> site
+    site_name: Expertiza
+    site_subtitle: Reusable learning objects through peer review

@@ -1,0 +1,16 @@
+<!--[form:course]-->
+<p><label for="institution_name">Institution Name</label><br/>
+<%= select("course", "institutions_id", Institution.all.collect{ |c| [ c.name, c.id] }) %></p>
+
+<p><label for="course_name">Course Name</label><br/>
+<%= text_field 'course', 'name'  %></p>
+
+<p><label for="course_directory_path">Course Directory</label> (Mandatory field. No space or special chars.)
+  <img src="/assets/info.png" title='- DO NOT change this filed for an on-going course. This may cause lost of student submitted file.'>
+<br/>
+<%= text_field 'course', 'directory_path'  %></p>
+<p><label for="course_info">Course Information</label><br/>
+<%= text_field 'course', 'info'  %></p>
+
+<!--[eoform:user]-->
+<br/>

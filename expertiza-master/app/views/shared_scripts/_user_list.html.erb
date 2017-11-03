@@ -1,0 +1,40 @@
+<div class = "exp">
+
+<table id="plist">
+  <tr>
+    <th colspan=5></th>
+    <th colspan=3 class="head">E-mail on ...</th>
+    <th colspan=3 class="head">Permissions ...</th>
+  </tr>  
+  <tr>
+    <th class="head">Name</th>
+    <th class="head">Full Name</th>
+    <th class="head">Email Address</th>
+    <th class="head">Role</th>
+    <th class="head">Parent</th>
+    <th class="head">Review</th>
+    <th class="head">Submission</th>
+    <th class="head">Metareview</th>
+    <th class="head">Submit</th>
+    <th class="head">Review</th>
+    <th class="head">Take quiz</th>
+    <th class="head">Handle</th>
+    <th class="head">Action</th>
+  </tr>
+  <!--E1721 changes begin-->
+  <% @user_id = [] %>
+  <%= render partial: 'participants/participant', collection: user_list, :locals => {:userid => @user_id, :controller => 'participants'}%>
+  <!--E1721 changes End-->
+</table>
+
+
+</div>
+
+<script>
+    var participants = <%=@user_id%>;
+    participants.forEach(function(participant){
+        $('#'.concat(participant.toString())).change(function(){
+            $('#button'.concat(participant.toString())).show();
+        });
+    });
+</script>

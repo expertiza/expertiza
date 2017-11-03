@@ -1,0 +1,38 @@
+<a href="#" name='team-chartLink' onClick="toggleElement('team-chart', 'stats');return false;">Hide stats</a>
+<br>
+<TR style ="background-color: white;" class="team" id="team-chart">
+	<th>
+
+	<div class="circle" id="average-score">          
+  			
+  	</div>
+  	Class Average
+	</th>
+	<TH COLSPAN="8">
+		<img src="<%= @average_chart  %>" ><br>
+		Class Distribution
+		<br>
+	</th>
+	<TH WIDTH="9">&nbsp;</th>
+</TR>
+
+<script type="text/javascript">
+  var myCircle = Circles.create({
+    id:           'average-score',
+    radius:       50,
+    value:        <%= @avg_of_avg.to_i %>,
+    maxValue:     100,
+    width:        15,
+    text:         '<%=@avg_of_avg.to_i%>',
+    colors:       ['#FFEB99', '#FFCC00'],
+    duration:       700,
+    textClass:      'circles-final'  
+  });
+
+</script>
+
+<style> 
+ .circles-final{
+    font-size: 16px !important;    
+  }
+</style> 

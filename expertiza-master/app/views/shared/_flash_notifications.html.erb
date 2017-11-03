@@ -1,0 +1,26 @@
+<%# this page will display the notifications as a flash message Randal Myers, 22 March 2017 %>
+
+<% @my_notifications = Notification.where(:active_flag => true) %>
+
+<% if !@my_notifications.nil? %>
+
+  <% @my_notifications.each do |individual_notification| %>
+
+    <% @tracked_notification = TrackNotification.where(notification: individual_notification.id, user_id: current_user.id).count %>
+
+    <% if @tracked_notification == 0 %>
+      <% if individual_notification.expiration_date >= Date.today %>
+
+        <table style="width: 100%">
+          <tbody class="flash_notification">
+            <tr style="border-style: none none solid none; border-width: 1px;">
+              <td><b><%= individual_notification.subject.upcase %></b></td>
+              <td><%= link_to image_tag("/assets/tree_view/delete-icon-24.png", border: 0, height: '16', width: '16', align: 'right'), track_notifications_path(id: individual_notification.id), {class: 'dock-item'} %> </td>
+            </tr>
+            <tr><td><%= individual_notification.description %></td><td></td></tr>
+          </tbody>
+        </table>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

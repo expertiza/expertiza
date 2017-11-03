@@ -1,0 +1,9 @@
+Hi <%= @first_name %>,
+
+<%= @reviewer_name %> has just submitted a <%= @type %> of <%= @reviewee_name %>.  The score on this <%= @type %> differs from the
+previous average score by more than the threshold of <%= @limit %>%. The new score is <%= sprintf("%.2f",@new_pct*100) %>%, compared
+to a current average of <%= sprintf("%.2f",@avg_pct*100) %>%.  It might be advisable to look over all the <%= @types %> of this work to
+determine if any of them are out of line, and if so, to notify the <%= @performer %>.
+
+Assignment: <%= @assignment.name %>
+

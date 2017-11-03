@@ -1,0 +1,72 @@
+<% if is_suggested_topic == false %>
+  <% if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name and params[:controller] != 'sign_up_sheet' %>
+  <!--These roles ('Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator') can act as normal students if they become participants of one assignment and the controller is ‘sign_up_sheet’ controller; otherwise, they act as normal roles.-->
+      <td align="center">
+        <%= link_to image_tag('edit_icon.png', :border => 0, :title => 'Edit Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'edit', :id => topic.id %>
+        <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Topic', :align => 'middle'), sign_up_sheet_path(:id=>topic.id, :assignment_id => params[:id]), method: :delete, confirm: 'Are you sure?' %>
+  <%elsif @show_actions %>
+      <% action_symbol_added = false %>
+      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+          <% for selected_topic in @selected_topics %>
+              <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
+                  <!--#if there is a drop topic deadline in current assignment, after the drop topic deadline, student will not see the choice of dropping topics any more. -->
+                  <% if @drop_topic_deadline.nil? or (!@drop_topic_deadline.nil? and Time.now < @drop_topic_deadline.due_at) %>
+                    <td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id=>params[:id],:topic_id => topic.id, :assignment_id => params[:assignment_id] %></td>
+                  <% end %>
+                  <% action_symbol_added = true %>
+              <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+                  <td align="center">
+                    <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'delete_signup', :id=>params[:id], :topic_id => topic.id, :assignment_id => params[:assignment_id] %>
+                    <% if @assignment.is_intelligent %>
+                        <%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
+                            <%= number_field_tag :priority, selected_topic.preference_priority_number %>
+                            <%= submit_tag  'Set priority', name: nil  %>
+                        <% end %>
+                    <% end %>
+                  </td>
+                  <% action_symbol_added = true %>
+              <% end %>
+          <% end %>
+      <% end %>
+      <% if action_symbol_added == false %>
+          <!--#if there is a signup topic deadline in current assignment, after the signup topic deadline, student will not see the choice of signing up topics any more. -->
+          <% if @assignment.is_intelligent %>
+            <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
+            <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
+              <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
+            <% end %>
+            <% @student_bids.each do |sb| %>
+              <% if sb.topic_id == topic.id %>
+                <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
+                <% break %>
+              <% end %>
+            <% end %>
+            <%= submit_tag  'Set priority', name: nil  %>
+            <% end %></td>
+          <% elsif (@signup_topic_deadline.nil? || (Time.now < @signup_topic_deadline.due_at)) && 
+          (!@assignment.staggered_deadline? || (Time.now < get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id))) %>
+              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id=>params[:id],:topic_id => topic.id, :assignment_id => params[:assignment_id] %></td>
+          <% end %>
+      <% end %>
+  <% end %>
+<% else %>
+  <td align="center">
+    <% if @assignment.is_intelligent %>
+      <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
+      <% if @student_bids.all? {|sb| sb.topic_id != topic.id} %>
+        <%= number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
+      <% end %>
+      <% @student_bids.each do |sb| %>
+        <% if sb.topic_id == topic.id %>
+          <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
+          <% break %>
+        <% end %>
+      <% end %>
+      <%= submit_tag  'Set priority', name: nil  %>
+      <% end %></td>
+    <% else %>
+      <%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Switch Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'switch_original_topic_to_approved_suggested_topic', :id=>params[:id], :topic_id => topic.id, :assignment_id => params[:assignment_id] %>
+      <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Publish Topic', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'publish_approved_suggested_topic', :id=>params[:id], :topic_id => topic.id, :assignment_id => params[:assignment_id] %>
+    <% end %>
+  </td>
+<% end %>

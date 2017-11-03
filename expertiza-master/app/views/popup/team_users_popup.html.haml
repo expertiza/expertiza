@@ -1,0 +1,59 @@
+%div
+  %h3
+    Members of #{@team.name}
+  %table{:width => "100%"}
+    - if @team_users.empty?
+      %tr No team members
+    - else
+      - @team_users.each do |t|
+        %tr
+          %td
+            \- #{User.find(t.user_id).fullname}
+  - (1..@assignment.num_review_rounds).each do |round|
+    - next if instance_variable_get('@response_round_' + round.to_s).nil?
+    - if instance_variable_get('@scores_round_' + round.to_s).nil?
+      %tr
+        %td{:align => "center"} No review done yet.
+      %br/
+      %tr
+        %th{:align => "left"} Reviewer score
+      %tr
+        %td{:align => "center"} --
+      %br/
+    - else
+      %h3= "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
+      %table{:border => "1px solid #ccc"}
+        %tr
+          %th{:align => "left", :width => "50%"} Question
+          %th{:width => "5%"} Score
+          %th{:width => "45%"} Comments
+        - instance_variable_get('@scores_round_' + round.to_s).each do |s|
+          %tr
+            %td{:align => "left"}
+              = Question.find(s.question_id).txt
+            - if Question.find(s.question_id).is_a?(ScoredQuestion)
+              %td{:align => "center"}
+                = s.answer
+                \/#{instance_variable_get('@max_score_round_' + round.to_s)}
+            - else
+              %td{:align => "center"}
+                = s.answer
+            %td{:align => "left"}
+              = s.comments
+        %tr
+          %th Reviewer Score (Σ weighted score/Σ weighted available score)
+          %td{:align => "center"}
+            = instance_variable_get('@sum_round_' + round.to_s)
+            \/#{instance_variable_get('@total_possible_round_' + round.to_s)}
+          %td{:align => "left"}
+            \= #{instance_variable_get('@total_percentage_round_' + round.to_s)}
+      %table
+        %tr
+          %th Additional Comment
+        %tr
+          - additional_comment = Response.find(instance_variable_get('@response_id_round_' + round.to_s)).additional_comment
+          %td= additional_comment.nil? ? 'No Comments' : additional_comment
+      %hr/
+  %br/
+  .footer
+    = link_to 'Back', :controller=> 'review_mapping', :action=>'response_report', :id=>params[:assignment_id]

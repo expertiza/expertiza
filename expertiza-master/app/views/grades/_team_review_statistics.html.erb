@@ -1,0 +1,30 @@
+<% rscore = pscore[:review] %> 
+<tr>
+    <td colspan="10">
+<% if rscore and rscore[:assessments].length > 0 %>
+    <%flag_varying_rubrics=false%>
+
+    <%if @questions.has_key?("review1".to_sym)%>
+        <b> Round 1:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review1".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer", :round=>1 }%>
+    <%end%>
+
+    <%if @questions.has_key?("review2".to_sym)%>
+        <b> Round 2:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review2".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>2 }%>
+    <%end%>
+
+    <%if @questions.has_key?("review3".to_sym)%>
+        <b> Round 3:</b>
+        <%flag_varying_rubrics=true%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>3 }%>
+    <%end%>
+    
+    <%if flag_varying_rubrics==false%>
+        <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
+    <%end%>
+    </td>
+</tr>
+<% end %>

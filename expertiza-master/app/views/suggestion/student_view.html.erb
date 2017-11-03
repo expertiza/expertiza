@@ -1,0 +1,67 @@
+<h2>View Suggested topic <%= @suggestion.title %></h2>
+<table border=0 cellspacing=10>
+<colgroup>
+<col width=25%>
+    <col width=60%>
+</colgroup>
+<tr>
+  <td><b>Title:</b></td>
+  <td><%=h @suggestion.title %></td>
+</tr>
+<tr>
+  <td><b>Description:</b></td>
+  <td><%=h @suggestion.description %></td>
+</tr>
+<tr>
+  <td><b>Approval Status:</b></td>
+  <td><%=h @suggestion.status %></td>
+</tr>
+
+<table class="general" cellpadding=5 border="1">
+  <colgroup>
+    <col width=15% />
+    <col width=5% />
+    <col width=80% />
+  </colgroup>
+  <tr>
+    <th>Commenter</th>
+    <th>Vote</th>
+    <th>Comment</th>
+  </tr>
+  <%if @suggestion.suggestion_comments.size > 0 %>
+    <% for suggestion_comment in @suggestion.suggestion_comments %>
+      <tr class="listingRow">
+        <td align="center"><%=suggestion_comment.commenter %></td>
+        <td align="center">
+          <%if suggestion_comment.vote == 'Y' %>
+            Yes
+          <%elsif suggestion_comment.vote == 'N'%>
+            No
+          <%elsif suggestion_comment.vote == 'R'%>
+            Revise
+          <%else%>
+            --
+          <%end%>
+        </td>
+        <td><%= suggestion_comment.comments %></td>
+      </tr>
+    <% end %>
+  <%end%>
+</table>
+<br>
+<br>
+
+<% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
+  <b>Add new comment</b> <br>
+  <%= form_tag :action => 'submit', :id => @suggestion do %>
+    <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %>
+    <br>
+
+    <%= submit_tag "Submit comment", :name => 'add_comment' %>
+  <% end %>
+
+<% end %>
+<br>
+<br>
+
+<%= link_to 'Back', :controller => 'suggestion', :action => 'new', :id => @suggestion.assignment_id %>

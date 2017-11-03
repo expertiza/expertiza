@@ -1,0 +1,55 @@
+<h1><%= @questionnaire.name %></h1>
+  
+    <% @questions.each_with_index do |question,index| %>
+      <b>Q - <%= question.txt %></b>
+      <% answer_list = @all_answers[index] %>
+      <% if answer_list.nil? %>
+        <p>No responses for the question</p>
+      <% else %>
+        <table border="1" style ="text-align: center">
+          <tr>
+            <td><b>Comments</b></td>
+            <td><b>Score</b></td>    
+          </tr>    
+        <% answer_list.each do |an_answer| %>
+          <tr>
+            <td>
+              <%= an_answer.comments %>
+            </td>
+            <td>
+              <%= an_answer.answer %>
+            </td>
+          </tr>
+        <% end %>
+        </table>
+      <% end %>
+    <% end %>
+
+<% if @global_survey_present == true %>
+<h1>Global Survey: <%= @global_questionnaire.name %></h1>
+
+<% @global_questions.each_with_index do |question,index| %>
+    <b>Q - <%= question.txt %></b>
+    <% answer_list = @global_answers[index] %>
+    <% if answer_list.nil? %>
+        <p>No responses for the question</p>
+    <% else %>
+        <table border="1" style ="text-align: center">
+          <tr>
+            <td><b>Comments</b></td>
+            <td><b>Score</b></td>
+          </tr>
+          <% answer_list.each do |an_answer| %>
+              <tr>
+                <td>
+                  <%= an_answer.comments %>
+                </td>
+                <td>
+                  <%= an_answer.answer %>
+                </td>
+              </tr>
+          <% end %>
+        </table>
+    <% end %>
+<% end %>
+<% end %>

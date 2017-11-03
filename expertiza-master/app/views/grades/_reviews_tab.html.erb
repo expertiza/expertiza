@@ -1,0 +1,5 @@
+<% participant = tscore[:team].participants.first %>
+<% pscore = @scores[:participants][participant.id.to_s.to_sym] if participant %>
+<% if pscore %>
+	<%= view_heatgrid(participant.id, "ReviewQuestionnaire") %>
+<% end %>

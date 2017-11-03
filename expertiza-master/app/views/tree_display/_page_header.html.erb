@@ -1,0 +1,85 @@
+<BR/>
+<%= form_tag({:action => 'list'}) do %>
+  <TABLE width="80%">
+    <TR>
+      <TD width="50%" align="right">
+        Sort by:
+        <select name='display[sortvar]' style="width: 10em">
+          <option value='name'
+          <% if @sortvar == 'name' %>selected
+          <% end %>>name
+          </option>
+          <option value='created_at'
+          <% if @sortvar == 'created_at' %>selected
+          <% end %>>date created
+          </option>
+          <option value='updated_at'
+          <% if @sortvar == 'updated_at' %>selected
+          <% end %>>date updated
+          </option>
+          <option value='directory_path'
+          <% if @sortvar == 'directory_path' %>selected
+          <% end %>>directory path
+          </option>
+        </select>
+        <select name='display[sortorder]' style="width: 10em">
+          <option value='desc'
+          <% if @sortorder == 'desc' %>selected
+          <% end %>>descending
+          </option>
+          <option value='asc'
+          <% if @sortorder == 'asc' %>selected
+          <% end %>>ascending
+          </option>
+        </select>
+      </TD>
+      <TD width="5%" align="left"><%= submit_tag "Sort" %></TD>
+    </TR>
+    Search: &nbsp
+
+    <%= label_tag(:search_string, "") %>
+    <%= text_field_tag(:search_string) %>
+    in
+
+    <select name='searchnode' style="width: 10em">
+      <option value='Q'
+      <% if @searchnode == 'Q' %>selected
+      <% end %>>Questionnare
+      </option>
+      <option value='C'
+      <% if @searchnode == 'C' %>selected
+      <% end %>>Courses
+      </option>
+      <option value='A'
+      <% if @searchnode == 'A' %>selected
+      <% end %>>Assignments
+      </option>
+    </select>
+    &nbsp &nbsp
+    <%= submit_tag("Search") %>
+
+    &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+    <%= submit_tag("Reset") %>
+
+    </br></br>
+    Filter: &nbsp
+    <select name='filternode' style="width: 17em">
+      <option value='ACN'
+      <% if @filternode == 'ACN' %>selected
+      <% end %>>Assignment by course name
+      </option>
+      <option value='QAN'
+      <% if @filternode == 'QAN' %>selected
+      <% end %>>Questionnare by assignment name
+      </option>
+    </select>
+    &nbsp
+    <%= label_tag(:filter_string, "") %>
+    <%= text_field_tag(:filter_string) %>
+    &nbsp &nbsp
+    <%= submit_tag("Filter") %>
+  </TABLE>
+  <% if @root %>
+    <%= hidden_field_tag('root', @root_node.id) %>
+  <% end %>
+<% end %>

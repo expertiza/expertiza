@@ -1,0 +1,22 @@
+<h1>Instructors</h1>
+
+<%= will_paginate @users %>
+
+<table>
+  <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
+  <% for user in @users%>
+    <tr>
+      <td><%= link_to user.name, :action => 'show_instructor',
+        :id => user.id %></td>
+      <td><%= user.fullname %></td>
+      <td><%= user.email %></td>
+      <td><%= (User.find(user.parent_id)).name  %></td>
+    </tr>
+  <% end -%>
+</table>
+
+<hr/>
+<%= form_tag(new_user_path, method: :get) do %>
+<%= hidden_field_tag :role, "Instructor" %>
+<%= submit_tag("New Instructor")%>
+<% end %>

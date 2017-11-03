@@ -1,0 +1,50 @@
+<!--
+if plagiarism_checker_assignment_submission doesn't exist, you won't be able to come to this page
+else if plagiarism_checker_comparison has no records, say "yay! no one cheated!"
+else show records
+-->
+
+
+<% if @plagiarism_checker_comparisons.nil? %>
+    <div class="text-center">
+      <h4>There are no cheaters in this assignment! Hooray!</h4>
+    </div>
+<% else %>
+
+    <div class="container">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Similarity</th>
+          <th>Submission 1</th>
+          <th>Team 1</th>
+          <th>Submission 2</th>
+          <th>Team 2</th>
+        </tr>
+        </thead>
+        <% @plagiarism_checker_comparisons.each do |pcc| %>
+            <tr>
+
+              <td><%= link_to (pcc.similarity_percentage).to_s + "%", pcc.similarity_link %></td>
+              <td><%= pcc.file1_name%></td>
+
+              <% team = Team.find(pcc.file1_team) %>
+              <% if team.nil? %>
+                  <td>Unknown</td>
+              <% else %>
+                  <td><%= team.name %></td>
+              <% end %>
+
+              <td><%= pcc.file2_name%></td>
+
+              <% team = Team.find(pcc.file2_team) %>
+              <% if team.nil? %>
+                  <td>Unknown</td>
+              <% else %>
+                  <td><%= team.name %></td>
+              <% end %>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>

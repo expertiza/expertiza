@@ -1,0 +1,38 @@
+<%= form_tag form_action, :id => "part_add", :method => 'post', :remote => remote do %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 20} %>
+	<%= hidden_field_tag(obj_type, obj_id) %>
+	<%= hidden_field_tag('model', model) %>
+        <!-- E726 Fall2012 Changes Begin -->
+    <%= hidden_field_tag('authorization', authorization) %>
+        <!-- E726 Fall2012 Changes End -->
+    <% if form_action == "add" %>
+		<input id='add_a' type='submit' value='Add'/>
+		<%= radio_button "user","role", "participant",:checked=>(params[:authorization]=='participant' or params[:authorization].nil?)%>
+		<%= label_tag :role_participant, "participant" ,{:style=>"font-size:16px;"}%>
+		<img src="/assets/info.png" title='A participant can submit artifacts, review artifacts and take a quiz.'>
+
+		<%= radio_button "user","role", "reader", :checked=>params[:authorization]=='reader' %>
+		<%= label_tag :role_reader, "reader" ,{:style=>"font-size:16px;"}%>
+		<img src="/assets/info.png" title='A reader can review artifacts and take a quiz, but cannot submit artifacts.'>
+
+		<%= radio_button"user","role", "reviewer", :checked=>params[:authorization]=='reviewer' %>
+		<%= label_tag :role_reviewer, "reviewer" ,{:style=>"font-size:16px;"}%>
+		<img src="/assets/info.png" title='A reviewer can only review artifacts.'>
+
+		<%= radio_button"user","role", "submitter", :checked=>params[:authorization]=='submitter' %>
+		<%= label_tag :role_submitter, "submitter" ,{:style=>"font-size:16px;"} %>
+		<img src="/assets/info.png" title='A submitter can only submit artifacts.'>
+
+	<% elsif form_action == "add_ta" %>
+		<input type='submit' value='Add TA'/>
+	<% end %>
+<% end %>
+
+<script>
+	$("input[name='user[role]']").change(function(){
+		var role = $(this).val();
+		$('#authorization').val(role);
+	});
+
+</script>
+

@@ -1,0 +1,8 @@
+- @files = participant.team.submitted_files
+- if @files and @files.length > 0
+  %b> Submitted Files
+     
+  %a{:href => "#", :id => "filesLink#{@files.id}", :name => "filesLink", :onclick => "toggleElement('files#{@files.id}','files#{@files.id}');return false;"} show files
+  %br/
+  %div{:id => "files#{@files.id}", :style => "display:none"}
+    = display_directory_tree(participant, @files, true)

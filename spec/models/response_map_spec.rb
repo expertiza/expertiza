@@ -36,7 +36,7 @@ describe 'Response Map' do
   end
 
   describe '#survey' do
-    it 'should return false survey' do
+    it 'should return false' do
       expect(@response_map.survey?).to eql (false)
     end
   end
@@ -47,6 +47,13 @@ describe 'Response Map' do
       mappings=Array.new
       expect(ResponseMap.delete_mappings(mappings,nil)).to eql (0)
     end
+    it 'should remove all mappings in the mapping array' do
+      @response_map1 = create(:response_map, id: 1, reviewer_id: 5, reviewed_object_id: 1, reviewee_id: 2)
+      @response_map2 = create(:response_map, id: 2, reviewer_id: 2, reviewed_object_id: 1, reviewee_id: 2)
+      ResponseMap.delete_mappings([@response_map2],nil)
+      expect(ResponseMap.first).to eql (@response_map1)
+    end
   end
+
 
 end

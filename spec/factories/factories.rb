@@ -319,6 +319,16 @@ FactoryGirl.define do
     instruction_loc nil
   end
 
+  factory :quizquestionnaire, class: QuizQuestionnaire do
+    name 'Quiz questionnaire'
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'QuizQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+  end
+
   factory :question, class: Criterion do
     txt 'Test question:'
     weight 1
@@ -350,7 +360,7 @@ FactoryGirl.define do
   factory :response_map, class: ResponseMap do
     reviewed_object_id 1
     reviewer_id 1
-    reviewee_id 1
+    reviewee_id 2
     type 'ResponseMap'
     calibrate_to 0
   end
@@ -360,6 +370,14 @@ FactoryGirl.define do
     reviewee { AssignmentTeam.first || association(:assignment_team) }
     reviewer_id 1
     type 'ReviewResponseMap'
+    calibrate_to 0
+  end
+
+  factory :quizresponse_map, class: QuizResponseMap do
+    quiz_questionnaire { Questionnaire.first || association(:questionnaire) }
+    reviewee_id 2
+    reviewer_id 1
+    type 'QuizResponseMap'
     calibrate_to 0
   end
 
@@ -375,19 +393,19 @@ FactoryGirl.define do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment "abc"
     version_num 1
-    created_at DateTime.new(2017,10,26)
-    updated_at DateTime.new(2017,10,27)
     round 1
     is_submitted false
   end
 
+
   factory :feedback_response_map, class: FeedbackResponseMap do
-    reviewed_object_id 1
-    reviewer_id 1
-    reviewee_id 1
+    review { Response.first || association(:response) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { AssignmentParticipant.first || association(:participant) }
     type 'FeedbackResponseMap'
     calibrate_to 0
   end
+
   factory :submission_record, class: SubmissionRecord do
     team_id 666
     operation 'create'

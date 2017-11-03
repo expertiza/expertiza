@@ -91,6 +91,10 @@ class GithubMetricsFetcher
         is_fork = get_data(json, ["data", "repository", "isFork"])
         since = "since:\\\"#{created_at}\\\""
 
+        if not params[:last_commit_date].nil? 
+          since = "since:\\\"#{params[:last_commit_date]}\\\""  
+        end
+
         fetch_project_commits_data(params, since)
       else
         { :error => "Error loading project #{response.code}", :msg => response.body }
@@ -112,16 +116,20 @@ class GithubMetricsFetcher
         p = commits.map { | commit | 
           params[:throttle].throttled_future(1) do 
             oid = get_data(commit, ["node", "oid"])
+            login = get_data(commit, ["commit", "user", "login"])
             name = get_data(commit, ["node", "author", "name"])
             email = get_data(commit, ["node", "author", "email"])
             date = get_data(commit, ["node", "committedDate"])
             stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
-            { :id  => oid,
-              :date => date, 
-              :name => name, 
-              :email => email, 
-              :stats => stats }
+            { :user_id => login,
+            :commit_id => oid,
+            :commit_date => date, 
+            :user_name => name, 
+            :user_email => email, 
+            :lines_added => stats[:additions],
+            :lines_deleted => stats[:deletions],
+            :lines_changed => stats[:total]}
           end
         }
 
@@ -154,17 +162,20 @@ class GithubMetricsFetcher
           p = commits.map { | commit | 
             params[:throttle].throttled_future(1) do
               oid = get_data(commit, ["commit", "oid"])
+              login = get_data(commit, ["commit", "user", "login"])
               name = get_data(commit, ["commit", "author", "name"])
               email = get_data(commit, ["commit", "author", "email"])
               date = get_data(commit, ["commit", "committedDate"])
               stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
-              {
-              :id => oid,
-              :date => date, 
-              :name => name, 
-              :email => email, 
-              :stats => stats }
+              { :user_id => login,
+              :commit_id => oid,
+              :commit_date => date, 
+              :user_name => name, 
+              :user_email => email, 
+              :lines_added => stats[:additions],
+              :lines_deleted => stats[:deletions],
+              :lines_changed => stats[:total] }
             end
           } 
 
@@ -228,6 +239,9 @@ class GithubMetricsFetcher
                     { 
                       date email name 
                     } 
+                    user {
+                      login
+                    }
                 } 
               }
               pageInfo {
@@ -279,6 +293,9 @@ class GithubMetricsFetcher
                       { 
                         date email name 
                       }  
+                      user {
+                        login
+                      }
                     }
                   }
                 }

@@ -1,0 +1,3 @@
+class MetricDisplayAdapter
+  def 
+end

@@ -1,5 +1,6 @@
 class Metric < ActiveRecord::Base
-  has_one :metric
+  enum source: [ :github ]
   has_one :team
+  has_one :assignment
   has_many :metric_data_point, dependent: :destroy
 end

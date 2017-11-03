@@ -3,17 +3,17 @@ require 'csv'
 module ImportTopicsHelper
   def self.define_attributes(columns)
     attributes = {}
-    attributes["topic_identifier"] = columns[0].strip
-    attributes["topic_name"] = columns[1].strip
-    attributes["max_choosers"] = columns[2].strip
-    attributes["category"] = columns[3].strip if columns.length > 3
+    attributes[:topic_identifier] = columns[0].strip
+    attributes[:topic_name] = columns[1].strip
+    attributes[:max_choosers] = columns[2].strip
+    attributes[:category] = columns[3].strip if columns.length > 3
     define_attributes_extra(attributes, columns)
     attributes
   end
 
   def self.define_attributes_extra(attributes, columns)
-    attributes["description"] = columns[4].strip if columns.length > 4
-    attributes["link"] = columns[5].strip if columns.length > 5
+    attributes[:description] = columns[4].strip if columns.length > 4
+    attributes[:link] = columns[5].strip if columns.length > 5
     attributes
   end
 
@@ -26,14 +26,8 @@ module ImportTopicsHelper
 
   private
 
-  def sign_up_topic_params(params_hash)
-    params_local = params
-    params_local[:sign_up_topic] = params_hash
-    params_local.require(:sign_up_topic).permit(:topic_identifier,
-                                                :topic_name,
-                                                :max_choosers,
-                                                :category,
-                                                :description,
-                                                :link)
+  def self.sign_up_topic_params(params_hash)
+    params_hash.slice(:topic_identifier, :topic_name, :assignment_id, :max_choosers,
+                                                :category, :description, :link, :micropayment)
   end
 end

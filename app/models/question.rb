@@ -6,7 +6,7 @@ class Question < ActiveRecord::Base
   has_many :signup_choices # ?? this may reference signup type questionnaires
   has_many :answers
 
-  attr_accessible :id, :txt, :weight, :questionnaire_id, :seq, :type, :size,
+  attr_accessible :id, :txt, :weight, :questionnaire_id, :seq, :size,
                   :alternatives, :break_before, :max_label, :min_label, :questionnaire
 
   validates_presence_of :seq # user must define sequence for a question

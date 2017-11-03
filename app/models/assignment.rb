@@ -32,6 +32,7 @@ class Assignment < ActiveRecord::Base
 
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
+  validates :directory_path, presence: true
   validate :valid_num_review
   validate :check_directory_path
 

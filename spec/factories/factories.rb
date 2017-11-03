@@ -66,6 +66,7 @@ FactoryGirl.define do
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails  false
+    github_id nil
   end
 
   factory :instructor, class: Instructor do
@@ -377,5 +378,14 @@ FactoryGirl.define do
     user 'student1234'
     content 'www.wolfware.edu'
     created_at Time.now
+  end
+
+  factory :metric_data_point_type, class: MetricDataPointType do
+    name "commit_id"
+    source :github
+    value_type "string" 
+    description "Commit Id"
+    dimension "label"
+    id 1
   end
 end

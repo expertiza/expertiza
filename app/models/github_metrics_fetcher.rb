@@ -26,7 +26,7 @@ class GithubMetricsFetcher
   end
 
   def initialize(params)
-    @url = params["url"]
+    @url = params[:url]
     @loaded = false
   end
 
@@ -113,10 +113,14 @@ class GithubMetricsFetcher
         page_info = get_data(json, ["data", "repository", "ref", "target", "history", "pageInfo"])
         commits = get_data(json, ["data", "repository", "ref", "target", "history", "edges"])
 
+        if commits.nil?
+          return json
+        end
+
         p = commits.map { | commit | 
           params[:throttle].throttled_future(1) do 
             oid = get_data(commit, ["node", "oid"])
-            login = get_data(commit, ["commit", "user", "login"])
+            login = get_data(commit, ["node", "author", "user", "login"])
             name = get_data(commit, ["node", "author", "name"])
             email = get_data(commit, ["node", "author", "email"])
             date = get_data(commit, ["node", "committedDate"])
@@ -162,7 +166,7 @@ class GithubMetricsFetcher
           p = commits.map { | commit | 
             params[:throttle].throttled_future(1) do
               oid = get_data(commit, ["commit", "oid"])
-              login = get_data(commit, ["commit", "user", "login"])
+              login = get_data(commit, ["commit", "author", "user", "login"])
               name = get_data(commit, ["commit", "author", "name"])
               email = get_data(commit, ["commit", "author", "email"])
               date = get_data(commit, ["commit", "committedDate"])
@@ -238,10 +242,10 @@ class GithubMetricsFetcher
                     author
                     { 
                       date email name 
+                      user {
+                        login
+                      }
                     } 
-                    user {
-                      login
-                    }
                 } 
               }
               pageInfo {
@@ -291,11 +295,11 @@ class GithubMetricsFetcher
                       oid commitUrl committedDate 
                       author
                       { 
-                        date email name 
+                        date email name  
+                        user {
+                          login
+                        }
                       }  
-                      user {
-                        login
-                      }
                     }
                   }
                 }

@@ -1,3 +1,2 @@
 class MetricDisplayAdapter
-  def 
 end

@@ -1,4 +1,4 @@
 class MetricDataPoint < ActiveRecord::Base
   has_one :metric
-  has_one :metric_data_point_type
+  belongs_to :metric_data_point_type
 end

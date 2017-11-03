@@ -7,7 +7,7 @@ class Question < ActiveRecord::Base
   has_many :answers
 
   attr_accessible :id, :txt, :weight, :questionnaire_id, :seq, :type, :size,
-                  :alternatives, :break_before, :max_label, :min_label
+                  :alternatives, :break_before, :max_label, :min_label, :questionnaire
 
   validates_presence_of :seq # user must define sequence for a question
   validates_numericality_of :seq # sequence must be numeric

@@ -11,7 +11,7 @@ class ReputationWebServiceController < ApplicationController
   @another_assignment_id = ''
   @round_num = ''
   @algorithm = ''
-  @@additional_info = ''
+  @additional_info = ''
   @response = ''
 
   def action_allowed?
@@ -72,10 +72,10 @@ class ReputationWebServiceController < ApplicationController
         end
 
         peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
-        raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
+        raw_data_array = [reviewer.id, team.id, peer_review_grade.round(4)]
       end
     end
-    raw_data_array
+    return raw_data_array
   end
 
   # special db query, return quiz scores
@@ -103,7 +103,7 @@ class ReputationWebServiceController < ApplicationController
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
     if type == 'peer review grades'
-      @results = db_query(assignment.id, round_num, has_topic, another_assignment_id)
+      @results = db_query(assignment.__id__, round_num, has_topic, another_assignment_id)
     elsif type == 'quiz scores'
       @results = db_query_with_quiz_score(assignment.id, another_assignment_id)
     end
@@ -127,7 +127,7 @@ class ReputationWebServiceController < ApplicationController
     @another_assignment = Assignment.find(@another_assignment_id) rescue nil
     @round_num = @round_num
     @algorithm = @algorithm
-    @additional_info = @@additional_info
+    @additional_info = @additional_info
     @response = @response
   end
 

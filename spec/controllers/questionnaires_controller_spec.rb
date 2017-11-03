@@ -207,7 +207,17 @@ describe QuestionnairesController do
   end
 
   describe '#toggle_access' do
-    it 'redirects to tree_display#list page'
+    it 'redirects to tree_display#list page' do
+      allow(Questionnaire).to receive(:find).and_return(questionnaire)
+      params = {
+            id: 1
+        }
+        user = double("User")
+        allow(user).to receive(:id).and_return(1)
+        session = {user: user}
+      get :toggle_access, params, session
+      expect(response).to redirect_to controller: 'tree_display', action: 'list'
+    end
   end
 
   describe '#add_new_questions' do

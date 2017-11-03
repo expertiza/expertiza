@@ -337,8 +337,10 @@ describe Assignment do
 
   it 'should contain course in path name' do
     @assignment = create(:assignment)
-    @assignment.directory_path = Course.first.path + "/finaltest"
-    expect(@assignment.directory_path).must_include (Course.first.directory_path)
+    @assignment.directory_path = Course.first.directory_path.to_s + "/finaltest"
+    expect(@assignment.directory_path).to include(Course.first.directory_path)
   end
+
+
 
 end

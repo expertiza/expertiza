@@ -42,8 +42,7 @@ class InvitationsController < ApplicationController
 
   def accept
     # Accept the invite and check whether the add was successful
-    acceptance =Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
-      unless acceptance
+    unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
         flash[:error] = 'The system failed to add you to the team that invited you.'
     end
 

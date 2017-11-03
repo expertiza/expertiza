@@ -36,6 +36,7 @@ describe 'bidding process test', js: true do
     click_link "final2"
 
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+#      drag and drop
     source = page.find('#topics')
     target = page.find('#selections')
     source.drag_to(target)

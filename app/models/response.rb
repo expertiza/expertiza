@@ -137,9 +137,9 @@ class Response < ActiveRecord::Base
     participant = Participant.find(response_map.reviewer_id)
     # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
     parent = if response_map.survey?
-               response_map.survey_parent
+              response_map.survey_parent
             else
-               Assignment.find(participant.parent_id)
+              Assignment.find(participant.parent_id)
             end
     defn[:subject] = "A new submission is available for " + parent.name
     response_map.email(defn, participant, parent)

@@ -162,7 +162,7 @@ describe QuestionnairesController do
   describe '#edit' do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do
-        allow(Questionnaire).to receive(:find).and_return(double('Questionnaire'))
+        allow(Questionnaire).to receive(:find_by_id).and_return(double('Questionnaire'))
         params = {
             id: 1
         }
@@ -173,6 +173,11 @@ describe QuestionnairesController do
 
     context 'when @questionnaire is nil' do
       it 'redirects to /questionnaires page' do
+        params = {
+            id: -1
+        }
+        get :edit, params
+        expect(response).to redirect_to Questionnaire
       end
     end
   end

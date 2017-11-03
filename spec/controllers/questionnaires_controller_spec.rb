@@ -255,7 +255,16 @@ describe QuestionnairesController do
   end
 
   describe '#view_quiz' do
-    it 'renders questionnaires#view_quiz'
+    it 'renders questionnaires#view_quiz' do
+      allow(Questionnaire).to receive(:find).and_return(questionnaire)
+      allow(Participant).to receive(:find).and_return(double('Participant'))
+      params = {
+          id: 1,
+          pid: 1
+        }
+        get :view_quiz, params
+        expect(response).to render_template(:view)
+    end
   end
 
   describe '#new_quiz' do

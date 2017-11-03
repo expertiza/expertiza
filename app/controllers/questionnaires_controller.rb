@@ -5,19 +5,21 @@ class QuestionnairesController < ApplicationController
   # Generally a questionnaire is associated with an assignment (Assignment)
 
   before_action :authorize
+  
+  def action_allowed?
+    if action_name == "edit"
+      @questionnaire = Questionnaire.find(params[:id])
+      (['Super-Administrator',
+       'Administrator'
+       ].include? current_role_name)  ||
+          ((['Instructor'].include? current_role_name) && current_user_id?( @questionnaire.instructor_id))
 
-  if action_name == "edit"
-    @questionnaire = Questionnaire.find(params[:id])
-    (['Super-Administrator',
-     'Administrator'
-     ].include? current_role_name)  ||
-        ((['Instructor'].include? current_role_name) && current_user_id?( @questionnaire.instructor_id))
-    
-  else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant', 'Student'].include? current_role_name
+    else
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant', 'Student'].include? current_role_name
+   end
  end
 
   # Create a clone of the given questionnaire, copying all associated

@@ -3,7 +3,7 @@ class TeamsUser < ActiveRecord::Base
   belongs_to :team
   has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
-  attr_accessible
+  attr_accessible :user, :team
 
   def name
     self.user.name

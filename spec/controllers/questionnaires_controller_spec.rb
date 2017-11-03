@@ -341,19 +341,49 @@ describe QuestionnairesController do
 
   describe '#valid_quiz' do
     context 'when user does not specify quiz name' do
-      it 'returns message (Please specify quiz name (please do not use your name or id).)'
+      it 'returns message (Please specify quiz name (please do not use your name or id).)' do
+        assignment = double('Assignment')
+        allow(assignment).to receive(:num_quiz_questions).and_return(1)
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(subject).to receive(:params).and_return({
+          aid: 1,
+          questionnaire: { name: ""}
+        })
+        expect(subject.valid_quiz).to eq("Please specify quiz name (please do not use your name or id).")
+      end
     end
 
     context 'when user does not specify a type for each question' do
-      it 'returns message (Please select a type for each question)'
+      it 'returns message (Please select a type for each question)' do
+        assignment = double('Assignment')
+        allow(assignment).to receive(:num_quiz_questions).and_return(1)
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(subject).to receive(:params).and_return({
+          aid: 1,
+          questionnaire: { name: "Random Name"}
+        })
+        expect(subject.valid_quiz).to eq("Please select a type for each question")
+      end
     end
 
     context 'when user does not specify choice info for one question' do
-      it 'returns mesage (Please select a correct answer for all questions)'
+      it 'returns mesage (Please select a correct answer for all questions)' do
+        assignment = double('Assignment')
+        allow(assignment).to receive(:num_quiz_questions).and_return(1)
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(subject).to receive(:params).and_return({
+           aid: 1,
+           questionnaire: {name: 'test questionnaire'},
+           question_type: {'1' => {type: 'TrueFalse'}},
+           new_question: {'1' => {iscorrect: 'True'}},
+           new_choices: {'1' => {'TrueFalse' => nil}}
+         })
+        expect(subject.valid_quiz).to eq("Please select a correct answer for all questions")
+      end
     end
 
     context 'when user specifies all necessary information' do
-      it 'returns mesage (valid)'
+      it 'returns mesage (valid)' do
         # controller.params = {
         #   aid: 1,
         #   questionnaire: {name: 'test questionnaire'},
@@ -361,6 +391,18 @@ describe QuestionnairesController do
         #   new_question: {'1' => {iscorrect: 'True'}},
         #   new_choices: {'1' => {'TrueFalse' => 'sth'}}
         # }
+        assignment = double('Assignment')
+        allow(assignment).to receive(:num_quiz_questions).and_return(1)
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(subject).to receive(:params).and_return({
+           aid: 1,
+           questionnaire: {name: 'test questionnaire'},
+           question_type: {'1' => {type: 'TrueFalse'}},
+           new_question: {'1' => {iscorrect: 'True'}},
+           new_choices: {'1' => {'TrueFalse' => {0 => {txt:'sth', iscorrect: 0}}}}
+         })
+        expect(subject.valid_quiz).to eq("valid")
+      end
     end
   end
 
@@ -382,7 +424,8 @@ describe QuestionnairesController do
               '4' => {iscorrect: '0', txt: 'a34'}}}},
          question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
       }
-
+      #allow(Question).to receive(:where).and_return([question,question])
+      #get :save_choices, controller.params
       #allow(QuestionnairesController).to receive(:params).with(:id => "1").and_return(true)
       #@save_questions = QuestionnairesController.new
       #@save_questions.send(:save_all_questions_questionnaires_path).should == true

@@ -103,7 +103,7 @@ class ReputationWebServiceController < ApplicationController
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
     if type == 'peer review grades'
-      @results = db_query(assignment.__id__, round_num, has_topic, another_assignment_id)
+      @results = db_query(assignment.id, round_num, has_topic, another_assignment_id)
     elsif type == 'quiz scores'
       @results = db_query_with_quiz_score(assignment.id, another_assignment_id)
     end

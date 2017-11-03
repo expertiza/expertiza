@@ -100,9 +100,13 @@ describe Response do
 
   describe '.concatenate_all_review_comments' do
     it 'returns concatenated review comments and # of reviews in each round' do
-      # As this method is getting called from get_volume_of_review_comments
-      # we need not test this method separately. Also this method has not been called
-      # from any other places.
+      question_ids = [1, 5]
+      allow(Assignment).to receive(:find).and_return(assignment)
+      allow(Question).to receive(:get_all_questions_with_comments_available).and_return(question_ids)
+      allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).and_return(review_response_map)
+      allow(Assignment).to receive(:num_review_rounds).and_return(3)
+      result = ["", 0, "", 0, "", 0, "", 0]
+      expect(Response.concatenate_all_review_comments(1,1)).to eq(result)
     end
   end
 

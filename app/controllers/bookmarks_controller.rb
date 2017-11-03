@@ -10,8 +10,6 @@ class BookmarksController < ApplicationController
   end
 
   def list
-    puts params[:id]
-    puts params[:assignment_id]
     @bookmarks = Bookmark.where(topic_id: params[:id])
     @topic = SignUpTopic.find(params[:id])
   end
@@ -25,8 +23,9 @@ class BookmarksController < ApplicationController
     params[:url] = params[:url].gsub!(/http:\/\//, "") if params[:url].start_with?('http://')
     params[:url] = params[:url].gsub!(/https:\/\//, "") if params[:url].start_with?('https://')
     begin
-      @bookmark = Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
-      if @bookmark.save
+      @bookmark = Bookmark.create(url: params[:url], title: params[:title], description: params[:description],
+                                  user_id: session[:user].id, topic_id: params[:topic_id])
+      if @bookmark.save # we are making sure its gets saved else we display the error
       flash[:success] = 'Your bookmark has been successfully created!'
       redirect_to action: 'list', id: params[:topic_id]
       else

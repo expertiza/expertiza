@@ -75,7 +75,7 @@ class ReputationWebServiceController < ApplicationController
         raw_data_array = [reviewer.id, team.id, peer_review_grade.round(4)]
       end
     end
-    return raw_data_array
+    raw_data_array
   end
 
   # special db query, return quiz scores

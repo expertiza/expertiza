@@ -21,5 +21,5 @@ describe ReputationWebServiceController do
     expect(result).should_not be(nil)
     # puts result
   end
-  
+
 end

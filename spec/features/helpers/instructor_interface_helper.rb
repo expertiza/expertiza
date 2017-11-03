@@ -33,7 +33,7 @@ module InstructorInterfaceHelperSpec
     visit '/assignments/1/edit'
     click_link "Topics"
     click_link "Import topics"
-    find('.ui-button-text', :text => 'OK').click
+    find('.ui-button-text', text: 'OK').click
     file_path = Rails.root + filepath
     attach_file('file', file_path)
     wait_for_ajax

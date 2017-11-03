@@ -120,8 +120,6 @@ class SignUpSheetController < ApplicationController
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
-
-
   # issue 971 - do enable ajax control
   # 1781
   # see Js Grid for json format to insert in the model
@@ -478,7 +476,6 @@ def setup_new_topic
     render json: @sign_up_topic.as_json
   end
 end
-
 
 def update_existing_topic(topic)
   topic.topic_identifier = params[:topic_identifier]

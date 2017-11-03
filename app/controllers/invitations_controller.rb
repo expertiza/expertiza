@@ -59,7 +59,6 @@ class InvitationsController < ApplicationController
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])
-
     @inviter = User.find(@inv.from_id)
     @invitee = User.find(@inv.to_id)
     prepared_mail = MailerHelper.send_mail_about_invitation(@invitee, @inviter, "invitation_declined")

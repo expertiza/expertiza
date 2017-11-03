@@ -80,9 +80,9 @@ class Mailer < ActionMailer::Base
   end
 
   def new_topic_suggested_message(defn)
-    @body = defn[:body]
-    @topic_name = defn[:body][:topic_name]
     @proposer = defn[:body][:proposer]
+    @topic_name = defn[:body][:topic_name]
+    @body = defn[:body]
 
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'

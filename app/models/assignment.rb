@@ -181,8 +181,6 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        # scores_max()
-        # scores_min()
         scores_arr=[['max','<'],['min','>']]
         scores_arr.each do |(a,b)|
           scores_max_min(a,b)          

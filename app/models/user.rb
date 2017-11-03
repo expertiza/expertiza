@@ -362,8 +362,6 @@ class User < ActiveRecord::Base
     users
   end
 
-  private
-
   def self.user_params(params_hash)
     params_hash.slice(:name,
                       :crypted_password,

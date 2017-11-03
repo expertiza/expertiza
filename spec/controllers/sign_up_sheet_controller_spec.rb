@@ -59,7 +59,7 @@ describe SignUpSheetController do
   describe '#update' do
     context 'when topic cannot be found' do
       it 'shows an error flash message and redirects to assignment#edit page'
-       end
+    end
 
     context 'when topic can be found' do
       it 'updates current topic and redirects to assignment#edit page'
@@ -117,49 +117,36 @@ describe SignUpSheetController do
       it 'shows a flash success message and redirects to sign_up_sheet#list page'
     end
   end
-
   describe '#delete_signup_as_instructor' do
     context 'when either submitted files or hyperlinks of current team are not empty' do
       it 'shows a flash error message and redirects to assignment#edit page'
     end
-
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to assignment#edit page'
     end
-
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
       it 'shows a flash success message and redirects to assignment#edit page'
     end
   end
-
   describe '#set_priority' do
     it 'sets priority of bidding topic and redirects to sign_up_sheet#list page'
   end
-
   describe '#save_topic_deadlines' do
     context 'when topic_due_date cannot be found' do
       it 'creates a new topic_due_date record and redirects to assignment#edit page'
     end
-
     context 'when topic_due_date can be found' do
       it 'updates the existing topic_due_date record and redirects to assignment#edit page'
     end
   end
-
   describe '#show_team' do
     it 'renders show_team page'
   end
-
   describe '#switch_original_topic_to_approved_suggested_topic' do
     it 'redirects to sign_up_sheet#list page'
   end
-
   describe '#load_add_signup_topics' do
-
-
-
-      context 'when assignment is found' do
-        
+      context 'when assignment is found' do        
         it 'should render json successfully' do 
           allow(SignUpTopic).to receive(:where).and_return([topic])
           get :load_add_signup_topics, id: "#{assignment.id}"
@@ -178,19 +165,15 @@ describe SignUpSheetController do
               slots_waitlisted: 0,
               slots_available: 1,
               partipants: []
-              }],
+            }],
             slots_waitlisted: [],
             assignment: {
               id: assignment.id
              }
-           }
-          )
-
-
-
-       end
+            }
+           )
+        end
       end
-
       context 'when assignment is not found' do
         it 'should render empty json successfully' do
            allow(Assignment).to receive(:find).and_raise(ActiveRecord::RecordNotFound)
@@ -198,8 +181,7 @@ describe SignUpSheetController do
            puts response.body
            expect(response.content_type).to eq "application/json"
            expect(response).to have_http_status(:not_found)
+        end
       end
-     end
-
   end
 end

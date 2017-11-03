@@ -42,8 +42,8 @@ FactoryGirl.define do
     digital_certificate nil
     timezonepref nil
     public_key nil
-    copy_of_emails  false
-    copy_of_all_emails  false
+    copy_of_emails false
+    copy_of_all_emails false
   end
 
   factory :student, class: User do
@@ -66,8 +66,8 @@ FactoryGirl.define do
     digital_certificate nil
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
-    copy_of_emails  false
-    copy_of_all_emails  false
+    copy_of_emails false
+    copy_of_all_emails false
   end
 
   factory :instructor, class: Instructor do
@@ -89,7 +89,7 @@ FactoryGirl.define do
     digital_certificate nil
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
-    copy_of_all_emails  false
+    copy_of_all_emails false
   end
 
   factory :teaching_assistant, class: Ta do
@@ -111,8 +111,8 @@ FactoryGirl.define do
     digital_certificate nil
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
-    copy_of_emails  false
-    copy_of_all_emails  false
+    copy_of_emails false
+    copy_of_all_emails false
   end
 
   factory :course, class: Course do

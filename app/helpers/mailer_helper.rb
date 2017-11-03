@@ -43,7 +43,7 @@ module MailerHelper
         user: user,
         password: password,
         first_name: ApplicationHelper.get_user_first_name(user),
-        partial_name: partial_name,
+        partial_name: partial_name
       }
     })
   end

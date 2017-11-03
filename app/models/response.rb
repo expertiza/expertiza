@@ -149,9 +149,9 @@ class Response < ActiveRecord::Base
 
     # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
     parent = if response_map.survey?
-      response_map.survey_parent
-    else
-      Assignment.find(participant.parent_id)
+               response_map.survey_parent
+             else
+               Assignment.find(participant.parent_id)
              end
 
     defn[:subject] = "A new submission is available for " + parent.name
@@ -281,16 +281,16 @@ class Response < ActiveRecord::Base
       to: assignment.instructor.email,
       subject: "Expertiza Notification: A review score is outside the acceptable range",
       body: {
-              reviewer_name: reviewer_name,
-              type: "review",
-              reviewee_name: reviewee_name,
-              new_score: get_total_score.to_f / get_maximum_score,
-              avg_score: average_score,
-              assignment: assignment,
-              conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
-              summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-              assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-            }
+        reviewer_name: reviewer_name,
+        type: "review",
+        reviewee_name: reviewee_name,
+        new_score: get_total_score.to_f / get_maximum_score,
+        avg_score: average_score,
+        assignment: assignment,
+        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
+        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+      }
     ).deliver_now
   end
 end

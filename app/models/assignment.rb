@@ -10,7 +10,7 @@ class Assignment < ActiveRecord::Base
   include QuizAssignment
   include OnTheFlyCalc
   has_paper_trail
-  attr_accessible :name, :directory_path, :require_quiz
+  attr_accessible :name, :directory_path, :require_quiz, :course_id
 
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;

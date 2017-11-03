@@ -82,7 +82,7 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire = Questionnaire.find_by_id(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
   end
 

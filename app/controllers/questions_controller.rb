@@ -80,6 +80,7 @@ class QuestionsController < ApplicationController
     redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
   end
 
+
   private
 
   def question_params

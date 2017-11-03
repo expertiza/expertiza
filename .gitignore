@@ -205,5 +205,3 @@ pg_data
 .ruby-version
 mysql2psql.yml
 *.pem
-
-Gemfile.lock

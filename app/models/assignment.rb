@@ -181,7 +181,8 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        scores_min_max()
+        scores_max()
+        scores_min()
         if total_num_of_assessments != 0
           scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
@@ -199,17 +200,23 @@ class Assignment < ActiveRecord::Base
     scores
   end
 
-  def scores_min_max
+  def scores_max
     (1..self.num_review_rounds).each do |i|
           round_sym = ("review" + i.to_s).to_sym
           if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
             scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
           end
-          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
+        end
+    end
+
+  def scores_min
+      (1..self.num_review_rounds).each do |i|
+          round_sym = ("review" + i.to_s).to_sym
+            if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
             scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
           end
         end
-    end
+    end  
 
 
   def path
@@ -584,24 +591,18 @@ class Assignment < ActiveRecord::Base
         tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
         tcsv.push('---', '---', '---') if options['team_score'] == 'true'
       
-      pscore[:review] ?
-        tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['submitted_score']
-
-      pscore[:metareview] ?
-        tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['metareview_score']
-
-      pscore[:feedback] ?
-        tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['author_feedback_score']
-
-      pscore[:teammate] ?
-        tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['teammate_review_score']
-
+      arr=[['review','submitted_score'],['metareview','metareview_score'],['feedback','author_feedback_score'],['teammate','teammate_review_score']]
+      arr.each do |(a,b)|
+        export_individual_fields(a,b)          
+      end
       tcsv.push(pscore[:total_score])
  end
+
+  def self.export_individual_fields(option,k)
+    pscore[option.to_sym] ?
+        tcsv.push(pscore[option.to_sym][:scores][:max], pscore[option.to_sym][:scores][:min], pscore[option.to_sym][:scores][:avg]) :
+        tcsv.push('---', '---', '---') if options[k]
+  end 
   
 
   # This method is used for export contents of grade#view.  -Zhewei

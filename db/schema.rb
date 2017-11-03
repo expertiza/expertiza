@@ -11,20 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027182114) do
-
-  create_table "answer_tags", force: :cascade do |t|
-    t.integer  "answer_id",                limit: 4
-    t.integer  "tag_prompt_deployment_id", limit: 4
-    t.integer  "user_id",                  limit: 4
-    t.string   "value",                    limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
-  end
-
-  add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
-  add_index "answer_tags", ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id", using: :btree
-  add_index "answer_tags", ["user_id"], name: "index_answer_tags_on_user_id", using: :btree
+ActiveRecord::Schema.define(version: 20170925225438) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -98,7 +85,6 @@ ActiveRecord::Schema.define(version: 20171027182114) do
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
-    t.boolean  "is_answer_tagging_allowed"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -637,28 +623,6 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   add_index "ta_mappings", ["course_id"], name: "fk_ta_mappings_course_id", using: :btree
   add_index "ta_mappings", ["ta_id"], name: "fk_ta_mappings_ta_id", using: :btree
 
-  create_table "tag_prompt_deployments", force: :cascade do |t|
-    t.integer  "tag_prompt_id",           limit: 4
-    t.integer  "assignment_id",           limit: 4
-    t.integer  "questionnaire_id",        limit: 4
-    t.string   "question_type",           limit: 255
-    t.integer  "answer_length_threshold", limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-  end
-
-  add_index "tag_prompt_deployments", ["assignment_id"], name: "index_tag_prompt_deployments_on_assignment_id", using: :btree
-  add_index "tag_prompt_deployments", ["questionnaire_id"], name: "index_tag_prompt_deployments_on_questionnaire_id", using: :btree
-  add_index "tag_prompt_deployments", ["tag_prompt_id"], name: "index_tag_prompt_deployments_on_tag_prompt_id", using: :btree
-
-  create_table "tag_prompts", force: :cascade do |t|
-    t.string   "prompt",       limit: 255
-    t.string   "desc",         limit: 255
-    t.string   "control_type", limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-  end
-
   create_table "teams", force: :cascade do |t|
     t.string  "name",                       limit: 255
     t.integer "parent_id",                  limit: 4
@@ -737,9 +701,6 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
-  add_foreign_key "answer_tags", "answers"
-  add_foreign_key "answer_tags", "tag_prompt_deployments"
-  add_foreign_key "answer_tags", "users"
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
@@ -769,9 +730,6 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   add_foreign_key "survey_deployments", "questionnaires"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"
-  add_foreign_key "tag_prompt_deployments", "assignments"
-  add_foreign_key "tag_prompt_deployments", "questionnaires"
-  add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
 end

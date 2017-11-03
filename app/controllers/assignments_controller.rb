@@ -112,10 +112,6 @@ class AssignmentsController < ApplicationController
     if @assignment_form.assignment.directory_path.nil? || @assignment_form.assignment.directory_path.empty?
       flash.now[:error] = "You did not specify your submission directory."
     end
-
-    if @assignment_form.assignment.is_answer_tagging_allowed
-      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
-    end
   end
 
   def update

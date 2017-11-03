@@ -179,8 +179,6 @@ GEM
     http-cookie (1.0.2)
       domain_name (~> 0.5)
     i18n (0.7.0)
-    jquery-colorbox-rails (1.7.0)
-      railties (>= 3.1)
     jquery-datetimepicker-rails (2.4.1.0)
     jquery-rails (4.0.4)
       rails-dom-testing (~> 1.0)
@@ -475,7 +473,6 @@ DEPENDENCIES
   guard-rails
   guard-rspec
   haml-rails
-  jquery-colorbox-rails
   jquery-datetimepicker-rails
   jquery-rails
   jquery-tablesorter

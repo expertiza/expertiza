@@ -76,7 +76,7 @@ module GradesHelper
                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
                end
       next unless questionnaire.type == type
-      vm = VmQuestionResponse.new(questionnaire, @assignment)
+      vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
       questions = questionnaire.questions
       vm.add_questions(questions)
       vm.add_team_members(@team)

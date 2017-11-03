@@ -1,14 +1,7 @@
 describe 'Airbrake-1781551925379466692' do
-  let(:assignment) { build(:assignment, id: 1) }
-  let(:assignment_questionaire1) { build(:assignment_questionaire1, assignment_id: 1, used_in_round: 2 )}
-  let(:assignment_due_date) do
-    build(:assignment_due_date, parent_id: 1, due_at: '2011-11-11 11:11:11 UTC', deadline_name: 'Review',
-          description_url: 'https://expertiza.ncsu.edu/', round: 2)
-  end
-
   before(:each) do
     questionnaire = Questionnaire.new
-    @qs = VmQuestionResponse.new(questionnaire, assignment)
+    @qs = VmQuestionResponse.new(questionnaire, 1, 2)
     # @list_of_reviews = [Response.new(id: 1)]
     @qs.instance_variable_set(:@list_of_reviews, [instance_double('Response', response_id: 1)])
     @qs.instance_variable_set(:@list_of_rows, [VmQuestionResponseRow.new('', 1, 1, 5, 0)])

@@ -1,16 +1,3 @@
-<script type="text/javascript">
-  toggle_tag_prompt = function() {
-    $('.tag_prompt_container').toggle();
-  };
-  $( document ).ready(function() {
-    $('#tag_prompt_toggler').click(function () {
-      if ($('#tag_prompt_toggler').text() == "hide tags")
-        $('#tag_prompt_toggler').text("show tags")
-      else
-        $('#tag_prompt_toggler').text("hide tags")
-    });
-  });
-</script>
 <% if rscore and rscore[:assessments].length > 0 %>
     <BR/>
     <%flag_varying_rubrics=false%>
@@ -52,9 +39,6 @@
         <h3>Round <%= round %></h3>
         <% if controller.action_name != "view_my_scores"%> %>
             <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
-        <% end %>
-        <% if @assignment.is_answer_tagging_allowed %>
-            <span class="spn_qsttog" id="tag_prompt_toggler" title="Click to display/hide tags" onclick="toggle_tag_prompt()">hide tags</span>
         <% end %>
         <table class="table table-striped" id=<%= participant.id.to_s + '_' + round.to_s %> <%= style="display: none;" if controller.action_name != "view_my_scores"%>>
             <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>

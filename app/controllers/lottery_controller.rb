@@ -48,7 +48,7 @@ class LotteryController < ApplicationController
           next unless team_user
           if index.zero?
             # keep the original team of 1st user if exists and ask later students join in this team
-            current_team = team_user.team
+            current_team = AssignmentTeam.find_by(id: team_user.team_id)
             parent = TeamNode.find_by(parent_id: assignment.id, node_object_id: current_team.id)
             break if current_team and parent
             current_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(10000).to_s, parent_id: assignment.id)
@@ -103,9 +103,8 @@ class LotteryController < ApplicationController
 
     team_bids.each do |tb|
       tb[:bids].each do |bid|
-        num_of_signed_up_teams = SignedUpTeam.where(topic_id: bid[:topic_id]).count
-        max_choosers = SignUpTopic.find_by(id: bid[:topic_id]).try(:max_choosers)
-        if num_of_signed_up_teams < max_choosers
+        signed_up_team = SignedUpTeam.find_by(topic_id: bid[:topic_id])
+        unless signed_up_team
           SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
           break
         end
@@ -115,9 +114,9 @@ class LotteryController < ApplicationController
     # auto_merge_teams unassignedTeams, finalTeamTopics
 
     # Remove is_intelligent property from assignment so that it can revert to the default signup state
-    assignment = Assignment.find_by(id: params[:id])
+    assignment = Assignment.find(params[:id])
     assignment.update_attribute(:is_intelligent, false)
-    flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
+    flash[:notice] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
   end
 
   # This method is called to automerge smaller teams to teams which were assigned topics through intelligent assignment

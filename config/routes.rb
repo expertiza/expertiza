@@ -1,19 +1,12 @@
 Expertiza::Application.routes.draw do
 
   resources :user_pastebins
-  resources :tag_prompts
   resources :track_notifications
   resources :notifications
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
-
-  resources :answer_tags do
-    collection do
-      post :create_edit
-    end
-  end
 
   resources :bookmarks do
     collection do
@@ -296,7 +289,6 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :delete
-      get :types
     end
   end
 

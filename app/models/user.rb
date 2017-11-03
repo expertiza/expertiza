@@ -17,7 +17,27 @@ class User < ActiveRecord::Base
   belongs_to :parent, class_name: 'User'
   belongs_to :role
   attr_accessor :anonymous_mode
-  attr_protected
+  attr_accessible :name,
+                  :crypted_password,
+                  :role_id,
+                  :password_salt,
+                  :fullname,
+                  :email,
+                  :parent_id,
+                  :private_by_default,
+                  :mru_directory_path,
+                  :email_on_review,
+                  :email_on_submission,
+                  :email_on_review_of_review,
+                  :is_new_user,
+                  :master_permission_granted,
+                  :handle,
+                  :digital_certificate,
+                  :persistence_token,
+                  :timezonepref,
+                  :public_key,
+                  :copy_of_emails,
+                  :institution_id
   validates_presence_of :name
   validates_uniqueness_of :name
 

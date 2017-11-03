@@ -181,8 +181,13 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
         scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        scores_max()
-        scores_min()
+        # scores_max()
+        # scores_min()
+        scores_arr=[['max','<'],['min','>']]
+        scores_arr.each do |(a,b)|
+          scores_max_min(a,b)          
+      end
+     
         if total_num_of_assessments != 0
           scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
@@ -199,25 +204,14 @@ class Assignment < ActiveRecord::Base
     end
     scores
   end
-
-  def scores_max
-    (1..self.num_review_rounds).each do |i|
-          round_sym = ("review" + i.to_s).to_sym
-          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
-            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
-          end
-        end
-    end
-
-  def scores_min
+  def scores_max_min(option,sym)
       (1..self.num_review_rounds).each do |i|
-          round_sym = ("review" + i.to_s).to_sym
-            if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
-            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
+            round_sym = ("review" + i.to_s).to_sym
+            if !((grades_by_rounds[round_sym][option.to_sym].nil? && scores[:teams][index.to_s.to_sym][:scores][option.to_sym]).method(sym).(grades_by_rounds[round_sym][option.to_sym]))
+              scores[:teams][index.to_s.to_sym][:scores][option.to_sym] = grades_by_rounds[round_sym][option.to_sym]
+            end
           end
-        end
-    end  
-
+      end
 
   def path
     if self.course_id.nil? && self.instructor_id.nil?

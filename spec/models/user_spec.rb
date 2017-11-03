@@ -236,7 +236,7 @@ describe User do
       it 'finds user by email if the local part of email is the same as username' do
         allow(User).to receive(:find_by).and_return(nil)
         allow(User).to receive(:where).and_return([{name: 'abc', fullname: 'abc bbc'}])
-        expect(User.find_by_login('abcxyz@gmail.com')).to eq([{name: "abc", fullname: "abc bbc"}])
+        expect(User.find_by_login('abcxyz@gmail.com')).to eq(name: "abc", fullname: "abc bbc")
       end
     end
   end
@@ -464,39 +464,35 @@ describe User do
 
   describe '.search_users' do
     let(:role) { Role.new }
+
     before(:each) do
-      allow(User).to receive_message_chain(:order, :where).and_return(user)
       allow(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, @user_id, '%name%')
+      allow(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, @user_id, '%fullname%')
+      allow(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and email like ?", role.get_available_roles, @user_id, '%email%')
       user_id = double
     end
 
     it 'when the search_by is 1' do
       search_by = "1"
-      # expect(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, @user_id, '%name%')
+      allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'name', search_by)).to eq user
     end
 
     it 'when the search_by is 2' do
       search_by = "2"
-      # expect(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and fullname like ?",
-      #                                                           role.get_available_roles,
-      #                                                           @user_id,
-      #                                                           '%fullname%')
+      allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'fullname', search_by)).to eq user
     end
 
     it 'when the search_by is 3' do
       search_by = "3"
-      # expect(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and email like ?",
-      #                                                           role.get_available_roles,
-      #                                                           @user_id,
-      #                                                           '%email%')
+      allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, 'email', search_by)).to eq user
     end
 
     it 'when the search_by is default value' do
       search_by = nil
-      expect(User).to receive_message_chain(:order, :where).with("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, @user_id, '%')
+      allow(User).to receive_message_chain(:order, :where).and_return(user)
       expect(User.search_users(role, @user_id, '', search_by)).to eq user
     end
   end

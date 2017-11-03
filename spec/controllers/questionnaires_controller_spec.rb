@@ -179,7 +179,8 @@ describe QuestionnairesController do
 
   describe '#update' do
     context 'successfully updates the attributes of questionnaire' do
-      it 'redirects to questionnaires#edit page after updating'
+      it 'redirects to questionnaires#edit page after updating' do
+      end
     end
 
     context 'have some errors when updating the attributes of questionnaire' do
@@ -240,7 +241,17 @@ describe QuestionnairesController do
   end
 
   describe '#view_quiz' do
-    it 'renders questionnaires#view_quiz'
+    it 'renders questionnaires#view_quiz'do
+      questionnaires = double('Questionnaire')
+      allow(Questionnaire).to receive(:find).and_return(questionnaires)
+      allow(Participant).to receive(:find).and_return(double("Participant"))
+      params = {
+          id: 11
+      }
+      get :view_quiz, params
+      expect(response).to render_template(:view)
+
+    end
   end
 
   describe '#new_quiz' do
@@ -249,21 +260,53 @@ describe QuestionnairesController do
 
       it 'shows error message and redirects to submitted_content#view if current participant does not have a team'
 
+
       it 'shows error message and redirects to submitted_content#view if current participant have a team w/o topic'
     end
 
     context 'when an assignment does not require quiz' do
-      it 'shows error message and redirects to submitted_content#view'
+      it 'shows error message and redirects to submitted_content#view'do
+        assignment= double('Assignment')
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(assignment).to receive(:require_quiz?).and_return(false)
+        params = {
+            id: 1,
+            pid: 1
+        }
+        get :new_quiz, params
+        expect(flash[:error]).to eq("This assignment does not support the quizzing feature.")
+        expect(response).to redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+      end
     end
   end
 
   describe '#edit_quiz' do
     context 'when current questionnaire is not taken by anyone' do
-      it 'renders questionnaires#edit page'
+      it 'renders questionnaires#edit page' do
+        questionnaire= double('Questionnaire')
+        allow(Questionnaire).to receive(:find).and_return(questionnaire)
+        allow(questionnaire).to receive(:taken_by_anyone?).and_return(false)
+        params = {
+            id: 1
+        }
+        get :edit_quiz, params
+        expect(response).to render_template(:edit)
+      end
     end
 
     context 'when current questionnaire has been taken by someone' do
-      it 'shows flash[:error] message and redirects to submitted_content#view page'
+      it 'shows flash[:error] message and redirects to submitted_content#view page' do
+        questionnaire= double('Questionnaire')
+        allow(Questionnaire).to receive(:find).and_return(questionnaire)
+        allow(questionnaire).to receive(:taken_by_anyone?).and_return(true)
+        params = {
+            id: 1,
+            pid: 1
+        }
+        get :edit_quiz, params
+        expect(flash[:error]).to eq("Your quiz has been taken by some other students, you cannot edit it anymore.")
+        expect(response).to redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+      end
     end
   end
 

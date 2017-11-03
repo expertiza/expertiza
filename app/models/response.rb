@@ -143,7 +143,6 @@ class Response < ActiveRecord::Base
     defn[:body][:partial_name] = partial
     defn[:body][:team_id] = response_map.reviewer_id
     response_map = ResponseMap.find map_id
-
     reviewer_participant_id = response_map.reviewer_id
     participant = Participant.find(reviewer_participant_id)
 
@@ -275,7 +274,7 @@ class Response < ActiveRecord::Base
     assignment = Assignment.find(reviewer_participanat.parent_id)
     map_class = self.map.class
     existing_responses = map_class.get_assessments_for(self.map.reviewee)
-    average_score, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    average_score, _count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
 
     Mailer.notify_grade_conflict_message(
       to: assignment.instructor.email,

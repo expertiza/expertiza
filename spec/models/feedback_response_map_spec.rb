@@ -15,13 +15,14 @@ describe 'FeedbackResponseMap' do
       @team = create(:assignment_team, id: 2, name: "teamxyz", parent_id: 1)
       @teamuser1 = create(:team_user, team: @team, user: @student2)
       @teamuser2 = create(:team_user, team: @team, user: @student3)
-      @review_response_map1 = create(:review_response_map, id: 1, assignment: @assignment,reviewee: @team, reviewer_id: 1)
-      @review_response_map2 = create(:review_response_map, id: 2, assignment: @assignment,reviewee: @team, reviewer_id: 4)
-      @review_response_map3 = create(:review_response_map, id: 3, assignment: @assignment,reviewee: @team, reviewer_id: 5)
+      @review_response_map1 = create(:review_response_map, id: 1, assignment: @assignment, reviewee: @team, reviewer_id: 1)
+      @review_response_map2 = create(:review_response_map, id: 2, assignment: @assignment, reviewee: @team, reviewer_id: 4)
+      @review_response_map3 = create(:review_response_map, id: 3, assignment: @assignment, reviewee: @team, reviewer_id: 5)
       @response1 = create(:response, id: 1, response_map: @review_response_map1, round: 1)
       @response2 = create(:response, id: 2, response_map: @review_response_map2, round: 2)
       @response3 = create(:response, id: 3, response_map: @review_response_map3, round: 3)
-      expect(FeedbackResponseMap.feedback_response_report(1,nil)).to eql ([[@reviewee1,@reviewee2],[1,2,3]])
+      expect(FeedbackResponseMap.feedback_response_report(1, nil)).to eql [[@reviewee1, @reviewee2], [1, 2, 3]]
     end
   end
+
 end

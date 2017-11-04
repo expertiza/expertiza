@@ -30,8 +30,9 @@ describe 'ReviewResponseMap' do
       @team = create(:assignment_team, id: 2, name: "teamxyz", parent_id: 1)
       @teamuser = create(:team_user, team: @team, user: @student2)
       @review_response_map = create(:review_response_map, assignment: @assignment, reviewee: @team, reviewer_id: 1)
-      ReviewResponseMap.import(["efgh","abcd"],nil,nil,1)
+      ReviewResponseMap.import(["efgh", "abcd"], nil, nil, 1)
       expect(ReviewResponseMap.first).to eql @review_response_map
     end
   end
+
 end

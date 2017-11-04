@@ -24,5 +24,4 @@ describe 'FeedbackResponseMap' do
       expect(FeedbackResponseMap.feedback_response_report(1, nil)).to eql [[@reviewee1, @reviewee2], [1, 2, 3]]
     end
   end
-
 end

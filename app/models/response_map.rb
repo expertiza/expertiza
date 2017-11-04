@@ -86,5 +86,4 @@ class ResponseMap < ActiveRecord::Base
   def survey?
     false
   end
-
 end

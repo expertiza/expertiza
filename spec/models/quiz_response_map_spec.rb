@@ -12,5 +12,4 @@ describe 'QuizResponseMap' do
       expect(@quiz_response_map.quiz_score).to eql "N/A"
     end
   end
-
 end

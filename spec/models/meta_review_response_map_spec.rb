@@ -44,9 +44,8 @@ describe 'MetaReviewResponseMap' do
       @team = create(:assignment_team, id: 2, name: "teamxyz", parent_id: 1)
       @teamuser = create(:team_user, team: @team, user: @student2)
       @review_response_map = create(:review_response_map, id: 1, assignment: @assignment, reviewee: @team, reviewer_id: 1)
-      MetareviewResponseMap.import(["teamxyz", "abcd", "wxyz"], nil, 1)
+      MetareviewResponseMap.import(%w[teamxyz abcd wxyz], nil, 1)
       expect(MetareviewResponseMap.first).not_to eql nil
     end
   end
-
 end

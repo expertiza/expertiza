@@ -53,5 +53,4 @@ describe 'Response Map' do
       expect(ResponseMap.first).to eql @response_map1
     end
   end
-
 end

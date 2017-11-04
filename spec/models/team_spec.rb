@@ -119,7 +119,7 @@ describe Team do
     context 'when team exists' do
       it 'raises a TeamExistsError' do
         allow(AssignmentTeam).to receive(:where).with(parent_id: 1, name: team.name).and_return([team])
-        expect { Team.check_for_existing(team, team.name, 'Assignment')}.to raise_error(TeamExistsError)
+        expect { Team.check_for_existing(team, team.name, 'Assignment') }.to raise_error(TeamExistsError)
       end
     end
 

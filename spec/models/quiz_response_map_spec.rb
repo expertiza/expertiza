@@ -1,8 +1,7 @@
 describe 'QuizResponseMap' do
-
   describe '#quiz_score' do
     it 'should return N/A when no answer' do
-      @questionnaire = create(:quizquestionnaire,id: 1)
+      @questionnaire = create(:quizquestionnaire, id: 1)
       @question1 = create(:question, id: 1, questionnaire: @questionnaire)
       @question2 = create(:question, id: 2, questionnaire: @questionnaire)
       @response1 = create(:response, id: 1)
@@ -13,5 +12,4 @@ describe 'QuizResponseMap' do
       expect(@quiz_response_map.quiz_score).to eql "N/A"
     end
   end
-
 end

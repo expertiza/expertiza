@@ -1,6 +1,6 @@
 describe 'Response Map' do
   before(:each) do
-    @response_map = build(:response_map,id: 1)
+    @response_map = build(:response_map, id: 1)
   end
 
   #check for validity - always true as no validation in model
@@ -15,7 +15,6 @@ describe 'Response Map' do
     end
   end
 
-
   describe '.get_assessments_for' do
     let(:team) { Team.create name: 'team',id: 2, parent_id: 1, type: "AssignmentTeam" }
     it 'should return the responses given to them by all the reviewers' do
@@ -26,9 +25,9 @@ describe 'Response Map' do
   end
 
   describe '.get_reviewer_assessments_for' do
-    let(:team) { Team.create name: 'team',id: 2, parent_id: 1, type: "AssignmentTeam" }
+    let(:team) { Team.create name: 'team', id: 2, parent_id: 1, type: "AssignmentTeam" }
     it 'should return the responses given to the team by the reviewer' do
-      @reviewer = create(:student,id: 5)
+      @reviewer = create(:student, id: 5)
       @response_map1 = create(:response_map, id: 1, reviewer_id: 5, reviewed_object_id: 1, reviewee_id: 2, type: "ReviewResponseMap")
       @response1 = create(:response, id: 1, map_id: 1, is_submitted: true)
       expect(ResponseMap.get_reviewer_assessments_for(team,@reviewer)).to eql @response1
@@ -44,8 +43,8 @@ describe 'Response Map' do
   #checks if delete mappings can take an empty array
   describe '.delete_mappings' do
     it 'should return failed count zero' do
-      mappings=Array.new
-      expect(ResponseMap.delete_mappings(mappings,nil)).to eql (0)
+      mappings=[]
+      expect(ResponseMap.delete_mappings(mappings, nil)).to eql (0)
     end
     it 'should remove all mappings in the mapping array' do
       @response_map1 = create(:response_map, id: 1, reviewer_id: 5, reviewed_object_id: 1, reviewee_id: 2)
@@ -54,6 +53,4 @@ describe 'Response Map' do
       expect(ResponseMap.first).to eql (@response_map1)
     end
   end
-
-
 end

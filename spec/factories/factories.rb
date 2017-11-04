@@ -397,7 +397,6 @@ FactoryGirl.define do
     is_submitted false
   end
 
-
   factory :feedback_response_map, class: FeedbackResponseMap do
     review { Response.first || association(:response) }
     reviewer { AssignmentParticipant.first || association(:participant) }

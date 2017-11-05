@@ -38,7 +38,7 @@ class SubmittedContentController < ApplicationController
   end
 
   def submit_hyperlink
-    #@participant = AssignmentParticipant.find(params[:id])
+    
     # E1758 Fall 17
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -65,7 +65,7 @@ class SubmittedContentController < ApplicationController
         reviewers << User.find(reviewer.user_id).email
       end
       Mailer.delayed_message(bcc: reviewers, subject: "You have a new submission to be review", body: "Please visit http://expertiza.ncsu.edu and proceed to peer reviews.").deliver_now
-      # participant.assignment.email(participant.id) rescue nil
+      
       end
     end
     redirect_to action: 'edit', id: @participant.id
@@ -121,15 +121,7 @@ class SubmittedContentController < ApplicationController
                           user: participant.name,
                           assignment_id: assignment.id,
                           operation: "Submit File")
-    # ###########hhhhhhh
-    # stage = assignment.get_current_stage(SignedUpTeam.topic_id(participant.parent_id, participant.user_id))
-    # @due = DueDate.get_next_due_date(assignment)
-    # @duesorted = DueDate.deadline_sort(@due_date_all = AssignmentDueDate.where(parent_id: params[:id]))
     
-    # if stage == 'review' and @duesorted.last != @due
-    #   Mailer.send_mail_to_instructor().deliver_now
-    # end
-    # ###############hhhhhhhhhhh
 
     # E1758 Fall 17
     if participant.is_round_valid_for_mail?
@@ -138,7 +130,7 @@ class SubmittedContentController < ApplicationController
         reviewers << User.find(reviewer.user_id).email
       end
       Mailer.delayed_message(bcc: reviewers, subject: "You have a new submission to be review", body: "Please visit http://expertiza.ncsu.edu and proceed to peer reviews.").deliver_now
-      # participant.assignment.email(participant.id) rescue nil
+      
     end
 
     # send message to reviewers when submission has been updated

@@ -213,7 +213,7 @@ describe SignUpSheetController do
       it 'shows a flash error message and redirects to sign_up_sheet#list page' do
         allow(team).to receive(:submitted_files).and_return([])
 	allow(team).to receive(:hyperlinks ).and_return([])
-        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return(due_date)
+        allow(assignment).to receive_message_chain(:due_dates, :find_by).with(no_args).with(deadline_type_id: 6).and_return(due_date)
         allow(due_date).to receive(:due_at).and_return(Time.now - 1.second)
         delete :delete_signup, params
         expect(flash.now[:error]).to eq("You cannot drop your topic after the drop topic deadline!")
@@ -226,7 +226,7 @@ describe SignUpSheetController do
       it 'shows a flash success message and redirects to sign_up_sheet#list page' do
         allow(team).to receive(:submitted_files).and_return([])
 	allow(team).to receive(:hyperlinks ).and_return([])
-        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return nil
+        allow(assignment).to receive_message_chain(:due_dates, :find_by).with(no_args).with(deadline_type_id: 6).and_return nil
         allow(SignedUpTeam).to receive(:reassign_topic).with(any_args)
         allow(SignedUpTeam).to receive(:find_team_users).with(participant.assignment.id, session[:user].id).and_return([signed_up_team2])
         allow(signed_up_team2).to receive(:t_id).and_return(2)
@@ -258,7 +258,7 @@ describe SignUpSheetController do
       it 'shows a flash error message and redirects to assignment#edit page' do
         allow(team).to receive(:submitted_files).and_return([])
 	allow(team).to receive(:hyperlinks ).and_return([])
-        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return(due_date)
+        allow(assignment).to receive_message_chain(:due_dates, :find_by).with(no_args).with(deadline_type_id: 6).and_return(due_date)
         allow(due_date).to receive(:due_at).and_return(Time.now - 1.second)
         delete :delete_signup_as_instructor, params
         expect(flash.now[:error]).to eq("You cannot drop a student after the drop topic deadline!")
@@ -271,7 +271,7 @@ describe SignUpSheetController do
       it 'shows a flash success message and redirects to assignment#edit page' do
         allow(team).to receive(:submitted_files).and_return([])
 	allow(team).to receive(:hyperlinks ).and_return([])
-        allow(assignment).to receive_message_chain(:due_dates, :find_by_deadline_type_id).with(no_args).with(6).and_return nil
+        allow(assignment).to receive_message_chain(:due_dates, :find_by).with(no_args).with(deadline_type_id: 6).and_return nil
         allow(SignedUpTeam).to receive(:reassign_topic).with(any_args)
         allow(SignedUpTeam).to receive(:find_team_users).with(participant.assignment.id, session[:user].id).and_return([signed_up_team2])
         allow(signed_up_team2).to receive(:t_id).and_return(2)
@@ -307,7 +307,7 @@ describe SignUpSheetController do
         allow(SignUpTopic).to receive(:where).with(any_args).and_return(topics)
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         assignment.due_dates = assignment.due_dates.push(due_date2)
-        allow(DeadlineType).to receive_message_chain(:find_by_name, :id).with(String).with(no_args).and_return(1)
+        allow(DeadlineType).to receive_message_chain(:find_by, :id).with(name: String).with(no_args).and_return(1)
         expect(TopicDueDate).to receive(:create).exactly(2).times.with(any_args)
         post :save_topic_deadlines, params
         expect(response).to redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
@@ -320,7 +320,7 @@ describe SignUpSheetController do
         allow(SignUpTopic).to receive(:where).with(any_args).and_return(topics)
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         assignment.due_dates = assignment.due_dates.push(due_date2)
-        allow(DeadlineType).to receive_message_chain(:find_by_name, :id).with(String).with(no_args).and_return(1)
+        allow(DeadlineType).to receive_message_chain(:find_by, :id).with(name: String).with(no_args).and_return(1)
         expect(due_date).to receive(:update_attributes).exactly(2).times.with(any_args)
         get :save_topic_deadlines, params
         expect(response).to redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]

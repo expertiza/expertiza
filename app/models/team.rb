@@ -19,7 +19,7 @@ class Team < ActiveRecord::Base
 
   # Delete the given team
   def delete
-    TeamsUser.where(team_id: self.id).each(&:destroy)
+    TeamsUser.where(team_id: self.id).find_each(&:destroy)
     node = TeamNode.find_by(node_object_id: self.id)
     node.destroy if node
     self.destroy
@@ -127,15 +127,15 @@ class Team < ActiveRecord::Base
 
   def self.create_team_from_single_users(min_team_size, parent, team_type, users)
     num_of_teams = users.length.fdiv(min_team_size).ceil
-    nextTeamMemberIndex = 0
+    next_team_member_index = 0
     for i in (1..num_of_teams).to_a
       team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: team.id)
       min_team_size.times do
-        break if nextTeamMemberIndex >= users.length
-        user = users[nextTeamMemberIndex]
+        break if next_team_member_index >= users.length
+        user = users[next_team_member_index]
         team.add_member(user, parent.id)
-        nextTeamMemberIndex += 1
+        next_team_member_index += 1
       end
     end
   end
@@ -144,7 +144,7 @@ class Team < ActiveRecord::Base
     teams.each do |team|
       curr_team_size = Team.size(team.id)
       member_num_difference = min_team_size - curr_team_size
-      while (member_num_difference > 0)
+      while member_num_difference > 0
         team.add_member(users.first, parent.id)
         users.delete(users.first)
         member_num_difference -= 1

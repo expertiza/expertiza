@@ -151,13 +151,13 @@ class SignUpSheetController < ApplicationController
   end
 
   def find_signed_up_topics student_bids
-      signed_up_topics = []
-      student_bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-     # signed_up_topics &= sign_up_topics
-      return signed_up_topics
+    signed_up_topics = []
+    student_bids.each do |bid|
+      sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+      signed_up_topics << sign_up_topic if sign_up_topic
+    end
+    # signed_up_topics &= sign_up_topics
+    # return signed_up_topics
   end
 
   def find_selected_topics assignment
@@ -166,13 +166,13 @@ class SignUpSheetController < ApplicationController
     # sign up again unless the former was a waitlisted topic
     # if team assignment, then team id needs to be passed as parameter else the user's id
     users_team = SignedUpTeam.find_team_users(assignment.id, session[:user].id)
-    selected_topics = if users_team.empty?
+    selected_topics =  if users_team.empty?
                          nil
                        else
                          # TODO: fix this; cant use 0
                          SignedUpTeam.find_user_signup_topics(assignment.id, users_team.first.t_id)
                        end
-    return selected_topics
+  #  return selected_topics
   end
 
   def list

@@ -194,12 +194,12 @@ class SignUpSheetController < ApplicationController
     end
 
     @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(7)
-    @drop_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(6)
+    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
 
 
-    unless @assignment.due_dates.find_by_deadline_type_id(1).nil?
-      if !@assignment.staggered_deadline? and @assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
+    unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
+      if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
         @show_actions = false
       end
       @selected_topics = find_selected_topics @assignment
@@ -246,7 +246,7 @@ class SignUpSheetController < ApplicationController
   def delete_signup
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
-    drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
+    drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
     # A student who has already submitted work should not be allowed to drop his/her topic!
     # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
     # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
@@ -268,7 +268,7 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(team.parent_id)
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
-    drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
+    drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "The student has already submitted their work, so you are not allowed to remove them."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
@@ -330,7 +330,7 @@ class SignUpSheetController < ApplicationController
         @assignment_submission_due_date = DateTime.parse(@assignment_submission_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
         @assignment_review_due_date = DateTime.parse(@assignment_review_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
         %w(submission review).each do |deadline_type|
-          deadline_type_id = DeadlineType.find_by_name(deadline_type).id
+          deadline_type_id = DeadlineType.find_by(name: deadline_type).id
           next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
           topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
           if topic_due_date.nil? # create a new record
@@ -441,7 +441,7 @@ class SignUpSheetController < ApplicationController
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
       topic.max_choosers = params[:topic][:max_choosers]
     else
       if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i

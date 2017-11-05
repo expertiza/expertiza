@@ -144,10 +144,10 @@ class Team < ActiveRecord::Base
     teams.each do |team|
       curr_team_size = Team.size(team.id)
       member_num_difference = min_team_size - curr_team_size
-      while(member_num_difference > 0) do
+      while (member_num_difference > 0)
         team.add_member(users.first, parent.id)
         users.delete(users.first)
-        member_num_difference = member_num_difference - 1
+        member_num_difference -= 1
         break if users.empty?
       end
       break if users.empty?

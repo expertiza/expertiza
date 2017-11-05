@@ -3,7 +3,8 @@ describe SignUpSheetController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
-  let(:topic) { build(:topic, id: 1, topic_name: 'new topic', micropayment: 0, category: 'test',topic_identifier: '1', micropayment: 0, description: 'test', link: 'test') }
+  let(:topic) { build(:topic, id: 1, topic_name: 'new topic', micropayment: 0, 
+	  category: 'test', topic_identifier: '1', description: 'test', link: 'test') }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
@@ -21,20 +22,20 @@ describe SignUpSheetController do
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: student.id, parent_id: 1).and_return(participant)
     allow(participant).to receive(:team).and_return(team)
-   allow(Team).to receive(:find).with('1').and_return(team)
+    allow(Team).to receive(:find).with('1').and_return(team)
     allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(team_user)
     allow(team_user).to receive(:user).and_return(student)
   end
 
   describe '#new' do
     it 'builds a new sign up topic and renders sign_up_sheet#new page' do
-      get :new,  id:  1.to_s
+      get :new,  id: 1.to_s
       expect(response).to render_template(:new)
     end
   end
 
   describe '#create' do
-   let(:params) { {id: 1, topic: {}}}
+    let(:params) { {id: 1, topic: {}}}
     context 'when topic cannot be found' do
       context 'when new topic can be saved successfully' do
         it 'sets up a new topic and redirects to assignment#edit page' do
@@ -60,13 +61,10 @@ describe SignUpSheetController do
       it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page' do
         allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(topic)
         post :create, params
-        expect(response).to  redirect_to action: 'add_signup_topics_staggered', id: 1
+        expect(response).to redirect_to action: 'add_signup_topics_staggered', id: 1
       end
     end
   end
-
-
-
 
   describe '#destroy' do
     let(:params) { {id: 1, assignment_id: 1} }
@@ -121,7 +119,6 @@ describe SignUpSheetController do
         allow(assignment).to receive(:is_intelligent).and_return(true)
         get :list, id: 1
         expect(response).to render_template(:intelligent_topic_selection)
-
       end
     end
 
@@ -135,8 +132,8 @@ describe SignUpSheetController do
   end
 
   describe '#sign_up' do
-	let(:session) { {user: student } }
-	let(:params) { {id: 1} }
+    let(:session) { {user: student } }
+    let(:params) { {id: 1} }
     context 'when SignUpSheet.signup_team method return nil' do
       it 'shows an error flash message and redirects to sign_up_sheet#list page' do
         allow(SignUpSheet).to receive(:signup_team).with(any_args).and_return(nil)
@@ -148,7 +145,7 @@ describe SignUpSheetController do
   end
 
   describe '#signup_as_instructor_action' do
-   let(:params) { {username: '1', assignment_id: 1} }
+    let(:params) { {username: '1', assignment_id: 1} }
     context 'when user cannot be found' do
       it 'shows an flash error message and redirects to assignment#edit page' do
         allow(User).to receive(:find_by).with(any_args).and_return(nil)

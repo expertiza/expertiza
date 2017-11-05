@@ -121,10 +121,5 @@ class StudentReviewController < ApplicationController
     end
   end
 
-  def file_updated? # this function hasn't been implemented
-    @file_update_time = nil
-    false
-  end
-
   helper_method :get_update_time
 end

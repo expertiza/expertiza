@@ -272,10 +272,45 @@ describe QuestionnairesController do
     context 'when an assignment requires quiz' do
       it 'renders questionnaires#new_quiz if current participant has a team'
 
-      it 'shows error message and redirects to submitted_content#view if current participant does not have a team'
+      it 'shows error message and redirects to submitted_content#view if current participant does not have a team' do
+        assignment= double('Assignment')
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(assignment).to receive(:require_quiz?).and_return(true)
+        dummy = double('BasicObject')
+        allow(AssignmentParticipant).to receive(:find).and_return(dummy)
+        team = double('AssignmentParticipant')
+        allow(dummy).to receive(:team).and_return(team)
+        allow(team).to receive(:nil?).and_return(true)
+        params = {
+            id: 1,
+            pid: 1
+        }
+        get :new_quiz, params
+        expect(flash[:error]).to eq("You should create or join a team first.")
+        expect(response).to redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+      end
 
 
-      it 'shows error message and redirects to submitted_content#view if current participant have a team w/o topic'
+      it 'shows error message and redirects to submitted_content#view if current participant have a team w/o topic' do
+        assignment= double('Assignment')
+        allow(Assignment).to receive(:find).and_return(assignment)
+        allow(assignment).to receive(:require_quiz?).and_return(true)
+        dummy = double('BasicObject')
+        allow(AssignmentParticipant).to receive(:find).and_return(dummy)
+        team = double('AssignmentParticipant')
+        allow(dummy).to receive(:team).and_return(team)
+        allow(team).to receive(:nil?).and_return(false)
+        allow(assignment).to receive(:has_topics?).and_return(true)
+        allow(team).to receive(:topic).and_return(dummy)
+        allow(dummy).to receive(:nil?).and_return(true)
+        params = {
+            id: 1,
+            pid: 1
+        }
+        get :new_quiz, params
+        expect(flash[:error]).to eq("Your team should have a topic.")
+        expect(response).to redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
+      end
     end
 
     context 'when an assignment does not require quiz' do

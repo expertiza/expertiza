@@ -15,9 +15,7 @@ class InvitationsController < ApplicationController
       create_utility
       # E1758 Fall 17
       MailerHelper.send_mail_to_invitee(@user, "You have been invited to join a team", "user_invite").deliver
-      #password = "password"
-      #prepared_mail = MailerHelper.send_mail_to_user(@user, "You have been invited to join a team", "user_welcome", password)
-      #prepared_mail.deliver
+      
     else
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end

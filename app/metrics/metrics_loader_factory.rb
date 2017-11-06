@@ -9,8 +9,10 @@ class MetricsFactory
       url = params[:url]
 
       if a.can_load?(url) 
-        return load_metric(params)
+        return GithubDisplayAdapter(load_metric(params))
       end
     end
   end
+
+  
 end

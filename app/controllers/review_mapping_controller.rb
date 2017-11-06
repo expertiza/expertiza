@@ -132,7 +132,6 @@ class ReviewMappingController < ApplicationController
         @map = QuizResponseMap.new
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
-        #@map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
         @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save
       end
@@ -274,7 +273,6 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
-    #@items.sort {|a, b| a.name <=> b.name }
     @items.sort_by {|a| a.name}
   end
 
@@ -285,10 +283,10 @@ class ReviewMappingController < ApplicationController
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
     # Create teams if its an individual assignment.
     team_size(teams, max_team_size)
-    artifacts_num(params[:num_reviews_per_student].to_i,
-                  params[:num_reviews_per_submission].to_i,
-                  params[:num_calibrated_artifacts].to_i,
-                  params[:num_uncalibrated_artifacts].to_i, teams)
+    artifact(params[:num_reviews_per_student].to_i,
+             params[:num_reviews_per_submission].to_i,
+             params[:num_calibrated_artifacts].to_i,
+             params[:num_uncalibrated_artifacts].to_i, teams)
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
@@ -299,15 +297,15 @@ class ReviewMappingController < ApplicationController
         next if TeamsUser.team_id(assignment_id, user.id)
         team = AssignmentTeam.create_team_and_node(assignment_id)
         ApplicationController.helpers.create_team_users(participant.user, team.id)
-          teams << team
+        teams << team
         return teams
       end
     end
   end
 
-  def artifacts_num (calibrated_artifacts_num, uncalibrated_artifacts_num, student_review_num, submission_review_num, teams)
+  def artifact (calibrated_artifacts_num, uncalibrated_artifacts_num, student_review_num, submission_review_num, teams)
     if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
-      review_num student_review_num, submission_review_num, teams
+      review student_review_num, submission_review_num, teams
     else
       teams_with_calibrated_artifacts = []
       teams_with_uncalibrated_artifacts = []
@@ -324,7 +322,7 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  def review_num (student_review_num, submission_review_num, teams)
+  def review (student_review_num, submission_review_num, teams)
     if student_review_num == 0 and submission_review_num == 0
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
     elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
@@ -376,48 +374,21 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
+    review_id = @id
+    review_type = @type
+    review_assignment = @assignment
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-
-    case @type
-      # this summarizes the reviews of each reviewee by each rubric criterion
-      when "SummaryByRevieweeAndCriteria"
-        sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
-        # list of variables used in the view and the parameters (should have been done as objects instead of hash maps)
-        # @summary[reviewee][round][question]
-        # @reviewers[team][reviewer]
-        # @avg_scores_by_reviewee[team]
-        # @avg_score_round[reviewee][round]
-        # @avg_scores_by_criterion[reviewee][round][criterion]
-
-        @summary = sum.summary
-        @reviewers = sum.reviewers
-        @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
-        @avg_scores_by_round = sum.avg_scores_by_round
-        @avg_scores_by_criterion = sum.avg_scores_by_criterion
-      # this summarizes all reviews by each rubric criterion
-    when "SummaryByCriteria"
-      sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, summary_ws_url)
-
-      @summary = sum.summary
-      @avg_scores_by_round = sum.avg_scores_by_round
-      @avg_scores_by_criterion = sum.avg_scores_by_criterion
-    when "ReviewResponseMap"
-      @review_user = params[:user]
-      # If review response is required call review_response_report method in review_response_map model
-      @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
-      @review_scores = @assignment.compute_reviews_hash
-      @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
-    when "FeedbackResponseMap"
-      # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
-      if @assignment.varying_rubrics_by_round?
-        @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(@id, @type)
-      else
-        @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, @type)
-      end
-    when "TeammateReviewResponseMap"
-      # If review report for teammate is required call teammate_response_report method in teammate_review_response_map model
-      @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
-    when "Calibration"
+    current_user = session[:user]
+    return SummaryHelper::Summary.response_report_by_review_and_criteria(review_assignment, summary_ws_url) if @type=="SummaryByRevieweeAndCriteria"
+    return SummaryHelper::Summary.response_report_by_criteria(review_assignment, summary_ws_url) if @type=="SummaryByCriteria"
+    @review_user = params[:user]
+    review_user = @review_user
+    return ReviewResponseMap.response_report(review_id, review_assignment, review_type, review_user) if @type== "ReviewResponseMap"
+    return FeedbackResponseMap.response_report(review_assignment, review_id, review_type) if @type == "FeedbackResponseMap"
+    return TeammateReviewResponseMap.response_report(review_id) if @type == "TeammateReviewResponseMap"
+    return PlagiarismCheckerComparison.response_report(review_id) if @type == "PlagiarismCheckerReport"
+    return TagPromptDeployment.response_report(review_id) if @type == "AnswerTaggingReport"
+    if @type == "Calibration"
       participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
       if participant.nil?
         participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
@@ -429,21 +400,7 @@ class ReviewMappingController < ApplicationController
       @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: params[:id], calibrate_to: 1)
       @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: params[:id], calibrate_to: 0)
       @responses = Response.where(map_id: @review_response_map_ids)
-
-    when "PlagiarismCheckerReport"
-      @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
-                                                                              PlagiarismCheckerAssignmentSubmission.where(assignment_id:
-                                                                                                                              params[:id]).pluck(:id))
-    when "AnswerTaggingReport"
-      tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
-
-      @questionnaire_tagging_report = {}
-
-      tag_prompt_deployments.each do |tag_dep|
-        @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
-      end
     end
-
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 

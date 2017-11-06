@@ -427,6 +427,7 @@ describe ReviewMappingController do
         expect(sum).to receive(:avg_scores_by_round).with(any_args).and_return(avg_scores_by_round)
         avg_scores_by_criterion = double()
         expect(sum).to receive(:avg_scores_by_criterion).with(any_args).and_return(avg_scores_by_criterion)
+        params = double{ }
         params = {id: 1, report: {type: 'SummaryByRevieweeAndCriteria'}}
         get :response_report, params
         expect(response).to render_template('response_report')
@@ -444,6 +445,7 @@ describe ReviewMappingController do
         expect(sum).to receive(:avg_scores_by_round).with(any_args).and_return(avg_scores_by_round)
         avg_scores_by_criterion = double()
         expect(sum).to receive(:avg_scores_by_criterion).with(any_args).and_return(avg_scores_by_criterion)
+        params = double{ }
         params = {id: 1, report: {type: 'SummaryByCriteria'}}
         get :response_report, params
         expect(response).to render_template('response_report')
@@ -459,6 +461,7 @@ describe ReviewMappingController do
         expect(assignment).to receive(:compute_reviews_hash).with(any_args).and_return(review_scores)
         avg_and_ranges = double()
         expect(assignment).to receive(:compute_avg_and_ranges_hash).with(any_args).and_return(avg_and_ranges)
+        params = double{ }
         params = {id: 1, report: {type: 'ReviewResponseMap'}, user: 1}
         get :response_report, params
         expect(response).to render_template('response_report')
@@ -472,6 +475,7 @@ describe ReviewMappingController do
           expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(true)
           expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(true)
           expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(true)
+          params = double{ }
           params = {id: 1, report: {type: 'FeedbackResponseMap'}}
           get :response_report, params
           expect(response).to render_template('response_report')
@@ -484,6 +488,7 @@ describe ReviewMappingController do
           expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(false)
           expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(false)
           expect(assignment).to receive(:varying_rubrics_by_round?).with(any_args).and_return(false)
+          params = double{ }
           params = {id: 1, report: {type: 'FeedbackResponseMap'}}
           get :response_report, params
           expect(response).to render_template('response_report')
@@ -496,6 +501,7 @@ describe ReviewMappingController do
         expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
         reviewers = double()
         expect(TeammateReviewResponseMap).to receive(:teammate_response_report).with(any_args).and_return(reviewers)
+        params = double{ }
         params = {id: 1, report: {type: 'TeammateReviewResponseMap'}}
         get :response_report, params
         expect(response).to render_template('response_report')
@@ -516,6 +522,7 @@ describe ReviewMappingController do
         expect(ReviewResponseMap).to receive(:where).with(any_args).and_return(calibration_response_maps)
         responses = double()
         expect(Response).to receive(:where).with(any_args).and_return(responses)
+        params = double{ }
         params = {id: 1, report: {type: 'Calibration'}}
         session[:user] = user
         get :response_report, params, session
@@ -528,6 +535,7 @@ describe ReviewMappingController do
         expect(Assignment).to receive(:find).with(any_args).and_return(assignment)
         plagiarism_checker_comparisons = double()
         expect(PlagiarismCheckerComparison).to receive(:where).with(any_args).and_return(plagiarism_checker_comparisons)
+        params = double{ }
         params = {id: 1, report: {type: 'PlagiarismCheckerReport'}}
         session[:user] = user
         get :response_report, params, session

@@ -194,4 +194,11 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
+
+  def self.response_report (id, assignment, type, review_user)
+    # If review response is required call review_response_report method in review_response_map model
+    @reviewers = ReviewResponseMap.review_response_report(id, assignment, type, review_user)
+    @review_scores = assignment.compute_reviews_hash
+    @avg_and_ranges = assignment.compute_avg_and_ranges_hash
+  end
 end

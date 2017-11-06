@@ -15,7 +15,7 @@ class GithubMetricsFetcher
 
   class << self
     def supports_url?(url)
-      if not url.nil?
+      if ! url.nil?
         lower_case_url = url.downcase
         params = SOURCES.find { | params | ! params[:REGEX].match(lower_case_url).nil? }
         ! params.nil?
@@ -28,7 +28,8 @@ class GithubMetricsFetcher
   def initialize(params)
     @url = params[:url]
     @loaded = false
-    @commit_filter = params[:commit_filter].nil? ? [] : params[:commit_filter]
+    @commit_filter = params[:commit_filter].nil? ? lambda { |commit| true } : params[:commit_filter]
+    @team_filter = params[:team_filter].nil? ? lambda { |email,login|  true } : params[:team_filter]
   end
 
   def is_loaded?
@@ -116,13 +117,16 @@ class GithubMetricsFetcher
 
         p = commits.map { | commit | 
           oid = get_data(commit, ["node", "oid"])
+          login = get_data(commit, ["node", "author", "user", "login"])
+          email = get_data(commit, ["node", "author", "email"])
 
-          if not @commit_filter.include?(oid)
+          #puts "commit", @commit_filter.call(oid), "team", @team_filter.call(email, login)
+
+          if @commit_filter.call(oid) && @team_filter.call(email, login)
+            puts "loading #{oid}"
             params[:throttle].throttled_future(1) do 
               oid = get_data(commit, ["node", "oid"])
-              login = get_data(commit, ["node", "author", "user", "login"])
               name = get_data(commit, ["node", "author", "name"])
-              email = get_data(commit, ["node", "author", "email"])
               date = get_data(commit, ["node", "committedDate"])
               stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
@@ -146,7 +150,7 @@ class GithubMetricsFetcher
           fetch_pr_data(params, page_info, commits_list) 
         else
           { :data => Concurrent::Promises.zip_futures(*commits_list).value!
-              .select{ |t| not t.nil? }
+              .select{ |t| ! t.nil? }
           }
         end
       else
@@ -164,17 +168,18 @@ class GithubMetricsFetcher
       when 200
         json = JSON.parse(response.body)
         pull_request = get_data(json, ["data", "repository", "pullRequest"])
-        if not pull_request.nil?
+        if ! pull_request.nil?
           page_info = get_data(pull_request, ["commits", "pageInfo"])
           commits = get_data(pull_request, ["commits", "nodes"])
 
           p = commits.map { | commit | 
             oid = get_data(commit, ["commit", "oid"])
-            if not @commit_filter.include?(oid)
+            login = get_data(commit, ["commit", "author", "user", "login"])
+            email = get_data(commit, ["commit", "author", "email"])
+            
+            if @commit_filter.call(oid) && @team_filter.call(email, login)
               params[:throttle].throttled_future(1) do
-                login = get_data(commit, ["commit", "author", "user", "login"])
                 name = get_data(commit, ["commit", "author", "name"])
-                email = get_data(commit, ["commit", "author", "email"])
                 date = get_data(commit, ["commit", "committedDate"])
                 stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
@@ -198,7 +203,7 @@ class GithubMetricsFetcher
             fetch_pr_data(params, page_info, commits_list) 
           else
             { :data => Concurrent::Promises.zip_futures(*commits_list).value!
-                .select{ |t| not t.nil? }
+                .select{ |t| ! t.nil? }
             }
           end
         end

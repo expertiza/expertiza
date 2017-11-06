@@ -316,4 +316,31 @@ describe Assignment do
       expect(generated_csv(assignment, @options)).to eq(expected_csv)
     end
   end
+
+  #describe '#check_directory_path' do
+  #  create(:assignment)
+  #  @assignment = create(:assignment)
+  #  expect(check_directory_path).to eq(false)
+  #end
+
+  describe 'check_directory_path' do
+    it 'returns false if directory path already in use' do
+      @assignment = create(:assignment)
+      expect(@assignment.check_directory_path).to eql(false)
+    end
+  end
+
+  it 'is not valid without directory_path' do
+    assignment.directory_path = nil
+    assignment.should_not be_valid
+  end
+
+  it 'should contain course in path name' do
+    @assignment = create(:assignment)
+    @assignment.directory_path = Course.first.directory_path.to_s + "/finaltest"
+    expect(@assignment.directory_path).to include(Course.first.directory_path)
+  end
+
+
+
 end

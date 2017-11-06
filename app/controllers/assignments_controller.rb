@@ -1,3 +1,5 @@
+require 'fileutils'
+
 class AssignmentsController < ApplicationController
   include AssignmentHelper
   autocomplete :user, :name
@@ -36,7 +38,6 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else
@@ -122,6 +123,24 @@ class AssignmentsController < ApplicationController
     unless params.key?(:assignment_form)
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]
+
+      if !params[:course_id].nil?
+        @assignment_new_path = @assignment.directory_path
+        @course = Course.find(params[:course_id])
+        @assignment.directory_path = @course.directory_path + "/" + @assignment.directory_path
+        @destination_path = "/home/expertiza_developer/expertiza/pg_data/" + @assignment.directory_path.to_s
+        FileUtils.makedirs(@destination_path)
+        my_dir = Dir.glob("/home/expertiza_developer/expertiza/pg_data/" + @assignment.instructor.name.to_s + "/" + @assignment_new_path.to_s + "/*")
+       
+        dest_folder = @destination_path
+
+        my_dir.each do |filename|
+          name = File.basename(filename, '*')
+          dest_folder = @destination_path + "/" + name
+          FileUtils.mv(filename, dest_folder)
+        end
+
+      end
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
         redirect_to list_tree_display_index_path

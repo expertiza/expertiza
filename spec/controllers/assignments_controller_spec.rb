@@ -14,6 +14,7 @@ describe AssignmentsController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
+
   describe '#action_allowed?' do
     context 'when params action is edit or update' do
       context 'when the role name of current user is super admin or admin' do
@@ -100,7 +101,10 @@ describe AssignmentsController do
     end
   end
 
+
+
   describe '#update' do
+
     context 'when params does not have key :assignment_form' do
       context 'when assignment is saved successfully' do
         it 'shows a note flash message and redirects to tree_display#index page'
@@ -173,4 +177,6 @@ describe AssignmentsController do
       it 'shows an error flash message and redirects to tree_display#list page'
     end
   end
+
+
 end

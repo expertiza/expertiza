@@ -5,7 +5,6 @@ describe "GithubMetricsFetcher" do
     pr.fetch_content
     expect(pr.is_loaded?).to be true
     expect(pr.repo).to eq "simicheck-expertiza-sandbox"
-    puts "GITHUB PR"
     puts pr.commits
   end
 

@@ -28,6 +28,7 @@ class GithubMetricsFetcher
   def initialize(params)
     @url = params[:url]
     @loaded = false
+    @commit_filter = params[:commit_filter].nil? ? [] : params[:commit_filter]
   end
 
   def is_loaded?
@@ -91,10 +92,6 @@ class GithubMetricsFetcher
         is_fork = get_data(json, ["data", "repository", "isFork"])
         since = "since:\\\"#{created_at}\\\""
 
-        if not params[:last_commit_date].nil? 
-          since = "since:\\\"#{params[:last_commit_date]}\\\""  
-        end
-
         fetch_project_commits_data(params, since)
       else
         { :error => "Error loading project #{response.code}", :msg => response.body }
@@ -118,22 +115,28 @@ class GithubMetricsFetcher
         end
 
         p = commits.map { | commit | 
-          params[:throttle].throttled_future(1) do 
-            oid = get_data(commit, ["node", "oid"])
-            login = get_data(commit, ["node", "author", "user", "login"])
-            name = get_data(commit, ["node", "author", "name"])
-            email = get_data(commit, ["node", "author", "email"])
-            date = get_data(commit, ["node", "committedDate"])
-            stats = fetch_commit_stats_data(params, @user, @repo, oid)
+          oid = get_data(commit, ["node", "oid"])
 
-            { :user_id => login,
-            :commit_id => oid,
-            :commit_date => date, 
-            :user_name => name, 
-            :user_email => email, 
-            :lines_added => stats[:additions],
-            :lines_deleted => stats[:deletions],
-            :lines_changed => stats[:total]}
+          if not @commit_filter.include?(oid)
+            params[:throttle].throttled_future(1) do 
+              oid = get_data(commit, ["node", "oid"])
+              login = get_data(commit, ["node", "author", "user", "login"])
+              name = get_data(commit, ["node", "author", "name"])
+              email = get_data(commit, ["node", "author", "email"])
+              date = get_data(commit, ["node", "committedDate"])
+              stats = fetch_commit_stats_data(params, @user, @repo, oid)
+
+              { :user_id => login,
+              :commit_id => oid,
+              :commit_date => date, 
+              :user_name => name, 
+              :user_email => email, 
+              :lines_added => stats[:additions],
+              :lines_deleted => stats[:deletions],
+              :lines_changed => stats[:total]}
+            end
+          else
+              Concurrent::Promises.fulfilled_future( nil )
           end
         }
 
@@ -142,7 +145,9 @@ class GithubMetricsFetcher
         if page_info["hasNextPage"] == "true"
           fetch_pr_data(params, page_info, commits_list) 
         else
-          { :data => Concurrent::Promises.zip_futures(*commits_list).value! }
+          { :data => Concurrent::Promises.zip_futures(*commits_list).value!
+              .select{ |t| not t.nil? }
+          }
         end
       else
         { :error => "Error loading commits list #{response.code}", :msg => response.body, :data => commits_list }
@@ -164,22 +169,26 @@ class GithubMetricsFetcher
           commits = get_data(pull_request, ["commits", "nodes"])
 
           p = commits.map { | commit | 
-            params[:throttle].throttled_future(1) do
-              oid = get_data(commit, ["commit", "oid"])
-              login = get_data(commit, ["commit", "author", "user", "login"])
-              name = get_data(commit, ["commit", "author", "name"])
-              email = get_data(commit, ["commit", "author", "email"])
-              date = get_data(commit, ["commit", "committedDate"])
-              stats = fetch_commit_stats_data(params, @user, @repo, oid)
+            oid = get_data(commit, ["commit", "oid"])
+            if not @commit_filter.include?(oid)
+              params[:throttle].throttled_future(1) do
+                login = get_data(commit, ["commit", "author", "user", "login"])
+                name = get_data(commit, ["commit", "author", "name"])
+                email = get_data(commit, ["commit", "author", "email"])
+                date = get_data(commit, ["commit", "committedDate"])
+                stats = fetch_commit_stats_data(params, @user, @repo, oid)
 
-              { :user_id => login,
-              :commit_id => oid,
-              :commit_date => date, 
-              :user_name => name, 
-              :user_email => email, 
-              :lines_added => stats[:additions],
-              :lines_deleted => stats[:deletions],
-              :lines_changed => stats[:total] }
+                { :user_id => login,
+                :commit_id => oid,
+                :commit_date => date, 
+                :user_name => name, 
+                :user_email => email, 
+                :lines_added => stats[:additions],
+                :lines_deleted => stats[:deletions],
+                :lines_changed => stats[:total] }
+              end
+            else
+              Concurrent::Promises.fulfilled_future( nil )
             end
           } 
 
@@ -188,7 +197,9 @@ class GithubMetricsFetcher
           if page_info["hasNextPage"] == "true"
             fetch_pr_data(params, page_info, commits_list) 
           else
-            { :data => Concurrent::Promises.zip_futures(*commits_list).value! }
+            { :data => Concurrent::Promises.zip_futures(*commits_list).value!
+                .select{ |t| not t.nil? }
+            }
           end
         end
       else

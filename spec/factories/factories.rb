@@ -388,4 +388,19 @@ FactoryGirl.define do
     dimension "label"
     id 1
   end
+
+  factory :metric, class: Metric do
+    team { AssignmentTeam.first || association(:assignment_team) }
+    assignment { Assignment.first || association(:assignment) }
+    source :github
+    remote_id "url"
+    uri "newmetric"
+    id 1
+  end
+
+  factory :metric_data_point, class: MetricDataPoint do
+    metric { Metric.first || association(:metric) }
+    metric_data_point_type { MetricDataPointType.first || association(:metric_data_point_type) }
+    value "1"
+  end
 end

@@ -20,9 +20,8 @@ class GithubLoaderAdaptee < MetricLoaderAdapter
       metrics = GithubMetricsFetcher.new({:url => url})
     else 
       flattened_data = to_map(metric_db_data)
-      last_commit_date = flattened_data.sort_by{ |t| -t[:commit_date] }.first
-      metrics = GithubMetricsFetcher.new({:url => url, 
-        :last_commit_date => last_commit_date })
+      commit_filter = flattened_data.map { |t| t[:commit_id] }
+      metrics = GithubMetricsFetcher.new({:url => url, :commit_filter => commit_filter})
     end
 
     metrics.fetch_content
@@ -42,7 +41,7 @@ class GithubLoaderAdaptee < MetricLoaderAdapter
   def self.to_map(metric_data) 
     metric_data.map{ |n| 
       n.metric_data_points.map{ |m| 
-        [m.metric_data_point_type.name,  m.value]
+        [m.metric_data_point_type.name.to_sym,  m.value]
       }.to_h
     }
   end

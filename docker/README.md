@@ -32,7 +32,7 @@
 * You will be required to fill in your MY SQL PASSWORD. Put any password for you MySQL Database.
 * After some time open up your browser and go to the `localhost:3000` 
 * If you see the following error, it means the script ran successfully and you just need to do the database migration.
-![migration_error](https://github.com/VivekBhat/expertiza/blob/master/docker/migration_pending_error.png)
+![migration_error](https://i.stack.imgur.com/Om4yH.png)
 
 #### Database Migration
 

@@ -317,7 +317,7 @@ FactoryGirl.define do
     type 'ReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
-    id 1
+  
   end
 
   factory :question, class: Criterion do

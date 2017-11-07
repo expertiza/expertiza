@@ -1,3 +1,6 @@
+extend RSpec::Matchers
+require 'spec_helper'
+
 describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
@@ -9,11 +12,13 @@ describe QuestionnairesController do
   end
 
   describe '#copy,  #copy_questionnaire_details and #assign_instructor_id' do
-    it 'redirects to view page of copied questionnaire'
+    it 'redirects to view page of copied questionnaire' do
+    end
   end
 
   describe '#view' do
-    it 'renders questionnaires#view page'
+    it 'renders questionnaires#view page' do
+    end
   end
 
   describe '#new' do
@@ -27,7 +32,33 @@ describe QuestionnairesController do
   end
 
   describe '#create' do
-    it 'redirects to questionnaires#edit page after create a new questionnaire'
+    it 'redirects to questionnaires#edit page after create a new questionnaire' do
+      tree_folder1 = double('TreeFolder')
+      allow(tree_folder1).to receive(:id).and_return(1)
+      allow(tree_folder1).to receive(:node_object_id).and_return(1)
+      tree_folder2 = double('TreeFolder')
+      allow(tree_folder2).to receive(:id).and_return(1)
+      allow(tree_folder2).to receive(:node_object_id).and_return(1)
+      allow(TreeFolder).to receive(:where).with(["name like ?", "Review"]).and_return([tree_folder1, tree_folder2])
+      folder_node2 = double('FolderNode')
+      allow(folder_node2).to receive(:id).and_return(1)
+      allow(FolderNode).to receive(:find_by_node_object_id).and_return(folder_node2)
+      user = double("User")
+      allow(user).to receive(:id).and_return(1)
+      params = {
+        questionnaire: {
+          private: "true",
+          type: "ReviewQuestionnaire",
+          name: "Random Name",
+          min_question_score: "0",
+          max_question_score: "5"
+        }
+      }
+      session = {user: user}
+      get :create, params, session
+      expect(flash[:success]).to eq("You have successfully created a questionnaire!")
+      expect(response).to redirect_to(edit_questionnaire_path(id: 1))
+    end
   end
 
   describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
@@ -48,11 +79,19 @@ describe QuestionnairesController do
 
   describe '#edit' do
     context 'when @questionnaire is not nil' do
-      it 'renders the questionnaires#edit page'
+      it 'renders the questionnaires#edit page' do
+        allow(Questionnaire).to receive(:find).and_return(double('Questionnaire'))
+        params = {
+            id: 1
+        }
+        get :edit, params
+        expect(response).to render_template(:edit)
+      end
     end
 
     context 'when @questionnaire is nil' do
-      it 'redirects to /questionnaires page'
+      it 'redirects to /questionnaires page' do
+      end
     end
   end
 
@@ -148,39 +187,49 @@ describe QuestionnairesController do
 
   describe '#update_quiz' do
     context 'when @questionnaire is nil' do
-      it 'redirects to submitted_content#view page'
+      it 'redirects to submitted_content#view page' do
+        params = {
+          id: 1,
+          pid: 1
+        }
+        get :update_quiz, params
+        expect(response).to redirect_to(view_submitted_content_index_path(id: params[:pid]))
+      end
     end
 
     context 'when @questionnaire is not nil' do
-      it 'updates all quiz questions and redirects to submitted_content#view page'
-        # params = {
-        #   id: 1,
-        #   pid: 1,
-        #   save: true,
-        #   questionnaire: {
-        #     name: 'test questionnaire',
-        #     instructor_id: 6,
-        #     private: 0,
-        #     min_question_score: 0,
-        #     max_question_score: 5,
-        #     type: 'ReviewQuestionnaire',
-        #     display_type: 'Review',
-        #     instructor_loc: ''
-        #   },
-        #   question: {
-        #     '1' => {txt: 'Q1'},
-        #     '2' => {txt: 'Q2'},
-        #     '3' => {txt: 'Q3'}
-        #   },
-        #   quiz_question_choices: {
-        #     '1' => {MultipleChoiceRadio:
-        #             {:correctindex => 1, '1' => {txt: 'a11'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-        #     '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
-        #     '3' => {MultipleChoiceCheckbox:
-        #             {'1' => {iscorrect: '1', txt: 'a31'}, '2' => {iscorrect: '0', txt: 'a32'},
-        #              '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
-        #   }
-        # }
+      it 'updates all quiz questions and redirects to submitted_content#view page' do
+        params = {
+          id: 3,
+          pid: 1,
+          save: true,
+          questionnaire: {
+            name: 'test questionnaire',
+            instructor_id: 6,
+            private: 0,
+            min_question_score: 0,
+            max_question_score: 5,
+            type: 'ReviewQuestionnaire',
+            display_type: 'Review',
+            instructor_loc: ''
+          },
+          question: {
+            '1' => {txt: 'Q1'},
+            '2' => {txt: 'Q2'},
+            '3' => {txt: 'Q3'}
+          },
+          quiz_question_choices: {
+            '1' => {MultipleChoiceRadio:
+                    {:correctindex => 1, '1' => {txt: 'a11'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
+            '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
+            '3' => {MultipleChoiceCheckbox:
+                    {'1' => {iscorrect: '1', txt: 'a31'}, '2' => {iscorrect: '0', txt: 'a32'},
+                     '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
+          }
+        }
+        get :update_quiz, params
+        expect(response).to redirect_to(view_submitted_content_index_path(id: params[:pid]))
+      end
     end
   end
 
@@ -210,21 +259,27 @@ describe QuestionnairesController do
   end
 
   describe '#save_choices' do
-    it 'is able to save different kinds of quiz questions'
-      # controller.params = {
-      #   new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
-      #   new_choices:
-      #   {'1' =>
-      #     {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-      #    '2' =>
-      #     {TrueFalse: {'1' => {iscorrect: '1'}}},
-      #    '3' =>
-      #     {MultipleChoiceCheckbox:
-      #       {'1' => {iscorrect: '1', txt: 'a31'},
-      #        '2' => {iscorrect: '0', txt: 'a32'},
-      #        '3' => {iscorrect: '1', txt: 'a33'},
-      #        '4' => {iscorrect: '0', txt: 'a34'}}}},
-      #   question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
-      # }
+    it 'is able to save different kinds of quiz questions' do
+
+      controller.params = {
+         new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
+         new_choices:
+         {'1' =>
+           {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
+          '2' =>
+           {TrueFalse: {'1' => {iscorrect: '1'}}},
+          '3' =>
+           {MultipleChoiceCheckbox:
+             {'1' => {iscorrect: '1', txt: 'a31'},
+              '2' => {iscorrect: '0', txt: 'a32'},
+              '3' => {iscorrect: '1', txt: 'a33'},
+              '4' => {iscorrect: '0', txt: 'a34'}}}},
+         question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
+      }
+
+      #allow(QuestionnairesController).to receive(:params).with(:id => "1").and_return(true)
+      #@save_questions = QuestionnairesController.new
+      #@save_questions.send(:save_all_questions_questionnaires_path).should == true
+    end
   end
 end

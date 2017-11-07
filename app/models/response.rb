@@ -25,19 +25,15 @@ class Response < ActiveRecord::Base
     if self.map.type.to_s == 'FeedbackResponseMap'
       identifier += "<h3>Feedback from author</h3>"
     end
-
     if prefix
       self_id = prefix + '_' + self.id.to_s
-
       code = construct_instructor_html identifier, self_id, count
     else
       self_id = self.id.to_s
-
       code = construct_student_html identifier, self_id, count
     end
 
     code = construct_review_response code, self_id
-
     code.html_safe
   end
 

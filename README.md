@@ -29,7 +29,7 @@ See the Expertiza wiki for setup instructions. Please update the wiki with corre
  * [OSX](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:OSX)
  * [RedHat Linux](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:Linux:RHEL)
  * [Ubuntu](http://wiki.expertiza.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_Expertiza_-_Installation_Guide)
- * [Docker-compose](https://hub.docker.com/r/winbobob/expertiza/)
+ * [Docker-compose](https://github.com/expertiza/expertiza/tree/master/docker)
 
 Contributing
 ------------

@@ -1,4 +1,6 @@
 class UnscoredQuestion < ChoiceQuestion
+  attr_accessible
+
   def edit
   end
 

@@ -294,7 +294,7 @@ class SignUpSheetController < ApplicationController
       params[:topic].each_with_index do |topic_id, index|
         bid_existence = Bid.where(topic_id: topic_id, team_id: team_id)
         if bid_existence.empty?
-          Bid.create(topic_id: topic_id, team_id: team_id, priority: index + 1)
+          Bid.create(bid_params(topic_id: topic_id, team_id: team_id, priority: index + 1))
         else
           Bid.where(topic_id: topic_id, team_id: team_id).update_all(priority: index + 1)
         end
@@ -324,7 +324,7 @@ class SignUpSheetController < ApplicationController
           next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
           topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
           if topic_due_date.nil? # create a new record
-            TopicDueDate.create(
+            TopicDueDate.create(topic_due_date_params(
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
               deadline_type_id:            deadline_type_id,
               parent_id:                   topic.id,
@@ -340,7 +340,7 @@ class SignUpSheetController < ApplicationController
               quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
               teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id,
               type:                       'TopicDueDate'
-            )
+            ))
           else # update an existed record
             topic_due_date.update_attributes(
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
@@ -469,5 +469,21 @@ class SignUpSheetController < ApplicationController
 
   def delete_signup_for_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+  end
+
+  def bid_params(params_hash)
+    params_local = params
+    params_local[:bid] = params_hash
+    params_local.require(:bid).permit(:topic_id, :team_id, :priority)
+  end
+
+  def topic_due_date_params(params_hash)
+    params_local = params
+    params_local[:topic_due_date] = params_hash
+    params_local.require(:topic_due_date).permit(:due_at, :deadline_type_id, :parent_id,
+                                                 :submission_allowed_id, :review_allowed_id,
+                                                 :review_of_review_allowed_id, :round, :flag, :threshold,
+                                                 :delayed_job_id, :deadline_name, :description_url,
+                                                 :quiz_allowed_id, :teammate_review_allowed_id, :type)
   end
 end

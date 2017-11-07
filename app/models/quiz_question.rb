@@ -1,4 +1,6 @@
 class QuizQuestion < Question
+  attr_accessible
+
   has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id'
   def edit
   end

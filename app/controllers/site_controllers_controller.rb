@@ -24,7 +24,7 @@ class SiteControllersController < ApplicationController
 
   def new
     foreign
-    @site_controller = SiteController.new(name: params[:id])
+    @site_controller = SiteController.new(site_controller_params(name: params[:id]))
   end
 
   def new_called
@@ -32,7 +32,7 @@ class SiteControllersController < ApplicationController
   end
 
   def create
-    @site_controller = SiteController.new(params[:site_controller])
+    @site_controller = SiteController.new(site_controller_params(nil))
     if @site_controller.save
       flash[:notice] = 'The site controller was successfully created.'
       Role.rebuild_cache
@@ -50,7 +50,7 @@ class SiteControllersController < ApplicationController
 
   def update
     @site_controller = SiteController.find(params[:id])
-    if @site_controller.update_attributes(params[:site_controller])
+    if @site_controller.update_attributes(site_controller_params(nil))
       flash[:notice] = 'The site controller was successfully updated.'
       Role.rebuild_cache
       redirect_to @site_controller
@@ -132,4 +132,12 @@ class SiteControllersController < ApplicationController
 
     actions.keys
   end  # def controller_actions
+
+  private
+
+  def site_controller_params(params_hash)
+    params_local = params
+    params_local[:site_controller] = params_hash unless nil == params_hash
+    params_local.require(:site_controller).permit(:name, :permission_id, :builtin)
+  end
   end  # class

@@ -46,7 +46,7 @@ module PlagiarismCheckerHelper
     json_response = JSON.parse(response.body)
     as_name = json_response["name"]
     as_id = json_response["id"]
-    assignment_submission = PlagiarismCheckerAssignmentSubmission.new(name: as_name, simicheck_id: as_id)
+    assignment_submission = PlagiarismCheckerAssignmentSubmission.new(plagiarism_checker_assignment_submission_params(name: as_name, simicheck_id: as_id))
     assignment_submission.save!
     as_id
   end
@@ -95,16 +95,39 @@ module PlagiarismCheckerHelper
       sim_link = 'https://www.simicheck.com' + get_sim_link_response.body
 
       as_id = PlagiarismCheckerAssignmentSubmission.find_by_simicheck_id(assignment_submission_simicheck_id).id
-      comparison = PlagiarismCheckerComparison.new(plagiarism_checker_assignment_submission_id: as_id,
-                                                   similarity_link: sim_link,
-                                                   similarity_percentage: percent_similar,
-                                                   file1_name: f1_name,
-                                                   file1_id: f1_id,
-                                                   file1_team: t1_id,
-                                                   file2_name: f2_name,
-                                                   file2_id: f2_id,
-                                                   file2_team: t2_id)
+      comparison = PlagiarismCheckerComparison.new(plagiarism_checker_comparison_params(plagiarism_checker_assignment_submission_id: as_id,
+                                                                                        similarity_link: sim_link,
+                                                                                        similarity_percentage: percent_similar,
+                                                                                        file1_name: f1_name,
+                                                                                        file1_id: f1_id,
+                                                                                        file1_team: t1_id,
+                                                                                        file2_name: f2_name,
+                                                                                        file2_id: f2_id,
+                                                                                        file2_team: t2_id))
       comparison.save!
     end
+  end
+
+  private
+
+  def plagiarism_checker_assignment_submission_params(params_hash)
+    params_local = params
+    params_local[:plagiarism_checker_assignment_submission] = params_hash
+    params_local.require(:plagiarism_checker_assignment_submission).permit(:name,
+                                                                           :simicheck_id)
+  end
+
+  def plagiarism_checker_comparison_params(params_hash)
+    params_local = params
+    params_local[:plagiarism_checker_comparison] = params_hash
+    params_local.require(:plagiarism_checker_comparison).permit(:plagiarism_checker_assignment_submission_id,
+                                                                :similarity_link,
+                                                                :similarity_percentage,
+                                                                :file1_name,
+                                                                :file1_id,
+                                                                :file1_team,
+                                                                :file2_name,
+                                                                :file2_id,
+                                                                :file2_team)
   end
 end

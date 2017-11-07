@@ -47,11 +47,11 @@ class SubmittedContentController < ApplicationController
     else
       begin
         team.submit_hyperlink(params['submission'])
-        SubmissionRecord.create(team_id: team.id,
-                                content: params['submission'],
-                                user: @participant.name,
-                                assignment_id: @participant.assignment.id,
-                                operation: "Submit Hyperlink")
+        SubmissionRecord.create(submission_record_params(team_id: team.id,
+                                                         content: params['submission'],
+                                                         user: @participant.name,
+                                                         assignment_id: @participant.assignment.id,
+                                                         operation: "Submit Hyperlink"))
       rescue
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
@@ -71,11 +71,11 @@ class SubmittedContentController < ApplicationController
     # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
-    SubmissionRecord.create(team_id: team.id,
+    SubmissionRecord.create(submission_record_params(team_id: team.id,
                           content: hyperlink_to_delete,
                           user: @participant.name,
                           assignment_id: assignment.id,
-                          operation: "Remove Hyperlink")
+                          operation: "Remove Hyperlink"))
     action = (assignment.submission_allowed(topic_id) ? 'edit' : 'view')
     redirect_to action: action, id: @participant.id
   end
@@ -105,11 +105,11 @@ class SubmittedContentController < ApplicationController
     end
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
-    SubmissionRecord.create(team_id: team.id,
+    SubmissionRecord.create(submission_record_params(team_id: team.id,
                           content: full_filename,
                           user: participant.name,
                           assignment_id: assignment.id,
-                          operation: "Submit File")
+                          operation: "Submit File"))
     # send message to reviewers when submission has been updated
     # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
     participant.assignment.email(participant.id) rescue nil
@@ -193,11 +193,11 @@ class SubmittedContentController < ApplicationController
     participant = Participant.find_by(id: params[:id])
     assignment = participant.try(:assignment)
     team = participant.try(:team)
-    SubmissionRecord.create(team_id: team.try(:id),
+    SubmissionRecord.create(submission_record_params(team_id: team.try(:id),
                           content: filename,
                           user: participant.try(:name),
                           assignment_id: assignment.try(:id),
-                          operation: "Remove File")
+                          operation: "Remove File"))
   end
 
   def copy_selected_file
@@ -235,5 +235,11 @@ class SubmittedContentController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
     # check one assignment has topics or not
     (!@topics.empty? and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.empty?
+  end
+
+  def submission_record_params(params_hash)
+    params_local = params
+    params_local[:submission_record] = params_hash
+    params_local.require(:submission_record).permit(:team_id, :content, :user, :assignment_id, :operation)
   end
 end

@@ -5,6 +5,8 @@
 # Author: AJBUDLON
 # Date: 7/18/2008
 class Node < ActiveRecord::Base
+  attr_accessible :parent_id, :node_object_id
+
   has_paper_trail
   # acts_as_nested_set
 

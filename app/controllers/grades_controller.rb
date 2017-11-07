@@ -127,15 +127,18 @@ class GradesController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
     if reviewer.nil?
-      reviewer = AssignmentParticipant.create(user_id: session[:user].id, parent_id: participant.assignment.id)
+      reviewer = AssignmentParticipant.create(assignment_participant_params(user_id: session[:user].id, parent_id: participant.assignment.id))
       reviewer.set_handle
     end
     review_exists = true
+
     reviewee = participant.team
     review_mapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
     if review_mapping.nil?
       review_exists = false
-      review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
+      review_mapping = ReviewResponseMap.create(review_response_map_params(reviewee_id: participant.team.id,
+                                                                           reviewer_id: reviewer.id,
+                                                                           reviewed_object_id: participant.assignment.id))
     else
       review = Response.find_by_map_id(review_mapping.map_id)
     end
@@ -329,5 +332,18 @@ class GradesController < ApplicationController
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def assignment_participant_params(params_hash)
+    params_local = params
+    params_local[:assignment_participant] = params_hash
+    params_local.require(:assignment_participant).permit(:user_id, :parent_id)
+  end
+
+  def review_response_map_params(params_hash)
+    params_local = params
+    params_local[:review_response_map] = params_hash
+    params_local.require(:review_response_map).permit(:reviewee_id, :reviewer_id, :reviewed_object_id)
   end
 end

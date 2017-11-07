@@ -139,7 +139,7 @@ class UsersController < ApplicationController
       # TAs and Students do not need a default. TAs inherit the default from the instructor,
       # Students do not have any checks for this information.
       if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-        AssignmentQuestionnaire.create(user_id: @user.id)
+        AssignmentQuestionnaire.create(assignment_questionnaire_params(user_id: @user.id))
       end
       undo_link("The user \"#{@user.name}\" has been successfully created. ")
       redirect_to action: 'list'
@@ -155,7 +155,7 @@ class UsersController < ApplicationController
     @user.reason = params[:reason]
     if @user.status.nil?
       flash[:error] = "Please Approve or Reject before submitting"
-    elsif @user.update_attributes(params[:user])
+    elsif @user.update_attributes(user_params)
       flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
     end
     if @user.status == "Approved"
@@ -179,7 +179,7 @@ class UsersController < ApplicationController
         prepared_mail.deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"
-          AssignmentQuestionnaire.create(user_id: @user.id)
+          AssignmentQuestionnaire.create(assignment_questionnaire_params(user_id: @user.id))
         end
         undo_link("The user \"#{@user.name}\" has been successfully created. ")
       else
@@ -230,7 +230,7 @@ class UsersController < ApplicationController
   end
 
   def update
-    params.permit!
+    # params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
@@ -239,7 +239,7 @@ class UsersController < ApplicationController
       @user.name += '_hidden'
     end
 
-    if @user.update_attributes(params[:user])
+    if @user.update_attributes(user_params)
       flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
       redirect_to @user
     else
@@ -310,6 +310,12 @@ class UsersController < ApplicationController
                                  :public_key,
                                  :copy_of_emails,
                                  :institution_id)
+  end
+
+  def assignment_questionnaire_params(params_hash)
+    params_local = params
+    params_local[:assignment_questionnaire] = params_hash
+    params_local.require(:assignment_questionnaire).permit(:user_id)
   end
 
   def get_role

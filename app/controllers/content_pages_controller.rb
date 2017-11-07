@@ -53,7 +53,7 @@ class ContentPagesController < ApplicationController
   end
 
   def create
-    @content_page = ContentPage.new(params[:content_page])
+    @content_page = ContentPage.new(content_pages_params)
     begin
       @content_page.save!
       flash[:notice] = 'The content page was successfully created.'
@@ -72,7 +72,7 @@ class ContentPagesController < ApplicationController
   end
 
   def update
-    @content_page = ContentPage.find(params[:id])
+    @content_page = ContentPage.find(content_pages_params)
     if @content_page.update_attributes(params[:content_page])
       flash[:notice] = 'The content page was successfully updated.'
       Role.rebuild_cache
@@ -108,5 +108,11 @@ class ContentPagesController < ApplicationController
                     .where('content_page_id=?', @content_page.id)
       @system_pages = @settings.system_pages @content_page.id
     end
+  end
+
+  private
+
+  def content_pages_params
+    params.require(:content_page).permit(:id, :content_page)
   end
 end

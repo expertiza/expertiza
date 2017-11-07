@@ -2,6 +2,8 @@ class SiteController < ActiveRecord::Base
   has_many :controller_actions
   belongs_to :permission
 
+  attr_accessible
+
   validates_presence_of :name
   validates_uniqueness_of :name
 

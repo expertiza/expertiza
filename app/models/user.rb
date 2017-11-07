@@ -16,7 +16,28 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  attr_accessor :anonymous_mode 
+  attr_accessor :anonymous_mode
+  attr_accessible :name,
+                  :crypted_password,
+                  :role_id,
+                  :password_salt,
+                  :fullname,
+                  :email,
+                  :parent_id,
+                  :private_by_default,
+                  :mru_directory_path,
+                  :email_on_review,
+                  :email_on_submission,
+                  :email_on_review_of_review,
+                  :is_new_user,
+                  :master_permission_granted,
+                  :handle,
+                  :digital_certificate,
+                  :persistence_token,
+                  :timezonepref,
+                  :public_key,
+                  :copy_of_emails,
+                  :institution_id
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -339,5 +360,29 @@ class User < ActiveRecord::Base
       users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
     end
     users
+  end
+
+  def self.user_params(params_hash)
+    params_hash.slice(:name,
+                      :crypted_password,
+                      :role_id,
+                      :password_salt,
+                      :fullname,
+                      :email,
+                      :parent_id,
+                      :private_by_default,
+                      :mru_directory_path,
+                      :email_on_review,
+                      :email_on_submission,
+                      :email_on_review_of_review,
+                      :is_new_user,
+                      :master_permission_granted,
+                      :handle,
+                      :digital_certificate,
+                      :persistence_token,
+                      :timezonepref,
+                      :public_key,
+                      :copy_of_emails,
+                      :institution_id)
   end
 end

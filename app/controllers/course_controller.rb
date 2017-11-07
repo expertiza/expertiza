@@ -65,13 +65,13 @@ class CourseController < ApplicationController
       new_course.save!
       parent_id = CourseNode.get_parent_id
       if parent_id
-        CourseNode.create(node_object_id: new_course.id, parent_id: parent_id)
+        CourseNode.create(course_node_params(node_object_id: new_course.id, parent_id: parent_id))
       else
-        CourseNode.create(node_object_id: new_course.id)
+        CourseNode.create(course_node_params(node_object_id: new_course.id))
       end
 
-      undo_link("The course \"#{orig_course.name}\" has been successfully copied. 
-        The copy is currently associated with an existing location from the original course. 
+      undo_link("The course \"#{orig_course.name}\" has been successfully copied.
+        The copy is currently associated with an existing location from the original course.
         This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
       redirect_to controller: 'course', action: 'edit', id: new_course.id
 
@@ -150,7 +150,7 @@ class CourseController < ApplicationController
     elsif !TaMapping.where(ta_id: @user.id, course_id: @course.id).empty?
       flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" is already a TA for this course."
     else
-      @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
+      @ta_mapping = TaMapping.create(ta_mapping_params(ta_id: @user.id, course_id: @course.id))
       @user.role = Role.find_by_name 'Teaching Assistant'
       @user.save
 
@@ -176,5 +176,20 @@ class CourseController < ApplicationController
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
     render action: 'remove_ta.js.erb', layout: false
+  end
+
+  private
+
+  # Only allow a trusted parameter "white list" through.
+  def course_node_params(params_hash)
+    params_local = params
+    params_local[:course_node] = params_hash
+    params_local.require(:course_node).permit(:node_object_id, :parent_id)
+  end
+
+  def ta_mapping_params(params_hash)
+    params_local = params
+    params_local[:ta_mapping] = params_hash
+    params_local.require(:ta_mapping).permit(:ta_id, :course_id)
   end
 end

@@ -23,6 +23,7 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
+  attr_accessible
 
   def dir_path
     assignment.try :directory_path
@@ -281,5 +282,11 @@ class AssignmentParticipant < Participant
       return (assignment.staggered_deadline? ? TopicDueDate.find_by(parent_id: topic_id).try(:last).try(:due_at) : assignment.due_dates.last.due_at).to_s
     end
     return stage
+  end
+
+  def self.assignment_participant_params(params_hash)
+    params_hash.slice(:can_submit, :can_review, :user_id, :parent_id, :submitted_at,
+                      :permission_granted, :penalty_accumulated, :grade, :type, :handle,
+                      :time_stamp, :digital_signature, :duty, :can_take_quiz)
   end
 end

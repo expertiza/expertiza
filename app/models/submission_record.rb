@@ -1,4 +1,5 @@
 class SubmissionRecord < ActiveRecord::Base
+  attr_accessible
   validates :content, presence: true
   validates :operation, presence: true
   validates :team_id, presence: true

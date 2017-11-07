@@ -10,6 +10,7 @@ class Assignment < ActiveRecord::Base
   include QuizAssignment
   include OnTheFlyCalc
   has_paper_trail
+  attr_accessible :name, :directory_path, :require_quiz, :course_id, :max_team_size
 
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
@@ -306,12 +307,12 @@ class Assignment < ActiveRecord::Base
       url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id:  user.id)
     raise "The user #{user.name} is already a participant." if participant
-    new_part = AssignmentParticipant.create(parent_id: self.id,
-                                            user_id: user.id,
-                                            permission_granted: user.master_permission_granted,
-                                            can_submit: can_submit,
-                                            can_review: can_review,
-                                            can_take_quiz: can_take_quiz)
+    new_part = AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: self.id,
+                                                                                                user_id: user.id,
+                                                                                                permission_granted: user.master_permission_granted,
+                                                                                                can_submit: can_submit,
+                                                                                                can_review: can_review,
+                                                                                                can_take_quiz: can_take_quiz))
     new_part.set_handle
   end
 

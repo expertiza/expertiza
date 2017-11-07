@@ -39,7 +39,7 @@ module ParticipantsHelper
 
   def self.create_new_user(attrs, session)
     user = User.new
-    user.update_attributes attrs
+    user.update_attributes(User.user_params(attrs))
     user.parent_id = (session[:user]).id
     user.save
     user
@@ -48,7 +48,7 @@ module ParticipantsHelper
   def self.add_user_to_assignment(params, user)
     assignment = Assignment.find params[:assignment_id]
     if AssignmentParticipant.where('user_id = ? AND parent_id = ?', user.id, assignment.id).empty?
-      return AssignmentParticipant.create(parent_id: assignment.id, user_id: user.id)
+      return AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: assignment.id, user_id: user.id))
     end
   end
 

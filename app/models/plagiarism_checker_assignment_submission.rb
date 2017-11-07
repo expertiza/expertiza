@@ -1,6 +1,7 @@
 class PlagiarismCheckerAssignmentSubmission < ActiveRecord::Base
   belongs_to :assignment
   has_many :plagiarism_checker_comparisons
+  attr_accessible
 
   # t.string :name
   validates :name, presence: true

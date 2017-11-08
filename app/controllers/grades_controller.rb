@@ -4,6 +4,7 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
   include StudentTaskHelper
+  include AssignmentHelper
 
   def action_allowed?
     case params[:action]

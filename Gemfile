@@ -4,6 +4,7 @@ gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
 gem 'flamegraph'
+gem 'kaminari'
 gem 'stackprof' 
 gem 'fast_stack'
 gem 'rack-mini-profiler', require: false

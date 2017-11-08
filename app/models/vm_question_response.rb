@@ -8,11 +8,9 @@ class VmQuestionResponse
   def initialize(questionnaire, assignment=nil)
     @assignment = assignment
     @questionnaire = questionnaire
-    @round = if questionnaire.type == "ReviewQuestionnaire"
-               AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round 
-             else
-               nil
-             end
+    if questionnaire.type == "ReviewQuestionnaire"
+      @round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+    end
 
     @rounds = @assignment.rounds_of_reviews
 

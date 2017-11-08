@@ -205,9 +205,21 @@ class UsersController < ApplicationController
     # TODO: Do not allow duplicates
     # TODO: All fields should be entered
     @user = RequestedUser.new(user_params)
-    @user.institution_id = params[:user][:institution_id]
-    @user.status = 'Under Review'
+    if params[:user][:institution_id]==''
+      if Institution.find_by(name: params[:institution][:name])
+          @institution = Institution.find_by(name: params[:institution][:name])
+          @user.institution_id = @institution.id
+      else
+        @institution = Institution.new(name: params[:institution][:name])
+        @institution.save
+        @user.institution_id = @institution.id
+      end
+    else
+      @user.institution_id = params[:user][:institution_id]
+    end
 
+    @user.status = 'Under Review'
+    @user.intro = params[:requested_users][:intro]
     # The super admin receives a mail about a new user request with the user name
     if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil? && @user.save
       @super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')

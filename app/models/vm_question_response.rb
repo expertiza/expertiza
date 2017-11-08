@@ -8,7 +8,7 @@ class VmQuestionResponse
   def initialize(questionnaire, assignment=nil)
     @assignment = assignment
     @questionnaire = questionnaire
-    @round = @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire" ?
+    @round = questionnaire.type == "ReviewQuestionnaire" ?
         AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round :
         nil
     @rounds = @assignment.rounds_of_reviews

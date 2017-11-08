@@ -59,7 +59,8 @@ class UsersController < ApplicationController
   # for displaying the list of users
   def list
     user = session[:user]
-    @users = user.get_user_list
+    #@users = user.get_user_list.page params[:page]
+	@users=Kaminari.paginate_array(user.get_user_list).page(params[:page])
   end
 
   def list_pending_requested

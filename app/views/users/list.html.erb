@@ -1,5 +1,6 @@
 <h1>Manage users</h1>
 
+<%= paginate @users %>
 <br/>
 <%= form_tag :action => 'show_selection' do %>
   View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>

@@ -22,7 +22,8 @@ class ParticipantsController < ApplicationController
       @parent = Object.const_get(params[:model]).find(params[:id])
     end
     begin
-      @participants = @parent.participants
+      #@participants = @parent.participants
+	@participants=Kaminari.paginate_array(@parent.participants).page(params[:page])
       @model = params[:model]
       # E726 Fall2012 Changes Begin
       @authorization = params[:authorization]

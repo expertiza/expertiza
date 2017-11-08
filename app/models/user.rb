@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+	max_paginates_per 10
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
     config.crypto_provider = Authlogic::CryptoProviders::Sha1
@@ -78,10 +79,14 @@ class User < ActiveRecord::Base
     # If the user is an instructor, fetch all users in his course/assignment
     if self.role.instructor?
       participants = []
-      Course.where(instructor_id: self.id).find_each do |course|
+      #Course.where(instructor_id: self.id).find_each do |course|
+	
+	Course.where(instructor_id: self.id).limit(20).each do |course|
+	puts "asdfadsjfnajdf"
         participants << course.get_participants
       end
-      Assignment.where(instructor_id: self.id).find_each do |assignment|
+      Assignment.where(instructor_id: self.id).limit(20).each do |assignment|
+	puts "asdf"
         participants << assignment.participants
       end
       participants.each do |p_s|

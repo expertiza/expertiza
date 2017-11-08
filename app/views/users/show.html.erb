@@ -1,5 +1,9 @@
 <h1>User: <%=h @user.name %></h1>
 
+<h1>hey</h1>
+
+<%= paginate @user %>
+
 <table>
 
   <tr><th>Full Name:</th>
@@ -16,6 +20,8 @@
   </tr>
 
 </table>
+
+
 
 <% unless current_user_role? == "Student" %>
   <hr/>

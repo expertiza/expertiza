@@ -123,7 +123,6 @@ class AssignmentsController < ApplicationController
     unless params.key?(:assignment_form)
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]
-      puts "Perry1"
       if @assignment.save
         flash[:note] = 'The assignment was successfully saved.'
         redirect_to list_tree_display_index_path

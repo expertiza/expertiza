@@ -254,4 +254,9 @@ class Team < ActiveRecord::Base
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
+  # This method will return true if the assignment have some topic
+  def self.topic?(assignment_id)
+    topics = SignUpTopic.where("assignment_id = ?", assignment_id)
+    topics.empty?
+  end
 end

@@ -24,10 +24,4 @@ $(document).ready(function(){
         $(this).css("text-decoration", "none");
     });
 
-    $('#show_hide_summary_link').click(function(){
-        if ($('#show_hide_summary_link').text() == "show review summary"){
-            $('#show_hide_summary_link').html("hide review summary");
-        }else
-            $('#show_hide_summary_link').html("show review summary");
-    });
 });

@@ -1,7 +1,7 @@
 <nav role="navigation" class="navbar navbar-default navbar-static-top navbarposition">
   <div class="container-fluid">
     <div class="navbar-header">
-      <%= image_tag "logo.png", height: '65'%>
+      <%= image_tag "logo.jpg", height: '65'%>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
@@ -44,15 +44,6 @@
 </nav>
 
 <script type="text/javascript">
-    $(document).ready(function(){
-      $('#inputImpersonateBox').keyup(function(){
-        if($('#impersonate-button').text() == 'Revert' && $('#inputImpersonateBox').val().trim() != '' )
-          $('#impersonate-button').text('Impersonate');
-        else if($('#impersonate-button').text() == 'Impersonate' && $('#inputImpersonateBox').val().trim() == '')
-          $('#impersonate-button').text('Revert');
-      });
-    });
-
     jQuery("#impersonate-button").click(function(event) {
         jQuery("#impersonate-form").submit()
     });

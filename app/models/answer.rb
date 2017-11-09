@@ -125,12 +125,4 @@ class Answer < ActiveRecord::Base
     question_answers
   end
   # end added by ferry, required for the summarization
-
-  # start added by ferry for answer tagging
-  def get_reviewee_from_answer(answer)
-    resp = Response.find(answer.response_id)
-    map = ResponseMap find(resp.map_id)
-    return map.reviewee_id
-  end
-  # end added by ferry for answer tagging
 end

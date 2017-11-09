@@ -27,15 +27,17 @@
             <TD id=<%="rowspanTd1#{participant_id}"%> ALIGN="CENTER" rowspan=<%=team_size.to_s%>>
                 <%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %>%<BR/>
                 <FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="var td=document.getElementById('<%="rowspanTd1#{participant_id}"%>'); var td2=document.getElementById('<%="rowspanTd2#{participant_id}"%>'); if(td.rowSpan=='1'){td.rowSpan=<%=team_size.to_s%>;td2.rowSpan=<%=team_size.to_s%>;}else{td.rowSpan='1'; td2.rowSpan='1';};toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
-              <!-- add a fake link to the auto summarization table, and only show it to the reviewee-->
-              <% if controller.action_name == "view_my_scores" %>
-                  <br/><div align="center" data-toggle="collapse" data-target="#summary_review_table" class="fake-link" id="show_hide_summary_link">show review summary</div>
-              <% end %>
-            </TD>
+            </TD> 
         
            
             <TD id=<%="rowspanTd2#{participant_id}"%> ALIGN="CENTER" rowspan=<%=team_size.to_s%>>
                 <%= rscore_review.my_min.is_a?(Float)? sprintf("%.0f",rscore_review.my_min): rscore_review.my_min %>% - <%= rscore_review.my_max.is_a?(Float)? sprintf("%.0f",rscore_review.my_max): rscore_review.my_max %>%
+                <% if controller.action_name != "view_my_scores" %>
+                <!-- add a fake link to the auto summarization table, and only show it to the reviewee-->
+                <% else %>
+                    <div align="center" data-toggle="collapse" data-target="#summary_review_table" class="fake-link">show review summary</div>
+                <!-- end fake link -->
+                <% end %>
             </TD>
         <% end %>
     <% else %>

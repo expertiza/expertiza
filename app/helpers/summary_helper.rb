@@ -50,7 +50,7 @@ module SummaryHelper
       self.summary = Array.new(nround)
       self.avg_scores_by_criterion = Array.new(nround)
       self.avg_scores_by_round = Array.new(nround)
-      threads = []
+
       rubric = get_questions_by_assignment(assignment)
 
       for round in 0..nround - 1
@@ -66,14 +66,14 @@ module SummaryHelper
 
           max_score = get_max_score_for_question(question)
           # process each question in a seperate thread
-          threads << Thread.new do
+          Thread.new do
             comments = break_up_comments_to_sentences(answers_questions)
             # store each avg in a hashmap and use the question as the key
             self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, max_score)
-            self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
+            self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url)
           end
           # Wait for all threads to end
-          threads.each do |t|
+          Thread.list.each do |t|
             # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
             t.join if t != Thread.current
           end
@@ -95,7 +95,6 @@ module SummaryHelper
       self.avg_scores_by_round = Hash.new
       self.avg_scores_by_criterion = Hash.new
       self.reviewers = Hash.new
-      threads = []
 
       # get all criteria used in each round
       rubric = get_questions_by_assignment(assignment)
@@ -109,7 +108,6 @@ module SummaryHelper
         self.avg_scores_by_round[reviewee.name] = []
         self.avg_scores_by_criterion[reviewee.name] = []
 
-
         # get the name of reviewers for display only
         self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
 
@@ -121,8 +119,8 @@ module SummaryHelper
 
           # iterate each round and get answers
           # if use the same rubric, only use rubric[0]
-          rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
-          rubric_questions_used.each do |q|
+          rubric_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+          rubric_used.each do |q|
             next if q.type.eql?("SectionHeader")
             summary[reviewee.name][round][q.txt] = ""
             self.avg_scores_by_criterion[reviewee.name][round][q.txt] = 0.0
@@ -139,17 +137,17 @@ module SummaryHelper
             # summarize the comments by calling the summarization Web Service
 
             # since it'll do a lot of request, do this in seperate threads
-            threads << Thread.new do
+            Thread.new do
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
           end
-          self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_questions_used)
+          self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_used)
         end
         self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
       end
 
       # Wait for all threads to end
-      threads.each do |t|
+      Thread.list.each do |t|
         t.join if t != Thread.current
       end
 

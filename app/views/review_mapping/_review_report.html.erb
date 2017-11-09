@@ -2,13 +2,6 @@
       <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
       <div class = 'reviewreport'>
   <!-- Added headers for tablesorter -->
-  
-<script type='text/javascript'>
-$(window).load(function(){
-$("#myTable tbody").sortable().disableSelection();
-});
-</script>
-
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
@@ -35,12 +28,12 @@ $("#myTable tbody").sortable().disableSelection();
         <%if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
-            <td bgcolor=<%= @bgcolor %>>
+            <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%>>
               <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
               (<%= user.fullname %>)
             </td>
             <!--# reviews done-->
-            <td bgcolor=<%= @bgcolor %> align = 'left'>
+            <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
               <% (1..@assignment.num_review_rounds).each do |round| %>
                 <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
                 <%= ', ' unless round == @assignment.num_review_rounds %>
@@ -48,84 +41,63 @@ $("#myTable tbody").sortable().disableSelection();
               <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
             </td>
 
-
-          <!--Team reviewed / Author feedback-->
-          <td bgcolor=<%= @bgcolor %> align = 'left'>
           <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
             <% team_name_color = get_team_name_color(ri) %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
+                <%@team = Team.find(ri.reviewee_id) %>
                 <!--Team reviewed-->
-                <% if index == 0 %>
-                  <div>
-                <% else %>
-                  <div style="border-top: solid; border-width: 1px;">
-                <% end %>
-                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
-                    <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
-                    <!--Hard-coded Dr.Kidd's question in order to display link.-->
-                    <!--later we can create a hyperlink question type to deal with this situation.-->
-                    <%= list_hyperlink_submission(ri.id, 5386) if @id.to_i == 806 %>
-                  </div>
+                <td id = <%= team_name_color %> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
+                  <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                  <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
+                  <!--Hard-coded Dr.Kidd's question in order to display link.-->
+                  <!--later we can create a hyperlink question type to deal with this situation.-->
+                  <%= list_hyperlink_submission(ri.id, 5386) if @id.to_i == 806 %>
+                </td>
 
                 <!--Author feedback-->
                 <!--Dr.Kidd required to add a "autor feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
                 <!--Dr.Kidd's course-->
                 <% if @assignment.instructor_id == 2026 %>
-                  <% if index == 0 %>
-                  <div>
-                  <% else %>
-                  <div style="border-top: solid; border-width: 1px;">
-                  <% end %>
+                  <td id = <%= team_name_color %> bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
                     <%= calcutate_average_author_feedback_score(@assignment.id, @assignment.max_team_size, ri.id, ri.reviewee_id) %>
-                  </div>
+                  </td>
                 <% end %>
-              <%end%>
-          <%end %>
-          </td>
-          
-          
-          <!--Score awarded / Avg. score-->
-          <td bgcolor=<%= @bgcolor %> align = 'left' >
-          <% @response_maps.each_with_index do |ri, index| %>
-            <% if Team.where(id: ri.reviewee_id).length > 0 %>
-                <%@team = Team.find(ri.reviewee_id) %>
+
+                <!--Score awarded / Avg. score-->
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+                <% if index == 0 %>
+                  <!--Metrics-->
+                  <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
+                    <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+                  </td>
+                  <!--Assign grade and write comments-->
+                  <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan%> align = 'left'>
+                    <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
+                      <%= hidden_field_tag :participant_id, r.id %>
+                      <%= hidden_field_tag :assignment_id, @id %>
+                      <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer) ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %><br/>
+                      <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '',  'data-minchars' => "1"  %>
+                        <table class="inline-transparent">
+                          <tr>
+                            <td>
+                              <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()'%>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <%= submit_tag 'Save' %>
+                            </td>
+                          </tr>
+                        </table>
+                    <% end %>
+                  </td>
+                <% end %>
+                </tr><tr class = "tablesorter-childRow">
+              <%end%>
             <%end %>
           <%end %>
-          </td>
-          
-
-          <!--Metrics-->
-          <td bgcolor=<%= @bgcolor %> align = 'left'>
-            <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
-          </td>
-          <!--Assign grade and write comments-->
-          <td bgcolor=<%= @bgcolor %> align = 'left'>
-            <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
-              <%= hidden_field_tag :participant_id, r.id %>
-              <%= hidden_field_tag :assignment_id, @id %>
-              <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer) ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %><br/>
-              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '',  'data-minchars' => "1"  %>
-                <table class="inline-transparent">
-                  <tr>
-                    <td>
-                      <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()'%>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <%= submit_tag 'Save' %>
-                    </td>
-                  </tr>
-                </table>
-            <% end %>
-          </td>
-          
-          
-          
-        <%end %>  
         </tr>
       <%end %>
 </table>
@@ -134,6 +106,37 @@ $("#myTable tbody").sortable().disableSelection();
 </div>
   <!--Partial for text macro form-->
  <%= render :partial => '/user_pastebins/save_text_macros'%>
+<style>
+  /*TableSorter CSS styles */
+  th.tablesorter-headerAsc{
+    /* Style for Up Arrow */
+    background-image: url(<%= asset_path("up-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  th.tablesorter-headerDesc{
+    /* Style for down arrow */
+    background-image: url(<%= asset_path("down-arrow.png") %>);
+    background-size: 15px 15px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+  }
+
+  /* Style for no-sort*/
+  th.sorter-true.tablesorter-headerUnSorted{
+    /* Style for default view  */
+    background-image: url(<%= asset_path("sort.png") %>);
+    background-size: 15px 7px;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 15px;
+
+  }
+</style>
 
 <script>
 $(function () {
@@ -162,4 +165,3 @@ $.tablesorter.addParser({
   type: 'numeric'
 });
 </script>
-

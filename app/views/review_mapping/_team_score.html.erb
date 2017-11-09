@@ -1,6 +1,6 @@
 <% if !@assignment.varying_rubrics_by_round? %>
     <!--Score awarded / Avg. score-->
-    <div style="border-top: solid; border-width: 1px">
+    <td bgcolor=<%= bgcolor %> align = 'left' >
     <% if @review_scores[reviewer_id][team_id] != -1%>
         <%= @review_scores[reviewer_id][team_id].inspect %>%
     <% else %>
@@ -12,12 +12,12 @@
     <%else%>
         --
     <%end%>
-    </div>
+    </td>
 <%else%>
     <!--Assignments have vary_rubric_by_rounds-->
     <!--Score awarded / Avg. score-->
     <% get_each_round_score_awarded_for_review_report(reviewer_id, team_id) %>
-    <div style="border-top: solid; border-width: 1px">
+    <td bgcolor=<%= bgcolor %> align = 'left' >
     <% (1..@assignment.num_review_rounds).each do |round| %>
         <% get_min_max_avg_value_for_review_report(round, team_id) %>
             <%= instance_variable_get("@score_awarded_round_" + round.to_s) %> / <%= @avg %>
@@ -27,5 +27,5 @@
             (<%= @min %>% - <%= @max %>%)
         </td>-->
     <%end%>
-    </div>
+    </td>
 <%end%>

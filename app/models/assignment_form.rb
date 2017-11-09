@@ -1,7 +1,7 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -25,7 +25,6 @@ class AssignmentForm
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
-    assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     assignment_form
   end
 
@@ -46,7 +45,6 @@ class AssignmentForm
       delete_from_delayed_queue
       add_to_delayed_queue
     end
-    update_tag_prompt_deployments(attributes[:tag_prompt_deployments])
     !@has_errors
   end
 
@@ -83,40 +81,6 @@ class AssignmentForm
       end
     end
   end
-
-  # s required by answer tagging
-  def update_tag_prompt_deployments(attributes)
-    if !attributes.nil?
-      attributes.each do |key, value|
-        if value.key?('deleted')
-          TagPromptDeployment.where(id: value['deleted']).delete_all
-        end
-        # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
-        if value.key?('tag_prompt')
-          for i in 0..value['tag_prompt'].count - 1
-            tag_dep = nil
-            if !(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
-              tag_dep = TagPromptDeployment.find(value['id'][i])
-              if tag_dep
-                tag_dep.update(assignment_id: @assignment.id,
-                               questionnaire_id: key,
-                               tag_prompt_id: value['tag_prompt'][i],
-                               question_type: value['question_type'][i],
-                               answer_length_threshold: value['answer_length_threshold'][i])
-              end
-            else
-              tag_dep = TagPromptDeployment.new(assignment_id: @assignment.id,
-                                                questionnaire_id: key,
-                                                tag_prompt_id: value['tag_prompt'][i],
-                                                question_type: value['question_type'][i],
-                                                answer_length_threshold: value['answer_length_threshold'][i]).save
-            end
-          end
-        end
-      end
-    end
-  end
-  # end required by answer tagging
 
   # code to save due dates
   def update_due_dates(attributes, user)

@@ -105,7 +105,7 @@ class GradesController < ApplicationController
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
                end
-      vm = VmQuestionResponse.new(questionnaire, @assignment)
+      vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
       questions = questionnaire.questions
       vm.add_questions(questions)
       vm.add_team_members(@team)

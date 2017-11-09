@@ -88,7 +88,7 @@ class CreateResponseMaps < ActiveRecord::Migration
        end    
     }
     
-    Score.delete_all("response_id is null")
+    Score.delete_all("response_id is null")   
      
     remove_column :scores, :instance_id
      

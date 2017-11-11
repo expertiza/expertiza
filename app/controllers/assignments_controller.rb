@@ -79,7 +79,7 @@ class AssignmentsController < ApplicationController
 
     retrieve_assignment_form
 
-    handle_current_user_timezonepref_nil
+    handle_current_user_timezonepref_nil_with_parent_timezone
 
     feedback_assignment_form_attributes_update
 
@@ -349,7 +349,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def handle_current_user_timezonepref_nil
+  def handle_current_user_timezonepref_nil_with_parent_timezone
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref

@@ -196,7 +196,7 @@ You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
           allow(assignment).to receive(:save).and_return(true)
           params = {id: 1, course_id: 1}
           post :update, params
-          expect(flash.now[:note]).to eq("The assignment was successfully saved.")
+          expect(flash[:note]).to eq("The assignment was successfully saved.")
           expect(response).to redirect_to list_tree_display_index_path
         end
       end
@@ -208,7 +208,7 @@ You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
           allow(assignment).to receive_message_chain(:errors, :full_messages) { ['Assignment not find.', 'Course not find.'] }
           params = {id: 1, course_id: 1}
           post :update, params
-          expect(flash.now[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")
+          expect(flash[:error]).to eq("Failed to save the assignment: Assignment not find. Course not find.")
           expect(response).to redirect_to edit_assignment_path assignment.id
         end
       end

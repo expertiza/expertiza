@@ -93,7 +93,7 @@ class Ta < User
     @courses = TaMapping.get_courses(self.id)
   end
 
-  def is_teaching_assistant?
+  def teaching_assistant?
     true
   end
 

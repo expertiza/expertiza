@@ -239,7 +239,7 @@ describe User do
     end
   end
 
-describe '#get_instructor' do
+  describe '#get_instructor' do
     it 'gets the instructor id' do
       user.id = 6
       expect(user.get_instructor).to eq 6
@@ -275,7 +275,7 @@ describe '#get_instructor' do
     end
   end
 
-describe '.export' do
+  describe '.export' do
     before(:each) do
       allow(User).to receive(:all).and_return([user])
       allow(user).to receive_message_chain(:role, :name).and_return('Student')

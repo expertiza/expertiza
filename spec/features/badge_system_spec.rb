@@ -1,3 +1,6 @@
+require '../rails_helper.rb'
+# Method is created to autofill all the fields required to create an assignment
+
 describe 'badge system' do
   ###
   # Please do not share this file with other teams.
@@ -9,10 +12,13 @@ describe 'badge system' do
   # If your tests need to switch to different users frequently,
   # please use stub_current_user(user, user.role.name, user.role) each time to stub login behavior.
   ###
-
+  before(:each) do
+	create(:assignment, name: "testAssignment")
+  end
   context 'in assignments#edit page' do
     it 'has a tab named \'Badges\''
-
+		@assignment = Assignment.where(name: 'testAssignment').first
+		expect(page).to have_select("Badges")
     context 'when switching to \'Badges\' tab' do
       it 'allows instructor to change the thresholds of two badges (by default is 95) and save thresholds to DB'
     end

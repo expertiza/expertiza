@@ -52,7 +52,7 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has been given
-  # methods extracted from scores method:assignment_questionnaires, merge_scores, topic_total_scores, caculate_scores
+  # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
   def scores(questions)
     scores = {}
     scores[:participant] = self
@@ -76,7 +76,7 @@ class AssignmentParticipant < Participant
     scores[:total_score] = assignment.compute_total_score(scores)
     # scores[:total_score] += compute_quiz_scores(scores)
     # move lots of calculation from view(_participant.html.erb) to model
-    caculate_scores(scores)
+    calculate_scores(scores)
   end
 
   def compute_assignment_score(questions, scores)
@@ -138,7 +138,7 @@ class AssignmentParticipant < Participant
     end
   end
 
-  def caculate_scores(scores)
+  def calculate_scores(scores)
     if self.grade
       scores[:total_score] = self.grade
     else

@@ -98,6 +98,7 @@
       <th>Review Grade</th>
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
+      <th>Badges</th>
     </tr>
 
     <% @student_tasks.each do |student_task| %>
@@ -130,6 +131,7 @@
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <!--publish rights-->
           <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
+          <td><img height = "auto" width = "50px" src="/assets/badges/goodReviewer.png"/><img height = "auto" width = "50px" src="/assets/badges/goodTeammate.png"/></td>
         </tr>
       <% end %>
     <% end %>

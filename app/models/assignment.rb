@@ -406,16 +406,12 @@ class Assignment < ActiveRecord::Base
 
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options.value?('true')
-
     @assignment = Assignment.find(parent_id)
-
     @answers = {} # Contains all answer objects for this assignment
-
     # Find all unique response types
     @uniq_response_type = ResponseMap.uniq.pluck(:type)
     # Find all unique round numbers
     @uniq_rounds = Response.uniq.pluck(:round)
-
     # create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
       @answers[round_num] = {}
@@ -423,18 +419,14 @@ class Assignment < ActiveRecord::Base
         @answers[round_num][res_type] = []
       end
     end
-
     @answers = generate_answer(@answers, @assignment)
-
     # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
       @uniq_response_type.each do |res_type|
         round_type = check_empty_rounds(@answers, round_num, res_type)
-
         unless round_type.nil?
           csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
         end
-
         @answers[round_num][res_type].each do |answer|
           csv << csv_row(detail_options, answer)
         end
@@ -466,10 +458,8 @@ class Assignment < ActiveRecord::Base
     tcsv = []
     @response = Response.find(answer.response_id)
     map = ResponseMap.find(@response.map_id)
-
     @reviewee = Team.find_by id: map.reviewee_id
     @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
-
     reviewer = Participant.find(map.reviewer_id).user
     tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
     tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
@@ -486,14 +476,12 @@ class Assignment < ActiveRecord::Base
   def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
-
     # for each map, get the response & answer associated with it
     @response_maps_for_assignment.each do |map|
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
       @response_for_this_map.each do |resp|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
-
         @answer.each do |ans|
           answers[resp.round][map.type].push(ans)
         end
@@ -545,10 +533,10 @@ class Assignment < ActiveRecord::Base
     end
     @scores = @assignment.scores(@questions)
     return csv if @scores[:teams].nil?
-    export_data(csv, @scores, parent_id, options)
+    export_data(csv, @scores, options)
   end
 
-  def export_data(csv, scores, _parent_id, options)
+  def self.export_data(csv, scores, options)
     @scores = scores
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
@@ -567,7 +555,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def export_data_fields(options)
+  def self.export_data_fields(options)
     team[:scores] ?
       tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
       tcsv.push('---', '---', '---') if options['team_score'] == 'true'
@@ -581,7 +569,7 @@ class Assignment < ActiveRecord::Base
     tcsv.push(pscore[:total_score])
  end
 
-  def export_individual_data_fields(review_type, score_name)
+  def self.export_individual_data_fields(review_type, score_name)
     if pscore[review_type]
       tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
     else

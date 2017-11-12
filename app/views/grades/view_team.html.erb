@@ -62,16 +62,31 @@
 
           <table id="scoresTable" class="tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
+            <!-- 1799 -->
             <thead>
             <tr>
               <th class="sorter-true">Criterion<span></span></th>
               <th class="sorter-false">Max</th>
-
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
+              <%
+                review_map = ResponseMap.find(review.map_id)
+                review_type = nil
+                if review_map 
+                  review_type =  review_map.type
+                end
+
+               %>
+                
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details">
+                        <% if review_type == 'SelfReviewResponseMap' %>
+                          <%= "Self Review "%>
+                        <%else%>
+                         <%= "Review " +   i.to_s %>
+                        <%end%>
+                      </a>  </th>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
@@ -87,6 +102,7 @@
               </th>
 
             </tr>
+
             </thead>
 
 

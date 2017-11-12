@@ -43,19 +43,36 @@ class VmQuestionResponse
 
   def add_reviews(participant, team, vary)
     if @questionnaire_type == "ReviewQuestionnaire"
+      # 1799
+      # should add types of Self_review_Resonse_map too in the response
+      puts("Varying by ",vary)
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
+
+      self_reviews = SelfReviewResponseMap.get_assessments_for(team)
+
+    #  reviews = reviews + self_reviews
+      puts " counting the reviews : ",reviews.length
+      puts " counting the s reviews : ",self_reviews.length
+
+
       reviews.each do |review|
-        review_mapping = ReviewResponseMap.find(review.map_id)
-        if review_mapping.present?
+        review_mapping = ReviewResponseMap.find_by(review.map_id)
+        self_review_mapping = SelfReviewResponseMap.find_by(review.map_id)
+        if review_mapping && review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
+          @list_of_reviewers << participant
+        
+        elsif self_review_mapping && self_review_mapping.present?
+          participant = Participant.find(self_review_mapping.reviewer_id)
           @list_of_reviewers << participant
         end
       end
-      @list_of_reviews = reviews
+      @list_of_reviews = reviews + self_reviews
+
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
@@ -84,12 +101,21 @@ class VmQuestionResponse
       end
     end
 
+    # 1799 adding answers part
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         add_answer(answer)
       end
     end
+
+     if self_reviews
+      answers = Answer.where(response_id: self_reviews[0].response_id)
+      answers.each do |answer|
+        add_answer(answer)
+      end
+    end
+   
   end
 
   def display_team_members
@@ -179,7 +205,9 @@ class VmQuestionResponse
   def get_number_of_comments_greater_than_10_words
     first_time = true
 
+   puts " The List of reviews in Answers part : "+@list_of_reviews.length.to_s
     @list_of_reviews.each do |review|
+      puts "Response Id : ",review.response_id
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|

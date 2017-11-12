@@ -62,7 +62,7 @@ class AssignmentParticipant < Participant
     merge_scores(scores) if self.assignment.varying_rubrics_by_round?
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
-    topic_total_scores(scores) if self.assignment.is_microtask?
+    topic_total_scores(scores) if self.assignment.microtask?
 
     # for all quiz questionnaires (quizzes) taken by the participant
     # quiz_responses = []
@@ -271,6 +271,6 @@ class AssignmentParticipant < Participant
     if stage == 'Finished'
       return (assignment.staggered_deadline? ? TopicDueDate.find_by(parent_id: topic_id).try(:last).try(:due_at) : assignment.due_dates.last.due_at).to_s
     end
-    return stage
+    stage
   end
 end

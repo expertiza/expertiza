@@ -29,7 +29,6 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
-
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
@@ -51,7 +50,7 @@ class Assignment < ActiveRecord::Base
   end
   alias team_assignment team_assignment?
 
-  def has_topics?
+  def topics?
     @has_topics ||= !sign_up_topics.empty?
   end
 
@@ -71,7 +70,7 @@ class Assignment < ActiveRecord::Base
     FileHelper.update_file_location(oldpath, newpath)
   end
 
-  def has_teams?
+  def teams?
     @has_teams ||= !self.teams.empty?
   end
 
@@ -95,7 +94,6 @@ class Assignment < ActiveRecord::Base
   # Returns a review (response) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
-
     # Reject response maps without responses
     response_map_set.reject! {|response_map| response_map.response.empty? }
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
@@ -137,7 +135,7 @@ class Assignment < ActiveRecord::Base
   def metareview_mappings
     mappings = []
     self.review_mappings.each do |map|
-      m_map = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
+      m_map = MetareviewResponseMap.find_by(reviewed_object_id: map.id)
       mappings << m_map unless m_map.nil?
     end
     mappings
@@ -151,21 +149,17 @@ class Assignment < ActiveRecord::Base
 
   def scores(questions)
     scores = {}
-
     scores[:participants] = {}
     self.participants.each do |participant|
       scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
     end
-
     scores[:teams] = {}
     index = 0
     self.teams.each do |team|
       scores[:teams][index.to_s.to_sym] = {}
       scores[:teams][index.to_s.to_sym][:team] = team
-
       if self.varying_rubrics_by_round?
         grades_by_rounds = {}
-
         total_score = 0
         total_num_of_assessments = 0 # calculate grades for each rounds
         (1..self.num_review_rounds).each do |i|
@@ -177,7 +171,6 @@ class Assignment < ActiveRecord::Base
             total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
           end
         end
-
         # merge the grades from multiple rounds
         scores[:teams][index.to_s.to_sym][:scores] = {}
         scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
@@ -192,7 +185,6 @@ class Assignment < ActiveRecord::Base
             scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
           end
         end
-
         if total_num_of_assessments != 0
           scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
         else
@@ -200,12 +192,10 @@ class Assignment < ActiveRecord::Base
           scores[:teams][index.to_s.to_sym][:scores][:max] = 0
           scores[:teams][index.to_s.to_sym][:scores][:min] = 0
         end
-
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
       end
-
       index += 1
     end
     scores
@@ -293,7 +283,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Check to see if assignment is a microtask
-  def is_microtask?
+  def microtask?
     self.microtask.nil? ? false : self.microtask
   end
 
@@ -301,7 +291,7 @@ class Assignment < ActiveRecord::Base
   # manual addition
   # user_name - the user account name of the participant to add
   def add_participant(user_name, can_submit, can_review, can_take_quiz)
-    user = User.find_by_name(user_name)
+    user = User.find_by(name: user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" +
       url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id:  user.id)
@@ -316,7 +306,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def create_node
-    parent = CourseNode.find_by_node_object_id(self.course_id)
+    parent = CourseNode.find_by(node_object_id: self.course_id)
     node = AssignmentNode.create(node_object_id: self.id)
     node.parent_id = parent.id unless parent.nil?
     node.save
@@ -540,10 +530,9 @@ class Assignment < ActiveRecord::Base
     @assignment = Assignment.find(parent_id)
     @questions = {}
     questionnaires = @assignment.questionnaires
-
     questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round?
-        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
         questionnaire_symbol = if round.nil?
                                  questionnaire.symbol
                                else
@@ -555,9 +544,12 @@ class Assignment < ActiveRecord::Base
       @questions[questionnaire_symbol] = questionnaire.questions
     end
     @scores = @assignment.scores(@questions)
-
     return csv if @scores[:teams].nil?
+    export_data(csv, @scores, parent_id, options)
+  end
 
+  def export_data(csv, scores, _parent_id, options)
+    @scores = scores
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
@@ -570,29 +562,30 @@ class Assignment < ActiveRecord::Base
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-
-      team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['team_score'] == 'true'
-
-      pscore[:review] ?
-        tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['submitted_score']
-
-      pscore[:metareview] ?
-        tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['metareview_score']
-
-      pscore[:feedback] ?
-        tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['author_feedback_score']
-
-      pscore[:teammate] ?
-        tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['teammate_review_score']
-
-      tcsv.push(pscore[:total_score])
+      export_data_fields(options)
       csv << tcsv
+    end
+  end
+
+  def export_data_fields(options)
+    team[:scores] ?
+      tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+      tcsv.push('---', '---', '---') if options['team_score'] == 'true'
+    review_hype_mapping_hash = {review: 'submitted_score',
+                                metareview: 'metareview_score',
+                                feedback: 'author_feedback_score',
+                                teammate: 'teammate_review_score'}
+    review_hype_mapping_hash.each do |review_type, score_name|
+      export_individual_data_fields(review_type, score_name)
+    end
+    tcsv.push(pscore[:total_score])
+ end
+
+  def export_individual_data_fields(review_type, score_name)
+    if pscore[review_type]
+      tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
+    else
+      tcsv.push('---', '---', '---') if options[score_name]
     end
   end
 
@@ -611,6 +604,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 end

@@ -27,7 +27,7 @@
 <h4>Team: <%= @team.name %></h4>
 <!--Obtain topic name from assignment helper-->
 <% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
-<% if @assignment.has_topics? %>
+<% if @assignment.topics? %>
   <h5>Topic: <%= topic_id + '. ' + topic_name %></h5>
 <% end %>
 <!--Obtain only review scores-->

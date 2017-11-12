@@ -17,6 +17,7 @@ describe SignUpSheetController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
     allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
+    allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 8).and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
   end

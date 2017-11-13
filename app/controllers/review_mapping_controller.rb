@@ -86,12 +86,12 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.has_topics? && assignment.can_choose_topic_to_review?
+    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
 
       # begin
-      if assignment.has_topics? # assignment with topics
+      if assignment.topics? # assignment with topics
         topic = if params[:topic_id]
                   SignUpTopic.find(params[:topic_id])
                 else
@@ -421,6 +421,14 @@ class ReviewMappingController < ApplicationController
       @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
                                                                               PlagiarismCheckerAssignmentSubmission.where(assignment_id:
                                                                                                                               params[:id]).pluck(:id))
+    when "AnswerTaggingReport"
+      tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
+
+      @questionnaire_tagging_report = {}
+
+      tag_prompt_deployments.each do |tag_dep|
+        @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
+      end
     end
 
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user

@@ -120,7 +120,19 @@ to display the label "Your team" in the student assignment tasks-->
   #display_directory_tree(participant, files, true).html_safe
 
   if (u.operation).eql?('Submit File')
-
+    f = u.content
+    ret=""
+    if File.exist?(f) && File.directory?(f)
+      ret += link_to File.basename(f), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => f
+    else
+      ret += "\n      "
+      ret += link_to File.basename(f), :controller => 'submitted_content',
+                     :action => 'download',
+                     :id => @participant.id,
+                     :download => File.basename(f),
+                     "current_folder[name]" => File.dirname(f)
+    end
+    @href_arr.push(ret.split('"')[1])
     { :id => u.id, :start=> u.created_at, :content => (u.content).split('/')[-1] }
   else
     @href_arr.push(u.content)

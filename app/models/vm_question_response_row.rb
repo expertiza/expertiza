@@ -12,6 +12,8 @@ class VmQuestionResponseRow
     @score_row = []
 
     @countofcomments = 0
+
+    @self_review_score = -1
   end
 
   attr_reader :countofcomments
@@ -27,6 +29,8 @@ class VmQuestionResponseRow
   attr_reader :score_row
 
   attr_reader :weight
+
+  attr_accessor :self_review_score
 
   # the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
   # the max score is one.

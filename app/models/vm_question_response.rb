@@ -4,6 +4,7 @@
 class VmQuestionResponse
   @questionnaire = nil
   @assignment = nil
+  @self_reviews = nil
 
   def initialize(questionnaire, assignment=nil)
     @assignment = assignment
@@ -12,10 +13,10 @@ class VmQuestionResponse
         AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round :
         nil
     @rounds = @assignment.rounds_of_reviews
-
     @list_of_rows = []
     @list_of_reviewers = []
     @list_of_reviews = []
+    
     @list_of_team_participants = []
     @max_score = questionnaire.max_question_score
     @questionnaire_type = questionnaire.type
@@ -45,7 +46,6 @@ class VmQuestionResponse
     if @questionnaire_type == "ReviewQuestionnaire"
       # 1799
       # should add types of Self_review_Resonse_map too in the response
-      puts("Varying by ",vary)
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
@@ -54,24 +54,17 @@ class VmQuestionResponse
 
       self_reviews = SelfReviewResponseMap.get_assessments_for(team)
 
-    #  reviews = reviews + self_reviews
-      puts " counting the reviews : ",reviews.length
-      puts " counting the s reviews : ",self_reviews.length
-
-
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find_by(review.map_id)
         self_review_mapping = SelfReviewResponseMap.find_by(review.map_id)
         if review_mapping && review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
           @list_of_reviewers << participant
-        
-        elsif self_review_mapping && self_review_mapping.present?
-          participant = Participant.find(self_review_mapping.reviewer_id)
-          @list_of_reviewers << participant
-        end
+         end
       end
-      @list_of_reviews = reviews + self_reviews
+
+      @list_of_reviews = reviews 
+      @self_reviews = self_reviews
 
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
@@ -105,14 +98,14 @@ class VmQuestionResponse
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-        add_answer(answer)
+        add_answer(answer,"ResponseReview")
       end
     end
 
      if self_reviews
       answers = Answer.where(response_id: self_reviews[0].response_id)
       answers.each do |answer|
-        add_answer(answer)
+        add_answer(answer,"SelfReview")
       end
     end
    
@@ -159,14 +152,19 @@ class VmQuestionResponse
 
   attr_reader :list_of_reviews
 
+  attr_reader :self_reviews
+
   attr_reader :list_of_rows
+
+  attr_reader :list_of_rows_self_reviews
 
   attr_reader :list_of_reviewers
 
-  def add_answer(answer)
+  def add_answer(answer,review_type)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
-    @list_of_rows.each do |row|
+ 
+    list_of_rows.each do |row|
       next unless row.question_id == answer.question_id
       # Go ahead and calculate what the color code for this score should be.
       question_max_score = row.question_max_score
@@ -198,16 +196,18 @@ class VmQuestionResponse
 
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
+
+      if review_type == "ResponseReview"
       row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
+      else
+      row.self_review_score = VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts)
+      end
     end
   end
 
   def get_number_of_comments_greater_than_10_words
     first_time = true
-
-   puts " The List of reviews in Answers part : "+@list_of_reviews.length.to_s
     @list_of_reviews.each do |review|
-      puts "Response Id : ",review.response_id
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|

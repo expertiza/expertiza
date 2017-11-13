@@ -16,7 +16,6 @@
 </script>
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
-
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
@@ -60,7 +59,7 @@
 
           </span>
 
-          <table id="scoresTable" class="tbl_heat tablesorter">
+          <table id="scoresTable" class="tbl_heat tablesorter" >
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <!-- 1799 -->
             <thead>
@@ -68,25 +67,11 @@
               <th class="sorter-true">Criterion<span></span></th>
               <th class="sorter-false">Max</th>
               <% i = 1 %>
-              <% vm.list_of_reviews.each do |review| %>
-              <%
-                review_map = ResponseMap.find(review.map_id)
-                review_type = nil
-                if review_map 
-                  review_type =  review_map.type
-                end
-
-               %>
-                
-                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
+              <% vm.list_of_reviews.each do |review| %>         
+                 <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details">
-                        <% if review_type == 'SelfReviewResponseMap' %>
-                          <%= "Self Review "%>
-                        <%else%>
-                         <%= "Review " +   i.to_s %>
-                        <%end%>
-                      </a>  </th>
+                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-  toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>
+                    </th>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
@@ -98,14 +83,20 @@
                 Avg<span></span>
               </th>
               <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
+                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1 <%= @self_reviews%> </span>
               </th>
 
+                <% if vm.self_reviews %>
+                      <th>
+                        Self Reviews
+                      </th>
+                <% end %>
+            
             </tr>
 
             </thead>
 
-
+            
             <% score_row_count = vm.list_of_rows.first.score_row.count %>
             <% j = 1 %>
             <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
@@ -139,6 +130,13 @@
                   <td  class = 'cf' align="center">
                     <%= row.countofcomments.to_s %>
                   </td>
+
+                   <% if vm.self_reviews %>
+                      <td class = 'cf' align="center">
+                        <%= row.self_review_score.score_value%>
+                      </td>
+                   <% end %>
+
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
@@ -180,7 +178,7 @@
               <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
                 <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                   <div style="background-color:#A9A9F5;padding:4px;">
-                    <table class="tbl_addlcmt">
+                    <table class="tbl_addlcmt" >
                       <thead>
                       <th>Review</th>
                       <th >Additional Comments</th>
@@ -200,6 +198,11 @@
             </tr>
 
           </table>
+
+
+
+
+
           <!-- Display the list of team members, for Peer Reviews. -->
           <div style="margin-top:5px"></div>
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>

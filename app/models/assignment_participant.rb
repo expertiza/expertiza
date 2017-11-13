@@ -1,5 +1,6 @@
 require 'uri'
 require 'yaml'
+require 'file_support'
 require 'import_support'
 # Code Review: Notice that Participant overloads two different concepts:
 #              contribution and participant (see fields of the participant table).

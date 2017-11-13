@@ -1,6 +1,8 @@
 # This helper contains methods to manipulate due dates of topics in an assignment. This helper if used by
 # sign_up_controller
 module DeadlineHelper
+  DEALINE_TYPE_SUBMISSION = 1
+  DEALINE_TYPE_REVIEW = 2
   DEADLINE_TYPE_METAREVIEW = 5
   DEADLINE_TYPE_DROP_TOPIC = 6
   DEADLINE_TYPE_SIGN_UP = 7

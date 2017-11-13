@@ -1,3 +1,6 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
       Submit or Review work for <%= @assignment.name %>
@@ -101,4 +104,58 @@ to display the label "Your team" in the student assignment tasks-->
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
   </ul>
   <br>
+
+<div id="visualization"></div>
+<% @participant = AssignmentParticipant.find(params[:id]) %>
+
+<% current_folder = DisplayOption.new %>
+<% current_folder.name = "" %>
+<% files = @participant.team.files(@participant.team.path.to_s + current_folder.name) %>
+<% like_key = "Remove%"%>
+<% @sub = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN
+(select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')" %>
+
+   <% @href_arr= Array.new %>
+<% @json_sample = @sub.map do |u|
+  #display_directory_tree(participant, files, true).html_safe
+
+  if (u.operation).eql?('Submit File')
+
+    { :id => u.id, :start=> u.created_at, :content => (u.content).split('/')[-1] }
+  else
+    @href_arr.push(u.content)
+    { :id => u.id, :start=> u.created_at, :content => u.content }
+  end
+end
+%>
+
+<% @json_sample%>
+<br><br>
+<% @json_sample=@json_sample.to_json%>
+<script>
+    var json_parse = JSON.parse('<%=raw  @json_sample%>');
+    var js_href_arr = JSON.parse('<%= @href_arr.to_json.html_safe%>')
+    console.log(js_href_arr)
+    var link=""
+    for(i=0;  i<json_parse.length; i++) {
+        //console.log(js_href_arr[i]);
+        json_parse[i].content = "<a href="+js_href_arr[i]+" target='_blank'>"+json_parse[i].content+"</a>"+ " <br> " + json_parse[i].start;
+        console.log(json_parse[i].content);
+    }
+</script>
+<script type="text/javascript">
+    // DOM element where the Timeline will be attached
+    var container = document.getElementById('visualization');
+
+    // Create a DataSet (allows two way data-binding)
+    var items = new vis.DataSet(json_parse);
+    //items.add(JSON.parse(json_parse));
+
+    // Configuration for the Timeline
+    var options = {};
+
+    // Create a Timeline
+    var timeline = new vis.Timeline(container, items, options);
+</script>
+
   <a href="javascript:window.history.back()">Back</a>

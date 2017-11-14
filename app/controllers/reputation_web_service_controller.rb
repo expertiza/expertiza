@@ -5,14 +5,14 @@ require 'openssl'
 require 'base64'
 
 class ReputationWebServiceController < ApplicationController
-  @request_body = ''
-  @response_body = ''
-  @assignment_id = ''
-  @another_assignment_id = ''
-  @round_num = ''
-  @algorithm = ''
-  @additional_info = ''
-  @response = ''
+  @@request_body = ''
+  @@response_body = ''
+  @@assignment_id = ''
+  @@another_assignment_id = ''
+  @@round_num = ''
+  @@algorithm = ''
+  @@additional_info = ''
+  @@response = ''
 
   def action_allowed?
     ['Super-Administrator',
@@ -61,7 +61,7 @@ class ReputationWebServiceController < ApplicationController
       next unless topic_condition == true and !valid_response.nil? and !valid_response.empty?
       valid_response.each do |response|
         answers = Answer.where(response_id: response.id)
-        max_question_score = answers.first.question.questionnaire.max_question_score
+        max_question_score = answers.first.question.questionnaire.max_question_score rescue 1
         temp_sum = 0
         weight_sum = 0
         valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? }
@@ -119,15 +119,15 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def client
-    @request_body = @request_body
-    @response_body = @response_body
+    @request_body = @@request_body
+    @response_body = @@response_body
     @max_assignment_id = Assignment.last.id
-    @assignment = Assignment.find(@assignment_id) rescue nil
-    @another_assignment = Assignment.find(@another_assignment_id) rescue nil
-    @round_num = @round_num
-    @algorithm = @algorithm
-    @additional_info = @additional_info
-    @response = @response
+    @assignment = Assignment.find(@@assignment_id) rescue nil
+    @another_assignment = Assignment.find(@@another_assignment_id) rescue nil
+    @round_num = @@round_num
+    @algorithm = @@algorithm
+    @additional_info = @@additional_info
+    @response = @@response
   end
 
   def send_post_request
@@ -136,13 +136,13 @@ class ReputationWebServiceController < ApplicationController
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-    @assignment_id = params[:assignment_id]
-    @round_num = params[:round_num]
-    @algorithm = params[:algorithm]
-    @another_assignment_id = params[:another_assignment_id]
+    @@assignment_id = params[:assignment_id]
+    @@round_num = params[:round_num]
+    @@algorithm = params[:algorithm]
+    @@another_assignment_id = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      @additional_info = 'add expert grades'
+      @@additional_info = 'add expert grades'
       case params[:assignment_id]
       when '724' # expert grades of Wiki 1a (724)
         if params[:another_assignment_id].to_i.zero?
@@ -158,11 +158,11 @@ class ReputationWebServiceController < ApplicationController
         req.body.prepend("\"expert_grades\": {\"submission25107\":76.6667,\"submission25109\":83.3333},")
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      @additional_info = 'add initial hamer reputation values'
+      @@additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      @additional_info = 'add initial lauw reputation values'
+      @@additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @additional_info = 'add quiz scores'
+      @@additional_info = 'add quiz scores'
       quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -170,7 +170,7 @@ class ReputationWebServiceController < ApplicationController
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      @additional_info = ''
+      @@additional_info = ''
     end
 
     # Eg.
@@ -180,7 +180,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @request_body = req.body
+    @@request_body = req.body
     # puts 'This is the request prior to encryption: ' + req.body
     # puts
     # Encryption
@@ -207,12 +207,11 @@ class ReputationWebServiceController < ApplicationController
     # AES symmetric algorithm decrypts data
     aes_encrypted_response_data = response.body["data"]
     response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
-
     # puts "Response #{response.code} #{response.message}:
     # {response.body}"
     # puts
-    @response = response
-    @response_body = response.body
+    @@response = response
+    @@response_body = response.body
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"

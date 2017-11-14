@@ -132,7 +132,7 @@
                   </td>
 
                    <% if vm.self_reviews %>
-                      <td class = 'cf' align="center">
+                      <td class = "<%= row.self_review_score.color_code %>" align="center">
                         <%= row.self_review_score.score_value%>
                       </td>
                    <% end %>
@@ -164,7 +164,20 @@
                                 <% end %>
                               </td>
                             </tr>
-                        <% end %>
+                     -    <% end %>
+                        <% if vm.self_reviews%>
+                          <tr>
+                            <td>
+                              Self Review
+                            </td>
+                            <td align="center" class = "<%=row.self_review_score.color_code%>">
+                             <%= row.self_review_score.score_value %>
+                            </td>
+                            <td >
+                             <%= row.self_review_score.comment %>
+                            </td>                       
+                          </tr>
+                       <%end%>  
                       </table>
                     </div>
                   </div>

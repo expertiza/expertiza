@@ -1,11 +1,9 @@
 class ImpersonateController < ApplicationController
   def action_allowed?
-    case params[:action]
-    when 'impersonate'
-      true
-    when 'start'
-      true
-    end
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
   end
 
   def auto_complete_for_user_name
@@ -14,10 +12,18 @@ class ImpersonateController < ApplicationController
   end
 
   def start
+    if !request.GET.empty?
+      flash[:error] = "This page doesn't take any query string."
+    end
   end
 
   def impersonate
-    # default error message
+    special_chars_handler = SecurityHelper::SpecialCharsHandler.new
+    if special_chars_handler.contains_special_chars?(params[:user]) || special_chars_handler.contains_special_chars?(params[:user][:name])
+      flash[:error] = "Username must not contain " + special_chars_handler.special_chars
+      redirect_back
+      return
+    end
     if params[:user] && params[:user][:name]
       message = "No user exists with the name '#{params[:user][:name]}'."
     end

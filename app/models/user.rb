@@ -16,7 +16,6 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  attr_accessor :anonymous_mode
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -89,20 +88,37 @@ class User < ActiveRecord::Base
     user_list.uniq
   end
 
+  def anonymized_view?
+    anonymized_view = $redis.get('anonymized_view')
+    anonymized_view_starter = $redis.get('anonymized_view_starter')
+    starter_session_id = $redis.get('anonymized_view_starter_session_id')
+    session_data = Session.find_by(session_id: starter_session_id).try(:data)
+    current_user_session_id = $redis.get("#{self[:name]}_session_id")
+    if session_data
+      session_starter = session_data['user']
+      super_user = session_data['super_user']
+      anonymized_view and anonymized_view == 'true' and anonymized_view_starter and 
+        ((session_starter and starter_session_id == current_user_session_id and anonymized_view_starter.include? session_starter[:name]) or 
+        (super_user and anonymized_view_starter.include? super_user[:name]))
+    else
+      false
+    end
+  end
+
   def name
-    $redis.get('anonymous_mode') == 'true' ? self.role.name + ' ' + self.id.to_s : self[:name]
+    anonymized_view? ? self.role.name + ' ' + self.id.to_s : self[:name]
   end
 
   def fullname
-    $redis.get('anonymous_mode') == 'true' ? self.role.name + ', ' + self.id.to_s : self[:fullname]
+    anonymized_view? ? self.role.name + ', ' + self.id.to_s : self[:fullname]
   end
 
   def first_name
-    $redis.get('anonymous_mode') == 'true' ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+    anonymized_view? ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
   def email
-    $redis.get('anonymous_mode') == 'true' ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
+    anonymized_view? ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
   end
 
   def super_admin?

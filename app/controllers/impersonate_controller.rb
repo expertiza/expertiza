@@ -21,20 +21,17 @@ class ImpersonateController < ApplicationController
     if params[:user] && params[:user][:name]
       message = "No user exists with the name '#{params[:user][:name]}'."
     end
-
     begin
       original_user = session[:super_user] || session[:user]
-
       # Impersonate using form on /impersonate/start
       if params[:impersonate].nil?
-        user = User.find_by_name(params[:user][:name])
+        user = User.find_by(name: params[:user][:name])
         if user
           unless original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
             redirect_back
             return
           end
-
           session[:super_user] = session[:user] if session[:super_user].nil?
           AuthController.clear_user_info(session, nil)
           session[:user] = user
@@ -46,14 +43,13 @@ class ImpersonateController < ApplicationController
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
-          user = User.find_by_name(params[:impersonate][:name])
+          user = User.find_by(name: params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user
               flash[:error] = "You cannot impersonate #{params[:user][:name]}."
               redirect_back
               return
             end
-
             AuthController.clear_user_info(session, nil)
             session[:user] = user
           else

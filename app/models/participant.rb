@@ -41,8 +41,25 @@ class Participant < ActiveRecord::Base
     self.user.fullname
   end
 
+  def anonymized_view?
+    anonymized_view = $redis.get('anonymized_view')
+    anonymized_view_starter = $redis.get('anonymized_view_starter')
+    starter_session_id = $redis.get('anonymized_view_starter_session_id')
+    session_data = Session.find_by(session_id: starter_session_id).try(:data)
+    current_user_session_id = $redis.get("#{self.user[:name]}_session_id")
+    if session_data
+      session_starter = session_data['user']
+      super_user = session_data['super_user']
+      anonymized_view and anonymized_view == 'true' and anonymized_view_starter and 
+        ((session_starter and starter_session_id == current_user_session_id and anonymized_view_starter.include? session_starter[:name]) or 
+        (super_user and anonymized_view_starter.include? super_user[:name]))
+    else
+      false
+    end
+  end
+
   def handle
-    $redis.get('anonymous_mode') == 'true' ? 'handle' : self[:handle]
+    anonymized_view? ? 'handle' : self[:handle]
   end
 
   def delete(force = nil)

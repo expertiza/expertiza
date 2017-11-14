@@ -9,9 +9,10 @@ class VmQuestionResponse
   def initialize(questionnaire, assignment=nil)
     @assignment = assignment
     @questionnaire = questionnaire
-    @round = @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire" ?
-        AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round :
-        nil
+    if questionnaire.type == "ReviewQuestionnaire"
+      @round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+    end
+
     @rounds = @assignment.rounds_of_reviews
     @list_of_rows = []
     @list_of_reviewers = []

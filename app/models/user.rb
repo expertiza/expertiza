@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  attr_accessor :anonymous_mode 
+  attr_accessor :anonymous_mode
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -53,65 +53,34 @@ class User < ActiveRecord::Base
 
   def can_impersonate?(user)
     return true if self.role.super_admin?
-    return true if self.is_teaching_assistant_for?(user)
-    return true if self.is_recursively_parent_of(user)
+    return true if self.teaching_assistant_for?(user)
+    return true if self.recursively_parent_of(user)
     false
   end
 
-  def is_recursively_parent_of(user)
+  def recursively_parent_of(user)
     p = user.parent
     return false if p.nil?
     return true if p == self
     return false if p.role.super_admin?
-    self.is_recursively_parent_of(p)
+    self.recursively_parent_of(p)
   end
 
   def get_user_list
     user_list = []
     # If the user is a super admin, fetch all users
-    if self.role.super_admin?
-      User.all.find_each do |user|
-        user_list << user
-      end
-    end
+    user_list = SuperAdministrator.get_user_list if self.role.super_admin?
 
     # If the user is an instructor, fetch all users in his course/assignment
-    if self.role.instructor?
-      participants = []
-      Course.where(instructor_id: self.id).find_each do |course|
-        participants << course.get_participants
-      end
-      Assignment.where(instructor_id: self.id).find_each do |assignment|
-        participants << assignment.participants
-      end
-      participants.each do |p_s|
-        next if p_s.empty?
-        p_s.each do |p|
-          user_list << p.user if self.role.hasAllPrivilegesOf(p.user.role)
-        end
-      end
-    end
+    user_list = Instructor.get_user_list(self) if self.role.instructor?
 
     # If the user is a TA, fetch all users in his courses
-    if self.role.ta?
-      courses = Ta.get_mapped_courses(self.id)
-      participants = []
-      courses.each do |course_id|
-        course = Course.find(course_id)
-        participants << course.get_participants
-      end
-      participants.each do |p_s|
-        next if p_s.empty?
-        p_s.each do |p|
-          user_list << p.user if self.role.hasAllPrivilegesOf(p.user.role)
-        end
-      end
-    end
+    user_list = Ta.get_user_list(self) if self.role.ta?
 
     # Add the children to the list
     unless self.role.super_admin?
       User.all.find_each do |u|
-        if is_recursively_parent_of(u)
+        if recursively_parent_of(u)
           user_list << u unless user_list.include?(u)
         end
       end
@@ -144,7 +113,7 @@ class User < ActiveRecord::Base
 
   delegate :student?, to: :role
 
-  def is_creator_of?(user)
+  def creator_of?(user)
     self == user.creator
   end
 
@@ -169,7 +138,7 @@ class User < ActiveRecord::Base
     if row.length != 3
       raise ArgumentError, "Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email."
     end
-    user = User.find_by_name(row[0])
+    user = User.find_by name: row[0]
 
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row)
@@ -198,11 +167,11 @@ class User < ActiveRecord::Base
   # If user supplies e-mail or name, the
   # helper will try to find that User account.
   def self.find_by_login(login)
-    user = User.find_by_email(login)
+    user = User.find_by(email: login)
     if user.nil?
       items = login.split("@")
       shortName = items[0]
-      userList = User.where ["name =?", shortName]
+      userList = User.where("name = ?", shortName)
       user = userList.first if !userList.nil? && userList.length == 1
     end
     user
@@ -300,7 +269,7 @@ class User < ActiveRecord::Base
     user = if params[:user_id]
              User.find(params[:user_id])
            else
-             User.find_by_name(params[:user][:name])
+             User.find_by name: params[:user][:name]
            end
     if user.nil?
       newuser = url_for controller: 'users', action: 'new'
@@ -309,8 +278,8 @@ class User < ActiveRecord::Base
     user
   end
 
-  def is_teaching_assistant_for?(student)
-    return false unless is_teaching_assistant?
+  def teaching_assistant_for?(student)
+    return false unless teaching_assistant?
     return false if student.role.name != 'Student'
     # We have to use the Ta object instead of User object
     # because single table inheritance is not currently functioning
@@ -320,20 +289,16 @@ class User < ActiveRecord::Base
     end
   end
 
-  def is_teaching_assistant?
+  def teaching_assistant?
     return true if self.role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    if search_by == '1' # search by user name
+    key_word = {'1' => 'name', '2' => 'fullname', '3' => 'email'}
+    sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
+    if key_word.include? search_by
       search_filter = '%' + letter + '%'
-      users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
-    elsif search_by == '2' # search by full name
-      search_filter = '%' + letter + '%'
-      users = User.order('name').where("(role_id in (?) or id = ?) and fullname like ?", role.get_available_roles, user_id, search_filter)
-    elsif search_by == '3' # search by email
-      search_filter = '%' + letter + '%'
-      users = User.order('name').where("(role_id in (?) or id = ?) and email like ?", role.get_available_roles, user_id, search_filter)
+      users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
       search_filter = letter + '%'
       users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)

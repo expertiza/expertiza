@@ -199,16 +199,13 @@
 
           </table>
 
-
-
-
-
           <!-- Display the list of team members, for Peer Reviews. -->
           <div style="margin-top:5px"></div>
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <br>
           <% table_count += 1%>
-          <span> <%= vm.display_team_members %></span>
+          <span> <%= vm.display_team_members %></span> <br>
+          <span data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%"> Self Review Score is :<strong> <%= vm.computed_self_review_score%> %</strong></span>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <div class="flash_warn">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>

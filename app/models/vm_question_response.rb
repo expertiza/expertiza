@@ -24,6 +24,7 @@ class VmQuestionResponse
     @rounds = rounds
     @round = round
     @name  = questionnaire.name
+    @aggregate_self_review_composite_score = 0
   end
 
   attr_reader :name
@@ -156,15 +157,27 @@ class VmQuestionResponse
 
   attr_reader :list_of_rows
 
-  attr_reader :list_of_rows_self_reviews
-
   attr_reader :list_of_reviewers
+
+  attr_reader :aggregate_self_review_composite_score
+
+ 
+
+
+
+  def computed_self_review_score
+   total_self_review_composite_score =0
+   if @list_of_rows.length > 0
+    total_self_review_composite_score = @aggregate_self_review_composite_score * 100 / @list_of_rows.length
+   end
+  total_self_review_composite_score.round(2)
+  end
 
   def add_answer(answer,review_type)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
  
-    list_of_rows.each do |row|
+    @list_of_rows.each do |row|
       next unless row.question_id == answer.question_id
       # Go ahead and calculate what the color code for this score should be.
       question_max_score = row.question_max_score
@@ -201,6 +214,7 @@ class VmQuestionResponse
       row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
       else
       row.self_review_score = VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts)
+      @aggregate_self_review_composite_score += row.weighted_diff_for_row
       end
     end
   end

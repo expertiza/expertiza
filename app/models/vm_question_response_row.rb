@@ -55,4 +55,15 @@ class VmQuestionResponseRow
     row_average_score /= @score_row.length.to_f
     row_average_score.round(2)
   end
+
+  # it calculates the difference between the self review score and average of all reviews.
+  def weighted_diff_for_row
+    weighted_average_score =  average_score_for_row / question_max_score
+    weighted_self_review_score = self_review_score.score_value / question_max_score
+    result = weighted_average_score - weighted_self_review_score 
+    result = result > 0 ? result : -result
+  end
+
+
+
 end

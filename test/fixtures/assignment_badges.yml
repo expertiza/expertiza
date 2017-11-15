@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  badge_id: 1
+  assignment_id: 1
+  threshold: 1
+
+two:
+  badge_id: 1
+  assignment_id: 1
+  threshold: 1

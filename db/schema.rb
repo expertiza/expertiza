@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171115222415) do
+ActiveRecord::Schema.define(version: 20171115224048) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -35,6 +35,17 @@ ActiveRecord::Schema.define(version: 20171115222415) do
 
   add_index "answers", ["question_id"], name: "fk_score_questions", using: :btree
   add_index "answers", ["response_id"], name: "fk_score_response", using: :btree
+
+  create_table "assignment_badges", force: :cascade do |t|
+    t.integer  "badge_id",      limit: 4
+    t.integer  "assignment_id", limit: 4
+    t.integer  "threshold",     limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "assignment_badges", ["assignment_id"], name: "fk_rails_ae5e13de3a", using: :btree
+  add_index "assignment_badges", ["badge_id"], name: "fk_rails_9fdeeda42a", using: :btree
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -749,6 +760,8 @@ ActiveRecord::Schema.define(version: 20171115222415) do
   add_foreign_key "answer_tags", "users"
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"
+  add_foreign_key "assignment_badges", "assignments"
+  add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"

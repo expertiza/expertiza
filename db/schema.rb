@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171115224048) do
+ActiveRecord::Schema.define(version: 20171115230007) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -133,6 +133,16 @@ ActiveRecord::Schema.define(version: 20171115224048) do
   end
 
   add_index "automated_metareviews", ["response_id"], name: "fk_automated_metareviews_responses_id", using: :btree
+
+  create_table "awarded_badges", force: :cascade do |t|
+    t.integer  "badge_id",       limit: 4
+    t.integer  "participant_id", limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "awarded_badges", ["badge_id"], name: "fk_rails_f30a8107ce", using: :btree
+  add_index "awarded_badges", ["participant_id"], name: "fk_rails_44490f8a50", using: :btree
 
   create_table "badges", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -767,6 +777,8 @@ ActiveRecord::Schema.define(version: 20171115224048) do
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
+  add_foreign_key "awarded_badges", "badges"
+  add_foreign_key "awarded_badges", "participants"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"

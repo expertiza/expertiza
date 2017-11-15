@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  badge_id: 1
+  participant_id: 1
+
+two:
+  badge_id: 1
+  participant_id: 1

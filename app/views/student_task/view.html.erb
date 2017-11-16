@@ -111,11 +111,12 @@ to display the label "Your team" in the student assignment tasks-->
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
 <% files = @participant.team.files(@participant.team.path.to_s + current_folder.name) %>
-<% like_key = "Remove%"%>
 <% @sub = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN
 (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')" %>
 
-   <% @href_arr= Array.new %>
+<% @href_arr= Array.new %>
+<% @maxdate = DueDate.where("parent_id = #{@assignment.id}")#find_by_sql"select * from due_dates where parent_id=#{@assignment.id}"%>
+
 <% @json_sample = @sub.map do |u|
   #display_directory_tree(participant, files, true).html_safe
 
@@ -164,7 +165,13 @@ end
     //items.add(JSON.parse(json_parse));
 
     // Configuration for the Timeline
-    var options = {};
+    var options = {
+        //height: '300px',
+        min: new Date('<%=raw @assignment.created_at.strftime("%Y-%m-%d") %>'),                // lower limit of visible range
+        max: new Date('<%=raw @maxdate.maximum(:due_at).strftime("%Y-%m-%d") %>'),                // upper limit of visible range
+        zoomMin: 1000 * 60 * 60 * 24,             // one day in milliseconds
+        zoomMax: 1000 * 60 * 60 * 24 * 31 * 3     // about three months in milliseconds
+    };
 
     // Create a Timeline
     var timeline = new vis.Timeline(container, items, options);

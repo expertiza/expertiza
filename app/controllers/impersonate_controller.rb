@@ -1,4 +1,6 @@
 class ImpersonateController < ApplicationController
+  include SecurityHelper
+
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -18,19 +20,20 @@ class ImpersonateController < ApplicationController
   end
 
   def impersonate
-    special_chars_handler = SecurityHelper::SpecialCharsHandler.new
-    if special_chars_handler.contains_special_chars?(params[:user]) || special_chars_handler.contains_special_chars?(params[:user][:name])
-      flash[:error] = "Username must not contain " + special_chars_handler.special_chars
-      redirect_back
-      return
-    end
-    if params[:user] && params[:user][:name]
+    if params[:user]
       message = "No user exists with the name '#{params[:user][:name]}'."
+    elsif params[:impersonate]
+      message = "No user exists with the name '#{params[:impersonate][:name]}'."
     end
     begin
       original_user = session[:super_user] || session[:user]
       # Impersonate using form on /impersonate/start
       if params[:impersonate].nil?
+        # check if special chars /\?<>|&$# are used to avoid html tags or system command
+        if warn_for_special_chars(params[:user][:name], "Username")
+          redirect_back
+          return
+        end
         user = User.find_by(name: params[:user][:name])
         if user
           unless original_user.can_impersonate? user
@@ -49,6 +52,11 @@ class ImpersonateController < ApplicationController
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
+          # check if special chars /\?<>|&$# are used to avoid html tags or system command
+          if warn_for_special_chars(params[:impersonate][:name], "Username")
+            redirect_back
+            return
+          end
           user = User.find_by(name: params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user

@@ -1,6 +1,7 @@
 class NotificationsController < ApplicationController
   before_action :set_notification, only: [:show, :edit, :update, :destroy]
   helper_method :validate_params
+  include SecurityHelper
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
     ['Instructor',
@@ -33,20 +34,10 @@ class NotificationsController < ApplicationController
   # GET /notifications/1/edit
   def edit; end
 
-
-  def params_valid?
-    special_chars_handler = SecurityHelper::SpecialCharsHandler.new
-    if special_chars_handler.contains_special_chars?(params[:notification][:subject]) ||
-        special_chars_handler.contains_special_chars?(params[:notification][:description])
-      flash[:error] = "Text input must not contain the following special characters " + special_chars_handler.special_chars
-      return false
-    end
-    return true
-  end
-
   # POST /notifications
   def create
-    if !params_valid?
+    if params[:notification] && (warn_for_special_chars(params[:notification][:subject], "Subject") ||
+        warn_for_special_chars(params[:notification][:description], "Description"))
       redirect_back
       return
     end

@@ -1,5 +1,6 @@
 class TreeDisplayController < ApplicationController
   helper :application
+  include SecurityHelper
 
   def action_allowed?
     true
@@ -189,8 +190,8 @@ class TreeDisplayController < ApplicationController
 
   # for child nodes
   def children_node_ng
-    if !SecurityHelper::SpecialCharsHandler.new.json_valid? (params[:reactParams][:child_nodes])
-      flash[:error] = "Invalid JSON"
+    if !json_valid? (params[:reactParams][:child_nodes])
+      flash[:error] = "Invalid JSON in the TreeList"
     end
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}

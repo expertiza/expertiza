@@ -1,0 +1,19 @@
+%h1 Listing response_times
+
+%table
+  %thead
+    %tr
+      %th
+      %th
+      %th
+
+  %tbody
+    - @response_times.each do |response_time|
+      %tr
+        %td= link_to 'Show', response_time
+        %td= link_to 'Edit', edit_response_time_path(response_time)
+        %td= link_to 'Destroy', response_time, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Response time', new_response_time_path

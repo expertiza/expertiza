@@ -1,0 +1,10 @@
+= form_for @response_time do |f|
+  - if @response_time.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@response_time.errors.count, "error")} prohibited this response_time from being saved:"
+      %ul
+        - @response_time.errors.full_messages.each do |msg|
+          %li= msg
+
+  .actions
+    = f.submit 'Save'

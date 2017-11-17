@@ -53,6 +53,6 @@ class ResponseTimesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def response_time_params
-      params[:response_time]
+      params.require(:response_time).permit(:map_id, :link, :round, :start_at, :end_at)
     end
 end

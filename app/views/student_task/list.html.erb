@@ -100,7 +100,7 @@
       <th>Publishing Rights</th>
       <th>Badges</th>
     </tr>
-
+    <%= @student_badges %>
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
@@ -108,6 +108,7 @@
           <td>&nbsp;</td>
           <!--assignment-->
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+
           <!--course-->
           <td><%= student_task.course.try :name %></td>
           <!--topic-->
@@ -131,7 +132,15 @@
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <!--publish rights-->
           <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
-          <td><img height = "auto" width = "50px" src="/assets/badges/goodReviewer.png"/><img height = "auto" width = "50px" src="/assets/badges/goodTeammate.png"/></td>
+          <td>
+          <% if false %>
+           <% student_badge.each do |each_badge| %>
+              <% if each_badge %>
+                <%= each_badge %>
+              <% end %>
+            <% end %>
+          </td>
+          <% end %>
         </tr>
       <% end %>
     <% end %>

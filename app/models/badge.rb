@@ -71,7 +71,6 @@ class Badge < ActiveRecord::Base
 
 	def self.good_reviewer(participant)
 		begin
-			print "hello"
 			r = ReviewGrade.where(participant_id: participant.id)[0]
 			grade_for_reviewer = r.grade_for_reviewer
 			comment_for_reviewer = r.comment_for_reviewer 
@@ -84,19 +83,15 @@ class Badge < ActiveRecord::Base
 			if info >= GOOD_REVIEW_THRESHOLD
 				return GOOD_REVIEWER_BADGE_IMAGE.html_safe
 			else
-				print info
-				print "info < threshold"
 				return false
 			end
 		rescue
-			print "rescue"
 			return false
 		end
 	end
 
 
 def self.good_teammate(assignment, participant)
-		
 	
 	team = participant.team
 	

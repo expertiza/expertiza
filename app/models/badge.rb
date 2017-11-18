@@ -91,49 +91,25 @@ class Badge < ActiveRecord::Base
 	end
 
 
-def self.good_teammate(assignment, participant)
-	
+def self.good_teammate(assignment, participant)	
 	team = participant.team
-	
 	if team.nil?
 		return false
 	end
 
 	begin
-		team_participants = team.participants
-		scores = {}
-
-	 	team_participants.each do |teammate|
-		 	teammate_reviews = teammate.teammate_reviews
-		 	teammate_reviews.each do |teammate_review|
-		 			key = teammate_review.reviewee.name
-		 			if scores.key?(key)
-		 				scores[key] = scores[key] + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)
-		 			else
-		 				scores[key] = 0.0
-		 				scores[key] = scores[key] + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)
-		 			end	
-		 		end
+		score = 0.0
+	 	teammate_reviews = participant.teammate_reviews
+	 	teammate_reviews.each do |teammate_review|
+			score = score + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)		
 	 	end
-
-	 	total_reviews_per_teammate = scores.length - 1
-	 	team_participants.each do |teammate|
-	 		key = teammate.name
-	 		scores[key] = scores[key]/total_reviews_per_teammate
-	 	end
-	 	
-	 	badge = true 
-
-	 	team_participants.each do |teammate|
-	 		key = teammate.name
-	 		if scores[key] < DREAM_TEAM_THRESHOLD
-				badge = false
-				break
-			end
+	 	badge = true
+ 		if score < GOOD_TEAMMATE_THRESHOLD
+			badge = false
 		end
-
+	
 		if badge
-			return DREAM_TEAM_BADGE_IMAGE.html_safe
+			return GOOD_TEAMMATE_IMAGE.html_safe
 		else
 			return false
 		end

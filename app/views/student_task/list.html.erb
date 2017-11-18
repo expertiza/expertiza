@@ -100,8 +100,7 @@
       <th>Publishing Rights</th>
       <th>Badges</th>
     </tr>
-    <%= @student_badges %>
-    <% @student_tasks.each do |student_task| %>
+    <% @student_tasks.zip(@student_badges).each do |student_task, student_badge| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
         <tr class="listingRow">
@@ -133,14 +132,12 @@
           <!--publish rights-->
           <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
           <td>
-          <% if false %>
            <% student_badge.each do |each_badge| %>
               <% if each_badge %>
                 <%= each_badge %>
               <% end %>
             <% end %>
           </td>
-          <% end %>
         </tr>
       <% end %>
     <% end %>

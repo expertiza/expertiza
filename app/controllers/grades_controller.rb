@@ -198,7 +198,7 @@ class GradesController < ApplicationController
     if @participant.assignment.max_team_size > 1
       team = @participant.team
       unless team.nil?
-        unless team.has_user session[:user]
+        unless team.user? session[:user]
           flash[:error] = 'You are not on the team that wrote this feedback'
           redirect_to '/'
           return true

@@ -86,12 +86,12 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.has_topics? && assignment.can_choose_topic_to_review?
+    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
 
       # begin
-      if assignment.has_topics? # assignment with topics
+      if assignment.topics? # assignment with topics
         topic = if params[:topic_id]
                   SignUpTopic.find(params[:topic_id])
                 else

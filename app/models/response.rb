@@ -62,7 +62,7 @@ class Response < ActiveRecord::Base
         row_class = count.even? ? "info" : "warning"
         row_class = "" if question.is_a? QuestionnaireHeader
         code += '<tr class="' + row_class + '"><td>'
-        if !answer.nil? or question.is_a? QuestionnaireHeader
+        # if !answer.nil? or question.is_a? QuestionnaireHeader
           code += if question.instance_of? Criterion
                     # Answer Tags are enabled only for Criterion questions at the moment.
                     question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
@@ -71,7 +71,7 @@ class Response < ActiveRecord::Base
                   else
                     question.view_completed_question(count, answer)
                   end
-        end
+        # end
         code += '</td></tr>'
       end
 

@@ -129,6 +129,8 @@ class UsersController < ApplicationController
     if @user.save
       password = @user.reset_password # the password is reset
 
+      # Send notification to instructor about the new account being created
+      # if he wants all copies of emails sent to him
       if current_user.copy_of_all_emails
         prepared_mail = MailerHelper.there_is_no_other_way_email(@user, current_user,
                                                                  "Your Expertiza account and password have been created.",

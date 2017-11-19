@@ -79,6 +79,7 @@ class Mailer < ActionMailer::Base
          bcc: defn[:cc])
   end
 
+  # emails about a suggested topics to the instructor
   def new_topic_suggested_message(defn)
     @proposer = defn[:body][:proposer]
     @topic_name = defn[:body][:topic_name]
@@ -112,6 +113,7 @@ class Mailer < ActionMailer::Base
          to: defn[:to])
   end
 
+  # invite message related emails
   def invite_message(defn)
     @partial_name = defn[:body][:partial_name]
     @sender = defn[:body][:sender]

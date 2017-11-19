@@ -83,6 +83,7 @@ class SuggestionController < ApplicationController
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
     end
+    # Instructor gets a notification about the new topic suggested
     send_email_on_new_topic
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
@@ -128,6 +129,7 @@ class SuggestionController < ApplicationController
     ).deliver_now!
   end
 
+  # If the user submits a suggestion  -> Send email to instructor
   def send_email_on_new_topic
     if params[:suggestion_anonymous].nil?
       @user_id = User.where(name: @suggestion.unityID).first.id

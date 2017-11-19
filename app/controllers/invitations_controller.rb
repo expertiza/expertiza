@@ -13,6 +13,7 @@ class InvitationsController < ApplicationController
     # check if the invited user is already invited (i.e. awaiting reply)
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       create_utility
+      # Send email to the student about the new invitation pending
       prepared_mail = MailerHelper.send_mail_about_invitation(@student, @user, "invitation_pending")
       prepared_mail.deliver
     else
@@ -46,6 +47,7 @@ class InvitationsController < ApplicationController
       flash[:error] = 'The system failed to add you to the team that invited you.'
     end
 
+    # Notify the inviter about the acceptance of invitation
     @inviter = User.find(@inv.from_id)
     prepared_mail = MailerHelper.send_mail_about_invitation(@student, @inviter, "invitation_accepted")
     prepared_mail.deliver
@@ -61,6 +63,7 @@ class InvitationsController < ApplicationController
     student = Participant.find(params[:student_id])
     @inviter = User.find(@inv.from_id)
     @invitee = User.find(@inv.to_id)
+    # Notify the inviter about the declined invitation
     prepared_mail = MailerHelper.send_mail_about_invitation(@invitee, @inviter, "invitation_declined")
     prepared_mail.deliver
 

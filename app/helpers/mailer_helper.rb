@@ -24,6 +24,7 @@ module MailerHelper
     })
   end
 
+  # Invitation related emails: acceptance, declination, etc
   def self.send_mail_about_invitation(sender, receiver, partial_name)
     Mailer.invite_message ({
       to: receiver.email,
@@ -35,6 +36,7 @@ module MailerHelper
     })
   end
 
+  # Sent to instructor on as a copy of every email
   def self.there_is_no_other_way_email(user, instructor, subject, partial_name, password)
     Mailer.generic_message ({
       to: instructor.email,

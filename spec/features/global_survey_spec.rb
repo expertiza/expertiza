@@ -5,7 +5,7 @@ def create_course_questionnaire survey_name
 	find('input[name="commit"]').click
 end
 
-def deploy_course_survey(start_date, end_date, survey_name)
+def deploy_global_survey(start_date, end_date, survey_name)
 	login_as('instructor6')
 	expect(page).to have_content('Manage content')
 	create_course_questionnaire survey_name
@@ -37,7 +37,7 @@ describe "Course Survey questionnaire tests for instructor interface" do
 
 	it "is able to deploy a course survey with valid dates" do
 	survey_name = 'Global Course Survey Questionnaire 1'
-	deploy_course_survey(@next_day, @next_to_next_day, survey_name)
+	deploy_global_survey(@next_day, @next_to_next_day, survey_name)
 	expect(page).to have_content(survey_name)
 	end
 end

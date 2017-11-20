@@ -16,7 +16,6 @@ def deploy_course_survey(start_date, end_date, survey_name)
 	expect(page).to have_content('New Survey Deployment')
 	fill_in 'survey_deployment_start_date', with: start_date
 	fill_in 'survey_deployment_end_date', with: end_date
-	check("add_global_survey")
 	select survey.name, from: "survey_deployment_questionnaire_id"
 	find('input[name="commit"]').click
 end

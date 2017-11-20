@@ -56,7 +56,7 @@ class AdvertiseForPartnerController < ApplicationController
 
   def team_params(params_hash)
     params_local = params
-    params_local[:@team] = params_hash unless nil == params_hash
+    params_local[:team] = params_hash unless nil == params_hash
     params_local.require(:team).permit(:id, :comments_for_advertisement)
   end
 end

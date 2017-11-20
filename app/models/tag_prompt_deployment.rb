@@ -53,4 +53,13 @@ class TagPromptDeployment < ActiveRecord::Base
     end
     return user_answer_tagging
   end
+  def self.response_report(id)
+    tag_prompt_deployments = TagPromptDeployment.where(assignment_id: id)
+
+    @questionnaire_tagging_report = {}
+
+    tag_prompt_deployments.each do |tag_dep|
+      @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
+    end
+  end
 end

@@ -11,4 +11,9 @@ class PlagiarismCheckerComparison < ActiveRecord::Base
   # t.string :file2_name
   # t.string :file2_id
   # t.string :file2_team
+  def self.response_report(id)
+    @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
+                                                                            PlagiarismCheckerAssignmentSubmission.where(assignment_id:
+                                                                                                                            id).pluck(:id))
+  end
 end

@@ -1,153 +1,211 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
 
+
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
       Submit or Review work for <%= @assignment.name %>
   <% else %>
       Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
-  
+
 </h1>
 
 <div class="flash_note">
   Next: Click the activity you wish to perform on the assignment titled: <%= @assignment.name %>
 </div>
 <% if @assignment.spec_location && @assignment.spec_location.length > 0 %>
-  <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
+    <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
   <%if @topics.size > 0 %>
-    <% if @authorization == 'participant' || @authorization == 'submitter' %>
-      <li> 
-        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
-        (Sign up for a topic)
-      </li>
-    <% end %>
+      <% if @authorization == 'participant' || @authorization == 'submitter' %>
+          <li>
+            <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
+            (Sign up for a topic)
+          </li>
+      <% end %>
   <%end%>
-<!--ACS Here we need to know the size of the team to decide whether or not
-to display the label "Your team" in the student assignment tasks-->
+  <!--ACS Here we need to know the size of the team to decide whether or not
+  to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
-    <% if @authorization == 'participant' %>
-      <li> 
-        <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
-        (View and manage your team)
-      </li>
-    <% end %>
+      <% if @authorization == 'participant' %>
+          <li>
+            <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
+            (View and manage your team)
+          </li>
+      <% end %>
   <%end%>
   <% if @authorization == 'participant' or @can_submit == true %>
-    <li>
-      <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
-      <% if @topic_id.nil? and @topics.size > 0 %>
-        <font color="gray">Your work</font> (You have to choose a topic first)
-      <% else %>
-        <% if @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+      <li>
+        <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
+        <% if @topic_id.nil? and @topics.size > 0 %>
+            <font color="gray">Your work</font> (You have to choose a topic first)
         <% else %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
+            <% if @assignment.submission_allowed(@topic_id) %>
+                <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+            <% else %>
+                <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
+            <% end %>
         <% end %>
-      <% end %>
-    </li>
+      </li>
   <% end %>
 
   <% if @authorization == 'participant' or @can_review == true %>
-    <li>
-      <!--alias_name means if one participant is a reader, it will show 'Your readings' to see others' work; if one participant is not a reader, it will show 'Others' work' on the screen.-->
-      <% if @authorization != 'reader' %>
-        <% @alias_name = "Others' work" %>
-      <% else %>
-        <% @alias_name = "Your readings" %>
-      <% end %>
-      <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
-      <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
-        <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
-      <% else %>
-        <font color="gray"><%= @alias_name%></font>
-      <% end %>
-      (Give feedback to others on their work)
-    </li>
+      <li>
+        <!--alias_name means if one participant is a reader, it will show 'Your readings' to see others' work; if one participant is not a reader, it will show 'Others' work' on the screen.-->
+        <% if @authorization != 'reader' %>
+            <% @alias_name = "Others' work" %>
+        <% else %>
+            <% @alias_name = "Your readings" %>
+        <% end %>
+        <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
+        <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+            <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+        <% else %>
+            <font color="gray"><%= @alias_name%></font>
+        <% end %>
+        (Give feedback to others on their work)
+      </li>
   <% end %>
 
-    <!--Quiz-->
+  <!--Quiz-->
   <%if @assignment.require_quiz%>
-    <% if @authorization == 'participant' or @can_take_quiz == true %>
-      <li>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
-          <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
-        <% else %>
-          <font color="gray">Take quizzes</font>
-        <% end %>
-        (Take quizzes over the work you have read)
-      </li>
-    <% end %> 
-  <%end%>
-  
-  <% if @team && (@authorization == 'participant' or @can_submit == true) %>
-    <li>
-      <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
-      <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
-        <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
-      <% else %>
-        <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %> 
-        (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
+      <% if @authorization == 'participant' or @can_take_quiz == true %>
+          <li>
+            <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
+                <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
+            <% else %>
+                <font color="gray">Take quizzes</font>
+            <% end %>
+            (Take quizzes over the work you have read)
+          </li>
       <% end %>
-    </li>
-  <% end %> 
-    <%if @can_provide_suggestions == true %>
-      <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
-    <% end %>
+  <%end%>
 
-    <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
+  <% if @team && (@authorization == 'participant' or @can_submit == true) %>
+      <li>
+        <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
+        <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
+            <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
+        <% else %>
+            <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %>
+            (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
+        <% end %>
+      </li>
+  <% end %>
+  <%if @can_provide_suggestions == true %>
+      <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
+  <% end %>
+
+  <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
-    <% end %>
-    <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
-  </ul>
-  <br>
+  <% end %>
+  <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+</ul>
+<br>
 
 <div id="visualization"></div>
-<% @participant = AssignmentParticipant.find(params[:id]) %>
+<%# @participant = AssignmentParticipant.find(params[:id]) %>
 
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
-<% files = @participant.team.files(@participant.team.path.to_s + current_folder.name) %>
-<% @sub = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN
-(select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')" %>
+<% #files = @participant.team.files(@participant.team.path.to_s + current_folder.name) %>
 
 <% @href_arr= Array.new %>
-<% @maxdate = DueDate.where("parent_id = #{@assignment.id}")#find_by_sql"select * from due_dates where parent_id=#{@assignment.id}"%>
-
-<% @json_sample = @sub.map do |u|
-  #display_directory_tree(participant, files, true).html_safe
-
-  if (u.operation).eql?('Submit File')
-    f = u.content
-    ret=""
-    if File.exist?(f) && File.directory?(f)
-      ret += link_to File.basename(f), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => f
-    else
-      ret += "\n      "
-      ret += link_to File.basename(f), :controller => 'submitted_content',
-                     :action => 'download',
-                     :id => @participant.id,
-                     :download => File.basename(f),
-                     "current_folder[name]" => File.dirname(f)
-    end
-    @href_arr.push(ret.split('"')[1])
-    { :id => u.id, :start=> u.created_at, :content => (u.content).split('/')[-1] }
-  else
-    @href_arr.push(u.content)
-    { :id => u.id, :start=> u.created_at, :content => u.content }
-  end
-end
+<% @maxdate = DueDate.where("parent_id = #{@assignment.id}")#find_by_sql"select * from due_dates where parent_id=#{@assignment.id}"
+   @json_sample = @maxdate.map do |u|
+     @href_arr.push("")
+     if u.deadline_type_id==1
+       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Submission due at "+u.due_at.to_s }
+     else
+       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Review due at "+u.due_at.to_s }
+     end
+   end
 %>
 
-<% @json_sample%>
-<br><br>
-<% @json_sample=@json_sample.to_json%>
+<!-- display only if submissions are made-->
+<% unless @team.nil? %>
+    <% @sub = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN
+(select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"  %>
+
+    <!-- SQL  select * from  submission_records where assignment_id=844 and content NOT IN
+    (select content from  submission_records where assignment_id=844 and UPPER(operation) Like 'REMOVE%');-->
+<%# @sub = SubmissionRecord.where("assignment_id=#{@assignment.id} AND team_id=#{@team.id}")%> <!-- old code-->
+<%#= @sub %>
+
+    <% @json_sample += @sub.map do |u|
+      #display_directory_tree(participant, files, true).html_safe
+
+      if (u.operation).eql?('Submit File')
+        f = u.content
+        ret=""
+        if File.exist?(f) && File.directory?(f)
+          ret += link_to File.basename(f), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => f
+        else
+          ret += "\n      "
+          ret += link_to File.basename(f), :controller => 'submitted_content',
+                         :action => 'download',
+                         :id => @participant.id,
+                         :download => File.basename(f),
+                         "current_folder[name]" => File.dirname(f)
+        end
+        @href_arr.push(ret.split('"')[1])
+        { :id => u.id, :start=> u.created_at, :content => (u.content).split('/')[-1] }
+      else
+        @href_arr.push(u.content)
+        { :id => u.id, :start=> u.created_at, :content => u.content }
+      end
+    end
+
+       @href_arr.each do |i|
+         puts "hell shyam "+i
+       end
+    %>
+    <% @json_sample%>
+    <br><%= raw @assignment.created_at.strftime("%Y-%m-%d") %><br>
+<%end%>
+<!-- Reviews not yet started -->
+<% unless @review_mappings.nil?
+     @review_mappings.each do |i|
+       @prev = Response.where(:map_id => i.id)
+       @json_sample += @prev.map do |j|
+         if i.type=="ReviewResponseMap"
+           review_mapping = ResponseMap.find(i.reviewed_object_id)
+           participant = AssignmentTeam.get_first_member(i.reviewee_id)
+           puts "jjjj #{participant.id}"
+           topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+           if !topic_id.nil?
+             if SignUpTopic.find(topic_id).topic_identifier != ''
+               @topic_name=SignUpTopic.find(topic_id).topic_identifier+": "+SignUpTopic.find(topic_id).topic_name
+             else
+               @topic_name=SignUpTopic.find(topic_id).topic_name
+             end
+           end
+           unless j.nil? and j.is_submitted.zero?
+             @href_arr.push("../response/view?id="+j.id.to_s)
+             { :id => j.id, :start=> j.created_at, :content => "Review for: #{@topic_name}" }
+           end
+         elsif i.type=="SelfReviewResponseMap"
+           unless j.nil? and j.is_submitted.zero?
+             @href_arr.push("../response/view?id="+j.id.to_s)
+             { :id => j.id, :start=> j.created_at, :content => "Self Feedback" }
+           end
+         else
+           unless j.nil? and j.is_submitted.zero?
+             @href_arr.push("../response/view?id="+j.id.to_s)
+             { :id => j.id, :start=> j.created_at, :content => "Feedback" }
+           end
+         end
+       end
+     end%>
+<% end %>
 <script>
+    <% @json_sample=@json_sample.to_json%>
     var json_parse = JSON.parse('<%=raw  @json_sample%>');
     var js_href_arr = JSON.parse('<%= @href_arr.to_json.html_safe%>')
+
     console.log(js_href_arr)
     var link=""
     for(i=0;  i<json_parse.length; i++) {
@@ -155,26 +213,33 @@ end
         json_parse[i].content = "<a href="+js_href_arr[i]+" target='_blank'>"+json_parse[i].content+"</a>"+ " <br> " + json_parse[i].start;
         console.log(json_parse[i].content);
     }
+    //
 </script>
+<!--code for visualization-->
 <script type="text/javascript">
     // DOM element where the Timeline will be attached
     var container = document.getElementById('visualization');
 
     // Create a DataSet (allows two way data-binding)
     var items = new vis.DataSet(json_parse);
-    //items.add(JSON.parse(json_parse));
+    //items.add(JSON.parse(json_arr));
 
+    console.log('<%=raw @maxdate.maximum(:due_at) %>'+"is max date");
+    console.log('<%raw @assignment.created_at.strftime("%Y-%m-%d") %>')
     // Configuration for the Timeline
     var options = {
         //height: '300px',
-        min: new Date('<%=raw @assignment.created_at.strftime("%Y-%m-%d") %>'),                // lower limit of visible range
-        max: new Date('<%=raw @maxdate.maximum(:due_at).strftime("%Y-%m-%d") %>'),                // upper limit of visible range
+        //min: new Date('<%=raw @assignment.created_at.strftime("%Y-%m-%d") %>'),                // lower limit of visible range
+        //max: new Date('<%=raw @maxdate.maximum(:due_at).strftime("%Y-%m-%d") %>'),                // upper limit of visible range
         zoomMin: 1000 * 60 * 60 * 24,             // one day in milliseconds
-        zoomMax: 1000 * 60 * 60 * 24 * 31 * 3     // about three months in milliseconds
+        zoomMax: 1000 * 60 * 60 * 24 * 31 * 12     // about three months in milliseconds
     };
 
     // Create a Timeline
     var timeline = new vis.Timeline(container, items, options);
 </script>
 
-  <a href="javascript:window.history.back()">Back</a>
+<%#= @team.id %><br>
+<%#= @assignment.id %>
+<br>
+<a href="javascript:window.history.back()">Back</a>

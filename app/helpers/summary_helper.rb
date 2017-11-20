@@ -7,6 +7,29 @@ module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
 
+    def self.response_report_by_review_and_criteria (assignment, summary_ws_url)
+      sum = Summary.new.summarize_reviews_by_reviewees(assignment, summary_ws_url)
+      # list of variables used in the view and the parameters (should have been done as objects instead of hash maps)
+      # @summary[reviewee][round][question]
+      # @reviewers[team][reviewer]
+      # @avg_scores_by_reviewee[team]
+      # @avg_score_round[reviewee][round]
+      # @avg_scores_by_criterion[reviewee][round][criterion]
+
+      @summary = sum.summary
+      @reviewers = sum.reviewers
+      @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
+      @avg_scores_by_round = sum.avg_scores_by_round
+      @avg_scores_by_criterion = sum.avg_scores_by_criterion
+    end
+
+    def self.response_report_by_criteria(assignment, summary_ws_url)
+      sum = Summary.new.summarize_reviews_by_criterion(assignment, summary_ws_url)
+      @summary = sum.summary
+      @avg_scores_by_round = sum.avg_scores_by_round
+      @avg_scores_by_criterion = sum.avg_scores_by_criterion
+    end
+
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       self.summary = Hash.new
       self.avg_scores_by_round = Hash.new
@@ -40,6 +63,7 @@ module SummaryHelper
       end
       self
     end
+
 
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)

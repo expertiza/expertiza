@@ -174,9 +174,10 @@ class UsersController < ApplicationController
       if @usernew.save
         password = @usernew.reset_password # the password is reset
         # Mail is sent to the user with a new password
-        prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password
-                                                            have been created.", "user_welcome", password)
-        prepared_mail.deliver
+       # prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password
+        # have been created.", "user_welcome", password)
+        prepared_mail = UserMailer.send_to_user(@usernew,"Your Expertiza account and password have been created.","user_welcome",password)
+        prepared_mail.deliver_now
         flash[:success] = "A new password has been sent to new user's e-mail address."
         if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"
           AssignmentQuestionnaire.create(user_id: @user.id)

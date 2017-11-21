@@ -30,7 +30,4 @@ class TeammateReviewResponseMap < ResponseMap
     defn[:to] = user.email
     Mailer.sync_message(defn).deliver
   end
-  def self.response_report (id)
-    @reviewers = TeammateReviewResponseMap.teammate_response_report(id)
-  end
 end

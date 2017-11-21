@@ -17,6 +17,55 @@
     margin: 10px;
     z-index: 9999;
   }
+  .vis-timeline {
+    border: 2px solid purple;
+  //font-family:  purisa, 'comic sans', cursive;
+  //font-size: 12pt;
+    background: #ffecea;
+  }
+
+  .vis-item {
+    border-color: #F991A3;
+    background-color: pink;
+  //font-size: 15pt;
+    color: purple;
+    box-shadow: 5px 5px 20px rgba(128,128,128, 0.5);
+  }
+
+  .vis-item,
+  .vis-item.vis-line {
+    border-width: 3px;
+  }
+
+  .vis-item.vis-dot {
+    border-width: 10px;
+    border-radius: 10px;
+  }
+
+  .vis-item.vis-selected {
+    border-color: green;
+    background-color: lightgreen;
+  }
+
+  .vis-time-axis .vis-text {
+    color: purple;
+    padding-top: 10px;
+    padding-left: 10px;
+  }
+
+  .vis-time-axis .vis-text.vis-major {
+    font-weight: bold;
+  }
+
+  .vis-time-axis .vis-grid.vis-minor {
+    border-width: 2px;
+    border-color: pink;
+  }
+
+  .vis-time-axis .vis-grid.vis-major {
+    border-width: 2px;
+    border-color: #F991A3;
+  }
 </style>
 
 <h1>
@@ -129,7 +178,7 @@
     <input id="zoomOut" value="Zoom out" type="button">
     <input id="moveLeft" value="Move left" type="button">
     <input id="moveRight" value="Move right" type="button">
-    <input id="Recenter" value="toggleRollingMode" type="button">
+    <input id="Recenter" value="Recenter" type="button">
   </div>
 </div>
 <%# @participant = AssignmentParticipant.find(params[:id]) %>
@@ -177,15 +226,15 @@
                          "current_folder[name]" => File.dirname(f)
         end
         @href_arr.push(ret.split('"')[1])
-        { :id => u.id, :start=> u.created_at, :content => (u.content).split('/')[-1] }
+        { :id => u.id, :start=> u.created_at, :content => (u.content).split('/')[-1]+'<img src=\"../../assets/attachment-icon.png\" style=\"width:32px; height:32px;\">' }
       else
         @href_arr.push(u.content)
-        { :id => u.id, :start=> u.created_at, :content => u.content }
+        { :id => u.id, :start=> u.created_at, :content => u.content+'<img src=\"../../assets/hyperlink-icon.png\" style=\"width:40px; height:40px;\">' }
       end
     end
 
        @href_arr.each do |i|
-         puts "hell shyam "+i
+         puts "hello shyam "+i
        end
     %>
     <% @json_sample%>

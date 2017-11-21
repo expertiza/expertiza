@@ -86,7 +86,7 @@ describe ReviewMappingController do
       it 'shows an error message and redirects to student_review#list page' do
         expect(Assignment).to receive(:find).and_return(assignment)
         expect(AssignmentParticipant).to receive(:where).and_return([participant])
-        expect(assignment).to receive(:has_topics?).and_return(true)
+        expect(assignment).to receive(:topics?).and_return(true)
         expect(assignment).to receive(:can_choose_topic_to_review?).and_return(true)
         get :assign_reviewer_dynamically
         expect(flash[:error]).to eq("No topic is selected.  Please go back and select a topic.")
@@ -98,7 +98,7 @@ describe ReviewMappingController do
       it 'assigns reviewer dynamically and redirects to student_review#list page' do
         expect(Assignment).to receive(:find).and_return(assignment)
         expect(AssignmentParticipant).to receive(:where).and_return([participant])
-        expect(assignment).to receive(:has_topics?).and_return(true)
+        expect(assignment).to receive(:topics?).and_return(true)
         dummy_topic = double()
         expect(SignUpTopic).to receive(:find).and_return(dummy_topic)
         allow(dummy_topic).to receive(:nil?).and_return(false)
@@ -112,8 +112,8 @@ describe ReviewMappingController do
       it 'runs another algorithms and redirects to student_review#list page' do
         expect(Assignment).to receive(:find).and_return(assignment)
         expect(AssignmentParticipant).to receive(:where).and_return([participant])
-        expect(assignment).to receive(:has_topics?).and_return(false)
-        expect(assignment).to receive(:has_topics?).and_return(false)
+        expect(assignment).to receive(:topics?).and_return(false)
+        expect(assignment).to receive(:topics?).and_return(false)
         assignment_teams = double()
         assignment_team = double()
         expect(assignment).to receive(:candidate_assignment_teams_to_review).with(any_args).and_return(assignment_teams)

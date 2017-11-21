@@ -11,7 +11,8 @@ def deploy_assignment_survey(start_date, end_date, survey_name)
   expect(page).to have_content('Manage content')
   create_assignment_questionnaire survey_name
   survey = Questionnaire.where(name: survey_name)
-  visit '/survey_deployment/new?id=' + Assignment.where(instructor_id: User.where(name: 'instructor6').first.id).first.id.to_s + '&type=AssignmentSurveyDeployment'
+  visit '/survey_deployment/new?id=' + \
+   Assignment.where(instructor_id: User.where(name: 'instructor6').first.id).first.id.to_s + '&type=AssignmentSurveyDeployment'
   expect(page).to have_content('New Survey Deployment')
   fill_in 'survey_deployment_start_date', with: start_date
   fill_in 'survey_deployment_end_date', with: end_date
@@ -21,10 +22,10 @@ end
 
 describe "Survey questionnaire tests for instructor interface" do
   before(:each) do
+    assignment_setup
     @previous_day = (Time.now.getlocal - 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
     @next_day = (Time.now.getlocal + 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
     @next_to_next_day = (Time.now.getlocal + 2 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
-    assignment_setup
   end
 
   it "is able to create an assignment survey" do
@@ -42,6 +43,7 @@ describe "Survey questionnaire tests for instructor interface" do
     expect(page).to have_content(survey_name)
   end
 
+
   it "is not able to deploy a assignment survey with invalid dates" do
     survey_name = 'Assignment Survey Questionnaire 1'
     # passing current time - 1 day for start date and current time + 2 days for end date
@@ -53,10 +55,10 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_name = 'Assignment Survey Questionnaire 1'
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_assignment = Questionnaire.where(name: survey_name).first
+    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
 
     # adding some questions for the deployed survey
-    visit '/questionnaires/' + survey_questionnaire_assignment.id.to_s + '/edit'
+    visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
     fill_in('question_total_num', with: '1')
     select('Criterion', from: 'question_type')
     click_button "Add"
@@ -66,8 +68,9 @@ describe "Survey questionnaire tests for instructor interface" do
     click_button "Save assignment survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')
 
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_assignment.id).first
-    question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire_assignment.id.to_s + " and (type = 'Criterion' OR type = 'Checkbox')")
+    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
+    question = Question.find_by_sql(\
+"select * from questions where questionnaire_id = " + survey_questionnaire_1.id.to_s + " and (type = 'Criterion' OR type = 'Checkbox')")
 
     visit '/survey_deployment/generate_statistics/' + survey_deployment.id.to_s
     question.each do |q|
@@ -80,8 +83,8 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_name = 'Assignment Survey Questionnaire 1'
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_assignment = Questionnaire.where(name: survey_name).first
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_assignment.id).first
+    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
+    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
 
     # after adding a response:
     visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s

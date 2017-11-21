@@ -1,6 +1,23 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+  body, html, input {
+    font-family: sans-serif;
+    font-size: 12pt;
+  }
 
+  #visualization {
+    position: relative;
+  }
+
+  .menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px;
+    z-index: 9999;
+  }
+</style>
 
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
@@ -106,7 +123,15 @@
 </ul>
 <br>
 
-<div id="visualization"></div>
+<div id="visualization">
+  <div class="menu">
+    <input id="zoomIn" value="Zoom in" type="button">
+    <input id="zoomOut" value="Zoom out" type="button">
+    <input id="moveLeft" value="Move left" type="button">
+    <input id="moveRight" value="Move right" type="button">
+    <input id="Recenter" value="toggleRollingMode" type="button">
+  </div>
+</div>
 <%# @participant = AssignmentParticipant.find(params[:id]) %>
 
 <% current_folder = DisplayOption.new %>
@@ -237,6 +262,35 @@
 
     // Create a Timeline
     var timeline = new vis.Timeline(container, items, options);
+</script>
+<script>
+    var t=timeline.range.getRange();
+    function move (percentage) {
+        var range = timeline.getWindow();
+        var interval = range.end - range.start;
+
+        timeline.setWindow({
+            start: range.start.valueOf() - interval * percentage,
+            end:   range.end.valueOf()   - interval * percentage
+        });
+    }
+    // attach events to the navigation buttons
+    document.getElementById('zoomIn').onclick    = function () { timeline.zoomIn( 0.2); };
+    document.getElementById('zoomOut').onclick   = function () { timeline.zoomOut( 0.2); };
+    document.getElementById('moveLeft').onclick  = function () { move( 0.2); };
+    document.getElementById('moveRight').onclick = function () { move(-0.2); };
+    document.getElementById('Recenter').onclick = function () {
+        //alert("hi");
+        var todayStart = new Date(t.start);
+//todayStart.setHours(8, 0, 0, 0);
+        var todayEnd = new Date(t.end);
+//todayEnd.setHours(18, 0, 0, 0);
+
+        console.log(todayStart, ':', todayEnd);
+        //setTimeout(_ => {
+        timeline.setWindow(todayStart, todayEnd, { animation: true });
+        //});
+    };
 </script>
 
 <%#= @team.id %><br>

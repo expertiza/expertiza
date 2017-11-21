@@ -192,9 +192,9 @@
    @json_sample = @maxdate.map do |u|
      @href_arr.push("")
      if u.deadline_type_id==1
-       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Submission due at "+u.due_at.to_s }
+       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Submission due at "+u.due_at.to_s+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/submit-icon.png\" style=\"width:40px; height:40px;\">' }
      else
-       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Review due at "+u.due_at.to_s }
+       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Review due at "+u.due_at.to_s+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
      end
    end
 %>
@@ -259,17 +259,17 @@
            end
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :content => "Review for: #{@topic_name}" }
+             { :id => j.id, :start=> j.created_at, :content => "Round "+j.round.to_s+"<br> Review for: #{@topic_name}"+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
            end
          elsif i.type=="SelfReviewResponseMap"
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :content => "Self Feedback" }
+             { :id => j.id, :start=> j.created_at, :content => "Round "+j.round.to_s+"<br>Self Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\">' }
            end
          else
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :content => "Feedback" }
+             { :id => j.id, :start=> j.created_at, :content => "Round "+j.round.to_s+"<br>Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\">' }
            end
          end
        end

@@ -41,7 +41,9 @@ class Badge < ActiveRecord::Base
 	def self.get_badges_instructor_view(participants, assignment)
 		current_assignment_count = 0
 		badge_matrix = []
-		scores = Badge.get_scores(assignment)
+		print "++++++++++++++++++++++++++ Assignment"
+		print assignment
+		# scores = Badge.get_scores(assignment)
 		
 		participants.each do |participant|
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
@@ -92,33 +94,33 @@ class Badge < ActiveRecord::Base
 	end
 
 
-def self.good_teammate(assignment, participant)	
-	team = participant.team
-	if team.nil?
-		return false
-	end
-
-	begin
-		score = 0.0
-	 	teammate_reviews = participant.teammate_reviews
-	 	teammate_reviews.each do |teammate_review|
-			score = score + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)		
-	 	end
-	 	badge = true
- 		if score < GOOD_TEAMMATE_THRESHOLD
-			badge = false
-		end
-	
-		if badge
-			return GOOD_TEAMMATE_IMAGE.html_safe
-		else
+	def self.good_teammate(assignment, participant)	
+		team = participant.team
+		if team.nil?
 			return false
 		end
-	rescue
-		return false
-	end
 
-end
+		begin
+			score = 0.0
+		 	teammate_reviews = participant.teammate_reviews
+		 	teammate_reviews.each do |teammate_review|
+				score = score + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)		
+		 	end
+		 	badge = true
+	 		if score < GOOD_TEAMMATE_THRESHOLD
+				badge = false
+			end
+		
+			if badge
+				return GOOD_TEAMMATE_IMAGE.html_safe
+			else
+				return false
+			end
+		rescue
+			return false
+		end
+
+	end
 
   
 end

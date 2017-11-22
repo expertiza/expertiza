@@ -1,6 +1,5 @@
 # PRECONDITIONS FOR TESTING:
 #
-#
 # 1 .We need a Course
 # 2. We need an Instructor for the Course
 # 3. We need a Student enrolled in the Course

@@ -3,11 +3,11 @@ class Badge < ActiveRecord::Base
 	NUMBER_OF_BADGES = 2
 	
 	# CONSTANTS RELATED TO GOOD REVIEWER
-	GOOD_REVIEW_THRESHOLD = 75
+	GOOD_REVIEW_THRESHOLD = 95
 	GOOD_REVIEWER_BADGE_IMAGE = "<img height = 'auto' width = '50px' src='/assets/badges/goodReviewer.png'/>"
 
 	
-	GOOD_TEAMMATE_THRESHOLD = 0.75
+	GOOD_TEAMMATE_THRESHOLD = 2
 	GOOD_TEAMMATE_IMAGE = "<img height = 'auto' width = '50px' src='/assets/badges/goodTeammate.png'/>"
 
 

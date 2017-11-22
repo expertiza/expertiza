@@ -16,6 +16,7 @@
 //= require jquery
 //= require bootstrap-sass/assets/javascripts/bootstrap-sprockets
 //= require jquery_ujs
+//= require tinymce-jquery
 //= require jquery.datetimepicker
 //= require jquery.datetimepicker/init
 //= require hoverIntent

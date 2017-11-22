@@ -121,8 +121,8 @@ class Criterion < ScoredQuestion
         html += "</option>"
       end
       html += "</select></div>"
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
-       ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+      html += '<textarea' + ' id="responses_' + count.to_s + '_comments"' \
+       ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
       html += '</textarea></td></br><br/>'
     elsif dropdown_or_scale == 'scale'
@@ -160,7 +160,7 @@ class Criterion < ScoredQuestion
 
       html += '<td width="10%"></td></tr></table>'
       html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
-        ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+        ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
       html += '</textarea><br/><br/>'
 
@@ -200,7 +200,7 @@ class Criterion < ScoredQuestion
     html += '</td>'
     unless answer.comments.nil?
       html += '<td style="padding-left:10px">'
-      html += answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
+      html += '<br>' + answer.comments.html_safe
       html += '</td>'
     end
     html += '</tr></table>'

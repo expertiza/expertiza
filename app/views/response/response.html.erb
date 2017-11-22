@@ -17,6 +17,8 @@ jQuery(document).ready(function() {
     });
 })
 </script>
+
+<!--including tinymce javascript-->
 <%= tinymce_assets %>
 
 <% if @map.survey? %>
@@ -82,6 +84,7 @@ jQuery(document).ready(function() {
             <%= tinymce %>
        <% elsif question.instance_of? Scale %>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
+            <%= tinymce %>
        <% elsif question.instance_of? UploadFile %>
             <!--One form had better not in another form-->
             <!--Zhewei: I move the Uploadfile question to the end of questionnaire. So multiple forms will not been overlapped.-->

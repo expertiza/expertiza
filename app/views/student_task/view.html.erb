@@ -1,3 +1,5 @@
+
+
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
       Submit or Review work for <%= @assignment.name %>
@@ -102,6 +104,4 @@ to display the label "Your team" in the student assignment tasks-->
   </ul>
   <br>
   <a href="javascript:window.history.back()">Back</a>
-
-
   <%= render 'timeline' %>

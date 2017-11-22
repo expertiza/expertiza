@@ -10,6 +10,7 @@ class StudentTask
     @topic = args[:topic]
   end
 
+
   def self.from_participant(participant)
     StudentTask.new(
       participant: participant,

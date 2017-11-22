@@ -32,6 +32,8 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    @dues = DueDate.where(parent_id: @assignment.id)
+    #@due = StudentTask.get_due_dates(@assignment.id)
   end
 
   def others_work

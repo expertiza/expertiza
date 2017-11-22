@@ -2,10 +2,14 @@ class ImpersonateController < ApplicationController
   include SecurityHelper
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    if ['Student'].include? current_role_name
+      !session[:super_user].nil?
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
+    end
   end
 
   def auto_complete_for_user_name

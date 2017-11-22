@@ -5,4 +5,10 @@ class UserMailer < ApplicationMailer
     @password = password
     mail(to:@user.email, subject:subject)
   end
+
+  def send_to_request_user(user,subject,partial_name)
+    @user=user
+    @message = partial_name
+    mail(to:@user.email, subject:subject)
+  end
 end

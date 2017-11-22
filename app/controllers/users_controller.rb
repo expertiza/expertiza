@@ -149,6 +149,20 @@ class UsersController < ApplicationController
     end
   end
 
+  def send_mail
+    @request_user = RequestedUser.find_by_email(params["user_email"])
+
+  end
+
+  def send_to_request
+    @user = RequestedUser.find_by_email(params["user_email"])
+    text = params[:users][:intro]
+    prepared_mail = UserMailer.send_to_request_user(@user,"This email is coming from the Expertiza Group.",text)
+    prepared_mail.deliver_now
+    flash[:success] = "A new password has been sent to the user's e-mail address."
+    redirect_to action: 'list_pending_requested'
+  end
+
   def create_approved_user
     @user = RequestedUser.find params[:id]
     @user.status = params[:status]

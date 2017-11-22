@@ -6,10 +6,21 @@
   <li class="li complete">
     <div class="timestamp">
       <span class="author"><%= due.assignment.name %></span>
-      <span class="date"><%= due.due_at %><span>
+      <span class="date"><%= due.due_at.strftime('%a, %d %b %Y %H:%M:%S') %><span>
     </div>
     <div class="status">
       <h4> <%= due.deadline_type.name %></h4>
+    </div>
+  </li>
+  <% end %>
+  <% @submissions.each do |s| %>
+  <li class="li complete">
+    <div class="timestamp">
+      <span class="author"><%=link_to 'file', s.content %></span>
+      <span class="date"><%= s.updated_at.strftime('%a, %d %b %Y %H:%M:%S') %><span>
+    </div>
+    <div class="status">
+      <h4><%= s.operation %></h4>
     </div>
   </li>
      <% end %>

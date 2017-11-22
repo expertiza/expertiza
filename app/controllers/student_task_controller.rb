@@ -33,6 +33,7 @@ class StudentTaskController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     @dues = DueDate.where(parent_id: @assignment.id)
+    @submissions = SubmissionRecord.where(team_id: TeamsUser.team_id(@assignment.id, @participant.user_id) , assignment_id: @assignment.id)
     #@due = StudentTask.get_due_dates(@assignment.id)
   end
 

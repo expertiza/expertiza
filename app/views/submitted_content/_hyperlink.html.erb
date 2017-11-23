@@ -29,10 +29,69 @@
             <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
           <% end %>
         <% end %>
-              <a href="<%= link %>" target="_blank"><%= link %></a>
+              <a href="<%= link %>" target="_blank" class="review_link"><%= link %></a>
               <br/>
       <% end %>
       <% } %>
     </ul>
   </div>
+  <script type="text/javascript">
+    function ISODateString(date){
+      function pad(num){return num<10? '0'+num: num;}
+      return date.getUTCFullYear()+'-'
+                + pad(date.getUTCMonth()+1) + '-';
+                + pad(date.getUTCDate()) + ' '
+                + pad(date.getUTCHours()) + ':'
+                + pad(date.getUTCMinutes()) + ':'
+                + pad(date.getUTCSeconds());
+    }
+    $(document).ready(function(){
+      var window_counter = 0;
+      $("#url a.review_link").click(function linkAction(){
+        var link_handler = $(this); // current link
+        var address = link_handler.attr("href"); // url address of the current link
+        var window_handler = window.open(address); // open link in new window/tag
+        // var t_start = new Date(); // open time
+        startTime(<%= map_id %>, <%= round %>, address);
+        var link_timer = setInterval(checkWindowStatus, 1000); // check window open/close every second
+
+        function startTime(map_id, round, link) {
+          var t = new Date();
+          $.ajax({
+            type: "POST",
+            url: '/response_time/record_start_time',
+            data: $.param({response_time:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+          });
+        }
+
+        function endTime(){
+          var t = new Date();
+          $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            async: false,
+            url: '/response_time/record_end_time',
+            data: $.param({
+              response_time: {map_id: <%= map_id %>, round: <%= round %>, end_at: ISODateString(t)}
+              }),
+            /*success: function(json){
+              var links = JSON.parse(JSON.stringigy(json));
+              for (lk in links)
+                console.log(lk+" review time is complete!");
+            }*/
+            failure: function(){
+              console.log("review time failed to save!");
+            }
+          });
+        }
+
+        function checkWindowStatus(){
+          if (window_handler.closed){
+            endTime();
+            clearInterval(link_timer);
+          }
+        }
+      });
+    });
+  </script>
 <% end %>

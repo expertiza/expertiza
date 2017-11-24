@@ -26,4 +26,12 @@
   :model=> modelType,
   :id=>@root_node.node_object_id %>
 |<%= link_to 'Delete All Teams', :action => 'delete_all', :id=> @root_node.node_object_id, :model => @model %>
-|<%= render :partial => '/shared_scripts/back' %>
+
+<!-- display a list of students who do not have a team with invitation links -->
+<% if @root_node.class == AssignmentNode %>
+    <h6><strong>Students without a complete team</strong></h6>
+  <%= render :partial => 'join_team_requests/list_not_initiated',
+           :locals =>{:assignment_id => @root_node.node_object_id} %>
+<% end %>
+
+<%= render :partial => '/shared_scripts/back' %>

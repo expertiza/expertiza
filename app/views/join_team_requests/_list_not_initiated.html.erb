@@ -1,0 +1,44 @@
+
+<% if (@student && @student.team) or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
+    include? current_user_role?.name %>
+
+    <%
+      @team_list = AssignmentTeam.where(advertise_for_partner: [false, nil], parent_id: assignment_id)
+
+      if (@student && @student.team)
+        @team_list = @team_list.where.not(id: @student.team.id)
+      end
+    %>
+
+    <table style="width:80%" align="center" >
+      <tr style="border: 1px outset #000000; ">
+        <th class="head">Student ID</th>
+        <th class="head">Student Name</th>
+        <% if (@student && @student.team) %>
+          <th class="head">Action</th>
+        <% end %>
+      </tr>
+
+      <% @team_list.each do |team| %>
+            <% for member in team.participants %> <!--start team member content-->
+              <tr>
+                <td><%= member.user.name %></td>
+                <td><%= member.user.fullname %></td>
+                <% if (@student && @student.team) %>
+                  <td style="padding: 5px;">
+                    <%= form_tag :controller => 'invitations', :action => 'create' do %>
+                        <%= hidden_field_tag 'team_id', @student.team.id %>
+                        <%= hidden_field_tag 'student_id', @student.id %>
+                        <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
+                        <%= hidden_field_tag 'user[name]', member.user.name %>
+                        <input type='submit' value='Invite'/>
+                    <% end %>
+                  </td>
+              <% end %>
+              </tr>
+            <% end %>
+      <% end %>
+    </table>
+<% else %>
+    <p>You need to create a team to see who all are available to send invites.</p><br>
+<% end %>

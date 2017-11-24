@@ -14,10 +14,16 @@
   <br/><br/>
 
   <% i=1 %>
+  <% my_topic = false %>
   <tbody id="tablelist">
     <% for topic in @sign_up_topics %>
       <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
         <% for selected_topic in @selected_topics %>
+              <%
+                 if selected_topic.topic_id == topic.id
+                    my_topic = true
+                 end
+              %>
           <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
             <tr bgcolor="yellow">
           <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
@@ -30,7 +36,7 @@
         <tr id="topic_<%= topic.id %>">
       <% end %>
       <% is_suggested_topic = false %>
-      <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+      <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic, my_topic: my_topic} %>
       </tr>
       <% i=i+1 %>
     <% end %>

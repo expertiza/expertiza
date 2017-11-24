@@ -1,4 +1,4 @@
-<h1>Team Information for <%= @student.assignment.name %></h1>
+<h1 xmlns="http://www.w3.org/1999/html">Team Information for <%= @student.assignment.name %></h1>
 
 <% if @student.team == nil %>
   You no longer have a team!
@@ -229,5 +229,14 @@
                       :assignment_id => @student.assignment.id
            } %>
 <br>
+
+
+<!-- display a list of students who do not have a team with invitation links -->
+<h5><strong>Invite team mates to join your team</strong></h5>
+<%= render :partial => 'join_team_requests/list_not_initiated',
+           :locals =>{:assignment_id => @student.assignment.id} %>
+<br>
+
+
    <a href="javascript:window.history.back()">Back</a>
 

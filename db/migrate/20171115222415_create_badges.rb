@@ -3,12 +3,15 @@ class CreateBadges < ActiveRecord::Migration
     create_table :badges do |t|
       t.string :name
       t.string :description
+      t.string :image_name
 
       t.timestamps null: false
     end
     Badge.create name: 'Good Reviewer',
-                 description: 'This badge is awarded to students who receive very high review grades.'
+                 description: 'This badge is awarded to students who receive very high review grades.',
+                 image_name: 'Badge-Good-Reviewer.png'
     Badge.create name: 'Good Teammate',
-                 description: 'This badge is awarded to students who receive very high teammate review scores.'
+                 description: 'This badge is awarded to students who receive very high teammate review scores.',
+                 image_name: 'Badge-Good-Teammate.png'
   end
 end

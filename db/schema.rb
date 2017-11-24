@@ -147,6 +147,7 @@ ActiveRecord::Schema.define(version: 20171115230007) do
   create_table "badges", force: :cascade do |t|
     t.string   "name",        limit: 255
     t.string   "description", limit: 255
+    t.string   "image_name",  limit: 255
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
   end

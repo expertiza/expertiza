@@ -1,14 +1,4 @@
-
-<% if (@student && @student.team) or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
-    include? current_user_role?.name %>
-
-    <%
-      @team_list = AssignmentTeam.where(advertise_for_partner: [false, nil], parent_id: assignment_id)
-
-      if (@student && @student.team)
-        @team_list = @team_list.where.not(id: @student.team.id)
-      end
-    %>
+<% if @has_team && @is_valid_for_ad %>
 
     <table style="width:80%" align="center" >
       <tr style="border: 1px outset #000000; ">
@@ -40,5 +30,5 @@
       <% end %>
     </table>
 <% else %>
-    <p>You need to create a team to see who all are available to send invites.</p><br>
+    <p>You need to create a team to see who all are available to send invites or create advertisements.</p><br>
 <% end %>

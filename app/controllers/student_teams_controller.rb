@@ -56,30 +56,80 @@ class StudentTeamsController < ApplicationController
                              end
 
     @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+
+    check_ad_criteria
+  end
+
+  def check_ad_criteria
+    allowed_team_size = @student.assignment.max_team_size
+    min_team_size = 1
+    @has_team = true
+    if allowed_team_size <= min_team_size
+      @is_valid_for_ad = false;
+    else
+      if @student.team == nil
+        @is_valid_for_ad = false
+        @has_team = false
+        team_name = 'team_' + @student.id.to_s + '_' + @student.assignment.id.to_s
+        team = create_team team_name
+        unless team == nil
+          @has_team = true
+          check_ad_criteria
+        end
+      else
+        current_team_size = @student.team.participants.length
+        if current_team_size == allowed_team_size
+          @is_valid_for_ad = false
+        else
+          #within 1st submission
+          within_submission = true
+          if within_submission
+            @is_valid_for_ad = true
+          else
+            @is_valid_for_ad = false
+          end
+        end
+      end
+    end
+
+    if @is_valid_for_ad
+      # find list of students to show for sending invitations
+      puts "find list of students to show for sending invitations"
+      @team_list = AssignmentTeam.where(advertise_for_partner: [false, nil], parent_id: @student.assignment.id)
+      if (@student && @student.team)
+        @team_list = @team_list.where.not(id: @student.team.id)
+      end
+    end
   end
 
   def create
-    existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
     # check if the team name is in use
+    if params[:team][:name].nil? || params[:team][:name].empty?
+      flash[:notice] = 'The team name is empty.'
+      redirect_to view_student_teams_path student_id: student.id
+      return
+    end
+    team = create_team params[:team][:name]
+    unless team == nil
+      team_created_successfully(team)
+      redirect_to view_student_teams_path student_id: student.id
+    else
+      flash[:notice] = 'That team name is already in use.'
+      redirect_to view_student_teams_path student_id: student.id
+    end
+  end
+
+  def create_team(team_name)
+    existing_assignments = AssignmentTeam.where name: team_name, parent_id: student.parent_id
     if existing_assignments.empty?
-      if params[:team][:name].nil? || params[:team][:name].empty?
-        flash[:notice] = 'The team name is empty.'
-        redirect_to view_student_teams_path student_id: student.id
-        return
-      end
-      team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+      team = AssignmentTeam.new(name: team_name, parent_id: student.parent_id)
       team.save
       parent = AssignmentNode.find_by_node_object_id student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find student.user_id
       team.add_member user, team.parent_id
-      team_created_successfully(team)
-      redirect_to view_student_teams_path student_id: student.id
-
-    else
-      flash[:notice] = 'That team name is already in use.'
-      redirect_to view_student_teams_path student_id: student.id
     end
+    return team
   end
 
   def edit

@@ -5,20 +5,19 @@ class SuggestionController < ApplicationController
       current_role_name.eql? 'Student'
     when 'submit'
       ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator',
-      'Student'].include? current_role_name
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name
     else
       ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-      'Super-Administrator'].include? current_role_name
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
   def add_comment
-
     @suggestioncomment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
     @suggestioncomment.suggestion_id = params[:id]
     @suggestioncomment.commenter = session[:user].name
@@ -36,7 +35,7 @@ class SuggestionController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: [:destroy, :create, :update],
-  redirect_to: {action: :list}
+         redirect_to: {action: :list}
 
   def list
     @suggestions = Suggestion.where(assignment_id: params[:id])
@@ -57,8 +56,8 @@ class SuggestionController < ApplicationController
 
   def update_suggestion
     Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title],
-    description: params[:suggestion][:description],
-    signup_preference: params[:suggestion][:signup_preference])
+                                                   description: params[:suggestion][:description],
+                                                   signup_preference: params[:suggestion][:signup_preference])
     redirect_to action: 'new', id: Suggestion.find(params[:id]).assignment_id
   end
 
@@ -75,29 +74,28 @@ class SuggestionController < ApplicationController
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
     @suggestion.unityID = if params[:suggestion_anonymous].nil?
-    session[:user].name
-  else
-    ""
+                            session[:user].name
+                          else
+                            ""
+    end
+
+    if @suggestion.save
+      flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
+      flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+    end
+    redirect_to action: 'new', id: @suggestion.assignment_id
   end
 
-  if @suggestion.save
-    flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
-    flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+  def submit
+    if !params[:add_comment].nil?
+      add_comment
+    elsif !params[:approve_suggestion].nil?
+      approve_suggestion
+    elsif !params[:reject_suggestion].nil?
+      reject_suggestion
+    end
   end
-  redirect_to action: 'new', id: @suggestion.assignment_id
-end
 
-
-def submit
-  if !params[:add_comment].nil?
-    add_comment
-  end
-  if !params[:approve_suggestion].nil?
-    approve_suggestion
-  elsif !params[:reject_suggestion].nil?
-    reject_suggestion
-  end
-end
   # this is a method for lazy team creation. Here may not be the right place for this method.
   # should be refactored into a static method in AssignmentTeam class. --Yang
   def create_new_team
@@ -173,7 +171,7 @@ def approve_suggestion
   redirect_to action: 'show', id: @suggestion
 end
 
-def reject_suggestion
+  def reject_suggestion
   # 1781 - 718 issue
   # The Instructor should be able to give feed backs during the times of rejection as well.
   # Thus we are getting the comments through the request when denial is made and saving those in 
@@ -184,14 +182,15 @@ def reject_suggestion
     @suggestioncomment.commenter = session[:user].name
     @suggestioncomment.save
   end
-  @suggestion = Suggestion.find(params[:id])
-  if @suggestion.update_attribute('status', 'Rejected')
-    flash[:notice] = 'The suggestion has been successfully rejected.'
-  else
-    flash[:error] = 'An error occurred when rejecting the suggestion.'
+    @suggestion = Suggestion.find(params[:id])
+
+    if @suggestion.update_attribute('status', 'Rejected')
+      flash[:notice] = 'The suggestion has been successfully rejected.'
+    else
+      flash[:error] = 'An error occurred when rejecting the suggestion.'
+    end
+    redirect_to action: 'show', id: @suggestion
   end
-  redirect_to action: 'show', id: @suggestion
-end
 
 
 private
@@ -212,21 +211,21 @@ def approve
     @suggestioncomment.commenter = session[:user].name
     @suggestioncomment.save
   end
-  @suggestion = Suggestion.find(params[:id])
-  @user_id = User.where(name: @suggestion.unityID).first.id
-  if @user_id
-    @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
-    @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    @suggestion = Suggestion.find(params[:id])
+    @user_id = User.find_by(name: @suggestion.unityID).try(:id)
+    if @user_id
+      @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
+      @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    end
+    @signuptopic = SignUpTopic.new
+    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
+    @signuptopic.topic_name = @suggestion.title
+    @signuptopic.assignment_id = @suggestion.assignment_id
+    @signuptopic.max_choosers = 1
+    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
+      flash[:success] = 'The suggestion was successfully approved.'
+    else
+      flash[:error] = 'An error occurred when approving the suggestion.'
+    end
   end
-  @signuptopic = SignUpTopic.new
-  @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
-  @signuptopic.topic_name = @suggestion.title
-  @signuptopic.assignment_id = @suggestion.assignment_id
-  @signuptopic.max_choosers = 1
-  if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
-    flash[:success] = 'The suggestion was successfully approved.'
-  else
-    flash[:error] = 'An error occurred when approving the suggestion.'
-  end
-end
 end

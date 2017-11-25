@@ -172,6 +172,9 @@ end
 
 def reject_suggestion
   # 1781 - 718 issue
+  # The Instructor should be able to give feed backs during the times of rejection as well.
+  # Thus we are getting the comments through the request when denial is made and saving those in 
+  # Database with Vote type as D - meaning reject 
   if params[:suggestion_comment][:comments] && params[:suggestion_comment][:comments] != ""
     @suggestioncomment = SuggestionComment.new(vote: 'D', comments: params[:suggestion_comment][:comments])
     @suggestioncomment.suggestion_id = params[:id]
@@ -195,6 +198,10 @@ def suggestion_params
 end
 
 def approve
+  # 1781 - 718 issue
+  # The Instructor should be able to give feed backs during the times of approval as well.
+  # Thus we are getting the comments through the request when approval is made and saving those in 
+  # Database with Vote type as A - meaning approval 
   if params[:suggestion_comment][:comments] && params[:suggestion_comment][:comments] != ""
     @suggestioncomment = SuggestionComment.new(vote: 'A', comments: params[:suggestion_comment][:comments])
     @suggestioncomment.suggestion_id = params[:id]

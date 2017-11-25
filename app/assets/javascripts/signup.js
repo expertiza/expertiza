@@ -1,16 +1,16 @@
-function showHideTeamAndMembers(numTeams){
+function showHideTeamAndMembers(numTeams) {
     var element = document.getElementById('teamsAndMembers');
     var show = element.innerHTML == 'Hide all teams';
-    if (show){
-        element.innerHTML='Show all teams';
-    }else{
-        element.innerHTML='Hide all teams';
+    if (show) {
+        element.innerHTML = 'Show all teams';
+    } else {
+        element.innerHTML = 'Hide all teams';
     }
     toggleTeamsAndMembers(numTeams);
 }
 
 function toggleTeamsAndMembers(numTeams) {
-    for(var i=1; i<=numTeams; i++){
+    for (var i = 1; i <= numTeams; i++) {
         var elem = document.getElementById(i.toString() + "_myDiv");
         if (elem.style.display == 'none') {
             elem.style.display = '';
@@ -34,309 +34,281 @@ jQuery("input[id^='due_date_']").datetimepicker({
     timeFormat: 'HH:mm:ss',
     controlType: 'select',
     timezoneList: [
-        { value: -000, label: 'GMT'},
-        { value: -300, label: 'Eastern'},
+        { value: -000, label: 'GMT' },
+        { value: -300, label: 'Eastern' },
         { value: -360, label: 'Central' },
         { value: -420, label: 'Mountain' },
         { value: -480, label: 'Pacific' }
     ]
 });
 
+/*1781
+ This is used for taking care of all the JS GRID Operations which will be shown in Topics Tab of Assignment page
+ JS grid information http://js-grid.com/
+*/
+jQuery(document).ready(function() {
+    /* this is used for getting the assignment ID passed from Ruby into the Java script for making those Ajax calls*/
+    function getAssignmentId() {
+        return jQuery("#jsGrid").data("assignmentid");
+    }
 
+    //this is the all powerful configuration object for setting up the JS GRID Table
+    jQuery("#jsGrid").jsGrid({
 
+        //These are the configurations that are required for our JS Grid Table
+        width: "100%",
+        height: "auto",
+        filtering: false,
+        inserting: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+        autoload: true,
+        updateOnResize: true,
+        deleteConfirm: "Do you really want to delete the Topic?",
 
+        /* controller Object : All the CRUD functionalities of our JS GRID is taken care under this controller object*/
+        controller: {
+            /*This makes an Ajax call to load all the signup topics which will be rendered as a json from endpoint */
+            loadData: function(filter) {
+                var data = $.Deferred();
+                $.ajax({
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    url: "/sign_up_sheet/" + getAssignmentId() + "/load_add_signup_topics", // end point for making the load topics 
+                    dataType: "json"
+                }).done(function(response) {
+                    var sign_up_topics = response.sign_up_topics;
+                    data.resolve(sign_up_topics);
+                }).fail(function(response) {
+                    alert("Issue on Loading Topics"); // If problem occurs in loading topics
+                    data.resolve(response);
+                });
+                return data.promise();
+            },
 
+            /*This makes an Ajax call to insert a new  signup topic which will be entered by the user as topic argument */
+            insertItem: function(topic) {
+                topic.id = getAssignmentId() // the data to be sent through Ajax should be having the assignment id in id field
+                var data = $.Deferred();
+                $.ajax({
+                    type: "POST",
+                    url: "/sign_up_sheet/",
+                    data: topic
+                }).done(function(response) {
+                    jQuery("#jsGrid").jsGrid("loadData");
+                    data.resolve(response);
+                }).fail(function(response) {
+                    var responseJson = response;
+                    data.resolve(response);
+                    // this is the special case when user tries to set slots than slots already booked
+                    if (responseJson.status == 400) {
+                        jQuery(document).scrollTop(0);
+                        location.reload();
+                    } else
+                        alert(responseJson.responseText);
+                });
+                return data.promise();
+            },
 
-// after document is ready
-//1781
-jQuery(function(){
+            /*This makes an Ajax call to update a single record in our JS Grid when user makes changes to it*/
+            updateItem: function(topic) {
+                var data = $.Deferred();
+                $.ajax({
+                    type: "PUT",
+                    url: "/sign_up_sheet/" + topic.id,
+                    data: topic
+                }).done(function(response) {
+                    jQuery("#jsGrid").jsGrid("loadData");
+                    data.resolve(response);
+                }).fail(function(response) {
+                    var responseJson = response;
+                    data.resolve(previousItem);
+                    // this is the special case when user tries to set slots than slots already booked
+                    if (responseJson.status == 400) {
+                        jQuery(document).scrollTop(0);
+                        location.reload();
+                    } else
+                        alert(responseJson.responseText);
+                });
+                return data.promise();
+            },
 
-jQuery('.jsgrid-header-row th:first-child, .jsgrid-filter-row td:first-child, .jsgrid-insert-row td:first-child, .jsgrid-grid-body tr td:first-child')
-.css({
-position: "absolute",
-left: "1px"
-});
-jQuery('.jsgrid-grid-header, .jsgrid-grid-body').css('margin-left', '100px');
-var assignmentId = jQuery("#jsGrid").data("assignmentid");
+            /*This makes an Ajax call to delete a single record*/
+            deleteItem: function(topic) {
+                return $.ajax({
+                    type: "DELETE",
+                    url: "/sign_up_sheet/" + topic.id
+                });
+            }
+        },
 
-jQuery("#jsGrid").jsGrid({  
-                width: "100%",
-                height : "auto",
-
+        /*This Object takes care of all the columns in the JS GRID Table 
+          All the configurations required for each column is mentioned here.
+          Fields - Controls, Topic Number, Topic Category, # Slots, Available Slots, Num of Waitlist, Book mark, Topic Description, Tpic Link 
+            */
+        fields: [{
+                title: "Actions",
+                type: "control",
+                editButton: true,
+                deleteButton: true,
+                searching: false,
                 filtering: false,
-                inserting: true,
-                editing: true,
-                sorting: true,
-                paging: true,
+                deleteButtonTooltip: "Delete Topic",
+                editButtonTooltip: "Edit Topic",
+                editButtonClass: "jsgrid-edit-button-custom",
+                deleteButtonClass: "jsgrid-delete-button-custom",
+                modeSwitchButton: false,
+                width: "2%"
+            },
+            {
+                name: "topic_identifier",
+                type: "text",
+                title: "Topic #",
+                width: "1.5%",
+                validate: {
+                    validator: "required",
+                    message: "Topic Number should not be empty "
+                }
 
-                autoload: true,
-                updateOnResize : true,
-                
+            },
+            {
+                name: "topic_name",
+                type: "text",
+                title: "Topic name(s)",
+                width: "5%",
+                validate: {
+                    validator: "required",
+                    message: "Topic Name should not be empty "
+                },
 
-                
-                deleteConfirm: "Do you really want to delete the Topic?",
-                controller: {
-                    loadData: function (filter) {
-
-                   
-                    var data = $.Deferred();
-                        $.ajax({
-                            type: "GET",
-                            contentType: "application/json; charset=utf-8",
-                            url: "/sign_up_sheet/"+jQuery("#jsGrid").data("assignmentid")+"/load_add_signup_topics",
-                              // url: "/sign_up_sheet/847/load_add_signup_topics",
-                            dataType: "json"
-                            }).done(function(response){
-                               
-                               var sign_up_topics =  response.sign_up_topics;
-                               data.resolve(sign_up_topics);
-                        }).fail(function(response){
-                             alert("Issue on Loading Topics");
-                             data.resolve(respomse);
-                        });
-                    return data.promise();
-                    },
-
-
-                    insertItem: function (topic) {
-              
-                    topic.id = jQuery("#jsGrid").data("assignmentid")
-
-                     var data = $.Deferred();
-                        $.ajax({
-                            type: "POST",
-                            url: "/sign_up_sheet/",
-                              // url: "/sign_up_sheet/847/load_add_signup_topics",
-                            data: topic
-                            }).done(function(response){
-                              jQuery("#jsGrid").jsGrid("loadData");
-                              data.resolve(response);
-                        }).fail(function(response){
-                            var responseJson = response;
-                             data.resolve(response);
-                             console.log(JSON.stringify(responseJson));
-                             console.log(responseJson.responseJSON.flash);
-                             if(responseJson.responseJSON.flash == "The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.")
-                            {
-                             jQuery(document).scrollTop(0);
-                             location.reload();
-                             }
-                             else
-                                alert(responseJson.responseText);
-                        }
-                        );
-                    return data.promise();
-                    },
-
-
-                    updateItem: function (topic) {
-                 
-
-                    var data = $.Deferred();
-                        $.ajax({
-                            type: "PUT",
-                            url: "/sign_up_sheet/"+topic.id,
-                              // url: "/sign_up_sheet/847/load_add_signup_topics",
-                            data: topic
-                            }).done(function(response){
-                              jQuery("#jsGrid").jsGrid("loadData");
-                              data.resolve(response);
-
-                        }).fail(function(response){
-                             var responseJson = response;
-                             data.resolve(previousItem);
-                             if(responseJson.responseJSON.flash == "The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.")
-                            {
-                             jQuery(document).scrollTop(0);
-                             location.reload();
-                             }
-                             else
-                                 alert(responseJson.responseText);
-                        });
-                    return data.promise();
-                    },
-
-
-                    deleteItem: function(item) {
-                        return $.ajax({
-                            type: "DELETE",
-                            url: "/sign_up_sheet/" + item.id
-                        });
+                /* this is used for customizing our Topic Names Field with details of signing up student and showing 
+                    details of all teams subscribed to a topic
+                */
+                itemTemplate: function(value, topic) {
+                    /*setting a link for topic name if any link is present.*/
+                    if (topic.link != null && topic.link != "") {
+                        var topicLink = $("<a>").attr("href", topic.link).attr("target", "_blank").text(value);
+                    } else {
+                        var topicLink = $("<span>").text(value);
                     }
+
+                    /* button for signing up to a topic */
+                    var signupUrl = "/sign_up_sheet/signup_as_instructor?assignment_id=" + getAssignmentId() + "&topic_id=" + topic.id;
+                    var signUpUser = $("<a>").attr("href", signupUrl);
+                    var signUpUserImage = $("<img>").attr({
+                        src: "/assets/signup-806fc3d5ffb6923d8f5061db243bf1afd15ec4029f1bac250793e6ceb2ab22bf.png",
+                        title: "Sign Up Student",
+                        alt: "Signup"
+                    });
+                    var signUp = signUpUser.append(signUpUserImage)
+
+                    /* adding all participants/teams to be shown under the topic name*/
+                    var participants_temp = topic.partipants;
+                    if (participants_temp == null)
+                        participants_temp = []
+                    var participants_div = $("<div>");
+                    for (var p = 0; p < participants_temp.length; p++) {
+                        var current_participant = participants_temp[p];
+                        var text = $("<span>");
+                        text.html(current_participant.user_name_placeholder);
+                        var dropStudentUrl = "/sign_up_sheet/delete_signup_as_instructor/" + current_participant.team_id + "?topic_id=" + topic.id;
+                        var dropStudentAnchor = $("<a>").attr("href", dropStudentUrl);
+                        var dropStudentImage = $("<img>").attr({
+                            src: "/assets/delete_icon.png",
+                            title: "Drop Student",
+                            alt: "Drop Student Image"
+                        });
+                        participants_div.append(text).append(dropStudentAnchor.append(dropStudentImage));
+                    }
+                    return $("<div>").append(topicLink).append(signUp).append(participants_div);
                 },
+                filtering: true
+            },
 
+            { name: "category", type: "text", title: "Topic category", width: "5%" },
 
-
-
-                fields: [
-                      {
-                       title : "Actions",
-                       type: "control",                      
-                        editButton: true,                               // show edit button
-                        deleteButton: true,     
-                        searching : false,
-                         filtering: false,                         // show delete button
-                         deleteButtonTooltip: "Delete Topic",
-                         editButtonTooltip: "Edit Topic",
-                      //  clearFilterButton: true,                        // show clear filter button
-                        modeSwitchButton: false,                         // show switching filtering/inserting button
-                        width : "2%"
-                        
-                        
-                 }  ,
-                    { name: "topic_identifier", type: "text" ,title: "Topic #",width : "1.5%" ,  validate: { 
-                        validator: "required" ,
-                        message : "Topic Number should not be empty " }
-
-                },
-                    { name: "topic_name", type: "text" ,title: "Topic name(s)",width : "5%" ,  validate: { 
-                        validator: "required" ,
-                        message : "Topic Name should not be empty " },
-                        itemTemplate: function(value,topic) {
-
-                            if(topic.link !=null && topic.link != "")
-                            {
-                            var linkText =  $("<a>").attr("href", topic.link).attr("target", "_blank").text(value);
-                            }
-                            else
-                            {
-                            var linkText =  $("<span>").text(value);
-                           // console.log("value : "+value, " link : "+topic.link)
-                            }
-
-                            var signupUrl = "/sign_up_sheet/signup_as_instructor?assignment_id=" + assignmentId + "&topic_id="+topic.id;
-                            var signUpUser = $("<a>").attr("href", signupUrl);
-
-                            var signUpUserImage = $("<img>").attr({src: "/assets/signup-806fc3d5ffb6923d8f5061db243bf1afd15ec4029f1bac250793e6ceb2ab22bf.png"
-                            , title: "Sign Up Student" 
-                            , alt: "Signup"});
-
-
-
-                            
-                            //participants
-                            var participants_temp = topic.partipants;
-                            if(participants_temp == null)
-                                participants_temp = []
-
-                            var participants_div = $("<div>");
-
-
-                            for(var p = 0 ; p < participants_temp.length ; p ++)
-                            {
-                                
-                                var current_participant = participants_temp[p];
-                                var text = $("<span>");
-                                text.html(current_participant.user_name_placeholder);
-
-                                var dropStudentUrl = "/sign_up_sheet/delete_signup_as_instructor/" + current_participant.team_id + "?topic_id="+topic.id;
-                                
-                                var dropStudentAnchor = $("<a>").attr("href", dropStudentUrl);
-                               
-                                var dropStudentImage = $("<img>").attr({src: "/assets/delete_icon.png"
-                                 , title: "Drop Student" 
-                                 , alt: "Drop Student Image"});
-
-                                participants_div.append(text).append(dropStudentAnchor.append(dropStudentImage));
-
-
-                            }
-
-
-
-                            return $("<div>").append(linkText).append(signUpUser.append(signUpUserImage)).append(participants_div);
-
-
-
-
-                       //     return $("<a>").attr("href", topic.link).text(value);
-                        } , filtering: true 
-
-
-
-
-                },
-                    { name: "category", type: "text",title: "Topic category" ,width : "5%"},
-                    { name: "max_choosers", type: "text" ,title: "# Slots" ,width : "2%",
-                        validate: {
-                        message: "Choose Num of slots greater than or equal to 1",
-                        validator: function(value, item) {
+            /* Validate whether the number of slots entered is greter than 0*/
+            {
+                name: "max_choosers",
+                type: "text",
+                title: "# Slots",
+                width: "2%",
+                validate: {
+                    message: "Choose Num of slots greater than or equal to 1",
+                    validator: function(value, item) {
                         return value > 0;
-                        }
+                    }
+                }
+            },
 
-                        }
+            { name: "slots_available", editing: false, title: "Available Slots", width: "2%" },
 
+            { name: "slots_waitlisted", editing: false, title: "Num on Waitlist", width: "2%" },
 
-                    },
-                    { name: "slots_available", editing: false ,title: "Available Slots",width : "2%"},
-                    { name: "slots_waitlisted",  editing: false  ,title: "Num on Waitlist"  , width : "2%"},
-
-                   
-                    { name: "id",title: "Book marks",width :"20%", editing: false,width :"2%",
-
-                        itemTemplate: function(value, topic) {
-                        console.log("value ",value)
-                        console.log("topic ",topic)
-                        var $customBookmarkAddButton = $("<a>").attr({
-                            href:"/bookmarks/list/"+topic.id });
-                        
-                        var $BookmarkSelectButton= $("<i>").attr({class :"jsgrid-bookmark-show fa fa-bookmark", title :"View Topic Bookmarks"});
-
-
-                        var $customBookmarkSetButton = $("<a>").attr({
-                            href:"/bookmarks/new?id="+topic.id });
-                        
-                        var $BookmarkSetButton= $("<i>").attr({class :"jsgrid-bookmark-add fa fa-plus" , title :"Add Bookmark to Topic"});
-
-
-                        var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
-                        var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
-
-                        return $("<div>").attr("align","center").append(set1).append(set2);
-                     }
-                     ,filtering: true 
-                      },
-
-                    { name: "description", type: "textarea",title: "Topic Description",width :"12%" },
-                  { name: "link", type: "text",title: "Topic Link" ,width :"12%" }
-                   
-                ],
-                // for freezing the first column
-                onItemUpdated: function (args) {
-                UpdateColPos(1);
+            /*adding Add bookmark and View bookmark functionalities*/
+            {
+                name: "id",
+                title: "Book marks",
+                width: "20%",
+                editing: false,
+                width: "2%",
+                itemTemplate: function(value, topic) {
+                    console.log("value ", value)
+                    console.log("topic ", topic)
+                    var $customBookmarkAddButton = $("<a>").attr({
+                        href: "/bookmarks/list/" + topic.id
+                    });
+                    var $BookmarkSelectButton = $("<i>").attr({ class: "jsgrid-bookmark-show fa fa-bookmark", title: "View Topic Bookmarks" });
+                    var $customBookmarkSetButton = $("<a>").attr({
+                        href: "/bookmarks/new?id=" + topic.id
+                    });
+                    var $BookmarkSetButton = $("<i>").attr({ class: "jsgrid-bookmark-add fa fa-plus", title: "Add Bookmark to Topic" });
+                    var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
+                    var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
+                    return $("<div>").attr("align", "center").append(set1).append(set2);
                 },
-                onItemEditing: function (args) {
-                setTimeout(function () { UpdateColPos(1); }, 1);
-                },
-                onRefreshed: function (args) {
-                UpdateColPos(1);
-                },
-                 onItemUpdating: function(args) {
-                  previousItem = args.previousItem;
-                 },
+                filtering: true
+            },
 
-            }); // jsgrid
-//freezing columns
-$('.jsgrid-grid-body').scroll(function () {
-    UpdateColPos(1);
+            { name: "description", type: "textarea", title: "Topic Description", width: "12%" },
+            { name: "link", type: "text", title: "Topic Link", width: "12%" }
+
+        ],
+        /* for freezing the first column*/
+        onItemUpdated: function(args) {
+            UpdateColPos(1);
+        },
+        onItemEditing: function(args) {
+            setTimeout(function() { UpdateColPos(1); }, 1);
+        },
+        onRefreshed: function(args) {
+            UpdateColPos(1);
+        },
+        onItemUpdating: function(args) {
+            previousItem = args.previousItem;
+        },
+
+    }); // jsgrid
+    //freezing columns
+
+
+
+    $('.jsgrid-grid-body').scroll(function() {
+        UpdateColPos(1);
+    });
+
+    /* Again used for freezing the controls column in our JS GRID*/
+    function UpdateColPos(cols) {
+        var left = $('.jsgrid-grid-body').scrollLeft() < $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16 ?
+            $('.jsgrid-grid-body').scrollLeft() : $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16;
+        $('.jsgrid-header-row th:nth-child(-n+' + cols + '), .jsgrid-filter-row td:nth-child(-n+' + cols + '), .jsgrid-insert-row td:nth-child(-n+' + cols + '), .jsgrid-grid-body tr td:nth-child(-n+' + cols + ')')
+            .css({
+                "position": "relative",
+                "left": left
+            });
+    }
+
+
+
 });
-
-function UpdateColPos(cols) {
-    var left = $('.jsgrid-grid-body').scrollLeft() < $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16
-        ? $('.jsgrid-grid-body').scrollLeft() : $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16;
-    $('.jsgrid-header-row th:nth-child(-n+' + cols + '), .jsgrid-filter-row td:nth-child(-n+' + cols + '), .jsgrid-insert-row td:nth-child(-n+' + cols + '), .jsgrid-grid-body tr td:nth-child(-n+' + cols + ')')
-        .css({
-            "position": "relative",
-            "left": left
-        });
-}
-
-
-
-});
-
-// 1781 Ajax JSGrid Components
-
-   /* 
-
-    */

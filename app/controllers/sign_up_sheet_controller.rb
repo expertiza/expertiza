@@ -99,7 +99,7 @@ class SignUpSheetController < ApplicationController
     if @topic
       @topic.topic_identifier = params[:topic_identifier]
       if !update_max_choosers @topic
-        render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 404
+        render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 400
       else
         # update tables
         @topic.category = params[:category]
@@ -480,7 +480,7 @@ end
 def update_existing_topic(topic)
   topic.topic_identifier = params[:topic_identifier]
   if !update_max_choosers topic
-    render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 404
+    render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 400
   else
     topic.category = params[:category]
     # topic.assignment_id = params[:id]

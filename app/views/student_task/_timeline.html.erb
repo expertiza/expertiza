@@ -2,7 +2,7 @@
 
 
 <ul class="timeline" id="timeline">
-  <% @dues.each do |due| %>
+  <!-- <% @dues.each do |due| %>
   <li class="li complete">
     <div class="timestamp">
       <span class="author"><%= due.assignment.name %></span>
@@ -24,4 +24,30 @@
     </div>
   </li>
      <% end %>
+  <% @responses.each do |s| %>
+     <li class="li complete">
+       <div class="timestamp">
+         <span class="author"><%=link_to 'file' %></span>
+         <span class="date"><%= 's.updated_at.strftime(' %><span>
+       </div>
+       <div class="status">
+         <h4><%= s[0].round %></h4>
+       </div>
+     </li>
+        <% end %> -->
+
+  <% @timeline_list.each do |tl| %>
+  <li class="li complete">
+    <div class="timestamp">
+      <% unless tl['link'].nil? %>
+      <span class="author"><%=link_to 'link', tl['link'] %></span>
+      <% else %>
+      <span class="author">-</span>
+      <% end %>
+      <span class="date"><%= tl['updated_at'] %><span>
+    </div>
+    <div class="status">
+      <h4><%= tl['label'] %></h4>
+    </div>
+  <% end %>
  </ul>

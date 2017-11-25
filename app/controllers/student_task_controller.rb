@@ -35,6 +35,18 @@ class StudentTaskController < ApplicationController
     @dues = DueDate.where(parent_id: @assignment.id)
     @submissions = SubmissionRecord.where(team_id: TeamsUser.team_id(@assignment.id, @participant.user_id) , assignment_id: @assignment.id)
     #@due = StudentTask.get_due_dates(@assignment.id)
+    @review_mappings = ResponseMap.where(reviewer_id: @participant.id)
+    @responses = Array.new
+    #@rounds = []
+    @review_mappings.each do |rm|
+      @responses << Response.where(map_id: rm.id)
+      #@responses << tmp[0]
+    end
+
+    @responses1 = Response.where(map_id: @review_mappings[0].id)
+    @round = @responses1[0].round
+
+    @timeline_list = StudentTask.gettimelinedata @assignment.id, @participant.id
   end
 
   def others_work

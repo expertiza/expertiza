@@ -128,4 +128,40 @@ class StudentTask
     end
     @students_teamed
   end
+
+  def self.gettimelinedata(assignment_id, participant_id)
+    @timeline_list = Array.new
+    @dues = DueDate.where(parent_id: assignment_id)
+    @dues.each do |dd|
+      tmp = Hash.new
+      tmp['label'] = dd.deadline_type.name + ' deadline'
+      tmp['updated_at'] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
+      tmp['link'] = nil
+      @timeline_list << tmp
+    end
+
+    @submissions = SubmissionRecord.where(team_id: TeamsUser.team_id(assignment_id, participant_id) , assignment_id: assignment_id)
+    @submissions.each do |sr|
+      tmp = Hash.new
+      tmp['label'] = sr.operation
+      tmp['updated_at'] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
+      tmp['link'] = sr.content
+      @timeline_list << tmp
+    end
+
+    @response_map = ResponseMap.where(reviewer_id: participant_id)
+    @response_map.each do |rm|
+      tmp = Hash.new
+      @response = Response.where(map_id: rm.id)
+      tmp['label'] = 'Round ' + @response[0].round.to_s
+      tmp['updated_at'] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
+      tmp['link'] = 'Static url' + @response[0].id.to_s
+      @timeline_list << tmp
+    end
+
+    return @timeline_list.sort_by { |f| [f['updated_at']]}
+  end
+
+  #public :gettimelinedata
+
 end

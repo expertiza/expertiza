@@ -24,7 +24,7 @@ class SignUpTopic < ActiveRecord::Base
   def self.import(columns, session, _id = nil)
     if columns.length < 3
       raise ArgumentError, "The CSV File expects the format:
-      Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
+  Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
     end
 
     topic = SignUpTopic.where(topic_name: columns[1], assignment_id: session[:assignment_id]).first
@@ -101,11 +101,11 @@ class SignUpTopic < ActiveRecord::Base
             # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
             # to treat all assignments as team assignments
             Waitlist.cancel_all_waitlists(first_waitlisted_user.team_id, assignment_id)
-          end
+            end
         end
       end
       signup_record.destroy unless signup_record.nil?
-    end # end condition for 'drop deadline' check
+      end # end condition for 'drop deadline' check
   end
 
   def self.assign_to_first_waiting_team(next_wait_listed_team)

@@ -11,28 +11,18 @@
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment.id do %>
 <% end %>
 
-
 <br>
-
-
 <% if @sign_up_topics.size == 0 %>
 <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
 <%end%>
-
-<!-- 1781 -->
+<!-- 1781 For Displaying the JS GRID in topics-->
 <%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id }  do %>
 <% end %>
-
-
 <% session[:return_to] = request.url %>
-
 <br><br>
-
-
 <%= render :partial => '/sign_up_sheet/add_topics' %>
 
-
- <% if @assignment.staggered_deadline == true %>
+<% if @assignment.staggered_deadline == true %>
   <a href="#due_date" onClick="toggleVis('due_date');">
     <span class="inline" id="due_date_show">Show start/due date</span>
     <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
@@ -43,8 +33,4 @@
     </div>
   <% end %>
 <% end %>
-<br>
-
-
-<!-- Old Code -->
 

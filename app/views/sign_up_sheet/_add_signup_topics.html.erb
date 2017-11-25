@@ -12,12 +12,7 @@
 <%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id }  do %>
 <% end %>
 
-
-
-
-
 <% session[:return_to] = request.url %>
-
 
 <%= render :partial => '/sign_up_sheet/add_topics' %>
 <a href="javascript:history.back()">Back</a>

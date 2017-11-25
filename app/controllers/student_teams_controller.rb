@@ -1,4 +1,5 @@
 class StudentTeamsController < ApplicationController
+  include AssignmentHelper
   autocomplete :user, :name
 
   def team
@@ -57,49 +58,75 @@ class StudentTeamsController < ApplicationController
 
     @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
 
-    check_ad_criteria
+    check_invitation_criteria
   end
 
-  def check_ad_criteria
+  def check_invitation_criteria
     allowed_team_size = @student.assignment.max_team_size
     min_team_size = 1
     @has_team = true
     if allowed_team_size <= min_team_size
-      @is_valid_for_ad = false;
+      @can_send_invitation = false;
     else
       if @student.team == nil
-        @is_valid_for_ad = false
+        @can_send_invitation = false
         @has_team = false
-        team_name = 'team_' + @student.id.to_s + '_' + @student.assignment.id.to_s
-        team = create_team team_name
-        unless team == nil
-          @has_team = true
-          check_ad_criteria
-        end
+        # team_name = 'team_' + @student.id.to_s + '_' + @student.assignment.id.to_s
+        # team = create_team team_name
+        # unless team == nil
+        #   @has_team = true
+        #   check_ad_criteria
+        # end
       else
         current_team_size = @student.team.participants.length
         if current_team_size == allowed_team_size
-          @is_valid_for_ad = false
+          @can_send_invitation = false
         else
           #within 1st submission
           within_submission = true
           if within_submission
-            @is_valid_for_ad = true
+            @can_send_invitation = true
           else
-            @is_valid_for_ad = false
+            @can_send_invitation = false
           end
         end
       end
     end
 
-    if @is_valid_for_ad
+    prepare_participant_list
+  end
+
+  # prepares a map of participants who dont have a team or whose team is a single member team
+  def prepare_participant_list
+    # prepare map only if student is eligible to send invitation
+    # must be called after check_invitation_criteria
+    if @can_send_invitation
       # find list of students to show for sending invitations
-      puts "find list of students to show for sending invitations"
-      @team_list = AssignmentTeam.where(advertise_for_partner: [false, nil], parent_id: @student.assignment.id)
-      if (@student && @student.team)
-        @team_list = @team_list.where.not(id: @student.team.id)
-      end
+      # find participants for the assignment
+      # find team participant mapping from teams_users
+      # check the size of the team
+      # if team_size > 1 reject
+      # if team_size = 1, include
+      # if no_team, participant is alone without team, include
+      # exclude current student
+      @participant_map = extract_assignment_participants(student.parent_id.to_s, student.user_id.to_s)
     end
+  end
+
+
+
+  # create a team
+  def create_team(team_name)
+    existing_assignments = AssignmentTeam.where name: team_name, parent_id: student.parent_id
+    if existing_assignments.empty?
+      team = AssignmentTeam.new(name: team_name, parent_id: student.parent_id)
+      team.save
+      parent = AssignmentNode.find_by_node_object_id student.parent_id
+      TeamNode.create parent_id: parent.id, node_object_id: team.id
+      user = User.find student.user_id
+      team.add_member user, team.parent_id
+    end
+    return team
   end
 
   def create
@@ -117,19 +144,6 @@ class StudentTeamsController < ApplicationController
       flash[:notice] = 'That team name is already in use.'
       redirect_to view_student_teams_path student_id: student.id
     end
-  end
-
-  def create_team(team_name)
-    existing_assignments = AssignmentTeam.where name: team_name, parent_id: student.parent_id
-    if existing_assignments.empty?
-      team = AssignmentTeam.new(name: team_name, parent_id: student.parent_id)
-      team.save
-      parent = AssignmentNode.find_by_node_object_id student.parent_id
-      TeamNode.create parent_id: parent.id, node_object_id: team.id
-      user = User.find student.user_id
-      team.add_member user, team.parent_id
-    end
-    return team
   end
 
   def edit

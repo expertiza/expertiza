@@ -145,4 +145,53 @@ module AssignmentHelper
     end
     [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
   end
+
+  # check for participants having teams and populates participants map
+  def filter_participants_with_teams(assignment_id, participant_map, excluded_id=nil)
+    if excluded_id == nil
+      participants = Participant.joins('LEFT JOIN teams_users ON teams_users.user_id = participants.user_id LEFT JOIN teams ON teams_users.team_id = teams.id and teams.parent_id = participants.parent_id where participants.parent_id = \''+assignment_id+'\'').select("participants.*, teams_users.*, teams.*")
+    else
+      participants = Participant.joins('LEFT JOIN teams_users ON teams_users.user_id = participants.user_id LEFT JOIN teams ON teams_users.team_id = teams.id and teams.parent_id = participants.parent_id where participants.parent_id = \''+assignment_id+'\' and participants.user_id <> \''+excluded_id+'\'').select("participants.*, teams_users.*, teams.*")
+    end
+    participants.each do |participant|
+      participant_id = participant.user_id
+      puts participant_id
+      unless participant.team_id == nil
+        team_users_all = TeamsUser.where(team_id: participant.team_id)
+        if team_users_all.size == 1
+          add_to_participant_list(participant_id, participant_map)
+        else
+          participant_map.delete(participant_id)
+        end
+      end
+    end
+  end
+
+  # check for all participants which belongs to this assignment
+  # exclude student id for student while fetching so that it's not returned
+  # for Instructor, all participant list without team/sigle member team will be returned
+  def extract_assignment_participants(assignment_id, excluded_id=nil)
+    participant_map = {}
+    if excluded_id == nil
+      participants = Participant.where(parent_id: assignment_id)
+    else
+      participants = Participant.where(parent_id: assignment_id).where.not(user_id: excluded_id)
+    end
+    participants.each do |participant|
+      participant_id = participant.user_id
+      add_to_participant_list(participant_id, participant_map)
+    end
+    filter_participants_with_teams(assignment_id, participant_map, excluded_id)
+    return participant_map
+  end
+
+  # check for all participants which belongs to this assignment
+  def add_to_participant_list(participant_id, participant_map)
+    if participant_id == nil
+      return
+    end
+    unless participant_map.has_key?(participant_id)
+      participant_map[participant_id] = User.find(participant_id)
+    end
+  end
 end

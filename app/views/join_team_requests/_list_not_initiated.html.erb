@@ -1,33 +1,31 @@
-<% if @has_team && @is_valid_for_ad %>
+<% if @has_team && @can_send_invitation %>
 
     <table style="width:80%" align="center" >
       <tr style="border: 1px outset #000000; ">
         <th class="head">Student ID</th>
         <th class="head">Student Name</th>
-        <% if (@student && @student.team) %>
+        <% if @student %>
           <th class="head">Action</th>
         <% end %>
       </tr>
 
-      <% @team_list.each do |team| %>
-            <% for member in team.participants %> <!--start team member content-->
+      <% @participant_map.each { |key, participant| %>
               <tr>
-                <td><%= member.user.name %></td>
-                <td><%= member.user.fullname %></td>
-                <% if (@student && @student.team) %>
+                <td><%= participant.name %></td>
+                <td><%= participant.fullname %></td>
+                <% if @student %>
                   <td style="padding: 5px;">
                     <%= form_tag :controller => 'invitations', :action => 'create' do %>
                         <%= hidden_field_tag 'team_id', @student.team.id %>
                         <%= hidden_field_tag 'student_id', @student.id %>
                         <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
-                        <%= hidden_field_tag 'user[name]', member.user.name %>
+                        <%= hidden_field_tag 'user[name]', participant.name %>
                         <input type='submit' value='Invite'/>
                     <% end %>
                   </td>
-              <% end %>
+                <% end %>
               </tr>
-            <% end %>
-      <% end %>
+      <% } %>
     </table>
 <% else %>
     <p>You need to create a team to see who all are available to send invites or create advertisements.</p><br>

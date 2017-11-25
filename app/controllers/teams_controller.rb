@@ -1,4 +1,5 @@
 class TeamsController < ApplicationController
+  include AssignmentHelper
   autocomplete :user, :name
 
   def action_allowed?
@@ -22,6 +23,11 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + "Node").find_by_node_object_id(params[:id])
       @child_nodes = @root_node.get_teams
+
+      # prepare objects for displaying list of students who dont have a team or are in a single member team
+      @has_team = true
+      @can_send_invitation = true
+      @participant_map = extract_assignment_participants(@root_node.node_object_id.to_s)
     rescue
       flash[:error] = $ERROR_INFO
     end

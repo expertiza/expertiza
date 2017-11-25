@@ -173,7 +173,7 @@
 <br/>
 
 <!--send invitation-->
-<% if @has_team && @is_valid_for_ad %>
+<% if @has_team && @can_send_invitation %>
     <h3>Send new Invitation</h3>
     <b>Invite people</b>
     <%= form_tag :controller => 'invitations', :action => 'create' do %>

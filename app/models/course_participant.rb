@@ -1,5 +1,7 @@
+require 'import_support'
 class CourseParticipant < Participant
   belongs_to :course, class_name: 'Course', foreign_key: 'parent_id'
+  extend ImportSupport
 
   # Copy this participant to an assignment
   def copy(assignment_id)
@@ -16,13 +18,7 @@ class CourseParticipant < Participant
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)
-    raise ArgumentError, "No user id has been specified." if row.empty?
-    user = User.find_by_name(row[0])
-    if user.nil?
-      raise ArgumentError, "The record containing #{row[0]} does not have enough items." if row.length < 4
-      attributes = ImportFileHelper.define_attributes(row)
-      user = ImportFileHelper.create_new_user(attributes, session)
-    end
+    user = CourseParticipant.check_info_and_create(row, _row_header = nil, session)
     course = Course.find(id)
     if course.nil?
       raise ImportError, "The course with the id \"" + id.to_s + "\" was not found."

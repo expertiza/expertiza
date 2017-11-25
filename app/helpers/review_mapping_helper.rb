@@ -38,18 +38,18 @@ module ReviewMappingHelper
     [response_maps, bgcolor, rspan, line_num]
   end
 
-  def get_team_name_color(response_map)
+  def get_team_name_color_in_review_report(response_map)
     if Response.exists?(map_id: response_map.id)
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
       if review_graded_at.nil? ||
         (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
-        "blue"
+        'blue' # review grade is not assigned or updated yet.
       else
-        "green"
+        'brown' # review grades has been assigned.
       end
     else
-      "red"
+      'red' # review is not finished yet.
     end
   end
 

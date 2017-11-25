@@ -1,9 +1,10 @@
+require 'file_support'
 class AssignmentTeam < Team
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
-
+  include FileSupport
   # START of contributor methods, shared with AssignmentParticipant
 
   # Whether this team includes a given participant or not
@@ -71,7 +72,7 @@ class AssignmentTeam < Team
     users = self.users
     participants = []
     users.each do |user|
-      participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
+      participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: self.parent_id)
       participants << participant unless participant.nil?
     end
     participants
@@ -100,20 +101,6 @@ class AssignmentTeam < Team
   end
 
   # Return the files residing in the directory of team submissions
-  def files(directory)
-    files_list = Dir[directory + "/*"]
-    files = []
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each {|f| files << f }
-      end
-      files << file
-    end
-    files
-  end
-
   # Main calling method to return the files residing in the directory of team submissions
   def submitted_files(path = self.path)
     files = []
@@ -147,7 +134,9 @@ class AssignmentTeam < Team
 
   # Add Participants to the current Assignment Team
   def add_participant(assignment_id, user)
-    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id: user.id).first.nil?
+    if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id).nil?
+      AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
+    end
   end
 
   # Return the parent Assignment

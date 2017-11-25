@@ -12,12 +12,12 @@ class ReviewMappingController < ApplicationController
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
-      true
-    else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator'].include? current_role_name
+      when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
+        true
+      else
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator'].include? current_role_name
     end
   end
 
@@ -86,12 +86,12 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.has_topics? && assignment.can_choose_topic_to_review?
+    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
 
       # begin
-      if assignment.has_topics? # assignment with topics
+      if assignment.topics? # assignment with topics
         topic = if params[:topic_id]
                   SignUpTopic.find(params[:topic_id])
                 else
@@ -113,7 +113,7 @@ class ReviewMappingController < ApplicationController
         end
 
       end
-      end
+    end
     # rescue Exception => e
     #   flash[:error] = (e.nil?) ? $! : e
     # end
@@ -132,7 +132,7 @@ class ReviewMappingController < ApplicationController
         @map = QuizResponseMap.new
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
-        @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+        @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save
       end
 
@@ -230,6 +230,7 @@ class ReviewMappingController < ApplicationController
     end
     render action: 'unsubmit_review.js.erb', layout: false
   end
+
   # E1721 changes End
 
   def delete_reviewer
@@ -272,16 +273,24 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
-    @items.sort {|a, b| a.name <=> b.name }
+    @items.sort_by {|a| a.name}
   end
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
-
-    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject {|p| p.can_review == false }.shuffle!
+    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject {|p| p.can_review == false}.shuffle!
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
     # Create teams if its an individual assignment.
+    team_size(teams, max_team_size)
+    artifact(params[:num_reviews_per_student].to_i,
+             params[:num_reviews_per_submission].to_i,
+             params[:num_calibrated_artifacts].to_i,
+             params[:num_uncalibrated_artifacts].to_i, teams)
+    redirect_to action: 'list_mappings', id: assignment_id
+  end
+
+  def team_size (teams, max_team_size)
     if teams.empty? and max_team_size == 1
       participants.each do |participant|
         user = participant.user
@@ -289,22 +298,14 @@ class ReviewMappingController < ApplicationController
         team = AssignmentTeam.create_team_and_node(assignment_id)
         ApplicationController.helpers.create_team_users(participant.user, team.id)
         teams << team
+        return teams
       end
     end
-    student_review_num = params[:num_reviews_per_student].to_i
-    submission_review_num = params[:num_reviews_per_submission].to_i
-    calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
-    uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
+  end
 
+  def artifact (calibrated_artifacts_num, uncalibrated_artifacts_num, student_review_num, submission_review_num, teams)
     if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
-      if student_review_num == 0 and submission_review_num == 0
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
-        # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
-      else
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-      end
+      review student_review_num, submission_review_num, teams
     else
       teams_with_calibrated_artifacts = []
       teams_with_uncalibrated_artifacts = []
@@ -316,17 +317,27 @@ class ReviewMappingController < ApplicationController
       automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, calibrated_artifacts_num, 0)
       # REVIEW: mapping strategy
       # since after first mapping, participants (delete_at) will be nil
-      participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject {|p| p.can_review == false }.shuffle!
+      participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject {|p| p.can_review == false}.shuffle!
       automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
     end
-    redirect_to action: 'list_mappings', id: assignment_id
+  end
+
+  def review (student_review_num, submission_review_num, teams)
+    if student_review_num == 0 and submission_review_num == 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+    elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
+      # REVIEW: mapping strategy
+      automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+    else
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+    end
   end
 
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, student_review_num = 0,
                                         submission_review_num = 0)
     participants_hash = {}
-    participants.each {|participant| participants_hash[participant.id] = 0 }
+    participants.each {|participant| participants_hash[participant.id] = 0}
     # calculate reviewers for each team
     num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
@@ -375,7 +386,6 @@ class ReviewMappingController < ApplicationController
       # @avg_scores_by_reviewee[team]
       # @avg_score_round[reviewee][round]
       # @avg_scores_by_criterion[reviewee][round][criterion]
-
       @summary = sum.summary
       @reviewers = sum.reviewers
       @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
@@ -384,7 +394,6 @@ class ReviewMappingController < ApplicationController
       # this summarizes all reviews by each rubric criterion
     when "SummaryByCriteria"
       sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, summary_ws_url)
-
       @summary = sum.summary
       @avg_scores_by_round = sum.avg_scores_by_round
       @avg_scores_by_criterion = sum.avg_scores_by_criterion
@@ -421,16 +430,7 @@ class ReviewMappingController < ApplicationController
       @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
                                                                               PlagiarismCheckerAssignmentSubmission.where(assignment_id:
                                                                                                                               params[:id]).pluck(:id))
-    when "AnswerTaggingReport"
-      tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
-
-      @questionnaire_tagging_report = {}
-
-      tag_prompt_deployments.each do |tag_dep|
-        @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
-      end
     end
-
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 
@@ -477,8 +477,8 @@ class ReviewMappingController < ApplicationController
   def assign_reviewers_for_team(assignment_id, student_review_num, participants_hash,
                                 exact_num_of_review_needed)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
-                        .where("created_at > :time",
-                               time: @@time_create_last_review_mapping_record).size < exact_num_of_review_needed
+           .where("created_at > :time",
+                  time: @@time_create_last_review_mapping_record).size < exact_num_of_review_needed
 
       participants_with_insufficient_review_num = []
       participants_hash.each do |participant_id, review_num|
@@ -494,7 +494,7 @@ class ReviewMappingController < ApplicationController
           unsorted_teams_hash[response_map.reviewee_id] = 1
         end
       end
-      teams_hash = unsorted_teams_hash.sort_by {|_, v| v }.to_h
+      teams_hash = unsorted_teams_hash.sort_by {|_, v| v}.to_h
 
       participants_with_insufficient_review_num.each do |participant_id|
         teams_hash.each do |team_id, _num_review_received|
@@ -505,14 +505,14 @@ class ReviewMappingController < ApplicationController
                                   reviewed_object_id: assignment_id).first_or_create
 
           teams_hash[team_id] += 1
-          teams_hash = teams_hash.sort_by {|_, v| v }.to_h
+          teams_hash = teams_hash.sort_by {|_, v| v}.to_h
           break
         end
       end
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap.
-                                               where(reviewed_object_id: assignment_id).
-                                               last.created_at
+        where(reviewed_object_id: assignment_id).
+        last.created_at
   end
 
   def execute_peer_review_strategy(assignment_id, teams, num_participants,
@@ -601,7 +601,7 @@ class ReviewMappingController < ApplicationController
       end
 
       begin
-        selected_participants.each {|index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create }
+        selected_participants.each {|index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create}
       rescue
         flash[:error] = "Automatic assignment of reviewer failed."
       end

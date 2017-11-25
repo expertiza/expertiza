@@ -457,11 +457,11 @@ def publish_approved_suggested_topic
   redirect_to action: 'list', id: params[:id]
 end
 
-private
 
+private
 def setup_new_topic
   set_values_for_new_topic
-  if @assignment.is_microtask?
+  if @assignment.microtask?
     @sign_up_topic.micropayment = params[:micropayment]
   end
   if @assignment.staggered_deadline?

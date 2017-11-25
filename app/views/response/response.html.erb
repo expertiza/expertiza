@@ -15,6 +15,82 @@ jQuery(document).ready(function() {
             autoRelease: true
         }); 
     });
+
+    jQuery('#save').click(function(e){
+
+        var respData = [];
+        $('textarea').each(function () {
+            respData.push($(this).val());
+        });
+        var rev = {submission: "my submission", reviews: respData.join(' ').toString(), rubric: "my rubric"};
+
+        //alert(JSON.stringify(rev));
+        var volReq = $.ajax({
+            url: "http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/volume",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            data: JSON.stringify(rev),
+            success: function (data) {
+                //alert("Volume is: "+data.volume);
+            },
+            failure: function (errMsg) {
+                //alert('nope!');
+                alert(errMsg);
+            }
+        });
+        var toneReq = $.ajax({
+            url: "http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/tone",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            data: JSON.stringify(rev),
+            success: function (data) {
+            },
+            failure: function (errMsg) {
+                //alert('nope!');
+                alert(errMsg);
+            }
+        });
+
+        var plagReq = $.ajax({
+            url: "http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/plagiarism",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: false,
+            data: JSON.stringify(rev),
+            success: function (data) {
+                //alert("Postive Tone is: "+data.tone_positive + ", Neg tone is: "+data.tone_negative + ", Neutral tone is: "+data.tone_neutral );
+            },
+            failure: function (errMsg) {
+                //alert('nope!');
+                alert(errMsg);
+            }
+        });
+
+        $.when(volReq, toneReq, plagReq).then(function (d1, d2, d4) {
+            //alert("AutoMetaReview metrics: \nVolume is:" + d1[0].volume + "\nPostive Tone is: " + d2[0].tone_positive + ", Neg tone is: " + d2[0].tone_negative + ", Neutral tone is: " + d2[0].tone_neutral + "\n" + "Plagiarism: " + d4[0].plagiarism);
+            jQuery('#isSubmit').val('No');
+            jQuery('#volume').val(d1[0].volume);
+            jQuery('#plagiarism').val(d4[0].plagiarism);
+            jQuery('#tone_p').val(d2[0].tone_positive);
+            jQuery('#tone_n').val(d2[0].tone_neutral);
+            jQuery('#tone_ng').val(d2[0].tone_negative);
+            jQuery('#auto_metareview').val('Yes');
+        });
+
+    })
+
+    $(function(){
+        $("form").sisyphus({
+            locationBased: true,
+            autoRelease: true
+        });
+    });
+
 })
 </script>
 
@@ -103,7 +179,8 @@ jQuery(document).ready(function() {
 
     <br/>
     <br>
-    <%= submit_tag "Save "+@title, :name => "save" %>
+    <b>Note: Save the review to see the meta-review metrics before you submit </b><br>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
@@ -111,6 +188,12 @@ jQuery(document).ready(function() {
     <% end %>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+    <%= hidden_field_tag "auto_metareview", :id=>"auto_metareview" %>
+    <%= hidden_field_tag "volume", :id=>"volume" %>
+    <%= hidden_field_tag "plagiarism", :id=>"plagiarism" %>
+    <%= hidden_field_tag "tone_p", :id=>"tone_p" %>
+    <%= hidden_field_tag "tone_n", :id=>"tone_n" %>
+    <%= hidden_field_tag "tone_ng", :id=>"tone_ng" %>
 <% end %>
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>

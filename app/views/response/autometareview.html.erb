@@ -1,0 +1,195 @@
+<head>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart", "bar"]});
+      google.charts.setOnLoadCallback(drawChart);
+      google.charts.setOnLoadCallback(drawBarColors);
+      function drawChart() {
+          var data = google.visualization.arrayToDataTable([
+              ['Tone', 'Value', { role: 'style' }],
+              ['Postive',     parseFloat(jQuery(pos).val()), 'green'],
+              ['Negative',      parseFloat(jQuery(neg).val()), 'red'],
+              ['Neutral',  parseFloat(jQuery(neut).val()), 'yellow']
+          ]);
+
+          var options = {
+              title: 'Tone',
+              chartArea: {width: '50%', height: '40%'},
+              bar: {groupWidth: "50%"},
+              legend: { position: "none" }
+              //colors: ['#b0120a']
+          };
+
+          var chart = new google.visualization.BarChart(document.getElementById('piechart_3d'));
+          chart.draw(data, options);
+      }
+      //var vl = parseInt(jQuery('#vol').val());
+
+      function drawBarColors() {
+          var data = google.visualization.arrayToDataTable([
+              ['Volume', 'Volume', { role: 'style' }],
+              ['Your Review',parseInt(jQuery('#vol').val()), 'c53711'],
+              ['Avg. Volume',parseInt(jQuery('#avg_vol').val()), '0000ff']
+              //['Benchmark Volume',58]
+          ]);
+
+          var options = {
+              title: 'Review Volume',
+              chartArea: {width: '50%'},
+              bar: {groupWidth: "40%"},
+              legend: {position: 'none'}
+
+              //colors: ['#00ff00']
+
+          };
+          var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+          chart.draw(data, options);
+      }
+  </script>
+</head>
+
+
+
+<h2> Automated Metareview Metrics </h2>
+<br>
+<table class ="metrics">
+  <tr>
+    <th>Metric</th>
+    <th>Score</th>
+
+  </tr>
+  <tr>
+    <td>Review volume:</td>
+    <td id="chart_div" style="width: 500px; height: 180px;"><br>Volume: <%= @volume %></td>
+  </tr>
+  <tr>
+    <td>Plagiarism:</td>
+    <td class ="upper" style="color: green"><b><%= @plagiarism %></b></td>
+
+  </tr>
+  <tr>
+    <td>Tone:</td>
+    <!--<td></td>-->
+    <td  id="piechart_3d" style="width: 500px; height: 200px;"></td>
+  </tr>
+
+
+
+
+</table>
+<%= hidden_field_tag "pos", @tone_p, { :id => "pos" } %>
+<%= hidden_field_tag "neg", @tone_ng, { :id => "neg" } %>
+<%= hidden_field_tag "neut", @tone_n, { :id => "neut" } %>
+<%= hidden_field_tag "vol", @volume, { :id => "vol" } %>
+<%= hidden_field_tag "avg_vol", @avg_volume, { :id => "avg_vol" } %>
+
+<% array_not_empty = 0 %>
+<% @sorted_responses = Array.new %>
+<% @prev = Response.where(:map_id => @map_id) %>
+<% for element in @prev %>
+    <% array_not_empty = 1 %>
+    <% @sorted_responses << element %>
+<% end %>
+
+<% if (array_not_empty == 1) %>
+    <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
+    <% @latest_response = @sorted_responses.last %>
+<% end %>
+<!--%= @response_id = Response.find_by_map_id(@map_id) %-->
+<%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id } %>
+<br>
+<br>
+<%= link_to 'Back to Reviews List', :controller => 'student_review', :action =>'list', :id => @reviewer_id %>
+<style>
+  /*table, th, td {*/
+  /*border: 1px solid black;*/
+  /*}*/
+  table {
+    font-family:Arial, Helvetica, sans-serif;
+    color:#666;
+    font-size:12px;
+    text-shadow: 1px 1px 0px #fff;
+    background:#eaebec;
+    margin:20px;
+    border:#ccc 1px solid;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    border-radius:3px;
+    height: 45%;
+    width: 50%;
+
+    -moz-box-shadow: 0 1px 2px #d1d1d1;
+    -webkit-box-shadow: 0 1px 2px #d1d1d1;
+    box-shadow: 0 1px 2px #d1d1d1;
+  }
+  table th {
+    padding:21px 25px 22px 25px;
+    border-top:1px solid #fafafa;
+    border-bottom:1px solid #e0e0e0;
+
+    background: #ededed;
+    background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#ebebeb));
+    background: -moz-linear-gradient(top,  #ededed,  #ebebeb);
+  }
+  table th:first-child {
+    text-align: left;
+    padding-left:20px;
+  }
+  table tr:first-child th:first-child {
+    -moz-border-radius-topleft:3px;
+    -webkit-border-top-left-radius:3px;
+    border-top-left-radius:3px;
+  }
+  table tr:first-child th:last-child {
+    -moz-border-radius-topright:3px;
+    -webkit-border-top-right-radius:3px;
+    border-top-right-radius:3px;
+  }
+  table tr {
+    text-align: center;
+    padding-left:20px;
+  }
+  table td:first-child {
+    text-align: left;
+    padding-left:20px;
+    border-left: 0;
+  }
+  table td {
+    padding:18px;
+    border-top: 1px solid #ffffff;
+    border-bottom:1px solid #e0e0e0;
+    border-left: 1px solid #e0e0e0;
+
+    background: #fafafa;
+    background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
+    background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
+  }
+  table tr.even td {
+    background: #f6f6f6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
+    background: -moz-linear-gradient(top,  #f8f8f8,  #f6f6f6);
+  }
+  table tr:last-child td {
+    border-bottom:0;
+  }
+  table tr:last-child td:first-child {
+    -moz-border-radius-bottomleft:3px;
+    -webkit-border-bottom-left-radius:3px;
+    border-bottom-left-radius:3px;
+  }
+  table tr:last-child td:last-child {
+    -moz-border-radius-bottomright:3px;
+    -webkit-border-bottom-right-radius:3px;
+    border-bottom-right-radius:3px;
+  }
+  table tr:hover td {
+    background: #f2f2f2;
+    background: -webkit-gradient(linear, left top, left bottom, from(#f2f2f2), to(#f0f0f0));
+    background: -moz-linear-gradient(top,  #f2f2f2,  #f0f0f0);
+  }
+  td.upper {
+    text-transform: uppercase;
+  }
+</style>
+
+

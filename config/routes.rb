@@ -528,6 +528,12 @@ Expertiza::Application.routes.draw do
 
   get '/versions/search', controller: :versions, action: :search
 
+  resources :duties do
+    collection do
+      get :unmapped_duties
+    end
+  end
+
   resources :versions do
     collection do
       delete '', action: :destroy_all

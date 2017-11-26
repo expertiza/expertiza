@@ -145,6 +145,11 @@ class AssignmentsController < ApplicationController
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
+
+    if !@assignment_form.assignment.is_calibrated?
+           DueDate.where(parent_id: params[:id], deadline_type_id: 12).destroy_all
+    end
+
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 

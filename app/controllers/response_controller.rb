@@ -158,13 +158,15 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
     end
     @response.email
-    redirect_to controller: 'response', action: 'saving', auto_metareview: params[:auto_metareview], id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options], volume: params[:volume], plagiarism: params[:plagiarism], tone_p: params[:tone_p], tone_n: params[:tone_n], tone_ng: params[:tone_ng]  end
+    redirect_to controller: 'response', action: 'saving', auto_metareview: params[:auto_metareview], id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options], volume: params[:volume], plagiarism: params[:plagiarism], tone_p: params[:tone_p], tone_n: params[:tone_n], tone_ng: params[:tone_ng]  
+  end
 
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    redirect_to action: 'redirection', auto_metareview: params[:auto_metareview], id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg], volume: params[:volume], plagiarism: params[:plagiarism], tone_p: params[:tone_p], tone_n: params[:tone_n], tone_ng: params[:tone_ng]  end
+    redirect_to action: 'redirection', auto_metareview: params[:auto_metareview], id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg], volume: params[:volume], plagiarism: params[:plagiarism], tone_p: params[:tone_p], tone_n: params[:tone_n], tone_ng: params[:tone_ng]  
+  end
 
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
@@ -234,10 +236,9 @@ class ResponseController < ApplicationController
     end
   end
 
-  #this method houses all auto_meta review functionality
+  # this method houses all auto_meta review functionality
 
   def autometareview
-
     @id = params[:id]
     @reviewer_id = params[:reviewer_id]
     @assignment = Assignment.find(@id)
@@ -246,46 +247,36 @@ class ResponseController < ApplicationController
 
     # Search for all the reviewers in the current assignment
     @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, nil)
-
-
-    @tot_vol =0
-    @count_rev =0
-
+    @tot_vol = 0
+    @count_rev = 0
     reviewees_topic = SignedUpTeam.topic_id(@assignment.id, @reviewer_id)
     @current_round = @assignment.number_of_current_round(reviewees_topic)
 
     @reviewers.each do |r|
       overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3 = Response.get_volume_of_review_comments(params[:id], r.id)
 
-
       if @current_round == 1 && avg_vol_in_round_1 > 0
         @tot_vol += avg_vol_in_round_1
-        @count_rev = @count_rev+1
+        @count_rev += 1
       elsif @current_round == 2 && avg_vol_in_round_2 > 0
         @tot_vol += avg_vol_in_round_2
-        @count_rev = @count_rev+1
+        @count_rev += 1
       elsif @current_round == 3 && avg_vol_in_round_3 > 0
         @tot_vol += avg_vol_in_round_3
-        @count_rev = @count_rev+1
+        @count_rev += 1
       else
         @tot_vol += overall_avg_vol
-        @count_rev = @count_rev+1
+        @count_rev += 1
       end
-
-
-
     end
 
-
-    @avg_volume = (@tot_vol.to_f/@count_rev)
-
+    @avg_volume = (@tot_vol.to_f / @count_rev)
     @volume = params[:volume]
     @plagiarism = params[:plagiarism]
     @tone_p = params[:tone_p]
     @tone_n = params[:tone_n]
     @tone_ng = params[:tone_ng]
     @map_id = params[:map_id]
-
   end
 
   private

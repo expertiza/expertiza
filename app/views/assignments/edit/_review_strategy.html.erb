@@ -91,8 +91,8 @@
     </td>
   </tr>
 
-  <tr>
-    <td style='padding:5px' id='is_anonymous'>
+  <tr id="is_anonymous">
+    <td>
       <input name="assignment_form[assignment][is_anonymous]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_anonymous]', 'true', @assignment_form.assignment.is_anonymous) %>
       <%= label_tag('assignment_form[assignment][is_anonymous]', 'Is Anonymous Review?') %>
@@ -101,8 +101,8 @@
 
   <!--#E1600-->
   <!-- self review flag should be the last checkbox in review strategy tab while editing/creating assignment-->
-  <tr>
-    <td style='padding:5px' id='assignment_is_selfreview_enabled'>
+  <tr  id="assignment_is_selfreview_enabled">
+    <td>
       <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_selfreview_enabled]', 'true', @assignment_form.assignment.is_selfreview_enabled) %>
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>

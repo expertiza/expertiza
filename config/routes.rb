@@ -174,6 +174,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :decline
       get :edit
+      post :accept
     end
   end
 

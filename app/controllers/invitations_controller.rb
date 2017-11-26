@@ -1,5 +1,6 @@
 class InvitationsController < ApplicationController
-  before_action :check_user_before_invitation, only: [:create]
+  before_action :check_inviterteam_before_invitation,only: [:create]
+ before_action :check_user_before_invitation, only: [:create]
   before_action :check_team_before_accept, only: [:accept]
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
@@ -8,6 +9,9 @@ class InvitationsController < ApplicationController
   def new
     @invitation = Invitation.new
   end
+
+
+
 
   def create
     # check if the invited user is already invited (i.e. awaiting reply)
@@ -96,6 +100,15 @@ class InvitationsController < ApplicationController
       return
     end
     check_team_before_invitation
+  end
+
+  def check_inviterteam_before_invitation
+    team_id=params[:team_id]
+    if team_id=="0"
+       flash[:note]="please create your team before invitation"
+      redirect_to view_student_teams_path student_id: params[:student_id]
+      return
+    end
   end
 
   def check_team_before_invitation

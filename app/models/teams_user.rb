@@ -40,6 +40,7 @@ class TeamsUser < ActiveRecord::Base
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
     users_teams = TeamsUser.where(['user_id = ?', invitee_user_id])
     for team in users_teams
+
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
         can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id)
@@ -63,4 +64,5 @@ class TeamsUser < ActiveRecord::Base
     end
     team_id
   end
+
 end

@@ -1,5 +1,6 @@
 require 'analytic/response_analytic'
 require 'lingua/en/readability'
+$latestfiletime=1;
 
 class Response < ActiveRecord::Base
   include ResponseAnalytic
@@ -264,9 +265,19 @@ class Response < ActiveRecord::Base
   require 'uri'
 
   def check_update (participant)
+    temp_time=[];
+    @team=participant
+    #@submission_records = SubmissionRecord.order(:created_at)
+    @a=@team.id
+    #b=
+    @submission_records = SubmissionRecord.where(team_id: 25443 )
 
-    team = participant.team
-    team_hyperlinks = team.hyperlinks
+    @submission_records.each do |record|
+      temp_time=record.created_at
+
+      end
+
+    team_hyperlinks = @team.hyperlinks
 
     github_time = nil
     team_hyperlinks.each do |link|
@@ -274,7 +285,7 @@ class Response < ActiveRecord::Base
     github_time = get_latest_update_time(link)
     break unless github_time.nil?
     end
-
+    a=self.updated_at;
     return github_time if(github_time <=> self.updated_at)==1
 
     nil
@@ -310,6 +321,9 @@ class Response < ActiveRecord::Base
     latest_commit[:commit][:author][:date]
   end
 
-end
+
+
+    end
+
 
 

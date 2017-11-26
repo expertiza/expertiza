@@ -117,11 +117,16 @@ class SignUpSheet < ActiveRecord::Base
   end
 
   def self.has_teammate_ads?(topic_id)
-    teams = Team.joins('INNER JOIN signed_up_teams ON signed_up_teams.team_id = teams.id')
-                .select('teams.*')
-                .where('teams.advertise_for_partner = 1 and signed_up_teams.topic_id = ?', topic_id).to_a
-    teams.reject!(&:full?)
-    !teams.empty?
+     @ads_exsit=false
+      @result=SignedUpTeam.where("topic_id = ?", topic_id.to_s)
+      @result.each do |result|
+          team=result.team
+          @ads_exsit=team.advertise_for_partner
+      end
+     @ads_exsit
+
+
+
   end
 
   class << self

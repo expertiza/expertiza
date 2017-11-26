@@ -1,7 +1,7 @@
 class JoinTeamRequestsController < ApplicationController
   before_action :check_team, only: [:create]
-  before_action :find_request, only: [:show, :edit, :update, :destroy, :decline]
-
+  before_action :find_request, only: [:show, :edit, :update, :destroy, :decline,:accept]
+  before_action :check_team_before_accept, only: [:accept]
   def action_allowed?
     current_role_name.eql?("Student")
   end
@@ -64,6 +64,15 @@ class JoinTeamRequestsController < ApplicationController
     end
   end
 
+  def accept
+    # Accept the invite and check whether the add was successful
+    unless JoinTeamRequest.accept_invite(params[:team_id], @inviter_userid,  @invited_userid, @assignment_id)
+      flash[:error] = 'The system failed to add you to the team that invited you.'
+    end
+
+    redirect_to view_student_teams_path student_id: params[:student_id]
+  end
+
   # decline request to join the team...
   def decline
     @join_team_request.status = 'D'
@@ -93,4 +102,31 @@ class JoinTeamRequestsController < ApplicationController
       format.xml { render xml: request }
     end
   end
+
+  def check_team_before_accept
+    @inviter_userid=(params[:inviter_user_id]).to_i
+    @assignment_id=(params[:invited_assignment_id]).to_i
+    # check if the inviter's team is still existing, and have available slot to add the invitee
+    inviter_assignment_team = AssignmentTeam.team(AssignmentParticipant.find_by(user_id: @inviter_userid, parent_id:@assignment_id))
+    if inviter_assignment_team.nil?
+      flash[:error] = 'The team that invited you does not exist anymore.'
+      redirect_to view_student_teams_path student_id: params[:student_id]
+    elsif inviter_assignment_team.full?
+      flash[:error] = 'The team that invited you is full now.'
+      redirect_to view_student_teams_path student_id: params[:student_id]
+    else
+      invitation_accept
+    end
+  end
+
+  def invitation_accept
+    # Status code A for accepted
+    @join_team_request.status = 'A'
+    @join_team_request.save
+    @invited_userid=(params[:invited_user_id]).to_i
+
+    # Remove the users previous team since they are accepting an invite for possibly a new team.
+    TeamsUser.remove_team(@invited_userid, params[:team_id])
+  end
+
 end

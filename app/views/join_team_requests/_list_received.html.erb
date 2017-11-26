@@ -1,4 +1,5 @@
-<% @join_team_requests = JoinTeamRequest.where(team_id: team_id) %>
+<% @join_team_requests = JoinTeamRequest.where(team_id: team_id,status:'P') %>
+
 <% if !@join_team_requests.empty? %>
 <h2>Received Requests</h2>
 <table style="width:80%" align="center" >
@@ -23,14 +24,19 @@
             <table>
               <tr>
                 <td>
-                  <%= form_tag :controller => 'invitations', :action => 'create' do %>
-                    <%= hidden_field_tag 'team_id', team_id %>
-                    <%= hidden_field_tag 'student_id', teams_user_id %>
-                    <%= hidden_field_tag 'session[:dummy][:assignment_id]', Participant.find(join_team_request.participant_id).parent_id %>
-                    <%= hidden_field_tag 'user[name]', User.find(Participant.find(join_team_request.participant_id).user_id).name %>
-                    <%= hidden_field_tag 'participant_id', join_team_request.participant_id %>
-                    <input type='submit' value='Invite'/>
-                  <% end %>
+
+                  <% if Participant.find(join_team_request.participant_id).team==nil
+                       @team_id=0
+                       else
+                       @team_id=(Participant.find(join_team_request.participant_id).team.id).to_s
+                   end%>
+                  <% @inviter_user_id=(student_user_id).to_i %>
+                  <% @invited_user_id=(Participant.find(join_team_request.participant_id).user_id).to_i %>
+                  <% @assignment_id=(Participant.find(join_team_request.participant_id).assignment.id).to_i%>
+
+                  <%= button_to 'Accept', :controller => 'join_team_requests', :action => 'accept', :team_id=>@team_id ,:inviter_user_id=>@inviter_user_id ,:invited_user_id=>@invited_user_id,:invited_assignment_id=>@assignment_id,:id=>join_team_request.id  %>
+
+
                 </td>
                 <td>
                   <%= button_to 'Decline', :controller => 'join_team_requests', :action => 'decline', :id=>join_team_request.id, :teams_user_id=>teams_user_id %>

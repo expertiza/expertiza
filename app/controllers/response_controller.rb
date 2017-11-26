@@ -182,7 +182,7 @@ class ResponseController < ApplicationController
     end
   end
 
-  def show_calibration_results_for_student
+  def show_expert_review_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
     @calibration_response = calibration_response_map.response[0]

@@ -63,7 +63,7 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_reviews_visible_to_all")
-      check("assignment_form_assignment_is_calibrated")
+      check("assignment_form_assignment_has_expert_review")
       uncheck("assignment_form_assignment_availability_flag")
       expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
 
@@ -75,7 +75,7 @@ describe "assignment function" do
         directory_path: 'testDirectory',
         spec_location: 'testLocation',
         microtask: true,
-        is_calibrated: true,
+        has_expert_review: true,
         availability_flag: false
       )
     end
@@ -90,7 +90,7 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check("assignment_form_assignment_microtask")
       check("assignment_form_assignment_reviews_visible_to_all")
-      check("assignment_form_assignment_is_calibrated")
+      check("assignment_form_assignment_has_expert_review")
       uncheck("assignment_form_assignment_availability_flag")
       expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
 
@@ -211,12 +211,12 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
       select('Course 2', from: 'assignment_form_assignment_course_id')
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-      check("assignment_form_assignment_is_calibrated")
+      check("assignment_form_assignment_has_expert_review")
       click_button 'Create'
 
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-        is_calibrated: true
+        has_expert_review: true
       )
     end
   end
@@ -268,7 +268,7 @@ describe "assignment function" do
     it "should edit assignment available to students" do
       fill_assignment_form
       check("assignment_form_assignment_microtask")
-      check("assignment_form_assignment_is_calibrated")
+      check("assignment_form_assignment_has_expert_review")
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
@@ -277,7 +277,7 @@ describe "assignment function" do
         directory_path: 'testDirectory1',
         spec_location: 'testLocation1',
         microtask: true,
-        is_calibrated: true
+        has_expert_review: true
       )
     end
 
@@ -329,10 +329,10 @@ describe "assignment function" do
     end
 
     it "check if checking calibration shows the tab" do
-      uncheck 'assignment_form_assignment_is_calibrated'
+      uncheck 'assignment_form_assignment_has_expert_review'
       click_button 'Save'
 
-      check 'assignment_form_assignment_is_calibrated'
+      check 'assignment_form_assignment_has_expert_review'
       click_button 'Save'
 
       expect(page).to have_selector('#Calibration')

@@ -26,9 +26,9 @@ class ReviewMappingController < ApplicationController
     if participant.nil?
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
     end
-    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
+    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], expert_review_to: true).first rescue nil
     if map.nil?
-      map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true)
+      map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], expert_review_to: true)
     end
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
@@ -308,7 +308,7 @@ class ReviewMappingController < ApplicationController
     else
       teams_with_calibrated_artifacts = []
       teams_with_uncalibrated_artifacts = []
-      ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 1).each do |response_map|
+      ReviewResponseMap.where(reviewed_object_id: assignment_id, expert_review_to: 1).each do |response_map|
         teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
       end
       teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
@@ -413,8 +413,8 @@ class ReviewMappingController < ApplicationController
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
       @assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: params[:id], questionnaire_id: @review_questionnaire_ids).first
       @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
-      @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: params[:id], calibrate_to: 1)
-      @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: params[:id], calibrate_to: 0)
+      @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: params[:id], expert_review_to: 1)
+      @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: params[:id], expert_review_to: 0)
       @responses = Response.where(map_id: @review_response_map_ids)
 
     when "PlagiarismCheckerReport"
@@ -476,7 +476,7 @@ class ReviewMappingController < ApplicationController
 
   def assign_reviewers_for_team(assignment_id, student_review_num, participants_hash,
                                 exact_num_of_review_needed)
-    if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
+    if ReviewResponseMap.where(reviewed_object_id: assignment_id, expert_review_to: 0)
                         .where("created_at > :time",
                                time: @@time_create_last_review_mapping_record).size < exact_num_of_review_needed
 
@@ -487,7 +487,7 @@ class ReviewMappingController < ApplicationController
       unsorted_teams_hash = {}
 
       ReviewResponseMap.where(reviewed_object_id: assignment_id,
-                              calibrate_to: 0).each do |response_map|
+                              expert_review_to: 0).each do |response_map|
         if unsorted_teams_hash.key? response_map.reviewee_id
           unsorted_teams_hash[response_map.reviewee_id] += 1
         else

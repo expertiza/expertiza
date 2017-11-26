@@ -11,7 +11,7 @@
     <option value='TeammateReviewResponseMap' >
       Teammate Review report
     </option>
-    <% if @assignment.is_calibrated? %>
+    <% if @assignment.has_expert_review? %>
       <option value='Calibration' >
         Calibration report
       </option>

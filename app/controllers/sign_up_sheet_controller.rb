@@ -12,6 +12,7 @@ class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
+  #The rescue operations are added for our Ajax Calls that are made to this controller for loading data in Topics page
   rescue_from ::ActiveRecord::RecordNotFound, with: :record_not_found
   rescue_from ::NameError, with: :error_occurred
 
@@ -64,6 +65,8 @@ class SignUpSheetController < ApplicationController
   # that assignment id will virtually be the signup sheet id as well as we have assumed
   # that every assignment will have only one signup sheet
   def create
+    # the params are received through Ajax requests rather than form submits.
+    # Thus parameters are given directly than ruby hashes.
     topic = SignUpTopic.where(topic_name: params[:topic_name], assignment_id: params[:id]).first
     # if the topic already exists then update
     if topic == nil
@@ -83,7 +86,7 @@ class SignUpSheetController < ApplicationController
     else
       render json: {error: 'FAIL'} , :status => 404
     end
-    # changing the redirection url to topics tab in edit assignment view.
+    # All the CRUD operations in topics page are ajax based on json responses. Thus we will be responding with JSON.
     render json: {status: 'PASS'}
 
   end
@@ -99,9 +102,11 @@ class SignUpSheetController < ApplicationController
     if @topic
       @topic.topic_identifier = params[:topic_identifier]
       if !update_max_choosers @topic
+        # We are setting up the response code to 400 if we encounter this criteria so that it can be handled if Ajax call fails in the front end.
         render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 400
       else
         # update tables
+        #All the following parameters are send through data in Ajax in updateItem.
         @topic.category = params[:category]
         @topic.topic_name = params[:topic_name]
         @topic.micropayment = params[:micropayment]
@@ -131,7 +136,8 @@ class SignUpSheetController < ApplicationController
 
   # retrieves all the data associated with the given assignment. Includes all topics,
   # this should retrieve results in Json so that it can be ajaxed
-  #1781
+  # 1781
+  # the following method is an action which renders all the topics of an assignment in the JSON format.
   def load_add_signup_topics
     @id = params[:id]
     assignment_id =  params[:id]
@@ -185,6 +191,7 @@ class SignUpSheetController < ApplicationController
     }
   end
 
+  # All the parameters are sent through data object in the Ajax insert call
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.topic_identifier = params[:topic_identifier]
@@ -211,7 +218,7 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-   def list
+  def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
@@ -330,7 +337,6 @@ class SignUpSheetController < ApplicationController
     end
     redirect_to controller: 'assignments', action: 'edit', id: assignment.id
   end
-
 
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
@@ -461,6 +467,7 @@ class SignUpSheetController < ApplicationController
   end
 
   private
+  
   def setup_new_topic
     set_values_for_new_topic
     if @assignment.microtask?

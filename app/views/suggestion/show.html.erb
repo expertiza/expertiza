@@ -70,7 +70,8 @@
             No
           <%elsif suggestion_comment.vote == 'R'%>
             Revise
-          <%elsif suggestion_comment.vote == 'A'%>
+            <!-- Two more crieteria for displaying comments. During Approval and Denial. Issue #1781 -->
+          <%elsif suggestion_comment.vote == 'A'%> 
             Approved
           <%elsif suggestion_comment.vote == 'D'%>
             Denied
@@ -85,14 +86,10 @@
 <%end%>
 <br>
 
-<!--Add new comment and vote-->
+<!-- New comments can be added by instructor while voting,Approving or rejecting the suggestions-->
 <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
   <b>Add new Feedback and Approve/Reject/Vote</b> <br>
   <%= form_tag :action => 'submit', :id => @suggestion do %>
-
-  
-
-
     <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %>
     <p>
       <%= "Vote"%>
@@ -103,7 +100,6 @@
 
   <!-- 1781 718-->
   <!-- The approve and Reject should be passed only for User roles - instructor -->
-
      <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
      
       <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>

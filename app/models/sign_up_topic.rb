@@ -9,7 +9,6 @@ class SignUpTopic < ActiveRecord::Base
   attr_accessor :slots_waitlisted
   attr_accessor :slots_available
   attr_accessor :partipants
-
   has_paper_trail
 
   # the below relations have been added to make it consistent with the database schema

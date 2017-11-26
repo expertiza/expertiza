@@ -4,7 +4,7 @@ describe SignUpSheetController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
-  let(:topic) { build(:topic, id: 1 ) }
+  let(:topic) { build(:topic, id: 1) }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
@@ -331,6 +331,7 @@ describe SignUpSheetController do
       end
     end
   end
+
   describe '#delete_signup_as_instructor' do
     before(:each) do
       allow(Team).to receive(:find).with('1').and_return(team)
@@ -348,6 +349,7 @@ describe SignUpSheetController do
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
+
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to assignment#edit page' do
         due_date.due_at = DateTime.now.in_time_zone - 1.day
@@ -360,6 +362,7 @@ describe SignUpSheetController do
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
+
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
       it 'shows a flash success message and redirects to assignment#edit page' do
         allow(team).to receive(:submitted_files).and_return([])
@@ -374,6 +377,7 @@ describe SignUpSheetController do
       end
     end
   end
+
   describe '#set_priority' do
     it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
       allow(participant).to receive(:team).and_return(team)
@@ -390,6 +394,7 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/sign_up_sheet/list?assignment_id=1')
     end
   end
+
   describe '#save_topic_deadlines' do
     context 'when topic_due_date cannot be found' do
       it 'creates a new topic_due_date record and redirects to assignment#edit page' do
@@ -406,6 +411,7 @@ describe SignUpSheetController do
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
+
     context 'when topic_due_date can be found' do
       it 'updates the existing topic_due_date record and redirects to assignment#edit page' do
         assignment.due_dates = [due_date, due_date2]
@@ -424,6 +430,7 @@ describe SignUpSheetController do
       end
     end
   end
+
   describe '#show_team' do
     it 'renders show_team page' do
       allow(SignedUpTeam).to receive(:where).with("topic_id = ?", '1').and_return([signed_up_team])
@@ -434,6 +441,7 @@ describe SignUpSheetController do
       expect(response).to render_template(:show_team)
     end
   end
+  
   describe '#switch_original_topic_to_approved_suggested_topic' do
     it 'redirects to sign_up_sheet#list page' do
       allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])

@@ -192,15 +192,14 @@ end
     redirect_to action: 'show', id: @suggestion
   end
 
+  private
 
-private
+  def suggestion_params
+    params.require(:suggestion).permit(:assignment_id, :title, :description,
+                                       :status, :unityID, :signup_preference)
+  end
 
-def suggestion_params
-  params.require(:suggestion).permit(:assignment_id, :title, :description,
-  :status, :unityID, :signup_preference)
-end
-
-def approve
+  def approve
   # 1781 - 718 issue
   # The Instructor should be able to give feed backs during the times of approval as well.
   # Thus we are getting the comments through the request when approval is made and saving those in 

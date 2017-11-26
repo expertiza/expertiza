@@ -108,7 +108,7 @@ class UsersController < ApplicationController
   end
 
   def request_new
-    flash[:error] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
+    flash[:danger] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
@@ -204,7 +204,18 @@ class UsersController < ApplicationController
   def request_user_create
     # TODO: Do not allow duplicates
     # TODO: All fields should be entered
+
+
     @user = RequestedUser.new(user_params)
+
+=begin
+    if(@user.email.blank?)
+      flash[:error] = "Email can not be blank"
+      redirect_to controller: 'users', action: 'request_new', role: "Student"
+      return
+    end
+=end
+
     if params[:user][:institution_id]==''
       if Institution.find_by(name: params[:institution][:name])
           @institution = Institution.find_by(name: params[:institution][:name])
@@ -218,6 +229,7 @@ class UsersController < ApplicationController
       @user.institution_id = params[:user][:institution_id]
     end
 
+    byebug
     @user.status = 'Under Review'
     @user.intro = params[:requested_users][:intro]
     # The super admin receives a mail about a new user request with the user name
@@ -231,7 +243,8 @@ class UsersController < ApplicationController
       redirect_to '/instructions/home'
     else
       flash[:error] = "The account you are requesting has already existed in Expertiza."
-      redirect_to controller: 'users', action: 'request_new', role: "Student"
+      #redirect_to controller: 'users', action: 'request_new', role: "Student"
+      render 'request_new'
     end
   end
 

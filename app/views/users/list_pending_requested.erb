@@ -9,6 +9,7 @@
           <td><%=  user.name %></td>
           <td><%= user.fullname %></td>
           <td><%= user.email %></td>
+
           <% for role in @roles %>
             <% if user.role_id == role.id %>
               <td><%= role.name%></td>

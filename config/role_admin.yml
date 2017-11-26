@@ -25,6 +25,7 @@ development:
       users:
         list: true
         keys: true
+        goto_show_pending_users: true
       admin:
         list_instructors: false
         list_administrators: false
@@ -252,6 +253,20 @@ development:
         - 45
         - 33
         - 50
+        - 51
+
+      51: &25 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 51
+        label: Pending Users
+        name: manage/show pending users
+        parent:
+        parent_id: 37
+        site_controller_id: 111
+        url: "/users/list_pending_requested"
+
+
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -498,6 +513,8 @@ development:
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
       anonymized_view: *24
+      manage/show pending users: *25
+
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

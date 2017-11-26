@@ -15,12 +15,13 @@
 - Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
     </td>
   </tr>
-
-  <td>
-    <%= check_box_tag( 'team_reviews') %>
-    <%= label_tag('Reviews are to be performed by teams.') %>
-  </td>
-
+  <tr id="reviewer_is_team">
+    <td>
+      <input name="assignment_form[assignment][reviewer_is_team]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][reviewer_is_team]', 'true', @assignment_form.assignment.reviewer_is_team) %>
+      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Reviews are to be performed by teams.') %>
+    </td>
+  </tr>
   <tr id="assignment_review_topic_threshold_row">
     <td>
       <%= label_tag('assignment_form[assignment][review_topic_threshold]', 'Review topic threshold (k):') %>

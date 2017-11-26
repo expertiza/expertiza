@@ -1,0 +1,13 @@
+<h1>Mail Send Page</h1>
+<div class = "row">
+  <div class="col-md-10 col-md-offset-4">
+    <%= form_tag controller:'users',action:'send_to_request',user_email:@request_user.email,message:params[:intro]%>
+    <div class = 'field'>
+        <%= "This Mail will send to "+@request_user.email %>
+      <p></p>
+      <%= text_area :users,:intro,:cols=>50,:rows=>20,placeholds:"write down the new Mail..." %>
+    </div>
+        <%= submit_tag "Send!",class:"btn btn-primary"%>
+
+  </div>
+</div>

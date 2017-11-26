@@ -8,8 +8,7 @@
         <tr class="exp">
           <td><%=  user.name %></td>
           <td><%= user.fullname %></td>
-          <td><%= user.email %></td>
-
+          <td><%= link_to user.email,:controller=>'users',:action=>'send_mail',user_email:user.email%></td>
           <% for role in @roles %>
             <% if user.role_id == role.id %>
               <td><%= role.name%></td>

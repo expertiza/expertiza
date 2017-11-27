@@ -44,7 +44,7 @@ describe Assignment do
   end
 
   describe '.set_courses_to_assignment' do
-    it 'fetches all courses belong to current instructor and with the order of course names' do
+    it 'fetches all courses belong to current instructor and with the order off course names' do
       course = double('Course')
       allow(Course).to receive_message_chain(:where, :order).with(instructor_id: 6).with(:name).and_return([course])
       expect(Assignment.set_courses_to_assignment(instructor)).to eq([course])

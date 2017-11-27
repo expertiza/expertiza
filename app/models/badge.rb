@@ -11,6 +11,12 @@ class Badge < ActiveRecord::Base
 	GOOD_TEAMMATE_IMAGE = "<img height = 'auto' width = '50px' src='/assets/badges/goodTeammate.png'/>"
 
 
+
+	def self.get_id_from_name(badge_name)
+  		badge = Badge.where(:name => badge_name)[0]
+	  	badge.id
+	end
+
 	def self.get_badges_student_view(student_task_list)
 		
 		# create badge matrix

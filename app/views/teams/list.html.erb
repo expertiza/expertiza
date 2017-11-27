@@ -2,8 +2,7 @@
 
 <%= render :partial => '/tree_display/page_footer' %>
 
-
-<%
+ <%
     session[:return_to] = request.url
   %>
 <BR/>
@@ -27,3 +26,24 @@
   :id=>@root_node.node_object_id %>
 |<%= link_to 'Delete All Teams', :action => 'delete_all', :id=> @root_node.node_object_id, :model => @model %>
 |<%= render :partial => '/shared_scripts/back' %>
+
+<%@assignment = Assignment.find(params[:id])%>
+
+
+
+<br/><br/>
+<table style="width:20%" align="left" >
+  <b>Students without teams</b>
+  <br/><br/>
+  <tr style="border: 1px outset #000000; padding: 10px 20px" >
+    <th class="head">Username</th>
+
+  </tr>
+  <% @assignment.participants.each do |participant| %> <!--start team member content-->
+      <% if participant.team==nil  %>
+          <% if User.find(participant.user_id).role.name=="Student"  %>
+              <td><%= participant.user.name %></td>
+          <% end %>
+      <% end %>
+  <% end %>
+</table>

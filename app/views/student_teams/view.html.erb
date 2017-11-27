@@ -89,7 +89,11 @@
 
         <td><%= participant.user.name %></td>
          <%if @student.team==nil
-             @teamid=0
+             team = AssignmentTeam.create_team_and_node(@student.parent_id)
+             user = User.find(@student.user_id)
+             # create TeamsUser and TeamUserNode
+             teamuser = ApplicationController.helpers.create_team_users(user, team.id)
+             @teamid=team.id
            else
            @teamid=@student.team.id
          end%>
@@ -102,7 +106,7 @@
          <% end %>
                </td>
           <% end %>
-      </tr>
+
 
       <% end %>
   <% end %>

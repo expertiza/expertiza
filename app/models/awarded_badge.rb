@@ -7,16 +7,38 @@ class AwardedBadge < ActiveRecord::Base
   GOOD_TEAMMATE_IMAGE = "<img height = 'auto' width = '50px' src='/assets/badges/goodTeammate.png'/>"
 
 
-	def self.award(participant_id, assignment_id, grade_for_reviewer, badge_name)
+	def self.award(participant_id, assignment_id,score,badge_name)
 		print "In AwardedBadge _____________________________"
 		badge_id = Badge.get_id_from_name(badge_name)
 		# assignmentBadge = AssignmentBadge.where(:badge_id => badge_id,:assignment_id => assignment_id)
 		assignmentBadge = AssignmentBadge.where("badge_id = ? AND assignment_id = ?",badge_id,assignment_id)
 		print assignmentBadge.empty?
-		if !assignmentBadge.empty? and grade_for_reviewer.to_i >= assignmentBadge[0].threshold
+		if !assignmentBadge.empty? and score.to_i >= assignmentBadge[0].threshold
 			a = AwardedBadge.new(:participant_id => participant_id, :assignment_id => assignment_id, :badge_id => badge_id)
 			a.save!
 		end
+	end
+
+	def self.update(assignment_id)
+		AwardedBadge.where(:assignment_id => assignment_id).delete_all
+		participants = Participant.where("parent_id = ? AND type = ?",assignment_id,"AssignmentParticipant")
+		review_grades = ReviewGrade.where(:participant_id => participants.ids)
+		review_grades.each do |r|
+			AwardedBadge.award(r.participant_id,assignment_id,r.grade_for_reviewer,"GoodReviewer")
+		end
+	end
+
+	def self.get_teammate_review_score(participant)	
+		team = participant.team
+		if team.nil?
+			return false
+		end
+		score = 0.0
+	 	teammate_reviews = participant.teammate_reviews
+	 	teammate_reviews.each do |teammate_review|
+			score = score + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)		
+	 	end
+	 	score/teammate_reviews.size*100
 	end
 
 	def self.get_badges_student_view(student_tasks)

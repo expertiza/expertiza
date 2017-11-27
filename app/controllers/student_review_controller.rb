@@ -10,7 +10,25 @@ class StudentReviewController < ApplicationController
 
   def list
     @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
+    @assignment = @participant.assignment
+    @response_map = ReviewResponseMap.where(reviewer_id: params[:id]).first
+    @reviewer_is_team_member = false
+
+    # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
+    if !@assignment.nil?
+      if @assignment.reviewer_is_team?
+        reviewer_team_members = TeamsUser.joins("
+          LEFT JOIN teams ON teams_users.team_id = teams.id
+          LEFT JOIN participants ON teams_users.user_id = participants.user_id").select("
+          participants.user_id").where("
+          teams.parent_id = ? AND participants.parent_id = ?
+          AND teams_users.team_id = ?", @assignment.id, @assignment.id, @response_map.team_id)
+        @reviewer_is_team_member = reviewer_team_members.all.any? { |m| m.user_id == current_user.id}
+      end
+    end
+
+    return unless current_user_id?(@participant.user_id) || @reviewer_is_team_member
+
     @assignment = @participant.assignment
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
@@ -18,10 +36,9 @@ class StudentReviewController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
 
-    if @assignment.reviewer_is_team?
-      team_user = TeamsUser.joins("LEFT JOIN teams on teams_users.team_id = teams.id").where("parent_id = ? and user_id =?", @assignment.id, @participant.user_id)
-      team_id = team_user.team_id(@assignment.id, @participant.user_id)
-      @review_mappings = ReviewResponseMap.where(team_id: team_id)
+    # E17A0 If an assignment is to be reviewed by a team, select it by team_id otherwise by reviewer_id
+    if @reviewer_is_team_member
+      @review_mappings = ReviewResponseMap.where(team_id: @response_map.team_id)
     else
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     end
@@ -41,9 +58,11 @@ class StudentReviewController < ApplicationController
     # Calculate the number of metareviews that the user has completed so far.
     @num_metareviews_total       = @metareview_mappings.size
     @num_metareviews_completed   = 0
+
     @metareview_mappings.each do |map|
       @num_metareviews_completed += 1 unless map.response.empty?
     end
+
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
   end

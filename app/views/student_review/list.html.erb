@@ -7,7 +7,6 @@
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 
-
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>

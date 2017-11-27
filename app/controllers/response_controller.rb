@@ -5,17 +5,20 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = user_id = nil
     action = params[:action]
+
     if %w(edit delete update view).include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
+
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      return current_user_id?(user_id)
+      puts reviewer_is_team_member?
+      return current_user_id?(user_id) || reviewer_is_team_member?
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      return current_user_id?(user_id)
+      return current_user_id?(user_id) || reviewer_is_team_member?
     when 'view'
       return edit_allowed?(response.map, user_id)
     else
@@ -30,7 +33,8 @@ class ResponseController < ApplicationController
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
-        (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
+        (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
+        reviewer_is_team_member?
     else
       return current_user_id?(user_id)
     end
@@ -56,17 +60,21 @@ class ResponseController < ApplicationController
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
+
     if @prev.present?
       @sorted = @review_scores.sort {|m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
+
     @modified_object = @response.response_id
     # set more handy variables for the view
     set_content
     @review_scores = []
+
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
+
     render action: 'response'
   end
 
@@ -76,23 +84,27 @@ class ResponseController < ApplicationController
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
+
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
       else
         @response.update_attribute('is_submitted', false)
       end
+
       if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
         @response.notify_instructor_on_difference
       end
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
+
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
   end
 
@@ -104,14 +116,17 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     set_content(true)
+
     if @assignment
       @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     end
+
     render action: 'response'
   end
 
   def new_feedback
     review = Response.find(params[:id])
+
     if review
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
@@ -119,6 +134,7 @@ class ResponseController < ApplicationController
         # if no feedback exists by dat user den only create for dat particular response/review
         map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
       end
+
       redirect_to action: 'new', id: map.id, return: "feedback"
     else
       redirect_to :back
@@ -135,13 +151,16 @@ class ResponseController < ApplicationController
   def create
     @map = ResponseMap.find(params[:id])
     set_all_responses
+
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
     else
       @round = nil
     end
+
     is_submitted = (params[:isSubmit] == 'Yes')
+
     @response = Response.create(
       map_id: @map.id,
       additional_comment: params[:review][:comments],
@@ -154,9 +173,11 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
+
     if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
       @response.notify_instructor_on_difference
     end
+
     @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
@@ -172,6 +193,7 @@ class ResponseController < ApplicationController
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by(map_id: params[:id])
+
     if params[:return] == "feedback"
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
     elsif params[:return] == "teammate"
@@ -243,11 +265,13 @@ class ResponseController < ApplicationController
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
     @title = @map.get_title
+
     if @map.survey?
       @survey_parent = @map.survey_parent
     else
       @assignment = @map.assignment
     end
+
     @participant = @map.reviewer
     @contributor = @map.contributor
     new_response ? set_questionnaire_for_new_response : set_questionnaire
@@ -309,6 +333,7 @@ class ResponseController < ApplicationController
       unless score
         score = Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       end
+
       score.update_attribute('answer', v[:score])
       score.update_attribute('comments', v[:comment])
     end
@@ -321,5 +346,27 @@ class ResponseController < ApplicationController
     @prev = Response.where(map_id: @map.id)
     # not sure what this is about
     @review_scores = @prev.to_a
+  end
+
+  private
+  # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
+  def reviewer_is_team_member?
+    false
+    review_response_map = ReviewResponseMap.find(Response.find(params[:id]).map_id)
+    if !review_response_map.nil?
+      assignment = Assignment.where(id:review_response_map.reviewed_object_id).first
+
+      if !assignment.nil?
+        if assignment.reviewer_is_team?
+          reviewer_team_members = TeamsUser.joins("
+            LEFT JOIN teams ON teams_users.team_id = teams.id
+            LEFT JOIN participants ON teams_users.user_id = participants.user_id").select("
+            participants.user_id").where("
+            teams.parent_id = ? AND participants.parent_id = ?
+            AND teams_users.team_id = ?", assignment.id, assignment.id, review_response_map.team_id)
+          reviewer_team_members.all.any? { |m| m.user_id == current_user.id}
+        end
+      end
+    end
   end
 end

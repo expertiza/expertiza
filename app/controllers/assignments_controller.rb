@@ -8,6 +8,7 @@ class AssignmentsController < ApplicationController
       assignment = Assignment.find(params[:id])
       ['Super-Administrator', 'Administrator'].include? current_role_name or
       assignment.instructor_id == current_user.try(:id) or
+      current_role_name == 'Teaching Assistant' or
       TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
       assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
     else

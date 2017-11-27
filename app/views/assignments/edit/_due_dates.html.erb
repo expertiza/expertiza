@@ -513,7 +513,7 @@ function addDaysOrMonth(mul, type) {
     jQuery(document).ready(function () {
 
         <% if @assignment_form.assignment.is_calibrated %>
-            addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'calibration', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
+            addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'calibration', 0, <%= due_date(@assignment_form.assignment, 'calibration_review').to_json.html_safe %>);
         <%end %>
 
         <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'team_formation').due_at %>

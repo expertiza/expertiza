@@ -41,8 +41,18 @@ class AssignmentTeam < Team
     assignment = Assignment.find(self.parent_id)
     raise "The assignment cannot be found." if assignment.nil?
 
-    ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
+    # E17A0 Check if reviewer_is_team
+
+    if assignment.reviewer_is_team?
+      team_user = TeamsUser.joins("LEFT JOIN teams on teams_users.team_id = teams.id").where("parent_id = ? and user_id =?", assignment.id, reviewer.user_id)
+      team_id = team_user.team_id(assignment.id, reviewer.user_id)
+
+      ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
+                               reviewed_object_id: assignment.id, team_id: team_id)
+    else
+      ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
                              reviewed_object_id: assignment.id)
+    end
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer

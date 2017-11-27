@@ -8,7 +8,7 @@ class ControllerActionsController < ApplicationController
   end
 
   def index
-    @controller_actions = ControllerAction.order(:name).paginate(per_page: 50, page: 1)
+    @controller_actions = ControllerAction.order(:name).paginate(per_page: 50,page: params[:page])
   end
 
   def list

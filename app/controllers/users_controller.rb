@@ -17,6 +17,9 @@ class UsersController < ApplicationController
       current_role_name.eql? 'Super-Administrator'
     when 'keys'
       current_role_name.eql? 'Student'
+    when 'list_pending_requested'
+      ['Super-Administrator',
+       'Administrator'].include? current_role_name
     else
       ['Super-Administrator',
        'Administrator',
@@ -63,7 +66,7 @@ class UsersController < ApplicationController
   end
 
   def list_pending_requested
-    sql_query = "select * from requested_users where status <> 'Approved' or status is null"
+    sql_query = "select * from requested_users where status <> '' or status is null"
     @users = RequestedUser.find_by_sql(sql_query)
     # @users=RequestedUser.all
     @roles = Role.all
@@ -244,7 +247,7 @@ class UsersController < ApplicationController
       @user.institution_id = params[:user][:institution_id]
     end
 
-    byebug
+
     @user.status = 'Under Review'
     @user.intro = params[:requested_users][:intro]
     # The super admin receives a mail about a new user request with the user name

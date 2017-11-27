@@ -365,6 +365,19 @@ development:
         - 17
         - 16
         - 15
+        - 51
+
+      51: &37 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 112
+        id: 51
+        label: Pending Users
+        name: show/show pending users
+        parent:
+        parent_id: 46
+        site_controller_id: 10
+        url: "/users/list_pending_requested"
+
       6: &13 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 3
@@ -649,6 +662,8 @@ development:
       show/administrators: *34
       show/instructors: *35
       anonymized_view: *36
+      show/show pending users: *37
+
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node
@@ -1643,6 +1658,19 @@ production:
         - 17
         - 16
         - 15
+        - 51
+
+      51: &37 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 112
+        id: 51
+        label: Pending Users
+        name: show/show pending users
+        parent:
+        parent_id: 46
+        site_controller_id: 10
+        url: "/users/list_pending_requested"
+
       6: &13 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 3
@@ -1927,6 +1955,7 @@ production:
       show/administrators: *34
       show/instructors: *35
       anonymized_view: *36
+      show/show pending users: *37
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node

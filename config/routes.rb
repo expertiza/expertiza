@@ -91,9 +91,11 @@ Expertiza::Application.routes.draw do
     collection do
       get 'list'
       post ':id', action: :update
+      delete ':id', action: :destroy
       get 'new_for'
     end
   end
+
 
   resources :course do
     collection do

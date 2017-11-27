@@ -36,13 +36,14 @@
      </li>
         <% end %> -->
 
+
   <% @timeline_list.each do |tl| %>
   <li class="li complete">
     <div class="timestamp">
       <% unless tl['link'].nil? %>
-      <span class="author"><%=link_to 'link', tl['link'] %></span>
-      <% else %>
-      <span class="author">-</span>
+     <p class="author"><%=link_to 'link', tl['link'] %></p>
+     <% else %>
+    <p class="author">-</p>
       <% end %>
       <span class="date"><%= tl['updated_at'] %><span>
     </div>

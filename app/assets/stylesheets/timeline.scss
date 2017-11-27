@@ -7,15 +7,22 @@
 
 .li {
   transition: all 200ms ease-in;
+  height: 200px;
 }
 
-.timestamp {
+// .timestamp {
+//   margin-bottom: 20px;
+//   padding: 0px 40px;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   font-weight: 100;
+// }
+
+.timestamp
+{
   margin-bottom: 20px;
-  padding: 0px 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-weight: 100;
+  width: 90%;
 }
 
 .status {
@@ -41,6 +48,7 @@
   left: 42%;
   transition: all 200ms ease-in;
 }
+
 
 .li.complete .status {
   border-top: 2px solid #66DC71;
@@ -98,6 +106,7 @@ button {
   font-size: 16px;
   text-align: center;
 }
+
 /*#toggleButton {
   position: absolute;
   left: 50px;

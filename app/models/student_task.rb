@@ -134,7 +134,7 @@ class StudentTask
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
       tmp = Hash.new
-      tmp['label'] = dd.deadline_type.name + ' deadline'
+      tmp['label'] = dd.deadline_type.name + ' Deadline'
       tmp['updated_at'] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
       tmp['link'] = nil
       @timeline_list << tmp
@@ -153,7 +153,7 @@ class StudentTask
     @response_map.each do |rm|
       tmp = Hash.new
       @response = Response.where(map_id: rm.id)
-      tmp['label'] = 'Round ' + @response[0].round.to_s
+      tmp['label'] = 'Round ' + @response[0].round.to_s + ' Review Performed'
       tmp['updated_at'] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
       tmp['link'] = 'Static url' + @response[0].id.to_s
       @timeline_list << tmp

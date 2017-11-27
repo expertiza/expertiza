@@ -75,6 +75,7 @@ class AssignmentsController < ApplicationController
       AssignmentBadge.saveBadge(thresholdHash,assignment_id)
       if(AssignmentBadge.exists?(assignment_id))
         # Update entries in Awarded Badges for this assignment
+        AwardedBadge.update(assignment_id)
       end
     end
     unless params.key?(:assignment_form)

@@ -10,13 +10,33 @@ class AwardedBadge < ActiveRecord::Base
 	def self.get_badges_student_view(student_tasks)
 		badge_matrix = []
 		current_assignment_count = 0
-		consistency_flag = true
+		
 		student_tasks.each do |student_task|
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
 			
 			badge_matrix[current_assignment_count][0] = AwardedBadge.good_reviewer(student_task.participant)
 			
 		  badge_matrix[current_assignment_count][1] = AwardedBadge.good_teammate(student_task.participant)
+		
+		  
+		  current_assignment_count = current_assignment_count + 1;
+		 end
+		 
+		 return badge_matrix
+	end
+	
+	def self.get_badges_instructor_view(participants)
+		badge_matrix = []
+		current_assignment_count = 0
+		
+		participants.each do |participant|
+			badge_matrix.push([false] * NUMBER_OF_BADGES)
+			
+			badge_matrix[current_assignment_count][0] = AwardedBadge.good_reviewer(participant)
+			
+		  badge_matrix[current_assignment_count][1] = AwardedBadge.good_teammate(participant)
+		  
+		  badge_matrix[current_assignment_count][2] = participant.user_id
 		
 		  
 		  current_assignment_count = current_assignment_count + 1;

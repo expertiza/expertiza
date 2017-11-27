@@ -2,7 +2,17 @@
 <tr class= "exp">
   <td ><%= link_to User.find(participant.user_id).name, impersonate_impersonate_path(:user => {:name => User.find(participant.user_id).name}), :method => :post %></td>
   <td ><%= link_to User.find(participant.user_id).fullname, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
-<td><img height = "auto" width = "50px" src="/assets/badges/goodReviewer.png"/></td>
+  <td>
+   <% @student_badges.each do |student_badge| %>
+      <% if student_badge[2] == participant.user_id %>
+      	<% student_badge.each do |each_badge| %>
+      		<% if (each_badge && !each_badge.is_a?(Integer)) %>
+       	 		<%= each_badge %>
+       	 	<% end %>
+       	<% end %>
+      <% end %>
+    <% end %>
+  </td>
   <td><a href="mailto: <%= User.find(participant.user_id).email %>"><%= User.find(participant.user_id).email %></a></td>
   <td ><%= User.find(participant.user_id).role.name %></td>
   <td  align="center"><%= (User.find(User.find(participant.user_id).parent_id)).name %></td>

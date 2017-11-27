@@ -29,6 +29,11 @@ class StudentReviewController < ApplicationController
 
     return unless current_user_id?(@participant.user_id) || @reviewer_is_team_member
 
+    #E17A0 We unlock a response_map if it was locked by another team member.
+    if(params.has_key?(:response_id))
+      unlock_response_map params[:response_id]
+    end
+
     @assignment = @participant.assignment
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
@@ -65,5 +70,14 @@ class StudentReviewController < ApplicationController
 
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
+  end
+
+  private
+  def unlock_response_map response_id
+    review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
+
+    if !review_response_map.nil?
+      ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
+    end
   end
 end

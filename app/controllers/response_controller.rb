@@ -16,7 +16,7 @@ class ResponseController < ApplicationController
       return false if response.is_submitted
       return current_user_id?(user_id) || reviewer_is_team_member?
       # Deny access to anyone except reviewer & author's team
-    when 'delete', 'update'
+    when 'delete', 'update', 'unlock'
       return current_user_id?(user_id) || reviewer_is_team_member?
     when 'view'
       return edit_allowed?(response.map, user_id)
@@ -57,6 +57,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @response = Response.find(params[:id])
     @map = @response.map
+    lock_response_map params[:id]
     @contributor = @map.contributor
     set_all_responses
 
@@ -185,6 +186,16 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+    unlock_response_map @map.id
+    redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
+  #E17AO Any review team member can unlock and review locked by team-mate. Changes will be lost
+  def unlock
+    @map = ResponseMap.find(params[:id])
+    @return = params[:return]
+    @map.save
+    unlock_response_map @map.id
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
@@ -366,6 +377,22 @@ class ResponseController < ApplicationController
           reviewer_team_members.all.any? { |m| m.user_id == current_user.id}
         end
       end
+    end
+  end
+
+  def lock_response_map response_id
+    review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
+
+    if !review_response_map.nil?
+      ReviewResponseMap.update(review_response_map.id, :is_locked => true, :locked_by => current_user.id)
+    end
+  end
+
+  def unlock_response_map response_id
+    review_response_map = ReviewResponseMap.find(response_id)
+
+    if !review_response_map.nil?
+      ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
     end
   end
 end

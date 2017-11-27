@@ -23,6 +23,8 @@ class ParticipantsController < ApplicationController
     end
     begin
       @participants = @parent.participants
+      @student_badges = AwardedBadge.get_badges_instructor_view(@participants)
+      print @student_badges.inspect
       @model = params[:model]
       # E726 Fall2012 Changes Begin
       @authorization = params[:authorization]

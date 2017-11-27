@@ -110,7 +110,6 @@ describe "review mapping" do
   it "can unsubmit a review", js: true do
     participant_reviewer = create :participant, assignment: @assignment
     login_and_assign_reviewer("instructor6", @assignment.id, 0, 2)
-
     # add_reviewer
     first(:link, 'add reviewer').click
     add_reviewer(participant_reviewer.user.name)

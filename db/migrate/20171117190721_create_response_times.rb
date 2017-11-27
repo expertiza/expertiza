@@ -1,4 +1,5 @@
 class CreateResponseTimes < ActiveRecord::Migration
+
   def change
     create_table :response_times do |t|
       t.integer :map_id

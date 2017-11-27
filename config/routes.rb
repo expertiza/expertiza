@@ -1,6 +1,14 @@
 Expertiza::Application.routes.draw do
 
-  resources :response_times
+  resources :response_times do
+    collection do
+      post :response_start_time
+      post :response_end_time
+      get :response_start_time
+      get :response_end_time
+    end
+  end
+
   resources :user_pastebins
   resources :track_notifications
   resources :notifications

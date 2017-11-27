@@ -29,12 +29,18 @@
             <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
           <% end %>
         <% end %>
-              <a href="<%= link %>" target="_blank" class="review_link"><%= link %></a>
-              <br/>
+          <% if local_assigns[:response_check] %>
+            <a href="<%= link %>" class="review_link"><%= link %></a>
+          <% else %>
+            <a href="<%= link %>" target="_blank"><%= link %></a>
+          <% end %>
+            <br/>
       <% end %>
       <% } %>
     </ul>
   </div>
+
+  <% if local_assigns[:response_check] %>
   <script type="text/javascript">
     function ISODateString(date){
       function pad(num){return num<10? '0'+num: num;}
@@ -47,7 +53,8 @@
     }
     $(document).ready(function(){
       var window_counter = 0;
-      $("#url a.review_link").click(function linkAction(){
+      $("#url a.review_link").click(function linkAction(event){
+        event.preventDefault();
         var link_handler = $(this); // current link
         var address = link_handler.attr("href"); // url address of the current link
         var window_handler = window.open(address); // open link in new window/tag
@@ -94,4 +101,5 @@
       });
     });
   </script>
+  <% end %>
 <% end %>

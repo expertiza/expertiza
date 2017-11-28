@@ -5,7 +5,11 @@
   <% if topic_id%>
     <%= tscore[:team].name + ' ('+SignUpTopic.find(topic_id).topic_identifier+')' %>
   <% else %>
-    <%= tscore[:team].name %>
+    <% if @assignment.max_team_size == 1 %>
+      <%= tscore[:team].users.first.name + ' (' + tscore[:team].users.first.fullname + ')' rescue '' %>
+    <% else %>
+      <%= tscore[:team].name %>
+    <% end %>
   <% end %>
      <% if tscore[:scores][:avg] %>
       	<TD COLSPAN="<%= col_avg_th_span_value %>" ALIGN="CENTER"><%= sprintf("%.2f",tscore[:scores][:avg]) %>%</TD>

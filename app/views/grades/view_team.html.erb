@@ -248,7 +248,7 @@
           <span> <%= vm.display_team_members %></span> <br>
           <%if vm.self_reviews%>
 
-          <h5>Self_review_score: <span class = "c5"  data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%" ><%= vm.computed_self_review_score.is_a?(Float)? sprintf("%.2f",vm.computed_self_review_score): vm.computed_self_review_score %></span></h5>
+          <h5>Self review score: <span class = "c5" id="computed_self_review_score" data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%" ><%= vm.computed_self_review_score.is_a?(Float)? sprintf("%.2f",vm.computed_self_review_score): vm.computed_self_review_score %></span></h5>
           <%end%>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>

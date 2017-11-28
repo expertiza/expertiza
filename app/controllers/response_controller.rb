@@ -3,17 +3,18 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
-    response = user_id = nil
+    response = response_map = user_id = nil
     action = params[:action]
 
     if %w(edit delete update view).include?(action)
       response = Response.find(params[:id])
+      response_map = ReviewResponseMap.find(response.map_id)
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
 
     case action
     when 'edit' # If response has been submitted, no further editing allowed
-      return false if response.is_submitted
+      return false if response.is_submitted || response_map.is_locked? && response_map.locked_by != current_user.id
       return current_user_id?(user_id) || reviewer_is_team_member?
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update', 'unlock'
@@ -33,7 +34,7 @@ class ResponseController < ApplicationController
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
         (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
-        reviewer_is_team_member?
+        reviewer_is_team_member? || !(map.is_locked? && map.locked_by != current_user.id)
     else
       return current_user_id?(user_id)
     end

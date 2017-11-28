@@ -62,7 +62,7 @@
                       <% if (last_response_round == current_round)%>
                         <td>
                           <% if (!@latest_response.is_submitted) %>
-                            <% if(!map.is_locked) %>
+                            <% if !(map.is_locked && map.locked_by != current_user.id) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
                             <% else %>
                               <%= link_to "Unlock", {:controller => 'student_review', :action => 'list', :id => params[:id], :response_id => @latest_response.id} %>

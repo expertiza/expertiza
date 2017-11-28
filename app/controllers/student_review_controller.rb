@@ -44,6 +44,7 @@ class StudentReviewController < ApplicationController
     # E17A0 If an assignment is to be reviewed by a team, select it by team_id otherwise by reviewer_id
     if @reviewer_is_team_member
       @review_mappings = ReviewResponseMap.where(team_id: @response_map.team_id)
+      @team = Team.find(@response_map.team_id)
     else
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     end

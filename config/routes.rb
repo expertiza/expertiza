@@ -391,13 +391,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :statistics do
-    collection do
-      get :list_surveys
-      get :list
-      get :view_responses
-    end
-  end
+  # resources :statistics do
+  #   collection do
+  #     get :list_surveys
+  #     get :list
+  #     get :view_responses
+  #   end
+  # end
 
   resources :student_quizzes do
     collection do
@@ -521,7 +521,7 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
-      get 'set_anonymous_mode'
+      get 'set_anonymized_view'
       get :keys
     end
   end

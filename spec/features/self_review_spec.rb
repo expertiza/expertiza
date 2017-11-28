@@ -32,17 +32,17 @@ describe "self review testing", js: true  do
     # stub_current_user(user, user.role.name, user.role)
     expect(page).to have_content "User: student2065"
     expect(page).to have_content "TestAssignment"
-    click_link "TestAssignment"
+    find_link( "TestAssignment").click
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
-    click_link "Your work"
+    find_link( "Your work").click
    # expect(page).to have_content 'Review our own work'
-    click_button "Review our own work"
-    click_link "Begin"
+    find_button("Review our own work").click
+    find_link( "Begin").click
     # Fill in a textbox and a dropdown
     fill_in "responses[0][comment]", with: "HelloWorld"
     select 5, from: "responses[0][score]"
-    click_button "Submit Self Review"
+    find_button("Submit Self Review").click
     # since alert box appears after submitting a review
     page.driver.browser.switch_to.alert.accept
     expect(page).to have_content "Your response was successfully saved."
@@ -61,18 +61,18 @@ describe "self review testing", js: true  do
     visit_new_user "student2064"
     expect(page).to have_content "User: student2064"
     expect(page).to have_content "TestAssignment"
-    click_link "TestAssignment"
+    find_link( "TestAssignment").click
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
-    click_link "Others' work"
+    find_link( "Others' work").click
     expect(page).to have_content 'Reviews for "TestAssignment"'
     choose "topic_id"
-    click_button "Request a new submission to review"
-    click_link "Begin"
+    find_button("Request a new submission to review").click
+    find_link( "Begin").click
     # Fill in a textbox and a dropdown
     fill_in "responses[0][comment]", with: "HelloWorld"
     select 3, from: "responses[0][score]"
-    click_button "Submit Review"
+    find_button("Submit Review").click
     page.driver.browser.switch_to.alert.accept
     expect(page).to have_content "Your response was successfully saved."
    end
@@ -84,10 +84,10 @@ describe "self review testing", js: true  do
     visit_new_user "student2065"
     expect(page).to have_content "User: student2065"
     expect(page).to have_content "TestAssignment"
-    click_link "TestAssignment"
+    find_link( "TestAssignment").click
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
-    click_link "Your scores"
+    find_link( "Your scores").click
     #  The value should be equal to 40.00 when the peer review score is 3 and self review score is 5
     # these scores are set up in
     expect(page).to have_css("#computed_self_review_score", text: "40.00")    

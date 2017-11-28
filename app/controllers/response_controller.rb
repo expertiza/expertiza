@@ -385,6 +385,7 @@ class ResponseController < ApplicationController
 
     if !review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => true, :locked_by => current_user.id)
+      flash[:note] = "Artifact (ID: #{review_response_map.id}) has been locked and can only be editted by the current user."
     end
   end
 

@@ -78,6 +78,7 @@ class StudentReviewController < ApplicationController
 
     if !review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
+      flash[:note] = "Artifact (ID: #{review_response_map.id}) has been successfully unlocked and can now be editted."
     end
   end
 end

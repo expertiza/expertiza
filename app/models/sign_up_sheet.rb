@@ -118,14 +118,12 @@ class SignUpSheet < ActiveRecord::Base
 
   def self.has_teammate_ads?(topic_id)
      @ads_exsit=false
-      @result=SignedUpTeam.where("topic_id = ?", topic_id.to_s)
-      @result.each do |result|
+     @result=SignedUpTeam.where("topic_id = ?", topic_id.to_s)
+     @result.each do |result|
           team=result.team
           @ads_exsit=team.advertise_for_partner
       end
      @ads_exsit
-
-
 
   end
 

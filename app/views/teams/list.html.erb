@@ -42,7 +42,9 @@
   <% @assignment.participants.each do |participant| %> <!--start team member content-->
       <% if participant.team==nil  %>
           <% if User.find(participant.user_id).role.name=="Student"  %>
+              <tr>
               <td><%= participant.user.name %></td>
+              </tr>
           <% end %>
       <% end %>
   <% end %>

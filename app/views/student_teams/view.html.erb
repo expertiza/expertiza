@@ -79,21 +79,14 @@
     <th class="head">Action</th>
   </tr>
 
-
   <% @student.assignment.participants.each do |participant| %> <!--start team member content-->
       <% if participant.team==nil  %>
           <% if User.find(participant.user_id).role.name=="Student"  %>
+             <tr>
               <% if participant.user.name!=@student.name  %>
-
-
-
-        <td><%= participant.user.name %></td>
+                  <td><%= participant.user.name %></td>
          <%if @student.team==nil
-             team = AssignmentTeam.create_team_and_node(@student.parent_id)
-             user = User.find(@student.user_id)
-             # create TeamsUser and TeamUserNode
-             teamuser = ApplicationController.helpers.create_team_users(user, team.id)
-             @teamid=team.id
+             @teamid="0"
            else
            @teamid=@student.team.id
          end%>
@@ -104,7 +97,8 @@
               <%= hidden_field_tag 'user[name]',  participant.user.name%>
               <%=  submit_tag "invite"%>
          <% end %>
-               </td>
+            </td>
+                   </tr>
           <% end %>
 
 

@@ -14,7 +14,9 @@ class ResponseController < ApplicationController
 
     case action
     when 'edit' # If response has been submitted, no further editing allowed
-      return false if response.is_submitted || response_map.is_locked? && response_map.locked_by != current_user.id
+      puts "Response Map: #{response_map.is_locked?} and Current User ID: #{current_user.id}"
+      return false if response.is_submitted
+      return false if response_map.is_locked? && response_map.locked_by != current_user.id
       return current_user_id?(user_id) || reviewer_is_team_member?
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update', 'unlock'

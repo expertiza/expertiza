@@ -235,6 +235,8 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
+    odyssey (0.2.0)
+      require_all
     omniauth (1.2.2)
       hashie (>= 1.2, < 4)
       rack (~> 1.0)
@@ -331,6 +333,7 @@ GEM
       redis (>= 2.2)
     ref (2.0.0)
     request_store (1.2.0)
+    require_all (1.4.0)
     rest-client (1.8.0)
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 3.0)
@@ -486,6 +489,7 @@ DEPENDENCIES
   lingua
   mysql2
   nokogiri (~> 1.6.8)
+  odyssey (= 0.2.0)
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail

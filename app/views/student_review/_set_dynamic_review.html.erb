@@ -41,7 +41,12 @@
       <% end %>
     </table>
 
-  <p><input type='submit' value='Request a new submission to review'/></p>
+      <br>
+      <% if assignment.reviewer_is_team? %>
+        <p><input type='submit' value='Request a new submission for your team to review'/></p>
+      <% else %>
+        <p><input type='submit' value='Request a new submission to review'/></p>
+      <% end %>
     <% end %>
   <%end%>
 <% else %>
@@ -50,7 +55,12 @@
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
-    <p><input type='submit' value='Request a new submission to review'/></p>
+    <br>
+    <% if assignment.reviewer_is_team? %>
+        <p><input type='submit' value='Request a new submission for your team to review'/></p>
+    <% else %>
+        <p><input type='submit' value='Request a new submission to review'/></p>
+    <% end %>
   <% end %>
   <%end%>
 <% end %>

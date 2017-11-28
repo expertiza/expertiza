@@ -5,7 +5,12 @@
 <% else %>
     <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
 <% end %>
-<h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
+
+<% if @assignment.reviewer_is_team? %>
+  <h4>Your team is required to do <%= @assignment.num_reviews_required %> reviews</h4>
+<% else %>
+  <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
+<% end %>
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
@@ -33,6 +38,7 @@
     <% else %>
         <h4>Number of Meta-Reviews Allowed: "<%= @assignment.num_metareviews_allowed %>"</h4>
     <% end %>
+
     <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
 
     <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>

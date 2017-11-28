@@ -90,7 +90,8 @@ describe "self review testing", js: true  do
     find_link( "Your scores").click
     #  The value should be equal to 40.00 when the peer review score is 3 and self review score is 5
     # these scores are set up in
-    expect(page).to have_css("#computed_self_review_score", text: "40.00")    
+    score_displayed = page.evaluate_script("$('#computed_self_review_score').html();")
+    expect(score_displayed).to eql("40.00")    
    end
 
 

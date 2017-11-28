@@ -142,7 +142,8 @@ Expertiza::Application.routes.draw do
       post :save_grade_and_comment_for_submission
     end
   end
-
+  get  'grades/tabbing/:prefix/:tscore' , to: 'grades#tabbing', as: 'grades_tabbing'
+ 
   resources :impersonate do
     collection do
       get :start

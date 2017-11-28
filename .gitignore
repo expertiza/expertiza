@@ -205,3 +205,6 @@ pg_data
 .ruby-version
 mysql2psql.yml
 *.pem
+mariadb
+docker-compose.yaml
+env_vars.sh

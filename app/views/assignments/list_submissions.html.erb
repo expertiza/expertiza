@@ -8,6 +8,7 @@
 <% else %>
   <% headers["Participant name"] = "18%" %>
 <% end %>                              
+<% headers["Github metrics"] = "30%" %>
 <% headers["Submitted item(s)"] = nil %>
 <%= create_report_table_header(headers) %>
     <% @l = -1 %>
@@ -31,12 +32,32 @@
         <% end %>
 
         <!--Team member(s) / Participant name-->
-          <td bgcolor= <%= bgcolor %>>
-              <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
-                  (<%= user.fullname%>)<br>
+        <td bgcolor= <%= bgcolor %>>
+            <% users_for_curr_team.each do |user| %>
+                <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
+                (<%= user.fullname%>)<br>
+            <% end %>
+        </td>
+
+        <!-- Github -->
+        <td bgcolor= <%= bgcolor%>>
+          <% if !team.hyperlinks.empty? %>
+            <% team.hyperlinks.each do |link| %>
+              <% if GithubMetricsFetcher.supports_url?(link) %>
+                <% metrics = GithubMetricsFetcher.new({"url" => link})%>
+                <% metrics.fetch_content %>
+                <% stats = metrics.to_bar_graph %>
+                <% if ! stats.nil? && ! stats.empty? %>
+                  <div id ="<%= link %>" />
+                  <script> 
+                  <%= render partial: "list_submissions_github_chart", 
+                    :formats => :js, :locals => { stats: stats, id: link, title: "Github Data" }%>
+                  </script>
+                <% end %>
               <% end %>
-          </td>
+            <% end %>
+          <% end %>
+        </td>
 
         <!--Submitted item(s)-->
         <td bgcolor= <%= bgcolor %>>
@@ -57,6 +78,7 @@
             Files: <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
           <% end %>
         </td>
+        
       </tr>
     <% end %>
   </table>

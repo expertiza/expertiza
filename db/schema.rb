@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170925225438) do
+ActiveRecord::Schema.define(version: 20171103022331) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -286,6 +286,47 @@ ActiveRecord::Schema.define(version: 20170925225438) do
   add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
   add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+
+  create_table "metric_data_point_types", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.integer  "source",      limit: 4
+    t.string   "value_type",  limit: 255
+    t.string   "description", limit: 255
+    t.integer  "dimension",   limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "metric_data_point_types", ["name"], name: "index_metric_data_point_types_on_name", unique: true, using: :btree
+
+  create_table "metric_data_points", force: :cascade do |t|
+    t.integer  "metric_id",                 limit: 4
+    t.integer  "metric_data_point_type_id", limit: 4
+    t.string   "value",                     limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "metric_data_points", ["metric_id"], name: "index_metric_data_points_on_metric_id", using: :btree
+
+  create_table "metric_sources", force: :cascade do |t|
+    t.string "name",        limit: 255
+    t.string "description", limit: 255
+  end
+
+  create_table "metrics", force: :cascade do |t|
+    t.integer  "team_id",       limit: 4
+    t.integer  "assignment_id", limit: 4
+    t.integer  "source",        limit: 4,   null: false
+    t.string   "remote_id",     limit: 255, null: false
+    t.string   "uri",           limit: 255, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "metrics", ["assignment_id"], name: "index_metrics_on_assignment_id", using: :btree
+  add_index "metrics", ["remote_id", "uri"], name: "index_metrics_on_remote_id_and_uri", unique: true, using: :btree
+  add_index "metrics", ["team_id"], name: "index_metrics_on_team_id", using: :btree
 
   create_table "nodes", force: :cascade do |t|
     t.integer "parent_id",      limit: 4
@@ -686,6 +727,7 @@ ActiveRecord::Schema.define(version: 20170925225438) do
     t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
+    t.string  "github_id",                 limit: 255
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

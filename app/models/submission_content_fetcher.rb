@@ -16,7 +16,7 @@ class SubmissionContentFetcher
       params = {"url" => url}
 
       if GithubPullRequestFetcher.supports_url?(url)
-        return GithubPullRequestFetcher.new(params)
+        return GithuPullRequestFetcher.new(params)
       end
       nil
     end

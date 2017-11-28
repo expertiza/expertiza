@@ -1,4 +1,3 @@
-
 class GithubPullRequestFetcher
   require 'http_request'
 

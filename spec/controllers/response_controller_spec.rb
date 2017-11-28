@@ -47,7 +47,6 @@ describe ResponseController do
           allow(review_response_map).to receive(:is_locked?).and_return(true)
           allow(review_response_map).to receive(:locked_by).and_return(2)
           expect(controller.send(:action_allowed?)).to be false
-
         end
       end
 
@@ -59,7 +58,6 @@ describe ResponseController do
           allow(review_response_map).to receive(:is_locked?).and_return(true)
           allow(review_response_map).to receive(:locked_by).and_return(1)
           expect(controller.send(:action_allowed?)).not_to be false
-
         end
       end
     end

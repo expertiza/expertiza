@@ -12,6 +12,8 @@
  <h5><%= "Team Name: #{@team.name}" %></h5>
 <% end %>
 
+<hr>
+
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <% if @assignment.dynamic_reviewer_assignment? %>
@@ -50,5 +52,4 @@
     <% end %>
 <% end %>
 
-<br><br>
 <a href="javascript:window.history.back()">Back</a>

@@ -57,7 +57,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @response = Response.find(params[:id])
     @map = @response.map
-    lock_response_map params[:id]
+    lock_response_map params[:id] if @map.type == 'ReviewResponseMap'
     @contributor = @map.contributor
     set_all_responses
 
@@ -186,7 +186,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    unlock_response_map @map.id
+    unlock_response_map @map.id if @map.type == 'ReviewResponseMap'
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
@@ -195,7 +195,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    unlock_response_map @map.id
+    unlock_response_map @map.id if @map.type == 'ReviewResponseMap'
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 

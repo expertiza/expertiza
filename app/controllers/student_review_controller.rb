@@ -31,7 +31,7 @@ class StudentReviewController < ApplicationController
 
     #E17A0 We unlock a response_map if it was locked by another team member.
     if(params.has_key?(:response_id))
-      unlock_response_map params[:response_id]
+      unlock_response_map params[:response_id] if @response_map.type == 'ReviewResponseMap'
     end
 
     @assignment = @participant.assignment

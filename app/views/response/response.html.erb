@@ -89,20 +89,20 @@ jQuery(document).ready(function() {
        <% i += 1%>
     <% end %>
 
-    <p>
-      <label for="review_comments">Additional Comments</label><BR/>
-      <!--#E17A0 Added white-space:preline styling to get rid of white-spaces in the additional comments text-area-->
-      <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden; white-space:pre-line;">
-        <% if controller.action_name != 'new' and @response.additional_comment != nil %><%= @response.additional_comment.strip if !@response.nil? %>
-        <% end %></textarea>
-    </p>
+    <!--#E17A0 Formatted this section to have a list and not have leading white spaces-->
+    <li>
+      <div><label for="review_comments">Additional Comments</label></div>
+      <% if controller.action_name != 'new' and @response.additional_comment != nil %>
+        <% additional_review_comments = @response.additional_comment.strip if !@response.nil? %>
+      <% end %>
+      <div><textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden"><%= additional_review_comments %></textarea></div>
+    </li>
 
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>
     <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
 
-    <br/>
     <br>
     <%= submit_tag "Save "+@title, :name => "save" %>
     <!--#E1600 check title for selfreview to show submit button-->

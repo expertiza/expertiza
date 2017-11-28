@@ -91,6 +91,7 @@ $("#myTable tbody").sortable().disableSelection();
           <% @response_maps.each_with_index do |ri, index| %>
             <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
+                <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: ri.id} %>
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
             <%end %>
           <%end %>

@@ -87,7 +87,7 @@
             <%= cal.reviewer_id %>
             <%end%>
 
-            <% if @assignment.has_expert_review == true and !calibration_response_map.nil? and !calibration_response_map.first.response.nil? and !map.response.empty? and map.response[0].is_submitted == true %>
+            <% if @assignment.has_expert_review == true and !calibration_response_map.nil? and calibration_response_map.any? and !calibration_response_map.first.response.nil? and !map.response.empty? and map.response[0].is_submitted == true %>
               <td>&nbsp;&nbsp;</td>
               <td><%= link_to "Show expert peer-review results", {controller: 'response', action: 'show_expert_review_results_for_student', calibration_response_map_id: calibration_response_map_ids, review_response_map_id: map.id} %></td>
             <% end %>

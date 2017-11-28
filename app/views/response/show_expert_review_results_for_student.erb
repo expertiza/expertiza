@@ -8,9 +8,23 @@ th, td {
 	<% next if question.break_before == false %>
     <b><%= "Question #{index+1} [#{question.type}]: " %></b><%= question.txt %>
     <% instructor_answer = [] %>
+    <% css_class =[] %>
     <% @calibration_response.each do |cal|%>
-
-	      <% instructor_answer.push Answer.where(["question_id = ? and response_id = ?", question.id, cal.id]).first ||= 0 %>
+        <% ins = Answer.where(["question_id = ? and response_id = ?", question.id, cal.id]).first ||= 0 %>
+           <% instructor_answer.push ins%>
+        <% case ins.answer %>
+        <% when 5 %>
+            <% cssclass = 'c5' %>
+        <% when 4 %>
+            <% cssclass = 'c4' %>
+        <% when 3 %>
+            <% cssclass = 'c3' %>
+        <% when 2 %>
+            <% cssclass = 'c2' %>
+        <% else %>
+            <% cssclass = 'c1' %>
+        <% end %>
+        <% css_class.push cssclass %>
     <%end%>
     <% stu_answer = Answer.where(["question_id = ? and response_id = ?", question.id, @review_response.id]).first ||= 0 %>
 
@@ -21,7 +35,6 @@ th, td {
 			<th>Comment</th>
 		</tr>
 		<tr>
-
 			<% case stu_answer.answer %>
 				<% when 5 %>
 					<% stu_css_class = 'c5' %>
@@ -34,25 +47,8 @@ th, td {
 				<% else %>
 					<% stu_css_class = 'c1' %>
 			<% end %>
-
-
-
-
-
 			<% if question.instance_of? Checkbox %>
-          <% instructor_answer.each do |ans| %>
-              <% case ans.answer %>
-      <% when 5 %>
-                  <% instructor_css_class = 'c5' %>
-              <% when 4 %>
-                  <% instructor_css_class = 'c4' %>
-              <% when 3 %>
-                  <% instructor_css_class = 'c3' %>
-              <% when 2 %>
-                  <% instructor_css_class = 'c2' %>
-              <% else %>
-                  <% instructor_css_class = 'c1' %>
-              <% end %>
+          <% instructor_answer.each do |ans|%>
               <td>Expert review</td>
 					<% if ans.answer == 1 %>
 					<td><img src="/assets/Check-icon.png"></td>
@@ -62,10 +58,6 @@ th, td {
 				<td>N/A</td></tr>
               <%end%>
 
-
-
-
-
 				<tr><td>Your review</td>
 				<% if stu_answer.answer == 1 %>
 					<td><img src="/assets/Check-icon.png"></td>
@@ -74,19 +66,7 @@ th, td {
 				<% end %>
 				<td>N/A</td>
 			<% elsif question.instance_of? Dropdown or question.instance_of? TextArea %>
-          <% instructor_answer.each do |ans| %>
-              <% case ans.answer %>
-      <% when 5 %>
-                  <% instructor_css_class = 'c5' %>
-              <% when 4 %>
-                  <% instructor_css_class = 'c4' %>
-              <% when 3 %>
-                  <% instructor_css_class = 'c3' %>
-              <% when 2 %>
-                  <% instructor_css_class = 'c2' %>
-              <% else %>
-                  <% instructor_css_class = 'c1' %>
-              <% end %>
+          <% instructor_answer.each do |ans |%>
               <td>Expert review</td>
           <td>N/A</td>
 				<td><%= ans.comments %></td></tr>
@@ -101,19 +81,7 @@ th, td {
 					<% next_stu_answer = Answer.where(question_id: @questions[index+1].id, response_id: @review_response.id).first %>
 				<% end %>
 				<% if question.break_before == true and !next_question.nil? and next_question.break_before == false %>
-              <% instructor_answer.each do |ans| %>
-                  <% case ans.answer %>
-      <% when 5 %>
-                      <% instructor_css_class = 'c5' %>
-                  <% when 4 %>
-                      <% instructor_css_class = 'c4' %>
-                  <% when 3 %>
-                      <% instructor_css_class = 'c3' %>
-                  <% when 2 %>
-                      <% instructor_css_class = 'c2' %>
-                  <% else %>
-                      <% instructor_css_class = 'c1' %>
-                  <% end %>
+              <% instructor_answer.each do |ans|%>
                   <td>Expert review</td>
               <td><%= "#{ans.comments} - #{next_instructor_answer.comments}" %></td>
 					<td>N/A</td></tr>
@@ -124,19 +92,7 @@ th, td {
 				<% elsif question.break_before == false or next_question.break_before == false %>
 					<% next %>
 				<% else %>
-              <% instructor_answer.each do |ans| %>
-                  <% case ans.answer %>
-      <% when 5 %>
-                      <% instructor_css_class = 'c5' %>
-                  <% when 4 %>
-                      <% instructor_css_class = 'c4' %>
-                  <% when 3 %>
-                      <% instructor_css_class = 'c3' %>
-                  <% when 2 %>
-                      <% instructor_css_class = 'c2' %>
-                  <% else %>
-                      <% instructor_css_class = 'c1' %>
-                  <% end %>
+              <% instructor_answer.each do |ans|%>
                   <td>Expert review</td>
 					<td><%= ans.comments %></td>
 					<td>N/A</td></tr>
@@ -146,21 +102,9 @@ th, td {
 					<td>N/A</td>
 				<% end %>
 			<% else %>
-          <% instructor_answer.each do |ans| %>
-              <% case ans.answer %>
-      <% when 5 %>
-                  <% instructor_css_class = 'c5' %>
-              <% when 4 %>
-                  <% instructor_css_class = 'c4' %>
-              <% when 3 %>
-                  <% instructor_css_class = 'c3' %>
-              <% when 2 %>
-                  <% instructor_css_class = 'c2' %>
-              <% else %>
-                  <% instructor_css_class = 'c1' %>
-              <% end %>
+          <% instructor_answer.zip(css_class).each do |ans , cc|%>
               <td>Expert review</td>
-				<td class=<%= instructor_css_class %>><%= ans.answer %></td>
+				<td class=<%= cc %>><%= ans.answer %></td>
 				<td><%= ans.comments %></td></tr>
           <%end%>
 				<tr><td>Your review</td>
@@ -170,6 +114,4 @@ th, td {
 		</tr>		
 	</table>
 	<br>
-
-
 <% end %>

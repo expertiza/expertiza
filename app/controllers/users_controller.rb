@@ -111,7 +111,7 @@ class UsersController < ApplicationController
   end
 
   def request_new
-    flash[:error] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
+    flash[:notice] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
@@ -207,8 +207,17 @@ class UsersController < ApplicationController
     # TODO: Do not allow duplicates
     # TODO: All fields should be entered
     @user = RequestedUser.new(user_params)
-    @user.institution_id = params[:user][:institution_id]
-    @user.status = 'Under Review'
+    if params[:user][:institution_id] == ""
+      @institution = Institution.new(name: params[:institution][:name])
+      @institution.save
+      @user.institution_id = @institution.id
+      @user.introduction = params[:requested_user][:introduction]
+      @user.status = 'Under Review'
+    else
+      @user.institution_id = params[:user][:institution_id]
+      @user.introduction = params[:requested_user][:introduction]
+      @user.status = 'Under Review'
+    end
 
     # The super admin receives a mail about a new user request with the user name
     if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil? && @user.save
@@ -220,7 +229,8 @@ class UsersController < ApplicationController
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else
-      flash[:error] = "The account you are requesting has already existed in Expertiza."
+      #flash[:error] = "The account you are requesting has already existed in Expertiza."
+      flash[:error] = @user.errors.full_messages.to_sentence
       redirect_to controller: 'users', action: 'request_new', role: "Student"
     end
   end

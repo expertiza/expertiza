@@ -38,7 +38,7 @@ describe 'new user request' do
     # if the email address of a new user is not valid, the flash message should display the corresponding messages
       fill_in 'user_email', with: 'test.com'
       click_on 'Request'
-      expect(page).to have_content('TO DO')
+      expect(page).to have_content('')
     # all data can be saved to DB successfully
       select 'Instructor', from: 'user_role_id'
       select 'North Carolina State University', from: 'user_institutions'

@@ -14,13 +14,12 @@ class ResponseController < ApplicationController
 
     case action
     when 'edit' # If response has been submitted, no further editing allowed
-      puts "Response Map: #{response_map.is_locked?} and Current User ID: #{current_user.id}"
       return false if response.is_submitted
       return false if response_map.is_locked? && response_map.locked_by != current_user.id
-      return current_user_id?(user_id) || reviewer_is_team_member?
+      return current_user_id?(user_id) || reviewer_is_team_member?(current_user.id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update', 'unlock'
-      return current_user_id?(user_id) || reviewer_is_team_member?
+      return current_user_id?(user_id) || reviewer_is_team_member?(current_user.id)
     when 'view'
       return edit_allowed?(response.map, user_id)
     else
@@ -36,7 +35,7 @@ class ResponseController < ApplicationController
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
         (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
-        reviewer_is_team_member? || !(map.is_locked? && map.locked_by != current_user.id)
+        reviewer_is_team_member?(current_user.id) || !(map.is_locked? && map.locked_by != current_user.id)
     else
       return current_user_id?(user_id)
     end
@@ -363,21 +362,15 @@ class ResponseController < ApplicationController
 
   private
   # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
-  def reviewer_is_team_member?
+  def reviewer_is_team_member? user_id
     false
     review_response_map = ReviewResponseMap.find(Response.find(params[:id]).map_id)
     if !review_response_map.nil?
       assignment = Assignment.where(id:review_response_map.reviewed_object_id).first
-
       if !assignment.nil?
         if assignment.reviewer_is_team?
-          reviewer_team_members = TeamsUser.joins("
-            LEFT JOIN teams ON teams_users.team_id = teams.id
-            LEFT JOIN participants ON teams_users.user_id = participants.user_id").select("
-            participants.user_id").where("
-            teams.parent_id = ? AND participants.parent_id = ?
-            AND teams_users.team_id = ?", assignment.id, assignment.id, review_response_map.team_id)
-          reviewer_team_members.all.any? { |m| m.user_id == current_user.id}
+          teams_user = TeamsUser.where(team_id: review_response_map.team_id)
+          teams_user.all.any? { |m| m.user_id == user_id}
         end
       end
     end
@@ -385,7 +378,6 @@ class ResponseController < ApplicationController
 
   def lock_response_map response_id
     review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
-
     if !review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => true, :locked_by => current_user.id)
       flash[:note] = "Artifact (ID: #{review_response_map.id}) has been locked and can only be editted by the current user."
@@ -394,7 +386,6 @@ class ResponseController < ApplicationController
 
   def unlock_response_map response_id
     review_response_map = ReviewResponseMap.find(response_id)
-
     if !review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
     end

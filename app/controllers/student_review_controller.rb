@@ -11,27 +11,12 @@ class StudentReviewController < ApplicationController
   def list
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    @response_map = ReviewResponseMap.where(reviewer_id: params[:id]).first
-    @reviewer_is_team_member = false
-
-    # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
-    if !@assignment.nil?
-      if @assignment.reviewer_is_team?
-        reviewer_team_members = TeamsUser.joins("
-          LEFT JOIN teams ON teams_users.team_id = teams.id
-          LEFT JOIN participants ON teams_users.user_id = participants.user_id").select("
-          participants.user_id").where("
-          teams.parent_id = ? AND participants.parent_id = ?
-          AND teams_users.team_id = ?", @assignment.id, @assignment.id, @response_map.team_id)
-        @reviewer_is_team_member = reviewer_team_members.all.any? { |m| m.user_id == current_user.id}
-      end
-    end
-
-    return unless current_user_id?(@participant.user_id) || @reviewer_is_team_member
+    @reviewer_team_info = reviewer_team_info current_user.id
+    return unless current_user_id?(@participant.user_id)
 
     #E17A0 We unlock a response_map if it was locked by another team member.
     if(params.has_key?(:response_id))
-      unlock_response_map params[:response_id] if @response_map.type == 'ReviewResponseMap'
+      unlock_response_map params[:response_id]
     end
 
     @assignment = @participant.assignment
@@ -42,9 +27,9 @@ class StudentReviewController < ApplicationController
     # to treat all assignments as team assignments
 
     # E17A0 If an assignment is to be reviewed by a team, select it by team_id otherwise by reviewer_id
-    if @reviewer_is_team_member
-      @review_mappings = ReviewResponseMap.where(team_id: @response_map.team_id)
-      @team = Team.find(@response_map.team_id)
+    if @reviewer_team_info[:reviewer_is_team_member]
+      @review_mappings = ReviewResponseMap.where(team_id: @reviewer_team_info[:team_id])
+      @team = Team.find(@reviewer_team_info[:team_id])
     else
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     end
@@ -74,9 +59,22 @@ class StudentReviewController < ApplicationController
   end
 
   private
+  # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
+  def reviewer_team_info user_id
+    false
+    if !@assignment.nil?
+        if @assignment.reviewer_is_team?
+          team = Team.select(:id, :parent_id).where(parent_id: @assignment.id).all
+          teams_user = TeamsUser.select(:id, :team_id, :user_id).where(user_id: user_id)
+          teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
+          {:reviewer_is_team_member => teams_user.any? { |t| t.user_id == user_id}, :team_id => teams_user.first.team_id}
+        end
+    end
+  end
+
+  # E17A0 If a review is locked by a team member, other team memebers can unlock it
   def unlock_response_map response_id
     review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
-
     if !review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
       flash[:note] = "Artifact (ID: #{review_response_map.id}) has been successfully unlocked and can now be editted."

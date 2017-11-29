@@ -2,6 +2,7 @@ describe ResponseController do
   let(:assignment) { build(:assignment, instructor_id: 6) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
+  let(:team_user) { build(:team_user, id: 1, team_id: 1, user_id: 1) }
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:review_response_map) { build(:review_response_map, id: 1, reviewer: participant, is_locked: false, locked_by: 1) }
   let(:questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
@@ -17,7 +18,6 @@ describe ResponseController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
-
   end
 
   describe '#action_allowed?' do
@@ -50,7 +50,7 @@ describe ResponseController do
         end
       end
 
-      #E17A0 If a review is locked by same user as current user,action not allowed
+      #E17A0 Check if current user is member os assignment review team
       context 'when response is locked by same user as current user' do
         it 'does not disallow certain action' do
           allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
@@ -80,6 +80,21 @@ describe ResponseController do
       end
     end
   end
+
+  describe '#reviewer_is_team_member' do
+    it 'if current user is a member of assignment review team' do
+
+      allow(ReviewResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(review_response_map).to receive(:nil?).and_return(false)
+      allow(Assignment).to receive(:where).with(1).and_return(assignment)
+      allow(TeamsUser).to receive(:joins).with("LEFT JOIN teams ON teams_uxsers.team_id = teams.id LEFT JOIN participants ON teams_users.user_id = participants.user_id").and_return(team_user)
+      allow(team_user).to receive(:select).with("participants.user_id").and_return(team_user)
+      allow(assignment).to receive(:nil?).and_return(false)
+      allow(assignment).to receive(:reviewer_is_team?).and_return(true)
+      allow_any_instance_of(ApplicationController).to receive(:reviewer_team_members).and_return(user)
+    end
+  end
+
 
   describe '#delete' do
     it 'deletes current response and redirects to response#redirection page' do

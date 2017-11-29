@@ -1,7 +1,7 @@
 <div class="exp">
 
   <table>
-    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Status</th><th class="head">Notes</th></tr>
+    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Status</th><th class="head">Introduction</th><th class="head">Notes</th></tr>
 
     <% for user in @users %>
       <%= form_tag :action => 'create_approved_user',:id => user.id  do %>
@@ -15,6 +15,7 @@
             <% end %>
           <% end %>
           <td><%= user.status %></td>
+          <td><%= user.introduction %></td>
           <td> <%= text_field_tag :reason, user.reason %> </td>
           <td> <input type="radio" name="status" value="Approved"> Accept </td>
           <td> <input type="radio" name="status" value="Rejected"> Reject </td>

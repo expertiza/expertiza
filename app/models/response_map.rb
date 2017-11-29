@@ -17,6 +17,8 @@ class ResponseMap < ActiveRecord::Base
       maps.each do |map|
         next if map.response.empty?
         @all_resp = Response.where(map_id: map.map_id).last
+        # this method (i.e get_assessments_for) should be available for both self and peer review
+        # this method is inherited in both ReviewResponseMap and SelfReviewResponseMap class where it will be used.
         if map.type.eql?('ReviewResponseMap') || map.type.eql?('SelfReviewResponseMap') 
           # If its ReviewResponseMap then only consider those response which are submitted.
           @array_sort << @all_resp if @all_resp.is_submitted

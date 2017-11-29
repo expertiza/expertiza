@@ -88,7 +88,7 @@ ActiveRecord::Schema.define(version: 20171125232609) do
     t.boolean  "use_bookmark"
     t.boolean  "can_review_same_topic",                    default: true
     t.boolean  "can_choose_topic_to_review",               default: true
-    t.boolean  "is_calibrated",                        default: false
+    t.boolean  "has_expert_review",                        default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true

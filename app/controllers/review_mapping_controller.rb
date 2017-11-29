@@ -606,7 +606,7 @@ class ReviewMappingController < ApplicationController
       iterator += 1
     end
   end
-<<<<<<< HEAD
+
   #this function assigns good reviewer score if review grade is greater than a particular threshold
   def assign_good_reviewer_badge(participant_id,review_grade)
     print participant_id
@@ -636,6 +636,4 @@ class ReviewMappingController < ApplicationController
     end
   end
 end
-=======
-end
->>>>>>> 86d9be5098bc03185d722d704d339daf5330a534
+

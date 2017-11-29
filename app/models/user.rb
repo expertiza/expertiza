@@ -81,13 +81,11 @@ class User < ActiveRecord::Base
       participants = []
       #Course.where(instructor_id: self.id).find_each do |course|
 	
-	Course.where(instructor_id: self.id).limit(20).each do |course|
-	puts "asdfadsjfnajdf"
-        participants << course.get_participants
+	Course.where(instructor_id: self.id).each do |course|
+	     participants << course.get_participants
       end
-      Assignment.where(instructor_id: self.id).limit(20).each do |assignment|
-	puts "asdf"
-        participants << assignment.participants
+      Assignment.where(instructor_id: self.id).each do |assignment|
+	    participants << assignment.participants
       end
       participants.each do |p_s|
         next if p_s.empty?

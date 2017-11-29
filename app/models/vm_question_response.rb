@@ -17,7 +17,7 @@ class VmQuestionResponse
 
     @list_of_rows = []
     @list_of_reviewers = []
-    @list_of_reviews = []    
+    @list_of_reviews = []
     @list_of_team_participants = []
     @max_score = questionnaire.max_question_score
     @questionnaire_type = questionnaire.type
@@ -56,7 +56,6 @@ class VmQuestionResponse
       # This gets the self review scores that are saved as the part of self assesing that a user performs after submission
       # Here the data will be nil, if no self review is done by the user.
       self_reviews = SelfReviewResponseMap.get_assessments_for(team)
-
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping.present?
@@ -109,8 +108,7 @@ class VmQuestionResponse
       answers.each do |answer|
         add_answer(answer,"SelfReview")
       end
-    end
-   
+    end   
   end
 
   def display_team_members
@@ -225,7 +223,7 @@ class VmQuestionResponse
 
   def get_number_of_comments_greater_than_10_words
     first_time = true
-    
+
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|

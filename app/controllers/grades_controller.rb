@@ -80,7 +80,6 @@ class GradesController < ApplicationController
     retrieve_questions questionnaires
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
-    
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
@@ -101,8 +100,7 @@ class GradesController < ApplicationController
       @vm.add_questions(vmquestions)
       @vm.add_team_members(@team)
       @vm.add_reviews(@participant, @team,@assignment.varying_rubrics_by_round?)
-      @vm.get_number_of_comments_greater_than_10_words
-    
+      @vm.get_number_of_comments_greater_than_10_words    
       end
     end
   end

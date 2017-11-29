@@ -10,7 +10,7 @@
   <tbody>
   <% @badges.each do |badge| %>
     <tr>
-      <td style="text-align:center"><img src="<%= asset_path("badges/#{badge.image_name}") %>"></td>
+      <td style="text-align:center"><img src="<%= asset_path("badges/#{badge.image_name}") %>" title="<%= badge.name %>"></td>
       <td><%= badge.name %></td>
       <td><%= badge.description %></td>
       <td><input type="text" name="<%= badge.name %> Threshold" value="95"></td>

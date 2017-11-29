@@ -132,7 +132,7 @@ class ReviewMappingController < ApplicationController
         @map = QuizResponseMap.new
         @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
         @map.reviewer_id = params[:participant_id]
-        @map.reviewed_object_id = Questionnaire.find_by_instructor_id(@map.reviewee_id).id
+        @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save
       end
 
@@ -272,12 +272,11 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)
-    @items.sort {|a, b| a.name <=> b.name }
+    @items.sort_by(&:name)
   end
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
-
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.reject {|p| p.can_review == false }.shuffle!
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
@@ -423,14 +422,11 @@ class ReviewMappingController < ApplicationController
                                                                                                                               params[:id]).pluck(:id))
     when "AnswerTaggingReport"
       tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
-
       @questionnaire_tagging_report = {}
-
       tag_prompt_deployments.each do |tag_dep|
         @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
       end
     end
-
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 
@@ -443,7 +439,6 @@ class ReviewMappingController < ApplicationController
     review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
-    p_id=params[:participant_id]
     assign_good_reviewer_badge( p_id, review_grade.grade_for_reviewer)
 
     begin
@@ -611,6 +606,7 @@ class ReviewMappingController < ApplicationController
       iterator += 1
     end
   end
+<<<<<<< HEAD
   #this function assigns good reviewer score if review grade is greater than a particular threshold
   def assign_good_reviewer_badge(participant_id,review_grade)
     print participant_id
@@ -640,3 +636,6 @@ class ReviewMappingController < ApplicationController
     end
   end
 end
+=======
+end
+>>>>>>> 86d9be5098bc03185d722d704d339daf5330a534

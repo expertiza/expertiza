@@ -473,7 +473,7 @@ development:
         parent:
         parent_id: 37
         site_controller_id: 35
-        url: "/users/set_anonymized_view"
+        url: "/users/set_anonymous_mode"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1446,7 +1446,7 @@ production:
         parent:
         parent_id: 37
         site_controller_id: 35
-        url: "/users/set_anonymized_view"
+        url: "/users/set_anonymous_mode"
     by_name:
       home: *1
       manage instructor content: *2

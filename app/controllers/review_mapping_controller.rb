@@ -439,7 +439,7 @@ class ReviewMappingController < ApplicationController
     review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
-    assign_good_reviewer_badge( p_id, review_grade.grade_for_reviewer)
+    assign_good_reviewer_badge(params[:participant_id], review_grade.grade_for_reviewer)
 
     begin
       review_grade.save

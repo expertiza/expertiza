@@ -62,7 +62,7 @@
   </div>
 </th>
 
-
+<!-- We are adding another circle graph to show case the self review points just like the peer review score is shown -->
 <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
   <div class="circle" id="self-review-circle">
           
@@ -101,6 +101,7 @@
     textClass:      'circles-final'  
   });
 
+   /* Creating another circle instance just like peer review circle, but this time for the purpose of showing self review scores*/
    var myCircle = Circles.create({
     id:           'self-review-circle',
     radius:       35,

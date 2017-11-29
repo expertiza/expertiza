@@ -108,7 +108,7 @@ class UsersController < ApplicationController
   end
 
   def request_new
-    flash[:error] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
+    flash[:notice] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
@@ -227,7 +227,8 @@ class UsersController < ApplicationController
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else
-      flash[:error] = "The account you are requesting has already existed in Expertiza."
+      #flash[:error] = "The account you are requesting has already existed in Expertiza."
+      flash[:error] = @user.errors.full_messages.to_sentence
       redirect_to controller: 'users', action: 'request_new', role: "Student"
     end
   end

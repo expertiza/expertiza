@@ -11,7 +11,7 @@
       function ISODateString(date){
         function pad(num){return num<10? '0'+num: num;}
         return date.getUTCFullYear()+'-'
-                  + pad(date.getUTCMonth()+1) + '-';
+                  + pad(date.getUTCMonth()+1) + '-'
                   + pad(date.getUTCDate()) + ' '
                   + pad(date.getUTCHours()) + ':'
                   + pad(date.getUTCMinutes()) + ':'
@@ -40,20 +40,20 @@
             var t = new Date();
             $.ajax({
               type: "POST",
-              url: '/response_time/record_start_time',
+              url: '/response_times/record_start_time',
               data: $.param({response_time:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
             });
           }
 
-          function endTime(){
+          function endTime(link){
             var t = new Date();
             $.ajax({
               type: 'POST',
               dataType: 'json',
               async: false,
-              url: '/response_time/record_end_time',
+              url: '/response_times/record_end_time',
               data: $.param({
-                response_time: {map_id: <%= map_id %>, round: <%= round %>, end_at: ISODateString(t)}
+                response_time: {map_id: <%= map_id %>, round: <%= round %>, link: link, end_at: ISODateString(t)}
                 }),
               /*success: function(json){
                 var links = JSON.parse(JSON.stringigy(json));
@@ -68,7 +68,7 @@
 
           function checkWindowStatus(){
             if (window_handler.closed){
-              endTime();
+              endTime(file_name);
               clearInterval(link_timer);
             }
           }

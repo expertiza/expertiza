@@ -3,7 +3,7 @@ class ResponseTimesController < ApplicationController
     true
   end
 
-  def response_start_time
+  def record_start_time
     map_id = params[:response_time][:map_id]
     round = params[:response_time][:round]
     link = params[:response_time][:link]
@@ -20,15 +20,16 @@ class ResponseTimesController < ApplicationController
     end
     # create new response time record for current link
     @response_time = ResponseTime.new(response_time_params)
+    #@response_time = ResponseTime.new(params)
     @response_time.save
   end
 
-  def response_end_time
+  def record_end_time
     @data = params.require(:response_time)
     @response_time_records = ResponseTime.where(map_id: @data[:map_id], round: @data[:round], link: @data[:link])
     @response_time_records.each do |time_record|
       if time_record.end_at.nil?
-        time_record.update_attribute('end', @data[:end_at])
+        time_record.update_attribute('end_at', @data[:end_at])
         break
       end
     end

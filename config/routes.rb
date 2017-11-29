@@ -391,13 +391,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :statistics do
-    collection do
-      get :list_surveys
-      get :list
-      get :view_responses
-    end
-  end
+  # resources :statistics do
+  #   collection do
+  #     get :list_surveys
+  #     get :list
+  #     get :view_responses
+  #   end
+  # end
 
   resources :student_quizzes do
     collection do

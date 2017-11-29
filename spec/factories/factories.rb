@@ -378,4 +378,12 @@ FactoryGirl.define do
     content 'www.wolfware.edu'
     created_at Time.now
   end
+  
+  factory :requester, class: RequestedUser do
+    name 'requester1'
+    role_id  2
+    fullname 'requester1,test'
+    institution_id 1
+    email 'requester1@test.com'
+  end
 end

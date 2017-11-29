@@ -8,6 +8,9 @@ class UsersController < ApplicationController
 
   def action_allowed?
     case params[:action]
+    when 'list_pending_requested'
+      ['Super-Administrator',
+       'Administrator'].include? current_role_name
     when 'request_new'
       true
     when 'request_user_create'
@@ -63,7 +66,7 @@ class UsersController < ApplicationController
   end
 
   def list_pending_requested
-    sql_query = "select * from requested_users where status <> 'Approved' or status is null"
+    sql_query = "select * from requested_users where status <> '' or status is null"
     @users = RequestedUser.find_by_sql(sql_query)
     # @users=RequestedUser.all
     @roles = Role.all
@@ -174,8 +177,7 @@ class UsersController < ApplicationController
       if @usernew.save
         password = @usernew.reset_password # the password is reset
         # Mail is sent to the user with a new password
-        prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password
-                                                            have been created.", "user_welcome", password)
+        prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password have been created.", "user_welcome", password)
         prepared_mail.deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"

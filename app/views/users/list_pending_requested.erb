@@ -8,18 +8,20 @@
         <tr class="exp">
           <td><%=  user.name %></td>
           <td><%= user.fullname %></td>
-          <td><%= user.email %></td>
+          <td><%= mail_to user.email, user.email %></td>
           <% for role in @roles %>
             <% if user.role_id == role.id %>
               <td><%= role.name%></td>
             <% end %>
           <% end %>
           <td><%= user.status %></td>
+          <% if user.status == 'under Review' %>
           <td> <%= text_field_tag :reason, user.reason %> </td>
           <td> <input type="radio" name="status" value="Approved"> Accept </td>
           <td> <input type="radio" name="status" value="Rejected"> Reject </td>
 
           <td> <%= submit_tag "Submit"%> </td>
+          <% end %>
         </tr>
       <% end %>
     <% end %>

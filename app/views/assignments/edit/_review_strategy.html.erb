@@ -114,6 +114,7 @@
   <%= form_tag controller: 'assignment', action: 'delete_reviews', assignment_id: @assignment_form.assignment.id do %>
     <tr id ="delete_reviews">
       <td>
+        <%= hidden_field_tag "other_action", "delete_reviews" %>
         <%= hidden_field_tag "action_confirmed", 0 %>
         <%= submit_tag "Delete Reviews", :id => 'delete_reviews_btn' %> | <%= label_tag('assignment_form[assignment][delete_review]', 'All reviews for this assignment will be deleted!') %>
       </td>

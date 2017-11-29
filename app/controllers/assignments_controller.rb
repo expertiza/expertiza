@@ -4,7 +4,7 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if %w(edit update list_submissions).include? params[:action]
+    if %w(edit update list_submissions).include? params[:action] || params[:other_action] == "delete_reviews"
       assignment = Assignment.find(params[:id])
       ['Super-Administrator',
        'Administrator'].include? current_role_name or

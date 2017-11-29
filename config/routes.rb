@@ -73,6 +73,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resource :assignment do
+    collection do
+      get :delete_reviews
+      post :delete_reviews
+    end
+  end
+
   resources :auth do
     collection do
       post :login

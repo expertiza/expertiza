@@ -12,13 +12,14 @@ class StudentReviewController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @reviewer_team_info = reviewer_team_info current_user.id
-    return unless current_user_id?(@participant.user_id)
+    return unless current_user_id?(@participant.user_id) || @reviewer_team_info[:reviewer_is_team_member]
 
     #E17A0 We unlock a response_map if it was locked by another team member.
     if(params.has_key?(:response_id))
       unlock_response_map params[:response_id]
     end
 
+    puts "Hello 123"
     @assignment = @participant.assignment
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
@@ -30,8 +31,11 @@ class StudentReviewController < ApplicationController
     if @reviewer_team_info[:reviewer_is_team_member]
       @review_mappings = ReviewResponseMap.where(team_id: @reviewer_team_info[:team_id])
       @team = Team.find(@reviewer_team_info[:team_id])
+      puts @team.inspect
+      puts "Team ID: #{@reviewer_team_info[:team_id]}"
     else
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+      puts "Team ID: #{@reviewer_team_info[:team_id]}"
     end
     # if it is an calibrated assignment, change the response_map order in a certain way
     @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5 } if @assignment.is_calibrated == true
@@ -65,8 +69,11 @@ class StudentReviewController < ApplicationController
     if !@assignment.nil?
         if @assignment.reviewer_is_team?
           team = Team.select(:id, :parent_id).where(parent_id: @assignment.id).all
+          puts team.inspect
           teams_user = TeamsUser.select(:id, :team_id, :user_id).where(user_id: user_id)
+          puts teams_user.inspect
           teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
+          puts teams_user.inspect
           {:reviewer_is_team_member => teams_user.any? { |t| t.user_id == user_id}, :team_id => teams_user.first.team_id}
         end
     end

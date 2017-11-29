@@ -64,6 +64,18 @@ class AssignmentsController < ApplicationController
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
   end
 
+  def delete_reviews
+    @assignment = Assignment.find(params[:assignment_id])
+    if params[:action_confirmed].to_i == 1
+      puts "action confirmed"
+      redirect_to edit_assignment_path @assignment.id
+      flash.now[:note] = "All reviews for assignment (ID: #{@assignment.id}) have been successfully deleted!"
+    else
+      puts "action confirmed - not"
+      flash.now[:error] = "All reviews for assignment(ID: #{@assignment.id}) will be deleted!"
+    end
+  end
+
   def update
     unless params.key?(:assignment_form)
       assignment_form_key_nonexist_case_handler

@@ -96,6 +96,7 @@
       <th>Topic</th>
       <th>Current Stage</th>
       <th>Review Grade</th>
+      <th>Badges</th>
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
@@ -126,6 +127,18 @@
           </td>
           <!--review grade-->
           <td><%= get_review_grade_info(participant) %></td>
+
+          <!--badges-->
+          <td align="center">
+            <% awarded_badges = AwardedBadge.where(participant_id: participant.id) %>
+            <% if awarded_badges != nil %>
+                <% awarded_badges.each do |awarded_badge| %>
+                    <% badge = Badge.find(awarded_badge.badge_id) %>
+                    <img src="<%= asset_path("badges/#{badge.image_name}") %>" title="<%= badge.name %>">
+                <% end %>
+            <% end %>
+          </td>
+
           <!--stage deadline-->
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <!--publish rights-->

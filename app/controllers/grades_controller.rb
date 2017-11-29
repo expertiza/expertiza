@@ -70,6 +70,7 @@ class GradesController < ApplicationController
 
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
+    # Getting the team data from participant, for the purpose of assigning it in the VM object
     @team = @participant.team
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
@@ -90,7 +91,9 @@ class GradesController < ApplicationController
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
-    # Done for the Self Review Composite Score generation part
+    # The computation of composite self review scores,require both self review and peer review scores
+    # the computation is same as we do in alternate view
+    # refer view_team action for the same computation that goes there
     questionnaires.each do |questionnaire|
     if questionnaire.type == "ReviewQuestionnaire"
       @vm = VmQuestionResponse.new(questionnaire, @assignment)

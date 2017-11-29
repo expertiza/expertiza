@@ -3,12 +3,10 @@ source 'https://rubygems.org'
 gem 'rails', '~> 4.2.6'
 
 ## Gems in Alphabetical Order
-gem 'render_async'
-gem 'flamegraph'
-gem 'kaminari'
+
+
 gem 'stackprof' 
 gem 'fast_stack'
-gem 'rack-mini-profiler', require: false
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
@@ -23,6 +21,7 @@ gem 'edavis10-ruby-web-search'
 gem 'engtagger'
 gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', require: 'authlogic'
 gem 'fastercsv'
+gem 'flamegraph'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
 gem "googlecharts", require: "gchart"
@@ -33,6 +32,7 @@ gem 'jquery-rails'
 gem 'jquery-ui-sass-rails'
 gem 'jquery-datetimepicker-rails'
 gem 'json', '~> 1.8', '>= 1.8.3'
+gem 'kaminari'
 gem 'lingua'
 gem 'mysql2'
 gem 'nokogiri', '~> 1.6.8'
@@ -40,6 +40,7 @@ gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
 gem 'protected_attributes'
+gem 'rack-mini-profiler', require: false
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'

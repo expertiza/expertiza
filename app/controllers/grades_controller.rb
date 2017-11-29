@@ -116,10 +116,6 @@ class GradesController < ApplicationController
     @current_role_name = current_role_name
   end
 
-  def tabbing
-   render :partial => 'tabbing', :locals => {:prefix => params[:prefix], :tscore => params[:tscore] }
-  end
-
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment

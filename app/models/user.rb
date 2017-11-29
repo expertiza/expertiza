@@ -79,13 +79,11 @@ class User < ActiveRecord::Base
     # If the user is an instructor, fetch all users in his course/assignment
     if self.role.instructor?
       participants = []
-      #Course.where(instructor_id: self.id).find_each do |course|
-	
-	Course.where(instructor_id: self.id).each do |course|
-	     participants << course.get_participants
+      Course.where(instructor_id: self.id).find_each do |course|
+	      participants << course.get_participants
       end
-      Assignment.where(instructor_id: self.id).each do |assignment|
-	    participants << assignment.participants
+      Assignment.where(instructor_id: self.id).find_each do |assignment|
+	     participants << assignment.participants
       end
       participants.each do |p_s|
         next if p_s.empty?

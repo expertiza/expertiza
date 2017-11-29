@@ -81,20 +81,13 @@
           }
       }
 
-      jQuery(document).ready(function () {
-        jQuery("#submit_btn").click(function(e) {
-          var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
-          if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
-            alert("Maxinum number of members per team must be greater than 1!");
-            e.preventDefault()
-          }
-        })
-
-        jQuery("#delete_reviews_btn").click(function(e) {
-            if (confirm("All reviews for this assignment will be deleted. Are you sure?")){
-              alert("All reviews for this assignment will be deleted!");
+        jQuery(document).ready(function () {
+          jQuery("#submit_btn").click(function(e) {
+            var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
+            if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
+              alert("Maxinum number of members per team must be greater than 1!");
+              e.preventDefault()
             }
-
         })
 
         jQuery("#tabs").tabs({

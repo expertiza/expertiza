@@ -19,7 +19,6 @@ class StudentReviewController < ApplicationController
       unlock_response_map params[:response_id]
     end
 
-    puts "Hello 123"
     @assignment = @participant.assignment
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
@@ -31,11 +30,8 @@ class StudentReviewController < ApplicationController
     if @reviewer_team_info[:reviewer_is_team_member]
       @review_mappings = ReviewResponseMap.where(team_id: @reviewer_team_info[:team_id])
       @team = Team.find(@reviewer_team_info[:team_id])
-      puts @team.inspect
-      puts "Team ID: #{@reviewer_team_info[:team_id]}"
     else
       @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
-      puts "Team ID: #{@reviewer_team_info[:team_id]}"
     end
     # if it is an calibrated assignment, change the response_map order in a certain way
     @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5 } if @assignment.is_calibrated == true
@@ -69,11 +65,8 @@ class StudentReviewController < ApplicationController
     if !@assignment.nil?
         if @assignment.reviewer_is_team?
           team = Team.select(:id, :parent_id).where(parent_id: @assignment.id).all
-          puts team.inspect
           teams_user = TeamsUser.select(:id, :team_id, :user_id).where(user_id: user_id)
-          puts teams_user.inspect
           teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
-          puts teams_user.inspect
           {:reviewer_is_team_member => teams_user.any? { |t| t.user_id == user_id}, :team_id => teams_user.first.team_id}
         end
     end
@@ -84,7 +77,7 @@ class StudentReviewController < ApplicationController
     review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
     if !review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
-      flash[:note] = "Artifact (ID: #{review_response_map.id}) has been successfully unlocked and can now be editted."
+      flash.now[:note] = "Artifact (ID: #{review_response_map.id}) has been successfully unlocked and can now be editted."
     end
   end
 end

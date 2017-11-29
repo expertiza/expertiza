@@ -67,12 +67,13 @@ class AssignmentsController < ApplicationController
   def delete_reviews
     @assignment = Assignment.find(params[:assignment_id])
     if params[:action_confirmed].to_i == 1
-      puts "action confirmed"
+      response_map = ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').select(:id).all
+      Response.where(map_id: response_map).destroy_all
+      ResponseMap.where(reviewed_object_id: @assignment.id).destroy_all
       redirect_to edit_assignment_path @assignment.id
-      flash.now[:note] = "All reviews for assignment (ID: #{@assignment.id}) have been successfully deleted!"
+      flash[:note] = "All reviews for assignment (ID: #{@assignment.id}) have been successfully deleted!"
     else
-      puts "action confirmed - not"
-      flash.now[:error] = "All reviews for assignment(ID: #{@assignment.id}) will be deleted!"
+      flash.now[:error] = "All reviews for assignment (ID: #{@assignment.id}) will be deleted!"
     end
   end
 

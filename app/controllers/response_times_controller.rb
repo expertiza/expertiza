@@ -22,6 +22,7 @@ class ResponseTimesController < ApplicationController
     @response_time = ResponseTime.new(response_time_params)
     #@response_time = ResponseTime.new(params)
     @response_time.save
+    render :nothing => true
   end
 
   def record_end_time
@@ -32,6 +33,9 @@ class ResponseTimesController < ApplicationController
         time_record.update_attribute('end_at', @data[:end_at])
         break
       end
+    end
+    respond_to do |format|
+      format.json {head :no_content}
     end
   end
 

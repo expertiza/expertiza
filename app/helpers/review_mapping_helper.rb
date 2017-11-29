@@ -193,7 +193,10 @@ module ReviewMappingHelper
       sum_time = 0
       @response_times = ResponseTime.where(map_id: map_id, round: round)
       @response_times.each do |link_time|
-        individual_time = (link_time.end - link_time.start)/60
+        start_time = link_time.start_at.nil?? 0: link_time.start_at
+        end_time = link_time.end_at.nil?? 0: link_time.end_at
+        individual_time = (end_time.to_i - start_time.to_i)/60.0
+        individual_time = individual_time<0? 0: individual_time
         sum_time = individual_time + sum_time
       end
       if sum_time > 0

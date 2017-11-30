@@ -33,7 +33,7 @@ class StudentTaskController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     #Timeline feature
-    @timeline_list = StudentTask.get_timeline_data(@assignment.id, @participant.id, @team.id)
+    @timeline_list = StudentTask.get_timeline_data(@assignment.id, @participant.id, @team)
   end
 
   def others_work

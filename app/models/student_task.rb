@@ -128,25 +128,39 @@ class StudentTask
     end
     @students_teamed
   end
+=begin
+  def sort_timeline_data(timeline_data)
+
+    for i in i<timeline_data.length; i++)
+      for(j=i; i<timeline_data.length; j++)
+        if timeline_data[i][:updated_at] > timeline_data[j][:updated_at]
+          tmp = timeline_data[i]
+          timeline_data[i] = timeline_data[j]
+          timeline_data[j] = tmp
+      end
+    end
+    return timeline_data
+  end
+=end
 
   def self.get_timeline_data(assignment_id, participant_id, team_id)
     @timeline_list = Array.new
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
       tmp = Hash.new
-      tmp['label'] = dd.deadline_type.name + ' Deadline'
-      tmp['updated_at'] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
-      tmp['link'] = nil
+      tmp[:label] = dd.deadline_type.name + ' Deadline'
+      tmp[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
+      tmp[:link] = nil
       @timeline_list << tmp
     end
 
     @submissions = SubmissionRecord.where(team_id: team_id , assignment_id: assignment_id)
     @submissions.each do |sr|
       tmp = Hash.new
-      tmp['label'] = sr.operation
-      tmp['updated_at'] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
+      tmp[:label] = sr.operation
+      tmp[:updated_at] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
       unless sr.operation == 'Submit File' || sr.operation == 'Remove File'
-        tmp['link'] = sr.content
+        tmp[:link] = sr.content
       end
       @timeline_list << tmp
     end
@@ -156,14 +170,16 @@ class StudentTask
       tmp = Hash.new
       @response = Response.where(map_id: rm.id)
       unless @response[0].nil?
-        tmp['label'] = 'Round ' + @response[0].round.to_s + ' Review Performed'
-        tmp['updated_at'] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
-        tmp['id'] = @response[0].id
+        tmp[:label] = 'Round ' + @response[0].round.to_s + ' Review'
+        tmp[:updated_at] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
+        tmp[:id] = @response[0].id
         @timeline_list << tmp
       end
     end
+    @tmp_sorted_list=@timeline_list.sort_by{ |f| Date.parse f[:updated_at]}
 
-    return @timeline_list.sort_by { |f| [f['updated_at']]}
+  #  @tmp_sorted_list = sort_timeline_data(@timeline_list)
+    return @tmp_sorted_list
   end
 
 end

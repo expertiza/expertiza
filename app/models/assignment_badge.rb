@@ -2,6 +2,12 @@ class AssignmentBadge < ActiveRecord::Base
   belongs_to :badge
   belongs_to :assignment
 
+  def self.get_threshold(name, assignment_id)
+    badge_id = Badge.get_id_from_name(name) 
+    b = AssignmentBadge.where("assignment_id = ? AND badge_id = ?",assignment_id,badge_id)[0]
+    b.threshold
+  end
+
   def self.saveBadge(thresholdHash,assignment_id)
   	if exists?(assignment_id)
   		update(thresholdHash,assignment_id)
@@ -12,7 +18,7 @@ class AssignmentBadge < ActiveRecord::Base
 
   # Store in the model entry with appropriate values - First time call
   def self.create(thresholdHash,assignment_id)
-	print thresholdHash
+	 print thresholdHash
   	Badge.all.each do |badge|
   		current_threshold = badge.name + "Threshold"	
   		print current_threshold

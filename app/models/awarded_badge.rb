@@ -6,25 +6,43 @@ class AwardedBadge < ActiveRecord::Base
   GOOD_REVIEWER_BADGE_IMAGE = "<img height = 'auto' width = '50px' src='/assets/badges/goodReviewer.png'/>"
   GOOD_TEAMMATE_IMAGE = "<img height = 'auto' width = '50px' src='/assets/badges/goodTeammate.png'/>"
 
-
+  	# Called from response_controller.rb and review_mapping_controller for GoodTeammate and GoodReviewer Badges respectively
+  	# Also handles score updates (deleting assigned badges if no longer valid)
 	def self.award(participant_id, assignment_id,score,badge_name)
 		print "In AwardedBadge _____________________________"
 		badge_id = Badge.get_id_from_name(badge_name)
 		# assignmentBadge = AssignmentBadge.where(:badge_id => badge_id,:assignment_id => assignment_id)
 		assignmentBadge = AssignmentBadge.where("badge_id = ? AND assignment_id = ?",badge_id,assignment_id)
-		print assignmentBadge.empty?
 		if !assignmentBadge.empty? and score.to_i >= assignmentBadge[0].threshold
 			a = AwardedBadge.new(:participant_id => participant_id, :assignment_id => assignment_id, :badge_id => badge_id)
 			a.save!
+		else # Score is less then threshold
+			existingBadges = AwardedBadge.where("badge_id = ? AND participant_id = ?",badge_id,participant_id)
+			if(!existingBadges.empty?)
+				existingBadges.delete_all
+			end
 		end
 	end
 
-	def self.update(assignment_id)
-		AwardedBadge.where(:assignment_id => assignment_id).delete_all
+	# When threshold is updated in Assignment edit page
+	# Repopulate AwardedBadges
+	def self.updateGoodReviewerBadge(assignment_id)
+		AwardedBadge.where(:assignment_id => assignment_id ).delete_all
 		participants = Participant.where("parent_id = ? AND type = ?",assignment_id,"AssignmentParticipant")
 		review_grades = ReviewGrade.where(:participant_id => participants.ids)
 		review_grades.each do |r|
 			AwardedBadge.award(r.participant_id,assignment_id,r.grade_for_reviewer,"GoodReviewer")
+		end
+	end
+
+	# When threshold is updated in Assignment edit page
+	# Repopulate AwardedBadges
+	def self.updateGoodTeammateBadge(assignment_id,participant)
+		AwardedBadge.where(:assignment_id => assignment_id ).delete_all
+		participants = Participant.where("parent_id = ? AND type = ?",assignment_id,"AssignmentParticipant")
+		participants.each do |p|
+			score = AwardedBadge.get_teammate_review_score(p)
+			AwardedBadge.award(p.id, assignment_id,score,"GoodTeammate")
 		end
 	end
 

@@ -9,7 +9,6 @@ class AssignmentBadge < ActiveRecord::Base
   end
 
   def self.saveBadge(thresholdHash,assignment_id)
-    print "SAveeeeeeeeeeeeeeeeeee Badgeeeeeeeeeeeeee"
   	if exists?(assignment_id)
   		update(thresholdHash,assignment_id)
   	else
@@ -19,10 +18,8 @@ class AssignmentBadge < ActiveRecord::Base
 
   # Store in the model entry with appropriate values - First time call
   def self.create(thresholdHash,assignment_id)
-	 print thresholdHash
   	Badge.all.each do |badge|
   		current_threshold = badge.name + "Threshold"	
-  		print current_threshold
 	  	ab = AssignmentBadge.new(:badge_id => badge.id,:assignment_id => assignment_id, :threshold => thresholdHash[current_threshold])
 	  	ab.save!
   	end

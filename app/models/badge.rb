@@ -1,7 +1,5 @@
 class Badge < ActiveRecord::Base
 	def self.get_id_from_name(badge_name)
-		print "name +++++++++++++++"
-		print badge_name
   		badge = Badge.where(:name => badge_name)[0]
 	  	badge.id
 	end
@@ -40,8 +38,6 @@ class Badge < ActiveRecord::Base
 		
 		participants.each do |participant|
 			badge_matrix.push([false] * NUMBER_OF_BADGES)
-			
-			print "Badge matrix"
 
 			if not assignment.is_calibrated and participant.user.role.name=="Student"
 			# check for different badges

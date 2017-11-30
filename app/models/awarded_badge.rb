@@ -9,15 +9,9 @@ class AwardedBadge < ActiveRecord::Base
   	# Called from response_controller.rb and review_mapping_controller for GoodTeammate and GoodReviewer Badges respectively
   	# Also handles score updates (deleting assigned badges if no longer valid)
 	def self.award(participant_id, assignment_id,score,badge_name)
-		print "In AwardedBadge _____________________________"
 		badge_id = Badge.get_id_from_name(badge_name)
 		# assignmentBadge = AssignmentBadge.where(:badge_id => badge_id,:assignment_id => assignment_id)
-		print badge_id
-		print assignment_id
 		assignmentBadge = AssignmentBadge.where("badge_id = ? AND assignment_id = ?",badge_id,assignment_id)
-		print !assignmentBadge.empty?
-		print assignmentBadge[0].threshold
-		print score.to_i
 		if !assignmentBadge.empty? and score.to_i >= assignmentBadge[0].threshold
 			a = AwardedBadge.new(:participant_id => participant_id, :assignment_id => assignment_id, :badge_id => badge_id)
 			a.save!

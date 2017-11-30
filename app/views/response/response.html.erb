@@ -95,8 +95,9 @@ jQuery(document).ready(function() {
         <% if controller.action_name != 'new' and @response.additional_comment != nil %><%= @response.additional_comment.strip if !@response.nil?%>
         <% end %></textarea>
     </p>
-
+    <%=  @current_round%>
     <%if @current_round%>
+
       <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>
     <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>

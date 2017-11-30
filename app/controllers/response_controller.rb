@@ -96,6 +96,13 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     set_content(true)
+    @response_count = Response.where(map_id: @map.id).count
+    @assignment_count = @assignment.rounds_of_reviews
+
+    if @response_count < @assignment_count
+      @current_round = @response_count + 1
+    end
+
     if @assignment
       @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     end

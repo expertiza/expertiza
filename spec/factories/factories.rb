@@ -378,4 +378,20 @@ FactoryGirl.define do
     content 'www.wolfware.edu'
     created_at Time.now
   end
+  
+  factory :badge, class: Badge do
+    name :name
+    description :description
+  end
+
+  factory :assignment_badge, class: AssignmentBadge do
+    badge_id :badge_id
+    assignment_id :assignment_id
+    threshold 95
+  end
+  
+  factory :awarded_badge, class: AwardedBadge do
+  	badge_id :badge_id
+  	participant_id :participant_id
+  	end
 end

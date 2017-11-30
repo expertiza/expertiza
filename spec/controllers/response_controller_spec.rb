@@ -11,7 +11,6 @@ describe ResponseController do
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:user) { build(:student, id:1) }
-  let(:different_team_user) { build(:student, id:2) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -83,15 +82,17 @@ describe ResponseController do
 
   describe '#reviewer_is_team_member' do
     it 'if current user is a member of assignment review team' do
+      params = {id: 1}
+      get :reviewer_is_team_member?, params
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
 
-      allow(ReviewResponseMap).to receive(:find).with(1).and_return(review_response_map)
+      allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
       allow(review_response_map).to receive(:nil?).and_return(false)
       allow(Assignment).to receive(:where).with(1).and_return(assignment)
-      allow(TeamsUser).to receive(:joins).with("LEFT JOIN teams ON teams_uxsers.team_id = teams.id LEFT JOIN participants ON teams_users.user_id = participants.user_id").and_return(team_user)
-      allow(team_user).to receive(:select).with("participants.user_id").and_return(team_user)
-      allow(assignment).to receive(:nil?).and_return(false)
-      allow(assignment).to receive(:reviewer_is_team?).and_return(true)
-      allow_any_instance_of(ApplicationController).to receive(:reviewer_team_members).and_return(user)
+      allow(assignment).to receive(:nil?).and_return(true)
+      allow(assignment).to receive(:reviewer_is_team).and_return(true)
+      allow(TeamsUser).to receive(:where).with(team_id: review_response_map.team_id).and_return(team_user)
+      expect(controller.send(:reviewer_is_team_member?)).to be true
     end
   end
 

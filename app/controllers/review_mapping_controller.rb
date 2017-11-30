@@ -432,7 +432,6 @@ class ReviewMappingController < ApplicationController
 
   def save_grade_and_comment_for_reviewer
     # AwardedBadges method
-    print "In save grade++++++++++++++++++++++++++++++++++++++++++++++"
     badgeName = "GoodReviewer"
     AwardedBadge.award(params[:participant_id],params[:assignment_id],params[:grade_for_reviewer],badgeName)
     

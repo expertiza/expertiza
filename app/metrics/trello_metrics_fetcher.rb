@@ -17,7 +17,7 @@ class TrelloMetricsFetcher
   class << self
     def supports_url?(url)
       if !url.nil?
-        params = SOURCE.find { |params| !params[:REGEX].match(url).nil? }
+        params = SOURCE[:REGEX].match(url)
         !params.nil?
       else
         false

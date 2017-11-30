@@ -62,6 +62,7 @@ class AwardedBadge < ActiveRecord::Base
 	 	if teammate_reviews.size == 0
 	 		return score
 	 	end
+
 	 	teammate_reviews.each do |teammate_review|
 			score = score + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)		
 	 	end

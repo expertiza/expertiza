@@ -12,7 +12,7 @@
 	<% namecolwidth = 25 %>
 	<% colwidth = 15 %>
 <% end %>
-
+<!--The if is used to check if there is are self reviews. If there are self_reviews then the column is created to display the self review score-->
 <%if @vm.self_reviews %>
 	<% colwidth = 10 %>
 <%end%>
@@ -29,6 +29,7 @@
 <% end %>
 
 <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;</th>
+<!-- The no breaking space is included to align the orientation of the elements in the page -->
 <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;</th>
 
 </tr>           
@@ -48,7 +49,9 @@
 	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
 	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
 <% end %>   
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Score</th>   
+<th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Score</th>
+	<!-- The method checks if there is a self_review_score. If there is a self review score then the composite score(self_review_score)
+	has been displayed in the pagw together with the final score -->
 <%if @vm.self_reviews%>
 <th style="text-align:center;"  WIDTH="<%= colwidth * 2 %>%">Self Review Score</th>
 <%end%>

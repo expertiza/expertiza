@@ -12,7 +12,8 @@ class VmQuestionResponseRow
     @score_row = []
 
     @countofcomments = 0
-
+  # The attribute self_review_score is set to -1. This particular variable is used to differentiate self review from the normal peer review score.
+  #
     @self_review_score = -1
   end
 
@@ -29,7 +30,7 @@ class VmQuestionResponseRow
   attr_reader :score_row
 
   attr_reader :weight
-
+ # slef_review_score value is assigned to the class variable to access it in the code or to assign values.
   attr_accessor :self_review_score
 
   # the question max score is the max score of the questionnaire, except if the question is a true/false, in which case
@@ -56,11 +57,16 @@ class VmQuestionResponseRow
     row_average_score.round(2)
   end
 
-  # it calculates the difference between the self review score and average of all reviews.
+  # It calculates the difference between the self review score and average of all reviews.
+  # The calculated average score of the row in the above method average_score_for_row is used and it is divided by the maximum score of
+  # the question to get the weighted_average_score.
+  # The weighted_self_review_score is calculated as above
+  # The differenece of weighted_average_score and weighted_self_review_score is calculated.
+  # The modulus of the value is considered.
   def weighted_diff_for_row
     weighted_average_score =  average_score_for_row / question_max_score
     weighted_self_review_score = self_review_score.score_value / question_max_score
-    result = weighted_average_score - weighted_self_review_score 
+    result = weighted_average_score - weighted_self_review_score
     result = result > 0 ? result : -result
   end
 

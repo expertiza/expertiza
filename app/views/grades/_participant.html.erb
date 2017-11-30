@@ -11,6 +11,8 @@
     rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview]
     rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback]
     rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate]
+   # The self review score is displyed in the page. The computed self review score is assigned to a variable and that particular variable
+   # is being displayed on the page.
     self_review_score = @vm.computed_self_review_score
 %>
 
@@ -143,6 +145,7 @@
       <% end %>
       </TD>
     <% end %>
+   <!--The self_review_score is being displayed with the average score, which is already computed and displyed.-->
     <TD align="center">
          <%= self_review_score.is_a?(Float)?sprintf("%.2f",self_review_score):rscore_review.my_avg %><%= score_postfix %>
     </TD>

@@ -129,7 +129,7 @@ class StudentTask
     @students_teamed
   end
 
-  def self.get_timeline_data(assignment_id, participant_id)
+  def self.get_timeline_data(assignment_id, participant_id, team_id)
     @timeline_list = Array.new
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
@@ -140,12 +140,14 @@ class StudentTask
       @timeline_list << tmp
     end
 
-    @submissions = SubmissionRecord.where(team_id: TeamsUser.team_id(assignment_id, participant_id) , assignment_id: assignment_id)
+    @submissions = SubmissionRecord.where(team_id: team_id , assignment_id: assignment_id)
     @submissions.each do |sr|
       tmp = Hash.new
       tmp['label'] = sr.operation
       tmp['updated_at'] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
-      tmp['link'] = sr.content
+      unless sr.operation == 'Submit File' || sr.operation == 'Remove File'
+        tmp['link'] = sr.content
+      end
       @timeline_list << tmp
     end
 
@@ -163,7 +165,5 @@ class StudentTask
 
     return @timeline_list.sort_by { |f| [f['updated_at']]}
   end
-
-  #public :gettimelinedata
 
 end

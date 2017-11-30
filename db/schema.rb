@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171103022331) do
+ActiveRecord::Schema.define(version: 20171130011520) do
 
   create_table "answers", force: :cascade do |t|
     t.integer "question_id", limit: 4,     default: 0, null: false
@@ -308,11 +308,6 @@ ActiveRecord::Schema.define(version: 20171103022331) do
   end
 
   add_index "metric_data_points", ["metric_id"], name: "index_metric_data_points_on_metric_id", using: :btree
-
-  create_table "metric_sources", force: :cascade do |t|
-    t.string "name",        limit: 255
-    t.string "description", limit: 255
-  end
 
   create_table "metrics", force: :cascade do |t|
     t.integer  "team_id",       limit: 4
@@ -728,6 +723,7 @@ ActiveRecord::Schema.define(version: 20171103022331) do
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
     t.string  "github_id",                 limit: 255
+    t.string  "trello_name",               limit: 255
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

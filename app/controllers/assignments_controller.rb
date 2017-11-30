@@ -65,19 +65,41 @@ class AssignmentsController < ApplicationController
   end
 
   def update
-    print "In update++++++++++++++++++++++++++++++++++++"
-    if params["GoodTeammateThreshold"].to_s != "" and params["GoodReviewerThreshold"].to_s != ""
-      thresholdHash  = Hash[
-        "GoodTeammateThreshold" => params["GoodTeammateThreshold"],
-        "GoodReviewerThreshold" => params["GoodReviewerThreshold"]
-      ]
-      assignment_id = params["assignment_form"]["assignment"]["id"]
-      AssignmentBadge.saveBadge(thresholdHash,assignment_id)
+    assignment_id = params["assignment_form"]["assignment"]["id"]
+    if(params["GoodTeammateThreshold"].to_s != "")
+      GoodTeammateThreshold = params["GoodTeammateThreshold"]
+    else
       if(AssignmentBadge.exists?(assignment_id))
-        # Update entries in Awarded Badges for this assignment
-        AwardedBadge.update(assignment_id)
+        GoodTeammateThreshold = AwardedBadge.get_threshold(assignment_id,"GoodTeammate")
+      else
+        GoodTeammateThreshold = 95
       end
     end
+    if(params["GoodReviewerThreshold"].to_s != "")
+      GoodReviewerThreshold = params["GoodReviewerThreshold"]
+    else
+      if(AssignmentBadge.exists?(assignment_id))
+        GoodReviewerThreshold = AwardedBadge.get_threshold(assignment_id,"GoodReviewer")
+      else
+        GoodReviewerThreshold = 95
+      end
+    end
+   
+    thresholdHash  = Hash[
+      "GoodTeammateThreshold" => GoodTeammateThreshold,
+      "GoodReviewerThreshold" => GoodReviewerThreshold
+    ]
+    AssignmentBadge.saveBadge(thresholdHash,assignment_id)
+    if(AssignmentBadge.exists?(assignment_id))
+      # Update entries in Awarded Badges for this assignment
+      if(params["GoodReviewerThreshold"].to_s != "")
+        AwardedBadge.updateGoodReviewerBadge(assignment_id)
+      end
+      if(params["GoodTeammateThreshold"].to_s != "")
+        AwardedBadge.updateGoodTeammateBadge(assignment_id)
+      end
+    end
+ 
     unless params.key?(:assignment_form)
       assignment_form_key_nonexist_case_handler
       return

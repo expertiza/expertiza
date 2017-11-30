@@ -386,4 +386,9 @@ FactoryGirl.define do
     institution_id 1
     email 'requester1@test.com'
   end
+
+  factory :institution, class: Institution do
+    name 'North Carolina State University'
+    id 1
+  end
 end

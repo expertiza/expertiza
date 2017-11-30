@@ -455,7 +455,7 @@ Expertiza::Application.routes.draw do
       post :submit
       post :student_submit
       post :update_suggestion
-    end      
+    end
   end
 
   resources :survey do
@@ -558,4 +558,7 @@ Expertiza::Application.routes.draw do
   get ':controller(/:action(/:id))(.:format)'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   match '*path' => 'content_pages#view', via: [:get, :post] unless Rails.env.development?
+
+  get 'response/view/:id' => 'response#view', as: :timeline_redirect 
+
 end

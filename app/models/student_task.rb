@@ -129,7 +129,7 @@ class StudentTask
     @students_teamed
   end
 
-  def self.gettimelinedata(assignment_id, participant_id)
+  def self.get_timeline_data(assignment_id, participant_id)
     @timeline_list = Array.new
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
@@ -155,7 +155,7 @@ class StudentTask
       @response = Response.where(map_id: rm.id)
       tmp['label'] = 'Round ' + @response[0].round.to_s + ' Review Performed'
       tmp['updated_at'] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
-      tmp['link'] = 'Static url' + @response[0].id.to_s
+      tmp['link'] = @response[0].id
       @timeline_list << tmp
     end
 

@@ -9,10 +9,12 @@
       <span class="date"><%= tl['updated_at'] %><span>
     </div>
     <div class="status">
-      <% unless tl['link'].nil? %>
-      <h4><%= link_to tl['label'], timeline_redirect_path(tl['link'])%></h4>
+      <% if !(tl['id'].nil?) %>
+        <h4><%= link_to tl['label'], timeline_redirect_path(tl['id'])%></h4>
+      <% elsif !(tl['link'].nil?) %>
+        <h4><%= link_to tl['label'], tl['link']%></h4>
       <% else %>
-      <h4><%= tl['label'] %></h4>
+        <h4><%= tl['label'] %></h4>
       <% end %>
     </div>
   <% end %>

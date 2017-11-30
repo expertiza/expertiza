@@ -153,10 +153,12 @@ class StudentTask
     @response_map.each do |rm|
       tmp = Hash.new
       @response = Response.where(map_id: rm.id)
-      tmp['label'] = 'Round ' + @response[0].round.to_s + ' Review Performed'
-      tmp['updated_at'] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
-      tmp['link'] = @response[0].id
-      @timeline_list << tmp
+      unless @response[0].nil?
+        tmp['label'] = 'Round ' + @response[0].round.to_s + ' Review Performed'
+        tmp['updated_at'] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
+        tmp['id'] = @response[0].id
+        @timeline_list << tmp
+      end
     end
 
     return @timeline_list.sort_by { |f| [f['updated_at']]}

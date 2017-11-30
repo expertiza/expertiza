@@ -48,11 +48,15 @@ class AwardedBadge < ActiveRecord::Base
 
 	def self.get_teammate_review_score(participant)	
 		team = participant.team
-		if team.nil?
-			return false
-		end
 		score = 0.0
+		if team.nil?
+			return score
+		end
 	 	teammate_reviews = participant.teammate_reviews
+	 	
+	 	if teammate_reviews.size == 0
+	 		return score
+
 	 	teammate_reviews.each do |teammate_review|
 			score = score + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)		
 	 	end

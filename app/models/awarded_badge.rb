@@ -12,7 +12,12 @@ class AwardedBadge < ActiveRecord::Base
 		print "In AwardedBadge _____________________________"
 		badge_id = Badge.get_id_from_name(badge_name)
 		# assignmentBadge = AssignmentBadge.where(:badge_id => badge_id,:assignment_id => assignment_id)
+		print badge_id
+		print assignment_id
 		assignmentBadge = AssignmentBadge.where("badge_id = ? AND assignment_id = ?",badge_id,assignment_id)
+		print !assignmentBadge.empty?
+		print assignmentBadge[0].threshold
+		print score.to_i
 		if !assignmentBadge.empty? and score.to_i >= assignmentBadge[0].threshold
 			a = AwardedBadge.new(:participant_id => participant_id, :assignment_id => assignment_id, :badge_id => badge_id)
 			a.save!
@@ -37,7 +42,7 @@ class AwardedBadge < ActiveRecord::Base
 
 	# When threshold is updated in Assignment edit page
 	# Repopulate AwardedBadges
-	def self.updateGoodTeammateBadge(assignment_id,participant)
+	def self.updateGoodTeammateBadge(assignment_id)
 		AwardedBadge.where(:assignment_id => assignment_id ).delete_all
 		participants = Participant.where("parent_id = ? AND type = ?",assignment_id,"AssignmentParticipant")
 		participants.each do |p|
@@ -56,7 +61,7 @@ class AwardedBadge < ActiveRecord::Base
 	 	
 	 	if teammate_reviews.size == 0
 	 		return score
-
+	 	end
 	 	teammate_reviews.each do |teammate_review|
 			score = score + (teammate_review.get_total_score.to_f/teammate_review.get_maximum_score.to_f)		
 	 	end

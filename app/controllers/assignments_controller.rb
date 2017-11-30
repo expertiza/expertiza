@@ -67,27 +67,27 @@ class AssignmentsController < ApplicationController
   def update
     assignment_id = params["assignment_form"]["assignment"]["id"]
     if(params["GoodTeammateThreshold"].to_s != "")
-      GoodTeammateThreshold = params["GoodTeammateThreshold"]
+      goodTeammateThreshold = params["GoodTeammateThreshold"]
     else
       if(AssignmentBadge.exists?(assignment_id))
-        GoodTeammateThreshold = AwardedBadge.get_threshold(assignment_id,"GoodTeammate")
+        goodTeammateThreshold = AssignmentBadge.get_threshold("GoodTeammate",assignment_id)
       else
-        GoodTeammateThreshold = 95
+        goodTeammateThreshold = 95
       end
     end
     if(params["GoodReviewerThreshold"].to_s != "")
-      GoodReviewerThreshold = params["GoodReviewerThreshold"]
+      goodReviewerThreshold = params["GoodReviewerThreshold"]
     else
       if(AssignmentBadge.exists?(assignment_id))
-        GoodReviewerThreshold = AwardedBadge.get_threshold(assignment_id,"GoodReviewer")
+        goodReviewerThreshold = AssignmentBadge.get_threshold("GoodReviewer",assignment_id)
       else
-        GoodReviewerThreshold = 95
+        goodReviewerThreshold = 95
       end
     end
    
     thresholdHash  = Hash[
-      "GoodTeammateThreshold" => GoodTeammateThreshold,
-      "GoodReviewerThreshold" => GoodReviewerThreshold
+      "GoodTeammateThreshold" => goodTeammateThreshold,
+      "GoodReviewerThreshold" => goodReviewerThreshold
     ]
     AssignmentBadge.saveBadge(thresholdHash,assignment_id)
     if(AssignmentBadge.exists?(assignment_id))

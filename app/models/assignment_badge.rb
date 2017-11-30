@@ -9,6 +9,7 @@ class AssignmentBadge < ActiveRecord::Base
   end
 
   def self.saveBadge(thresholdHash,assignment_id)
+    print "SAveeeeeeeeeeeeeeeeeee Badgeeeeeeeeeeeeee"
   	if exists?(assignment_id)
   		update(thresholdHash,assignment_id)
   	else

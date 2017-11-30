@@ -25,7 +25,6 @@ development:
       users:
         list: true
         keys: true
-        goto_show_pending_users: true
       admin:
         list_instructors: false
         list_administrators: false

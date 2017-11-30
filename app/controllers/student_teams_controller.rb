@@ -1,6 +1,6 @@
 class StudentTeamsController < ApplicationController
   autocomplete :user, :name
-
+  helper_method :duty_assigned, :available_duties, :duties_allowed
   def team
     @team ||= AssignmentTeam.find params[:team_id]
   end
@@ -174,5 +174,53 @@ class StudentTeamsController < ApplicationController
   def review
     @assignment = Assignment.find params[:assignment_id]
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
+  end
+
+  def duty_assigned (team_id, user_id)
+    dutyId = TeamsUser.duty_by_team_user team_id, user_id
+    if !dutyId.nil?
+      duty = Duty.find(dutyId)
+      duty.duty_name
+    else
+      'none'
+    end
+
+  end
+
+  def available_duties(assignment_id, team_id)
+    duties = Hash.new
+    booked_duties = TeamsUser.duties_by_team team_id
+    dutyIds = AssignmentsDuty.duties_by_assignment assignment_id
+
+    for id in dutyIds do
+      duty = Duty.find(id)
+      if duty.multiple_duty
+        duties.store(duty.duty_name, duty.id)
+      else
+        if !booked_duties.include?id
+          duties.store(duty.duty_name, duty.id)
+        end
+      end
+    end
+
+    return duties
+  end
+
+  def add_duty
+    team = TeamsUser.where(user_id: params[:user_id], team_id: params[:team_id]).first
+    team.update_attribute('duties_id', params[:duty][:id])
+    redirect_back
+  end
+
+  def duties_allowed(assignment_id, team_id, user_id)
+    assignment_duty_flag = Assignment.find(assignment_id).duty_flag
+    duty = TeamsUser.duty_by_team_user(team_id, user_id)
+
+    if  assignment_duty_flag==true && duty.nil?
+      return true
+    else
+      return false
+    end
+
   end
 end

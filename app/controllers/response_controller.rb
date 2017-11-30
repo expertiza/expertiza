@@ -264,6 +264,17 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
+    reviewee = @map.reviewee
+    duty_id = TeamsUser.duty_id @participant.parent_id, reviewee.user_id
+    questionnaireId = Duty.get_questionnaireID(duty_id)
+
+    puts questionnaireId
+
+    if !questionnaireId.nil?
+      @dutyQuestionnaire = Questionnaire.find(questionnaireId)
+      puts @dutyQuestionnaire.name
+    end
+
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
@@ -284,7 +295,13 @@ class ResponseController < ApplicationController
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap"
-      @questionnaire = @map.questionnaire
+
+      if(@dutyQuestionnaire.nil?)
+        @questionnaire = @map.questionnaire
+      else
+        @questionnaire = @dutyQuestionnaire
+      end
+
     end
   end
 

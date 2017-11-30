@@ -3,7 +3,7 @@ class TeamsUser < ActiveRecord::Base
   belongs_to :team
   has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
-  attr_accessible :user_id, :team_id
+  attr_accessible :user_id, :team_id, :duties_id
 
   def name
     self.user.name
@@ -62,5 +62,24 @@ class TeamsUser < ActiveRecord::Base
       end
     end
     team_id
+  end
+
+  def self.duty_id(assignment_id, user_id)
+    team_id = team_id(assignment_id, user_id)
+    team = TeamsUser.where(user_id: user_id, team_id: team_id).first
+    if !team.nil?
+      return team.duties_id
+    end
+  end
+
+  def self.duty_by_team_user(team_id, user_id)
+    team = TeamsUser.where(user_id: user_id, team_id: team_id).first
+    if !team.nil?
+     return team.duties_id
+    end
+  end
+
+  def self.duties_by_team(team_id)
+    duties = TeamsUser.where(team_id: team_id).pluck(:duties_id)
   end
 end

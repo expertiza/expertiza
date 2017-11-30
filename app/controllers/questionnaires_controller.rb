@@ -114,7 +114,7 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    @dutyName = fetch_duties
+    #@dutyName = fetch_duties
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
   end
@@ -166,10 +166,10 @@ class QuestionnairesController < ApplicationController
   def fetch_duties
     duties = Duty.get_unmapped_duties
     dutyName = Hash.new
+    dutyName.store('none', nil)
     duties.each do |duty|
       dutyName.store(duty.duty_name, duty.id)
     end
-    dutyName.store('none', nil)
     return dutyName
   end
 

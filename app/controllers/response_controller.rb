@@ -165,6 +165,26 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+
+    # If this is a Teammate review, we may need to update the Good Teammate badge information based on the score.
+    if @map.is_a? TeammateReviewResponseMap
+
+      threshold = AssignmentBadge.find_by(badge_id: 2, assignment_id: @map.assignment.id).threshold
+      reviewee_average_score = Response.find_by(map_id: @map.id).get_average_score
+      good_teammate_badge = AwardedBadge.find_by(badge_id: 2, participant_id: @map.reviewee_id)
+
+      # If the reviewee has not been awarded this badge, but their average rises above the threshold, award the badge.
+      if (good_teammate_badge == nil && reviewee_average_score >= threshold)
+        AwardedBadge.create(badge_id: 2, participant_id: @map.reviewee_id)
+      end
+
+      # If the reviewee has been awarded this badge, but their average drops below the threshold, revoke the badge.
+      if (good_teammate_badge != nil && reviewee_average_score < threshold)
+        AwardedBadge.find_by(badge_id: 2, participant_id: @map.reviewee_id).delete
+      end
+
+    end
+
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 

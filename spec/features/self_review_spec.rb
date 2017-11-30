@@ -23,7 +23,6 @@ describe "self review testing", js: true  do
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
     create(:assignment_questionnaire)
     create(:question)
-
   end
   
   # method to give self-review scores for a particular assignment
@@ -84,9 +83,7 @@ describe "self review testing", js: true  do
     expect(page).to have_content "Your response was successfully saved."
    end
 
-
-
-   def check_self_review_scores
+  def check_self_review_scores
     # Login again as student2065 to check the self-review scores
     visit_new_user "student2065"
     expect(page).to have_content "User: student2065"
@@ -102,14 +99,12 @@ describe "self review testing", js: true  do
     expect(score_displayed).to eql("40.00")    
    end
 
-
-it "validate scores" do
+  it "validate scores" do
     # we use student2065 for self reviewing his own work
     add_self_review_scores
     # we use student2064 for peer reviewing student2065's work
     add_peer_review_scores
     # after adding both the reviews, we get back to student2065 and check to see his scores
     check_self_review_scores
-end
- 
+  end
 end

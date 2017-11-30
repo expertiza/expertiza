@@ -93,7 +93,6 @@ describe "assignment function" do
       check("assignment_form_assignment_is_calibrated")
       uncheck("assignment_form_assignment_availability_flag")
       expect(page).to have_select("assignment_form[assignment][reputation_algorithm]", options: ['--', 'Hamer', 'Lauw'])
-
       click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
@@ -159,8 +158,8 @@ describe "assignment function" do
       page.driver.browser.switch_to.alert.accept
       click_button 'Create'
       fill_in 'assignment_form_assignment_days_between_submissions', with: 7
-      click_button 'submit_btn'
 
+      click_button 'submit_btn'
       assignment = Assignment.where(name: 'private assignment for test').first
       pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
@@ -385,14 +384,11 @@ describe "assignment function" do
     end
 
     it "Add new topic" do
-      click_link 'New topic'
-      click_button 'OK'
-      fill_in 'topic_topic_identifier', with: '1'
-      fill_in 'topic_topic_name', with: 'Test'
-      fill_in 'topic_category', with: 'Test Category'
-      fill_in 'topic_max_choosers', with: 2
-      click_button 'Create'
-
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[1]").set("1")
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[2]").set("Test")
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[3]").set("Test Category")
+      find(:xpath,"(//tr[@class='jsgrid-insert-row']//input[@type='text'])[4]").set("2")
+      all(:xpath, '//input[@title="Insert"]')[0].click
       sign_up_topics = SignUpTopic.where(topic_name: 'Test').first
       expect(sign_up_topics).to have_attributes(
         topic_name: 'Test',
@@ -413,9 +409,9 @@ describe "assignment function" do
       create(:topic, assignment_id: assignment.id)
       visit "/assignments/#{assignment.id}/edit"
       click_link 'Topics'
-      all(:xpath, '//img[@title="Delete Topic"]')[0].click
-      click_button 'OK'
-
+      all(:xpath, '//input[@title="Delete Topic"]')[0].click
+      page.driver.browser.switch_to.alert.accept
+      wait_for_ajax
       topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0
     end
@@ -623,10 +619,9 @@ describe "assignment function" do
 
     login_as('instructor6')
     visit "/assignments/associate_assignment_with_course?id=#{assignment_id}"
-
+    
     choose "course_id_#{course_id}"
     click_button 'Save'
-
     assignment_row = Assignment.where(name: 'Test Assignment')[0]
     expect(assignment_row).to have_attributes(
       course_id: course_id

@@ -45,7 +45,7 @@ describe "Integration tests for instructor interface" do
     end
   end
 
-  describe "Import tests for assignment topics" do
+  describe "Import tests for assignment topics", js: true do
     it 'should be valid file with 3 columns' do
       validate_login_and_page_content("spec/features/assignment_topic_csvs/3-col-valid_topics_import.csv", %w(expertiza mozilla), true)
     end

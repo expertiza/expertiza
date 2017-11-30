@@ -69,9 +69,10 @@ describe "Airbrake expection errors" do
 
     find_link('Topics').click
     # Delete first topic
-    first("img[title='Delete Topic']").click
+    first("input[title='Delete Topic']").click
     # page.execute_script 'window.confirm = function () { return true }'
-    click_button 'OK'
+    page.driver.browser.switch_to.alert.accept
+    wait_for_ajax   
     find_link('Topics').click
     expect(page).to have_content('TestReview')
     expect(page).not_to have_content('Hello world!')

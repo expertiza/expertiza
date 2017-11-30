@@ -12,6 +12,19 @@ class SignUpSheetController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
+  #The rescue operations are added for our Ajax Calls that are made to this controller for loading data in Topics page
+  rescue_from ::ActiveRecord::RecordNotFound, with: :record_not_found
+  rescue_from ::NameError, with: :error_occurred
+
+  def record_not_found(exception)
+    render json: {error: exception.message}.to_json, status: 404
+    return
+  end
+
+  def error_occurred(exception)
+    render json: {error: exception.message}.to_json, status: 500
+    return
+  end
 
   def action_allowed?
     case params[:action]
@@ -52,8 +65,11 @@ class SignUpSheetController < ApplicationController
   # that assignment id will virtually be the signup sheet id as well as we have assumed
   # that every assignment will have only one signup sheet
   def create
-    topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
-    if topic.nil?
+    # the params are received through Ajax requests rather than form submits.
+    # Thus parameters are given directly than ruby hashes.
+    topic = SignUpTopic.where(topic_name: params[:topic_name], assignment_id: params[:id]).first
+    # if the topic already exists then update
+    if topic == nil
       setup_new_topic
     else
       update_existing_topic topic
@@ -66,12 +82,13 @@ class SignUpSheetController < ApplicationController
     @topic = SignUpTopic.find(params[:id])
     if @topic
       @topic.destroy
-      undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
+      # undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
     else
-      flash[:error] = "The topic could not be deleted."
+      render json: {error: 'FAIL'} , :status => 404
     end
-    # changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
+    # All the CRUD operations in topics page are ajax based on json responses. Thus we will be responding with JSON.
+    render json: {status: 'PASS'}
+
   end
 
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
@@ -83,28 +100,34 @@ class SignUpSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
-      update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
-      undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
+      @topic.topic_identifier = params[:topic_identifier]
+      if !update_max_choosers @topic
+        # We are setting up the response code to 400 if we encounter this criteria so that it can be handled if Ajax call fails in the front end.
+        render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 400
+      else
+        # update tables
+        #All the following parameters are send through data in Ajax in updateItem.
+        @topic.category = params[:category]
+        @topic.topic_name = params[:topic_name]
+        @topic.micropayment = params[:micropayment]
+        @topic.description = params[:description]
+        @topic.link = params[:link]
+        @topic.save
+        render :json => @topic.as_json
+      end
     else
-      flash[:error] = "The topic could not be updated."
+      render json: {error: 'FAIL'}, :status => 404
     end
     # changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
   end
-
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
+  # issue 971 - do enable ajax control
+  # 1781
+  # see Js Grid for json format to insert in the model
   def add_signup_topics
-    load_add_signup_topics(params[:id])
-    SignUpSheet.add_signup_topic(params[:id])
+    SignUpSheet.add_signup_topic(params[:id]) #model call - just a get query .. nothing to do with add
   end
 
   def add_signup_topics_staggered
@@ -112,27 +135,72 @@ class SignUpSheetController < ApplicationController
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
-  def load_add_signup_topics(assignment_id)
-    @id = assignment_id
+  # this should retrieve results in Json so that it can be ajaxed
+  # 1781
+  # the following method is an action which renders all the topics of an assignment in the JSON format.
+  def load_add_signup_topics
+    @id = params[:id]
+    assignment_id =  params[:id]
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
-
     @assignment = Assignment.find(assignment_id)
+    @participants = SignedUpTeam.find_team_participants(assignment_id)
+    # colloborating for JSON
+    @sign_up_topics.each {|topic|
+      topic_id = topic.id
+      slots_fill_temp = 0
+      slots_waitlisted = 0
+      participants = []
+      if @slots_filled
+        @slots_filled.each {|slot|
+          if slot.topic_id == topic_id
+            slots_fill_temp = slot.count
+          end
+        }
+      end
+      if @slots_waitlisted
+        @slots_waitlisted.each {|slot|
+          if slot.topic_id == topic_id
+            slots_waitlisted = slot.count
+          end
+        }
+      end
+      if @participants
+        @participants.each {|participant|
+          if participant.topic_id == topic_id
+
+            participants << participant
+          end
+        }
+      end
+      topic.slots_filled_value = slots_fill_temp
+      topic.slots_waitlisted = slots_waitlisted
+      topic.slots_available = topic.max_choosers - topic.slots_filled_value
+      topic.partipants = participants
+    }
     # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recored are also counted)
-    @participants = SignedUpTeam.find_team_participants(assignment_id)
+    render :json => {
+      :id => @id.as_json,
+      :sign_up_topics => @sign_up_topics.as_json( :methods => [:slots_filled_value,:slots_waitlisted,:slots_available,:partipants]),
+      :slots_waitlisted => @slots_waitlisted.as_json,
+      :assignment => @assignment.as_json
+    }
   end
 
+  # All the parameters are sent through data object in the Ajax insert call
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
+    @sign_up_topic.topic_identifier = params[:topic_identifier]
+    @sign_up_topic.topic_name = params[:topic_name]
+    @sign_up_topic.max_choosers = params[:max_choosers]
+    @sign_up_topic.category = params[:category]
     @sign_up_topic.assignment_id = params[:id]
+    @sign_up_topic.description =params[:description]
+    @sign_up_topic.link =params[:link]
     @assignment = Assignment.find(params[:id])
   end
 
@@ -399,31 +467,35 @@ class SignUpSheetController < ApplicationController
   end
 
   private
-
+  
   def setup_new_topic
     set_values_for_new_topic
     if @assignment.microtask?
-      @sign_up_topic.micropayment = params[:topic][:micropayment]
+      @sign_up_topic.micropayment = params[:micropayment]
     end
     if @assignment.staggered_deadline?
       topic_set = []
       topic = @sign_up_topic.id
     end
-    if @sign_up_topic.save
-      undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
+    if !@sign_up_topic.save
+     # undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
+     # changing the redirection url to topics tab in edit assignment view.
+     render json: {error: 'FAIL'}, :status => 404
     else
-      render action: 'new', id: params[:id]
+      render json: @sign_up_topic.as_json
     end
   end
 
   def update_existing_topic(topic)
-    topic.topic_identifier = params[:topic][:topic_identifier]
-    update_max_choosers topic
-    topic.category = params[:topic][:category]
-    # topic.assignment_id = params[:id]
-    topic.save
-    redirect_to_sign_up params[:id]
+    topic.topic_identifier = params[:topic_identifier]
+    if !update_max_choosers topic
+      render json: {error: 'FAIL' , flash: 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'}.to_json, status: 400
+    else
+      topic.category = params[:category]
+      # topic.assignment_id = params[:id]
+      topic.save
+      render json: topic.as_json
+    end
   end
 
   def update_max_choosers(topic)
@@ -431,16 +503,18 @@ class SignUpSheetController < ApplicationController
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
+    if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:max_choosers]
+      topic.max_choosers = params[:max_choosers]
     else
-      if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-        topic.update_waitlisted_users params[:topic][:max_choosers]
-        topic.max_choosers = params[:topic][:max_choosers]
+      if topic.max_choosers.to_i < params[:max_choosers].to_i
+        topic.update_waitlisted_users params[:max_choosers]
+        topic.max_choosers = params[:max_choosers]
       else
-        flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
+        flash[:error] = "The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers."
+        return false
       end
     end
+    true
   end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant

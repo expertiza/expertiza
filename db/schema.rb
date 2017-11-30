@@ -105,6 +105,14 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
 
+  create_table "assignments_questionnaires", force: :cascade do |t|
+    t.integer "questionnaire_id", limit: 4, default: 0, null: false
+    t.integer "assignment_id",    limit: 4, default: 0, null: false
+  end
+
+  add_index "assignments_questionnaires", ["assignment_id"], name: "fk_assignments_questionnaires_assignments", using: :btree
+  add_index "assignments_questionnaires", ["questionnaire_id"], name: "fk_assignments_questionnaires_questionnaires", using: :btree
+
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24
     t.float    "content_summative", limit: 24
@@ -197,6 +205,15 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
 
+  create_table "courses_users", force: :cascade do |t|
+    t.integer "user_id",   limit: 4
+    t.integer "course_id", limit: 4
+    t.boolean "active"
+  end
+
+  add_index "courses_users", ["course_id"], name: "fk_users_courses", using: :btree
+  add_index "courses_users", ["user_id"], name: "fk_courses_users", using: :btree
+
   create_table "deadline_rights", force: :cascade do |t|
     t.string "name", limit: 32
   end
@@ -245,6 +262,125 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
+  create_table "goldberg_content_pages", force: :cascade do |t|
+    t.string   "title",           limit: 255
+    t.string   "name",            limit: 255,   default: "", null: false
+    t.integer  "markup_style_id", limit: 4
+    t.text     "content",         limit: 65535
+    t.integer  "permission_id",   limit: 4,     default: 0,  null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "content_cache",   limit: 65535
+    t.string   "markup_style",    limit: 255
+  end
+
+  add_index "goldberg_content_pages", ["markup_style_id"], name: "fk_content_page_markup_style_id", using: :btree
+  add_index "goldberg_content_pages", ["permission_id"], name: "fk_content_page_permission_id", using: :btree
+
+  create_table "goldberg_controller_actions", force: :cascade do |t|
+    t.integer "site_controller_id", limit: 4,   default: 0,  null: false
+    t.string  "name",               limit: 255, default: "", null: false
+    t.integer "permission_id",      limit: 4
+    t.string  "url_to_use",         limit: 255
+  end
+
+  add_index "goldberg_controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
+  add_index "goldberg_controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
+
+  create_table "goldberg_markup_styles", force: :cascade do |t|
+    t.string "name", limit: 255, default: "", null: false
+  end
+
+  create_table "goldberg_menu_items", force: :cascade do |t|
+    t.integer "parent_id",            limit: 4
+    t.string  "name",                 limit: 255, default: "", null: false
+    t.string  "label",                limit: 255, default: "", null: false
+    t.integer "seq",                  limit: 4
+    t.integer "controller_action_id", limit: 4
+    t.integer "content_page_id",      limit: 4
+  end
+
+  add_index "goldberg_menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
+  add_index "goldberg_menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
+  add_index "goldberg_menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+
+  create_table "goldberg_permissions", force: :cascade do |t|
+    t.string "name", limit: 255, default: "", null: false
+  end
+
+  create_table "goldberg_roles", force: :cascade do |t|
+    t.string   "name",            limit: 255,   default: "", null: false
+    t.integer  "parent_id",       limit: 4
+    t.string   "description",     limit: 255,   default: "", null: false
+    t.integer  "default_page_id", limit: 4
+    t.text     "cache",           limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "start_path",      limit: 255
+  end
+
+  add_index "goldberg_roles", ["default_page_id"], name: "fk_role_default_page_id", using: :btree
+  add_index "goldberg_roles", ["parent_id"], name: "fk_role_parent_id", using: :btree
+
+  create_table "goldberg_roles_permissions", force: :cascade do |t|
+    t.integer "role_id",       limit: 4, default: 0, null: false
+    t.integer "permission_id", limit: 4, default: 0, null: false
+  end
+
+  add_index "goldberg_roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
+  add_index "goldberg_roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
+
+  create_table "goldberg_site_controllers", force: :cascade do |t|
+    t.string  "name",          limit: 255, default: "", null: false
+    t.integer "permission_id", limit: 4,   default: 0,  null: false
+    t.integer "builtin",       limit: 4,   default: 0
+  end
+
+  add_index "goldberg_site_controllers", ["permission_id"], name: "fk_site_controller_permission_id", using: :btree
+
+  create_table "goldberg_system_settings", force: :cascade do |t|
+    t.string  "site_name",                           limit: 255, default: "", null: false
+    t.string  "site_subtitle",                       limit: 255
+    t.string  "footer_message",                      limit: 255, default: ""
+    t.integer "public_role_id",                      limit: 4,   default: 0,  null: false
+    t.integer "session_timeout",                     limit: 4,   default: 0,  null: false
+    t.integer "default_markup_style_id",             limit: 4,   default: 0
+    t.integer "site_default_page_id",                limit: 4,   default: 0,  null: false
+    t.integer "not_found_page_id",                   limit: 4,   default: 0,  null: false
+    t.integer "permission_denied_page_id",           limit: 4,   default: 0,  null: false
+    t.integer "session_expired_page_id",             limit: 4,   default: 0,  null: false
+    t.integer "menu_depth",                          limit: 4,   default: 0,  null: false
+    t.string  "start_path",                          limit: 255
+    t.string  "site_url_prefix",                     limit: 255
+    t.boolean "self_reg_enabled"
+    t.integer "self_reg_role_id",                    limit: 4
+    t.boolean "self_reg_confirmation_required"
+    t.integer "self_reg_confirmation_error_page_id", limit: 4
+    t.boolean "self_reg_send_confirmation_email"
+  end
+
+  add_index "goldberg_system_settings", ["not_found_page_id"], name: "fk_system_settings_not_found_page_id", using: :btree
+  add_index "goldberg_system_settings", ["permission_denied_page_id"], name: "fk_system_settings_permission_denied_page_id", using: :btree
+  add_index "goldberg_system_settings", ["public_role_id"], name: "fk_system_settings_public_role_id", using: :btree
+  add_index "goldberg_system_settings", ["session_expired_page_id"], name: "fk_system_settings_session_expired_page_id", using: :btree
+  add_index "goldberg_system_settings", ["site_default_page_id"], name: "fk_system_settings_site_default_page_id", using: :btree
+
+  create_table "goldberg_users", force: :cascade do |t|
+    t.string   "name",                           limit: 255, default: "", null: false
+    t.string   "password",                       limit: 40,  default: "", null: false
+    t.integer  "role_id",                        limit: 4,   default: 0,  null: false
+    t.string   "password_salt",                  limit: 255
+    t.string   "fullname",                       limit: 255
+    t.string   "email",                          limit: 255
+    t.string   "start_path",                     limit: 255
+    t.boolean  "self_reg_confirmation_required"
+    t.string   "confirmation_key",               limit: 255
+    t.datetime "password_changed_at"
+    t.boolean  "password_expired"
+  end
+
+  add_index "goldberg_users", ["role_id"], name: "fk_user_role_id", using: :btree
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -283,6 +419,10 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   end
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
+
+  create_table "mapping_strategies", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
 
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -373,6 +513,11 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "plagiarism_checker_comparisons", ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index", using: :btree
 
+  create_table "plugin_schema_info", id: false, force: :cascade do |t|
+    t.string  "plugin_name", limit: 255
+    t.integer "version",     limit: 4
+  end
+
   create_table "question_advices", force: :cascade do |t|
     t.integer "question_id", limit: 4
     t.integer "score",       limit: 4
@@ -380,6 +525,10 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   end
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
+
+  create_table "questionnaire_types", force: :cascade do |t|
+    t.string "name", limit: 255, default: "", null: false
+  end
 
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64
@@ -468,6 +617,17 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "review_comment_paste_bins", ["review_grade_id"], name: "fk_rails_0a539bcc81", using: :btree
 
+  create_table "review_feedbacks", force: :cascade do |t|
+    t.integer  "assignment_id",      limit: 4
+    t.integer  "review_id",          limit: 4
+    t.integer  "author_id",          limit: 4
+    t.datetime "feedback_at"
+    t.text     "additional_comment", limit: 65535
+  end
+
+  add_index "review_feedbacks", ["assignment_id"], name: "fk_review_feedback_assignments", using: :btree
+  add_index "review_feedbacks", ["review_id"], name: "fk_review_feedback_reviews", using: :btree
+
   create_table "review_grades", force: :cascade do |t|
     t.integer  "participant_id",       limit: 4
     t.integer  "grade_for_reviewer",   limit: 4
@@ -477,6 +637,73 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   end
 
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
+
+  create_table "review_mappings", force: :cascade do |t|
+    t.integer "author_id",     limit: 4
+    t.integer "team_id",       limit: 4
+    t.integer "reviewer_id",   limit: 4
+    t.integer "assignment_id", limit: 4
+    t.integer "round",         limit: 4
+  end
+
+  add_index "review_mappings", ["assignment_id"], name: "fk_review_mapping_assignments", using: :btree
+  add_index "review_mappings", ["author_id"], name: "fk_review_users_author", using: :btree
+  add_index "review_mappings", ["reviewer_id"], name: "fk_review_users_reviewer", using: :btree
+  add_index "review_mappings", ["team_id"], name: "fk_review_teams", using: :btree
+
+  create_table "review_of_review_mappings", force: :cascade do |t|
+    t.integer "review_mapping_id",  limit: 4
+    t.integer "review_reviewer_id", limit: 4
+  end
+
+  add_index "review_of_review_mappings", ["review_mapping_id"], name: "fk_review_of_review_mapping_review_mappings", using: :btree
+
+  create_table "review_of_review_scores", force: :cascade do |t|
+    t.integer "review_of_review_id", limit: 4
+    t.integer "question_id",         limit: 4
+    t.integer "score",               limit: 4
+    t.text    "comments",            limit: 65535
+  end
+
+  add_index "review_of_review_scores", ["question_id"], name: "fk_review_of_review_score_questions", using: :btree
+  add_index "review_of_review_scores", ["review_of_review_id"], name: "fk_review_of_review_score_reviews", using: :btree
+
+  create_table "review_of_reviews", force: :cascade do |t|
+    t.datetime "reviewed_at"
+    t.integer  "review_of_review_mapping_id", limit: 4
+    t.integer  "review_num_for_author",       limit: 4
+    t.integer  "review_num_for_reviewer",     limit: 4
+  end
+
+  add_index "review_of_reviews", ["review_of_review_mapping_id"], name: "fk_review_of_review_review_of_review_mappings", using: :btree
+
+  create_table "review_scores", force: :cascade do |t|
+    t.integer "review_id",             limit: 4
+    t.integer "question_id",           limit: 4
+    t.integer "score",                 limit: 4
+    t.text    "comments",              limit: 65535
+    t.integer "questionnaire_type_id", limit: 4
+  end
+
+  add_index "review_scores", ["question_id"], name: "fk_review_score_questions", using: :btree
+  add_index "review_scores", ["questionnaire_type_id"], name: "fk_review_scores_questionnaire_type_id", using: :btree
+  add_index "review_scores", ["review_id"], name: "fk_review_score_reviews", using: :btree
+
+  create_table "review_strategies", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
+  create_table "reviews", force: :cascade do |t|
+    t.integer  "review_mapping_id",       limit: 4
+    t.integer  "review_num_for_author",   limit: 4
+    t.integer  "review_num_for_reviewer", limit: 4
+    t.boolean  "ignore",                                default: false
+    t.text     "additional_comment",      limit: 65535
+    t.datetime "updated_at"
+    t.datetime "created_at"
+  end
+
+  add_index "reviews", ["review_mapping_id"], name: "fk_review_mappings", using: :btree
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255, default: "", null: false
@@ -609,6 +836,20 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "survey_deployments", ["questionnaire_id"], name: "fk_rails_7c62b6ef2b", using: :btree
 
+  create_table "survey_responses", force: :cascade do |t|
+    t.integer "score",                limit: 8
+    t.text    "comments",             limit: 65535
+    t.integer "assignment_id",        limit: 8,     default: 0, null: false
+    t.integer "question_id",          limit: 8,     default: 0, null: false
+    t.integer "survey_id",            limit: 8,     default: 0, null: false
+    t.string  "email",                limit: 255
+    t.integer "survey_deployment_id", limit: 4
+  end
+
+  add_index "survey_responses", ["assignment_id"], name: "fk_survey_assignments", using: :btree
+  add_index "survey_responses", ["question_id"], name: "fk_survey_questions", using: :btree
+  add_index "survey_responses", ["survey_id"], name: "fk_survey_questionnaires", using: :btree
+
   create_table "system_settings", force: :cascade do |t|
     t.string  "site_name",                 limit: 255, default: "", null: false
     t.string  "site_subtitle",             limit: 255
@@ -737,6 +978,10 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
+  create_table "wiki_types", force: :cascade do |t|
+    t.string "name", limit: 255, default: "", null: false
+  end
+
   add_foreign_key "answer_tags", "answers"
   add_foreign_key "answer_tags", "tag_prompt_deployments"
   add_foreign_key "answer_tags", "users"
@@ -746,8 +991,12 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
+  add_foreign_key "assignments_questionnaires", "assignments", name: "fk_assignments_questionnaires_assignments"
+  add_foreign_key "assignments_questionnaires", "questionnaires", name: "fk_assignments_questionnaires_questionnaires"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
+  add_foreign_key "courses_users", "courses", name: "fk_users_courses"
+  add_foreign_key "courses_users", "users", name: "fk_courses_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
@@ -763,7 +1012,20 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "review_comment_paste_bins", "review_grades"
+  add_foreign_key "review_feedbacks", "assignments", name: "fk_review_feedback_assignments"
+  add_foreign_key "review_feedbacks", "reviews", name: "fk_review_feedback_reviews"
   add_foreign_key "review_grades", "participants"
+  add_foreign_key "review_mappings", "assignments", name: "fk_review_mapping_assignments"
+  add_foreign_key "review_mappings", "teams", name: "fk_review_teams"
+  add_foreign_key "review_mappings", "users", column: "author_id", name: "fk_review_users_author"
+  add_foreign_key "review_mappings", "users", column: "reviewer_id", name: "fk_review_users_reviewer"
+  add_foreign_key "review_of_review_scores", "questions", name: "fk_review_of_review_score_questions"
+  add_foreign_key "review_of_review_scores", "review_of_reviews", name: "fk_review_of_review_score_reviews"
+  add_foreign_key "review_of_reviews", "review_of_review_mappings", name: "fk_review_of_review_review_of_review_mappings"
+  add_foreign_key "review_scores", "questionnaire_types", name: "fk_review_scores_questionnaire_type_id"
+  add_foreign_key "review_scores", "questions", name: "fk_review_score_questions"
+  add_foreign_key "review_scores", "reviews", name: "fk_review_score_reviews"
+  add_foreign_key "reviews", "review_mappings", name: "fk_review_mappings"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "survey_deployments", "questionnaires"

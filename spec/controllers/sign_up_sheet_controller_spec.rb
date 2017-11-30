@@ -1,4 +1,5 @@
 describe SignUpSheetController do
+  render_views
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
@@ -440,7 +441,7 @@ describe SignUpSheetController do
       expect(response).to render_template(:show_team)
     end
   end
-
+  
   describe '#switch_original_topic_to_approved_suggested_topic' do
     it 'redirects to sign_up_sheet#list page' do
       allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])
@@ -457,6 +458,45 @@ describe SignUpSheetController do
       session = {user: instructor}
       get :switch_original_topic_to_approved_suggested_topic, params, session
       expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+    end
+  end
+  describe '#load_add_signup_topics' do
+    context 'when assignment is found' do
+      it 'should render json successfully' do
+        allow(SignUpTopic).to receive(:where).and_return([topic])
+        get :load_add_signup_topics, id: "#{assignment.id}"
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq "application/json"
+        expect(response.body).to include_json({
+          id: assignment.id.to_s,
+          sign_up_topics: [{
+            id: topic.id,
+            topic_name: "#{topic.topic_name}",
+            assignment_id: assignment.id,
+            max_choosers: topic.max_choosers,
+            topic_identifier: "#{topic.topic_identifier}",
+            micropayment: topic.micropayment,
+            slots_filled_value: 0,
+            slots_waitlisted: 0,
+            slots_available: 1,
+            partipants: []
+          }],
+          slots_waitlisted: [],
+          assignment: {
+            id: assignment.id
+          }
+        }
+        )
+      end
+    end
+    context 'when assignment is not found' do
+      it 'should render empty json successfully' do
+        allow(Assignment).to receive(:find).and_raise(ActiveRecord::RecordNotFound)
+        get :load_add_signup_topics, id: "#{assignment.id}"
+        puts response.body
+        expect(response.content_type).to eq "application/json"
+        expect(response).to have_http_status(:not_found)
+      end
     end
   end
 end

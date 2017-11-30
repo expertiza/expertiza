@@ -10,6 +10,7 @@ th, td {
     <% instructor_answer = [] %>
     <% css_class =[] %>
     <% @calibration_response.each do |cal|%>
+        <%# abort("#{question.id}")%>
         <% ins = Answer.where(["question_id = ? and response_id = ?", question.id, cal.id]).first ||= 0 %>
            <% instructor_answer.push ins%>
         <% case ins.answer %>

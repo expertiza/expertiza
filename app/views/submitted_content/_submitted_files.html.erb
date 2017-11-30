@@ -72,15 +72,19 @@
           var file_name = $(this).attr("download");
           var file_name_extension = file_name.split(".").pop();
           startTime(<%= map_id %>, <%= round %>, file_path);
+          var window_handler = null;
+          var link_timer = null;
           
           if ($.inArray(file_name_extension, supported_file_type)>=0){
             alert("Open file "+ file_name + " in new window to view it online.");
-            var window_handler = window.open(file_path, "_blank");
-            var link_timer = setInterval(checkWindowStatus, 1000);
+            window_handler = window.open(file_path, "_blank");
+            link_timer = setInterval(checkWindowStatus, 1000);
           } else {
             // var window_handler = window.open(file_name);
             alert("Download file "+file_name + " to view it locally.");
-            window.location.href = file_path;
+            // window.location.href = file_path;
+            window_handler = window.open(file_path, "_blank");
+            // link_timer = setInterval(checkWindowStatus, 1000);
           }
 
           function startTime(map_id, round, link) {
@@ -115,7 +119,7 @@
 
           function checkWindowStatus(){
             if (window_handler.closed){
-              endTime(file_name);
+              endTime(file_path);
               clearInterval(link_timer);
             }
           }

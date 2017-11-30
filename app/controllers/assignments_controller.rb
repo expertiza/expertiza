@@ -351,32 +351,4 @@ class AssignmentsController < ApplicationController
   def assignment_form_params
     params.require(:assignment_form).permit!
   end
-
-  def set_badge_threshold_for_assignment(assignment_id, good_teammate_threshold, good_reviewer_threshold)
-    good_reviewer_badge= AssignmentBadge.find_by(assignment_id: assignment_id).where(badge_id: 1)
-    if good_reviewer_badge.nil?
-      good_reviewer_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 1, threshold: good_reviewer_threshold)
-    else
-      good_reviewer_badge.threshold=good_reviewer_threshold
-    end
-
-
-    begin good_reviewer_badge.save
-    rescue
-      flash[:error] = $ERROR_INFO
-    end
-    good_teammate_badge= AssignmentBadge.find_by(assignment_id: assignment_id).where(badge_id: 2)
-    if good_reviewer_badge.nil?
-      good_teammate_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 2, threshold: good_reviewer_threshold)
-    else
-      good_teammate_badge.threshold=good_teammate_threshold
-    end
-
-
-    begin good_teammate_badge.save
-    rescue
-      flash[:error] = $ERROR_INFO
-    end
-    
-  end
 end

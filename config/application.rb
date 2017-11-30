@@ -80,8 +80,8 @@ module Expertiza
     ]
 
     config.trello_token = {
-      trello_token: ENV["TRELLO_TOKEN"],
-      trello_key: ENV["TRELLO_KEY"]
+      trello_token: ENV["TRELLO_MEMBER_TOKEN"],
+      trello_key: ENV["TRELLO_DEVELOPER_PUBLIC_KEY"]
     }
 
     config.trello_source = {

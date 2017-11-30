@@ -36,14 +36,13 @@ class TrelloMetricsFetcher
   end
 
 	def fetch_content
-		params = SOURCE.find { |params| !params[:REGEX].match(url).nil? }
+		params = SOURCE[:REGEX].match(@url)
 		if !params.nil?
-      url_parsed = params[:REGEX].match(url)
-      @board_id = url_parsed['board_id']
+      @board_id = params['board_id']
 			@board = Trello::Board.find(@board_id)
 			@member_id_to_user_name = {}
 			@member_id_to_count = {}
-			board.members.each do |member|
+			@board.members.each do |member|
 				member_id_to_user_name[member.id] = member.username
 				member_id_to_count[member.id] = 0
 			end
@@ -51,16 +50,16 @@ class TrelloMetricsFetcher
 			@total_items = 0
 			@checked_items = 0
 
-			board.cards.each do |card|
+			@board.cards.each do |card|
 				card.checklists.each do |checklist|
 					checklist.check_items.each do |item|
-						total_items += 1
-						checked_items += 1 if item["state"] == "complete"
+						@total_items += 1
+						@checked_items += 1 if item["state"] == "complete"
 					end
 				end
 			end
 
-			board.actions.each do |action|
+			@board.actions.each do |action|
 				if action.type == "updateCheckItemStateOnCard" && action.data["checkItem"]["state"] == "complete"
 					member_id_to_count[action.member_creator_id] += 1
 				end
@@ -68,4 +67,8 @@ class TrelloMetricsFetcher
 		end
     @loaded = true
 	end
+
+  def is_loaded?
+    @loaded
+  end
 end

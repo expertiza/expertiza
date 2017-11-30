@@ -5,7 +5,8 @@
     </div>
 <% end %>
 <%= form_tag({:action=>'delete_reviews'})do %>
-  Are you sure you want to delete all assignment reviews for <%= @assignment.name.capitalize %>?<br/><br/>
+  <h3><%= "Number of assignment reviews: #{@response_map.count} " %></h3><br>
+  <%= "Are you sure you want to delete all assignment reviews for #{@assignment.name.capitalize}?" %><br>
 
   <br>
   <%= hidden_field_tag "assignment_id", @assignment.id %>

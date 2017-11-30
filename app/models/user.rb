@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :name
 
   validates_presence_of :email, message: "can't be blank"
-  validates_format_of :email, with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true
+  validates_format_of :email, with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: false
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
   after_create :email_welcome

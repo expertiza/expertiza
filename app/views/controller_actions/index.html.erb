@@ -7,6 +7,8 @@
     <th>Permission</th>
   </tr>
 
+  <%= will_paginate @controller_actions %>
+
   <% for controller_action in @controller_actions -%>
     <tr>
       <td><%= link_to controller_action.controller.name,

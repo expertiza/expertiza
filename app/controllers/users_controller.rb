@@ -63,7 +63,7 @@ class UsersController < ApplicationController
   end
 
   def list_pending_requested
-    sql_query = "select * from requested_users where status <> 'Approved' or status is null"
+    sql_query = "select * from requested_users where status <> '' or status is null"
     @users = RequestedUser.find_by_sql(sql_query)
     # @users=RequestedUser.all
     @roles = Role.all
@@ -108,7 +108,7 @@ class UsersController < ApplicationController
   end
 
   def request_new
-    flash[:error] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
+    flash[:danger] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
     roles_for_request_sign_up
@@ -240,13 +240,14 @@ class UsersController < ApplicationController
       @super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
       @super_users.each do |super_user|
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, @user, "New account Request")
-        prepared_mail.deliver
+        prepared_mail.deliver_now
       end
       flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
       redirect_to '/instructions/home'
     else
       flash[:error] = "The account you are requesting has already existed in Expertiza."
-      redirect_to controller: 'users', action: 'request_new', role: "Student"
+      #redirect_to controller: 'users',action:'request_new',role:"Student"
+      render 'request_new'
     end
   end
 

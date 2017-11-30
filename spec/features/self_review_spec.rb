@@ -25,45 +25,50 @@ describe "self review testing", js: true  do
     create(:question)
 
   end
-
+  
+  # method to give self-review scores for a particular assignment
   def add_self_review_scores
-    # Load questionnaire with generic setup  
+    # Login as student2065 to submit the self-review  
     login_as('student2065')
-    # stub_current_user(user, user.role.name, user.role)
     expect(page).to have_content "User: student2065"
     expect(page).to have_content "TestAssignment"
+    # select the assignment for self-review
     find_link( "TestAssignment").click
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
+    # click on the link to review the submitted assignment
     find_link( "Your work").click
-   # expect(page).to have_content 'Review our own work'
     find_button("Review our own work").click
     find_link( "Begin").click
     # Fill in a textbox and a dropdown
     fill_in "responses[0][comment]", with: "HelloWorld"
     select 5, from: "responses[0][score]"
+    # Submit self-review
     find_button("Submit Self Review").click
-    # since alert box appears after submitting a review
+    # Accept the alert box message that appears after submitting a review
     page.driver.browser.switch_to.alert.accept
     expect(page).to have_content "Your response was successfully saved."
   end
 
-  
+  # method added to login as another user; required for doing the peer review
+  # as a different student "student2064"; redirects to the assignments page of new user
   def visit_new_user name
     user = User.find_by_name(name)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
   end
 
-
+  # method for peer-reviewing the same assignment 
   def add_peer_review_scores
-    # Load questionnaire with generic setup
+    # Login as a different student "student2064" 
     visit_new_user "student2064"
     expect(page).to have_content "User: student2064"
     expect(page).to have_content "TestAssignment"
+    # select the same assignment as the self-review 
     find_link( "TestAssignment").click
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
+    # click on other's work to select the assignments available for review
     find_link( "Others' work").click
     expect(page).to have_content 'Reviews for "TestAssignment"'
     choose "topic_id"
@@ -72,7 +77,9 @@ describe "self review testing", js: true  do
     # Fill in a textbox and a dropdown
     fill_in "responses[0][comment]", with: "HelloWorld"
     select 3, from: "responses[0][score]"
+    # submit the peer-review
     find_button("Submit Review").click
+    # Accept the alert box message that appears after submitting a review
     page.driver.browser.switch_to.alert.accept
     expect(page).to have_content "Your response was successfully saved."
    end
@@ -80,16 +87,17 @@ describe "self review testing", js: true  do
 
 
    def check_self_review_scores
-    # Load questionnaire with generic setup
+    # Login again as student2065 to check the self-review scores
     visit_new_user "student2065"
     expect(page).to have_content "User: student2065"
     expect(page).to have_content "TestAssignment"
+    # select the same assignment as before - TestAssignment
     find_link( "TestAssignment").click
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
     find_link( "Your scores").click
-    #  The value should be equal to 40.00 when the peer review score is 3 and self review score is 5
-    # these scores are set up in
+    # The value should be equal to 40.00 when the peer review score is 3 and self review score is 5
+    # these scores are set up in the factory
     score_displayed = page.evaluate_script("$('#computed_self_review_score').html();")
     expect(score_displayed).to eql("40.00")    
    end

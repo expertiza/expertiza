@@ -84,6 +84,10 @@
     transition: all 200ms ease-in;
   }
 }
+.scrollable{
+  height: auto;
+  overflow-y: auto;
+}
 /*
 html, body {
   width: 100%;

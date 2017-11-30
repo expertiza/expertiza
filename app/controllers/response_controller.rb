@@ -180,7 +180,8 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
     end
 
-    @response.email
+    # E17A0 Email the reviewee only if the reviewer has submitted the review
+    @response.email if @response.is_submitted
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
@@ -360,6 +361,7 @@ class ResponseController < ApplicationController
     @review_scores = @prev.to_a
   end
 
+  private
   # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
   def reviewer_is_team_member?
     false
@@ -375,9 +377,6 @@ class ResponseController < ApplicationController
       end
     end
   end
-
-  private
-
 
   def lock_response_map response_id
     review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)

@@ -9,10 +9,9 @@
 <h4><%= "#{@assignment.reviewer_is_team? ? "Your team is required to do" : "You are required to do"} #{number_with_delimiter(@assignment.num_reviews_required)} reviews" %></h4>
 
 <% if @assignment.reviewer_is_team? %>
- <h5><%= "Team Name: #{@team.name}" %></h5>
+ <h5><%= "Team name: #{@team.name}" %></h5>
 <% end %>
-
-<hr>
+<br>
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>

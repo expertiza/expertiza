@@ -51,7 +51,7 @@
                    :action => 'assign_reviewer_dynamically',
                    :assignment_id => assignment.id,
                    :reviewer_id => session[:user].id do %>
-      <hr>
+      <br>
       <p><input type='submit' value='<%="#{assignment.reviewer_is_team? ? 'Request a new submission for your team to review' : 'Request a new submission to review'}" %>'></p>
     <% end %>
   <%end%>

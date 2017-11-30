@@ -53,7 +53,7 @@ class Criterion < ScoredQuestion
       rows = self.size.split(',')[1]
     end
 
-    html = '<li><div><label for="responses_' + count.to_s + '">' + self.txt + '</label></div>'
+    html = '<div><label for="responses_' + count.to_s + '">' + self.txt + '</label></div>'
     # show advice for each criterion question
     question_advices = QuestionAdvice.where(question_id: self.id).sort_by(&:id)
     advice_total_length = 0

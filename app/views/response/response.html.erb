@@ -1,5 +1,7 @@
 <script>
 jQuery(document).ready(function() {
+    var last_activity_time = new Date();
+
     jQuery('#Submit').click(function(e){
     if(!confirm('Once a review has been submitted, you cannot edit it again')){
         e.preventDefault();
@@ -15,6 +17,33 @@ jQuery(document).ready(function() {
             autoRelease: true
         }); 
     });
+
+    // E17AO When user presses a key, reset last activity time to now
+    $(document).on( "keypress keydown", function () {
+        last_activity_time = new Date();
+    });
+
+    // E17AO When user clicks mouse, reset last activity time to now
+    $(document).on( "mousedown", function () {
+        last_activity_time = new Date();
+    });
+
+    // E17AO When user moves mouse, reset last activity time to now
+    $(document).on( "mousemove", function () {
+        last_activity_time = new Date();
+    });
+
+    // E17A0 Check every 30 seconds to see if browser idle for more than 20 minutes
+    // E17AO If idle for more than 20 minutes, Save review
+    setInterval(function(){
+      var current_time = new Date();
+      var time_difference_in_seconds = (current_time - last_activity_time) / 1000;
+
+      if(time_difference_in_seconds > 1200) {
+        $( "#Save" ).click();
+      }
+
+    }, 30000);
 })
 </script>
 
@@ -69,7 +98,7 @@ jQuery(document).ready(function() {
 <% end %>
 <h2>Directions for the reviewer</h2>
 
-<%= form_tag :action => @next_action, :id => @modified_object do %>
+<%= form_tag :action => @next_action, :id => @modified_object  do %>
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
@@ -90,13 +119,12 @@ jQuery(document).ready(function() {
     <% end %>
 
     <!--#E17A0 Formatted this section to have a list and not have leading white spaces-->
-    <li>
       <div><label for="review_comments">Additional Comments</label></div>
       <% if controller.action_name != 'new' and @response.additional_comment != nil %>
         <% additional_review_comments = @response.additional_comment.strip if !@response.nil? %>
       <% end %>
       <div><textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden"><%= additional_review_comments %></textarea></div>
-    </li>
+
 
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>
@@ -104,12 +132,13 @@ jQuery(document).ready(function() {
     <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
 
     <hr>
-    <%= submit_tag "Save "+@title, :name => "save" %>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "Save" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
+    <%= hidden_field_tag :authenticity_token, value: form_authenticity_token %>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>
@@ -130,3 +159,7 @@ jQuery(document).ready(function() {
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+<script>
+
+</script>

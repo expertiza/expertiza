@@ -37,7 +37,12 @@ class AssignmentForm
     else
       attributes[:assignment][:late_policy_id] = nil
     end
+    good_teammate_threshold=attributes[:assignment].delete("badge_2_threshold")
+    good_reviewer_threshold=attributes[:assignment].delete("badge_1_threshold")
+
+
     update_assignment(attributes[:assignment])
+    set_badge_threshold_for_assignment(attributes[:assignment][:id],good_reviewer_threshold,good_teammate_threshold)
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -325,6 +330,41 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight
       )
+    end
+  end
+
+  def set_badge_threshold_for_assignment(assignment_id, good_reviewer_threshold, good_teammate_threshold)
+    if good_reviewer_threshold.nil?
+      good_reviewer_threshold=95
+    end
+    if good_teammate_threshold.nil?
+      good_teammate_threshold=95
+    end
+
+     good_reviewer_badge= AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 1)
+     good_teammate_badge=AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 2)
+
+
+    if good_reviewer_badge.nil?
+      good_reviewer_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 1, threshold: good_reviewer_threshold)
+    else
+      good_reviewer_badge.threshold=good_reviewer_threshold
+    end
+    begin
+      good_reviewer_badge.save
+    rescue
+      flash[:error] = $ERROR_INFO
+    end
+
+    if good_teammate_badge.nil?
+      good_teammate_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 2, threshold: good_reviewer_threshold)
+    else
+      good_teammate_badge.threshold=good_teammate_threshold
+    end
+    begin
+      good_teammate_badge.save
+    rescue
+      flash[:error] = $ERROR_INFO
     end
   end
 end

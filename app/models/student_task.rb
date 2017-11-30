@@ -176,7 +176,7 @@ class StudentTask
         @timeline_list << tmp
       end
     end
-    @tmp_sorted_list=@timeline_list.sort_by{ |f| Date.parse f[:updated_at]}
+    @tmp_sorted_list=@timeline_list.sort_by{ |f| Time.parse f[:updated_at]}
 
   #  @tmp_sorted_list = sort_timeline_data(@timeline_list)
     return @tmp_sorted_list

@@ -5,7 +5,7 @@ class StudentReviewController < ApplicationController
      'Administrator',
      'Super-Administrator',
      'Student'].include? current_role_name and
-    ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
+        ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
   end
 
   def list
@@ -61,7 +61,7 @@ class StudentReviewController < ApplicationController
   private
   # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
   def reviewer_team_info
-    if !@assignment.nil?
+    unless @assignment.nil?
       if @assignment.reviewer_is_team?
         team = Team.select(:id, :parent_id).where(parent_id: @assignment.id).all
         teams_user = TeamsUser.select(:id, :team_id, :user_id).where(user_id: current_user.id)
@@ -77,8 +77,8 @@ class StudentReviewController < ApplicationController
 
   # E17A0 If a review is locked by a team member, other team memebers can unlock it
   def unlock_response_map response_id
-    review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
-    if !review_response_map.nil?
+    review_response_map = ReviewResponseMap.find_by_id(Response.find(response_id).map_id)
+    unless review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
     end
   end

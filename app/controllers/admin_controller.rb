@@ -1,10 +1,10 @@
 class AdminController < ApplicationController
   def action_allowed?
     case params[:action]
-    when 'list_instructors'
-      current_user.role.name['Administrator']
-    else
-      current_user.role.name['Super-Administrator']
+      when 'list_instructors'
+        current_user.role.name['Administrator']
+      else
+        current_user.role.name['Super-Administrator']
     end
   end
 

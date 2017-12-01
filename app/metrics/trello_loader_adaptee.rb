@@ -43,6 +43,9 @@ class TrelloLoaderAdaptee < MetricLoaderAdapter
 	def self.create_points(new_metric, metrics)
 		total_items = metrics.total_items
 		checked_items = metrics.checked_items
+		member_id_to_user_name = metrics.member_id_to_user_name
+		member_id_to_count = metrics.member_id_to_count
+
 		data_type = MetricDataPointType.where(
 			:name => "total_items",
 			:source => MetricDataPointType.sources[:trello]
@@ -64,6 +67,22 @@ class TrelloLoaderAdaptee < MetricLoaderAdapter
 				value: checked_items.to_s
 			)
 		end
+
+		data_type = MetricDataPointType.where(
+			:name => "users_contributions",
+			:source => MetricDataPointType.sources[:trello]
+		)
+		result = ""
+		if !data_type.empty?
+			member_id_to_user_name.each do |id, name|
+				result += "#{name},#{member_id_to_count[id]},"
+			end
+
+			new_metric.metric_data_points.create(
+				metric_data_point_type_id: data_type.first.id,
+				value: result[0...-1]
+			)
+		end
 	end
 
 	def self.make_team_filter(team)
@@ -79,5 +98,12 @@ class TrelloLoaderAdaptee < MetricLoaderAdapter
         [m.metric_data_point_type.name.to_sym, m.value]
       }.to_h
     }
+	end
+
+	def self.map_user_contributions(contribution_str)
+		arr = contribution_str.split(",")
+		result = {}
+		arr.each_slice(2) { |user, count| result[user.to_sym] = count }
+		return result
 	end
 end

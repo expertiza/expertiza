@@ -31,7 +31,7 @@ class TeammateReviewResponseMap < ResponseMap
     Mailer.sync_message(defn).deliver
   end
 
-  def calculate_teammate_review_score (badge_id, assignment_id, reviewee_id)
+  def self.calculate_teammate_review_score (badge_id, assignment_id, reviewee_id)
     number_of_scores = 0
     aggregate_score = 0
     # Get the threshold for this assigment's Good Teammate badge.
@@ -53,13 +53,18 @@ class TeammateReviewResponseMap < ResponseMap
         aggregate_score += response.get_average_score
       end
     end
-    return aggregate_score / number_of_scores
+
+    if number_of_scores == 0
+      return 0
+    else
+      return aggregate_score / number_of_scores
+    end
   end
 
   def update_good_teammate_badge
 
     # Calculate the overall average score across all teammate reviews.
-    average_score = calculate_teammate_review_score(2, assignment.id, reviewee.id)
+    average_score = TeammateReviewResponseMap.calculate_teammate_review_score(2, assignment.id, reviewee.id)
 
     # Retrieve the Good Teammate badge for the reviewee if it exists.
     good_teammate_badge = AwardedBadge.find_by(badge_id: 2, participant_id: reviewee.id)

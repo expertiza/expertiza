@@ -94,11 +94,7 @@
          <table class="grades" style=" font-style: italic; margin-left: 90px;">
          <% if (@sorted_responses.size > 1) %>
            <%@sorted_responses = @sorted_responses.reverse%>
-           <% participant_of_response = @sorted_responses[1].map.contributor.id%>
-           <% latest_update_time = @sorted_responses[1].check_update(@sorted_responses[1].map.contributor) %>
-           <% unless latest_update_time.nil? %>
-                   <td colspan="10">Github updated at : <%= latest_update_time.to_s %></td>
-           <% end %>
+           
 
            <% for i in 1..@sorted_responses.size-1 %>
              <tr>

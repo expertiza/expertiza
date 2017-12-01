@@ -33,5 +33,12 @@ describe ResponseTimesController do
     end
   end
 
+  describe '#mark_end_time' do
+    context 'when the links for which end time has not been marked is encountered' do
+      it 'print the links to console' do
+      end
+    end
+  end
+
 end
 

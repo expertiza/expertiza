@@ -13,7 +13,7 @@
       <td style="text-align:center"><img src="<%= asset_path("badges/#{badge.image_name}") %>" title="<%= badge.name %>"></td>
       <td><%= badge.name %></td>
       <td><%= badge.description %></td>
-      <td><input type="text" id="badge_<%= badge.id %>" value="<%= AssignmentBadge.find_by(assignment_id: params[:id], badge_id: badge.id).threshold %>"></td>
+      <td><input type="text" id="badge_<%= badge.id %>" value="<%= AssignmentBadge.find_by(assignment_id: params[:id], badge_id: badge.id).threshold unless AssignmentBadge.find_by(assignment_id: params[:id], badge_id: badge.id).nil?%>"></td>
     </tr>
   <% end %>
   </tbody>

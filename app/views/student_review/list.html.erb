@@ -6,9 +6,9 @@
   <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
 <% end %>
 
-<h4><%= "#{@assignment.reviewer_is_team? ? "Your team is required to do" : "You are required to do"} #{number_with_delimiter(@assignment.num_reviews_required)} reviews" %></h4>
+<h4><%= "#{@assignment.reviewer_is_team? && !@team.nil? ? "Your team is required to do" : "You are required to do"} #{number_with_delimiter(@assignment.num_reviews_required)} reviews" %></h4>
 
-<% if @assignment.reviewer_is_team? %>
+<% if @assignment.reviewer_is_team? && !@team.nil? %>
  <h5><%= "Team name: #{@team.name}" %></h5>
 <% end %>
 <br>

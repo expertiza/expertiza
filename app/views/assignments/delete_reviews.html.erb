@@ -1,13 +1,12 @@
 <h1>Delete all assignment reviews</h1>
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
-    <div class="flash_error">
-      <%= flash[:notice] %>
-    </div>
+  <div class="flash_error">
+    <%= flash[:notice] %>
+  </div>
 <% end %>
 <%= form_tag({:action=>'delete_reviews'})do %>
-  <h3><%= "Number of assignment reviews: #{@response_map.count} " %></h3><br>
-  <%= "Are you sure you want to delete all assignment reviews for #{@assignment.name.capitalize}?" %><br>
-
+  <h4><%= "Number of assignment reviews: #{@response_map.count} " %></h4>
+  <h4><%= "Are you sure you want to delete all assignment reviews for \"#{@assignment.name.capitalize}\"?" %></h4>
   <br>
   <%= hidden_field_tag "assignment_id", @assignment.id %>
   <%= hidden_field_tag "action_confirmed", 1 %>

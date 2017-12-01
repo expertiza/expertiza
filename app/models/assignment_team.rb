@@ -42,16 +42,12 @@ class AssignmentTeam < Team
     raise "The assignment cannot be found." if assignment.nil?
 
     # E17A0 Add team_id to all reviews
-
-    #puts reviewer.user_id
-
     team = Team.select(:id, :parent_id).where(parent_id: assignment.id).all
     teams_user = TeamsUser.select(:id, :team_id, :user_id).where(user_id: reviewer.user_id)
-    zx = teams_user.team_id(assignment.id, reviewer.user_id)
-    teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
-    puts teams_user.first.team_id
+    team_id  = teams_user.team_id(assignment.id, reviewer.user_id)
+    #teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
     ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
-                             reviewed_object_id: assignment.id, team_id: zx)
+                             reviewed_object_id: assignment.id, team_id: team_id)
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer

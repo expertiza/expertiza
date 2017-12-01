@@ -25,6 +25,11 @@ class ResponseController < ApplicationController
     else
       current_user
     end
+
+  # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
+  # E17A0 In this case, when the review is not found, an error is returned
+  rescue ActiveRecord::RecordNotFound
+    false
   end
 
   def edit_allowed?(map, user_id)
@@ -87,6 +92,11 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     msg = ""
 
+    # E17A0 Show a flash message when a response is automatically saved after a period of inactivity
+    if params[:autosave_timeout].to_i > 0
+      msg = "Your response was automatically saved after #{((params[:autosave_timeout].to_i) / 60).round} minutes of inactivity."
+    end
+
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
@@ -103,6 +113,9 @@ class ResponseController < ApplicationController
       if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
         @response.notify_instructor_on_difference
       end
+
+      # E17A0 Email the reviewee only if the reviewer has submitted the review
+      @response.email if @response.is_submitted
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -180,8 +193,6 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
     end
 
-    # E17A0 Email the reviewee only if the reviewer has submitted the review
-    @response.email if @response.is_submitted
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
@@ -189,6 +200,8 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+
+
     unlock_response_map @map.id if @map.type == 'ReviewResponseMap'
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

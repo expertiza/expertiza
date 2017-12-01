@@ -42,7 +42,7 @@
     </table>
 
     <hr>
-    <p><input type='submit' value='<%="#{assignment.reviewer_is_team? ? 'Request a new submission for your team to review' : 'Request a new submission to review'}" %>'></p>
+    <p><input type='submit' value='<%="#{assignment.reviewer_is_team? && !@team.nil? ? 'Request a new submission for your team to review' : 'Request a new submission to review'}" %>'></p>
     <% end %>
   <%end%>
 <% else %>
@@ -52,7 +52,7 @@
                    :assignment_id => assignment.id,
                    :reviewer_id => session[:user].id do %>
       <br>
-      <p><input type='submit' value='<%="#{assignment.reviewer_is_team? ? 'Request a new submission for your team to review' : 'Request a new submission to review'}" %>'></p>
+      <p><input type='submit' value='<%="#{assignment.reviewer_is_team? && !@team.nil? ? 'Request a new submission for your team to review' : 'Request a new submission to review'}" %>'></p>
     <% end %>
   <%end%>
 <% end %>

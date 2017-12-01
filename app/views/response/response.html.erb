@@ -1,6 +1,7 @@
 <script>
 jQuery(document).ready(function() {
     var last_activity_time = new Date();
+    var default_timeout_time_in_minutes = 20
 
     jQuery('#Submit').click(function(e){
     if(!confirm('Once a review has been submitted, you cannot edit it again')){
@@ -39,8 +40,9 @@ jQuery(document).ready(function() {
       var current_time = new Date();
       var time_difference_in_seconds = (current_time - last_activity_time) / 1000;
 
-      if(time_difference_in_seconds > 1200) {
-        $( "#Save" ).click();
+      if(time_difference_in_seconds > default_timeout_time_in_minutes * 60 ) {
+          $('#autosave_timeout_id').val(time_difference_in_seconds);
+          $( "#Save" ).click();
       }
 
     }, 30000);
@@ -139,6 +141,7 @@ jQuery(document).ready(function() {
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
     <%= hidden_field_tag :authenticity_token, value: form_authenticity_token %>
+    <%= hidden_field_tag 'autosave_timeout', 0, id: 'autosave_timeout_id' %>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>

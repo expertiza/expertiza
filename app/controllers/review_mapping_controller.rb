@@ -616,23 +616,27 @@ class ReviewMappingController < ApplicationController
     puts("\n\n\n$$$$$$$")
     print participant.user_id # for finding the student_id
     print participant.parent_id
-    threshold = AssignmentBadges.where(:badge_id => 1 , :assignment_id => participant.parent_id )[0].threshold
-    if ( review_grade != nil && review_grade>=threshold)
-      awarded_badge= AwardedBadge.find_by(participant_id: participant_id)
-      if awarded_badge.nil?
-        awarded_badge= AwardedBadge.create(participant_id: participant_id)
-      end
+    if(!AssignmentBadge.where(:badge_id => 1 , :assignment_id => participant.parent_id ).nil?)
+      threshold = AssignmentBadge.find_by(:badge_id => 1 , :assignment_id => participant.parent_id ).threshold
+      if(!threshold.nil?)
+        if ( review_grade != nil && review_grade>=threshold)
+          awarded_badge= AwardedBadge.find_by(participant_id: participant_id)
+          if awarded_badge.nil?
+            awarded_badge= AwardedBadge.create(participant_id: participant_id)
+          end
 
-      awarded_badge.badge_id=1
-      begin
-        awarded_badge.save
-      rescue
-        flash[:error] = $ERROR_INFO
-      end
-    else
-      awarded_badge= AwardedBadge.find_by(participant_id: participant_id)
-      if !awarded_badge.nil?
-        awarded_badge.delete
+          awarded_badge.badge_id=1
+          begin
+            awarded_badge.save
+          rescue
+            flash[:error] = $ERROR_INFO
+          end
+        else
+          awarded_badge= AwardedBadge.find_by(participant_id: participant_id)
+          if !awarded_badge.nil?
+            awarded_badge.delete
+          end
+        end
       end
     end
   end

@@ -1,10 +1,10 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
-
+<!-- If assignment is calibrated, render the response partial for calibration reviews and title of each review as calibrated review -->
 <% if @assignment.is_calibrated? && !@calibration_reviews.nil? %>
 
     <%= render :partial => 'responses', :locals => {:mappings => @calibration_reviews, :title => 'Calibrated Review'} %>
 <% end %>
-
+<!-- Only when the first submission due date elapses, the peer reviews will start displaying in others work -->
 <% if Time.now >= @first_submission_due_date && (check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished") %>
     <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
 
@@ -13,6 +13,7 @@
     <% end %>
     <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
     <% if !@peer_reviews.nil? %>
+    <!-- Render response partial for peer reviews and title of each review as Review -->
         <%= render :partial => 'responses', :locals => {:mappings => @peer_reviews, :title => 'Review'} %>
     <% end %>
     <% if @assignment.dynamic_reviewer_assignment? %>

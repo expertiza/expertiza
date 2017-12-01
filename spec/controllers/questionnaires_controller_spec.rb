@@ -227,4 +227,17 @@ describe QuestionnairesController do
       #   question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
       # }
   end
+
+  describe '#fetch_duties' do
+    duty = Duty.new
+    duty.duty_name='tester'
+    duty.id=1
+    duties = [duty]
+
+    it 'fetching duties' do
+      q = QuestionnairesController.new
+      allow(Duty).to receive(:get_unmapped_duties).and_return(duties)
+      q.fetch_duties
+    end
+  end
 end

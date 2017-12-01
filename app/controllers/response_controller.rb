@@ -23,7 +23,7 @@ class ResponseController < ApplicationController
       when 'view'
         return edit_allowed?(response.map, user_id)
       when 'new'
-        response_map = ResponseMap.find(pararms[:id])
+        response_map = ResponseMap.find(params[:id])
         return response_map.locked_by== current_user.id
       else
         current_user

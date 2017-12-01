@@ -22,7 +22,10 @@ class ResponseController < ApplicationController
       return current_user_id?(user_id) || reviewer_is_team_member?
     when 'view'
       return edit_allowed?(response.map, user_id)
-    else
+      when 'new'
+        response_map = ResponseMap.find(pararms[:id])
+        return response_map.locked_by== current_user.id
+      else
       current_user
     end
 

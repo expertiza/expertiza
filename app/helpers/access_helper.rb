@@ -7,10 +7,23 @@ module AccessHelper
   end
 
   def flash_msg
-    if(params.has_key?(:map_id))
-      if ResponseMap.find(params[:map_id]).is_locked
-        flash[:error] = "One of your teammates is working on the review. Only one person can work on a review at a time."
+    if params[:controller] == 'response'
+      if params.has_key?(:map_id)
+        response_map = ResponseMap.find_by_id(params[:map_id])
+        response_locked = (!response_map.nil?) ? response_map.locked : false
+        if response_locked
+          flash[:error] = "One of your teammates is working on the review. Only one person can work on a review at a time."
+        else
+          flash[:error] = "This #{params[:controller]} is no longer available!"
+        end
       end
+
+      if params.has_key?(:id)
+        if params[:action] == 'new'
+          flash[:error] = "This review was requested by your teammate and only s/he can begin it."
+        end
+      end
+
     else
       if current_role && current_role.name.try(:downcase).start_with?('a', 'e', 'i', 'o', 'u')
         flash[:error] = if params[:action] == 'new'
@@ -27,7 +40,6 @@ module AccessHelper
       end
     end
   end
-
   def all_actions_allowed?
     if current_user && current_role.super_admin?
       true

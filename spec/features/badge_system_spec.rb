@@ -1,40 +1,24 @@
-def login_and_go_to_badge(user,assignment_id)
-  login_as(user)
-  visit "/assignments/#{assignment_id}/edit"
-  find_link('Badges').click
-end
-
-def change_good_reviewer_badge_threshold(threshold)
-  fill_in badge_1_threshold, with: threshold
-  click_button "Save"
-end
-
-def change_good_teammate_badge_threshold(threshold)
-  fill_in badge_2_threshold, with: threshold
-  click_button "Save"
-end
-
 describe 'Good Reviewer Badge Presence' do
 
   before :each do
 
     create(:assignment, name: 'Badge Assignment', directory_path: 'badge_test')
+
     create_list(:participant, 3)
+
     create_list(:assignment_team, 2)
+
     create(:team_user, user: User.find(2), team: AssignmentTeam.first)
     create(:team_user, user: User.find(3), team: AssignmentTeam.second)
     create(:team_user, user: User.find(4), team: AssignmentTeam.second)
-    # create(:assignment_node)
-    # create(:team_user, user: User.where(role_id: 2).first)
-    # create(:team_user, user: User.where(role_id: 2).second)
-    # create(:assignment_team)
-    # create(:team_user, user: User.where(role_id: 2).third, team: AssignmentTeam.second)
-    # create(:signed_up_team)
-    # create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-    # create(:assignment_questionnaire)
-    # create(:question)
-    # # create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
-    # # create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
+
+    create(:review_response_map, reviewer_id: Participant.find(1), reviewee: Team.find_by(name: 'team2'))
+    create(:review_response_map, reviewer_id: Participant.find(2), reviewee: Team.find_by(name: 'team2'))
+    create(:review_response_map, reviewer_id: Participant.find(3), reviewee: Team.find_by(name: 'team1'))
+
+    create(:review_grade, participant: Participant.find(1))
+    create(:review_grade, participant: Participant.find(2))
+    create(:review_grade, participant: Participant.find(3))
 
     Badge.create(name: 'Good Reviewer',
                  description: 'This badge is awarded to students who receive very high review grades.',
@@ -44,13 +28,16 @@ describe 'Good Reviewer Badge Presence' do
                  description: 'This badge is awarded to students who receive very high teammate review scores.',
                  image_name: 'Badge-Good-Teammate.png')
 
-    AssignmentBadge.create(assignment_id: 1, badge_id: 1, threshold: 95)
+    AssignmentBadge.create(assignment_id: 1,
+                           badge_id: 1,
+                           threshold: 95)
 
-    AssignmentBadge.create(assignment_id: 1, badge_id: 2, threshold: 95)
+    AssignmentBadge.create(assignment_id: 1,
+                           badge_id: 2,
+                           threshold: 95)
 
     puts "\n\nAssignment Badges:\n\n"
-    assignment_badges = AssignmentBadge.all
-    assignment_badges.each do |assignment_badge|
+    AssignmentBadge.all.each do |assignment_badge|
       puts "\t----------"
       puts "\tASSIGNMENT ID: #{assignment_badge.assignment_id}"
       puts "\tBADGE ID: #{assignment_badge.badge_id}"
@@ -59,8 +46,7 @@ describe 'Good Reviewer Badge Presence' do
     puts "\t----------"
 
     puts "\nUsers:\n\n"
-    users = User.all
-    users.each do |user|
+    User.all.each do |user|
       puts"\t----------"
       puts "\tUSER ID: #{user.id}"
       puts "\tUSER NAME: #{user.name}"
@@ -68,8 +54,7 @@ describe 'Good Reviewer Badge Presence' do
     puts "\t----------"
 
     puts "\nParticipants:\n\n"
-    participants = Participant.all
-    participants.each do |participant|
+    Participant.all.each do |participant|
       puts"\t----------"
       puts "\tPARTICIPANT ID: #{participant.id}"
       puts "\tPARENT ID: #{participant.parent_id}"
@@ -79,8 +64,7 @@ describe 'Good Reviewer Badge Presence' do
     puts "\t----------"
 
     puts "\nTeams:\n\n"
-    teams = Team.all
-    teams.each do |team|
+    Team.all.each do |team|
       puts"\t----------"
       puts "\tTEAM ID: #{team.id}"
       puts "\tTEAM NAME: #{team.name}"
@@ -90,13 +74,20 @@ describe 'Good Reviewer Badge Presence' do
     puts "\t----------"
 
     puts "\nTeam Users:\n\n"
-    team_users = TeamsUser.all
-    team_users.each do |team_user|
+    TeamsUser.all.each do |team_user|
       puts"\t----------"
       puts "\tTEAM ID: #{team_user.team_id}"
       puts "\tTEAM NAME: #{Team.find(team_user.team_id).name}"
       puts "\tUSER ID: #{team_user.user_id}"
       puts "\tUSER NAME: #{User.find(team_user.user_id).name}"
+    end
+    puts "\t----------"
+
+    puts "\nReview Grades:\n\n"
+    ReviewGrade.all.each do |review_grade|
+      puts "\t----------"
+      puts "\tPARTICIPANT ID: #{review_grade.participant_id}"
+      puts "\tGRADE: #{review_grade.grade_for_reviewer}"
     end
     puts "\t----------"
 
@@ -221,3 +212,18 @@ end
 #
 # end
 
+def login_and_go_to_badge(user,assignment_id)
+  login_as(user)
+  visit "/assignments/#{assignment_id}/edit"
+  find_link('Badges').click
+end
+
+def change_good_reviewer_badge_threshold(threshold)
+  fill_in badge_1_threshold, with: threshold
+  click_button "Save"
+end
+
+def change_good_teammate_badge_threshold(threshold)
+  fill_in badge_2_threshold, with: threshold
+  click_button "Save"
+end

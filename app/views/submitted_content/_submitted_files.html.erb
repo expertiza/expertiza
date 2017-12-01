@@ -71,7 +71,7 @@
           var file_path = $(this).attr("href");
           var file_name = $(this).attr("download");
           var file_name_extension = file_name.split(".").pop();
-          startTime(<%= map_id %>, <%= round %>, file_path);
+          startTime(<%= map_id %>, <%= round %>, file_name);
           var window_handler = null;
           var link_timer = null;
           
@@ -119,7 +119,7 @@
 
           function checkWindowStatus(){
             if (window_handler.closed){
-              endTime(file_path);
+              endTime(file_name);
               clearInterval(link_timer);
             }
           }

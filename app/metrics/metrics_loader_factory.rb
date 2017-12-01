@@ -3,7 +3,7 @@ require './loader/trello_loader_adaptee'
 
 class MetricsFactory
 
-  self.LOADER_ADAPTERS=[GithubLoaderAdapter, TrelloLoaderAdapter]
+  self.LOADER_ADAPTERS=[GithubLoaderAdaptee, TrelloLoaderAdaptee]
 
   def self.load_metric(params)
     for a in self.LOADER_ADAPTERS do

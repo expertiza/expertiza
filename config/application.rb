@@ -52,7 +52,7 @@ module Expertiza
 
     config.github_throttle = 5
 
-    config.github_sources = [ 
+    config.github_sources = [
       { REGEX: /http[s]{0,1}:\/\/github\.com\/(?'username'[^[\/]]+)\/(?'reponame'[^\/]+)\/pull\/(?'prnum'\d+)/,
         GRAPHQL: "https://api.github.com/graphql",
         API: "https://api.github.com/repos",
@@ -78,6 +78,22 @@ module Expertiza
         TOKEN: config.github_tokens[:ncsu_token]
       }
     ]
+
+    config.trello_token = {
+      trello_token: ENV["TRELLO_MEMBER_TOKEN"],
+      trello_key: ENV["TRELLO_DEVELOPER_PUBLIC_KEY"]
+    }
+
+    config.trello_source = {
+      REGEX: /http[s]{0,1}:\/\/trello\.com\/b\/(?'board_id'[^\/]+)\/(?'board_name'[^\/]+)/,
+      FUNCTION: :fetch_from_trello,
+      KEY: config.trello_token[:trello_key],
+      TOKEN: config.trello_token[:trello_token]
+    }
+
+    config.wiki_source = {
+        REGEX: /^http:\/\/wiki\.expertiza\.ncsu\.edu\/index\.php.*/
+    }
   end
 
   module Recaptcha

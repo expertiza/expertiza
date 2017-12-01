@@ -67,6 +67,7 @@ FactoryGirl.define do
     public_key nil
     copy_of_emails  false
     github_id nil
+    trello_name nil
   end
 
   factory :instructor, class: Instructor do
@@ -383,7 +384,7 @@ FactoryGirl.define do
   factory :metric_data_point_type, class: MetricDataPointType do
     name "commit_id"
     source :github
-    value_type "string" 
+    value_type "string"
     description "Commit Id"
     dimension "label"
     id 1

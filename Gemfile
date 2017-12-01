@@ -62,6 +62,8 @@ gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'timecop', '0.8.1'
+gem 'odyssey', '0.2.0'
+gem 'ruby-trello'
 
 group :development do
   gem 'daemons'

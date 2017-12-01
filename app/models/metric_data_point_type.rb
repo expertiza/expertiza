@@ -1,4 +1,4 @@
 class MetricDataPointType < ActiveRecord::Base
-  enum source: [ :github ]
+  enum source: [ :github, :trello, :wiki ]
   enum dimension: [ :label, :x, :y ]
 end

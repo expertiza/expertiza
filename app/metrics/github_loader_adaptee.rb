@@ -49,6 +49,10 @@ class GithubLoaderAdaptee < MetricLoaderAdapter
     }
   end
 
+  def self.displayAdapter(params)
+    return GithubDisplayAdapter(params)
+  end
+
   private
 
   def self.make_team_filter(team) 

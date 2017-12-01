@@ -149,9 +149,11 @@ class StudentTask
     @dues.each do |dd|
       tmp = Hash.new
       tmp[:label] = dd.deadline_type.name + ' Deadline'
-      tmp[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
       tmp[:link] = nil
-      @timeline_list << tmp
+      unless dd.due_at.nil?
+        tmp[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
+        @timeline_list << tmp
+      end
     end
 
     @submissions = SubmissionRecord.where(team_id: team_id , assignment_id: assignment_id)

@@ -1,7 +1,7 @@
 <h1>Request new user</h1>
 
 <%= form_tag :action => 'request_user_create' do %>
-
+    <% if false %>
     <%if @user.errors.any? %>
         <div id="error_explanation">
           <h2>
@@ -14,7 +14,7 @@
           </ul>
         </div>
     <% end %>
-
+    <% end %>
     <p><label for="role_id">Role</label><br/>
 
     <%= collection_select 'user', 'role_id', Role.where({name:["Instructor","Teaching Assistant"]}),:id,:name %></p>
@@ -23,7 +23,7 @@
 
     <p>
       Please write a brief introduction of request:</br>
-      <%= text_field 'requested_users', 'intro'  %>
+      <%= text_field 'requested_users', 'intro' , :value => @intro%>
     </p>
 
   <%= submit_tag "Request" %>

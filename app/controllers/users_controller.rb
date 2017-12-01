@@ -111,6 +111,7 @@ class UsersController < ApplicationController
     flash[:danger] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
+    @intro = params[:intro]
     roles_for_request_sign_up
   end
 
@@ -223,32 +224,38 @@ class UsersController < ApplicationController
     if params[:user][:institution_id]==''
       if Institution.find_by(name: params[:institution][:name])
           @institution = Institution.find_by(name: params[:institution][:name])
-          @user.institution_id = @institution.id
       else
         @institution = Institution.new(name: params[:institution][:name])
-        @institution.save
-        @user.institution_id = @institution.id
+        @institution.save #ID(row)generate only after save
       end
+      @user.institution_id = @institution.id
     else
       @user.institution_id = params[:user][:institution_id]
     end
 
     @user.status = 'Under Review'
     @user.intro = params[:requested_users][:intro]
+
     # The super admin receives a mail about a new user request with the user name
-    if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil? && @user.save
-      @super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
-      @super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, @user, "New account Request")
-        prepared_mail.deliver_now
+    if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil?
+      if @user.save
+        @super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
+        @super_users.each do |super_user|
+          prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, @user, "New account Request")
+          prepared_mail.deliver_now
+        end
+        flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
+        redirect_to '/instructions/home' and return
+      else
+        #include both invalid email and existed email for requesteduser
+        #invalide email of request user would not flash "alreadly existed"
       end
-      flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
-      redirect_to '/instructions/home'
     else
       flash[:error] = "The account you are requesting has already existed in Expertiza."
       #redirect_to controller: 'users',action:'request_new',role:"Student"
-      render 'request_new'
     end
+    @intro = params[:requested_users][:intro]
+    render 'request_new'
   end
 
   def edit

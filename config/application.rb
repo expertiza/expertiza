@@ -90,6 +90,10 @@ module Expertiza
       KEY: config.trello_token[:trello_key],
       TOKEN: config.trello_token[:trello_token]
     }
+
+    config.wiki_source = {
+        REGEX: /^http:\/\/wiki\.expertiza\.ncsu\.edu\/index\.php.*/
+    }
   end
 
   module Recaptcha

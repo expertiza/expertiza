@@ -75,7 +75,9 @@
                     <% end %>
                 <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
-                <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <% if !(map.is_locked && map.locked_by != current_user.id) %>
+                  <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <% end %>
                 <td>&nbsp;&nbsp;</td>
             <% else %>
                 <td>Begin</td>

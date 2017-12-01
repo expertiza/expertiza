@@ -201,7 +201,6 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.save
 
-
     unlock_response_map @map.id if @map.type == 'ReviewResponseMap'
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
@@ -378,7 +377,7 @@ class ResponseController < ApplicationController
   # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
   def reviewer_is_team_member?
     false
-    response = Response.find(params[:id])
+    response =git
     review_response_map = ReviewResponseMap.find(response.map_id)
     if !review_response_map.nil?
       assignment = Assignment.where(id:review_response_map.reviewed_object_id).first

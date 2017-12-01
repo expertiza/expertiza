@@ -71,23 +71,15 @@ class StudentTeamsController < ApplicationController
       if @student.team == nil
         @can_send_invitation = false
         @has_team = false
-        # team_name = 'team_' + @student.id.to_s + '_' + @student.assignment.id.to_s
-        # team = create_team team_name
-        # unless team == nil
-        #   @has_team = true
-        #   check_ad_criteria
-        # end
       else
         current_team_size = @student.team.participants.length
         if current_team_size == allowed_team_size
           @can_send_invitation = false
         else
-          #within 1st submission
-          within_submission = true
-          if within_submission
-            @can_send_invitation = true
-          else
+          if @teammate_review_allowed
             @can_send_invitation = false
+          else
+            @can_send_invitation = true
           end
         end
       end

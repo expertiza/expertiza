@@ -14,10 +14,11 @@
 
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %></td>
-  <% end %>
-  <% unless my_topic %>
-    <td></td>
-  <% end %>
+  <% else %>
+    <% unless my_topic %>
+      <td></td>
+    <% end %>
+    <% end %>
   <td align="center">
   <% if SignUpSheet.has_teammate_ads?(topic.id) %>
       <%# link_to :controller => 'sign_up_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>

@@ -350,10 +350,18 @@ FactoryGirl.define do
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
-    reviewer_id 1
+    reviewer_id { 1 || association(:participant) }
     type 'ReviewResponseMap'
     calibrate_to 0
   end
+
+  # factory :teammate_review_response_map, class: ReviewResponseMap do
+  #   assignment { Assignment.first || association(:assignment) }
+  #   reviewee { AssignmentTeam.first || association(:assignment_team) }
+  #   reviewer_id {  }
+  #   type 'ReviewResponseMap'
+  #   calibrate_to 0
+  # end
 
   factory :meta_review_response_map, class: MetareviewResponseMap do
     review_mapping { ReviewResponseMap.first || association(:review_response_map) }

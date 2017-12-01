@@ -31,40 +31,38 @@ class TeammateReviewResponseMap < ResponseMap
     Mailer.sync_message(defn).deliver
   end
 
-  def self.calculate_teammate_review_score (badge_id, assignment_id, reviewee_id)
+  def update_good_teammate_badge
+
     number_of_scores = 0
     aggregate_score = 0
+    average_score = 0
+
     # Get the threshold for this assigment's Good Teammate badge.
-    threshold = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: assignment_id).threshold
+    threshold = AssignmentBadge.find_by(badge_id: 2, assignment_id: assignment.id).threshold
 
     # Get all teammate reviews that have been submitted for this reviewee.
-    reviews = TeammateReviewResponseMap.where(reviewee_id: reviewee_id)
+    reviews = TeammateReviewResponseMap.where(reviewee_id: reviewee.id)
 
     # Loop through each of these teammate reviews.
     reviews.each do |review|
+
       # Get the response for each review.
       response = Response.find_by(map_id: review.id)
 
       # Make sure the response exists.
       unless response.nil?
+
         # Count the number of responses.
         number_of_scores += 1
+
         # Collect the aggregate score of the responses.
         aggregate_score += response.get_average_score
+
       end
     end
 
-    if number_of_scores == 0
-      return 0
-    else
-      return aggregate_score / number_of_scores
-    end
-  end
-
-  def update_good_teammate_badge
-
-    # Calculate the overall average score across all teammate reviews.
-    average_score = TeammateReviewResponseMap.calculate_teammate_review_score(2, assignment.id, reviewee.id)
+    # Calculate the overall average score across all teammate reviews, unless there are no responses.
+    average_score = aggregate_score / number_of_scores unless number_of_scores == 0
 
     # Retrieve the Good Teammate badge for the reviewee if it exists.
     good_teammate_badge = AwardedBadge.find_by(badge_id: 2, participant_id: reviewee.id)

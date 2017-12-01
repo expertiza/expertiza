@@ -12,9 +12,9 @@ describe 'Good Reviewer Badge Presence' do
     create(:team_user, user: User.find(3), team: AssignmentTeam.second)
     create(:team_user, user: User.find(4), team: AssignmentTeam.second)
 
-    create(:review_response_map, reviewer_id: Participant.find(1), reviewee: Team.find_by(name: 'team2'))
-    create(:review_response_map, reviewer_id: Participant.find(2), reviewee: Team.find_by(name: 'team2'))
-    create(:review_response_map, reviewer_id: Participant.find(3), reviewee: Team.find_by(name: 'team1'))
+    create(:review_response_map, reviewer_id: Participant.find(1), reviewee: Team.find_by(name: 'team2').id)
+    create(:review_response_map, reviewer_id: Participant.find(2), reviewee: Team.find_by(name: 'team2').id)
+    create(:review_response_map, reviewer_id: Participant.find(3), reviewee: Team.find_by(name: 'team1').id)
 
     create(:review_grade, participant: Participant.find(1))
     create(:review_grade, participant: Participant.find(2))

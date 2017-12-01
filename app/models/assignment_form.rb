@@ -362,7 +362,7 @@ class AssignmentForm
     end
 
     Participant.where(:parent_id => assignment_id).each do |participant|
-      awardedbadge= AwardedBadge.find_by(participant_id:participant.id, badge_id:good_reviewer_badge.badge_id)
+      awardedbadge = AwardedBadge.find_by(participant_id:participant.id, badge_id:good_reviewer_badge.badge_id)
       reviewgrade = ReviewGrade.find_by_participant_id(participant.id).grade_for_reviewer unless ReviewGrade.find_by_participant_id(participant.id).nil?
       if !awardedbadge.nil? and (reviewgrade < good_reviewer_threshold)
         AwardedBadge.find_by(badge_id:good_reviewer_badge.badge_id, participant_id:participant.id).delete
@@ -372,9 +372,9 @@ class AssignmentForm
     end
 
     if good_teammate_badge.nil?
-      good_teammate_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 2, threshold: good_reviewer_threshold)
+      good_teammate_badge = AssignmentBadge.create(assignment_id: assignment_id, badge_id: 2, threshold: good_reviewer_threshold)
     else
-      good_teammate_badge.threshold=good_teammate_threshold
+      good_teammate_badge.threshold = good_teammate_threshold
     end
     begin
       good_teammate_badge.save
@@ -382,14 +382,12 @@ class AssignmentForm
       flash[:error] = $ERROR_INFO
     end
 
-    Participant.where(:parent_id => assignment_id).each do |participant|
-      awardedbadge= AwardedBadge.find_by(participant_id:participant.id, badge_id:good_teammate_badge.badge_id)
-      reviewgrade = TeammateReviewResponseMap.calculate_teammate_review_score(good_teammate_badge.badge_id, assignment_id, participant.id)
-      if !awardedbadge.nil? and (reviewgrade < good_reviewer_threshold)
-        AwardedBadge.find_by(badge_id:good_reviewer_badge.badge_id, participant_id:participant.id).delete
-      elsif (reviewgrade and reviewgrade >= good_reviewer_threshold)
-        AwardedBadge.create(participant_id: participant.id, badge_id: good_reviewer_badge.badge_id)
-      end
+    Participant.where(parent_id: assignment_id).each do |participant|
+
+      teammate_review = TeammateReviewResponseMap.find_by(reviewee_id: participant.id)
+
+      teammate_review.update_good_teammate_badge unless teammate_review.nil?
+
     end
 
   end

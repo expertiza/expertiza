@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Duty:
+  = @assignments_duty.duty_id
+%p
+  %b Assignment:
+  = @assignments_duty.assignment_id
+
+= link_to 'Edit', edit_assignments_duty_path(@assignments_duty)
+\|
+= link_to 'Back', assignments_duties_path

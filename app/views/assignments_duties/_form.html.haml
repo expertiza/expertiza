@@ -1,0 +1,16 @@
+= form_for @assignments_duty do |f|
+  - if @assignments_duty.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@assignments_duty.errors.count, "error")} prohibited this assignments_duty from being saved:"
+      %ul
+        - @assignments_duty.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :duty_id
+    = f.number_field :duty_id
+  .field
+    = f.label :assignment_id
+    = f.number_field :assignment_id
+  .actions
+    = f.submit 'Save'

@@ -1,0 +1,23 @@
+%h1 Listing assignments_duties
+
+%table
+  %thead
+    %tr
+      %th Duty
+      %th Assignment
+      %th
+      %th
+      %th
+
+  %tbody
+    - @assignments_duties.each do |assignments_duty|
+      %tr
+        %td= assignments_duty.duty_id
+        %td= assignments_duty.assignment_id
+        %td= link_to 'Show', assignments_duty
+        %td= link_to 'Edit', edit_assignments_duty_path(assignments_duty)
+        %td= link_to 'Destroy', assignments_duty, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Assignments duty', new_assignments_duty_path

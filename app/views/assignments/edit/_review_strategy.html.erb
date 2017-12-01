@@ -25,9 +25,11 @@
       <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
       <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 1) %>
     <br/>
+
       <%= check_box_tag('review', 'true', true, {:onChange => 'hasReviewChanged()'}) %>
       <%= label_tag('review', 'Has Max Review Limit?') %>&emsp;&emsp;
       <span id="reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_reviews_allowed.nil?%>>
+
       <%= label_tag('assignment_form[assignment][num_reviews_allowed]', ' Set Allowed Number of Reviews per reviewer') %>
         <%if @assignment_form.assignment.num_reviews_allowed && @assignment_form.assignment.num_reviews_allowed >= 0 %>
       <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]', @assignment_form.assignment.num_reviews_allowed, size: 1) %>
@@ -35,6 +37,7 @@
       <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]',  3, size: 1) %>
         <%end%>
       </span>
+
     <br/>
       <%= label_tag('assignment_form[assignment][num_reviews_required]', 'Set Required Number of Reviews per reviewer') %>
       <%= text_field_tag('assignment_form[assignment][num_reviews_required]', @assignment_form.assignment.num_reviews_required ||= @assignment_form.assignment.num_reviews, size: 1) %>
@@ -93,6 +96,34 @@
     </td>
   </tr>
 
+
+
+  <tr>
+    <td style='padding:5px' id='is_rolebased_review_1'>
+      <input name="assignment_form[assignment][is_rolebased_review]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_rolebased_review]', 'true', @assignment_form.assignment.is_rolebased_review , {:onclick => 'dutiesAssign()'}) %>
+      <%= label_tag('assignment_form[assignment][is_rolebased_review]', 'Is Role Based?') %>&emsp;&emsp;
+
+
+      <%selected_duties_value=[]%>
+      <% selected_duties_value=@assignment_form.assignments_duties if(@assignment_form.assignments_duties.any?) %>
+
+     <%flag_rolebased=@assignment_form.assignment.is_rolebased_review==false%>
+     <span id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
+    <%= label_tag('assignment_form[assignments_duties][duty_id]', ' Add Duties ') %>
+    <%= select('assignment_form[assignments_duties]', 'duty_id', duties_assigned.select {|p| !selected_duties_value.include? p.id }.collect{|p| [p.duty_name, p.id]},{}, {:multiple => true}) %>
+    </span>
+
+      <span id="selected_duties" <%='hidden' if (flag_rolebased) %> >
+       <%= label_tag('assignment_form[assignments_duties][duty_id]', ' Remove Duties ') %>
+        <%= select('assignment_form[current_assignment_duties]', 'duty_id', duties_assigned.select {|p| selected_duties_value.include? p.id }.collect{|p| [p.duty_name, p.id]},{}, {:multiple => true}) %>
+    </span>
+    </td>
+
+  </tr>
+
+
+
   <!--#E1600-->
   <!-- self review flag should be the last checkbox in review strategy tab while editing/creating assignment-->
   <tr>
@@ -102,6 +133,8 @@
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
     </td>
   </tr>
+
+
 
 </table>
 <script>
@@ -134,5 +167,26 @@
 
         }
     }
+
+
+    function dutiesAssign() {
+        var duties_assigned = jQuery('#duties_assigned');
+        var duties_assigned2 = jQuery('#selected_duties');
+
+        var checkbox = jQuery('#assignment_form_assignment_is_rolebased_review');
+
+        if (checkbox.is(':checked')) {
+            duties_assigned.removeAttr('hidden');
+            duties_assigned2.removeAttr('hidden');
+            jQuery('#assignment_form.assignment.is_rolebased_review').val(true);
+
+        } else {
+            duties_assigned.attr('hidden', true);
+            duties_assigned2.attr('hidden', true);
+            jQuery('#assignment_form.assignment.is_rolebased_review').val(false);
+
+        }
+    }
+
 
 </script>

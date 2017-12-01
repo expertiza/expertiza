@@ -1,0 +1,25 @@
+%h1 Listing duties
+
+%table
+  %thead
+    %tr
+      %th Duty name
+      %th
+      %th Multiple duty
+      %th
+      %th
+      %th
+
+  %tbody
+    - @duties.each do |duty|
+      %tr
+        %td= duty.duty_name
+        %td
+        %td= duty.multiple_duty
+
+        %td= link_to 'Edit', edit_duty_path(duty)
+        %td
+        %td= link_to 'Delete', duty, :method => :delete
+%br
+
+= link_to 'New Duty', new_duty_path

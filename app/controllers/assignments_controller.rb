@@ -119,6 +119,7 @@ class AssignmentsController < ApplicationController
   end
 
   def update
+
     unless params.key?(:assignment_form)
       @assignment = Assignment.find(params[:id])
       @assignment.course_id = params[:course_id]

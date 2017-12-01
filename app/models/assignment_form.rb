@@ -1,7 +1,7 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :assignments_duties, :current_assignment_duties
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -13,9 +13,14 @@ class AssignmentForm
       @assignment.instructor = @assignment.course.instructor if @assignment.course
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
+
+
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
+    @assignments_duties = Array(args[:assignments_duties])
+    @current_assignment_duties=Array(args[:@current_assignment_duties])
+
   end
 
   # create a form object for this assignment_id
@@ -26,6 +31,8 @@ class AssignmentForm
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
+    assignment_form.assignments_duties =AssignmentsDuty.where(assignment_id: assignment_id ).pluck(:duty_id)
+
     assignment_form
   end
 
@@ -39,6 +46,8 @@ class AssignmentForm
     end
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
+    update_assignments_duties(attributes[:assignments_duties])
+    update_assignments_duties_current(attributes[:current_assignment_duties])
     update_due_dates(attributes[:due_date], user) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
@@ -61,6 +70,54 @@ class AssignmentForm
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment.num_reviews = @assignment.num_reviews_allowed
   end
+
+
+
+  # Code to update values of assignment
+  def update_assignments_duties(attributes)
+    return false unless attributes
+    attributes.each do |duties|
+
+        duties.each do |duty_array|
+
+        if(duty_array!="duty_id")
+          duty_array.each do |duty|
+          if(duty!="") then
+
+           @assignments_duty = AssignmentsDuty.new( assignment_id: @assignment.id, duty_id: duty.to_i)
+           @assignments_duty.save
+          end
+          end
+        end
+      end
+    end
+
+end
+
+
+
+  # Code to update values of assignment
+  def update_assignments_duties_current(attributes)
+
+    return false unless attributes
+    attributes.each do |duties|
+
+      duties.each do |duty_array|
+
+        if(duty_array!="duty_id")
+          duty_array.each do |duty|
+            if(duty!="") then
+              @assignments_duty = AssignmentsDuty.destroy_all( assignment_id: @assignment.id, duty_id: duty.to_i)
+
+            end
+          end
+        end
+      end
+    end
+  end
+
+
+
 
   # code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)

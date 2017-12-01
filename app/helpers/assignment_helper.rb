@@ -145,4 +145,13 @@ module AssignmentHelper
     end
     [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
   end
+
+
+  def duties_assigned
+
+    duties = Duty.all;
+
+  end
+
+
 end

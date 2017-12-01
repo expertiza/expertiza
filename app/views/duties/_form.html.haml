@@ -1,0 +1,22 @@
+= form_for @duty do |f|
+  - if @duty.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@duty.errors.count, "error")} prohibited this duty from being saved:"
+      %ul
+        - @duty.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :duty_name
+    = f.text_field :duty_name
+    %br
+
+
+  .field
+    = f.label :multiple_duty
+    = f.check_box :multiple_duty
+    %br
+
+
+  .actions
+    = f.submit 'Save'

@@ -12,7 +12,7 @@
 <% else %>
   <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
   <%= link_to "Edit name", edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
-  <% if duties_allowed(@student.assignment.id, @student.team.id, @student.user_id)%>
+  <% if duties_allowed(@student.assignment.id, @student.team.id, @student.user_id) %>
 
         <%= form_tag({ controller: 'student_teams', action: 'add_duty' }, method: 'get') do %>
             <%= hidden_field_tag 'team_id', @student.team.id %>
@@ -26,7 +26,6 @@
 
   <br/>
 
-    <% puts @selected_duty %>
   <b>Team members</b>
   <br/><br/>
   <!--start team member table-->
@@ -49,7 +48,8 @@
         <td><%= member.user.name %></td>
         <td><%= member.user.fullname %></td>
         <td><%= member.user.email %></td>
-        <% if @student.assignment.duty_flag%>
+        <% if @student.assignment.duty_flag
+        %>
           <td><%=duty_assigned(@student.team.id, member.user.id) %></td>
         <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->

@@ -20,7 +20,7 @@
        <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5 %>&nbsp;&nbsp;</td>
        <td>Is this <%= @questionnaire.display_type %> private:</td>
        <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]]) %>  </td>
-       <% if params[:action] != 'edit'%>
+       <% if params[:action] != 'edit' and @questionnaire.type == 'TeammateReviewQuestionnaire' %>
          <td>Assign duty:</td>
          <td><%= select(:duty, :id, @dutyName) %>  </td>
        <% end %>

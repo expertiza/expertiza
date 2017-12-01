@@ -36,7 +36,11 @@ class QuestionnairesController < ApplicationController
   end
 
   def create
-    dutyId = params[:duty][:id]
+    if(params.has_key?(:duty))
+      dutyId = params[:duty][:id]
+    else
+      dutyId = ''
+    end
     questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]

@@ -1,6 +1,6 @@
 class InvitationsController < ApplicationController
-  before_action :check_inviterteam_before_invitation,only: [:create]
- before_action :check_user_before_invitation, only: [:create]
+  before_action :check_inviterteam_before_invitation ,only: [:create]
+  before_action :check_user_before_invitation, only: [:create]
   before_action :check_team_before_accept, only: [:accept]
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
@@ -32,7 +32,7 @@ class InvitationsController < ApplicationController
     # participant information of invitee and assignment
     participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', user.id, student.parent_id).first
     return unless participant
-    old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
+    old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, @team_id).first
      # Status code A for accepted
     old_entry.update_attribute("status", 'A') if old_entry
   end
@@ -78,7 +78,7 @@ class InvitationsController < ApplicationController
     # user is the student you are inviting to your team
     @user = User.find_by(name: params[:user][:name].strip)
     # student has information about the participant
-    @student = AssignmentParticipant.find(params[:student_id])
+
 
     return unless current_user_id?(@student.user_id)
 
@@ -102,18 +102,12 @@ class InvitationsController < ApplicationController
     check_team_before_invitation
   end
 
-  def check_inviterteam_before_invitation
-    team_id=params[:team_id]
-    if team_id=="0"
-       flash[:note]="please create your team before invitation"
-      redirect_to view_student_teams_path student_id: params[:student_id]
-      return
-    end
-  end
+
 
   def check_team_before_invitation
     # team has information about the team
-    @team = AssignmentTeam.find(params[:team_id])
+
+    @team = AssignmentTeam.find(@team_id)
 
     if @team.full?
       flash[:error] = 'Your team already has the maximum number members.'
@@ -149,9 +143,26 @@ class InvitationsController < ApplicationController
     # Status code A for accepted
     @inv.reply_status = 'A'
     @inv.save
-
     @student = Participant.find(params[:student_id])
+
     # Remove the users previous team since they are accepting an invite for possibly a new team.
     TeamsUser.remove_team(@student.user_id, params[:team_id])
   end
+
+  def check_inviterteam_before_invitation
+    @student = AssignmentParticipant.find(params[:student_id])
+    @team_id=params[:team_id]
+    if @team_id=="0"
+      team = AssignmentTeam.create_team_and_node(@student.parent_id)
+      user = User.find(@student.user_id)
+      # create TeamsUser and TeamUserNode
+      teamuser = ApplicationController.helpers.create_team_users(user, team.id)
+      @team_id=team.id
+    end
+
+end
+
+
+
+
 end

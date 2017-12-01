@@ -79,17 +79,14 @@
     <th class="head">Action</th>
   </tr>
 
-
   <% @student.assignment.participants.each do |participant| %> <!--start team member content-->
       <% if participant.team==nil  %>
           <% if User.find(participant.user_id).role.name=="Student"  %>
+             <tr>
               <% if participant.user.name!=@student.name  %>
-
-
-
-        <td><%= participant.user.name %></td>
+                  <td><%= participant.user.name %></td>
          <%if @student.team==nil
-             @teamid=0
+             @teamid="0"
            else
            @teamid=@student.team.id
          end%>
@@ -100,9 +97,10 @@
               <%= hidden_field_tag 'user[name]',  participant.user.name%>
               <%=  submit_tag "invite"%>
          <% end %>
-               </td>
+            </td>
+                   </tr>
           <% end %>
-      </tr>
+
 
       <% end %>
   <% end %>

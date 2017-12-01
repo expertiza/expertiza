@@ -17,7 +17,6 @@ th, td {
 		</tr>
 	<!--%  @calibration_response_map. %-->
       <% @calibration_response_map.each_with_index do |cresponse, index|%>
-		LOOP
 		<tr>
 		  <% instructor_answer = Answer.where(["question_id = ? and response_id = ?", question.id, cresponse.response[0].id]).first %>
 	<% if instructor_answer.nil? %>

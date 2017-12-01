@@ -12,7 +12,20 @@
 <% else %>
   <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
   <%= link_to "Edit name", edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
-  <br/><br/>
+  <% if duties_allowed(@student.assignment.id, @student.team.id, @student.user_id) %>
+
+        <%= form_tag({ controller: 'student_teams', action: 'add_duty' }, method: 'get') do %>
+            <%= hidden_field_tag 'team_id', @student.team.id %>
+            <%= hidden_field_tag 'user_id', @student.user_id %>
+            <b>Pick duty</b>
+            <%= select(:duty, :id, available_duties(@student.assignment.id, @student.team.id)) %>
+            <%= submit_tag "add duty", class: 'btn-default' %>
+        <% end %>
+
+    <%end%>
+
+  <br/>
+
   <b>Team members</b>
   <br/><br/>
   <!--start team member table-->
@@ -22,6 +35,9 @@
       <th class="head">Full name</th>
       <!--<th class="head">Team-member role (duty)</th>-->
       <th class="head">Email address</th>
+      <% if @student.assignment.duty_flag %>
+        <th class="head">Duty Assigned</th>
+      <% end %>
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
       <% end %>
@@ -32,7 +48,9 @@
         <td><%= member.user.name %></td>
         <td><%= member.user.fullname %></td>
         <td><%= member.user.email %></td>
-
+        <% if @student.assignment.duty_flag %>
+          <td><%=duty_assigned(@student.team.id, member.user.id) %></td>
+        <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>

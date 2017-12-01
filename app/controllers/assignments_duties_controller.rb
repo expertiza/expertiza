@@ -55,4 +55,5 @@ class AssignmentsDutiesController < ApplicationController
     def assignments_duty_params
       params.require(:assignments_duty).permit(:duty_id => [], :assignment_id => [])
     end
+
 end

@@ -28,12 +28,19 @@ class QuestionnairesController < ApplicationController
   end
 
   def new
+    @dutyName = fetch_duties
+
     if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
       @questionnaire = Object.const_get(params[:model].split.join).new
     end
   end
 
   def create
+    if(params.has_key?(:duty))
+      dutyId = params[:duty][:id]
+    else
+      dutyId = ''
+    end
     questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
@@ -63,6 +70,10 @@ class QuestionnairesController < ApplicationController
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
       @questionnaire.save
+
+      if dutyId != ''
+        Duty.update_questionnaireID(dutyId, @questionnaire.id)#updating questionnaire id  in duty table
+      end
       # Create node
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
       parent = FolderNode.find_by_node_object_id(tree_folder.id)
@@ -107,6 +118,7 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
+    #@dutyName = fetch_duties
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
   end
@@ -153,6 +165,16 @@ class QuestionnairesController < ApplicationController
       end
     end
     redirect_to action: 'list', controller: 'tree_display'
+  end
+
+  def fetch_duties
+    duties = Duty.get_unmapped_duties
+    dutyName = Hash.new
+    dutyName.store('none', nil)
+    duties.each do |duty|
+      dutyName.store(duty.duty_name, duty.id)
+    end
+    return dutyName
   end
 
   # Toggle the access permission for this assignment from public to private, or vice versa

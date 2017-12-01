@@ -1,0 +1,19 @@
+%h1 Listing duties_controllers
+
+%table
+  %thead
+    %tr
+      %th
+      %th
+      %th
+
+  %tbody
+    - @duties_controllers.each do |duties_controller|
+      %tr
+        %td= link_to 'Show', duties_controller
+        %td= link_to 'Edit', edit_duties_controller_path(duties_controller)
+        %td= link_to 'Destroy', duties_controller, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Duties controller', new_duties_controller_path

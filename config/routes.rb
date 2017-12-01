@@ -433,6 +433,7 @@ Expertiza::Application.routes.draw do
       get :edit
       get :remove_participant
       get :auto_complete_for_user_name
+      get :add_duty
     end
   end
 
@@ -529,6 +530,12 @@ Expertiza::Application.routes.draw do
   end
 
   get '/versions/search', controller: :versions, action: :search
+
+  resources :duties do
+    collection do
+      get :unmapped_duties
+    end
+  end
 
   resources :versions do
     collection do

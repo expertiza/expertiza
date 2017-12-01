@@ -7,6 +7,7 @@ class DutiesController < ApplicationController
      'Teaching Assistant',
      'Administrator'].include? current_role_name
   end
+
   # GET /duties
   def index
     @duties = Duty.all
@@ -23,6 +24,12 @@ class DutiesController < ApplicationController
 
   # GET /duties/1/edit
   def edit
+  end
+
+
+  # GET for duties that are not mapped to any questionnaire
+  def unmapped_duties
+    duties = Duty.get_unmapped_duties
   end
 
   # POST /duties

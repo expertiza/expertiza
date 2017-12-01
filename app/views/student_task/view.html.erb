@@ -203,76 +203,60 @@
     <input id="Recenter" value="Recenter" type="button">
   </div>
 </div>
-<%# @participant = AssignmentParticipant.find(params[:id]) %>
 
 <% current_folder = DisplayOption.new %>
 <% current_folder.name = "" %>
-<% #files = @participant.team.files(@participant.team.path.to_s + current_folder.name) %>
 
 <% @href_arr= Array.new %>
-<% @maxdate = DueDate.where("parent_id = #{@assignment.id}")#find_by_sql"select * from due_dates where parent_id=#{@assignment.id}"
-   @json_sample = @maxdate.map do |u|
+<!-- @href_arr is used to store all the hyperlinks for each visualized object -->
+<% @duedates = DueDate.where("parent_id = #{@assignment.id}")
+   @visualization_data = @duedates.map do |due|
      @href_arr.push("");
-     if u.deadline_type_id==1
-       #("../submitted_content/"+@participant.id.to_s+"/edit")
-       { :id => u.id, :start=> u.due_at, :className => "submissionDue", :content => "Round "+(u.round.to_s)+"<split>Submission due by "+u.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/submit-icon.png\" style=\"width:40px; height:40px;\">' }
+     if due.deadline_type_id.eql? 1
+       { :id => due.id, :start=> due.due_at, :className => "submissionDue", :content => "Round "+(due.round.to_s)+"<split>Submission due by "+due.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/submit-icon.png\" style=\"width:40px; height:40px;\">' }
      else
-       { :id => u.id, :start=> u.due_at, :className => "reviewDue", :content => "Round "+(u.round.to_s)+"<split>Review due by "+u.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
+       { :id => due.id, :start=> due.due_at, :className => "reviewDue", :content => "Round "+(due.round.to_s)+"<split>Review due by "+due.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
      end
    end
 %>
 
 <!-- display only if submissions are made-->
-<% unless @team.nil? %>
-    <% @sub = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN
-(select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"  %>
+<% unless @team.nil?
+    @submissions = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"
 
-    <!-- SQL  select * from  submission_records where assignment_id=844 and content NOT IN
-    (select content from  submission_records where assignment_id=844 and UPPER(operation) Like 'REMOVE%');-->
-<%# @sub = SubmissionRecord.where("assignment_id=#{@assignment.id} AND team_id=#{@team.id}")%> <!-- old code-->
-<%#= @sub %>
-
-    <% @json_sample += @sub.map do |u|
+    @visualization_data += @submissions.map do |submission|
       #display_directory_tree(participant, files, true).html_safe
-
-      if (u.operation).eql?('Submit File')
-        f = u.content
+      if (submission.operation).eql?('Submit File')
+        file = submission.content
         ret=""
-        if File.exist?(f) && File.directory?(f)
-          ret += link_to File.basename(f), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => f
+        if File.exist?(file) && File.directory?(file)
+          ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => file
         else
           ret += "\n      "
-          ret += link_to File.basename(f), :controller => 'submitted_content',
+          ret += link_to File.basename(file), :controller => 'submitted_content',
                          :action => 'download',
                          :id => @participant.id,
-                         :download => File.basename(f),
-                         "current_folder[name]" => File.dirname(f)
+                         :download => File.basename(file),
+                         "current_folder[name]" => File.dirname(file)
         end
         @href_arr.push(ret.split('"')[1])
-        { :id => u.id, :start=> u.created_at, :className=> "fileUpload", :content => (u.content).split('/')[-1]+'<img src=\"../../assets/attachment-icon.png\" style=\"width:32px; height:32px;\"><split>'+u.created_at.strftime("%m/%d/%Y at %I:%M%p") }
+        { :id => submission.id, :start=> submission.created_at, :className=> "fileUpload", :content => (submission.content).split('/')[-1]+'<img src=\"../../assets/attachment-icon.png\" style=\"width:32px; height:32px;\"><split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M%p") }
       else
-        @href_arr.push(u.content)
-        { :id => u.id, :start=> u.created_at, :className=> "hyperlinkUpload" ,:content => u.content+'<img src=\"../../assets/hyperlink-icon.png\" style=\"width:40px; height:40px;\"><split>'+u.created_at.strftime("%m/%d/%Y at %I:%M%p") }
+        @href_arr.push(submission.content)
+        { :id => submission.id, :start=> submission.created_at, :className=> "hyperlinkUpload" ,:content => submission.content+'<img src=\"../../assets/hyperlink-icon.png\" style=\"width:40px; height:40px;\"><split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M%p") }
       end
     end
 
-       @href_arr.each do |i|
-         puts "hello shyam "+i
-       end
+end %>
 
-    %>
-    <% @json_sample%>
-    <br><%= raw @assignment.created_at.strftime("%Y-%m-%d") %><br>
-<%end%>
 <!-- Reviews not yet started -->
 <% unless @review_mappings.nil?
-     @review_mappings.each do |i|
-       @prev = Response.where(:map_id => i.id)
-       @json_sample += @prev.map do |j|
+    @review_mappings.each do |i|
+      @prev = Response.where(:map_id => i.id)
+      @visualization_data += @prev.map do |j|
          if i.type=="ReviewResponseMap"
            review_mapping = ResponseMap.find(i.reviewed_object_id)
            participant = AssignmentTeam.get_first_member(i.reviewee_id)
-           puts "jjjj #{participant.id}"
            topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
            if !topic_id.nil?
              if SignUpTopic.find(topic_id).topic_identifier != ''
@@ -310,27 +294,23 @@
            end
          end
        end
-     end%>
-<% end %>
-<script>
-    <% @json_sample=@json_sample.to_json%>
-    var json_parse = JSON.parse('<%=raw  @json_sample%>');
-    var js_href_arr = JSON.parse('<%= @href_arr.to_json.html_safe%>')
+     end
+end %>
 
-    console.log(js_href_arr)
-    var link=""
+<script>
+    // converting @visualization_data array to javascript compatible JSON object
+    var visualization_JSON = JSON.parse('<%=raw  @visualization_data.to_json%>');
+    var href_JSON = JSON.parse('<%= @href_arr.to_json.html_safe%>')
+
     var temp;
-    var temp1;
-    for(i=0;  i<json_parse.length; i++) {
-        //console.log(js_href_arr[i]);
-        temp=json_parse[i].content.split("<split>");
-        if(js_href_arr[i]=='')
-            json_parse[i].content = temp[0]+"<br>"+temp.slice(1);//+ " <br> " + json_parse[i].start;
+    //temp is temporary variable used to generate hyperlinks from content
+    for(i=0;  i<visualization_JSON.length; i++) {
+        temp=visualization_JSON[i].content.split("<split>");
+        if(href_JSON[i]=='')
+            visualization_JSON[i].content = temp[0]+"<br>"+temp.slice(1);
         else
-            json_parse[i].content = "<a href="+js_href_arr[i]+" target='_blank'>"+temp[0]+"</a><br>"+temp.slice(1);//+ " <br> " + json_parse[i].start;
-        console.log(json_parse[i].content);
+            visualization_JSON[i].content = "<a href="+href_JSON[i]+" target='_blank'>"+temp[0]+"</a><br>"+temp.slice(1);
     }
-    //
 </script>
 <!--code for visualization-->
 <script type="text/javascript">
@@ -338,16 +318,12 @@
     var container = document.getElementById('visualization');
 
     // Create a DataSet (allows two way data-binding)
-    var items = new vis.DataSet(json_parse);
-    //items.add(JSON.parse(json_arr));
+    var items = new vis.DataSet(visualization_JSON);
 
-    console.log('<%=raw @maxdate.maximum(:due_at) %>'+"is max date");
-    console.log('<%raw @assignment.created_at.strftime("%Y-%m-%d") %>')
     // Configuration for the Timeline
     var options = {
-        //height: '300px',
         //min: new Date('<%=raw @assignment.created_at.strftime("%Y-%m-%d") %>'),                // lower limit of visible range
-        //max: new Date('<%=raw @maxdate.maximum(:due_at).strftime("%Y-%m-%d") %>'),                // upper limit of visible range
+        //max: new Date('<%=raw @duedates.maximum(:due_at).strftime("%Y-%m-%d") %>'),                // upper limit of visible range
         zoomMin: 1000 * 60 * 60 * 24,             // one day in milliseconds
         zoomMax: 1000 * 60 * 60 * 24 * 31 * 12     // about three months in milliseconds
     };
@@ -355,8 +331,9 @@
     // Create a Timeline
     var timeline = new vis.Timeline(container, items, options);
 </script>
+
 <script>
-    var t=timeline.range.getRange();
+    var visualization_window=timeline.range.getRange();
     function move (percentage) {
         var range = timeline.getWindow();
         var interval = range.end - range.start;
@@ -366,26 +343,19 @@
             end:   range.end.valueOf()   - interval * percentage
         });
     }
+
     // attach events to the navigation buttons
+    // zoom percentage in zoomin/zoomout can be adjusted below by passing paramenter. Similar is the case for move left/right
     document.getElementById('zoomIn').onclick    = function () { timeline.zoomIn( 0.2); };
     document.getElementById('zoomOut').onclick   = function () { timeline.zoomOut( 0.2); };
     document.getElementById('moveLeft').onclick  = function () { move( 0.2); };
     document.getElementById('moveRight').onclick = function () { move(-0.2); };
-    document.getElementById('Recenter').onclick = function () {
-        //alert("hi");
-        var todayStart = new Date(t.start);
-//todayStart.setHours(8, 0, 0, 0);
-        var todayEnd = new Date(t.end);
-//todayEnd.setHours(18, 0, 0, 0);
-
-        console.log(todayStart, ':', todayEnd);
-        //setTimeout(_ => {
-        timeline.setWindow(todayStart, todayEnd, { animation: true });
-        //});
+    document.getElementById('Recenter').onclick  = function () {
+        var visualization_window_start = new Date(visualization_window.start);
+        var visualization_window_end = new Date(visualization_window.end);
+        timeline.setWindow(visualization_window_start, visualization_window_end, { animation: true });
     };
 </script>
 
-<%#= @team.id %><br>
-<%#= @assignment.id %>
 <br>
 <a href="javascript:window.history.back()">Back</a>

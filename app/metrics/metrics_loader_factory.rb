@@ -1,9 +1,10 @@
 require './loader/github_loader_adaptee'
 require './loader/trello_loader_adaptee'
+require './loader/wiki_loader_adaptee'
 
 class MetricsFactory
 
-  self.LOADER_ADAPTERS=[GithubLoaderAdaptee, TrelloLoaderAdaptee]
+  self.LOADER_ADAPTERS=[GithubLoaderAdapter, TrelloLoaderAdapter, WikiLoaderAdapter]
 
   def self.load_metric(params)
     for a in self.LOADER_ADAPTERS do

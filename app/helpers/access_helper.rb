@@ -8,8 +8,12 @@ module AccessHelper
 
   def flash_msg
     if(params.has_key?(:map_id))
-      if ResponseMap.find(params[:map_id]).is_locked
+      response_map = ResponseMap.find_by_id(params[:map_id])
+      response_locked = (!response_map.nil?) ? response_map.locked : false
+      if response_locked
         flash[:error] = "One of your teammates is working on the review. Only one person can work on a review at a time."
+      else
+        flash[:error] = "This #{params[:controller]} is no longer available!"
       end
     else
       if current_role && current_role.name.try(:downcase).start_with?('a', 'e', 'i', 'o', 'u')

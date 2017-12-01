@@ -5,7 +5,7 @@ class AssignmentsController < ApplicationController
 
   def action_allowed?
     if params[:other_action] == 'delete_reviews'
-      assignment = Assignment.find(params[:id])
+      assignment = Assignment.find(params[:assignment_id])
       ['Super-Administrator', 'Administrator'].include? current_role_name or
         assignment.instructor_id == current_user.try(:id) or
         TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
@@ -71,11 +71,9 @@ class AssignmentsController < ApplicationController
   def delete_reviews
     @assignment = Assignment.find(params[:assignment_id])
     @response_map = ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').select(:id).all
-    @response = Response.where(map_id: @response_map).select(:id).all
 
     if params[:action_confirmed].to_i == 1
-      Response.where(map_id: @response_map).destroy_all
-      ResponseMap.where(reviewed_object_id: @assignment.id).destroy_all
+      @assignment.delete_reviews
       redirect_to edit_assignment_path @assignment.id
       flash[:note] = "All reviews for assignment \"#{@assignment.name}\" have been successfully deleted!"
     else

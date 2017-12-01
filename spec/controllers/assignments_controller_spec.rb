@@ -90,7 +90,7 @@ describe AssignmentsController do
   describe '#other_action_allowed?' do
     context 'when params other action is delete reviews' do
       before(:each) do
-        controller.params = {id: '1', other_action: 'delete_reviews'}
+        controller.params = {assignment_id: '1', other_action: 'delete_reviews'}
       end
 
       context 'when the role name of current user is super admin or admin' do
@@ -369,6 +369,41 @@ describe AssignmentsController do
     end
   end
 
+  describe '#delete_reviews' do
+    let(:assignment) { build(:assignment, id: 1, name: 'new assignment') }
+
+    before(:each) do
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    end
+
+    context 'confirmation before assignment reviews are deleted' do
+      it 'shows a confirmation page before assignment reviews are deleted' do
+        params = {
+            assignment_id: 1,
+            action_confirmed: 0
+        }
+        session = {user: instructor}
+        post :delete_reviews, params
+        expect(flash[:error]).to eq("All reviews for assignment \"#{assignment.name}\" will be deleted!")
+      end
+    end
+
+    context 'when assignment reviews are deleted successfully' do
+      it 'shows a confirmation page when assignment reviews are deleted successfully' do
+        params = {
+            assignment_id: 1,
+            action_confirmed: 1
+        }
+        session = {user: instructor}
+        post :delete_reviews, params
+        allow(Response).to receive(:find).with(map_id: [2]).and_return(response)
+        expect(flash[:note]).to eq("All reviews for assignment \"#{assignment.name}\" have been successfully deleted!")
+        expect(response).to redirect_to("/assignments/#{assignment.id}/edit")
+
+      end
+    end
+  end
+
   describe '#delete' do
     context 'when assignment is deleted successfully' do
       it 'shows a success flash message and redirects to tree_display#list page' do
@@ -404,4 +439,7 @@ describe AssignmentsController do
       end
     end
   end
+
+
+
 end

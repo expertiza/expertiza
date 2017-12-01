@@ -26,7 +26,7 @@
 
   .vis-item {
     border-color: #F991A3;
-    background-color: pink;
+    background-color: cornsilk;
   //font-size: 15pt;
     color: purple;
     box-shadow: 5px 5px 20px rgba(128,128,128, 0.5);
@@ -42,10 +42,11 @@
     border-radius: 10px;
   }
 
-  .vis-item.vis-selected {
-    border-color: mediumvioletred;
-    background-color: firebrick;
-    color : #e4b9c0;
+  .vis-item.vis-selected, .vis-item.fileUpload.vis-selected, .vis-item.hyperlinkUpload.vis-selected, .vis-item.reviewDue.vis-selected, .vis-item.submissionDue.vis-selected, .vis-item.feedback.vis-selected {
+    border-color: black;
+    background-color: white;
+    color : black;
+    font-size: 12pt;
   }
 
   .vis-time-axis .vis-text {
@@ -68,7 +69,7 @@
     border-color: #F991A3;
   }
   .vis-item.fileUpload {
-    background-color: lawngreen;
+    background-color: palegreen;
     border-color: green;
   }
   .vis-item.hyperlinkUpload {
@@ -76,12 +77,16 @@
     border-color: green;
   }
   .vis-item.submissionDue {
-    background-color: orange;
-    border-color: orangered;
+    background-color: lightsalmon;
+    border-color: brown;
   }
   .vis-item.reviewDue {
-    background-color: darkorange;
-    border-color: orangered ;
+    background-color: sandybrown;
+    border-color: brown;
+  }
+  .vis-item.feedback {
+    background-color: cornsilk;
+    border-color: indianred;
   }
 </style>
 

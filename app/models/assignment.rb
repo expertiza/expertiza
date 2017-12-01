@@ -55,7 +55,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def calibrated?
-    self.is_calibrated
+    self.has_expert_review
   end
 
   def self.set_courses_to_assignment(user)

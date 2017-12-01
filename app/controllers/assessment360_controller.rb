@@ -12,7 +12,7 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).select {|a| !a.participants.empty? }
+    @assignments = course.assignments.reject(&:has_expert_review).select {|a| !a.participants.empty? }
     @course_participants = course.get_participants
     if @course_participants.empty?
       flash[:error] = "There is no course participant in course #{course.name}"

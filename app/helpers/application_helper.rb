@@ -2,8 +2,8 @@
 module ApplicationHelper
   def is_available(user, owner_id)
     user.id == owner_id ||
-      user.admin? ||
-      user.super_admin?
+        user.admin? ||
+        user.super_admin?
   end
 
   # Make a new user of the same class

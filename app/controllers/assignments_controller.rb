@@ -7,16 +7,16 @@ class AssignmentsController < ApplicationController
     if params[:other_action] == 'delete_reviews'
       assignment = Assignment.find(params[:assignment_id])
       ['Super-Administrator', 'Administrator'].include? current_role_name or
-        assignment.instructor_id == current_user.try(:id) or
-        TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
-        assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+          assignment.instructor_id == current_user.try(:id) or
+          TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+          assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
     else
       if %w(edit update list_submissions).include? params[:action]
         assignment = Assignment.find(params[:id])
         ['Super-Administrator', 'Administrator'].include? current_role_name or
-          assignment.instructor_id == current_user.try(:id) or
-          TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
-          assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+            assignment.instructor_id == current_user.try(:id) or
+            TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+            assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
       else
         ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
       end
@@ -294,7 +294,7 @@ class AssignmentsController < ApplicationController
 
   def validate_due_date
     @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
-      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+        (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
   def check_assignment_questionnaires_usage

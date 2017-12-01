@@ -13,24 +13,24 @@ class ResponseController < ApplicationController
     end
 
     case action
-    when 'edit' # If response has been submitted, no further editing allowed
-      return false if response.is_submitted
-      return false if response_map.is_locked? && response_map.locked_by != current_user.id
-      return current_user_id?(user_id) || reviewer_is_team_member?
+      when 'edit' # If response has been submitted, no further editing allowed
+        return false if response.is_submitted
+        return false if response_map.is_locked? && response_map.locked_by != current_user.id
+        return current_user_id?(user_id) || reviewer_is_team_member?
       # Deny access to anyone except reviewer & author's team
-    when 'delete', 'update', 'unlock'
-      return current_user_id?(user_id) || reviewer_is_team_member?
-    when 'view'
-      return edit_allowed?(response.map, user_id)
+      when 'delete', 'update', 'unlock'
+        return current_user_id?(user_id) || reviewer_is_team_member?
+      when 'view'
+        return edit_allowed?(response.map, user_id)
       when 'new'
         response_map = ResponseMap.find(pararms[:id])
         return response_map.locked_by== current_user.id
       else
-      current_user
+        current_user
     end
 
-  # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
-  # E17A0 In this case, when the review is not found, an error is returned
+      # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
+      # E17A0 In this case, when the review is not found, an error is returned
   rescue ActiveRecord::RecordNotFound
     false
   end
@@ -41,9 +41,9 @@ class ResponseController < ApplicationController
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
-        (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
-        reviewer_is_team_member? || !(map.is_locked? && map.locked_by != current_user.id)
+          (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
+          (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
+          reviewer_is_team_member? || !(map.is_locked? && map.locked_by != current_user.id)
     else
       return current_user_id?(user_id)
     end
@@ -180,10 +180,10 @@ class ResponseController < ApplicationController
     is_submitted = (params[:isSubmit] == 'Yes')
 
     @response = Response.create(
-      map_id: @map.id,
-      additional_comment: params[:review][:comments],
-      round: @round,
-      is_submitted: is_submitted
+        map_id: @map.id,
+        additional_comment: params[:review][:comments],
+        round: @round,
+        is_submitted: is_submitted
     )
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -271,13 +271,13 @@ class ResponseController < ApplicationController
           next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
           @surveys <<
               [
-                'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-                'survey_deployment_id' => survey_deployment.id,
-                'start_date' => survey_deployment.start_date,
-                'end_date' => survey_deployment.end_date,
-                'parent_id' => p.parent_id,
-                'participant_id' => p.id,
-                'global_survey_id' => survey_deployment.global_survey_id
+                  'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+                  'survey_deployment_id' => survey_deployment.id,
+                  'start_date' => survey_deployment.start_date,
+                  'end_date' => survey_deployment.end_date,
+                  'parent_id' => p.parent_id,
+                  'participant_id' => p.id,
+                  'global_survey_id' => survey_deployment.global_survey_id
               ]
         end
       end
@@ -311,18 +311,18 @@ class ResponseController < ApplicationController
 
   def set_questionnaire_for_new_response
     case @map.type
-    when "ReviewResponseMap", "SelfReviewResponseMap"
-      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-      @current_round = @assignment.number_of_current_round(reviewees_topic)
-      @questionnaire = @map.questionnaire(@current_round)
-    when
+      when "ReviewResponseMap", "SelfReviewResponseMap"
+        reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
+        @current_round = @assignment.number_of_current_round(reviewees_topic)
+        @questionnaire = @map.questionnaire(@current_round)
+      when
       "MetareviewResponseMap",
-      "TeammateReviewResponseMap",
-      "FeedbackResponseMap",
-      "CourseSurveyResponseMap",
-      "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
-      @questionnaire = @map.questionnaire
+          "TeammateReviewResponseMap",
+          "FeedbackResponseMap",
+          "CourseSurveyResponseMap",
+          "AssignmentSurveyResponseMap",
+          "GlobalSurveyResponseMap"
+        @questionnaire = @map.questionnaire
     end
   end
 
@@ -330,8 +330,8 @@ class ResponseController < ApplicationController
     @review_scores = []
     @questions.each do |question|
       @review_scores << Answer.where(
-        response_id: @response.id,
-        question_id:  question.id
+          response_id: @response.id,
+          question_id:  question.id
       ).first
     end
   end
@@ -346,7 +346,7 @@ class ResponseController < ApplicationController
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
-                                          .first.try(:dropdown)
+                       .first.try(:dropdown)
     @dropdown_or_scale = (use_dropdown == true ? 'dropdown' : 'scale')
   end
 
@@ -380,11 +380,11 @@ class ResponseController < ApplicationController
   # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
   def reviewer_is_team_member?
     false
-    response =git
+    response = Response.find_by_id(params[:id])
     review_response_map = ReviewResponseMap.find(response.map_id)
-    if !review_response_map.nil?
+    unless review_response_map.nil?
       assignment = Assignment.where(id:review_response_map.reviewed_object_id).first
-      if !assignment.nil?
+      unless assignment.nil?
         if assignment.reviewer_is_team?
           teams_user = TeamsUser.where(team_id: review_response_map.team_id)
           teams_user.all.any? { |m| m.user_id == current_user.id}
@@ -394,15 +394,15 @@ class ResponseController < ApplicationController
   end
 
   def lock_response_map response_id
-    review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
-    if !review_response_map.nil?
+    review_response_map = ReviewResponseMap.find_by_id(Response.find(response_id).map_id)
+    unless review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => true, :locked_by => current_user.id)
     end
   end
 
   def unlock_response_map response_id
-    review_response_map = ReviewResponseMap.find(response_id)
-    if !review_response_map.nil?
+    review_response_map = ReviewResponseMap.find_by_id(response_id)
+    unless review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
     end
   end

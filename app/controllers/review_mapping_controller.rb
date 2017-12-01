@@ -46,13 +46,15 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
     if assignment.reviewer_is_team?
-      team_id = Team.where(name: params[:user][:name], parent_id: assignment.id).first.id
+      team_id = Team.where(name: params[:user], parent_id: assignment.id).first.id
       user_id = TeamsUser.where(team_id: team_id).first.user_id
       reviewer_id = Participant.where(parent_id: assignment.id, user_id: user_id).first.id
-      if team_id == params[:contributor_id]
+      if team_id == params[:contributor_id].to_i
         flash[:error] = "You cannot assign this team to review their own artifact."
       elsif ReviewResponseMap.where(reviewee_id: params[:contributor_id], team_id: team_id).first.nil?
         ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer_id, reviewed_object_id: assignment.id, team_id: team_id)
+      else
+        flash[:error] = "You have already assigned #{params[:user]} to review #{AssignmentTeam.where(id: params[:contributor_id].to_i).first.name}."
       end
     else
       user_id = User.where(name: params[:user][:name]).first.id

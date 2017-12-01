@@ -5,6 +5,11 @@
   Assignment: #{@contributor.assignment.name}
 %br/
 = form_tag :action => 'add_reviewer', :id => @contributor.parent_id do
-  #{@contributor.assignment.reviewer_is_team? ? 'Enter a Team name:' : 'Enter a user login:'} #{text_field_with_auto_complete :user, :name, {:size => 41}}
+  -if @contributor.assignment.reviewer_is_team?
+    - @teams = AssignmentTeam.where(parent_id: @contributor.assignment.id)
+
+    = select_tag "user", options_from_collection_for_select(@teams, "name", "name")
+  -else
+    Enter a user login: #{text_field_with_auto_complete :user, :name, {:size => 41}}
   \#{hidden_field_tag('contributor_id', @contributor.id)}
   %input{:type => "submit", :value => "Add Reviewer"}/

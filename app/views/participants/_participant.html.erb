@@ -9,7 +9,7 @@
 
   <% if @model == 'Assignment' %>
 
-      <td align="center">
+      <td align="center" id="badge">
         <% awarded_badges = AwardedBadge.where(participant_id: participant.id) %>
         <% if awarded_badges != nil %>
             <% awarded_badges.each do |awarded_badge| %>

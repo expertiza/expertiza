@@ -65,9 +65,8 @@ class StudentTeamsController < ApplicationController
     allowed_team_size = @student.assignment.max_team_size
     min_team_size = 1
     @has_team = true
-    if allowed_team_size <= min_team_size
-      @can_send_invitation = false;
-    else
+    @can_send_invitation = false;
+    if allowed_team_size > min_team_size
       if @student.team == nil
         @can_send_invitation = false
         @has_team = false

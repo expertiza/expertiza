@@ -54,6 +54,15 @@ describe ReviewMappingController do
     end
   end
 
+  describe '#add_reviewer' do
+    context 'when assignment.has_team_reviews?' do
+      it 'creates only one response map with team_id' do
+        expect(ReviewResponseMap).to receive_message_chain("where.first").with(any_args).and_return(review_response_map)
+        expect(review_response_map).to receive(:nil?).and_return(false)
+      end
+    end
+  end
+
   describe '#add_reviewer and #get_reviewer' do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do

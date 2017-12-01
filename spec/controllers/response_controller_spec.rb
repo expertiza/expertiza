@@ -49,7 +49,7 @@ describe ResponseController do
         end
       end
 
-      #E17A0 Check if current user is member os assignment review team
+      #E17A0 Check if current user is a member of assignment review team
       context 'when response is locked by same user as current user' do
         it 'does not disallow certain action' do
           allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)

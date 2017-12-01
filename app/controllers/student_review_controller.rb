@@ -16,32 +16,21 @@ class StudentReviewController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @review_phase = @assignment.get_current_stage(@topic_id)
     @first_submission_due_date= AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: '1').first.due_at
-    puts "##########################first submission"
-
-    puts @first_submission_due_date
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @peer_reviews=Array.new
-    puts "##########################is_calibrated"
     if @assignment.is_calibrated?
       @calibration_reviews=Array.new
       calibration_due_date = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: '12').last.due_at
-      puts "##########################"
-      puts Time.now
-      puts calibration_due_date
-
       if Time.now <= calibration_due_date
           puts "During calibration period"
           @calibration_reviews=ReviewResponseMap.where(reviewer_id: @participant.id)
-          puts "#########################"
-          puts @calibration_reviews
       else
         @review_mappings=ReviewResponseMap.where(reviewer_id: @participant.id)
         @review_mappings.each do |review_map|
           if review_map.created_at <= calibration_due_date
             @calibration_reviews << review_map
           else
-            puts "##inside else ##"
             @peer_reviews << review_map
           end  
         end
@@ -50,9 +39,6 @@ class StudentReviewController < ApplicationController
     else
       @peer_reviews = ReviewResponseMap.where(reviewer_id: @participant.id)
     end
-    
-    puts "###########PEER REVIEWS##############"
-    puts @peer_reviews
     # if it is an calibrated assignment, change the response_map order in a certain way
 
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)

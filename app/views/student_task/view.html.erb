@@ -43,8 +43,9 @@
   }
 
   .vis-item.vis-selected {
-    border-color: green;
-    background-color: lightgreen;
+    border-color: mediumvioletred;
+    background-color: firebrick;
+    color : #e4b9c0;
   }
 
   .vis-time-axis .vis-text {
@@ -65,6 +66,22 @@
   .vis-time-axis .vis-grid.vis-major {
     border-width: 2px;
     border-color: #F991A3;
+  }
+  .vis-item.fileUpload {
+    background-color: lawngreen;
+    border-color: green;
+  }
+  .vis-item.hyperlinkUpload {
+    background-color: springgreen;
+    border-color: green;
+  }
+  .vis-item.submissionDue {
+    background-color: orange;
+    border-color: orangered;
+  }
+  .vis-item.reviewDue {
+    background-color: darkorange;
+    border-color: orangered ;
   }
 </style>
 
@@ -190,11 +207,12 @@
 <% @href_arr= Array.new %>
 <% @maxdate = DueDate.where("parent_id = #{@assignment.id}")#find_by_sql"select * from due_dates where parent_id=#{@assignment.id}"
    @json_sample = @maxdate.map do |u|
-     @href_arr.push("")
+     @href_arr.push("");
      if u.deadline_type_id==1
-       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Submission due at "+u.due_at.to_s+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/submit-icon.png\" style=\"width:40px; height:40px;\">' }
+       #("../submitted_content/"+@participant.id.to_s+"/edit")
+       { :id => u.id, :start=> u.due_at, :className => "submissionDue", :content => "Round "+(u.round.to_s)+"<split>Submission due by "+u.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/submit-icon.png\" style=\"width:40px; height:40px;\">' }
      else
-       { :id => u.id, :start=> u.due_at, :content => "Round "+(u.round.to_s)+"<br>Review due at "+u.due_at.to_s+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
+       { :id => u.id, :start=> u.due_at, :className => "reviewDue", :content => "Round "+(u.round.to_s)+"<split>Review due by "+u.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
      end
    end
 %>
@@ -226,16 +244,17 @@
                          "current_folder[name]" => File.dirname(f)
         end
         @href_arr.push(ret.split('"')[1])
-        { :id => u.id, :start=> u.created_at, :content => (u.content).split('/')[-1]+'<img src=\"../../assets/attachment-icon.png\" style=\"width:32px; height:32px;\">' }
+        { :id => u.id, :start=> u.created_at, :className=> "fileUpload", :content => (u.content).split('/')[-1]+'<img src=\"../../assets/attachment-icon.png\" style=\"width:32px; height:32px;\"><split>'+u.created_at.strftime("%m/%d/%Y at %I:%M%p") }
       else
         @href_arr.push(u.content)
-        { :id => u.id, :start=> u.created_at, :content => u.content+'<img src=\"../../assets/hyperlink-icon.png\" style=\"width:40px; height:40px;\">' }
+        { :id => u.id, :start=> u.created_at, :className=> "hyperlinkUpload" ,:content => u.content+'<img src=\"../../assets/hyperlink-icon.png\" style=\"width:40px; height:40px;\"><split>'+u.created_at.strftime("%m/%d/%Y at %I:%M%p") }
       end
     end
 
        @href_arr.each do |i|
          puts "hello shyam "+i
        end
+
     %>
     <% @json_sample%>
     <br><%= raw @assignment.created_at.strftime("%Y-%m-%d") %><br>
@@ -259,17 +278,30 @@
            end
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :content => "Round "+j.round.to_s+"<br> Review for: #{@topic_name}"+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
+             { :id => j.id, :start=> j.created_at, :className => "review", :content => "Round "+j.round.to_s+"<split> Review for: #{@topic_name}"+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
            end
          elsif i.type=="SelfReviewResponseMap"
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :content => "Round "+j.round.to_s+"<br>Self Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\">' }
+             { :id => j.id, :start=> j.created_at, :className => "selfReview", :content => "Round "+j.round.to_s+"<split>Self Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
+           end
+         elsif i.type=="TeammateReviewResponseMap"
+           unless j.nil? and j.is_submitted.zero?
+             reviewee = ResponseMap.where(:reviewer_id => "#{i.reviewer_id}", :id =>"#{i.id}").pluck(:reviewee_id)
+             #reviewee = ResponseMap.find_by_sql("select reviewee_id from response_maps where reviewer_id=#{i.reviewer_id} and id=#{i.id}")
+             puts reviewee.to_s+" "+i.reviewer_id.to_s+" "+i.id.to_s
+             user_id = Participant.where(:id=> "#{reviewee[0]}").pluck(:user_id)
+             #user_id = Participant.find_by_sql("select user_id from participants where id=#{reviewee[0]}")
+             reviewee_name = User.where(:id=>"#{user_id[0]}").pluck(:name)
+             #reviewee_name = User.find_by_sql("select name from users where id=#{user_id}")
+
+             @href_arr.push("../response/view?id="+j.id.to_s)
+             { :id => j.id, :start=> j.created_at, :className => "teamReview", :content => "Round "+j.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
            end
          else
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :content => "Round "+j.round.to_s+"<br>Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\">' }
+             { :id => j.id, :start=> j.created_at, :className => "feedback", :content => "Round "+j.round.to_s+"<split>Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
            end
          end
        end
@@ -282,9 +314,15 @@
 
     console.log(js_href_arr)
     var link=""
+    var temp;
+    var temp1;
     for(i=0;  i<json_parse.length; i++) {
         //console.log(js_href_arr[i]);
-        json_parse[i].content = "<a href="+js_href_arr[i]+" target='_blank'>"+json_parse[i].content+"</a>"+ " <br> " + json_parse[i].start;
+        temp=json_parse[i].content.split("<split>");
+        if(js_href_arr[i]=='')
+            json_parse[i].content = temp[0]+"<br>"+temp.slice(1);//+ " <br> " + json_parse[i].start;
+        else
+            json_parse[i].content = "<a href="+js_href_arr[i]+" target='_blank'>"+temp[0]+"</a><br>"+temp.slice(1);//+ " <br> " + json_parse[i].start;
         console.log(json_parse[i].content);
     }
     //

@@ -251,12 +251,12 @@
 
 <!-- Reviews not yet started -->
 <% unless @review_mappings.nil?
-     @review_mappings.each do |i|
-       @prev = Response.where(:map_id => i.id)
-       @visualization_data += @prev.map do |j|
-         if i.type=="ReviewResponseMap"
-           review_mapping = ResponseMap.find(i.reviewed_object_id)
-           participant = AssignmentTeam.get_first_member(i.reviewee_id)
+     @review_mappings.each do |review_mapping_iterator|
+       @response_values = Response.where(:map_id => review_mapping_iterator.id)
+       @visualization_data += @response_values.map do |response_value_iterator|
+         if review_mapping_iterator.type=="ReviewResponseMap"
+           review_mapping = ResponseMap.find(review_mapping_iterator.reviewed_object_id)
+           participant = AssignmentTeam.get_first_member(review_mapping_iterator.reviewee_id)
            topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
            if !topic_id.nil?
              if SignUpTopic.find(topic_id).topic_identifier != ''
@@ -265,32 +265,28 @@
                @topic_name=SignUpTopic.find(topic_id).topic_name
              end
            end
-           unless j.nil? and j.is_submitted.zero?
-             @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "review", :content => "Round "+j.round.to_s+"<split> Review for: #{@topic_name}"+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+           unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
+             @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "review", :content => "Round "+response_value_iterator.round.to_s+"<split> Review for: #{@topic_name}"+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\"><br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
-         elsif i.type=="SelfReviewResponseMap"
-           unless j.nil? and j.is_submitted.zero?
-             @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "selfReview", :content => "Round "+j.round.to_s+"<split>Self Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+         elsif review_mapping_iterator.type=="SelfReviewResponseMap"
+           unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
+             @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "selfReview", :content => "Round "+response_value_iterator.round.to_s+"<split>Self Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
-         elsif i.type=="TeammateReviewResponseMap"
-           unless j.nil? and j.is_submitted.zero?
-             reviewee = ResponseMap.where(:reviewer_id => "#{i.reviewer_id}", :id =>"#{i.id}").pluck(:reviewee_id)
-             #reviewee = ResponseMap.find_by_sql("select reviewee_id from response_maps where reviewer_id=#{i.reviewer_id} and id=#{i.id}")
-             puts reviewee.to_s+" "+i.reviewer_id.to_s+" "+i.id.to_s
+         elsif review_mapping_iterator.type=="TeammateReviewResponseMap"
+           unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
+             reviewee = ResponseMap.where(:reviewer_id => "#{review_mapping_iterator.reviewer_id}", :id =>"#{review_mapping_iterator.id}").pluck(:reviewee_id)
+             puts reviewee.to_s+" "+review_mapping_iterator.reviewer_id.to_s+" "+review_mapping_iterator.id.to_s
              user_id = Participant.where(:id=> "#{reviewee[0]}").pluck(:user_id)
-             #user_id = Participant.find_by_sql("select user_id from participants where id=#{reviewee[0]}")
              reviewee_name = User.where(:id=>"#{user_id[0]}").pluck(:name)
-             #reviewee_name = User.find_by_sql("select name from users where id=#{user_id}")
-
-             @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "teamReview", :content => "Round "+j.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+             @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "teamReview", :content => "Round "+response_value_iterator.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          else
-           unless j.nil? and j.is_submitted.zero?
-             @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "feedback", :content => "Round "+j.round.to_s+"<split>Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+           unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
+             @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "feedback", :content => "Round "+response_value_iterator.round.to_s+"<split>Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          end
        end
@@ -348,7 +344,7 @@
     // zoom percentage in zoomin/zoomout can be adjusted below by passing paramenter. Similar is the case for move left/right
     document.getElementById('zoomIn').onclick    = function () { timeline.zoomIn( 0.2); };
     document.getElementById('zoomOut').onclick   = function () { timeline.zoomOut( 0.2); };
-    document.getElementById('moveLeft').onclick  = function () { move( 0.2); };
+    document.getElementBydId('moveLeft').onclick  = function () { move( 0.2); };
     document.getElementById('moveRight').onclick = function () { move(-0.2); };
     document.getElementById('Recenter').onclick  = function () {
         var visualization_window_start = new Date(visualization_window.start);

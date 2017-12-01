@@ -76,5 +76,6 @@ class TeammateReviewResponseMap < ResponseMap
     if (good_teammate_badge != nil && average_score < threshold)
       AwardedBadge.find_by(badge_id: 2, participant_id: reviewee.id).delete
     end
+
   end
 end

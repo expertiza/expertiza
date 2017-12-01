@@ -37,9 +37,9 @@ class AssignmentForm
     else
       attributes[:assignment][:late_policy_id] = nil
     end
+
     good_teammate_threshold=attributes[:assignment].delete("badge_2_threshold")
     good_reviewer_threshold=attributes[:assignment].delete("badge_1_threshold")
-
 
     update_assignment(attributes[:assignment])
     set_badge_threshold_for_assignment(attributes[:assignment][:id],good_reviewer_threshold,good_teammate_threshold)
@@ -334,6 +334,10 @@ class AssignmentForm
   end
 
   def set_badge_threshold_for_assignment(assignment_id, good_reviewer_threshold, good_teammate_threshold)
+
+    good_reviewer_threshold = good_reviewer_threshold.to_i
+    good_teammate_threshold = good_teammate_threshold.to_i
+
     if good_reviewer_threshold.nil?
       good_reviewer_threshold=95
     end
@@ -341,9 +345,10 @@ class AssignmentForm
       good_teammate_threshold=95
     end
 
-     good_reviewer_badge= AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 1)
-     good_teammate_badge=AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 2)
+    good_reviewer_badge= AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 1)
+    good_teammate_badge=AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 2)
 
+    puts "\n\n good_reviewer_badge.badge_id = #{good_reviewer_badge.badge_id}"
 
     if good_reviewer_badge.nil?
       good_reviewer_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 1, threshold: good_reviewer_threshold)
@@ -356,6 +361,16 @@ class AssignmentForm
       flash[:error] = $ERROR_INFO
     end
 
+    Participant.where(:parent_id => assignment_id).each do |participant|
+      awardedbadge= AwardedBadge.find_by(participant_id:participant.id, badge_id:good_reviewer_badge.badge_id)
+      reviewgrade = ReviewGrade.find_by_participant_id(participant.id).grade_for_reviewer
+      if !awardedbadge.nil? and (reviewgrade < good_reviewer_threshold)
+        AwardedBadge.find_by(badge_id:good_reviewer_badge.badge_id, participant_id:participant.id).delete
+      elsif (reviewgrade and reviewgrade >= good_reviewer_threshold)
+        AwardedBadge.create(participant_id: participant.id, badge_id: good_reviewer_badge.badge_id)
+      end
+    end
+
     if good_teammate_badge.nil?
       good_teammate_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 2, threshold: good_reviewer_threshold)
     else
@@ -366,5 +381,16 @@ class AssignmentForm
     rescue
       flash[:error] = $ERROR_INFO
     end
+
+    Participant.where(:parent_id => assignment_id).each do |participant|
+      awardedbadge= AwardedBadge.find_by(participant_id:participant.id, badge_id:good_reviewer_badge.badge_id)
+      reviewgrade = ReviewGrade.find_by_participant_id(participant.id).grade_for_reviewer
+      if !awardedbadge.nil? and (reviewgrade < good_reviewer_threshold)
+        AwardedBadge.find_by(badge_id:good_reviewer_badge.badge_id, participant_id:participant.id).delete
+      elsif (reviewgrade and reviewgrade >= good_reviewer_threshold)
+        AwardedBadge.create(participant_id: participant.id, badge_id: good_reviewer_badge.badge_id)
+      end
+    end
+
   end
 end

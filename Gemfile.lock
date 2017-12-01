@@ -536,6 +536,3 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-BUNDLED WITH
-   1.16.0.pre.3

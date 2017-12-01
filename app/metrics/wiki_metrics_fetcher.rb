@@ -4,7 +4,6 @@ class WikiMetricsFetcher
   attr_accessor :url
   attr_accessor :text
   attr_accessor :readability
-  attr_accessor :loaded
 
   SOURCE = Rails.configuration.wiki_source
 
@@ -25,16 +24,12 @@ class WikiMetricsFetcher
   end
 
   def fetch_content
-    @text = parseWiki(@url)
-    @readability = analyzeText(@text)
+    @text = Nokogiri::HTML(open(@url)).css('#bodyContent p').text
+    @readability = Odyssey.analyze_multi(@text, ['FleschKincaidRe', 'FleschKincaidGl', 'Ari', 'ColemanLiau', 'GunningFog', 'Smog'], true)
     @loaded = true
   end
 
-  def self.parseWiki(url)
-    Nokogiri::HTML(open(url)).css('#bodyContent p').text()
-  end
-
-  def self.analyzeText(text)
-    Odyssey.analyze_multi(text, ['FleschKincaidRe', 'FleschKincaidGl', 'Ari', 'ColemanLiau', 'GunningFog', 'Smog'], true)
+  def is_loaded?
+    @loaded
   end
 end

@@ -55,7 +55,7 @@ class AssignmentsController < ApplicationController
 
     @assignment = Assignment.where(id: params[:id]).first
     @assignment_count = @assignment.rounds_of_reviews
-    @due_dates = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: 1).order("round")
+    @due_dates = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: 2).order("round")
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])

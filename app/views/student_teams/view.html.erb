@@ -35,7 +35,7 @@
       <th class="head">Full name</th>
       <!--<th class="head">Team-member role (duty)</th>-->
       <th class="head">Email address</th>
-      <% if @student.assignment.duty_flag%>
+      <% if @student.assignment.duty_flag %>
         <th class="head">Duty Assigned</th>
       <% end %>
       <% if @teammate_review_allowed %>
@@ -48,8 +48,7 @@
         <td><%= member.user.name %></td>
         <td><%= member.user.fullname %></td>
         <td><%= member.user.email %></td>
-        <% if @student.assignment.duty_flag
-        %>
+        <% if @student.assignment.duty_flag %>
           <td><%=duty_assigned(@student.team.id, member.user.id) %></td>
         <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->

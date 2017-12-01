@@ -34,6 +34,10 @@ class StudentTask
     topic.try(:topic_name) || '-'
   end
 
+  def overdue_tasks?
+    current_stage == 'Finished' && !started?
+  end
+
   def complete?
     stage_deadline == 'Complete'
   end
@@ -50,6 +54,10 @@ class StudentTask
 
   def incomplete?
     !complete?
+  end
+
+  def unknown?
+    !in_work_stage? && not_started?
   end
 
   def metareviews_given?
@@ -122,7 +130,7 @@ class StudentTask
         @students_teamed[@course_id] = @teammates
       else
         @teammates.each {|teammate| @students_teamed[@course_id] << teammate }
-        end
+      end
       @students_teamed[@course_id].uniq! if @students_teamed.key?(@course_id)
     end
     @students_teamed

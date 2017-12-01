@@ -378,4 +378,12 @@ FactoryGirl.define do
     content 'www.wolfware.edu'
     created_at Time.now
   end
+
+  factory :join_team_request, class: JoinTeamRequest do
+   comments "request1"
+   id 1
+   status 'P'
+   team_id 2
+   participant_id 2
+  end
 end

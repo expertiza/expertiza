@@ -1,4 +1,4 @@
-xdescribe "Invitations Check" do
+describe "Invitations Check" do
   before(:each) do
     create(:assignment)
     create_list(:participant, 3)

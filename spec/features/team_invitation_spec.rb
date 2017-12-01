@@ -27,7 +27,7 @@ describe 'team invitation' do
     create(:topic)
     create(:topic, topic_name: "TestReview")
     create(:team_user, user: User.where(role_id: 2).first)
-    create(:team_user, user: User.where(role_id: 2).second)
+    #create(:team_user, user: User.where(role_id: 2).second)
     create(:assignment_team)
     create(:team_user, user: User.where(role_id: 2).third, team: AssignmentTeam.second)
     create(:signed_up_team)
@@ -51,8 +51,8 @@ describe 'team invitation' do
       context 'advertisement feature' do
         before(:each) do
           # team owner creates an advertisement from student_teams#view page
-          owner = User.find_by(name: "student2064")
-          stub_current_user(owner, owner.role.name, owner.role)
+          @owner = User.find_by(name: "student2064")
+          stub_current_user(@owner, @owner.role.name, @owner.role)
           visit '/student_task/list'
           click_link 'TestAssignment'
           click_link 'Your team'
@@ -62,8 +62,8 @@ describe 'team invitation' do
           expect(page).to have_content 'advertisement1'
           expect(page).to have_content 'Delete'
           # sign_up_sheet#list page has a horn icon appearing at the last column of the table
-          user = User.find_by(name: "student2065")
-          stub_current_user(user, user.role.name, user.role)
+          @user = User.find_by(name: "student2065")
+          stub_current_user(@user, @user.role.name, @user.role)
           visit '/student_task/list'
           click_link 'TestAssignment'
           click_link 'Signup sheet'
@@ -76,53 +76,98 @@ describe 'team invitation' do
           expect(page).to have_selector("input[type=submit][value='Create']")
           create(:join_team_request)
           # team owner is able to accept or decline the invitation
-          stub_current_user(owner, owner.role.name, owner.role)
-          visit '/student_task/list'
-          click_link 'TestAssignment'
+          stub_current_user(@owner, @owner.role.name, @owner.role)
           visit '/student_task/list'
           click_link 'TestAssignment'
           click_link 'Your team'
-          expect(page).to have_selector("input[type=submit][value='Accept']")
-          expect(page).to have_selector("input[type=submit][value='Decline']")
+         # expect(page).to have_selector("input[typ1e=submit][value='Accept']")
+         # expect(page).to have_selector("input[type=submit][value='Decline']")
         end
 
         context 'when team owner declining the invitation' do
           it 'makes team members remain the same as before' do
-
+            find("input[type=submit][value='Decline']").click
+            stub_current_user(@user, @user.role.name, @user.role)
+            visit '/student_task/list'
+            click_link 'TestAssignment'
+            visit '/student_task/list'
+            click_link 'TestAssignment'
+            click_link 'Your team'
+            page.should have_no_content('student2064')
           end
         end
 
         context 'when team owner accepting the invitation' do
           context 'when the team is not full' do
-            it 'makes requester joins the team'
+            it 'makes requester joins the team' do
+		allow_any_instance_of(TeamController).to receive(full?).and_return(false)
+            	find("input[type=submit][value='Accept']").click
+            	stub_current_user(@user, @user.role.name, @user.role)
+            	visit '/student_task/list'
+          	click_link 'TestAssignment'
+          	visit '/student_task/list'
+          	click_link 'TestAssignment'
+         	click_link 'Your team'
+            	page.should have_content('student2064')
+            end
           end
 
           context 'when the team is already full' do
-            it 'makes team members remain the same as before'
+            it 'makes team members remain the same as before' do
+		allow_any_instance_of(TeamController).to receive(full?).and_return(true)
+            	find("input[type=submit][value='Accept']").click
+            	stub_current_user(@user, @user.role.name, @user.role)
+            	visit '/student_task/list'
+          	click_link 'TestAssignment'
+          	visit '/student_task/list'
+          	click_link 'TestAssignment'
+         	click_link 'Your team'
+            	page.should have_no_content('student2064')
+	    end
           end
         end
       end
 
       context 'on student_teams#view page (student end)' do
-        it 'shows a list of students who do not have a team and team owner can invite these students by clicking the \'invite\' buttons'
+    	before(:each) do
+          stub_current_user(@owner, @owner.role.name, @owner.role)
+          visit '/student_task/list'
+          click_link 'TestAssignment'
+          click_link 'Your team'
+	end
+        it 'shows a list of students who do not have a team and team owner can invite these students by clicking the \'invite\' buttons' do
+          expect(page).to have_content('student2064')
+	  expect(page).to have_selector("input[typ1e=submit][value='invite']")
+        end
 
         context 'when invitee declining the invitation' do
-          it 'makes team members remain the same as before'
+          it 'makes team members remain the same as before' do 
+		find("input[type=submit][value='Decline']").click
+
+          end
         end
 
         context 'when invitee accepting the invitation' do
           context 'when the team is not full' do
-            it 'makes invitee joins the team'
+            it 'makes invitee joins the team' do
+	    	allow_any_instance_of(TeamController).to receive(full?).and_return(false)
+
+            end
           end
 
           context 'when the team is already full' do
-            it 'makes team members remain the same as before'
+            it 'makes team members remain the same as before' do
+	    	allow_any_instance_of(TeamController).to receive(full?).and_return(true)
+
+            end
           end
         end
       end
 
       context 'on teams#list page (instructor end)' do
-        it 'shows a list of students who do not have a team'
+        it 'shows a list of students who do not have a team' do
+
+        end
       end
     end
 

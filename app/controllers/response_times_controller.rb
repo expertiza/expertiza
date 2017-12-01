@@ -39,7 +39,7 @@ class ResponseTimesController < ApplicationController
     end
   end
 
-  def mark_end_time
+  def mark_end_time # mark end_at review time for all uncommited links/files
     @data= params.require(:response_time)
     @linkArray=Array.new
     @responsetime_matches = ResponseTime.where(map_id: @data[:map_id], round: @data[:round])

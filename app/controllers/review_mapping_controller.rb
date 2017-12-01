@@ -439,10 +439,10 @@ class ReviewMappingController < ApplicationController
     review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
-    assign_good_reviewer_badge(params[:participant_id], review_grade.grade_for_reviewer)
 
     begin
       review_grade.save
+      assign_good_reviewer_badge(params[:participant_id], review_grade.grade_for_reviewer)
     rescue
       flash[:error] = $ERROR_INFO
     end
@@ -616,6 +616,7 @@ class ReviewMappingController < ApplicationController
     puts("\n\n\n$$$$$$$")
     print participant.user_id # for finding the student_id
     print participant.parent_id
+
     if(!AssignmentBadge.where(:badge_id => 1 , :assignment_id => participant.parent_id ).nil?)
       threshold = AssignmentBadge.find_by(:badge_id => 1 , :assignment_id => participant.parent_id ).threshold
       if(!threshold.nil?)
@@ -624,7 +625,6 @@ class ReviewMappingController < ApplicationController
           if awarded_badge.nil?
             awarded_badge= AwardedBadge.create(participant_id: participant_id)
           end
-
           awarded_badge.badge_id=1
           begin
             awarded_badge.save

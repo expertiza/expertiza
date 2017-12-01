@@ -4,18 +4,22 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if %w(edit update list_submissions).include? params[:action] || params[:other_action] == "delete_reviews"
+    if params[:other_action] == 'delete_reviews'
       assignment = Assignment.find(params[:id])
-      ['Super-Administrator',
-       'Administrator'].include? current_role_name or
-      assignment.instructor_id == current_user.try(:id) or
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
-      assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+      ['Super-Administrator', 'Administrator'].include? current_role_name or
+        assignment.instructor_id == current_user.try(:id) or
+        TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+        assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      if %w(edit update list_submissions).include? params[:action]
+        assignment = Assignment.find(params[:id])
+        ['Super-Administrator', 'Administrator'].include? current_role_name or
+          assignment.instructor_id == current_user.try(:id) or
+          TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+          assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+      else
+        ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
+      end
     end
   end
 

@@ -73,6 +73,81 @@ describe AssignmentsController do
 
       context 'when the role current user is super admin/admin/instractor/ta' do
         it 'allows certain action except edit and update' do
+          stub_current_user(instructor, instructor.role.name, instructor.role)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when the role current user is student' do
+        it 'does not allow certain action' do
+          stub_current_user(student, student.role.name, student.role)
+          expect(controller.send(:action_allowed?)).to be false
+        end
+      end
+    end
+  end
+
+  describe '#other_action_allowed?' do
+    context 'when params other action is delete reviews' do
+      before(:each) do
+        controller.params = {id: '1', other_action: 'delete_reviews'}
+      end
+
+      context 'when the role name of current user is super admin or admin' do
+        it 'allows certain action' do
+          stub_current_user(admin, admin.role.name, admin.role)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the instructor of current assignment' do
+        it 'allows certain action' do
+          stub_current_user(instructor, instructor.role.name, instructor.role)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the ta of the course which current assignment belongs to' do
+        it 'allows certain action' do
+          stub_current_user(ta, ta.role.name, ta.role)
+          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is a ta but not the ta of the course which current assignment belongs to' do
+        it 'does not allow certain action' do
+          stub_current_user(ta, ta.role.name, ta.role)
+          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(false)
+          expect(controller.send(:action_allowed?)).to be false
+        end
+      end
+
+      context 'when current user is the instructor of the course which current assignment belongs to' do
+        it 'allows certain action' do
+          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is an instructor but not the instructor of current course or current assignment' do
+        it 'does not allow certain action' do
+          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 666))
+          expect(controller.send(:action_allowed?)).to be false
+        end
+      end
+    end
+
+    context 'when params other action is not delete reviews' do
+      before(:each) do
+        controller.params = {id: '1', other_action: 'other'}
+      end
+
+      context 'when the role current user is super admin/admin/instractor/ta' do
+        it 'allows certain action except edit and update' do
+          stub_current_user(instructor, instructor.role.name, instructor.role)
           expect(controller.send(:action_allowed?)).to be true
         end
       end

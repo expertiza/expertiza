@@ -57,6 +57,8 @@
                 }
             } else if (deadline_type == 'signup') {
                 previous_element = jQuery('#due_date_heading')
+            } else if (deadline_type == 'calibration') {
+                previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
             } else {
                 previous_element = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').last();
             }
@@ -522,6 +524,11 @@ function addDaysOrMonth(mul, type) {
                 addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'drop_topic', 0,<%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
             <% end %>
         <% end %>
+
+        <% if @assignment_form.assignment.is_calibrated?  %>
+          addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'calibration', 0,<%= due_date(@assignment_form.assignment, 'calibration').to_json.html_safe %>);
+        <% end %>
+
         <% 1.upto @assignment_form.assignment.rounds_of_reviews do |i| %>
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
         addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>) ;

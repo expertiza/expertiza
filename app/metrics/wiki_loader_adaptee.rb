@@ -24,7 +24,9 @@ class WikiLoaderAdaptee < MetricLoaderAdapter
 
   		metrics.fetch_content
 
-  		return metric_db_data + metrics.create_metric(team, assignment, metric_db_data.count + 1, metrics)
+  		new_metric = create_metric(team, assignment, metric_db_data.count + 1, metrics)
+
+  		return metric_db_data  << new_metric
   	end
 
   	def self.create_metric(team, assignment, version, metrics)
@@ -121,6 +123,16 @@ class WikiLoaderAdaptee < MetricLoaderAdapter
 				value: smog.to_s
 			)
 		end
+
+
+		def self.to_map(metric_data)
+            metric_data.map{ |n|
+                n.metric_data_points.map{ |m|
+                	[m.metric_data_point_type.name.to_sym, m.value]
+                }.to_h
+            }
+        end
+
 
 	end
 

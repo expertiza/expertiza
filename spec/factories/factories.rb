@@ -68,6 +68,7 @@ FactoryGirl.define do
     copy_of_emails  false
     github_id nil
     trello_name nil
+    wiki_id nil
   end
 
   factory :instructor, class: Instructor do

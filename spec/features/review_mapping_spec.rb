@@ -21,7 +21,7 @@ def add_matareviewer(student_name)
   expect(page).to have_content student_name
 end
 
-describe "review mapping", js: true do
+describe "review mapping" do
   before(:each) do
     @assignment = create(:assignment, name: "automatic review mapping test", max_team_size: 4)
     create(:assignment_node)
@@ -46,35 +46,35 @@ describe "review mapping", js: true do
     end
   end
 
-  it "can add reviewer then delete it" do
-    @student_reviewer = create :student, name: 'student_reviewer'
-    @participant_reviewer = create :participant, assignment: @assignment, user: @student_reviewer
-    @student_reviewer2 = create :student, name: 'student_reviewer2'
-    @participant_reviewer2 = create :participant, assignment: @assignment, user: @student_reviewer2
-    login_and_assign_reviewer("instructor6", @assignment.id, 0, 0)
+  it "can add reviewer then delete it", js: true do
+    participant_reviewer = create :participant, assignment: @assignment
+    participant_reviewer2 = create :participant, assignment: @assignment
+    login_as("instructor6")
+    visit "/review_mapping/list_mappings?id=#{@assignment.id}"
 
     # add_reviewer
     first(:link, 'add reviewer').click
-    add_reviewer(@student_reviewer.name)
-    expect(page).to have_content @student_reviewer.name
+    add_reviewer(participant_reviewer.user.name)
+    expect(page).to have_content participant_reviewer.user.name
     click_link('delete')
-    expect(page).to have_content "The review mapping for \"#{@team1.name}\" and \"#{@student_reviewer.name}\" has been deleted"
+    expect(page).to have_content "The review mapping for \"#{@team1.name}\" and \"#{participant_reviewer.user.name}\" has been deleted"
 
     # add_meta_reviewer
     first(:link, 'add reviewer').click
-    add_reviewer(@student_reviewer.name)
+    add_reviewer(participant_reviewer.user.name)
     click_link('add metareviewer')
-    add_matareviewer(@student_reviewer2.name)
-    expect(page).to have_content @student_reviewer2.name
+    add_matareviewer(participant_reviewer2.user.name)
+    expect(page).to have_content participant_reviewer2.user.name
+
     # delete_meta_reviewer
     find(:xpath, "//a[@href='/review_mapping/delete_metareviewer?id=3']").click
-    expect(page).to have_content "The metareview mapping for #{@student_reviewer.name} and #{@student_reviewer2.name} has been deleted"
+    expect(page).to have_content "The metareview mapping for #{participant_reviewer.user.name} and #{participant_reviewer2.user.name} has been deleted"
 
     click_link('add metareviewer')
-    add_matareviewer(@student_reviewer2.name)
+    add_matareviewer(participant_reviewer2.user.name)
     # delete_all_meta_reviewer
     click_link('delete all metareviewers')
-    expect(page).to have_content "All metareview mappings for contributor \"#{@team1.name}\" and reviewer \"#{@student_reviewer.name}\" have been deleted"
+    expect(page).to have_content "metareview mappings for contributor \"#{@team1.name}\" and reviewer \"#{participant_reviewer.user.name}\" have been deleted"
 
     first(:link, 'delete outstanding reviewers').click
     expect(page).to have_content "All review mappings for \"#{@team1.name}\" have been deleted"
@@ -107,15 +107,13 @@ describe "review mapping", js: true do
   end
 
   # E1721 changes: test for unsubmitting a review
-  it "can unsubmit a review" do
-    @student_reviewer = create :student, name: 'student_reviewer'
-    @participant_reviewer = create :participant, assignment: @assignment, user: @student_reviewer
+  it "can unsubmit a review", js: true do
+    participant_reviewer = create :participant, assignment: @assignment
     login_and_assign_reviewer("instructor6", @assignment.id, 0, 2)
-
     # add_reviewer
     first(:link, 'add reviewer').click
-    add_reviewer(@student_reviewer.name)
-    expect(page).to have_content @student_reviewer.name
+    add_reviewer(participant_reviewer.user.name)
+    expect(page).to have_content participant_reviewer.user.name
 
     # create new submitted review
     team = AssignmentTeam.find(1)

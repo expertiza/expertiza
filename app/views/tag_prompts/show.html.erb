@@ -1,0 +1,84 @@
+<% if @popup %>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Tag Prompt</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+  <style>
+    #jsGrid {
+      width:720px;
+      height:1000px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+<% end %>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" rel="stylesheet" />
+
+<h4>Manage Tag Prompts</h4>
+<div id="jsGrid" ></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+<script>
+  $(function() {
+    control_type = [{ id: "Slider", name: "No-None-Yes Slider" }, { id: "Checkbox", name: "True/False Checkbox" } ]
+    $("#jsGrid").jsGrid({
+      height: "1000px",
+      width: "720px",
+      filtering: true,
+      inserting: true,
+      editing: true,
+      sorting: true,
+      paging: true,
+      autoload: true,
+      pageSize: 10,
+      pageButtonCount: 5,
+      deleteConfirm: "Do you really want to delete client?",
+      controller: {
+        loadData: function(filter) {
+          return $.ajax({
+            type: "GET",
+            url: "../tag_prompts",
+            dataType: "JSON",
+            data: filter
+          });
+        },
+        insertItem: function(item) {
+          return $.ajax({
+            type: "POST",
+            url: "../tag_prompts",
+            data: item
+          });
+        },
+        updateItem: function(item) {
+          return $.ajax({
+            type: "PUT",
+            url: "../tag_prompts/" + item.id,
+            data: item
+          });
+        },
+        deleteItem: function(item) {
+          return $.ajax({
+            type: "DELETE",
+            url: "../tag_prompts/" + item.id
+          });
+        }
+      },
+      fields: [
+        { name: "prompt", type: "text", width: 50 },
+        { name: "desc", type: "text", width: 150},
+        { name: "control_type", type: "select", width: 100, items: control_type, valueField: "id", textField: "name"  },
+        { type: "control" }
+      ]
+    });
+  });
+</script>
+
+<% if @popup %>
+</body>
+<% end %>
+

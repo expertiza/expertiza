@@ -1,12 +1,19 @@
 Expertiza::Application.routes.draw do
 
   resources :user_pastebins
+  resources :tag_prompts
   resources :track_notifications
   resources :notifications
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
+
+  resources :answer_tags do
+    collection do
+      post :create_edit
+    end
+  end
 
   resources :bookmarks do
     collection do
@@ -289,6 +296,7 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :delete
+      get :types
     end
   end
 
@@ -383,13 +391,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :statistics do
-    collection do
-      get :list_surveys
-      get :list
-      get :view_responses
-    end
-  end
+  # resources :statistics do
+  #   collection do
+  #     get :list_surveys
+  #     get :list
+  #     get :view_responses
+  #   end
+  # end
 
   resources :student_quizzes do
     collection do
@@ -513,7 +521,7 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
-      get 'set_anonymous_mode'
+      get 'set_anonymized_view'
       get :keys
     end
   end

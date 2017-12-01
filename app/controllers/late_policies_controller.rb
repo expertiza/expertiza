@@ -68,8 +68,9 @@ class LatePoliciesController < ApplicationController
     if invalid_penalty_per_unit
       flash[:error] = "The maximum penalty cannot be less than penalty per unit."
     end
-    if same_policy_name == LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+    if same_policy_name = LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = "A policy with the same name already exists."
+      same_policy_name = true
     end
     if !invalid_penalty_per_unit && !same_policy_name
       @late_policy = LatePolicy.new(late_policy_params)

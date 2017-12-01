@@ -363,7 +363,7 @@ class AssignmentForm
 
     Participant.where(:parent_id => assignment_id).each do |participant|
       awardedbadge= AwardedBadge.find_by(participant_id:participant.id, badge_id:good_reviewer_badge.badge_id)
-      reviewgrade = ReviewGrade.find_by_participant_id(participant.id).grade_for_reviewer
+      reviewgrade = ReviewGrade.find_by_participant_id(participant.id).grade_for_reviewer unless ReviewGrade.find_by_participant_id(participant.id).nil?
       if !awardedbadge.nil? and (reviewgrade < good_reviewer_threshold)
         AwardedBadge.find_by(badge_id:good_reviewer_badge.badge_id, participant_id:participant.id).delete
       elsif (reviewgrade and reviewgrade >= good_reviewer_threshold)
@@ -384,7 +384,7 @@ class AssignmentForm
 
     Participant.where(:parent_id => assignment_id).each do |participant|
       awardedbadge= AwardedBadge.find_by(participant_id:participant.id, badge_id:good_teammate_badge.badge_id)
-      reviewgrade = TeammateReviewResponseMap.calculate_teammate_review_score (good_teammate_badge.badge_id, assignment_id, participant.id)
+      reviewgrade = TeammateReviewResponseMap.calculate_teammate_review_score(good_teammate_badge.badge_id, assignment_id, participant.id)
       if !awardedbadge.nil? and (reviewgrade < good_reviewer_threshold)
         AwardedBadge.find_by(badge_id:good_reviewer_badge.badge_id, participant_id:participant.id).delete
       elsif (reviewgrade and reviewgrade >= good_reviewer_threshold)

@@ -4,14 +4,16 @@ class WikiLoaderAdaptee < MetricLoaderAdapter
 
 
 	def self.can_load?(params)
-		team, assignment, url = params.values_at(:team, :assignment, :url)
-  		tests = [!team.nil?, !assignment.nil?, !url.nil?, WikiMetricsFetcher.supports_url?(url)]
+		url = params.values_at(:url)[0]
+  		tests = [!url.nil?, WikiMetricsFetcher.supports_url?(url)]
   		tests.inject(true){ |sum, a| sum && a }
   	end
 
 
   	def self.load_metric(params)
   		team, assignment, url = params.values_at(:team, :assignment, :url)
+
+  		# puts team, assignment, url
 
   		metric_db_data = Metric.includes(:metric_data_points).where(team_id: team.id,
  			assignment_id: assignment.id,
@@ -35,7 +37,7 @@ class WikiLoaderAdaptee < MetricLoaderAdapter
   			assignment_id: assignment.id,
   			source: :wiki,
   			remote_id: :url,
-  			uri: "#{metrics.id}:#{version}"
+  			uri: "#{team.id}:#{assignment.id}:#{version}"
   			)
 
   		create_points(new_metric, metrics)
@@ -136,6 +138,6 @@ class WikiLoaderAdaptee < MetricLoaderAdapter
 
 	end
 
-
+end
 
 

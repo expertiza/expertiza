@@ -213,47 +213,47 @@
    @visualization_data = @duedates.map do |due|
      @href_arr.push("");
      if due.deadline_type_id.eql? 1
-       { :id => due.id, :start=> due.due_at, :className => "submissionDue", :content => "Round "+(due.round.to_s)+"<split>Submission due by "+due.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/submit-icon.png\" style=\"width:40px; height:40px;\">' }
+       { :id => due.id, :start=> due.due_at, :className => "submissionDue", :content => "Round "+(due.round.to_s)+"<split>Submission due by "+due.due_at.strftime("%m/%d/%Y at %I:%M %p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/submit-icon.png\" style=\"width:40px; height:40px;\">' }
      else
-       { :id => due.id, :start=> due.due_at, :className => "reviewDue", :content => "Round "+(due.round.to_s)+"<split>Review due by "+due.due_at.strftime("%m/%d/%Y at %I:%M%p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
+       { :id => due.id, :start=> due.due_at, :className => "reviewDue", :content => "Round "+(due.round.to_s)+"<split>Review due by "+due.due_at.strftime("%m/%d/%Y at %I:%M %p")+'<img src=\"../../assets/due-dates-icon.png\" style=\"width:40px; height:40px;\">'+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\">' }
      end
    end
 %>
 
 <!-- display only if submissions are made-->
 <% unless @team.nil?
-    @submissions = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"
+     @submissions = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"
 
-    @visualization_data += @submissions.map do |submission|
-      #display_directory_tree(participant, files, true).html_safe
-      if (submission.operation).eql?('Submit File')
-        file = submission.content
-        ret=""
-        if File.exist?(file) && File.directory?(file)
-          ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => file
-        else
-          ret += "\n      "
-          ret += link_to File.basename(file), :controller => 'submitted_content',
-                         :action => 'download',
-                         :id => @participant.id,
-                         :download => File.basename(file),
-                         "current_folder[name]" => File.dirname(file)
-        end
-        @href_arr.push(ret.split('"')[1])
-        { :id => submission.id, :start=> submission.created_at, :className=> "fileUpload", :content => (submission.content).split('/')[-1]+'<img src=\"../../assets/attachment-icon.png\" style=\"width:32px; height:32px;\"><split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M%p") }
-      else
-        @href_arr.push(submission.content)
-        { :id => submission.id, :start=> submission.created_at, :className=> "hyperlinkUpload" ,:content => submission.content+'<img src=\"../../assets/hyperlink-icon.png\" style=\"width:40px; height:40px;\"><split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M%p") }
-      end
-    end
+     @visualization_data += @submissions.map do |submission|
+       #display_directory_tree(participant, files, true).html_safe
+       if (submission.operation).eql?('Submit File')
+         file = submission.content
+         ret=""
+         if File.exist?(file) && File.directory?(file)
+           ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => file
+         else
+           ret += "\n      "
+           ret += link_to File.basename(file), :controller => 'submitted_content',
+                          :action => 'download',
+                          :id => @participant.id,
+                          :download => File.basename(file),
+                          "current_folder[name]" => File.dirname(file)
+         end
+         @href_arr.push(ret.split('"')[1])
+         { :id => submission.id, :start=> submission.created_at, :className=> "fileUpload", :content => (submission.content).split('/')[-1]+'<img src=\"../../assets/attachment-icon.png\" style=\"width:32px; height:32px;\"><split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+       else
+         @href_arr.push(submission.content)
+         { :id => submission.id, :start=> submission.created_at, :className=> "hyperlinkUpload" ,:content => submission.content+'<img src=\"../../assets/hyperlink-icon.png\" style=\"width:40px; height:40px;\"><split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+       end
+     end
 
-end %>
+   end %>
 
 <!-- Reviews not yet started -->
 <% unless @review_mappings.nil?
-    @review_mappings.each do |i|
-      @prev = Response.where(:map_id => i.id)
-      @visualization_data += @prev.map do |j|
+     @review_mappings.each do |i|
+       @prev = Response.where(:map_id => i.id)
+       @visualization_data += @prev.map do |j|
          if i.type=="ReviewResponseMap"
            review_mapping = ResponseMap.find(i.reviewed_object_id)
            participant = AssignmentTeam.get_first_member(i.reviewee_id)
@@ -267,12 +267,12 @@ end %>
            end
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "review", :content => "Round "+j.round.to_s+"<split> Review for: #{@topic_name}"+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
+             { :id => j.id, :start=> j.created_at, :className => "review", :content => "Round "+j.round.to_s+"<split> Review for: #{@topic_name}"+'<img src=\"../../assets/review-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          elsif i.type=="SelfReviewResponseMap"
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "selfReview", :content => "Round "+j.round.to_s+"<split>Self Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
+             { :id => j.id, :start=> j.created_at, :className => "selfReview", :content => "Round "+j.round.to_s+"<split>Self Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          elsif i.type=="TeammateReviewResponseMap"
            unless j.nil? and j.is_submitted.zero?
@@ -285,17 +285,17 @@ end %>
              #reviewee_name = User.find_by_sql("select name from users where id=#{user_id}")
 
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "teamReview", :content => "Round "+j.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
+             { :id => j.id, :start=> j.created_at, :className => "teamReview", :content => "Round "+j.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          else
            unless j.nil? and j.is_submitted.zero?
              @href_arr.push("../response/view?id="+j.id.to_s)
-             { :id => j.id, :start=> j.created_at, :className => "feedback", :content => "Round "+j.round.to_s+"<split>Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M%p") }
+             { :id => j.id, :start=> j.created_at, :className => "feedback", :content => "Round "+j.round.to_s+"<split>Feedback"+'<img src=\"../../assets/feedback-icon.png\" style=\"width:40px; height:40px;\"><br>'+j.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          end
        end
      end
-end %>
+   end %>
 
 <script>
     // converting @visualization_data array to javascript compatible JSON object
@@ -309,7 +309,7 @@ end %>
         if(href_JSON[i]=='')
             visualization_JSON[i].content = temp[0]+"<br>"+temp.slice(1);
         else
-            visualization_JSON[i].content = "<a href="+href_JSON[i]+" target='_blank'>"+temp[0]+"</a><br>"+temp.slice(1);
+            visualization_JSON[i].content = "<a href="+href_JSON[i]+" target='_blank'><b><u>"+temp[0]+"</u></b></a><br>"+temp.slice(1);
     }
 </script>
 <!--code for visualization-->
@@ -357,5 +357,6 @@ end %>
     };
 </script>
 
+<br>
 <br>
 <a href="javascript:window.history.back()">Back</a>

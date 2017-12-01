@@ -106,4 +106,8 @@ class TrelloLoaderAdaptee < MetricLoaderAdapter
 		arr.each_slice(2) { |user, count| result[user.to_sym] = count }
 		return result
 	end
+
+	def self.displayAdapter(params)
+		return true
+	end
 end

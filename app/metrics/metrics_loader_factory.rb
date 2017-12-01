@@ -7,18 +7,10 @@ class MetricsFactory
 
   def self.load_metric(params)
     for a in self.LOADER_ADAPTERS do
-      if a == GithubLoaderAdapter
-        url = params[:url]
+      url = params[:url]
 
-        if a.can_load?(url)
-          return GithubDisplayAdapter(load_metric(params))
-        end
-      elsif a == TrelloLoaderAdapter
-        url = params[:url]
-
-        if a.can_load?(url)
-          return true
-        end
+      if a.can_load?(url)
+        return a.displayAdapter(load_metric(params))
       end
     end
   end

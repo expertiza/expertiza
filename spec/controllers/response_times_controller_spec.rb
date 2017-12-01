@@ -28,6 +28,14 @@ describe ResponseTimesController do
         allow(ResponseTime).to receive(:end_at).and_return(dummy)
         allow(dummy).to receive(:nil?).and_return(true)
         allow(ResponseTime).to receive(:update_attributes).with(:end_at,Time.now.to_date).and_return(response_time_records)
+        expect(response.body).to be_blank
+      end
+    end
+  end
+
+  describe '#mark_end_time' do
+    context 'when the links for which end time has not been marked is encountered' do
+      it 'print the links to console' do
       end
     end
   end

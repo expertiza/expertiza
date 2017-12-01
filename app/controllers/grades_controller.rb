@@ -4,7 +4,6 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
   include StudentTaskHelper
-  include AssignmentHelper
 
   def action_allowed?
     case params[:action]
@@ -39,6 +38,11 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires
+
+    #For supp_ques
+    #supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
+    #supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
+    ####
 
     if @assignment.varying_rubrics_by_round?
       retrieve_questions questionnaires
@@ -96,11 +100,10 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    @questions = {}
+
     questionnaires = @assignment.questionnaires
-    retrieve_questions questionnaires
-    @pscore = @participant.scores(@questions)
     @vmlist = []
+    @supplist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
@@ -109,8 +112,25 @@ class GradesController < ApplicationController
                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
                end
       vm = VmQuestionResponse.new(questionnaire, @assignment)
-      vmquestions = questionnaire.questions
-      vm.add_questions(vmquestions)
+      questions = questionnaire.questions
+      vm.add_questions(questions)
+
+      ###For Supp questionnaire
+      supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
+      if not supp_questionnaire_id.nil?
+        supp = VmQuestionResponse.new(questionnaire, @assignment)
+        supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
+        supp_questions = supp_questionnaire.questions
+        supp.add_questions(supp_questions)
+        supp.add_team_members(@team)
+        supp.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+        supp.get_number_of_comments_greater_than_10_words
+        @supplist << supp
+      else
+        @supplist << nil
+      end
+      ###
+
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words

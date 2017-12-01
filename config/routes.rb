@@ -1,19 +1,14 @@
 Expertiza::Application.routes.draw do
 
   resources :user_pastebins
-  resources :tag_prompts
   resources :track_notifications
   resources :notifications
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
-
-  resources :answer_tags do
-    collection do
-      post :create_edit
-    end
-  end
+  post '/student_view/set', to: 'student_view#set'
+  post '/student_view/revert', to: 'student_view#revert'
 
   resources :bookmarks do
     collection do
@@ -296,7 +291,6 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :delete
-      get :types
     end
   end
 
@@ -391,13 +385,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  # resources :statistics do
-  #   collection do
-  #     get :list_surveys
-  #     get :list
-  #     get :view_responses
-  #   end
-  # end
+  resources :statistics do
+    collection do
+      get :list_surveys
+      get :list
+      get :view_responses
+    end
+  end
 
   resources :student_quizzes do
     collection do
@@ -521,7 +515,7 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
-      get 'set_anonymized_view'
+      get 'set_anonymous_mode'
       get :keys
     end
   end
@@ -541,6 +535,7 @@ Expertiza::Application.routes.draw do
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
+  post '/submitted_content/manage_supplementary_rubric', controller: :submitted_content, action: :manage_supplementary_rubric
 
   root to: 'content_pages#view', page_name: 'home'
 

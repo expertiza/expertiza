@@ -16,15 +16,20 @@ class ResponseController < ApplicationController
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
       return false if response_map.is_locked? && response_map.locked_by != current_user.id
-      return current_user_id?(user_id) || reviewer_is_team_member?(current_user.id)
+      return current_user_id?(user_id) || reviewer_is_team_member?
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update', 'unlock'
-      return current_user_id?(user_id) || reviewer_is_team_member?(current_user.id)
+      return current_user_id?(user_id) || reviewer_is_team_member?
     when 'view'
       return edit_allowed?(response.map, user_id)
     else
       current_user
     end
+
+  # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
+  # E17A0 In this case, when the review is not found, an error is returned
+  rescue ActiveRecord::RecordNotFound
+    false
   end
 
   def edit_allowed?(map, user_id)
@@ -35,7 +40,7 @@ class ResponseController < ApplicationController
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
         (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
-        reviewer_is_team_member?(current_user.id) || !(map.is_locked? && map.locked_by != current_user.id)
+        reviewer_is_team_member? || !(map.is_locked? && map.locked_by != current_user.id)
     else
       return current_user_id?(user_id)
     end
@@ -87,6 +92,11 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     msg = ""
 
+    # E17A0 Show a flash message when a response is automatically saved after a period of inactivity
+    if params[:autosave_timeout].to_i > 0
+      msg = "Your response was automatically saved after #{((params[:autosave_timeout].to_i) / 60).round} minutes of inactivity."
+    end
+
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
@@ -103,6 +113,9 @@ class ResponseController < ApplicationController
       if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
         @response.notify_instructor_on_difference
       end
+
+      # E17A0 Email the reviewee only if the reviewer has submitted the review
+      @response.email if @response.is_submitted
     rescue
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -180,7 +193,6 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
     end
 
-    @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
@@ -188,6 +200,8 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+
+
     unlock_response_map @map.id if @map.type == 'ReviewResponseMap'
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
@@ -362,15 +376,16 @@ class ResponseController < ApplicationController
 
   private
   # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
-  def reviewer_is_team_member? user_id
+  def reviewer_is_team_member?
     false
-    review_response_map = ReviewResponseMap.find(Response.find(params[:id]).map_id)
+    response = Response.find(params[:id])
+    review_response_map = ReviewResponseMap.find(response.map_id)
     if !review_response_map.nil?
       assignment = Assignment.where(id:review_response_map.reviewed_object_id).first
       if !assignment.nil?
         if assignment.reviewer_is_team?
           teams_user = TeamsUser.where(team_id: review_response_map.team_id)
-          teams_user.all.any? { |m| m.user_id == user_id}
+          teams_user.all.any? { |m| m.user_id == current_user.id}
         end
       end
     end
@@ -380,7 +395,6 @@ class ResponseController < ApplicationController
     review_response_map = ReviewResponseMap.find(Response.find(response_id).map_id)
     if !review_response_map.nil?
       ReviewResponseMap.update(review_response_map.id, :is_locked => true, :locked_by => current_user.id)
-      flash.now[:note] = "Artifact (ID: #{review_response_map.id}) has been locked and can only be editted by the current user."
     end
   end
 

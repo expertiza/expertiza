@@ -96,7 +96,11 @@
             end
           %>
         <tr style="background-color:<%=bgcolor2%>">
-          <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
+          <% if assignment.reviewer_is_team? %>
+              <td width="50%" style="vertical-align:top;"><%= Team.where(id: map.team_id).first.name %>
+          <% else %>
+              <td width="50%" style="vertical-align:top;"> <%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
+          <% end %>
             <div style="text-align:right">
               <div id="review_status<%=map.map_id%>">
                 <% if(Response.where(map_id: map.map_id).last.nil?) %>

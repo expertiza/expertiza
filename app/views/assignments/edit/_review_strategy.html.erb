@@ -15,13 +15,6 @@
 - Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
     </td>
   </tr>
-  <tr id="reviewer_is_team">
-    <td>
-      <input name="assignment_form[assignment][reviewer_is_team]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][reviewer_is_team]', 'true', @assignment_form.assignment.reviewer_is_team) %>
-      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Reviews are to be performed by teams.') %>
-    </td>
-  </tr>
 
   <tr id="assignment_review_topic_threshold_row">
     <td>
@@ -109,6 +102,16 @@
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
     </td>
   </tr>
+
+  <!--#E17A0 Allow reviews to be set to be reviewed by a team -->
+  <tr id="reviewer_is_team">
+    <td>
+      <input name="assignment_form[assignment][reviewer_is_team]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][reviewer_is_team]', 'true', @assignment_form.assignment.reviewer_is_team) %>
+      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Reviews are to be performed by teams.') %>
+    </td>
+  </tr>
+
 
   <!--#E17A0 Allow reviews to be deleted. Can be useful when review strategy changes after reviews begin -->
   <%= form_tag controller: 'assignment', action: 'delete_reviews', assignment_id: @assignment_form.assignment.id do %>

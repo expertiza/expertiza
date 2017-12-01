@@ -46,6 +46,11 @@ class ResponseMap < ActiveRecord::Base
     []
   end
 
+  def locked
+    self.reload
+    self.is_locked?
+  end
+
   def delete(_force = nil)
     self.destroy
   end

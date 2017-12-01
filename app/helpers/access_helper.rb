@@ -7,18 +7,24 @@ module AccessHelper
   end
 
   def flash_msg
-    if current_role && current_role.name.try(:downcase).start_with?('a', 'e', 'i', 'o', 'u')
-      flash[:error] = if params[:action] == 'new'
-                        "An #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
-                      else
-                        "An #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
-                      end
+    if(params.has_key?(:map_id))
+      if ResponseMap.find(params[:map_id]).is_locked
+        flash[:error] = "One of your teammates is working on the review. Only one person can work on a review at a time."
+      end
     else
-      flash[:error] = if params[:action] == 'new'
-                        "A #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
-                      else
-                        "A #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
-                      end
+      if current_role && current_role.name.try(:downcase).start_with?('a', 'e', 'i', 'o', 'u')
+        flash[:error] = if params[:action] == 'new'
+                          "An #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
+                        else
+                          "An #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
+                        end
+      else
+        flash[:error] = if params[:action] == 'new'
+                          "A #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
+                        else
+                          "A #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
+                        end
+      end
     end
   end
 

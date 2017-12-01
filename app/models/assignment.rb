@@ -282,6 +282,14 @@ class Assignment < ActiveRecord::Base
     self.destroy
   end
 
+  def delete_reviews
+    responsemap = ResponseMap.where(reviewed_object_id: self.id, type: 'ReviewResponseMap')
+    response = Response.where(map_id: responsemap.ids)
+    response.each { |r| Answer.destroy_all(response_id: r.id)}
+    Response.destroy_all(map_id: responsemap.ids)
+    ResponseMap.destroy_all(id: responsemap.ids)
+  end
+
   # Check to see if assignment is a microtask
   def microtask?
     self.microtask.nil? ? false : self.microtask

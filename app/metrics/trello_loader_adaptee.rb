@@ -20,12 +20,12 @@ class TrelloLoaderAdaptee < MetricLoaderAdapter
 		metrics = TrelloMetricsFetcher.new({:url => url,
 			:team_filter => team_filter_lam})
 
-
 		metrics.fetch_content
+		new_metric = create_metric(team, assignment, metrics.board_id, metric_db_data.count + 1, metrics)
 		# metric_data = metric_db_data + metrics.commits[:data].map { |m|
 		# 	create_metric(team, assignment, metrics.board_id, metric_db_data.count + 1)
 		# }
-		return metric_db_data + metrics.create_metric(team, assignment, metrics.board_id, metric_db_data.count + 1, metrics)
+		return metric_db_data << new_metric
 	end
 
 	def self.create_metric(team, assignment, board_id, version, metrics)
@@ -36,7 +36,6 @@ class TrelloLoaderAdaptee < MetricLoaderAdapter
 			remote_id: :url,
 			uri: "#{board_id}:#{version}"
 		)
-
 		create_points(new_metric, metrics)
 		return new_metric
 	end
@@ -72,5 +71,13 @@ class TrelloLoaderAdaptee < MetricLoaderAdapter
 		user_emails = team.users.map{ |u| u.email }
 
 		lambda { |email, login| trello_names.include?(login) || user_emails.include?(email) }
+	end
+
+	def self.to_map(metric_data)
+    metric_data.map{ |n|
+      n.metric_data_points.map{ |m|
+        [m.metric_data_point_type.name.to_sym, m.value]
+      }.to_h
+    }
 	end
 end

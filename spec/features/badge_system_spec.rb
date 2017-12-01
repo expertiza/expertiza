@@ -43,6 +43,8 @@ describe 'badge system' do
   	create(:response)
   	create(:review_response_map)
   	create(:meta_review_response_map)
+  	create(:questionnaire)
+  	create(:assignment_questionnaire)
   
  	 	@assignment_id = Assignment.where(name: "testAssignment").first.id
   
@@ -65,14 +67,32 @@ describe 'badge system' do
     	stub_current_user(user, user.role.name, user.role)
 			visit "/assignments/#{@assignment_id}/edit"
 			click_link 'Badges'
-			
-			# context 'when switching to \'Badges\' tab' do
-			#   it 'allows instructor to change the thresholds of two badges (by default is 95) and save thresholds to DB' do
-			  
-			#   end
-			# end
 		end
   end
+  
+  context 'when switching to \'Badges\' tab' do
+	  it 'allows instructor to change the thresholds of two badges (by default is 95) and save thresholds to DB' do
+	  	user = User.find_by(name: "instructor6")
+	
+			stub_current_user(user, user.role.name, user.role)
+			visit "/assignments/#{@assignment_id}/edit"
+			click_link 'Badges'
+	  	fill_in "GoodReviewerThresholdInput", with: 96
+	  	fill_in "GoodTeammateThresholdInput", with: 97
+	  	
+	  	click_button 'submit_btn'
+	  	
+	  	@good_reviewer_threshold = AssignmentBadge.where(badge_id: @good_reviewer_badge, assignment_id: @assignment_id).first.threshold
+	  	@good_teammate_threshold = AssignmentBadge.where(badge_id: @good_teammate_badge, assignment_id: @assignment_id).first.threshold
+	  	
+	  	if @good_reviewer_threshold != 96
+	  		fail "Good Reviewer Threshold not set"
+	  	end
+	  	if @good_teammate_threshold != 97
+	  		fail "Good Teammate Threshold not set"
+	  	end
+	  end
+	end
 
   context 'when a student receives a very high average teammate review grade (higher than 95 by default)' do
     it 'assigns the \'Good teammate\' badge to this student on student_task#list page' do
@@ -86,10 +106,6 @@ describe 'badge system' do
     	
     	teammate_grade = AwardedBadge.get_teammate_review_score(participant)
     	threshold = AssignmentBadge.where(badge_id: @good_teammate_badge, assignment_id: @assignment_id).first.threshold
-    	
-    	puts "-------"
-    	puts teammate_grade
-    	puts "-------"
     	
     	if teammate_grade
 		  	if teammate_grade > threshold

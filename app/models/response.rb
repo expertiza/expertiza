@@ -1,6 +1,6 @@
 require 'analytic/response_analytic'
 require 'lingua/en/readability'
-$latestfiletime=1;
+
 
 class Response < ActiveRecord::Base
   include ResponseAnalytic
@@ -260,67 +260,7 @@ class Response < ActiveRecord::Base
     }).deliver_now
   end
 
-  # Get latest commit time of submitted link-to content
-  require 'octokit'
-  require 'uri'
-
-  def check_update (participant)
-    temp_time=[];
-    @team=participant
-    #@submission_records = SubmissionRecord.order(:created_at)
-    @a=@team.id
-    #b=
-    @submission_records = SubmissionRecord.where(team_id: 25443 )
-
-    @submission_records.each do |record|
-      temp_time=record.created_at
-
-      end
-
-    team_hyperlinks = @team.hyperlinks
-
-    github_time = nil
-    team_hyperlinks.each do |link|
-
-    github_time = get_latest_update_time(link)
-    break unless github_time.nil?
-    end
-    a=self.updated_at;
-    return github_time if(github_time <=> self.updated_at)==1
-
-    nil
-  end
-
-  def get_latest_update_time(submitted_link)
-
-    # check validity of link
-    url = URI.extract(submitted_link, 'https')
-    return nil if url.empty?
-
-    # recognize url type
-    parsed_url = URI(url[0])
-
-    # url is a GitHub link
-    return get_latest_commit_time(parsed_url) if parsed_url.host =~ /^github(.*)/
-
-    nil
-  end
-
-  def get_latest_commit_time(github_url)
-    client = Octokit::Client.new(per_page: 1)
-
-    case github_url.host
-      when 'github.ncsu.edu'
-        client.access_token = '8289b47fe8db5c8bceb2f84b2e0c56fc31c5d9e5'
-        client.api_endpoint = 'https://github.ncsu.edu/api/v3'
-    end
-
-    repo = github_url.path[1..-1]
-    res = client.commits(repo)
-    latest_commit = res[0].to_h
-    latest_commit[:commit][:author][:date]
-  end
-
+ 
 
 
     end

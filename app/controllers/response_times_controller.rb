@@ -39,6 +39,21 @@ class ResponseTimesController < ApplicationController
     end
   end
 
+  def mark_end_time
+    @data= params.require(:response_time)
+    @linkArray=Array.new
+    @responsetime_matches = ResponseTime.where(map_id: @data[:map_id], round: @data[:round])
+    @responsetime_matches.each do |responsetime_entry|
+      if responsetime_entry.end_at.nil?
+        @linkArray.push(responsetime_entry.link)
+        responsetime_entry.update_attribute('end_at', @data[:end_at])
+      end
+    end   
+    respond_to do|format|
+      format.json {render json: @linkArray}
+    end
+  end
+
   private
     # Only allow a trusted parameter "white list" through.
     def response_time_params

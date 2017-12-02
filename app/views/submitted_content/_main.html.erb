@@ -1,17 +1,15 @@
-<% if participant.team.hyperlinks.try(:length) %>
-  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
-<% end %>
-
 <% if stage != "Finished" and controller.controller_name == 'submitted_content' and @can_submit %>
   <%= form_tag :action => 'submit_hyperlink', :id => participant.id do %>
-    <b>Submit a hyperlink:</b><BR/>
+    <h4>&#8226; Submit a hyperlink:</h4>
     <input type="text" name="submission" size=40 value="http://">
     <input type="submit" name="upload_link" value="Upload link"/>
   <% end %>
 <% end %>
-
+<br/>
+<% if participant.team.hyperlinks.try(:length) %>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
+<% end %>
 <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
-
 <% if @assignment.require_quiz? %>
   <!-- Setting the t_id for team assignments. The t_id should be not be nil because when the user does not have team, "your work" is unclickable-->
     <%team_for_current_participant = AssignmentTeam.team(participant)%>
@@ -21,9 +19,7 @@
          t_id=team_for_current_participant.id
        end
     %>
-
   <!-- If quiz is required for the assignment, find out if the quiz has already been created -->
-
   <% if (controller.action_name != "view_my_scores" and !(@map and @map.reviewer_id != session[:user].id)) %>
     <br/><b>Quiz:</b><br/>
     <% if !t_id.nil? && questionnaire = QuizQuestionnaire.where(["instructor_id = ?", t_id]).first %>

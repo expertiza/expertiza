@@ -3,7 +3,7 @@
 
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>
-  <% if @assignment.is_microtask? %>
+  <% if @assignment.microtask? %>
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
 

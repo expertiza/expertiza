@@ -22,8 +22,8 @@ describe "Assignment Topic Suggestion Test" do
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: DateTime.now.in_time_zone + 2.days)
   end
 
-  describe "case 1" do
-    it "Instructor set an assignment which allow student suggest topic and register student2065", js: true do
+  describe "topic_suggestion" do
+    it "Instructor set an assignment which allow student suggest topic and register student2065" do
       # login as student2065, Note by Xing Pan: modify spec/factories/factories.rb to generate student11 and call "create student" at beginning
       user = User.find_by(name: 'student2064')
       stub_current_user(user, user.role.name, user.role)
@@ -51,9 +51,7 @@ describe "Assignment Topic Suggestion Test" do
       click_button 'Approve suggestion'
       expect(page).to have_content "The suggestion was successfully approved."
     end
-  end
 
-  describe "case 2" do
     it " student2064 hold suggest topic and suggest a new one and student2065 enroll on waitlist of suggested topic", js: true do
       # login_as "student2064"
       user = User.find_by(name: 'student2064')
@@ -143,14 +141,11 @@ describe "Assignment Topic Suggestion Test" do
       visit '/student_task/list'
       expect(page).to have_content "suggested_topic2_will_switch"
     end
-  end
 
-  ########################################
-  # Case 3:
-  # One team is holding a topic. They sent a suggestion for new topic, and keep themselves in old topic
-  ########################################
-
-  describe "case 3" do
+    ########################################
+    # Case 3:
+    # One team is holding a topic. They sent a suggestion for new topic, and keep themselves in old topic
+    ########################################
     it "student2065 hold suggest topic and suggest a new one, but wish to stay in the old topic", js: true do
       # login_as "student2065"
       user = User.find_by(name: 'student2065')
@@ -241,6 +236,36 @@ describe "Assignment Topic Suggestion Test" do
       find(:xpath, "(//img[@title='Signup'])[2]").click
       visit '/student_task/list'
       expect(page).to have_content " suggested_topic2_without_switch"
+    end
+
+    it "professor could approve anonymous suggestion topic" do
+      # login_as "student2064"
+      user = User.find_by(name: 'student2064')
+      stub_current_user(user, user.role.name, user.role)
+      visit '/student_task/list'
+      expect(page).to have_content "Assignment_suggest_topic"
+
+      # student2064 suggest topic
+      click_link('Assignment_suggest_topic')
+      expect(page).to have_content "Suggest a topic"
+      click_link('Suggest a topic')
+      fill_in 'suggestion_title', with: 'suggested_topic'
+      fill_in 'suggestion_description', with: 'suggested_description'
+      find(:xpath, "//input[@name='suggestion_anonymous']").click
+      click_button 'Submit'
+      expect(page).to have_content "You have submitted an anonymous suggestion."
+
+      user = User.find_by(name: 'instructor6')
+      stub_current_user(user, user.role.name, user.role)
+
+      # instructor approve the suggestion topic
+      visit '/suggestion/list?id=1&type=Assignment'
+      expect(page).to have_content "Suggested topics for Assignment_suggest_topic"
+      expect(page).to have_content "suggested_topic"
+      click_link('View')
+      expect(page).to have_content "suggested_description"
+      click_button 'Approve suggestion'
+      expect(page).to have_content "The suggestion was successfully approved."
     end
   end
 end

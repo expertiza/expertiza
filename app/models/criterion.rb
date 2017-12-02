@@ -171,7 +171,9 @@ class Criterion < ScoredQuestion
   # This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
-    score = !answer.answer.nil? ? answer.answer.to_s : "-"
+
+
+    score = (answer && !answer.answer.nil?) ? answer.answer.to_s : "-"
     score_percent = if score != "-"
                       answer.answer * 1.0 / questionnaire_max
                     else
@@ -198,7 +200,7 @@ class Criterion < ScoredQuestion
     html += score
     html += '</div>'
     html += '</td>'
-    unless answer.comments.nil?
+    if answer && !answer.comments.nil?
       html += '<td style="padding-left:10px">'
       html += answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
       html += '</td>'

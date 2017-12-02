@@ -14,11 +14,6 @@ class CourseTeam < Team
     Course.find(id)
   end
 
-  # Get team node type
-  def get_node_type
-    "TeamNode"
-  end
-
   # since this team is not an assignment team, the assignment_id is nil.
   def assignment_id
     nil
@@ -39,7 +34,7 @@ class CourseTeam < Team
 
   # deprecated: the functionality belongs to course
   def add_participant(course_id, user)
-    if CourseParticipant.where(parent_id: course_id, user_id: user.id).first.nil?
+    if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
       CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
     end
   end
@@ -71,12 +66,12 @@ class CourseTeam < Team
 
   # Add member to the course team
   def add_member(user)
-    if has_user(user)
+    if user?(user)
       raise "The user \"" + user.name + "\" is already a member of the team, \"" + self.name + "\""
     end
 
     t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
-    parent = TeamNode.find_by_node_object_id(self.id)
+    parent = TeamNode.find_by(node_object_id: self.id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
     add_participant(self.parent_id, user)
   end

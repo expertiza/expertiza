@@ -15,13 +15,13 @@ $("#myTable tbody").sortable().disableSelection();
   <!-- class value decides whether the column should be sortable or not  -->
       <th width = "16%" class="sorter-true">Reviewer <span></span></th>
       <th width = "10%" class="sorter-false">Reviews done<span></span></th>
-      <!--Dr.Kidd's course-->
+      <!--Dr.Kidd's course
       <% if @assignment.instructor_id == 2026 %>
         <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
         <th width = "14%" class="sorter-false">Author feedback <span></span></th>
-      <% else %>
+      <% else %>-->
         <th width = "24%" class="sorter-false">Team reviewed <span></span></th>
-      <% end %>
+      <!--<% end %>-->
       <th width = "13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
       <th width = "13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
@@ -47,20 +47,18 @@ $("#myTable tbody").sortable().disableSelection();
               <% end %>
               <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
             </td>
-
-
           <!--Team reviewed / Author feedback-->
           <td bgcolor=<%= @bgcolor %> align = 'left'>
           <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_name_color(ri) %>
+            <% team_name_color = get_team_name_color_in_review_report(ri) %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
-                  <div>
+                  <div id = <%= team_name_color %>>
                 <% else %>
-                  <div style="border-top: solid; border-width: 1px;">
+                  <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
@@ -72,7 +70,7 @@ $("#myTable tbody").sortable().disableSelection();
                 <!--Author feedback-->
                 <!--Dr.Kidd required to add a "autor feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
                 <!--Dr.Kidd's course-->
-                <% if @assignment.instructor_id == 2026 %>
+                <!--<% if @assignment.instructor_id == 2026 %>
                   <% if index == 0 %>
                   <div>
                   <% else %>
@@ -80,12 +78,10 @@ $("#myTable tbody").sortable().disableSelection();
                   <% end %>
                     <%= calcutate_average_author_feedback_score(@assignment.id, @assignment.max_team_size, ri.id, ri.reviewee_id) %>
                   </div>
-                <% end %>
+                <% end %>-->
               <%end%>
           <%end %>
           </td>
-          
-          
           <!--Score awarded / Avg. score-->
           <td bgcolor=<%= @bgcolor %> align = 'left' >
           <% @response_maps.each_with_index do |ri, index| %>
@@ -95,8 +91,6 @@ $("#myTable tbody").sortable().disableSelection();
             <%end %>
           <%end %>
           </td>
-          
-
           <!--Metrics-->
           <td bgcolor=<%= @bgcolor %> align = 'left'>
             <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
@@ -122,15 +116,12 @@ $("#myTable tbody").sortable().disableSelection();
                 </table>
             <% end %>
           </td>
-          
-          
-          
         <%end %>  
         </tr>
       <%end %>
 </table>
 
-  <p> **Text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:blue">blue</i> indicates that the review grade is not assigned or updated.</p>
+  <p> **In "Team reviewed" column, text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:blue">blue</i> indicates that the review grade is not assigned or updated; text in <i style = "color: #986633">brown</i> indicates that the review grade has been assigned.</p>
 </div>
   <!--Partial for text macro form-->
  <%= render :partial => '/user_pastebins/save_text_macros'%>

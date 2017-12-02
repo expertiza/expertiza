@@ -128,20 +128,7 @@ class StudentTask
     end
     @students_teamed
   end
-=begin
-  def sort_timeline_data(timeline_data)
 
-    for i in i<timeline_data.length; i++)
-      for(j=i; i<timeline_data.length; j++)
-        if timeline_data[i][:updated_at] > timeline_data[j][:updated_at]
-          tmp = timeline_data[i]
-          timeline_data[i] = timeline_data[j]
-          timeline_data[j] = tmp
-      end
-    end
-    return timeline_data
-  end
-=end
 
   def self.get_timeline_data(assignment_id, participant_id, team_id)
     @timeline_list = Array.new

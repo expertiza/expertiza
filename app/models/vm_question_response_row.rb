@@ -63,6 +63,9 @@ class VmQuestionResponseRow
   # The weighted_self_review_score is calculated as above
   # The differenece of weighted_average_score and weighted_self_review_score is calculated.
   # The modulus of the value is considered.
+  # We also planned to using Median and Mode instead of Average/Mean but decided against it for the following reasons
+  # Median - the reviews are not too skewed to use median, also median is less inefficient as data sorting has to be done to find median
+  # Mode- this causes trouble if there are multiple modes(values with same frequency) then data would be improper.
   def weighted_diff_for_row
     weighted_average_score =  average_score_for_row / question_max_score
     weighted_self_review_score = self_review_score.score_value / question_max_score

@@ -203,7 +203,7 @@
 <!-- @href_arr is used to store all the hyperlinks for each visualized object -->
 <% @duedates = DueDate.where("parent_id = #{@assignment.id}")
    @visualization_data = @duedates.map do |due|
-     @href_arr.push("");
+     @href_arr.push(""); #empty hyperlink as we do not provide hyperlinks for submissions/reviews
      if due.deadline_type_id.eql? 1
        { :id => due.id, :start=> due.due_at, :className => "submissionDue", :content => "Round "+(due.round.to_s)+"<split>Submission due by "+'<br>'+due.due_at.strftime("%m/%d/%Y at %I:%M %p") }
      else
@@ -232,6 +232,7 @@
                           "current_folder[name]" => File.dirname(file)
          end
          @href_arr.push(ret.split('"')[1])
+         #only file name instead of entire relative path need to be displayed on timeline. Hence we push the same in content, appending created time to it
          { :id => submission.id, :start=> submission.created_at, :className=> "fileUpload", :content => (submission.content).split('/')[-1]+'<split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M %p") }
        else
          @href_arr.push(submission.content)
@@ -310,8 +311,6 @@
 
     // Configuration for the Timeline
     var options = {
-        //min: new Date('<%=raw @assignment.created_at.strftime("%Y-%m-%d") %>'),                // lower limit of visible range
-        //max: new Date('<%=raw @duedates.maximum(:due_at).strftime("%Y-%m-%d") %>'),                // upper limit of visible range
         zoomMin: 1000 * 60 * 60 * 24,             // one day in milliseconds
         zoomMax: 1000 * 60 * 60 * 24 * 31 * 12     // about three months in milliseconds
     };

@@ -112,8 +112,9 @@
               </th>
               <th class="sorter-false">
                 <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1 <%= @self_reviews%> </span>
+              <!-- Here, the metric of self review has been checked. The line checks if the self-review has the comments that have word count greater than 10. This shows the quality of the review done for the work-->
               </th>
-
+              <!--The self_review scores have been displayed beside the peer review scores in the defined form-->
                 <% if vm.self_reviews %>
                       <th>
                         Self Reviews
@@ -163,6 +164,7 @@
                       <td class = "<%= row.self_review_score.color_code %>" align="center">
                         <%= row.self_review_score.score_value%>
                       </td>
+                      <!--The self review score has been displayed assigning a colour code to it. The valus has been displayed in the expected position.-->
                    <% end %>
 
                 </tr>
@@ -198,10 +200,12 @@
                             <td>
                               Self Review
                             </td>
+                            <!--Here, the self review scores have been given for the assignment.-->
                             <td align="center" class = "<%=row.self_review_score.color_code%>">
                              <%= row.self_review_score.score_value %>
                             </td>
                             <td >
+                              <!--The comments for all the questions have been taken care-->
                              <%= row.self_review_score.comment %>
                             </td>                       
                           </tr>
@@ -247,8 +251,8 @@
           <% table_count += 1%>
           <span> <%= vm.display_team_members %></span> <br>
           <%if vm.self_reviews%>
-
-          <h5>Self review score: <span class = "c5" id="computed_self_review_score" data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%" ><%= vm.computed_self_review_score.is_a?(Float)? sprintf("%.2f",vm.computed_self_review_score): vm.computed_self_review_score %></span></h5>
+          <!-- Here, the information regarding the composite site is dispalyed when the mouse is hovered on the value. It describes the range amd also the interpretation of the score.-->
+          <h5>Self review score: <span class = "c5" id="computed_self_review_score" data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%. For our metrics the scores can be ranged as following : Improper Assessment (0 - 30), Moderate Assessment (30 - 60), Can do better (60 - 80), Perfect Assessment (80 - 100) " ><%= vm.computed_self_review_score.is_a?(Float)? sprintf("%.2f",vm.computed_self_review_score): vm.computed_self_review_score %></span></h5>
           <%end%>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>

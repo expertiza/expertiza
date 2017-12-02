@@ -129,11 +129,8 @@ class StudentTask
     @students_teamed
   end
 
-  #static method for the building timeline data
-  def self.get_timeline_data(assignment_id, participant_id, team_id)
-    @timeline_list = Array.new
-
-    #Assignment due dates data
+  #Assignment due dates data
+  def self.get_duedate_data(assignment_id, timeline_list)
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
       tmp = Hash.new
@@ -144,8 +141,10 @@ class StudentTask
         @timeline_list << tmp
       end
     end
+  end
 
-    #submitted links and file data
+  #submitted links and file data
+  def self.get_submission_data(assignment_id, team_id, timeline_list)
     @submissions = SubmissionRecord.where(team_id: team_id , assignment_id: assignment_id)
     @submissions.each do |sr|
       tmp = Hash.new
@@ -156,8 +155,10 @@ class StudentTask
       end
       @timeline_list << tmp
     end
+  end
 
-    #assignment review data
+  #assignment review data
+  def self.get_review_data(participant_id, timeline_list)
     @response_map = ResponseMap.where(reviewer_id: participant_id)
     @response_map.each do |rm|
       tmp = Hash.new
@@ -169,9 +170,18 @@ class StudentTask
         @timeline_list << tmp
       end
     end
-    @tmp_sorted_list=@timeline_list.sort_by{ |f| Time.parse f[:updated_at]}
-
-    return @tmp_sorted_list
   end
 
+  #static method for the building timeline data
+  def self.get_timeline_data(assignment_id, participant_id, team_id)
+    @timeline_list = Array.new
+    #Assignment duedate data
+    get_duedate_data(assignment_id, @timeline_list)
+    #Studnet's link and file submissions
+    get_submission_data(assignment_id, team_id, @timeline_list)
+    #Student's assignment review performed
+    get_review_data(participant_id, @timeline_list)
+    #List is sorted and returned
+    return @timeline_list.sort_by{ |f| Time.parse f[:updated_at]}
+  end
 end

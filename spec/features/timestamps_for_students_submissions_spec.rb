@@ -36,7 +36,7 @@ describe 'timestamps for student\'s submissions' do
     create(:question)
     #assignment_setup
     login_as("student2065")
-     visit '/student_task/list'
+    visit '/student_task/list'
 
   end
 
@@ -69,7 +69,6 @@ describe 'timestamps for student\'s submissions' do
       expect(page).to have_content("Deadline")
       expect(page).to have_content("Submit Hyperlink")
   end
-
 
   def submit_file
     visit '/student_task/list'
@@ -107,13 +106,13 @@ end
     context 'when current participant does not submit anything yet' do
       it 'displays due dates of current assignment in student_task#list page' do
          click_link "TestAssignment"
-          expect(page).to have_content("Deadline")
+         expect(page).to have_content("Deadline")
        end
     end
 
     context 'after current participant has submitted a hyperlink' do
       it 'displays hyperlinks with its timestamps' do
-              # it also displays due dates
+      # it also displays due dates
       submit_hyperlink
       end
     end

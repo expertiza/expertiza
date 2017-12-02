@@ -523,3 +523,8 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+ master
+
+BUNDLED WITH
+   1.11.2
+ master

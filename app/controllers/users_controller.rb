@@ -41,18 +41,30 @@ class UsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
+  #
   # for anonymized view for demo purposes
-  def set_anonymous_mode
-    anonymous_mode = $redis.get('anonymous_mode')
-    anonymous_mode = case anonymous_mode
+  # three scenarios:
+  # 1) when current user is anonymized view starter. change to anonymized view. 
+  #    (no session[:super_user], and current session_id == anonymized view starter session_id)
+  # 2) when current user is impersonated by anonymized view starter. change to anonymized view. 
+  #    (have session[:super_user], and current session_id != anonymized view starter session_id)
+  # 3) Other users. do not change to anonymized view. 
+  #    (no session[:super_user], and current session_id != anonymized view starter session_id)
+  #
+  def set_anonymized_view
+    anonymized_view = $redis.get('anonymized_view') || 'false'
+    anonymized_view_starter = $redis.get('anonymized_view_starter') || ''
+    anonymized_view = case anonymized_view
                      when 'true'
+                      anonymized_view_starter = ''
                       'false'
                      when 'false'
+                       anonymized_view_starter += session[:user][:name]
                        'true'
-                     else
-                       'false'
                      end
-    $redis.set('anonymous_mode', anonymous_mode)
+    $redis.set('anonymized_view', anonymized_view)
+    $redis.set('anonymized_view_starter', anonymized_view_starter)
+    $redis.set('anonymized_view_starter_session_id', session.id)
     redirect_to :back
   end
 

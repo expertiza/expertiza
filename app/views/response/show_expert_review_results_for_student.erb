@@ -10,8 +10,11 @@ th, td {
     <% instructor_answer = [] %>
     <% css_class =[] %>
     <% @calibration_response.each do |cal|%>
-        <% ins = Answer.where(["question_id = ? and response_id = ?", question.id, cal.id]).first ||= 0 %>
-           <% instructor_answer.push ins%>
+        <%@ans = Answer.where(["question_id = ? and response_id = ?", question.id, cal.id]) rescue nil %>
+        <% ins = @ans!=nil ? @ans.first : nil   %>
+           <% if ins != nil 
+           	instructor_answer.push ins%>
+           	
         <% case ins.answer %>
         <% when 5 %>
             <% cssclass = 'c5' %>
@@ -25,8 +28,9 @@ th, td {
             <% cssclass = 'c1' %>
         <% end %>
         <% css_class.push cssclass %>
+        <%end%>
     <%end%>
-    <% stu_answer = Answer.where(["question_id = ? and response_id = ?", question.id, @review_response.id]).first ||= 0 %>
+    <% stu_answer = Answer.where(["question_id = ? and response_id = ?", question.id, @review_response.id]).first %>
 
 	<table border = "1">
 		<tr>

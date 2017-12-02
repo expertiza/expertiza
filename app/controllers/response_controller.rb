@@ -99,9 +99,9 @@ class ResponseController < ApplicationController
     @response_count = Response.where(map_id: @map.id).count
     @assignment_count = @assignment.rounds_of_reviews
 
-    if @response_count < @assignment_count
-      @current_round = @response_count + 1
-    end
+    # if @response_count < @assignment_count
+    #   @current_round = @response_count + 1
+    # end
 
     if @assignment
       @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
@@ -193,20 +193,19 @@ class ResponseController < ApplicationController
 
     @calibration_response_map = []
     @calibration_response =[]
-
+    @round_no=params[:round]
     @expertcalibrations = params[:calibration_response_map_id].split(',')
     @expertcalibrations.each do |cal|
       @calibration_response_map.push ReviewResponseMap.find(cal)
     end
     @calibration_response_map.each do |cal|
-      @calibration_response.push cal.response[0]
+      @calibration_response.push Response.where(map_id: cal.id, round: @round_no).first
     end
-
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
-    @review_response = review_response_map.response[0]
+    @review_response = Response.where(map_id: review_response_map.id , round: @round_no).first
     @assignment = Assignment.find(@calibration_response_map.first.reviewed_object_id)
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
+    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and used_in_round = ? and questionnaire_id IN (?)", @assignment.id, @round_no, @review_questionnaire_ids]).first
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 

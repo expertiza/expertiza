@@ -53,6 +53,10 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
 
+    @assignment = Assignment.where(id: params[:id]).first
+    @assignment_count = @assignment.rounds_of_reviews
+    @due_dates = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: 2).order("round")
+
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @reviewvarycheck = false

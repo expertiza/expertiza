@@ -60,7 +60,7 @@ class AssignmentsController < ApplicationController
           render 'new'
         end
     else
-      redirect_to edit_assignment_path @assignment_form.assignment.id
+      render 'new'
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     end
   end

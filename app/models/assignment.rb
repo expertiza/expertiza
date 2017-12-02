@@ -56,6 +56,7 @@ class Assignment < ActiveRecord::Base
 
   def has_expert_review?
     self.has_expert_review
+  end
     
   def calibrated?
     self.is_calibrated

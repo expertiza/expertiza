@@ -335,7 +335,7 @@ describe "assignment function" do
       check 'assignment_form_assignment_has_expert_review'
       click_button 'Save'
 
-      expect(page).to have_selector('#Expert review')
+      expect(page).to have_selector('#ExpertReview')
     end
   end
 

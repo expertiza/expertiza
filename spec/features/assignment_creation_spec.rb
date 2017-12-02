@@ -311,19 +311,6 @@ describe "assignment function" do
                                 max_reviews_per_submission: 10
                             )
     end
-    it "sets no of reviews done by each student for review tab" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-
-      find_link('ReviewStrategy').click
-      expect(page).to
-      select "Instructor-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
-      check 'num_reviews_student'
-      fill_in 'num_reviews_per_student', with: 5
-    end
   end
 
   # instructor can set in which deadline can student reviewers take the quizzes

@@ -1,4 +1,4 @@
-module Import_support
+module ImportSupport
   def check_info_and_create(row, _row_header = nil, session)
     raise ArgumentError, "No user id has been specified." if row.empty?
     user = User.find_by(name:row[0])

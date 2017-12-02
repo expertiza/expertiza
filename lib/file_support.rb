@@ -1,4 +1,4 @@
-module File_support
+module FileSupport
   def files(directory)
     files_list = Dir[directory + "/*"]
     files = []

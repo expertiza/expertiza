@@ -1,6 +1,6 @@
-describe 'new user request' do
+require 'rspec'
 
-  ###
+describe 'new account request' do
 
   before(:each) do
 
@@ -14,32 +14,17 @@ describe 'new user request' do
 
     create(:admin, name: 'super_administrator2')
 
-    create(:institution, name: 'North Carolina State University')
+    create(:institution)
+
+    create(:studentx)
+
+    create(:requested_user)
+
   end
 
-  # Please do not share this file with other teams.
+  context 'account request' do
 
-  # Please follow the TDD process as much as you can.
-
-  # Use factories to create necessary DB records.
-
-  # Please avoid duplicated code as much as you can by moving the code to before(:each) block or separated methods.
-
-  # RSpec feature tests examples: spec/features/airbrake_expection_errors_feature_tests_spec.rb
-
-  # If your tests need to switch to different users frequently,
-
-  # please use stub_current_user(user, user.role.name, user.role) each time to stub login behavior.
-
-  ###
-
-
-
-  context 'request account feature' do
-
-    it 'works correctly'do
-
-      # click 'REQUEST ACCOUNT' button on root path, redirect to users#request_new page
+    it 'request with new institution successfully' do
 
       visit '/'
 
@@ -49,56 +34,103 @@ describe 'new user request' do
 
       select 'Instructor', from: 'user_role_id'
 
-      fill_in 'user_name', with: 'requester'
+      fill_in 'user_name', with: 'yzhan'
 
-      fill_in 'user_fullname', with: 'requester,requester'
+      fill_in 'user_fullname', with: 'yzhang'
 
+      fill_in 'user_email', with: 'yzhang@hnu.edu'
 
+      select 'Not List', from: 'user_institution_id'
 
-      # a new user is able to add a new institution
+      fill_in 'institution_name', with: 'HNU'
 
-      select('Not List', from: 'user_institution_id')
-
-      expect(page).to have_content('Institution')
-
-
-
-      expect(page).to have_field("institution_name")
-
-      fill_in 'institution_name', with: 'new college'
-
-      # a new user is able to write a brief introduction
-
-      expect(page).to have_field("requested_users_intro")
-
-      fill_in 'requested_users_intro', with: 'I am a tester'
-
-      # if the email address of a new user is not valid, the flash message should display the corresponding messages
-
-      fill_in 'user_email', with: 'test.com'
+      fill_in 'requested_user_intro', with: 'university from China'
 
       click_on 'Request'
 
-      expect(page).to have_content('Email is invalid')
+      expect(page).to have_content('successfully requested')
 
-      # all data can be saved to DB successfully
+    end
 
-      select 'Instructor', from: 'user_role_id'
+    it 'request with existed institution' do
 
-      select 'North Carolina State University', from: 'user[institution_id]'
+      visit '/'
 
-      fill_in 'user_name', with: 'requester'
+      click_link 'REQUEST ACCOUNT'
 
-      fill_in 'user_fullname', with: 'requester,requester'
+      expect(page).to have_content('Request new user')
 
-      fill_in 'user_email', with: 'test@test.com'
+      select 'Teaching Assistant', from: 'user_role_id'
 
-      expect{click_on 'Request'}.to change {RequestedUser.count}.by(1)
+      fill_in 'user_name', with: 'yzhan'
+
+      fill_in 'user_fullname', with: 'yzhang'
+
+      fill_in 'user_email', with: 'yzhang@ncsu.edu'
+
+      select 'North Carolina State University', from: 'user_institution_id'
+
+      fill_in 'requested_user_intro', with: 'new ta from NCSU'
+
+      click_on 'Request'
+
+      expect(page).to have_content('successfully requested')
+
+    end
+
+    it 'fail to request with existed user name' do
+
+      visit '/'
+
+      click_link 'REQUEST ACCOUNT'
+
+      expect(page).to have_content('Request new user')
+
+      select 'Teaching Assistant', from: 'user_role_id'
+
+      fill_in 'user_name', with: 'studentx'
+
+      fill_in 'user_fullname', with: 'yzhang'
+
+      fill_in 'user_email', with: 'yzhang@ncsu.edu'
+
+      select 'North Carolina State University', from: 'user_institution_id'
+
+      fill_in 'requested_user_intro', with: 'new ta from NCSU'
+
+      click_on 'Request'
+
+      expect(page).to have_content('The account you are requesting has already existed in Expertiza.')
+
+    end
+
+    it 'fail to request with existed requested_user email' do
+
+      visit '/'
+
+      click_link 'REQUEST ACCOUNT'
+
+      expect(page).to have_content('Request new user')
+
+      select 'Teaching Assistant', from: 'user_role_id'
+
+      fill_in 'user_name', with: 'whatever'
+
+      fill_in 'user_fullname', with: 'whatever'
+
+      fill_in 'user_email', with: 'rq@ncsu.edu'
+
+      select 'North Carolina State University', from: 'user_institution_id'
+
+      fill_in 'requested_user_intro', with: 'request an account for expertiza'
+
+      click_on 'Request'
+
+      expect(page).to have_content('Email has already been taken')
 
     end
 
   end
-
 
 
   context 'on users#list_pending_requested page' do

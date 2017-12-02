@@ -336,14 +336,17 @@ class AssignmentForm
 
   def set_badge_threshold_for_assignment(assignment_id, good_reviewer_threshold, good_teammate_threshold)
 
-    good_reviewer_threshold = good_reviewer_threshold.to_i
-    good_teammate_threshold = good_teammate_threshold.to_i
+
 
     if good_reviewer_threshold.nil?
       good_reviewer_threshold=95
+    else
+      good_reviewer_threshold = good_reviewer_threshold.to_i
     end
     if good_teammate_threshold.nil?
       good_teammate_threshold=95
+    else
+      good_teammate_threshold = good_teammate_threshold.to_i
     end
 
     good_reviewer_badge= AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 1)

@@ -219,6 +219,7 @@ class AssignmentForm
   # Save the assignment
   def save
     @assignment.save
+    set_badge_threshold_for_assignment(@assignment.id, nil, nil)
   end
 
   # create a node for the assignment

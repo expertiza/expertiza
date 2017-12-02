@@ -52,14 +52,16 @@ class AssignmentsController < ApplicationController
           quesparams[:due_date] = dueArray
           @assignment_form.update(quesparams,current_user)
           aid = Assignment.find_by_name(@assignment_form.assignment.name).id
-              redirect_to edit_assignment_path aid
-          return
+          redirect_to edit_assignment_path aid
           undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+          return
         else
           flash.now[:error] = "Failed to create assignment"
           render 'new'
         end
-
+    else
+      redirect_to edit_assignment_path @assignment_form.assignment.id
+      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     end
   end
 

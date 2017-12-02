@@ -2,7 +2,6 @@
 include InstructorInterfaceHelperSpec
 describe 'timestamps for student\'s submissions' do
   ###
-  # Please do not share this file with other teams.
   # Please follow the TDD process as much as you can.
   # Use factories to create necessary DB records.
   # Please avoid duplicated code as much as you can by moving the code to before(:each) block or separated methods.
@@ -41,6 +40,69 @@ describe 'timestamps for student\'s submissions' do
 
   end
 
+  def signup_topic
+    user = User.find_by(name: "student2064")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Your work"
+  end
+
+  def submit_to_topic
+    signup_topic
+    fill_in 'submission', with: "https://www.ncsu.edu"
+    click_on 'Upload link'
+    expect(page).to have_content "https://www.ncsu.edu"
+  end
+
+  def submit_hyperlink
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    expect(page).to have_content("Your work")
+      click_link "Your work"
+      fill_in "submission", with: "http://www.google.com"
+      click_button "Upload link"
+      all('a', :text => 'Assignments')[1].click
+      click_link "TestAssignment"
+      expect(page).to have_content("Deadline")
+      expect(page).to have_content("Submit Hyperlink")
+  end
+
+
+  def submit_file
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    expect(page).to have_content("Your work")
+    click_link "Your work"
+    file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
+    attach_file('uploaded_file', file_path)
+    click_on 'Upload file'
+    all('a', :text => 'Assignments')[1].click
+    click_link "TestAssignment"
+    expect(page).to have_content("Deadline")
+    expect(page).to have_content("Submit File")
+  end
+
+  def submit_review
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Others' work"
+    find(:css, "#i_dont_care").set(true)
+    click_button "Request a new submission to review"
+    expect(page).to have_content "Begin"
+    click_link "Begin"
+    fill_in "responses[0][comment]", with: "HelloWorld"
+    select 5, from: "responses[0][score]"
+    click_button "Submit Review"
+    expect(page).to have_content "Your response was successfully saved."
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    expect(page).to have_content "Round 1 Review"
+end
+
+
   context 'when current assignment is in submission stage' do
     context 'when current participant does not submit anything yet' do
       it 'displays due dates of current assignment in student_task#list page' do
@@ -52,52 +114,19 @@ describe 'timestamps for student\'s submissions' do
     context 'after current participant has submitted a hyperlink' do
       it 'displays hyperlinks with its timestamps' do
               # it also displays due dates
-      click_link "TestAssignment"
-      expect(page).to have_content("Your work")
-        click_link "Your work"
-        fill_in "submission", with: "http://www.google.com"
-        click_button "Upload link"
-        all('a', :text => 'Assignments')[1].click
-        click_link "TestAssignment"
-        expect(page).to have_content("Deadline")
-        expect(page).to have_content("Submit Hyperlink")
+      submit_hyperlink
       end
     end
 
     context 'after current participant has uploaded a file' do
       it 'displays file names with its timestamps' do
       # it also displays due dates
-      click_link "TestAssignment"
-      expect(page).to have_content("Your work")
-      click_link "Your work"
-      file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
-      attach_file('uploaded_file', file_path)
-      click_on 'Upload file'
-      all('a', :text => 'Assignments')[1].click
-      click_link "TestAssignment"
-      expect(page).to have_content("Deadline")
-      expect(page).to have_content("Submit File")
+      submit_file
     end
   end
 end
 
 
-def signup_topic
-  user = User.find_by(name: "student2064")
-  stub_current_user(user, user.role.name, user.role)
-  visit '/student_task/list'
-  visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
-  visit '/student_task/list'
-  click_link "TestAssignment"
-  click_link "Your work"
-end
-
-def submit_to_topic
-  signup_topic
-  fill_in 'submission', with: "https://www.ncsu.edu"
-  click_on 'Upload link'
-  expect(page).to have_content "https://www.ncsu.edu"
-end
 
   context 'when current assignment (with single review round) is in review stage' do
     context 'after current participant reviews other\'s work' do
@@ -105,21 +134,7 @@ end
       # it also displays due dates
       # it also displays submitted files or hyperlinks
       submit_to_topic
-      visit '/student_task/list'
-      click_link "TestAssignment"
-      click_link "Others' work"
-      find(:css, "#i_dont_care").set(true)
-      click_button "Request a new submission to review"
-      expect(page).to have_content "Begin"
-      click_link "Begin"
-      fill_in "responses[0][comment]", with: "HelloWorld"
-      select 5, from: "responses[0][score]"
-      click_button "Submit Review"
-      expect(page).to have_content "Your response was successfully saved."
-      visit '/student_task/list'
-      click_link "TestAssignment"
-      expect(page).to have_content "Round 1 Review"
-
+      submit_review
       end
     end
 
@@ -151,7 +166,7 @@ end
       click_link "Alternate View"
       expect(page).to have_content "Your response was successfully saved."
       end
-  end
+    end
   end
 
   context 'when current assignment (with multiple review round) is in review stage' do
@@ -161,33 +176,9 @@ end
       # it also displays submitted files or hyperlinks
       submit_to_topic
 
-      visit '/student_task/list'
-      click_link "TestAssignment"
-      expect(page).to have_content("Your work")
-      click_link "Your work"
-      file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
-      attach_file('uploaded_file', file_path)
-      click_on 'Upload file'
-      all('a', :text => 'Assignments')[1].click
-      click_link "TestAssignment"
-      expect(page).to have_content("Deadline")
-      expect(page).to have_content("Submit File")
+      submit_file
 
-      visit '/student_task/list'
-      click_link "TestAssignment"
-      click_link "Others' work"
-      find(:css, "#i_dont_care").set(true)
-      click_button "Request a new submission to review"
-      expect(page).to have_content "Begin"
-      click_link "Begin"
-      fill_in "responses[0][comment]", with: "HelloWorld"
-      select 5, from: "responses[0][score]"
-      click_button "Submit Review"
-      expect(page).to have_content "Your response was successfully saved."
-      visit '/student_task/list'
-      click_link "TestAssignment"
-      expect(page).to have_content "Round 1 Review"
-
+      submit_review
       end
     end
 

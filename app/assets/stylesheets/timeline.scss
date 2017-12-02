@@ -10,15 +10,6 @@
   height: 200px;
 }
 
-// .timestamp {
-//   margin-bottom: 20px;
-//   padding: 0px 40px;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   font-weight: 100;
-// }
-
 .timestamp
 {
   margin-bottom: 20px;
@@ -77,47 +68,11 @@
   .timestamp {
     width: 100px;
   }
-
-  .status:before {
-    left: -8%;
-    top: 30%;
-    transition: all 200ms ease-in;
-  }
 }
 .scrollable{
   height: auto;
   overflow-y: auto;
 }
-/*
-html, body {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  font-family: "Titillium Web", sans serif;
-  color: #758D96;
-}
-*/
-button {
-  position: absolute;
-  width: 100px;
-  min-width: 100px;
-  padding: 20px;
-  margin: 20px;
-  font-family: "Titillium Web", sans serif;
-  border: none;
-  color: white;
-  font-size: 16px;
-  text-align: center;
-}
-
-/*#toggleButton {
-  position: absolute;
-  left: 50px;
-  top: 20px;
-  background-color: #75C7F6;
-}
-*/
 
 span {
   display:block;

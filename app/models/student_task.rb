@@ -129,9 +129,11 @@ class StudentTask
     @students_teamed
   end
 
-
+  #static method for the building timeline data
   def self.get_timeline_data(assignment_id, participant_id, team_id)
     @timeline_list = Array.new
+
+    #Assignment due dates data
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
       tmp = Hash.new
@@ -143,6 +145,7 @@ class StudentTask
       end
     end
 
+    #submitted links and file data
     @submissions = SubmissionRecord.where(team_id: team_id , assignment_id: assignment_id)
     @submissions.each do |sr|
       tmp = Hash.new
@@ -154,6 +157,7 @@ class StudentTask
       @timeline_list << tmp
     end
 
+    #assignment review data
     @response_map = ResponseMap.where(reviewer_id: participant_id)
     @response_map.each do |rm|
       tmp = Hash.new
@@ -167,7 +171,6 @@ class StudentTask
     end
     @tmp_sorted_list=@timeline_list.sort_by{ |f| Time.parse f[:updated_at]}
 
-  #  @tmp_sorted_list = sort_timeline_data(@timeline_list)
     return @tmp_sorted_list
   end
 

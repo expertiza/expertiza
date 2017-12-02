@@ -53,7 +53,7 @@
                     <% current_round = @assignment.number_of_current_round(topic_id) %>
 
                     <td>
-                       <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                     <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
@@ -62,12 +62,8 @@
                       <% if (last_response_round == current_round)%>
                         <td>
                           <% if (!@latest_response.is_submitted) %>
-                            <% if !(map.is_locked && map.locked_by != current_user.id) %>
-                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id, :map_id => map.id} %>
-                            <%# else %>
-                              <%#= link_to "Unlock", {:controller => 'student_review', :action => 'list', :id => params[:id], :response_id => @latest_response.id} %>
-                            <%end%>
-                          <%end%>
+                            <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id, :map_id => map.id} %>
+                           <%end%>
                         </td>
                       <% else %>
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>

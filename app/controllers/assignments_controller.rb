@@ -69,15 +69,14 @@ class AssignmentsController < ApplicationController
       assignment_form_key_nonexist_case_handler
       return
     end
-
-    # Delete due date for Calibration if unchecked
-    unless @assignment_form.assignment.is_calibrated?
-      DueDate.where(parent_id: params[:id], deadline_type_id: 12).destroy_all
-    end
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     feedback_assignment_form_attributes_update
     redirect_to edit_assignment_path @assignment_form.assignment.id
+    # Delete due date for Calibration if unchecked
+    unless @assignment_form.assignment.is_calibrated?
+      DueDate.where(parent_id: params[:id], deadline_type_id: 12).destroy_all
+    end
   end
 
   def show

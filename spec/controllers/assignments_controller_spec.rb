@@ -106,6 +106,7 @@ describe AssignmentsController do
     before(:each) do
       allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
       @params = {
+        button: '',
         assignment_form: {
           assignment: {
             instructor_id: 2,
@@ -145,7 +146,8 @@ describe AssignmentsController do
     context 'when assignment_form is not saved successfully' do
       it 'renders assignment#new page' do
         allow(assignment_form).to receive(:save).and_return(false)
-        post :create, @params
+        params = {button: 1}
+        post :create, params
         expect(response).to render_template(:new)
       end
     end

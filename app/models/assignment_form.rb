@@ -348,8 +348,6 @@ class AssignmentForm
     good_reviewer_badge= AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 1)
     good_teammate_badge=AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 2)
 
-    puts "\n\n good_reviewer_badge.badge_id = #{good_reviewer_badge.badge_id}"
-
     if good_reviewer_badge.nil?
       good_reviewer_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 1, threshold: good_reviewer_threshold)
     else
@@ -364,11 +362,15 @@ class AssignmentForm
     Participant.where(:parent_id => assignment_id).each do |participant|
       awardedbadge = AwardedBadge.find_by(participant_id:participant.id, badge_id:good_reviewer_badge.badge_id)
       reviewgrade = ReviewGrade.find_by_participant_id(participant.id).grade_for_reviewer unless ReviewGrade.find_by_participant_id(participant.id).nil?
-      if !awardedbadge.nil? and (reviewgrade < good_reviewer_threshold)
-        AwardedBadge.find_by(badge_id:good_reviewer_badge.badge_id, participant_id:participant.id).delete
-      elsif (reviewgrade and reviewgrade >= good_reviewer_threshold)
-        AwardedBadge.create(participant_id: participant.id, badge_id: good_reviewer_badge.badge_id)
+
+      if (awardedbadge == nil && reviewgrade && reviewgrade >= good_reviewer_threshold)
+        AwardedBadge.create(badge_id: 1, participant_id: participant.id)
       end
+
+      if (awardedbadge != nil && reviewgrade < good_reviewer_threshold)
+        AwardedBadge.find_by(badge_id: 1, participant_id: participant.id).delete
+      end
+
     end
 
     if good_teammate_badge.nil?
@@ -389,6 +391,6 @@ class AssignmentForm
       teammate_review.update_good_teammate_badge unless teammate_review.nil?
 
     end
-
   end
+
 end

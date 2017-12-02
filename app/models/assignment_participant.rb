@@ -1,5 +1,6 @@
 require 'uri'
 require 'yaml'
+require 'file_support'
 require 'import_support'
 # Code Review: Notice that Participant overloads two different concepts:
 #              contribution and participant (see fields of the participant table).
@@ -23,8 +24,8 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
-  include File_support
-  extend Import_support
+  include FileSupport
+  extend ImportSupport
 
   def dir_path
     assignment.try :directory_path

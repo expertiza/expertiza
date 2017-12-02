@@ -84,7 +84,7 @@ describe "Staggered deadline test" do
     topic_due.save
   end
 
-    it "student2064 in calibration stage" do
+  it "student2064 in calibration stage" do
     # impersonate each participant submit their topics
     # change deadline to make student2064 in calibration stage
     change_due(1, 12, 1, DateTime.now.in_time_zone - 10)

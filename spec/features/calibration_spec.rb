@@ -282,7 +282,6 @@ describe 'calibration' do
   def create_fill_questionnaire
     # login as instructor
     login_as @instructor.name
-
     # go to the questionnaire creation page
     visit "/questionnaires/new?model=ReviewQuestionnaire&private=0"
 
@@ -439,8 +438,7 @@ describe 'calibration' do
       # Create an assignment participant linked to the assignment
       @participant_submitter = create :participant, assignment: @assignment, user: @submitter
       @participant_reviewer = create :participant, assignment: @assignment, user: @nonreviewer
-      @participant_reviewer_2 = create :participant, assignment: @assignment, user: @student
-
+      @participant_reviewer2 = create :participant, assignment: @assignment, user: @student
       # Create a mapping between the assignment team and the
       # participant object's user.
       create :team_user, team: @team, user: @nonreviewer

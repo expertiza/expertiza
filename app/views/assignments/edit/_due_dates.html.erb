@@ -462,7 +462,7 @@ function addDaysOrMonth(mul, type) {
     <br>
 <% end %>
 
-<% if @assignment_form.assignment.has_topics? %>
+<% if @assignment_form.assignment.topics? %>
     <input name="signupAllowed" type="hidden" value="false" />
     <%= check_box_tag('signupAllowed', 'true', @signup_allowed,:onclick=>"removeOrAddSignup()" ) %>
     <%= label_tag('signupAllowed', 'Use signup deadline') %><br/>

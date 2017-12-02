@@ -16,21 +16,19 @@ class StudentReviewController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @review_phase = @assignment.get_current_stage(@topic_id)
     # Based on first submission due date, the view is rendered. When current time exceeds this date, peer reviews start displaying
-    @first_submission_due_date= AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: '1').first.due_at
+    @first_submission_due_date = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: '1').first.due_at
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @peer_reviews=Array.new
-    
-    #If assignment is calibrated, all reviews performed before calibration due date are assigned to calibration reviews
+    @peer_reviews = [] 
+    # If assignment is calibrated, all reviews performed before calibration due date are assigned to calibration reviews
     if @assignment.is_calibrated?
-      @calibration_reviews=Array.new
+      @calibration_reviews = []
       calibration_due_date = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: '12').last.due_at
       if Time.now <= calibration_due_date
-          @calibration_reviews=ReviewResponseMap.where(reviewer_id: @participant.id)
+        @calibration_reviews = ReviewResponseMap.where(reviewer_id: @participant.id)
       else
-
-        #When current time exceeds calibration due date, the reviews are segregated based on the time of creation
-        @review_mappings=ReviewResponseMap.where(reviewer_id: @participant.id)
+        # When current time exceeds calibration due date, the reviews are segregated based on the time of creation
+        @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
         @review_mappings.each do |review_map|
           if review_map.created_at <= calibration_due_date
             @calibration_reviews << review_map
@@ -41,7 +39,7 @@ class StudentReviewController < ApplicationController
       end
       @calibration_reviews = @calibration_reviews.sort_by {|mapping| mapping.id % 5 }
     else
-      #If assignment is not calibrated, all reviews are considered as peer erviews
+      # If assignment is not calibrated, all reviews are considered as peer erviews
       @peer_reviews = ReviewResponseMap.where(reviewer_id: @participant.id)
     end
     # if it is an calibrated assignment, change the response_map order in a certain way

@@ -19,7 +19,7 @@ class StudentReviewController < ApplicationController
     @first_submission_due_date = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: '1').first.due_at
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @peer_reviews = [] 
+    @peer_reviews = []
     # If assignment is calibrated, all reviews performed before calibration due date are assigned to calibration reviews
     if @assignment.is_calibrated?
       @calibration_reviews = []
@@ -34,7 +34,7 @@ class StudentReviewController < ApplicationController
             @calibration_reviews << review_map
           else
             @peer_reviews << review_map
-          end  
+          end
         end
       end
       @calibration_reviews = @calibration_reviews.sort_by {|mapping| mapping.id % 5 }

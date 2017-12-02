@@ -26,6 +26,7 @@ describe "Staggered deadline test" do
     create(:deadline_right, name: 'OK')
 
     # assignment deadline
+    assignment_due('calibration', DateTime.now.in_time_zone, 1)
     assignment_due('submission', DateTime.now.in_time_zone + 10, 1, 1)
     assignment_due('review', DateTime.now.in_time_zone + 20, 1)
     assignment_due('submission', DateTime.now.in_time_zone + 30, 2)
@@ -81,6 +82,20 @@ describe "Staggered deadline test" do
     topic_due = TopicDueDate.where(parent_id: topic, deadline_type_id: type, round: round, type: "TopicDueDate").first
     topic_due.due_at = time
     topic_due.save
+  end
+
+    it "student2064 in calibration stage" do
+    # impersonate each participant submit their topics
+    # change deadline to make student2064 in calibration stage
+    change_due(1, 12, 1, DateTime.now.in_time_zone - 10)
+
+    # impersonate each participant and check their topic's current stage
+
+    # ####student 1:
+    user = User.find_by_name('student2064')
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    expect(page).to have_content "calibration"
   end
 
   it "test1: in round 1, student2064 in review stage could do review" do

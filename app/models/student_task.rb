@@ -129,7 +129,7 @@ class StudentTask
   end
 
   # Assignment due dates data
-  def self.get_duedate_data(assignment_id, timeline_list)
+  def self.get_duedate_data(assignment_id, _timeline_list)
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
       tmp = {}
@@ -143,10 +143,10 @@ class StudentTask
   end
 
   # submitted links and file data
-  def self.get_submission_data(assignment_id, team_id, timeline_list)
+  def self.get_submission_data(assignment_id, team_id, _timeline_list)
     @submissions = SubmissionRecord.where(team_id: team_id, assignment_id: assignment_id)
     @submissions.each do |sr|
-      tmp ={}
+      tmp = {}
       tmp[:label] = sr.operation
       tmp[:updated_at] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
       unless sr.operation == 'Submit File' || sr.operation == 'Remove File'
@@ -157,7 +157,7 @@ class StudentTask
   end
 
   # assignment review data
-  def self.get_review_data(participant_id, timeline_list)
+  def self.get_review_data(participant_id, _timeline_list)
     @response_map = ResponseMap.where(reviewer_id: participant_id)
     @response_map.each do |rm|
       tmp = {}

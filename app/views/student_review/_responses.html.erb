@@ -1,4 +1,4 @@
-e<table>
+<table>
   <% review_no = 1 %>
   <% mappings.each do |map| %>
       <%@sorted_responses=[]%>
@@ -10,10 +10,6 @@ e<table>
       <% else %>
           <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
       <% end %>
-
-
-
-
 
       <% if participant %>
 

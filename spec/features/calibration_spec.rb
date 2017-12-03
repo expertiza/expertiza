@@ -1,4 +1,4 @@
-describe 'expert review',js: true do
+describe 'expert review' do
   ###
   # Please do not share this file with other teams.
   # Please follow the TDD process as much as you can.
@@ -8,8 +8,6 @@ describe 'expert review',js: true do
   # If your tests need to switch to different users frequently,
   # please use stub_current_user(user, user.role.name, user.role) each time to stub login behavior.
   ###
-
-  
 
   before(:each) do
     create(:instructor)
@@ -66,24 +64,16 @@ describe 'expert review',js: true do
 
   context 'when current assignment is in calibration stage' do
     context 'calibration feature' do
-      it 'works correctly' do
-        # shows current stage of this assignment to be 'Calibration' on student_task#view page
-        login_as("student123")
-        user = User.find_by(name: "student123")
-        stub_current_user(user, user.role.name, user.role)
+      it 'works correctly'
+      # shows current stage of this assignment to be 'Calibration' on student_task#view page
 
+      # shows 'Calibration review 1, 2, 3...' instead of 'Review 1, 2, 3...' on student_review#list page
 
-        # shows 'Calibration review 1, 2, 3...' instead of 'Review 1, 2, 3...' on student_review#list page
+      # allows students to do calibration review and the data can be saved successfully
 
-        # allows students to do calibration review and the data can be saved successfully
-
-        # the student is able to compare the results of expert review by clicking 'show calibration results' link
-
-      end
-
+      # the student is able to compare the results of expert review by clicking 'show calibration results' link
     end
   end
-
 
   context 'when current assignment is in review stage' do
     it 'excludes calibration reviews from outstanding review restriction and total review restriction'

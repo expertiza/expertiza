@@ -54,6 +54,16 @@ class ResponseTimesController < ApplicationController
     end
   end
 
+  # def set_timeout_flag
+  #   @timeout_flag = params[:timeout_flag]
+  # end
+
+  # def timeout?
+  #   respond_to do |format|
+  #     format.json {render json: @timeout_flag}
+  #   end
+  # end
+
   private
     # Only allow a trusted parameter "white list" through.
     def response_time_params

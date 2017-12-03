@@ -55,42 +55,31 @@
     $(document).ready(function(){
       var map_id = <%= @map.id %>;
       var round = <%= @current_round %>;
-      var current_window_timer = null;
+      // var current_window_timer = null;
       var time_out_interval = 10000; // in milliseconds
       var linksToUpdate = {};
       var windowsToClose = new Array();
-      startTimer();
+      // startTimer();
 
-      function timeoutAction(){
-        window.focus();
-        markEndTime();
-        if(confirm("Are you still reviewing your submissions? Press OK to continue")){
-          resetTimer();
-          for (link in linksToUpdate){
-            if (linksToUpdate[link]){
-              startTime(map_id, round, link);
-            }
-          }
-        } else {
-          clearTimeout(current_window_timer);
-          //markEndTime();
-          alert("The page has not been interacted for a long time, and will close for security!");
+      function timeoutAction(timeout_flag){
+        if (timeout_flag) {
+          markEndTime();
           while (windowsToClose!=null && windowsToClose.length>0){
             windowsToClose.shift().close();
           }
         }
       }
 
-      function resetTimer() {
-        clearTimeout(current_window_timer);
-        current_window_timer = setTimeout(timeoutAction, time_out_interval);
-      }
+      // function resetTimer() {
+      //   clearTimeout(current_window_timer);
+      //   current_window_timer = setTimeout(timeoutAction, time_out_interval);
+      // }
 
-      function startTimer() {
-        resetTimer();
-        $(this).bind("click", resetTimer());
-        $(this).bind("mousemove", resetTimer());
-      }
+      // function startTimer() {
+      //   resetTimer();
+      //   $(this).bind("click", resetTimer());
+      //   $(this).bind("mousemove", resetTimer());
+      // }
 
       function startTime(map_id, round, link) {
         var t = new Date();
@@ -154,11 +143,13 @@
         }
 
         function checkWindowStatus(){
+          timeout_flag = $('#timeout_flag').val()=='true';
           if (window_handler.closed){
             endTime(address);
             linksToUpdate[address] = false;
             clearInterval(link_timer);
           }
+          timeoutAction(timeout_flag);
         }
       });
     });

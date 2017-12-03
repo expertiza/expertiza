@@ -148,8 +148,7 @@ describe AssignmentsController do
     context 'when assignment_form is not saved successfully' do
       it 'renders assignment#new page' do
         allow(assignment_form).to receive(:save).and_return(false)
-        params = {button: 1}
-        post :create, params
+        post :create, @params
         expect(response).to render_template(:new)
       end
     end

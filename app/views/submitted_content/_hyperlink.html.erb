@@ -51,25 +51,86 @@
                 + pad(date.getUTCMinutes()) + ':'
                 + pad(date.getUTCSeconds());
     }
+
     $(document).ready(function(){
-      var window_counter = 0;
+      var map_id = <%= @map.id %>;
+      var round = <%= @current_round %>;
+      var current_window_timer = null;
+      var time_out_interval = 10000; // in milliseconds
+      var linksToUpdate = {};
+      var windowsToClose = new Array();
+      startTimer();
+
+      function timeoutAction(){
+        window.focus();
+        markEndTime();
+        if(confirm("Are you still reviewing your submissions? Press OK to continue")){
+          resetTimer();
+          for (link in linksToUpdate){
+            if (linksToUpdate[link]){
+              startTime(map_id, round, link);
+            }
+          }
+        } else {
+          clearTimeout(current_window_timer);
+          //markEndTime();
+          alert("The page has not been interacted for a long time, and will close for security!");
+          while (windowsToClose!=null && windowsToClose.length>0){
+            windowsToClose.shift().close();
+          }
+        }
+      }
+
+      function resetTimer() {
+        clearTimeout(current_window_timer);
+        current_window_timer = setTimeout(timeoutAction, time_out_interval);
+      }
+
+      function startTimer() {
+        resetTimer();
+        $(this).bind("click", resetTimer());
+        $(this).bind("mousemove", resetTimer());
+      }
+
+      function startTime(map_id, round, link) {
+        var t = new Date();
+        $.ajax({
+          type: "POST",
+          url: '/response_times/record_start_time',
+          data: $.param({response_time:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+        });
+      }
+
+      function markEndTime() {
+        var  t = new Date();
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          async: false,
+          url: '/response_times/mark_end_time',
+          data: $.param({
+            response_time: {map_id: map_id, round: round, end_at: ISODateString(t)}
+            }),
+          success: function(json){
+            var links = JSON.parse(JSON.stringify(json));
+            for (lk in links)
+              console.log(lk+" review time is complete!");
+          },
+          error: function(json){
+            console.log("review time failed to save!");
+          }
+        });
+      }
+
       $("#url a.review_link").click(function linkAction(event){
         event.preventDefault();
         var link_handler = $(this); // current link
         var address = link_handler.attr("href"); // url address of the current link
         var window_handler = window.open(address); // open link in new window/tag
-        // var t_start = new Date(); // open time
-        startTime(<%= map_id %>, <%= round %>, address);
+        windowsToClose.push(window_handler);
+        startTime(map_id, round, address);
+        linksToUpdate[address] = true;
         var link_timer = setInterval(checkWindowStatus, 1000); // check window open/close every second
-
-        function startTime(map_id, round, link) {
-          var t = new Date();
-          $.ajax({
-            type: "POST",
-            url: '/response_times/record_start_time',
-            data: $.param({response_time:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
-          });
-        }
 
         function endTime(link){
           var t = new Date();
@@ -79,7 +140,7 @@
             async: false,
             url: '/response_times/record_end_time',
             data: $.param({
-              response_time: {map_id: <%= map_id %>, round: <%= round %>, link: link, end_at: ISODateString(t)}
+              response_time: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
               }),
             /*success: function(json){
               var links = JSON.parse(JSON.stringigy(json));
@@ -95,6 +156,7 @@
         function checkWindowStatus(){
           if (window_handler.closed){
             endTime(address);
+            linksToUpdate[address] = false;
             clearInterval(link_timer);
           }
         }

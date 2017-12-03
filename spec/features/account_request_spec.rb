@@ -169,7 +169,7 @@ describe 'new account request' do
 
 
 
-        choose(name: 'status',option:'Rejected')
+        choose(name: 'status',option:'Reject')
 
         click_on('Submit')
 

@@ -66,19 +66,21 @@ class AssignmentsController < ApplicationController
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    @assignment = Assignment.find(params[:id])
+    @response_map = ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').select(:id).all
   end
 
   def delete_reviews
     @assignment = Assignment.find(params[:assignment_id])
     @response_map = ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').select(:id).all
-
-    if params[:action_confirmed].to_i == 1
+    response_count = @response_map.count
+    if response_count > 0
       @assignment.delete_reviews
-      redirect_to edit_assignment_path @assignment.id
-      flash[:note] = "All reviews for assignment \"#{@assignment.name}\" have been successfully deleted!"
+      flash[:note] = "#{(response_count == 1) ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\" #{response_count ? 'has' : 'have'} been successfully deleted!"
     else
-      flash.now[:error] = "All reviews for assignment \"#{@assignment.name}\" will be deleted!"
+      flash[:error] = "This assignment does not have any reviews."
     end
+    redirect_to :back
   end
 
   def update

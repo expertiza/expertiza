@@ -1,4 +1,17 @@
 <!--The reason why add an empty form_tag here. (https://github.com/expertiza/expertiza/commit/4d1a9d50833aca4e8771afd851daa40455d4fc37)-->
+
+<script>
+    jQuery(document).ready(function() {
+        var default_timeout_time_in_minutes = 20
+
+        jQuery('#delete_reviews').click(function(e){
+            if(!confirm('All reviews for the assigment  will be deleted. Are you sure?')){
+                e.preventDefault();
+                return;
+            }
+        })
+    })
+</script>
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment_form.assignment.id do %>
 <% end %>
 <table>
@@ -112,17 +125,17 @@
     </td>
   </tr>
 
-
   <!--#E17A0 Allow reviews to be deleted. Can be useful when review strategy changes after reviews begin -->
-  <%= form_tag controller: 'assignment', action: 'delete_reviews', assignment_id: @assignment_form.assignment.id do %>
-    <tr id ="delete_reviews">
-      <td>
-        <%= hidden_field_tag "other_action", "delete_reviews" %>
-        <%= hidden_field_tag "action_confirmed", 0 %>
-        <%= submit_tag "Delete Reviews", :id => 'delete_reviews_btn' %> | <%= label_tag('assignment_form[assignment][delete_review]', 'All reviews for this assignment will be deleted!') %>
-      </td>
-    </tr>
-  <% end %>
+  <tr id="delete_reviews">
+    <td>
+      <%= link_to 'delete reviews', :controller=> 'assignments', :action => 'delete_reviews', :assignment_id => @assignment_form.assignment.id %> |
+      <% if @response_map.count > 0 %>
+        <%= label_tag('assignment_form[assignment][delete_review]', "#{@response_map.count == 1 ? '1 review ' : "All #{@response_map.count} reviews"} for assignment \"#{@assignment.name}\" will be deleted!") %>
+      <% else %>
+        <%= label_tag('assignment_form[assignment][delete_review]', "This assignment doesn't have any reviews.") %>
+      <% end %>
+    </td>
+  </tr>
 
 </table>
 <script>

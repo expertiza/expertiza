@@ -1,6 +1,5 @@
-#require 'spec_helper.rb'
 include InstructorInterfaceHelperSpec
-describe 'timestamps for student\'s submissions' do
+describe 'timestamps for students submissions' do
   ###
   # Please follow the TDD process as much as you can.
   # Use factories to create necessary DB records.
@@ -34,10 +33,8 @@ describe 'timestamps for student\'s submissions' do
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
     create(:assignment_questionnaire)
     create(:question)
-    #assignment_setup
     login_as("student2065")
     visit '/student_task/list'
-
   end
 
   def signup_topic
@@ -61,13 +58,13 @@ describe 'timestamps for student\'s submissions' do
     visit '/student_task/list'
     click_link "TestAssignment"
     expect(page).to have_content("Your work")
-      click_link "Your work"
-      fill_in "submission", with: "http://www.google.com"
-      click_button "Upload link"
-      all('a', :text => 'Assignments')[1].click
-      click_link "TestAssignment"
-      expect(page).to have_content("Deadline")
-      expect(page).to have_content("Submit Hyperlink")
+    click_link "Your work"
+    fill_in "submission", with: "http://www.google.com"
+    click_button "Upload link"
+    all('a', :text => 'Assignments')[1].click
+    click_link "TestAssignment"
+    expect(page).to have_content("Deadline")
+    expect(page).to have_content("Submit Hyperlink")
   end
 
   def submit_file
@@ -99,71 +96,68 @@ describe 'timestamps for student\'s submissions' do
     visit '/student_task/list'
     click_link "TestAssignment"
     expect(page).to have_content "Round 1 Review"
-end
-
+  end
 
   context 'when current assignment is in submission stage' do
     context 'when current participant does not submit anything yet' do
       it 'displays due dates of current assignment in student_task#list page' do
-         click_link "TestAssignment"
-         expect(page).to have_content("Deadline")
-       end
+        click_link "TestAssignment"
+        expect(page).to have_content("Deadline")
+      end
     end
 
     context 'after current participant has submitted a hyperlink' do
       it 'displays hyperlinks with its timestamps' do
       # it also displays due dates
-      submit_hyperlink
+       submit_hyperlink
       end
     end
 
     context 'after current participant has uploaded a file' do
       it 'displays file names with its timestamps' do
       # it also displays due dates
-      submit_file
+       submit_file
+      end
     end
   end
-end
-
-
 
   context 'when current assignment (with single review round) is in review stage' do
     context 'after current participant reviews other\'s work' do
       it 'displays a link named \'review\' with its timestamps (you could redirect to that review by clicking the link) ' do
       # it also displays due dates
       # it also displays submitted files or hyperlinks
-      submit_to_topic
-      submit_review
+       submit_to_topic
+       submit_review
       end
     end
 
-  context 'after current participant finishes an author feedback' do
+    context 'after current participant finishes an author feedback' do
       xit 'displays a link named \'feedback\' with its timestamps (you could redirect to that feedback by clicking the link)' do
       # it also displays due dates
       # it also displays submitted files or hyperlinks
       # it also displays review links
-      submit_to_topic
-      user = User.find_by_name("student2064")
-      stub_current_user(user, user.role.name, user.role)
-      visit '/student_task/list'
-      click_link "TestAssignment"
-      click_link "Others' work"
-      click_button("")
-      find(:css, "#i_dont_care").set(true)
-      click_button "Request a new submission to review"
-      expect(page).to have_content "Begin"
-      click_link "Begin"
-      fill_in "responses[0][comment]", with: "HelloWorld"
-      select 5, from: "responses[0][score]"
-      click_button "Submit Review"
-      expect(page).to have_content "Your response was successfully saved."
-      user = User.find_by_name("student2065")
-      stub_current_user(user, user.role.name, user.role)
-      visit '/student_task/list'
-      visit '/student_task/list'
-      click_link "TestAssignment"
-      click_link "Alternate View"
-      expect(page).to have_content "Your response was successfully saved."
+       submit_to_topic
+       user = User.find_by_name("student2064")
+       stub_current_user(user, user.role.name, user.role)
+       visit '/student_task/list'
+       click_link "TestAssignment"
+       click_link "Others' work"
+       click_button("")
+       find(:css, "#i_dont_care").set(true)
+       click_button "Request a new submission to review"
+       expect(page).to have_content "Begin"
+       click_link "Begin"
+       fill_in "responses[0][comment]", with: "HelloWorld"
+       select 5, from: "responses[0][score]"
+       click_button "Submit Review"
+       expect(page).to have_content "Your response was successfully saved."
+       user = User.find_by_name("student2065")
+       stub_current_user(user, user.role.name, user.role)
+       visit '/student_task/list'
+       visit '/student_task/list'
+       click_link "TestAssignment"
+       click_link "Alternate View"
+       expect(page).to have_content "Your response was successfully saved."
       end
     end
   end
@@ -173,11 +167,9 @@ end
       it 'displays a link named \'review\' with its round number (1) and timestamps (you could redirect to that review by clicking the link)' do
       # it also displays due dates
       # it also displays submitted files or hyperlinks
-      submit_to_topic
-
-      submit_file
-
-      submit_review
+       submit_to_topic
+       submit_file
+       submit_review
       end
     end
 

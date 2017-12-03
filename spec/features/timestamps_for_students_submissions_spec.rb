@@ -35,6 +35,7 @@ describe 'timestamps for students submissions' do
     create(:question)
     login_as("student2065")
     visit '/student_task/list'
+    click_link "TestAssignment"
   end
 
   def signup_topic
@@ -55,8 +56,6 @@ describe 'timestamps for students submissions' do
   end
 
   def submit_hyperlink
-    visit '/student_task/list'
-    click_link "TestAssignment"
     expect(page).to have_content("Your work")
     click_link "Your work"
     fill_in "submission", with: "http://www.google.com"
@@ -68,8 +67,6 @@ describe 'timestamps for students submissions' do
   end
 
   def submit_file
-    visit '/student_task/list'
-    click_link "TestAssignment"
     expect(page).to have_content("Your work")
     click_link "Your work"
     file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
@@ -82,8 +79,6 @@ describe 'timestamps for students submissions' do
   end
 
   def submit_review
-    visit '/student_task/list'
-    click_link "TestAssignment"
     click_link "Others' work"
     find(:css, "#i_dont_care").set(true)
     click_button "Request a new submission to review"

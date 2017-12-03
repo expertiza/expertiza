@@ -69,7 +69,7 @@ describe 'expert review',js: true do
         login_as("student123")
         user = User.find_by(name: "student123")
         stub_current_user(user, user.role.name, user.role)
-        
+
 
         # shows 'Calibration review 1, 2, 3...' instead of 'Review 1, 2, 3...' on student_review#list page
 

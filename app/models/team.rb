@@ -54,7 +54,7 @@ class Team < ActiveRecord::Base
 
   # Add memeber to the team
   def add_member(user, _assignment_id = nil)
-    if has_user(user)
+    if user?(user)
       raise "The user #{user.name} is already a member of the team #{self.name}"
     end
     can_add_member = false

@@ -24,11 +24,23 @@ class StudentReviewController < ApplicationController
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
 
+
+
+
+    @calibration_deadline = @assignment.due_dates.find_by_deadline_type_id(12)
+
+
+
+
+
+
     @num_reviews_total = @review_mappings.size
     # Add the reviews which are requested and not began.
     @num_reviews_completed = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      #if map.response.last.created_at > @calibration_deadline
+        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      #end
     end
 
     @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed

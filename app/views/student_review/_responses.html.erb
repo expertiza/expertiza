@@ -1,4 +1,4 @@
-<table>
+e<table>
   <% review_no = 1 %>
   <% mappings.each do |map| %>
       <%@sorted_responses=[]%>
@@ -11,8 +11,14 @@
           <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
       <% end %>
 
+
+
+
+
       <% if participant %>
-          <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+
+
+        <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
           <tr>
             <td>
               <b><%= "#{title} #{review_no}." %></b>
@@ -81,6 +87,7 @@
             <% review_no+=1 %>
 
             <!--[zhewei, 1/20/2016]: show calibration results-->
+
             <% calibration_response_map = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ? and calibrate_to = ?", @assignment.id, map.reviewee_id, 1]).first rescue nil %>
             <% if @assignment.is_calibrated == true and !calibration_response_map.nil? and !calibration_response_map.response.nil? and !map.response.empty? and map.response[0].is_submitted == true %>
               <td>&nbsp;&nbsp;</td>
@@ -88,6 +95,11 @@
             <% end %>
           </tr>
       <% end %>
+
+
+
+
+
 
      <% if map.type.to_s != "MetareviewResponseMap" %>
        <% if @sorted_responses !=nil %>

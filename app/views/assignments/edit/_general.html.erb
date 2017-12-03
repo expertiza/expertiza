@@ -99,7 +99,7 @@ function microtaskChanged() {
 
   <!--Quiz fields-->
   <tr>
-    <td style='padding:5px' id='assignment_require_quiz_field'>
+    <td style='padding:5px' id='Warning! Unchecking all topics for this assignment will now have the same deadline.'>
       <input name="assignment_form[assignment][require_quiz]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][require_quiz]', 'true', @assignment_form.assignment.require_quiz, {:onChange => 'hasQuizChanged()'}) %>
       <%= label_tag('assignment_form[assignment][require_quiz]', 'Has quiz?') %>

@@ -58,6 +58,17 @@ class ResponseMap < ActiveRecord::Base
     nil
   end
 
+  # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
+  def reviewer_is_team_member?(user_id)
+    assignment = Assignment.where(id: self.reviewed_object_id).first
+    unless assignment.nil?
+      if assignment.reviewer_is_team?
+        teams_user = TeamsUser.where(team_id: self.team_id)
+        teams_user.all.any? { |m| m.user_id == user_id}
+      end
+    end
+  end
+
   # Evaluates whether this response_map was metareviewed by metareviewer
   # @param[in] metareviewer AssignmentParticipant object
   def metareviewed_by?(metareviewer)

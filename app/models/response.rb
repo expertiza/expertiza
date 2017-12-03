@@ -104,20 +104,6 @@ class Response < ActiveRecord::Base
     self.destroy
   end
 
-  # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
-  def reviewer_is_team_member?(user_id)
-    review_response_map = ResponseMap.find(self.map_id)
-    unless review_response_map.nil?
-      assignment = Assignment.where(id:review_response_map.reviewed_object_id).first
-      unless assignment.nil?
-        if assignment.reviewer_is_team?
-          teams_user = TeamsUser.where(team_id: review_response_map.team_id)
-          teams_user.all.any? { |m| m.user_id == user_id}
-        end
-      end
-    end
-  end
-
   # bug fixed
   # Returns the average score for this response as an integer (0-100)
   def get_average_score

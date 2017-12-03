@@ -74,12 +74,4 @@ class StudentReviewController < ApplicationController
       end
     end
   end
-
-  # E17A0 If a review is locked by a team member, other team memebers can unlock it
-  def unlock_response_map response_id
-    review_response_map = ReviewResponseMap.find_by_id(Response.find(response_id).map_id)
-    unless review_response_map.nil?
-      ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
-    end
-  end
 end

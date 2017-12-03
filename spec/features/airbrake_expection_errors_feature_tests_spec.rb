@@ -58,24 +58,7 @@ describe "Airbrake expection errors" do
     expect(page).to have_current_path("/submitted_content/#{participant_id}/edit?view=true")
   end
 
-  # Airbrake-1800240536513675372
-  it "can delete topics in staggered deadline assignment", js: true do
-    assignment = Assignment.first
-    assignment.update_attributes(staggered_deadline: true)
-    login_as 'instructor6'
-    visit "/assignments/#{assignment.id}/edit"
-    check("assignment_form_assignment_staggered_deadline")
-    click_button 'Save'
 
-    find_link('Topics').click
-    # Delete first topic
-    first("img[title='Delete Topic']").click
-    # page.execute_script 'window.confirm = function () { return true }'
-    click_button 'OK'
-    find_link('Topics').click
-    expect(page).to have_content('TestReview')
-    expect(page).not_to have_content('Hello world!')
-  end
 
   # Airbrake-1608029321738848168
   it "will not show error when instructor did not login and try to access assignment editting page" do
@@ -121,19 +104,6 @@ describe "airbrake-1517247902792549741" do
     expect(page).to have_content('Password')
   end
 
-  it "can access to '/tree_display/list' after login as an admin/instructor/TA", js: true do
-    create(:instructor)
-    login_as 'instructor6'
-    visit '/tree_display/list'
-    expect(page).to have_current_path('/tree_display/list')
-    expect(page).to have_content('Manage content')
-    expect(page).to have_content('Courses')
-    expect(page).to have_content('Assignments')
-    expect(page).to have_content('Questionnaires')
-    expect(page).not_to have_content('Welcome!')
-    expect(page).not_to have_content('User Name')
-    expect(page).not_to have_content('Password')
-  end
 
   it "can access to '/student_task/list' after login as a student" do
     stu = create(:student)

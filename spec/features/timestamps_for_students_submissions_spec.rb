@@ -37,7 +37,7 @@ describe 'timestamps for students submissions' do
     visit '/student_task/list'
   end
 
-  def signupt_topic
+  def signup_topic
     user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'

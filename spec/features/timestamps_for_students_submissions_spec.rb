@@ -137,7 +137,7 @@ describe 'timestamps for students submissions' do
         # it also displays submitted files or hyperlinks
         # it also displays review links
         submit_to_topic
-        user = User.find_by_name("student2064")
+        user = User.find_by(name: "student2064")
         stub_current_user(user, user.role.name, user.role)
         visit '/student_task/list'
         click_link "TestAssignment"
@@ -151,7 +151,7 @@ describe 'timestamps for students submissions' do
         select 5, from: "responses[0][score]"
         click_button "Submit Review"
         expect(page).to have_content "Your response was successfully saved."
-        user = User.find_by_name("student2065")
+        user = User.find_by(name: "student2065")
         stub_current_user(user, user.role.name, user.role)
         visit '/student_task/list'
         visit '/student_task/list'

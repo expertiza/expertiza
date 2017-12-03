@@ -14,6 +14,7 @@ describe 'expert review',js: true do
     create_list(:participant, 3)
     create(:topic, topic_name: "TestTopic")
     create(:deadline_type, name: "submission")
+    
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")
     create(:deadline_type, name: "drop_topic")

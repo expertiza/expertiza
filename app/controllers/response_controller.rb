@@ -6,7 +6,7 @@ class ResponseController < ApplicationController
     response = response_map = user_id = nil
     action = params[:action]
 
-    # E17A0 When a review is delete midway, redirects to student review listing
+    # E17A0 When a review is deleted, redirects to student review listing
     if %(new create).include?(action)
       response_map =  ResponseMap.find_by_id(params[:id])
       if response_map.nil?
@@ -23,7 +23,6 @@ class ResponseController < ApplicationController
         # E17A0 In this case, when the review is not found, an error is returned
         return false if response_map.is_locked? && response_map.locked_by != current_user.id
         return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
-        puts response_map.reviewer_is_team_member?(current_user.id)
       end
     else
       if %w(edit delete update view).include?(action)

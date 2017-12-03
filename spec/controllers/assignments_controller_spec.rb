@@ -1,3 +1,5 @@
+require 'pry'
+
 describe AssignmentsController do
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
@@ -262,6 +264,7 @@ describe AssignmentsController do
 
   describe '#show' do
     it 'renders assignments#show page' do
+      binding.pry
       get :show, id: 1
       expect(response).to render_template(:show)
     end

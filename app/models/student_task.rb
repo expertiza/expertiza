@@ -181,6 +181,6 @@ class StudentTask
     # Student's assignment review performed
     get_review_data(participant_id, @timeline_list)
     # List is sorted and returned
-    @timeline_list.sort_by {|f| Time.parse f[:updated_at] }
+    @timeline_list.sort_by {|f| Time.zone.parse f[:updated_at] }
   end
 end

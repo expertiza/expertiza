@@ -132,6 +132,9 @@ describe UsersController do
         get :new
         expect(response).to render_template(:new)
         expect(assigns(:user)).to be_a_new(User)
+      end
+    end
+  end
 
   describe '#show_selection' do
     context 'when user is not nil and parent id is nil' do
@@ -158,6 +161,15 @@ describe UsersController do
         get :show, id: 1
         expect(response).to render_template(:show)
       end
+    end
+  end
+
+  describe '#edit' do
+    it 'can find user' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      @request.session['user'] = instructor
+      get :edit, id: 1
+      expect(response).to render_template(:edit)
     end
   end
 end

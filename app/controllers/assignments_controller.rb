@@ -80,7 +80,7 @@ class AssignmentsController < ApplicationController
     else
       flash[:error] = "This assignment does not have any reviews."
     end
-    redirect_to :back
+    redirect_to edit_assignment_path @assignment.id
   end
 
   def update

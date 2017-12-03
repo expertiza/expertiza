@@ -4,6 +4,7 @@ describe AssignmentsController do
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
   let(:assignment_form) { double('AssignmentForm') }
+
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
@@ -380,11 +381,10 @@ describe AssignmentsController do
       it 'shows a confirmation page before assignment reviews are deleted' do
         params = {
             assignment_id: 1,
-            action_confirmed: 0
         }
         session = {user: instructor}
         post :delete_reviews, params
-        expect(flash[:error]).to eq("All reviews for assignment \"#{assignment.name}\" will be deleted!")
+        expect(flash[:error]).to eq("#{(response_count == 1) ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\" #{response_count ? 'has' : 'have'} been successfully deleted!")
       end
     end
 
@@ -396,9 +396,15 @@ describe AssignmentsController do
         }
         session = {user: instructor}
         post :delete_reviews, params
-        allow(Response).to receive(:find).with(map_id: [2]).and_return(response)
-        expect(flash[:note]).to eq("All reviews for assignment \"#{assignment.name}\" have been successfully deleted!")
-        expect(response).to redirect_to("/assignments/#{assignment.id}/edit")
+        allow(Assignment).to receive(:find).with(params[:assignment_id]).and_return(assignment)
+        allow(ResponseMap).to receive(:where).with(reviewed_object_id: assignment.id, type: 'ReviewResponseMap').and_return(responsemap)
+
+
+        #@assignment = Assignment.find(params[:assignment_id])
+        #@response_map = ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').select(:id).all
+        #response_count = @response_map.count
+
+        expect(flash[:note]).to eq("#{(response_count == 1) ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\" #{response_count ? 'has' : 'have'} been successfully deleted!")
 
       end
     end

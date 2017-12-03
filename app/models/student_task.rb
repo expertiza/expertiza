@@ -10,7 +10,6 @@ class StudentTask
     @topic = args[:topic]
   end
 
-
   def self.from_participant(participant)
     StudentTask.new(
       participant: participant,
@@ -129,11 +128,11 @@ class StudentTask
     @students_teamed
   end
 
-  #Assignment due dates data
+  # Assignment due dates data
   def self.get_duedate_data(assignment_id, timeline_list)
     @dues = DueDate.where(parent_id: assignment_id)
     @dues.each do |dd|
-      tmp = Hash.new
+      tmp = {}
       tmp[:label] = dd.deadline_type.name + ' Deadline'
       tmp[:link] = nil
       unless dd.due_at.nil?
@@ -143,11 +142,11 @@ class StudentTask
     end
   end
 
-  #submitted links and file data
+  # submitted links and file data
   def self.get_submission_data(assignment_id, team_id, timeline_list)
-    @submissions = SubmissionRecord.where(team_id: team_id , assignment_id: assignment_id)
+    @submissions = SubmissionRecord.where(team_id: team_id, assignment_id: assignment_id)
     @submissions.each do |sr|
-      tmp = Hash.new
+      tmp ={}
       tmp[:label] = sr.operation
       tmp[:updated_at] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
       unless sr.operation == 'Submit File' || sr.operation == 'Remove File'
@@ -157,11 +156,11 @@ class StudentTask
     end
   end
 
-  #assignment review data
+  # assignment review data
   def self.get_review_data(participant_id, timeline_list)
     @response_map = ResponseMap.where(reviewer_id: participant_id)
     @response_map.each do |rm|
-      tmp = Hash.new
+      tmp = {}
       @response = Response.where(map_id: rm.id)
       unless @response[0].nil?
         tmp[:label] = 'Round ' + @response[0].round.to_s + ' Review'
@@ -172,16 +171,16 @@ class StudentTask
     end
   end
 
-  #static method for the building timeline data
+  # static method for the building timeline data
   def self.get_timeline_data(assignment_id, participant_id, team_id)
-    @timeline_list = Array.new
-    #Assignment duedate data
+    @timeline_list = []
+    # Assignment duedate data
     get_duedate_data(assignment_id, @timeline_list)
-    #Studnet's link and file submissions
+    # Studnet's link and file submissions
     get_submission_data(assignment_id, team_id, @timeline_list)
-    #Student's assignment review performed
+    # Student's assignment review performed
     get_review_data(participant_id, @timeline_list)
-    #List is sorted and returned
-    return @timeline_list.sort_by{ |f| Time.parse f[:updated_at]}
+    # List is sorted and returned
+    @timeline_list.sort_by {|f| Time.parse f[:updated_at] }
   end
 end

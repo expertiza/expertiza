@@ -108,15 +108,15 @@ describe 'timestamps for students submissions' do
 
     context 'after current participant has submitted a hyperlink' do
       it 'displays hyperlinks with its timestamps' do
-      # it also displays due dates
-       submit_hyperlink
+        # it also displays due dates
+        submit_hyperlink
       end
     end
 
     context 'after current participant has uploaded a file' do
       it 'displays file names with its timestamps' do
-      # it also displays due dates
-       submit_file
+         # it also displays due dates
+         submit_file
       end
     end
   end
@@ -124,18 +124,18 @@ describe 'timestamps for students submissions' do
   context 'when current assignment (with single review round) is in review stage' do
     context 'after current participant reviews other\'s work' do
       it 'displays a link named \'review\' with its timestamps (you could redirect to that review by clicking the link) ' do
-      # it also displays due dates
-      # it also displays submitted files or hyperlinks
-       submit_to_topic
-       submit_review
+        # it also displays due dates
+        # it also displays submitted files or hyperlinks
+        submit_to_topic
+        submit_review
       end
     end
 
     context 'after current participant finishes an author feedback' do
       xit 'displays a link named \'feedback\' with its timestamps (you could redirect to that feedback by clicking the link)' do
-      # it also displays due dates
-      # it also displays submitted files or hyperlinks
-      # it also displays review links
+       # it also displays due dates
+       # it also displays submitted files or hyperlinks
+       # it also displays review links
        submit_to_topic
        user = User.find_by_name("student2064")
        stub_current_user(user, user.role.name, user.role)
@@ -165,8 +165,8 @@ describe 'timestamps for students submissions' do
   context 'when current assignment (with multiple review round) is in review stage' do
     context 'after current participant reviews other\'s work in round 1' do
       it 'displays a link named \'review\' with its round number (1) and timestamps (you could redirect to that review by clicking the link)' do
-      # it also displays due dates
-      # it also displays submitted files or hyperlinks
+       # it also displays due dates
+       # it also displays submitted files or hyperlinks
        submit_to_topic
        submit_file
        submit_review
@@ -175,16 +175,16 @@ describe 'timestamps for students submissions' do
 
     context 'after current participant reviews other\'s work in round 2' do
       it 'displays a link named \'review\' with its round number (2) and timestamps (you could redirect to that review by clicking the link)'
-      # it also displays due dates
-      # it also displays submitted files or hyperlinks
-      # it also displays review links
+       # it also displays due dates
+       # it also displays submitted files or hyperlinks
+       # it also displays review links
     end
 
     context 'after current participant finishes an author feedback' do
       it 'displays a link named \'feedback\' with its timestamps (you could redirect to that feedback by clicking the link)'
-      # it also displays due dates
-      # it also displays submitted files or hyperlinks
-      # it also displays review links
+       # it also displays due dates
+       # it also displays submitted files or hyperlinks
+       # it also displays review links
     end
   end
 end

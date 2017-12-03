@@ -1,3 +1,6 @@
+require 'pry'
+
+
 describe UsersController do
   let(:admin) {build(:admin)}
   let(:superadmin) {build(:superadmin)}
@@ -5,6 +8,11 @@ describe UsersController do
   let(:instructor2) {build(:instructor, id: 66)}
   let(:ta) {build(:teaching_assistant, id: 8)}
   let(:student) {build(:student)}
+  before(:each) do
+    allow(User).to receive(:find_by_name).with('instructor6').and_return(instructor)
+    allow(User).to receive(:find_by_name).with('instructor66').and_return(instructor2)
+    allow(User).to receive(:find).with('1').and_return(instructor2)
+  end
 
   describe '#action_allowed?' do
     context 'when params action is request_new' do
@@ -92,9 +100,6 @@ describe UsersController do
 
   describe '#list' do
     it 'render list' do
-      # stub_current_user(instructor, instructor.role.name, instructor.role)
-      # get :show_selection, {'user' => {'name' => 'instructor6sss'}}
-      # expect(response).to render_template('/users/list')
       stub_current_user(instructor, instructor.role.name, instructor.role)
       @request.session['user'] = instructor
       get :list
@@ -109,6 +114,33 @@ describe UsersController do
     end
   end
 
+  describe '#show_selection' do
+    context 'when user is not nil and parent id is nil' do
+      it 'redirect to /users/show' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        get :show_selection, {user: {name: 'instructor6'}}
+        expect(response).to render_template(:show)
+      end
+    end
+  end
+
+  describe '#show' do
+    context 'when params id is nil' do
+      it 'redirect to /tree_display/drill' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        get :show, id: nil
+        expect(response).to redirect_to('/tree_display/drill')
+      end
+    end
+
+    context 'when params id is not nil' do
+      it 'render show' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        get :show, id: 1
+        expect(response).to render_template(:show)
+      end
+    end
+  end
 end
 
 

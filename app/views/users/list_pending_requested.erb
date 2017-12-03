@@ -15,9 +15,7 @@
             <% end %>
           <% end %>
           <td><%= user.status %></td>
-
-          <% if user.status == 'Under Review' %>
-
+          <% if user.status == 'Under Review'%>
           <td> <%= text_field_tag :reason, user.reason %> </td>
           <td> <input type="radio" name="status" value="Approved"> Accept </td>
           <td> <input type="radio" name="status" value="Rejected"> Reject </td>

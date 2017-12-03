@@ -44,18 +44,30 @@ class UsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
+  #
   # for anonymized view for demo purposes
-  def set_anonymous_mode
-    anonymous_mode = $redis.get('anonymous_mode')
-    anonymous_mode = case anonymous_mode
+  # three scenarios:
+  # 1) when current user is anonymized view starter. change to anonymized view. 
+  #    (no session[:super_user], and current session_id == anonymized view starter session_id)
+  # 2) when current user is impersonated by anonymized view starter. change to anonymized view. 
+  #    (have session[:super_user], and current session_id != anonymized view starter session_id)
+  # 3) Other users. do not change to anonymized view. 
+  #    (no session[:super_user], and current session_id != anonymized view starter session_id)
+  #
+  def set_anonymized_view
+    anonymized_view = $redis.get('anonymized_view') || 'false'
+    anonymized_view_starter = $redis.get('anonymized_view_starter') || ''
+    anonymized_view = case anonymized_view
                      when 'true'
+                      anonymized_view_starter = ''
                       'false'
                      when 'false'
+                       anonymized_view_starter += session[:user][:name]
                        'true'
-                     else
-                       'false'
                      end
-    $redis.set('anonymous_mode', anonymous_mode)
+    $redis.set('anonymized_view', anonymized_view)
+    $redis.set('anonymized_view_starter', anonymized_view_starter)
+    $redis.set('anonymized_view_starter_session_id', session.id)
     redirect_to :back
   end
 
@@ -114,6 +126,7 @@ class UsersController < ApplicationController
     flash[:danger] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by_name(params[:role])
+    @intro = params[:intro]
     roles_for_request_sign_up
   end
 
@@ -237,12 +250,11 @@ class UsersController < ApplicationController
     if params[:user][:institution_id]==''
       if Institution.find_by(name: params[:institution][:name])
           @institution = Institution.find_by(name: params[:institution][:name])
-          @user.institution_id = @institution.id
       else
         @institution = Institution.new(name: params[:institution][:name])
-        @institution.save
-        @user.institution_id = @institution.id
+        @institution.save #ID(row)generate only after save
       end
+      @user.institution_id = @institution.id
     else
       @user.institution_id = params[:user][:institution_id]
     end
@@ -250,20 +262,26 @@ class UsersController < ApplicationController
 
     @user.status = 'Under Review'
     @user.intro = params[:requested_users][:intro]
+
     # The super admin receives a mail about a new user request with the user name
-    if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil? && @user.save
-      @super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
-      @super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, @user, "New account Request")
-        prepared_mail.deliver
+    if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil?
+      if @user.save
+        @super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
+        @super_users.each do |super_user|
+          prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, @user, "New account Request")
+          prepared_mail.deliver_now
+        end
+        flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
+        redirect_to '/instructions/home' and return
+      else
+        #include both invalid email and existed email for requesteduser
+        #invalide email of request user would not flash "alreadly existed"
       end
-      flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
-      redirect_to '/instructions/home'
     else
       flash[:error] = "The account you are requesting has already existed in Expertiza."
-      #redirect_to controller: 'users', action: 'request_new', role: "Student"
-      render 'request_new'
     end
+    @intro = params[:requested_users][:intro]
+    render 'request_new'
   end
 
   def edit

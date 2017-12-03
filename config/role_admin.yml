@@ -267,6 +267,7 @@ development:
         url: "/users/list_pending_requested"
 
 
+>>>>>>> e9a5c20f953768b47794127bfa07a24fa5adb69f
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -489,6 +490,9 @@ development:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymous_mode"
+
+
+
     by_name:
       home: *1
       manage instructor content: *2
@@ -1245,6 +1249,7 @@ production:
         - 51
 
       51: &25 !ruby/object:Menu::Node
+<<<<<<< HEAD
         content_page_id:
         controller_action_id: 112
         id: 51
@@ -1254,6 +1259,17 @@ production:
         parent_id: 37
         site_controller_id: 10
         url: "/users/list_pending_requested"
+=======
+              content_page_id:
+              controller_action_id: 112
+              id: 51
+              label: Pending Users
+              name: manage/show pending users
+              parent:
+              parent_id: 37
+              site_controller_id: 10
+              url: "/users/list_pending_requested"
+>>>>>>> e9a5c20f953768b47794127bfa07a24fa5adb69f
 
       35: &3 !ruby/object:Menu::Node
         content_page_id:
@@ -1502,7 +1518,10 @@ production:
       manage/questionnaires/course surveys: *23
       anonymized_view: *24
       manage/show pending users: *25
+<<<<<<< HEAD
 
+=======
+>>>>>>> e9a5c20f953768b47794127bfa07a24fa5adb69f
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

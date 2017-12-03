@@ -4,7 +4,7 @@ class EulaController < ApplicationController
      'Administrator',
      'Instructor',
      'Teaching Assistant',
-     'student'].include? current_role_name
+     'Student'].include? current_role_name
   end
 
   def display

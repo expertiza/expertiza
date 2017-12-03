@@ -42,17 +42,21 @@ class Participant < ActiveRecord::Base
   end
 
   def anonymized_view?
+    return false unless self and self.user and self.user.parent
+    curr_name = self.user[:name]
+    parent_name = self.user.try(:parent).try(:[], :name)
     anonymized_view = $redis.get('anonymized_view')
     anonymized_view_starter = $redis.get('anonymized_view_starter')
     starter_session_id = $redis.get('anonymized_view_starter_session_id')
+    current_user_session_id = $redis.get("#{curr_name}_session_id")
     session_data = Session.find_by(session_id: starter_session_id).try(:data)
-    current_user_session_id = $redis.get("#{self.user[:name]}_session_id")
     if session_data
-      session_starter = session_data['user']
       super_user = session_data['super_user']
-      anonymized_view and anonymized_view == 'true' and anonymized_view_starter and 
-        ((session_starter and starter_session_id == current_user_session_id and anonymized_view_starter.include? session_starter[:name]) or 
-        (super_user and anonymized_view_starter.include? super_user[:name]))
+      return true if anonymized_view and anonymized_view == 'true' and anonymized_view_starter and 
+        ((super_user.nil? and current_user_session_id == starter_session_id) or # scenario 1
+         (super_user.nil? and current_user_session_id.nil? and $redis.get("#{parent_name}_session_id") == starter_session_id) or # scenario 2
+         (super_user and super_user[:name] == anonymized_view_starter)) # scenario 3
+      return false if super_user.nil? and current_user_session_id != starter_session_id # scenario 4
     else
       false
     end

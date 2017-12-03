@@ -162,7 +162,7 @@ class StudentTask
     @response_map.each do |rm|
       tmp = {}
       @response = Response.where(map_id: rm.id)
-      unless @response[0].nil?
+      next if @response[0].nil?
         tmp[:label] = 'Round ' + @response[0].round.to_s + ' Review'
         tmp[:updated_at] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
         tmp[:id] = @response[0].id

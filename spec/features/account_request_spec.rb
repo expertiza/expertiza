@@ -103,6 +103,32 @@ describe 'new account request' do
       expect(page).to have_content('The account you are requesting has already existed in Expertiza.')
 
     end
+    
+        it 'fail to request with existed requested_user email' do
+ 
+       visit '/'
+ 
+       click_link 'REQUEST ACCOUNT'
+ 
+       expect(page).to have_content('Request new user')
+ 
+       select 'Teaching Assistant', from: 'user_role_id'
+ 
+       fill_in 'user_name', with: 'whatever'
+ 
+       fill_in 'user_fullname', with: 'whatever'
+ 
+       fill_in 'user_email', with: 'rq@ncsu.edu'
+ 
+       select 'North Carolina State University', from: 'user_institution_id'
+ 
+       fill_in 'requested_user_intro', with: 'request an account for expertiza'
+ 
+       click_on 'Request'
+ 
+       expect(page).to have_content('Email has already been taken')
+    
+        end
 
   end
 

@@ -5,37 +5,44 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = response_map = user_id = nil
     action = params[:action]
+    map_id = (action == 'new') ? params[:id] : params[:map_id]
+    map =  ResponseMap.find_by_id(map_id)
 
-    if %w(edit delete update view).include?(action)
-      response = Response.find(params[:id])
-      response_map = ReviewResponseMap.find(response.map_id)
-      user_id = response.map.reviewer.user_id if response.map.reviewer
+    # E17A0 When a review is delete midway, redirects to student review listing
+    if map.nil?
+      flash[:error] = "This #{params[:controller]} is no longer available!"
+      redirect_to controller: 'student_review', action: 'list', id: params[:list_id]
+    else
+      if %w(edit delete update view).include?(action)
+        response = Response.find(params[:id])
+        response_map = ReviewResponseMap.find(response.map_id)
+        user_id = response.map.reviewer.user_id if response.map.reviewer
+      end
+      case action
+        when 'edit' # If response has been submitted, no further editing allowed
+          return false if response.is_submitted
+          return false if response_map.is_locked? && response_map.locked_by != current_user.id
+          return current_user_id?(user_id) || response.reviewer_is_team_member?(current_user.id)
+        # Deny access to anyone except reviewer & author's team
+        when 'delete', 'update', 'unlock'
+          return current_user_id?(user_id) || response.reviewer_is_team_member?(current_user.id)
+        when 'view'
+          return edit_allowed?(response.map, user_id)
+        when 'new'
+          # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
+          # E17A0 In this case, when the review is not found, an error is returned
+          response_map = ResponseMap.find_by_id(params[:id])
+          return response_map.locked_by == current_user.id
+        else
+          current_user
+      end
     end
-
-    case action
-      when 'edit' # If response has been submitted, no further editing allowed
-        return false if response.is_submitted
-        return false if response_map.is_locked? && response_map.locked_by != current_user.id
-        return current_user_id?(user_id) || reviewer_is_team_member?
-      # Deny access to anyone except reviewer & author's team
-      when 'delete', 'update', 'unlock'
-        return current_user_id?(user_id) || reviewer_is_team_member?
-      when 'view'
-        return edit_allowed?(response.map, user_id)
-      when 'new'
-        response_map = ResponseMap.find(params[:id])
-        return response_map.locked_by== current_user.id
-      else
-        current_user
-    end
-
-      # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
-      # E17A0 In this case, when the review is not found, an error is returned
   rescue ActiveRecord::RecordNotFound
     false
   end
 
   def edit_allowed?(map, user_id)
+    response = Response.find(params[:id])
     assignment = map.reviewer.assignment
     # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
     if map.is_a? ReviewResponseMap
@@ -43,7 +50,7 @@ class ResponseController < ApplicationController
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
           (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
           (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
-          reviewer_is_team_member? || !(map.is_locked? && map.locked_by != current_user.id)
+          response.reviewer_is_team_member?(current_user.id) || !(map.is_locked? && map.locked_by != current_user.id)
     else
       return current_user_id?(user_id)
     end
@@ -85,6 +92,7 @@ class ResponseController < ApplicationController
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
 
+
     render action: 'response'
   end
 
@@ -93,7 +101,6 @@ class ResponseController < ApplicationController
     return unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
-    msg = ""
 
     # E17A0 Show a flash message when a response is automatically saved after a period of inactivity
     if params[:autosave_timeout].to_i > 0
@@ -180,17 +187,17 @@ class ResponseController < ApplicationController
     is_submitted = (params[:isSubmit] == 'Yes')
 
     @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round,
-        is_submitted: is_submitted
+      map_id: @map.id,
+      additional_comment: params[:review][:comments],
+      round: @round,
+      is_submitted: is_submitted
     )
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
-    error_msg = ""
+    error_msg = ''
 
     if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
       @response.notify_instructor_on_difference
@@ -200,17 +207,6 @@ class ResponseController < ApplicationController
   end
 
   def saving
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @map.save
-
-
-    unlock_response_map @map.id if @map.type == 'ReviewResponseMap'
-    redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
-  end
-
-  #E17AO Any review team member can unlock and review locked by team-mate. Changes will be lost
-  def unlock
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
@@ -359,10 +355,7 @@ class ResponseController < ApplicationController
     # create score if it is not found. If it is found update it otherwise update it
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-      unless score
-        score = Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      end
-
+      score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       score.update_attribute('answer', v[:score])
       score.update_attribute('comments', v[:comment])
     end
@@ -378,21 +371,7 @@ class ResponseController < ApplicationController
   end
 
   private
-  # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
-  def reviewer_is_team_member?
-    false
-    response = Response.find_by_id(params[:id])
-    review_response_map = ReviewResponseMap.find(response.map_id)
-    unless review_response_map.nil?
-      assignment = Assignment.where(id:review_response_map.reviewed_object_id).first
-      unless assignment.nil?
-        if assignment.reviewer_is_team?
-          teams_user = TeamsUser.where(team_id: review_response_map.team_id)
-          teams_user.all.any? { |m| m.user_id == current_user.id}
-        end
-      end
-    end
-  end
+  # E17A0 Lock and unlock response maps
 
   def lock_response_map response_id
     review_response_map = ReviewResponseMap.find_by_id(Response.find(response_id).map_id)

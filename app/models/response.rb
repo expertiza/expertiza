@@ -63,14 +63,14 @@ class Response < ActiveRecord::Base
         row_class = "" if question.is_a? QuestionnaireHeader
         code += '<tr class="' + row_class + '"><td>'
         # if !answer.nil? or question.is_a? QuestionnaireHeader
-          code += if question.instance_of? Criterion
-                    # Answer Tags are enabled only for Criterion questions at the moment.
-                    question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
-                  elsif question.instance_of? Scale
-                    question.view_completed_question(count, answer, questionnaire_max)
-                  else
-                    question.view_completed_question(count, answer)
-                  end
+        code += if question.instance_of? Criterion
+                  # Answer Tags are enabled only for Criterion questions at the moment.
+                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
+                elsif question.instance_of? Scale
+                  question.view_completed_question(count, answer, questionnaire_max)
+                else
+                  question.view_completed_question(count, answer)
+                end
         # end
         code += '</td></tr>'
       end
@@ -102,6 +102,20 @@ class Response < ActiveRecord::Base
   def delete
     self.scores.each(&:destroy)
     self.destroy
+  end
+
+  # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
+  def reviewer_is_team_member?(user_id)
+    review_response_map = ResponseMap.find(self.map_id)
+    unless review_response_map.nil?
+      assignment = Assignment.where(id:review_response_map.reviewed_object_id).first
+      unless assignment.nil?
+        if assignment.reviewer_is_team?
+          teams_user = TeamsUser.where(team_id: review_response_map.team_id)
+          teams_user.all.any? { |m| m.user_id == user_id}
+        end
+      end
+    end
   end
 
   # bug fixed
@@ -141,10 +155,10 @@ class Response < ActiveRecord::Base
     participant = Participant.find(response_map.reviewer_id)
     # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
     parent = if response_map.survey?
-              response_map.survey_parent
-            else
-              Assignment.find(participant.parent_id)
-            end
+               response_map.survey_parent
+             else
+               Assignment.find(participant.parent_id)
+             end
     defn[:subject] = "A new submission is available for " + parent.name
     response_map.email(defn, participant, parent)
   end
@@ -193,9 +207,9 @@ class Response < ActiveRecord::Base
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
-    comments_in_round_1, counter_in_round_1,
-    comments_in_round_2, counter_in_round_2,
-    comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+        comments_in_round_1, counter_in_round_1,
+        comments_in_round_2, counter_in_round_2,
+        comments_in_round_3, counter_in_round_3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
 
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     avg_vol_in_round_1 = (Lingua::EN::Readability.new(comments_in_round_1).num_words / (counter_in_round_1.zero? ? 1 : counter_in_round_1)).round(0)
@@ -248,18 +262,18 @@ class Response < ActiveRecord::Base
     reviewee_name = User.find(reviewee_participant.user_id).fullname
     assignment = Assignment.find(reviewer_participanat.parent_id)
     Mailer.notify_grade_conflict_message({
-      to: assignment.instructor.email,
-       subject: "Expertiza Notification: A review score is outside the acceptable range",
-       body: {
-         reviewer_name: reviewer_name,
-           type: "review",
-           reviewee_name: reviewee_name,
-           new_score: get_total_score.to_f / get_maximum_score,
-           assignment: assignment,
-           conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
-           summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-           assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-       }
-    }).deliver_now
+                                             to: assignment.instructor.email,
+                                             subject: "Expertiza Notification: A review score is outside the acceptable range",
+                                             body: {
+                                                 reviewer_name: reviewer_name,
+                                                 type: "review",
+                                                 reviewee_name: reviewee_name,
+                                                 new_score: get_total_score.to_f / get_maximum_score,
+                                                 assignment: assignment,
+                                                 conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
+                                                 summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+                                                 assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+                                             }
+                                         }).deliver_now
   end
 end

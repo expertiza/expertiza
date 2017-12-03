@@ -139,6 +139,7 @@ describe AssignmentsController do
       it 'redirets to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment).to receive(:id).and_return(1)
         allow(Assignment).to receive(:find_by_name).with('test assignment').and_return(assignment)

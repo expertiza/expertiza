@@ -61,7 +61,7 @@ describe 'timestamps for students submissions' do
     click_link "Your work"
     fill_in "submission", with: "http://www.google.com"
     click_button "Upload link"
-    all('a', :text => 'Assignments')[1].click
+    all('a', text: 'Assignments')[1].click
     click_link "TestAssignment"
     expect(page).to have_content("Deadline")
     expect(page).to have_content("Submit Hyperlink")
@@ -75,7 +75,7 @@ describe 'timestamps for students submissions' do
     file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
     attach_file('uploaded_file', file_path)
     click_on 'Upload file'
-    all('a', :text => 'Assignments')[1].click
+    all('a', text: 'Assignments')[1].click
     click_link "TestAssignment"
     expect(page).to have_content("Deadline")
     expect(page).to have_content("Submit File")

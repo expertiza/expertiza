@@ -5,13 +5,26 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = response_map = user_id = nil
     action = params[:action]
-    map_id = (action == 'new') ? params[:id] : params[:map_id]
-    map =  ResponseMap.find_by_id(map_id)
 
     # E17A0 When a review is delete midway, redirects to student review listing
-    if map.nil?
-      flash[:error] = "This #{params[:controller]} is no longer available!"
-      redirect_to controller: 'student_review', action: 'list', id: params[:list_id]
+    if %(new create).include?(action)
+      map_id = params[:id]
+      map =  ResponseMap.find_by_id(map_id)
+      if map.nil?
+        flash[:error] = "This #{params[:controller]} is no longer available!"
+        redirect_to controller: 'student_review', action: 'list', id: params[:list_id]
+      end
+
+      case action
+      when 'new', 'create'
+        # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
+        # E17A0 In this case, when the review is not found, an error is returned
+        puts "Hello"
+        response_map = ResponseMap.find_by_id(params[:id])
+        puts response_map.id
+        puts response_map.locked_by == current_user.id
+        return response_map.locked_by == current_user.id
+      end
     else
       if %w(edit delete update view).include?(action)
         response = Response.find(params[:id])
@@ -28,11 +41,6 @@ class ResponseController < ApplicationController
           return current_user_id?(user_id) || response.reviewer_is_team_member?(current_user.id)
         when 'view'
           return edit_allowed?(response.map, user_id)
-        when 'new'
-          # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
-          # E17A0 In this case, when the review is not found, an error is returned
-          response_map = ResponseMap.find_by_id(params[:id])
-          return response_map.locked_by == current_user.id
         else
           current_user
       end

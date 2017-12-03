@@ -257,6 +257,17 @@ class ReviewMappingController < ApplicationController
     redirect_to :back
   end
 
+  def unlock_review
+    review_response_map = ReviewResponseMap.find_by(id: params[:id])
+    if review_response_map
+      ReviewResponseMap.update(review_response_map.id, :is_locked => false)
+      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been unlocked."
+    else
+      flash[:error] = "This #{params[:controller]} is no longer available!"
+    end
+    redirect_to :back
+  end
+
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id

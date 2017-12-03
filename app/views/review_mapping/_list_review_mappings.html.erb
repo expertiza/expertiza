@@ -113,6 +113,10 @@
                 <% end %><br/>
               </div>
               <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id %><br/>
+
+              <% if map.is_locked %>
+                <%= link_to 'unlock', :action => 'unlock_review', :id => map.map_id %><br/>
+              <% end %>
               <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.map_id %><br/>
               <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.map_id %>
             </div>

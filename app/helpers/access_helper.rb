@@ -10,7 +10,7 @@ module AccessHelper
     if params[:controller] == 'response'
       if params.has_key?(:map_id)
         response_map = ResponseMap.find_by_id(params[:map_id])
-        response_locked = (!response_map.nil?) ? response_map.locked : false
+        response_locked = (!response_map.nil?) ? response_map.is_locked : false
         if response_locked
           flash[:error] = "One of your teammates is working on the review. Only one person can work on a review at a time."
         else

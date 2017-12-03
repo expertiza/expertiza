@@ -175,16 +175,12 @@ describe 'timestamps for students submissions' do
 
     context 'after current participant reviews other\'s work in round 2' do
       it 'displays a link named \'review\' with its round number (2) and timestamps (you could redirect to that review by clicking the link)'
-         # it also displays due dates
-         # it also displays submitted files or hyperlinks
-         # it also displays review links
+
     end
 
     context 'after current participant finishes an author feedback' do
       it 'displays a link named \'feedback\' with its timestamps (you could redirect to that feedback by clicking the link)'
-        # it also displays due dates
-        # it also displays submitted files or hyperlinks
-        # it also displays review links
+
     end
   end
 end

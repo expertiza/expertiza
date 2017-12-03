@@ -325,7 +325,7 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
-    q[:questionnaire_id].empty?
+      q[:questionnaire_id].empty?
     end
   end
 

@@ -188,9 +188,11 @@
         }
       });
     }
-    <% @assignment_form.tag_prompt_deployments.each do |tag_dep| %>
-    addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.questionnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.questionnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.question_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
-    <% end %>
+    <% unless @assignment_form.tag_prompt_deployments == nil %>
+    	<% @assignment_form.tag_prompt_deployments.each do |tag_dep| %>
+    		addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.questionnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.questionnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.question_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
+    	<% end %>
+    <%end%>
     // end tag prompt code
     function removeQuestionnaireTableRow(questionnaire_type) {
       var row_id = 'questionnaire_table_' + questionnaire_type;

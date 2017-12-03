@@ -37,7 +37,7 @@ describe 'timestamps for students submissions' do
     visit '/student_task/list'
   end
 
-  def signup_topic
+  def signupt_topic
     user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
@@ -48,7 +48,7 @@ describe 'timestamps for students submissions' do
   end
 
   def submit_to_topic
-    signup_topic
+    signupt_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
     expect(page).to have_content "https://www.ncsu.edu"
@@ -115,7 +115,7 @@ describe 'timestamps for students submissions' do
 
     context 'after current participant has uploaded a file' do
       it 'displays file names with its timestamps' do
-         # it also displays due dates
+        # it also displays due dates
         submit_file
       end
     end
@@ -133,9 +133,9 @@ describe 'timestamps for students submissions' do
 
     context 'after current participant finishes an author feedback' do
       xit 'displays a link named \'feedback\' with its timestamps (you could redirect to that feedback by clicking the link)' do
-       # it also displays due dates
-       # it also displays submitted files or hyperlinks
-       # it also displays review links
+        # it also displays due dates
+        # it also displays submitted files or hyperlinks
+        # it also displays review links
         submit_to_topic
         user = User.find_by_name("student2064")
         stub_current_user(user, user.role.name, user.role)

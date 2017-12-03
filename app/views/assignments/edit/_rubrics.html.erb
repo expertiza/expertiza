@@ -4,8 +4,13 @@
         var row_id = 'questionnaire_table_' + questionnaire_type;
         var i = 0;
         var html;
+
         html += '<tr id="' + row_id + '">' +
-        '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> +'">';
+        '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="';
+        html += '<%= @assignment_form.assignment.id %>';
+	      html += '">';
+
+
         //Rubric name
         if (round_no ==null) {
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
@@ -58,25 +63,20 @@
         questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
     }
-
     // start used for tag prompt
     var tag_prompts = null
     var q_types = null
-
     function getIdPrefix(qs_id){
       prefix = 'assignment_form[tag_prompt_deployments]['
-
       if(qs_id!=null)
         return prefix + qs_id + ']'
       else
         return prefix + ']'
     }
-
     async function addTagPromptDropdown(placeholder_id, tag_dep_id, questionnaire_id, tag_prompt_id, question_type, text_len){
       $( "#" + placeholder_id ).append("<div id='loading_image'><img src='/assets/loading.gif' /></div>")
       q_types_filled = false
       tag_prompts_filled = false
-
       if(!q_types){
         $.ajax({
           dataType: "json",
@@ -89,7 +89,6 @@
         });
       }else
         q_types_filled = true
-
       if(!tag_prompts){
         $.ajax({
           dataType: "json",
@@ -101,14 +100,11 @@
           }});
       }else
         tag_prompts_filled = true
-
       while(!(tag_prompts_filled || q_types_filled)){
         await sleep(2000);
       }
       $('#loading_image').remove()
-
       var id_prefix = getIdPrefix(questionnaire_id)
-
       var html = "<div id='container_" + id_prefix + "'>"
       html += "<input type='hidden' name='" + id_prefix + "[id][]' value='" + tag_dep_id + "'>"
       html += "Tag prompt "
@@ -123,7 +119,6 @@
         html += ">" + tag_prompts[i].prompt + "</option>"
       }
       html += "</select>"
-
       html += "&nbsp;&nbsp; apply to question type "
       html += "<img src='/assets/info.png' title='The tag prompt will only be shown below the answers of this particular question type. It is useful to exclude types of question that the tags are not relevant to' />"
       html += ": <select name='" + id_prefix + "[question_type][]'>"
@@ -134,18 +129,15 @@
         html += ">" + q_types[i] + "</option>"
       }
       html += "</select>"
-
       html += "&nbsp;&nbsp; comment length threshold "
       html += "<img src='/assets/info.png' title='This is only applicable to textual comments. The tag prompt will only be shown below textual comments whose length exceed the threshold. it is useful to exclude short comments that are not relevant' />"
       html += ": <input type='text' name='" + id_prefix + "[answer_length_threshold][]' size='4' value='" + text_len + "'/>"
       html += "</div>"
       $( "#" + placeholder_id ).append(html)
     }
-
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
-
     function removeLastTagPromptDropdown(placeholder_id, deleted_input_id){
       //var id_prefix = 'assignment_form[tag_prompt_deployments]'
       deleted_tag_dep_id = $("#"+placeholder_id+" div:last").find('input[type="hidden"]')[0].value
@@ -153,7 +145,6 @@
       $("#" + placeholder_id + " div:last").remove()
       $("#" + placeholder_id).append(html)
     }
-
     function openAddNewTagPopup(){
       $.colorbox({
         iframe: true,
@@ -169,7 +160,6 @@
             data: "",
             success: function(tag_prompts){
               option = "<option value='none'>---</option><option value='new'>add new..</option>";
-
               //put all prompts including the newly added as options, find the highest id to be selected by default
               //This won't work if it's just an update
               last_added_id = 0;
@@ -182,7 +172,6 @@
                 option += "<option value='" + tag_prompts[i].id + "'";
                 option += ">" + tag_prompts[i].prompt + "</option>";
               }
-
               //update all dropdown with the option, restore the selected option, unless for the dropdown that calls the popup
               $('select[name*="\\[tag_prompt\\]"]').each( function() {
                 s = jQuery(this)
@@ -199,21 +188,18 @@
         }
       });
     }
-
-    <% @assignment_form.tag_prompt_deployments.each do |tag_dep| %>
-    addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.questionnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.questionnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.question_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
-    <% end %>
+    <% unless @assignment_form.tag_prompt_deployments == nil %>
+    	<% @assignment_form.tag_prompt_deployments.each do |tag_dep| %>
+    		addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.questionnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.questionnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.question_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
+    	<% end %>
+    <%end%>
     // end tag prompt code
-
     function removeQuestionnaireTableRow(questionnaire_type) {
       var row_id = 'questionnaire_table_' + questionnaire_type;
       jQuery('#' + row_id).remove();
     }
-
     function metareview_due_date() {
-
       var metareview = document.getElementById("metareview_due_date_label");
-
         var dropdownIndex = document.getElementById('metareview_quest').selectedIndex;
         var dropdownValue = document.getElementById('metareview_quest')[dropdownIndex].value;
         if (dropdownValue != "0") {
@@ -222,7 +208,6 @@
           metareview.style.display = "none";
         }
     }
-
     //zhewei: varying rubric by round still not add 'BookmarkRatingQuestionnaire' yet.
     function handleCheckReviewVary(checkvalue) {
         var state = checkvalue.checked;
@@ -356,7 +341,6 @@
                   <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
           );
           <% end %>
-
           var metareview_allowed_checkbox = jQuery('#metareviewAllowed');
           if (metareview_allowed_checkbox.is(':checked')) {
             addQuestionnaireTableRow(

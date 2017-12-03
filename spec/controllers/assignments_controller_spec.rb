@@ -106,7 +106,12 @@ describe AssignmentsController do
     before(:each) do
       allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
       @params = {
+        button: '',
         assignment_form: {
+          assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          due_date: [{"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"1", "due_at"=>"2017/12/05 00:00", "submission_allowed_id"=>"3", "review_allowed_id"=>"1", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}, 
+                    {"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"2", "due_at"=>"2017/12/02 00:00", "submission_allowed_id"=>"1", "review_allowed_id"=>"3", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}], 
           assignment: {
             instructor_id: 2,
             course_id: 1,
@@ -134,7 +139,10 @@ describe AssignmentsController do
       it 'redirets to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
+        allow(assignment).to receive(:id).and_return(1)
+        allow(Assignment).to receive(:find_by_name).with('test assignment').and_return(assignment)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params

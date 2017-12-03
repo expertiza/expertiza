@@ -59,6 +59,7 @@ class ResponseMap < ActiveRecord::Base
   end
 
   # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
+  # E17A0 Lock and unlock a response map
   def reviewer_is_team_member?(user_id)
     assignment = Assignment.where(id: self.reviewed_object_id).first
     unless assignment.nil?
@@ -68,6 +69,15 @@ class ResponseMap < ActiveRecord::Base
       end
     end
   end
+
+  def lock(user_id)
+    ResponseMap.update(self.id, :is_locked => true, :locked_by => user_id)
+  end
+
+  def unlock(user_id)
+    ResponseMap.update(self.id, :is_locked => false, :locked_by => user_id)
+  end
+  # E17A0 End
 
   # Evaluates whether this response_map was metareviewed by metareviewer
   # @param[in] metareviewer AssignmentParticipant object

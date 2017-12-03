@@ -80,7 +80,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @response = Response.find(params[:id])
     @map = @response.map
-    lock_response_map params[:id] if @map.type == 'ReviewResponseMap'
+    @map.lock current_user.id
     @contributor = @map.contributor
     set_all_responses
 
@@ -144,6 +144,7 @@ class ResponseController < ApplicationController
     @next_action = "create"
     @feedback = params[:feedback]
     @map = ResponseMap.find(params[:id])
+    @map.lock current_user.id
     @return = params[:return]
     @modified_object = @map.id
     set_content(true)
@@ -216,7 +217,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    unlock_response_map @map.id if @map.type == 'ReviewResponseMap'
+    @map.unlock current_user.id
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
@@ -374,22 +375,5 @@ class ResponseController < ApplicationController
     @prev = Response.where(map_id: @map.id)
     # not sure what this is about
     @review_scores = @prev.to_a
-  end
-
-  private
-  # E17A0 Lock and unlock response maps
-
-  def lock_response_map response_id
-    review_response_map = ReviewResponseMap.find_by_id(Response.find(response_id).map_id)
-    unless review_response_map.nil?
-      ReviewResponseMap.update(review_response_map.id, :is_locked => true, :locked_by => current_user.id)
-    end
-  end
-
-  def unlock_response_map response_id
-    review_response_map = ReviewResponseMap.find_by_id(response_id)
-    unless review_response_map.nil?
-      ReviewResponseMap.update(review_response_map.id, :is_locked => false, :locked_by => current_user.id)
-    end
   end
 end

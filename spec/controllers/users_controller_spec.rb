@@ -109,6 +109,27 @@ describe UsersController do
     end
   end
 
+  describe '#new' do
+    it 'creates a new user and renders users#new page' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      @request.session['user'] = instructor
+      get :new
+      expect(response).to render_template(:new)
+      expect(assigns(:user)).to be_a_new(User)
+    end
+  end
+
+  describe '#request_new' do
+    context 'when the current user is not student' do
+      it 'creates a new user and renders users#new page' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        @request.session['user'] = instructor
+        get :new
+        expect(response).to render_template(:new)
+        expect(assigns(:user)).to be_a_new(User)
+      end
+    end
+  end
 end
 
 

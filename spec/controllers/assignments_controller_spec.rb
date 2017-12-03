@@ -108,6 +108,10 @@ describe AssignmentsController do
       @params = {
         button: '',
         assignment_form: {
+          assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          due_date: [{"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"1", "due_at"=>"2017/12/05 00:00", "submission_allowed_id"=>"3", "review_allowed_id"=>"1", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}, 
+                    {"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"2", "due_at"=>"2017/12/02 00:00", "submission_allowed_id"=>"1", "review_allowed_id"=>"3", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}], 
           assignment: {
             instructor_id: 2,
             course_id: 1,

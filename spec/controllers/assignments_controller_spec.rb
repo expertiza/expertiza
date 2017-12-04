@@ -403,8 +403,7 @@ describe AssignmentsController do
         @response_count = response_map.count
         post :delete_reviews, params
         expect(@response_count).to eq 1
-        expect(flash[:note]).to eq("#{@response_count == 1 ? '1 review ' : "All #{@response_count} reviews"} for assignment \"#{assignment.name}\"
-                                   #{response_count ? 'has' : 'have'} been successfully deleted!")
+        expect(flash[:note]).to eq("#{@response_count == 1 ? '1 review ' : "All #{@response_count} reviews"} for assignment \"#{assignment.name}\"#{response_count ? 'has' : 'have'} been successfully deleted!")
         expect(response).to redirect_to("/assignments/#{assignment.id}/edit")
       end
     end

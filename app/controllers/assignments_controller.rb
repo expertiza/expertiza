@@ -74,8 +74,7 @@ class AssignmentsController < ApplicationController
     response_count = @response_map.count
     if response_count != 0
       @assignment.delete_reviews
-      flash[:note] = "#{response_count == 1 ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\"
-                      #{response_count ? 'has' : 'have'} been successfully deleted!"
+      flash[:note] = "#{response_count == 1 ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\"#{response_count ? 'has' : 'have'} been successfully deleted!"
     else
       flash[:error] = "This assignment does not have any reviews."
     end

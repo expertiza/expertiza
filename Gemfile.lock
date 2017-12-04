@@ -541,9 +541,4 @@ DEPENDENCIES
   will_paginate
   zip-zip
 
-BUNDLED WITH
-<<<<<<< HEAD
-   1.16.0.pre.3
-=======
    1.11.2
->>>>>>> e9a5c20f953768b47794127bfa07a24fa5adb69f

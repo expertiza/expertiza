@@ -79,6 +79,7 @@ class ResponseController < ApplicationController
     # the response to be updated
     @response = Response.find(params[:id])
     map = @response.map
+    team_id = map.reviewee_id
     msg = ""
     begin
       @map = @response.map
@@ -87,10 +88,13 @@ class ResponseController < ApplicationController
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
 
-      @supp_questionnaire = getSuppQuestionnaire(map)
-      unless @supp_questionnaire.nil?
-        questions_supp = sort_questions(@supp_questionnaire.questions)
-        create_answers(params, questions_supp) unless params[:responses].nil?
+      @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(team_id)
+      unless @supp_questionnaire_id.nil?
+        @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
+        unless @supp_questionnaire.nil?
+          questions_supp = sort_questions(@supp_questionnaire.questions)
+          create_answers(params, questions_supp) unless params[:responses].nil?
+        end
       end
 
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -143,22 +147,19 @@ class ResponseController < ApplicationController
     set_content
   end
 
-  def getSuppQuestionnaire(map)
-    @team_id = map.reviewee_id
-    supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
-    unless supp_questionnaire_id.nil?
-      supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
-    end
-    supp_questionnaire
-  end
-
   def create
     @map = ResponseMap.find(params[:id])
+    @team_id = @map.reviewee_id
     set_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
-      @supp_questionnaire = getSuppQuestionnaire(@map)
+
+      @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
+      unless @supp_questionnaire_id.nil?
+        @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
+      end
+
     else
       @round = nil
     end
@@ -172,6 +173,7 @@ class ResponseController < ApplicationController
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
+
     # For Supp Questions
     unless @supp_questionnaire.nil?
       questions_supp = sort_questions(@supp_questionnaire.questions)
@@ -279,9 +281,14 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
+
     @questions = sort_questions(@questionnaire.questions)
+
     # For supp Questionnaire
-    @questions_supp = sort_questions(@supp_questionnaire.questions)
+    unless @supp_questionnaire.nil?
+      @questions_supp = sort_questions(@supp_questionnaire.questions)
+    end
+    ###
 
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
@@ -339,9 +346,7 @@ class ResponseController < ApplicationController
   end
 
   def sort_questions(questions)
-    unless questions.nil?
-      questions.sort_by(&:seq)
-    end
+    questions.sort_by(&:seq)
   end
 
   def create_answers(params, questions)

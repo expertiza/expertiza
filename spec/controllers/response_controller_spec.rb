@@ -10,7 +10,7 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
-  let(:user) { build(:student, id:1) }
+  let(:user) { build(:student, id: 1) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -38,7 +38,7 @@ describe ResponseController do
         end
       end
 
-      #E17A0 If a review is locked by a different user than current user,action not allowed
+      # E17A0 If a review is locked by a different user than current user,action not allowed
       context 'when response is locked by different user than current user' do
         it 'does not allow certain action' do
           allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
@@ -49,7 +49,7 @@ describe ResponseController do
         end
       end
 
-      #E17A0 Check if current user is a member of assignment review team
+      # E17A0 Check if current user is a member of assignment review team
       context 'when response is locked by same user as current user' do
         it 'does not disallow certain action' do
           allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
@@ -86,9 +86,8 @@ describe ResponseController do
       allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
       allow(Assignment).to receive(:where).with(1).and_return(assignment)
       allow(assignment).to receive(:reviewer_is_team).with(user.id).and_return(true)
-      end
+    end
   end
-
 
   describe '#delete' do
     it 'deletes current response and redirects to response#redirection page' do
@@ -124,10 +123,10 @@ describe ResponseController do
       it 'raise an error and redirects to response#saving page' do
         allow(review_response).to receive(:update_attribute).with('additional_comment', 'some comments').and_raise('ERROR!')
         params = {
-            id: 1,
-            review: {
-                comments: 'some comments'
-            }
+          id: 1,
+          review: {
+            comments: 'some comments'
+          }
         }
         post :update, params
         expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21')
@@ -144,14 +143,14 @@ describe ResponseController do
         allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
         allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
         params = {
-            id: 1,
-            review: {
-                comments: 'some comments'
-            },
-            responses: {
-                '0' => {score: 98, comment: 'LGTM'}
-            },
-            isSubmit: 'No'
+          id: 1,
+          review: {
+            comments: 'some comments'
+          },
+          responses: {
+            '0' => {score: 98, comment: 'LGTM'}
+          },
+          isSubmit: 'No'
         }
         post :update, params
         expect(response).to redirect_to('/response/saving?id=1')
@@ -173,15 +172,15 @@ describe ResponseController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
       params = {
-          id: 1,
-          feedback: '',
-          return: ''
+        id: 1,
+        feedback: '',
+        return: ''
       }
       get :new, params
-      #expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
-      #expect(controller.instance_variable_get(:@min)).to eq(0)
-      #expect(controller.instance_variable_get(:@max)).to eq(5)
-      #expect(response).to render_template(:response)
+      # expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
+      # expect(controller.instance_variable_get(:@min)).to eq(0)
+      # expect(controller.instance_variable_get(:@max)).to eq(5)
+      # expect(response).to render_template(:response)
     end
   end
 
@@ -236,19 +235,19 @@ describe ResponseController do
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
       allow_any_instance_of(Response).to receive(:email).and_return('OK!')
       params = {
-          id: 1,
-          review: {
-              questionnaire_id: '1',
-              round: 1,
-              comments: 'no comment'
-          },
-          responses: {
-              '0' => {score: 98, comment: 'LGTM'}
-          },
-          isSubmit: 'No'
+        id: 1,
+        review: {
+          questionnaire_id: '1',
+          round: 1,
+          comments: 'no comment'
+        },
+        responses: {
+          '0' => {score: 98, comment: 'LGTM'}
+        },
+        isSubmit: 'No'
       }
-      #post :create, params
-      #bexpect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
+      # post :create, params
+      # bexpect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
     end
   end
 
@@ -257,8 +256,8 @@ describe ResponseController do
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
       allow(review_response_map).to receive(:save).and_return(review_response_map)
       params = {
-          id: 1,
-          return: ''
+        id: 1,
+        return: ''
       }
       post :saving, params
       expect(response).to redirect_to('/response/redirection?id=1&return=')
@@ -343,7 +342,7 @@ describe ResponseController do
         allow(CourseParticipant).to receive(:where).with(user_id: 6).and_return([double('CourseParticipant', id: 8, parent_id: 1)])
         allow(AssignmentParticipant).to receive(:where).with(user_id: 6).and_return([participant])
         survey_deployment = double('SurveyDeployment', id: 1, questionnaire_id: 1, global_survey_id: 1,
-                                   start_date: DateTime.now.in_time_zone - 1.day, end_date: DateTime.now.in_time_zone + 1.day)
+                                                       start_date: DateTime.now.in_time_zone - 1.day, end_date: DateTime.now.in_time_zone + 1.day)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
         allow(CourseSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
         participant.parent_id = 1

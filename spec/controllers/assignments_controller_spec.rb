@@ -370,10 +370,10 @@ describe AssignmentsController do
   end
 
   describe '#delete_reviews' do
-    let(:assignment) {build(:assignment, id: 1, name: 'new assignment')}
-    let(:responsemap) {build(:review_response_map, id: 1, reviewed_object_id: 1, type: 'ReviewResponseMap')}
+    let(:assignment) { build(:assignment, id: 1, name: 'new assignment') }
+    let(:responsemap) { build(:review_response_map, id: 1, reviewed_object_id: 1, type: 'ReviewResponseMap') }
     let(:response_count) { 0 }
-    let(:response_map) { ResponseMap.where(reviewed_object_id: 1, type: 'ReviewResponseMap')}
+    let(:response_map) { ResponseMap.where(reviewed_object_id: 1, type: 'ReviewResponseMap') }
     before(:each) do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(ResponseMap.where(reviewed_object_id: 1, type: 'ReviewResponseMap')).to receive(:all).and_return(@respose_map)
@@ -382,7 +382,7 @@ describe AssignmentsController do
     context 'confirmation before assignment reviews are deleted' do
       it 'shows a flash error when no reviews are there to be deleted and redirects to assignment edit' do
         params = {
-            assignment_id: 1
+          assignment_id: 1
         }
         session = {user: instructor}
         @response_count = response_map.count
@@ -394,16 +394,17 @@ describe AssignmentsController do
     end
 
     context 'when assignment reviews are deleted successfully' do
-      it 'shows a flash not when there are reveiws to be deleted and redirects to assignment edit' do
+      it 'shows a flash not when there are reviews to be deleted and redirects to assignment edit' do
         params = {
-            assignment_id: 1
+          assignment_id: 1
         }
         session = {user: instructor}
         ResponseMap.create(id: 1, reviewed_object_id: 1, type: 'ReviewResponseMap')
         @response_count = response_map.count
         post :delete_reviews, params
         expect(@response_count).to eq 1
-        expect(flash[:note]).to eq("#{(@response_count == 1) ? '1 review ' : "All #{@response_count} reviews"} for assignment \"#{assignment.name}\" #{response_count ? 'has' : 'have'} been successfully deleted!")
+        expect(flash[:note]).to eq("#{@response_count == 1 ? '1 review ' : "All #{@response_count} reviews"} for assignment \"#{assignment.name}\"
+                                   #{response_count ? 'has' : 'have'} been successfully deleted!")
         expect(response).to redirect_to("/assignments/#{assignment.id}/edit")
       end
     end

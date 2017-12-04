@@ -8,7 +8,7 @@ class ResponseController < ApplicationController
 
     # E17A0 When a review is deleted, redirects to student review listing
     if %(new create).include?(action)
-      response_map =  ResponseMap.find_by_id(params[:id])
+      response_map = ResponseMap.find_by_id(params[:id])
       if response_map.nil?
         flash[:error] = "This #{params[:controller]} is no longer available!"
         redirect_to controller: 'student_review', action: 'list', id: params[:list_id]
@@ -31,17 +31,17 @@ class ResponseController < ApplicationController
         user_id = response.map.reviewer.user_id if response.map.reviewer
       end
       case action
-        when 'edit' # If response has been submitted, no further editing allowed
-          return false if response.is_submitted
-          return false if response_map.is_locked? && response_map.locked_by != current_user.id
-          return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
-        # Deny access to anyone except reviewer & author's team
-        when 'delete', 'update', 'unlock'
-          return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
-        when 'view'
-          return edit_allowed?(response.map, user_id)
-        else
-          current_user
+      when 'edit' # If response has been submitted, no further editing allowed
+        return false if response.is_submitted
+        return false if response_map.is_locked? && response_map.locked_by != current_user.id
+        return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
+      # Deny access to anyone except reviewer & author's team
+      when 'delete', 'update', 'unlock'
+        return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
+      when 'view'
+        return edit_allowed?(response.map, user_id)
+      else
+        current_user
       end
     end
   rescue ActiveRecord::RecordNotFound
@@ -331,10 +331,10 @@ class ResponseController < ApplicationController
   def scores
     @review_scores = []
     @questions.each do |question|
-    @review_scores << Answer.where(
-      response_id: @response.id,
-      question_id:  question.id
-    ).first
+      @review_scores << Answer.where(
+        response_id: @response.id,
+        question_id:  question.id
+      ).first
     end
   end
 

@@ -5,7 +5,7 @@ class StudentReviewController < ApplicationController
      'Administrator',
      'Super-Administrator',
      'Student'].include? current_role_name and
-        ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
+        (%w(list).include? action_name ? are_needed_authorizations_present?(params[:id], "submitter") : true)
   end
 
   def list
@@ -14,10 +14,8 @@ class StudentReviewController < ApplicationController
     @reviewer_team_info = @assignment.reviewer_team_info current_user.id
     return unless current_user_id?(@participant.user_id) || @reviewer_team_info[:reviewer_is_team_member]
 
-    #E17A0 We unlock a response_map if it was locked by another team member.
-    if(params.has_key?(:response_id))
-      unlock_response_map params[:response_id]
-    end
+    # E17A0 We unlock a response_map if it was locked by another team member.
+    unlock_response_map params[:response_id] if params.key?(:response_id)
 
     @assignment = @participant.assignment
     # Find the current phase that the assignment is in.

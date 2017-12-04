@@ -6,13 +6,13 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if params[:other_action] == 'delete_reviews'
       assignment = Assignment.find(params[:assignment_id])
-      %w[Super-Administrator Administrator].include? current_role_name or
+      %w(Super-Administrator Administrator).include? current_role_name or
           assignment.instructor_id == current_user.try(:id) or
           TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
           assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
-    elsif %w[edit update list_submissions].include? params[:action]
+    elsif %w(edit update list_submissions).include? params[:action]
       assignment = Assignment.find(params[:id])
-      %w[Super-Administrator Administrator].include? current_role_name or
+      %w(Super-Administrator Administrator).include? current_role_name or
       assignment.instructor_id == current_user.try(:id) or
       TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
       assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)

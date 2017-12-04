@@ -1,6 +1,5 @@
 require 'rspec'
 
-
 describe 'new account request' do
 
   before(:each) do
@@ -108,6 +107,7 @@ describe 'new account request' do
 
     context 'when super-admin or admin accepts a requester' do
       it 'displays \'Accept\' as status and sends an email with randomly-generated password to the new user' do
+
         visit '/'
         login_as 'super_administrator2'
         visit '/users/list_pending_requested'

@@ -50,6 +50,8 @@ jQuery(document).ready(function() {
 
         <% @response_check = true %>
         <%= hidden_field_tag :timeout_flag, :id => 'timeout_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_link_timing_flag, :id => 'restart_link_timing_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_file_timing_flag, :id => 'restart_file_timing_flag', :value => 'false' %>
         <%if @assignment.has_teams?%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
             <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :response_check => @response_check, :round => @current_round} %>
@@ -144,7 +146,7 @@ jQuery(document).ready(function() {
 
       function timeoutAction(){
         // window.focus();
-        // markEndTime();
+        markEndTime();
         if(confirm("Are you still reviewing your submissions? Press OK to continue")){
           startTimer();
         } else {
@@ -152,7 +154,6 @@ jQuery(document).ready(function() {
           $("#timeout_flag").val("true");
           //markEndTime();
           alert("The page has not been interacted for a long time, and will close reference windows and go back!");
-          markEndTime();
           window.history.back();
         }
       }
@@ -165,6 +166,8 @@ jQuery(document).ready(function() {
       function startTimer() {
         resetTimer();
         $("#timeout_flag").val("false");
+        $("#restart_file_timing_flag").val("true");
+        $("#restart_link_timing_flag").val("true");
         document.onmousemove = resetTimer;
         document.onkeypress = resetTimer;
         document.onload = resetTimer;

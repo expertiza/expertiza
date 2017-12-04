@@ -8,23 +8,20 @@ class UsersController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'request_new'
-      true
-    when 'request_user_create'
-      true
+      when 'request_new'
+        true
+      when 'request_user_create'
+        true
       # TODO: change review to only authorized users
-    when 'review'
-      current_role_name.eql? 'Super-Administrator'
-    when 'keys'
-      current_role_name.eql? 'Student'
-    when 'list_pending_requested'
-      ['Super-Administrator',
-       'Administrator'].include? current_role_name
-    else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      when 'review'
+        current_role_name.eql? 'Super-Administrator'
+      when 'keys'
+        current_role_name.eql? 'Student'
+      else
+        ['Super-Administrator',
+         'Administrator',
+         'Instructor',
+         'Teaching Assistant'].include? current_role_name
     end
   end
 
@@ -44,30 +41,18 @@ class UsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
-  #
   # for anonymized view for demo purposes
-  # three scenarios:
-  # 1) when current user is anonymized view starter. change to anonymized view. 
-  #    (no session[:super_user], and current session_id == anonymized view starter session_id)
-  # 2) when current user is impersonated by anonymized view starter. change to anonymized view. 
-  #    (have session[:super_user], and current session_id != anonymized view starter session_id)
-  # 3) Other users. do not change to anonymized view. 
-  #    (no session[:super_user], and current session_id != anonymized view starter session_id)
-  #
-  def set_anonymized_view
-    anonymized_view = $redis.get('anonymized_view') || 'false'
-    anonymized_view_starter = $redis.get('anonymized_view_starter') || ''
-    anonymized_view = case anonymized_view
-                     when 'true'
-                      anonymized_view_starter = ''
-                      'false'
-                     when 'false'
-                       anonymized_view_starter += session[:user][:name]
-                       'true'
+  def set_anonymous_mode
+    anonymous_mode = $redis.get('anonymous_mode')
+    anonymous_mode = case anonymous_mode
+                       when 'true'
+                         'false'
+                       when 'false'
+                         'true'
+                       else
+                         'false'
                      end
-    $redis.set('anonymized_view', anonymized_view)
-    $redis.set('anonymized_view_starter', anonymized_view_starter)
-    $redis.set('anonymized_view_starter_session_id', session.id)
+    $redis.set('anonymous_mode', anonymous_mode)
     redirect_to :back
   end
 
@@ -173,7 +158,8 @@ class UsersController < ApplicationController
   def send_to_request
     @user = RequestedUser.find_by_email(params["user_email"])
     text = params[:users][:intro]
-    prepared_mail = UserMailer.send_to_request_user(@user,"This email is coming from the Expertiza Group.",text)
+
+    prepared_mail = MailerHelper.chat_with_user(@user,"This email is coming from the Expertiza Group.",text)
     prepared_mail.deliver_now
     flash[:success] = "A new password has been sent to the user's e-mail address."
     redirect_to action: 'list_pending_requested'
@@ -204,9 +190,12 @@ class UsersController < ApplicationController
       if @usernew.save
         password = @usernew.reset_password # the password is reset
         # Mail is sent to the user with a new password
-       # prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password
+        # prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password
         # have been created.", "user_welcome", password)
-        prepared_mail = UserMailer.send_to_user(@usernew,"Your Expertiza account and password have been created.","user_welcome",password)
+        #prepared_mail = UserMailer.send_to_user(@usernew,"Your Expertiza account and password have been created.","user_welcome",password)
+        prepared_mail = MailerHelper.send_mail_to_user(@usernew, "Your Expertiza account and password
+                                                            have been created.", "user_welcome", password)
+
         prepared_mail.deliver_now
         flash[:success] = "A new password has been sent to new user's e-mail address."
         if @usernew.role.name == "Instructor" or @usernew.role.name == "Administrator"
@@ -235,21 +224,10 @@ class UsersController < ApplicationController
   def request_user_create
     # TODO: Do not allow duplicates
     # TODO: All fields should be entered
-
-
     @user = RequestedUser.new(user_params)
-
-=begin
-    if(@user.email.blank?)
-      flash[:error] = "Email can not be blank"
-      redirect_to controller: 'users', action: 'request_new', role: "Student"
-      return
-    end
-=end
-
     if params[:user][:institution_id]==''
       if Institution.find_by(name: params[:institution][:name])
-          @institution = Institution.find_by(name: params[:institution][:name])
+        @institution = Institution.find_by(name: params[:institution][:name])
       else
         @institution = Institution.new(name: params[:institution][:name])
         @institution.save #ID(row)generate only after save
@@ -259,9 +237,8 @@ class UsersController < ApplicationController
       @user.institution_id = params[:user][:institution_id]
     end
 
-
     @user.status = 'Under Review'
-    @user.intro = params[:requested_user][:intro]
+    @user.intro = params[:requested_users][:intro]
 
     # The super admin receives a mail about a new user request with the user name
     if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil?
@@ -272,18 +249,17 @@ class UsersController < ApplicationController
           prepared_mail.deliver_now
         end
         flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
-        redirect_to '/instructions/home'
-
+        redirect_to '/instructions/home' and return
       else
-        flash[:error] = "The account you are requesting has already existed in Expertiza."
-        render 'request_new'
-    end
-
+        #include both invalid email and existed email for requesteduser
+        #invalide email of request user would not flash "alreadly existed"
+      end
     else
       flash[:error] = "The account you are requesting has already existed in Expertiza."
-      render 'request_new'
-      end
-
+      #redirect_to controller: 'users',action:'request_new',role:"Student"
+    end
+    @intro = params[:requested_users][:intro]
+    render 'request_new'
   end
 
   def edit

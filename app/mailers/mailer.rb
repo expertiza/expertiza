@@ -39,6 +39,13 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
+  def request_user_message_2(defn)
+    @message = defn[:body][:message]
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:bcc])
+  end
+
   def sync_message(defn)
     @body = defn[:body]
     @type = defn[:body][:type]

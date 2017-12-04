@@ -13,7 +13,7 @@ class ResponseController < ApplicationController
         flash[:error] = "This #{params[:controller]} is no longer available!"
         redirect_to controller: 'student_review', action: 'list', id: params[:list_id]
       else
-        response = Response.find_by(map_id: response_map.id)
+        response = Response.where(map_id: response_map.id).first
         unless response.nil?
           flash[:error] = "This review has already been started."
           redirect_to controller: 'student_review', action: 'list', id: params[:list_id]

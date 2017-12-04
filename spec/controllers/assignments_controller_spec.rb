@@ -444,7 +444,4 @@ describe AssignmentsController do
       end
     end
   end
-
-
-
 end

@@ -282,6 +282,8 @@ class Assignment < ActiveRecord::Base
     self.destroy
   end
 
+  # E17A0 Begin
+  # E17A0 Allow all reviews for the assignment to be deleted
   def delete_reviews
     responsemap = ResponseMap.where(reviewed_object_id: self.id, type: 'ReviewResponseMap')
     response = Response.where(map_id: responsemap.ids)
@@ -289,6 +291,19 @@ class Assignment < ActiveRecord::Base
     Response.destroy_all(map_id: responsemap.ids)
     ResponseMap.destroy_all(id: responsemap.ids)
   end
+
+  # E17A0 Get review team info for an user
+  def reviewer_team_info(user_id)
+    team = Team.select(:id, :parent_id).where(parent_id: self.id).all
+    teams_user = TeamsUser.select(:id, :team_id, :user_id).where(user_id: user_id)
+    teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
+    if teams_user.count > 0
+      {:reviewer_is_team_member => teams_user.any? { |t| t.user_id == user_id}, :team_id => teams_user.first.team_id}
+    else
+      {:reviewer_is_team_member => false, :team_id => 0}
+    end
+  end
+  # E17A0 End
 
   # Check to see if assignment is a microtask
   def microtask?

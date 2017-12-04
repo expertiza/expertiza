@@ -47,7 +47,7 @@ class AssignmentTeam < Team
     team_id  = teams_user.team_id(assignment.id, reviewer.user_id)
     #teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
     ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id,
-                             reviewed_object_id: assignment.id, team_id: team_id, is_locked: true, locked_by: reviewer.user_id)
+                             reviewed_object_id: assignment.id, team_id: team_id, is_locked: false, locked_by: reviewer.user_id)
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer

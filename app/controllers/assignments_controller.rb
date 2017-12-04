@@ -72,9 +72,9 @@ class AssignmentsController < ApplicationController
 
   def delete_reviews
     @assignment = Assignment.find(params[:assignment_id])
-    @response_map = ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').select(:id).all
+    @response_map = ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').all
     response_count = @response_map.count
-    if response_count > 0
+    if response_count != 0
       @assignment.delete_reviews
       flash[:note] = "#{(response_count == 1) ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\" #{response_count ? 'has' : 'have'} been successfully deleted!"
     else

@@ -14,20 +14,21 @@ module AccessHelper
         flash[:error] = response_locked ? "One of your teammates is working on the review. Only one person can work on a review at a time." : "This #{params[:controller]} is no longer available!"
       end
       flash[:error] = "One of your teammates has started this review." if params.has_key?(:id) && params[:action] == 'new'
-    end
-    if current_role && current_role.name.try(:downcase).start_with?('a', 'e', 'i', 'o', 'u')
-      flash[:error] = if params[:action] == 'new'
-        "An #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
-      else
-        "An #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
-      end
     else
-      flash[:error] = if params[:action] == 'new'
-        "A #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
+      if current_role && current_role.name.try(:downcase).start_with?('a', 'e', 'i', 'o', 'u')
+        flash[:error] = if params[:action] == 'new'
+          "An #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
+        else
+          "An #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
+        end
       else
-        "A #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
+        flash[:error] = if params[:action] == 'new'
+          "A #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
+        else
+          "A #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
+        end
       end
-    end
+    end 
   end
 
   def all_actions_allowed?

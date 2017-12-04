@@ -248,7 +248,7 @@ describe ResponseController do
           isSubmit: 'No'
       }
       #post :create, params
-      #expect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
+      #bexpect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
     end
   end
 

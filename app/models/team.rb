@@ -173,7 +173,7 @@ class Team < ActiveRecord::Base
         raise ImportError, "The user #{row[index].to_s.strip} was not found. <a href='/users/new'>Create</a> this user?"
       else
         if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
-        add_member(user)
+          add_member(user)
         end
       end
       index += 1
@@ -257,7 +257,7 @@ class Team < ActiveRecord::Base
     parent = parent_model id # current_task will be either a course object or an assignment object. # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = self.create(name: team_name, parent_id: id)
-                             # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
+    # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
     TeamNode.create(parent_id: id, node_object_id: team.id)
     team
   end

@@ -94,12 +94,26 @@ class GradesController < ApplicationController
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
+  def view_supplementary_questionnaire(team, assignment, participant, questionnaire)
+    supp = nil
+    supp_questionnaire_id = Team.supplementary_rubric_by_team_id(team.id)
+    if not supp_questionnaire_id.nil?
+      supp = VmQuestionResponse.new(questionnaire, assignment)
+      supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
+      supp_questions = supp_questionnaire.questions
+      supp.add_questions(supp_questions)
+      supp.add_team_members(team)
+      supp.add_reviews(participant, team, assignment.varying_rubrics_by_round?)
+      supp.get_number_of_comments_greater_than_10_words
+    end
+    supp
+  end
+
   # method for alternative view
   def view_team
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
-    @team_id = @team.id
 
     questionnaires = @assignment.questionnaires
     @vmlist = []
@@ -115,21 +129,7 @@ class GradesController < ApplicationController
       questions = questionnaire.questions
       vm.add_questions(questions)
 
-      ###For Supp questionnaire
-      supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
-      if not supp_questionnaire_id.nil?
-        supp = VmQuestionResponse.new(questionnaire, @assignment)
-        supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
-        supp_questions = supp_questionnaire.questions
-        supp.add_questions(supp_questions)
-        supp.add_team_members(@team)
-        supp.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
-        supp.get_number_of_comments_greater_than_10_words
-        @supplist << supp
-      else
-        @supplist << nil
-      end
-      ###
+      @supplist << view_supplementary_questionnaire(@team, @assignment, @participant, questionnaire)
 
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)

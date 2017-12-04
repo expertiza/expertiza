@@ -65,7 +65,6 @@ class GradesController < ApplicationController
                              end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
-
   end
 
   def view_my_scores

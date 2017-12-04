@@ -20,7 +20,9 @@ class Response < ActiveRecord::Base
     count = 0
     code = ''
     questions.each do |question|
-      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
+      if !question.is_a? QuestionnaireHeader and question.break_before == true
+        count += 1
+      end
       answer = answers.find {|a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader

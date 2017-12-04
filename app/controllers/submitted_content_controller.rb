@@ -76,7 +76,7 @@ class SubmittedContentController < ApplicationController
   def manage_supplementary_rubric
     @participant = AssignmentParticipant.find(params[:id])
     @team = Team.find(@participant.team.id)
-    if  @team.supplementary_rubric.nil?
+    if @team.supplementary_rubric.nil?
       @questionnaire = new_questionnaire
       begin
         @questionnaire.save

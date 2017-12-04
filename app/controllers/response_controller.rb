@@ -307,14 +307,14 @@ class ResponseController < ApplicationController
         @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
       end
 
-      when
+    when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
       "FeedbackResponseMap",
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap"
-        @questionnaire = @map.questionnaire
+      @questionnaire = @map.questionnaire
     end
   end
 

@@ -85,15 +85,17 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
+      questions = sort_questions(@questionnaire.questions)
+      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
 
       @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(team_id)
-      @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
-
-      questions = sort_questions(@questionnaire.questions)
-      questions_supp = sort_questions(@supp_questionnaire.questions)
-
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      create_answers(params, questions_supp) unless params[:responses].nil?
+      unless @supp_questionnaire_id.nil?
+        @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
+        unless @supp_questionnaire.nil?
+          questions_supp = sort_questions(@supp_questionnaire.questions)
+          create_answers(params, questions_supp) unless params[:responses].nil?
+        end
+      end
 
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)

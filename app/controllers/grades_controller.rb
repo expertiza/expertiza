@@ -50,7 +50,7 @@ class GradesController < ApplicationController
     @scores = @assignment.scores(@questions)
     averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
-    @avg_of_avg = averages.inject(0) {|sum, x| sum += x } / array.size.to_f
+    @avg_of_avg = averages.inject(0) {|sum, x| sum += x } / averages.size.to_f
     calculate_all_penalties(@assignment.id)
   end
 

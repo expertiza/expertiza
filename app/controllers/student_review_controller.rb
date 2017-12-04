@@ -57,21 +57,4 @@ class StudentReviewController < ApplicationController
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
   end
-
-  private
-  # E17A0 If an assignment is to be reviewed by a team, get a list of team members and allow them access
-  def reviewer_team_info
-    unless @assignment.nil?
-      if @assignment.reviewer_is_team?
-        team = Team.select(:id, :parent_id).where(parent_id: @assignment.id).all
-        teams_user = TeamsUser.select(:id, :team_id, :user_id).where(user_id: current_user.id)
-        teams_user = teams_user.select { |t| team.map { |t| t.id }.include?(t.team_id) }
-        if teams_user.count > 0
-          {:reviewer_is_team_member => teams_user.any? { |t| t.user_id == current_user.id}, :team_id => teams_user.first.team_id}
-        else
-          {:reviewer_is_team_member => false, :team_id => 0}
-        end
-      end
-    end
-  end
 end

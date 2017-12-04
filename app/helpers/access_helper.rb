@@ -20,7 +20,7 @@ module AccessHelper
 
       if params.has_key?(:id)
         if params[:action] == 'new'
-          flash[:error] = "One of your teammates requested this review. Only the requester can start it."
+          flash[:error] = "One of your teammates has started this review."
         end
       end
 

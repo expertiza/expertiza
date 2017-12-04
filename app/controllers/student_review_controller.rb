@@ -4,8 +4,7 @@ class StudentReviewController < ApplicationController
      'Teaching Assistant',
      'Administrator',
      'Super-Administrator',
-     'Student'].include? current_role_name and
-        (%w(list).include? action_name ? are_needed_authorizations_present?(params[:id], "submitter") : true)
+     'Student'].include? current_role_name and (%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true
   end
 
   def list

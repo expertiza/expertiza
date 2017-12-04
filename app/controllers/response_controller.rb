@@ -26,9 +26,15 @@ class ResponseController < ApplicationController
       end
     else
       if %w(edit delete update view).include?(action)
-        response = Response.find(params[:id])
-        response_map = ReviewResponseMap.find(response.map_id)
-        user_id = response.map.reviewer.user_id if response.map.reviewer
+        response_map = ResponseMap.find_by_id(params[:id])
+        if response_map.nil?
+          flash[:error] = "This #{params[:controller]} is no longer available!"
+          redirect_to controller: 'student_review', action: 'list', id: params[:list_id]
+        else
+          response = Response.find(params[:id])
+          response_map = ReviewResponseMap.find(response.map_id)
+          user_id = response.map.reviewer.user_id if response.map.reviewer
+        end
       end
       case action
       when 'edit' # If response has been submitted, no further editing allowed

@@ -122,9 +122,10 @@ describe 'new account request' do
         # the size of mailing queue changes by 1
         expect{
             requester1 = User.find_by_name('studentx')
-            prepare = UserMailer.send_to_user(requester1,'Your Expertiza account and password have been created.',"user_welcome",'123456')
+            repared_mail = MailerHelper.send_mail_to_user(requester1, "Your Expertiza account and password
+                                                            have been created.", "user_welcome", password)
             prepare.deliver_now
-        }.to change{ UserMailer.deliveries.count }.by(1)
+        }.to change{ MailerHelper.deliveries.count }.by(1)
       end
 
       context 'using name as username and password in the email' do

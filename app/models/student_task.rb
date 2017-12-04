@@ -163,10 +163,10 @@ class StudentTask
       tmp = {}
       @response = Response.where(map_id: rm.id)
       next if @response[0].nil?
-        tmp[:label] = 'Round ' + @response[0].round.to_s + ' Review'
-        tmp[:updated_at] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
-        tmp[:id] = @response[0].id
-        @timeline_list << tmp
+      tmp[:label] = 'Round ' + @response[0].round.to_s + ' Review'
+      tmp[:updated_at] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
+      tmp[:id] = @response[0].id
+      @timeline_list << tmp
     end
   end
 

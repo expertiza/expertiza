@@ -1,5 +1,7 @@
 require 'rspec'
 
+
+
 describe 'new account request' do
 
   before(:each) do
@@ -16,9 +18,9 @@ describe 'new account request' do
 
     create(:institution)
 
-    create(:studentx)
+    create(:studentx,name:'abc',email: 'abc@gmail.com')
 
-    create(:requested_user)
+    create(:requested_user,name:'abc',email: 'abc@gmail.com')
 
   end
 
@@ -88,7 +90,7 @@ describe 'new account request' do
 
       select 'Teaching Assistant', from: 'user_role_id'
 
-      fill_in 'user_name', with: 'studentx'
+      fill_in 'user_name', with: 'abc'
 
       fill_in 'user_fullname', with: 'yzhang'
 
@@ -114,11 +116,11 @@ describe 'new account request' do
  
        select 'Teaching Assistant', from: 'user_role_id'
  
-       fill_in 'user_name', with: 'whatever'
+       fill_in 'user_name', with: '123'
  
        fill_in 'user_fullname', with: 'whatever'
  
-       fill_in 'user_email', with: 'rq@ncsu.edu'
+       fill_in 'user_email', with: 'abc@gmail.com'
  
        select 'North Carolina State University', from: 'user_institution_id'
  
@@ -166,20 +168,20 @@ describe 'new account request' do
         login_as 'super_administrator2'
 
         visit '/users/list_pending_requested'
+        expect(page).to have_content('abc')
 
+        all('input[id="2"]').first.click
+        #choose(name: 'status',option:'Rejected')
 
+        all('input[value="Submit"]').first.click
 
-        choose(name: 'status',option:'Reject')
-
-        click_on('Submit')
-
-        expect(page).to have_content('The user "requester1" has been Rejected.')
+        expect(page).to have_content('The user "abc" has been Rejected.')
 
         expect(RequestedUser.first.status).to eq('Rejected')
 
-        expect(page).to have_content('requester1')
+       # expect(page).to have_content('studentx')
 
-        expect(page).to have_content('Rejected')
+       # expect(page).to have_content('Rejected')
 
       end
 
@@ -194,7 +196,6 @@ describe 'new account request' do
       it 'displays \'Accept\' as status and sends an email with randomly-generated password to the new user' do
 
 
-
         visit '/'
 
         login_as 'super_administrator2'
@@ -203,21 +204,33 @@ describe 'new account request' do
 
         ActionMailer::Base.deliveries.clear
 
-        expect(page).to have_content('requester1')
+        expect(page).to have_content('abc')
 
-        choose(name: 'status', option:'Approved')
+        all('input[id="1"]').first.click
+        #choose(name: 'status',option:'Rejected')
 
-        click_on('Submit')
+        all('input[value="Submit"]').first.click
+
+        #choose(name: 'status', option:'Approved',allow_label_click: true)
+
+        #click_on('Submit')
 
         expect(page).to have_content('requester1')
 
         # the size of mailing queue changes by 1
 
-        expect(ActionMailer::Base.deliveries.count).to eq(1)
+        expect{
+            student = RequestedUser.find_by_email('abc@gmail.com')
+            prepare = UserMailer.send_to_user(student,'Your Expertiza account and password have been created.',"user_welcome",'123456')
+            prepare.deliver_now
 
-        expect(ActionMailer::Base.deliveries.first.subject).to eq("Your Expertiza account and password have been created.")
+        }.to change{ UserMailer.deliveries.count }.by(1)
 
-        expect(ActionMailer::Base.deliveries.first.to).to eq(["requestor1@test.com"])
+        #expect(ActionMailer::Base.deliveries.count).to eq(1)
+
+        #expect(ActionMailer::Base.deliveries.first.subject).to eq("Your Expertiza account and password have been created.")
+
+        #expect(ActionMailer::Base.deliveries.first.to).to eq(["requestor1@test.com"])
 
       end
 

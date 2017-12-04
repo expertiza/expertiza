@@ -34,7 +34,7 @@ class Response < ActiveRecord::Base
       end
       code += '</td></tr>'
     end
-    return code
+    code
   end
 
   def display_as_html(prefix = nil, count = nil, _file_url = nil)
@@ -67,7 +67,6 @@ class Response < ActiveRecord::Base
     end
 
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
-    count = 0
     answers = Answer.where(response_id: self.response_id)
 
     unless answers.empty?
@@ -75,7 +74,7 @@ class Response < ActiveRecord::Base
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
 
-      ###For supp_questionnaire
+      # For supp_questionnaire
       response_map = self.map
       reviewee_id = response_map.reviewee_id
       supp_questionnaire_id = Team.supplementary_rubric_by_team_id(reviewee_id)
@@ -83,14 +82,13 @@ class Response < ActiveRecord::Base
         supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
         supp_questions = supp_questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
       end
-      ####
 
       # loop through questions so the the questions are displayed in order based on seq (sequence number)
       code += display_html_helper(questions, answers, questionnaire_max)
       code += '<tr><td style="text-align: center"><h4>Supplementary Review Questions </h4></td></tr>'
       code += display_html_helper(supp_questions, answers, questionnaire_max)
 
-          comment = if !self.additional_comment.nil?
+      comment = if !self.additional_comment.nil?
                   self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
                 else
                   ''

@@ -60,19 +60,24 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
+  def new_questionnaire
+    @questionnaire = Questionnaire.new
+    @questionnaire.private = false
+    @questionnaire.name = "SR_" + @team.id.to_s
+    @questionnaire.instructor_id = @team.id
+    @questionnaire.min_question_score = 0
+    @questionnaire.max_question_score = 5
+    @questionnaire.type = "ReviewQuestionnaire"
+    @questionnaire.display_type = "Review"
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    @questionnaire
+  end
+
   def manage_supplementary_rubric
     @participant = AssignmentParticipant.find(params[:id])
     @team = Team.find(@participant.team.id)
-    if @team.supplementary_rubric.nil? then
-      @questionnaire = Questionnaire.new
-      @questionnaire.private = false
-      @questionnaire.name = "SR_" + @team.id.to_s
-      @questionnaire.instructor_id = @team.id
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 5
-      @questionnaire.type = "ReviewQuestionnaire"
-      @questionnaire.display_type = "Review"
-      @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    unless @team.supplementary_rubric.nil?
+      @questionnaire = new_questionnaire
       begin
         @questionnaire.save
         @team.supplementary_rubric = @questionnaire.id

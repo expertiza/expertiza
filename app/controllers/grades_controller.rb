@@ -39,11 +39,6 @@ class GradesController < ApplicationController
     @questions = {}
     questionnaires = @assignment.questionnaires
 
-    #For supp_ques
-    #supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
-    #supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
-    ####
-
     if @assignment.varying_rubrics_by_round?
       retrieve_questions questionnaires
     else # if this assignment does not have "varying rubric by rounds" feature
@@ -70,6 +65,7 @@ class GradesController < ApplicationController
                              end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
+
   end
 
   def view_my_scores
@@ -97,7 +93,7 @@ class GradesController < ApplicationController
   def view_supplementary_questionnaire(team, assignment, participant, questionnaire)
     supp = nil
     supp_questionnaire_id = Team.supplementary_rubric_by_team_id(team.id)
-    if not supp_questionnaire_id.nil?
+    unless supp_questionnaire_id.nil?
       supp = VmQuestionResponse.new(questionnaire, assignment)
       supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
       supp_questions = supp_questionnaire.questions

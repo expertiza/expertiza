@@ -10,16 +10,16 @@ class ResponseController < ApplicationController
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
     case action
-      when 'edit' # If response has been submitted, no further editing allowed
-        return false if response.is_submitted
-        return current_user_id?(user_id)
-      # Deny access to anyone except reviewer & author's team
-      when 'delete', 'update'
-        return current_user_id?(user_id)
-      when 'view'
-        return edit_allowed?(response.map, user_id)
-      else
-        current_user
+    when 'edit' # If response has been submitted, no further editing allowed
+      return false if response.is_submitted
+      return current_user_id?(user_id)
+    # Deny access to anyone except reviewer & author's team
+    when 'delete', 'update'
+      return current_user_id?(user_id)
+    when 'view'
+      return edit_allowed?(response.map, user_id)
+    else
+      current_user
     end
   end
 
@@ -93,7 +93,7 @@ class ResponseController < ApplicationController
       questions_supp = sort_questions(@supp_questionnaire.questions)
 
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      create_answers(params, questions_supp) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      create_answers(params, questions_supp) unless params[:responses].nil?
 
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
@@ -175,7 +175,7 @@ class ResponseController < ApplicationController
     # For Supp Questions
     unless @supp_questionnaire.nil?
       questions_supp = sort_questions(@supp_questionnaire.questions)
-      questions = questions+questions_supp
+      questions += questions_supp
     end
 
     create_answers(params, questions) if params[:responses]
@@ -248,13 +248,13 @@ class ResponseController < ApplicationController
           next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
           @surveys <<
               [
-                  'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-                  'survey_deployment_id' => survey_deployment.id,
-                  'start_date' => survey_deployment.start_date,
-                  'end_date' => survey_deployment.end_date,
-                  'parent_id' => p.parent_id,
-                  'participant_id' => p.id,
-                  'global_survey_id' => survey_deployment.global_survey_id
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date,
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => p.parent_id,
+                'participant_id' => p.id,
+                'global_survey_id' => survey_deployment.global_survey_id
               ]
         end
       end
@@ -312,7 +312,7 @@ class ResponseController < ApplicationController
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap"
-      @questionnaire = @map.questionnaire
+        @questionnaire = @map.questionnaire
     end
   end
 

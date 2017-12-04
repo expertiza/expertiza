@@ -30,7 +30,7 @@ describe "supplementary rubric testing" do
   it "add supplementary questionnaire to teams model" do
     signup_topic
     click_button "Manage Supplementary Rubric"
-    assert !Team.supplementary_rubric_by_team_id(Team.second.id).nil?
+    assert !Team.supplementary_rubric_by_team_id(2).nil?
   end
 
   it "should display Supplementary Questionnaire to assigned student" do

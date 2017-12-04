@@ -399,6 +399,6 @@ FactoryGirl.define do
     role_id  2
     fullname 'requestor1,test'
     institution_id 1
-    email 'requestor1@test.com'
+    email 'requestor1@gmail.com'
   end
 end

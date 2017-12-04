@@ -261,7 +261,7 @@ class UsersController < ApplicationController
 
 
     @user.status = 'Under Review'
-    @user.intro = params[:requested_users][:intro]
+    @user.intro = params[:requested_user][:intro]
 
     # The super admin receives a mail about a new user request with the user name
     if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil?
@@ -272,16 +272,18 @@ class UsersController < ApplicationController
           prepared_mail.deliver_now
         end
         flash[:success] = "User signup for \"#{@user.name}\" has been successfully requested. "
-        redirect_to '/instructions/home' and return
+        redirect_to '/instructions/home'
+
       else
-        #include both invalid email and existed email for requesteduser
-        #invalide email of request user would not flash "alreadly existed"
-      end
+        flash[:error] = "The account you are requesting has already existed in Expertiza."
+        render 'request_new'
+    end
+
     else
       flash[:error] = "The account you are requesting has already existed in Expertiza."
-    end
-    @intro = params[:requested_users][:intro]
-    render 'request_new'
+      render 'request_new'
+      end
+
   end
 
   def edit

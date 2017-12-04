@@ -15,13 +15,14 @@
             <% end %>
           <% end %>
           <td><%= user.status %></td>
-          <% if user.status == 'Under Review'%>
+
+
           <td> <%= text_field_tag :reason, user.reason %> </td>
-          <td> <input type="radio" name="status" value="Approved"> Accept </td>
-          <td> <input type="radio" name="status" value="Rejected"> Reject </td>
+          <td> <input type="radio" id="1" name="status" value="Approved"> Accept </td>
+          <td> <input type="radio" id="2" name="status" value="Rejected"> Reject </td>
 
           <td> <%= submit_tag "Submit"%> </td>
-          <% end %>
+
         </tr>
       <% end %>
     <% end %>

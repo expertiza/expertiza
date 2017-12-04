@@ -1,6 +1,7 @@
 class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
+  before_action :set_all_responses, only: :create
 
   def action_allowed?
     response = user_id = nil
@@ -148,14 +149,11 @@ class ResponseController < ApplicationController
   end
 
   def create
-    @map = ResponseMap.find(params[:id])
-    @team_id = @map.reviewee_id
-    set_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
 
-      @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
+      @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@map.reviewee_id)
       unless @supp_questionnaire_id.nil?
         @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
       end
@@ -365,6 +363,7 @@ class ResponseController < ApplicationController
     # get all previous versions of responses for the response map.
     # I guess if we're in the middle of creating a new response, this would be
     # all 'previous' responses to this new one (which is not yet saved)?
+    @map = ResponseMap.find(params[:id])
     @prev = Response.where(map_id: @map.id)
     # not sure what this is about
     @review_scores = @prev.to_a

@@ -101,7 +101,7 @@ th.sorter-true.tablesorter-headerUnSorted{
 
             </tr>
             </thead>
-            <% index = 0 %>
+            <% supp_ques = 0 %>
             <% score_row_count = vm.list_of_rows.first.score_row.count %>
             <% [vm, supp].each do |track| %>
               <% unless track.nil? %>
@@ -109,7 +109,7 @@ th.sorter-true.tablesorter-headerUnSorted{
                 <% j = 1 %>
                 <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
                 <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
-                <% if index >= 1 %>
+                <% if supp_ques >= 1 %>
                    <tbody class="avoid-sort">
                      <tr>
                        <td colspan="5">Supplementary Rubric</td>
@@ -117,7 +117,7 @@ th.sorter-true.tablesorter-headerUnSorted{
                 <% else %>
                    <tbody>
                 <% end %>
-                <% index += 1 %>
+                <% supp_ques += 1 %>
                 <% track.list_of_rows.each do |row| %>
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->

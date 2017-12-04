@@ -238,7 +238,7 @@ class UsersController < ApplicationController
     end
 
     @user.status = 'Under Review'
-    @user.intro = params[:requested_users][:intro]
+    @user.intro = params[:requested_user][:intro]
 
     # The super admin receives a mail about a new user request with the user name
     if User.find_by(name: @user.name).nil? && User.find_by(name: @user.email).nil?
@@ -258,7 +258,7 @@ class UsersController < ApplicationController
       flash[:error] = "The account you are requesting has already existed in Expertiza."
       #redirect_to controller: 'users',action:'request_new',role:"Student"
     end
-    @intro = params[:requested_users][:intro]
+    @intro = params[:requested_user][:intro]
     render 'request_new'
   end
 

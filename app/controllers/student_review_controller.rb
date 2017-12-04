@@ -11,7 +11,7 @@ class StudentReviewController < ApplicationController
   def list
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    @reviewer_team_info = reviewer_team_info
+    @reviewer_team_info = @assignment.reviewer_team_info current_user.id
     return unless current_user_id?(@participant.user_id) || @reviewer_team_info[:reviewer_is_team_member]
 
     #E17A0 We unlock a response_map if it was locked by another team member.

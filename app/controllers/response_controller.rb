@@ -97,8 +97,6 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
-
-
     render action: 'response'
   end
 
@@ -110,7 +108,7 @@ class ResponseController < ApplicationController
 
     # E17A0 Show a flash message when a response is automatically saved after a period of inactivity
     if params[:autosave_timeout].to_i > 0
-      msg = "Your response was automatically saved after #{((params[:autosave_timeout].to_i) / 60).round} minutes of inactivity."
+      msg = "Your response was automatically saved after #{(params[:autosave_timeout].to_i / 60).round} minutes of inactivity."
     end
 
     begin
@@ -275,13 +273,13 @@ class ResponseController < ApplicationController
           next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
           @surveys <<
               [
-                  'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-                  'survey_deployment_id' => survey_deployment.id,
-                  'start_date' => survey_deployment.start_date,
-                  'end_date' => survey_deployment.end_date,
-                  'parent_id' => p.parent_id,
-                  'participant_id' => p.id,
-                  'global_survey_id' => survey_deployment.global_survey_id
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date,
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => p.parent_id,
+                'participant_id' => p.id,
+                'global_survey_id' => survey_deployment.global_survey_id
               ]
         end
       end
@@ -315,28 +313,28 @@ class ResponseController < ApplicationController
 
   def set_questionnaire_for_new_response
     case @map.type
-      when "ReviewResponseMap", "SelfReviewResponseMap"
-        reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-        @current_round = @assignment.number_of_current_round(reviewees_topic)
-        @questionnaire = @map.questionnaire(@current_round)
-      when
+    when "ReviewResponseMap", "SelfReviewResponseMap"
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
+      @current_round = @assignment.number_of_current_round(reviewees_topic)
+      @questionnaire = @map.questionnaire(@current_round)
+    when
       "MetareviewResponseMap",
-          "TeammateReviewResponseMap",
-          "FeedbackResponseMap",
-          "CourseSurveyResponseMap",
-          "AssignmentSurveyResponseMap",
-          "GlobalSurveyResponseMap"
-        @questionnaire = @map.questionnaire
+      "TeammateReviewResponseMap",
+      "FeedbackResponseMap",
+      "CourseSurveyResponseMap",
+      "AssignmentSurveyResponseMap",
+      "GlobalSurveyResponseMap"
+      @questionnaire = @map.questionnaire
     end
   end
 
   def scores
     @review_scores = []
     @questions.each do |question|
-      @review_scores << Answer.where(
-          response_id: @response.id,
-          question_id:  question.id
-      ).first
+    @review_scores << Answer.where(
+      response_id: @response.id,
+      question_id:  question.id
+    ).first
     end
   end
 
@@ -350,7 +348,7 @@ class ResponseController < ApplicationController
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
-                       .first.try(:dropdown)
+                                          .first.try(:dropdown)
     @dropdown_or_scale = (use_dropdown == true ? 'dropdown' : 'scale')
   end
 
@@ -376,5 +374,4 @@ class ResponseController < ApplicationController
     # not sure what this is about
     @review_scores = @prev.to_a
   end
-
 end

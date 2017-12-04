@@ -247,19 +247,19 @@ class Response < ActiveRecord::Base
     reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
     reviewee_name = User.find(reviewee_participant.user_id).fullname
     assignment = Assignment.find(reviewer_participanat.parent_id)
-    Mailer.notify_grade_conflict_message({
-                                             to: assignment.instructor.email,
-                                             subject: "Expertiza Notification: A review score is outside the acceptable range",
-                                             body: {
-                                                 reviewer_name: reviewer_name,
-                                                 type: "review",
-                                                 reviewee_name: reviewee_name,
-                                                 new_score: get_total_score.to_f / get_maximum_score,
-                                                 assignment: assignment,
-                                                 conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
-                                                 summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-                                                 assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-                                             }
-                                         }).deliver_now
+    Mailer.notify_grade_conflict_message(
+      to: assignment.instructor.email,
+      subject: "Expertiza Notification: A review score is outside the acceptable range",
+      body: {
+        reviewer_name: reviewer_name,
+        type: "review",
+        reviewee_name: reviewee_name,
+        new_score: get_total_score.to_f / get_maximum_score,
+        assignment: assignment,
+        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s, # 'https://expertiza.ncsu.edu/response/view?id='
+        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+      }
+    ).deliver_now
   end
 end

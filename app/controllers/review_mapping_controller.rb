@@ -52,14 +52,15 @@ class ReviewMappingController < ApplicationController
       if team_id == params[:contributor_id].to_i
         flash[:error] = "You cannot assign this team to review their own artifact."
       elsif ReviewResponseMap.where(reviewee_id: params[:contributor_id], team_id: team_id).first.nil?
-        ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer_id, reviewed_object_id: assignment.id, team_id: team_id, is_locked: true, locked_by: user_id)
+        ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer_id, reviewed_object_id: assignment.id,
+                                 team_id: team_id, is_locked: true, locked_by: user_id)
       else
         flash[:error] = "You have already assigned #{params[:user]} to review #{AssignmentTeam.where(id: params[:contributor_id].to_i).first.name}."
       end
     else
       user_id = User.where(name: params[:user][:name]).first.id
-    # If instructor want to assign one student to review his/her own artifact,
-    # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
+      # If instructor want to assign one student to review his/her own artifact,
+      # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
       if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
         flash[:error] = "You cannot assign this student to review his/her own artifact."
       else
@@ -260,8 +261,9 @@ class ReviewMappingController < ApplicationController
   def unlock_review
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
     if review_response_map
-      ReviewResponseMap.update(review_response_map.id, :is_locked => false)
-      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been unlocked."
+      ReviewResponseMap.update(review_response_map.id, is_locked: false)
+      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and
+                        \"" + review_response_map.reviewer.name + "\" has been unlocked."
     else
       flash[:error] = "This #{params[:controller]} is no longer available!"
     end

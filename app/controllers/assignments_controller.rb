@@ -6,20 +6,18 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if params[:other_action] == 'delete_reviews'
       assignment = Assignment.find(params[:assignment_id])
-      ['Super-Administrator', 'Administrator'].include? current_role_name or
+      %w[Super-Administrator Administrator].include? current_role_name or
           assignment.instructor_id == current_user.try(:id) or
           TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
           assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+    elsif %w[edit update list_submissions].include? params[:action]
+      assignment = Assignment.find(params[:id])
+      %w[Super-Administrator Administrator].include? current_role_name or
+      assignment.instructor_id == current_user.try(:id) or
+      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+      assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
     else
-      if %w(edit update list_submissions).include? params[:action]
-        assignment = Assignment.find(params[:id])
-        ['Super-Administrator', 'Administrator'].include? current_role_name or
-            assignment.instructor_id == current_user.try(:id) or
-            TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
-            assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
-      else
-        ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
-      end
+      ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
     end
   end
 
@@ -76,7 +74,8 @@ class AssignmentsController < ApplicationController
     response_count = @response_map.count
     if response_count != 0
       @assignment.delete_reviews
-      flash[:note] = "#{(response_count == 1) ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\" #{response_count ? 'has' : 'have'} been successfully deleted!"
+      flash[:note] = "#{response_count == 1 ? '1 review ' : "All #{response_count} reviews"} for assignment \"#{@assignment.name}\"
+                      #{response_count ? 'has' : 'have'} been successfully deleted!"
     else
       flash[:error] = "This assignment does not have any reviews."
     end

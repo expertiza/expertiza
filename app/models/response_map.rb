@@ -62,20 +62,16 @@ class ResponseMap < ActiveRecord::Base
   # E17A0 Lock and unlock a response map
   def reviewer_is_team_member?(user_id)
     assignment = Assignment.where(id: self.reviewed_object_id).first
-    unless assignment.nil?
-      if assignment.reviewer_is_team?
-        teams_user = TeamsUser.where(team_id: self.team_id)
-        teams_user.all.any? { |m| m.user_id == user_id}
-      end
-    end
+    teams_user = TeamsUser.where(team_id: self.team_id) unless assignment.nil? && !assignment.reviewer_is_team?
+    teams_user.all.any? {|m| m.user_id == user_id } unless assignment.nil? && !assignment.reviewer_is_team?
   end
 
   def lock(user_id)
-    ResponseMap.update(self.id, :is_locked => true, :locked_by => user_id)
+    ResponseMap.update(self.id, is_locked: true, locked_by: user_id)
   end
 
   def unlock(user_id)
-    ResponseMap.update(self.id, :is_locked => false, :locked_by => user_id)
+    ResponseMap.update(self.id, is_locked: false, locked_by: user_id)
   end
   # E17A0 End
 

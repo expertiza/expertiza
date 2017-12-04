@@ -18,19 +18,16 @@ class Response < ActiveRecord::Base
 
   def display_html_helper(questions, answers, questionnaire_max)
     count = 0
+    code = ''
     questions.each do |question|
-      answer = answers.find {|a| a.question_id == question.id }
-      if question.is_a? QuestionnaireHeader
-         row_class = ""
-      else
-        if question.break_before
-          count += 1
-        end
-        row_class = count.even? ? "info": "warning"
+      if !question.is_a? QuestionnaireHeader and question.break_before == true
+        count += 1
       end
-
-      code = '<tr class="' + row_class + '"><td>'
-      if !answer.nil? or row_class.empty?
+      answer = answers.find {|a| a.question_id == question.id }
+      row_class = count.even? ? "info" : "warning"
+      row_class = "" if question.is_a? QuestionnaireHeader
+      code += '<tr class="' + row_class + '"><td>'
+      if !answer.nil? or question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion or question.instance_of? Scale
                   question.view_completed_question(count, answer, questionnaire_max)
                 else

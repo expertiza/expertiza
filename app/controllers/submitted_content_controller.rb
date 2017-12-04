@@ -1,5 +1,4 @@
 class SubmittedContentController < ApplicationController
-  before_action :fetch_participant_team, only: :manage_supplementary_rubrics
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -74,12 +73,9 @@ class SubmittedContentController < ApplicationController
     @questionnaire
   end
 
-  def fetch_participant_team
+  def manage_supplementary_rubric
     @participant = AssignmentParticipant.find(params[:id])
     @team = Team.find(@participant.team.id)
-  end
-
-  def manage_supplementary_rubric
     if @team.supplementary_rubric.nil?
       @questionnaire = new_questionnaire
       begin

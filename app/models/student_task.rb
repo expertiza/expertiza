@@ -167,7 +167,6 @@ class StudentTask
         tmp[:updated_at] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
         tmp[:id] = @response[0].id
         @timeline_list << tmp
-      end
     end
   end
 

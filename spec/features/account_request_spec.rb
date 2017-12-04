@@ -125,7 +125,7 @@ describe 'new account request' do
             repared_mail = MailerHelper.send_mail_to_user(requester1, "Your Expertiza account and password
                                                             have been created.", "user_welcome", password)
             prepare.deliver_now
-        }.to change{ MailerHelper.deliveries.count }.by(1)
+        }.to change{ ActionMailer::Base.MailerHelper.deliveries.count }.by(1)
       end
 
       context 'using name as username and password in the email' do

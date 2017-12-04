@@ -173,11 +173,11 @@ class StudentTask
   # static method for the building timeline data
   def self.get_timeline_data(assignment_id, participant_id, team_id)
     @timeline_list = []
-    # Assignment duedate data
+    # Assignment duedate datapoints
     get_duedate_data(assignment_id, @timeline_list)
-    # Studnet's link and file submissions
+    # Studnet's link and file submissions datapoints
     get_submission_data(assignment_id, team_id, @timeline_list)
-    # Student's assignment review performed
+    # Student's assignment review performed datapoints
     get_review_data(participant_id, @timeline_list)
     # List is sorted and returned
     @timeline_list.sort_by {|f| Time.zone.parse f[:updated_at] }

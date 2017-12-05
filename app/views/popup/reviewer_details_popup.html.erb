@@ -46,7 +46,7 @@
   <% timeHash = Hash.new %>
   <h3> Response time details</h3>
   <a id = "details" class= "show" onclick="showDetails()">show details</a>
-  <canvas id="myChart" style="height: 150px; width: 50%; display: none;" ></canvas>
+  <canvas id="myChart" style="height: 240px; width: 80%; display: none;" ></canvas><br>
   <div>
     <table width="100%">
       <tr>
@@ -176,7 +176,10 @@ function drawChart(reviewee_id,round){
           // These labels appear in the legend and in the tooltips when hovering different arcs
          
       };
+      if (myPieChart)
+        myPieChart.destroy();
       var ctx = document.getElementById("myChart");
+      ctx.getContext('2d').clearRect(0,0,ctx.width,ctx.height);
       
       var myPieChart = new Chart(ctx,{
         type: 'pie',

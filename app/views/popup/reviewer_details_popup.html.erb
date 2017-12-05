@@ -96,7 +96,7 @@
                  <% @per_round_time << each_link_detail %>
                 <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
                 <% if @count == 0 %>
-                <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)">Alternate view </a></td>
+                <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)">Pie Chart </a></td>
                 <% else %> 
                 <td><%= " "%></td>
                 <%end%>

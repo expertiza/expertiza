@@ -11,9 +11,9 @@
   <br />
 <% end %>
 
-<% if stage != "Finished" and controller.controller_name == 'submitted_content'%>
+<% if stage != "Finished" %>
     <%= button_to :action => "manage_supplementary_rubric", :id => participant.id do %>
-       Manage Supplementary Rubric
+        Manage Supplementary Rubric
     <% end %>
 <% end  %>
 

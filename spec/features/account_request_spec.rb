@@ -55,20 +55,20 @@ describe 'new account request' do
       click_on 'Request'
       expect(page).to have_content('The account you are requesting has already existed in Expertiza.')
     end
-    
-        it 'fail to request with existed requested_user email' do
-       visit '/'
-       click_link 'REQUEST ACCOUNT'
-       expect(page).to have_content('Request new user')
-       select 'Teaching Assistant', from: 'user_role_id'
-       fill_in 'user_name', with: 'whatever'
-       fill_in 'user_fullname', with: 'whatever'
-       fill_in 'user_email', with: 'rq@ncsu.edu'
-       select 'North Carolina State University', from: 'user_institution_id'
-       fill_in 'requested_user_intro', with: 'request an account for expertiza'
-       click_on 'Request'
-       expect(page).to have_content('Email has already been taken')
-        end
+
+    it 'fail to request with existed requested_user email' do
+      visit '/'
+      click_link 'REQUEST ACCOUNT'
+      expect(page).to have_content('Request new user')
+      select 'Teaching Assistant', from: 'user_role_id'
+      fill_in 'user_name', with: 'whatever'
+      fill_in 'user_fullname', with: 'whatever'
+      fill_in 'user_email', with: 'rq@ncsu.edu'
+      select 'North Carolina State University', from: 'user_institution_id'
+      fill_in 'requested_user_intro', with: 'request an account for expertiza'
+      click_on 'Request'
+      expect(page).to have_content('Email has already been taken')
+    end
 
   end
 
@@ -99,8 +99,8 @@ describe 'new account request' do
         all('input[value="Submit"]').first.click
         expect(page).to have_content('The user "requested_user" has been Rejected.')
         expect(RequestedUser.first.status).to eq('Rejected')
-       # expect(page).to have_content('studentx')
-       # expect(page).to have_content('Rejected')
+        # expect(page).to have_content('studentx')
+        # expect(page).to have_content('Rejected')
       end
     end
 
@@ -121,10 +121,9 @@ describe 'new account request' do
         expect(page).to have_content('requester1')
         # the size of mailing queue changes by 1
         expect{
-            requester1 = User.find_by_name('studentx')
-            prepared_mail = MailerHelper.send_mail_to_user(requester1, "Your Expertiza account and password
-                                                have been created.", "user_welcome", requester1.password)
-            prepared_mail.deliver_now
+          requester1 = User.find_by_name('studentx')
+          prepare = MailerHelper.send_to_user(requester1,'Your Expertiza account and password have been created.',"user_welcome",'password1234')
+          prepare.deliver_now
         }.to change{ ActionMailer::Base.deliveries.count }.by(1)
       end
 

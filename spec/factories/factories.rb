@@ -386,6 +386,7 @@ FactoryGirl.define do
   factory :studentx, class: User do
     name 'studentx'
     email 'studenx@ncsu.edu'
+    password '12345'
   end
 
   factory :requested_user, class: RequestedUser do

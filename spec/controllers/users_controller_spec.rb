@@ -1,6 +1,3 @@
-require 'pry'
-
-
 describe UsersController do
   let(:admin) {build(:admin)}
   let(:superadmin) {build(:superadmin)}

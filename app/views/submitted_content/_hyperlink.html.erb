@@ -71,7 +71,9 @@
         restart_link_timing_flag = $("#restart_link_timing_flag").val()=='true';
         if (restart_link_timing_flag) {
           for (link in linksToUpdate) {
-            startTime(map_id, round, link);
+            if (linksToUpdate[link]) {
+              startTime(map_id, round, link);
+            }
           }
           $("#restart_link_timing_flag").val('false');
         }

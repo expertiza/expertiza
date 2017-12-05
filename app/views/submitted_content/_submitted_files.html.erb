@@ -84,7 +84,9 @@
           restart_file_timing_flag = $("#restart_file_timing_flag").val()=='true';
           if (restart_file_timing_flag) {
             for (file_name in filesToUpdate) {
-              startTime(map_id, round, file_name);
+              if (filesToUpdate[file_name]){
+                startTime(map_id, round, file_name);
+              }
             }
             $("#restart_file_timing_flag").val('false');
           }

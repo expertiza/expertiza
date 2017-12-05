@@ -123,7 +123,7 @@ describe 'new account request' do
         expect{
             requester1 = User.find_by_name('studentx')
             prepared_mail = MailerHelper.send_mail_to_user(requester1, "Your Expertiza account and password
-                                                            have been created.", "user_welcome", password)
+                                                            have been created.", "user_welcome", "123456")
             prepared_mail.deliver_now
         }.to change{ ActionMailer::Base.deliveries.count }.by(1)
       end

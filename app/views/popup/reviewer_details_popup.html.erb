@@ -46,7 +46,7 @@
   <% timeHash = Hash.new %>
   <h3> Response time details</h3>
   <a id = "details" class= "show" onclick="showDetails()">show details</a>
-  <div id="chartContainer" style="height: 200px; width: 100%; display: none; "></div>
+  <canvas id="myChart" style="height: 150px; width: 50%; display: none;" ></canvas>
   <div>
     <table width="100%">
       <tr>
@@ -115,7 +115,7 @@
 </div>
 
 <!--- Script to update the total time column after the page load-->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.js"> </script>     <!-- Canvas JS CDN -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js"> </script>     <!-- Canvas JS CDN -->
 <script type="text/javascript">
 var timeReportHash;
 var showDetailsEnabled = false;
@@ -130,7 +130,7 @@ $(document).ready(function () {
 });  
 function showDetails(){
   if(showDetailsEnabled){
-    $( "#chartContainer" ).toggle();
+    $( "#myChart" ).toggle();
       if($("#details").text()=="show details"){
         $("#details").text('hide details');  
       } else {
@@ -140,39 +140,64 @@ function showDetails(){
 }
 function drawChart(reviewee_id,round){
       showDetailsEnabled=true;   //To enable the show details link
-      if($("#chartContainer").css("display")== 'none'){
-          $( "#chartContainer" ).toggle();
+      if($("#myChart").css("display")== 'none'){
+          $( "#myChart" ).toggle();
           $("#details").text('hide details'); 
       }
+      var dynamicColors = function() {
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+            return "rgb(" + r + "," + g + "," + b + ")";
+      };
         var allLinks = timeReportHash[(reviewee_id.toString()).concat(round.toString())];
-        var dataArray=[];  // Data to be passed to chart
         var sum_time = 0.0;
+        var colors = [];   // background colors
+        var labels = [];   // labels to chart
+        var data = [];  // data to chart
         for (i=0; i<allLinks.length; i++)
           sum_time += allLinks[i][1]+0.00001;
         for(i=0;i<allLinks.length;i++){
           var dataPoint={}
           // dataPoint["y"] = allLinks[i][1];
-          dataPoint["y"] = allLinks[i][1] / sum_time;
           var link_name = allLinks[i][0];
-          dataPoint["indexLabel"] = link_name.slice(0,30)+(link_name.length>30? "...":"");
-          dataArray.push(dataPoint);
+          colors.push('hsl(' + (360 * i / allLinks.length) + ', 100%, 50%)');
+          data.push((allLinks[i][1]*100 / sum_time).toPrecision(3));
+          labels.push(link_name.slice(0,80)+(link_name.length>80? "...":""));
+          //labels.push(link_name);
         }
       
-      var chart = new CanvasJS.Chart("chartContainer",
-      { 
-        data: [
-        {
-          type: "pie",
-          showInLegend: false,
-          legendText: "{indexLabel}",
-          dataPoints : dataArray
-        }
-        ]
-      });
-      chart.render();
-      $(".canvasjs-chart-credit").css("display","none");//To remove the water mark from the chart
+      data = {
+          datasets: [{
+              backgroundColor: colors,
+              data: data, 
+          }],
+          labels: labels,
+          // These labels appear in the legend and in the tooltips when hovering different arcs
+         
+      };
+      var ctx = document.getElementById("myChart");
       
-      
+      var myPieChart = new Chart(ctx,{
+        type: 'pie',
+        data: data,
+        options: {
+          responsive: true,
+          legend: {
+            display: true,
+            position: 'right',
+            labels: {
+              fontSize: 14,
+            }
+          },
+          title: {
+            display: true,
+            text: 'Review time distribution(% )',
+            fontSize: 18,
+          },
+        },
+        maintainAspectRatio: true,
+      }); 
 }
 </script>
 

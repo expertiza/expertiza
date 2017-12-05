@@ -81,6 +81,7 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
+    flash[:error] = "Edit Reviews ..."
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]

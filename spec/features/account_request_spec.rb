@@ -122,7 +122,7 @@ describe 'new account request' do
         # the size of mailing queue changes by 1
         expect{
           requester1 = User.find_by_name('studentx')
-          prepare = MailerHelper.send_to_user(requester1,'Your Expertiza account and password have been created.',"user_welcome",'password1234')
+          prepare = MailerHelper.send_mail_to_user(requester1,'Your Expertiza account and password have been created.',"user_welcome",'password1234')
           prepare.deliver_now
         }.to change{ ActionMailer::Base.deliveries.count }.by(1)
       end

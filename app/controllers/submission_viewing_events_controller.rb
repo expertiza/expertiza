@@ -3,6 +3,7 @@ class SubmissionViewingEventsController < ApplicationController
     true
   end
 
+  # record time when link or file is opened in new window
   def record_start_time
     map_id = params[:submission_viewing_event][:map_id]
     round = params[:submission_viewing_event][:round]
@@ -20,11 +21,11 @@ class SubmissionViewingEventsController < ApplicationController
     end
     # create new response time record for current link
     @submission_viewing_event = SubmissiOnviewingEvent.new(submission_viewing_event_params)
-    #@submission_viewing_event = SubmissiOnviewingEvent.new(params)
     @submission_viewing_event.save
     render :nothing => true
   end
 
+  # record time when link or file window is closed
   def record_end_time
     @data = params.require(:submission_viewing_event)
     @submission_viewing_event_records = SubmissiOnviewingEvent.where(map_id: @data[:map_id], round: @data[:round], link: @data[:link])
@@ -39,7 +40,8 @@ class SubmissionViewingEventsController < ApplicationController
     end
   end
 
-  def mark_end_time # mark end_at review time for all uncommited links/files
+  # mark end_at review time for all uncommited links/files
+  def mark_end_time 
     @data= params.require(:submission_viewing_event)
     @linkArray=Array.new
     @submissionviewingevent_matches = SubmissiOnviewingEvent.where(map_id: @data[:map_id], round: @data[:round])

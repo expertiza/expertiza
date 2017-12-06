@@ -1,6 +1,6 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 
-<% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
+<% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1 %>
 
 <% else %>
     <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
@@ -10,43 +10,41 @@
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @calibration_review_mappings, :title => 'Calibration Review'} %>
-    <% puts '21' %>
     <% if @assignment.dynamic_reviewer_assignment? %>
-        <% puts '22' %>
         <% if @num_calibration_reviews_in_progress >= Assignment.max_outstanding_reviews %>
             <br><br>
-            <span>Note: You can't have more than 2 outstanding calibration reviews. You must complete one of your outstanding calibration reviews before selecting another.</span>
-        <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_calibration_reviews_total > @assignment.num_reviews%>
+            <span>Note: You can't have more than 2 calibration reviews. You must complete one of your calibration reviews before selecting another.</span>
+        <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_calibration_reviews_total > @assignment.num_reviews %>
             <br><br>
-            <span>Note: You can't do more than <%=@assignment.num_reviews%> reviews according to assignment policy.</span>
+            <span>Note: You can't do more than <%= @assignment.num_reviews %>
+              reviews according to assignment policy.</span>
         <% else %>
             <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment, :participant => @participant} %>
         <% end %>
+
     <% end %>
 <% else %>
     <p><em>Reviews cannot be performed at this time</em></p>
 <% end %>
 
-<% if @assignment.get_current_stage(@topic_id) == "review"%>
+<% if @assignment.get_current_stage(@topic_id) == "review" %>
     <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
         <%= render :partial => 'responses', :locals => {:mappings => @regular_review_mappings, :title => 'Review'} %>
-        <% puts '21' %>
         <% if @assignment.dynamic_reviewer_assignment? %>
-            <% puts '22' %>
-            <% if @num_regular_reviews_in_progress >= Assignment.max_outstanding_reviews %>
+            <% if @num_reviews_in_progress >= Assignment.max_outstanding_reviews %>
                 <br><br>
                 <span>Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another.</span>
-            <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_regular_reviews_total > @assignment.num_reviews%>
+            <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_reviews_total > @assignment.num_reviews %>
                 <br><br>
-                <span>Note: You can't do more than <%=@assignment.num_reviews%> reviews according to assignment policy.</span>
+                <span>Note: You can't do more than <%= @assignment.num_reviews %> reviews according to assignment policy.</span>
             <% else %>
                 <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment, :participant => @participant} %>
             <% end %>
+        <% else %>
+            <p><em>Reviews cannot be performed at this time</em></p>
         <% end %>
-    <% else %>
-        <p><em>Reviews cannot be performed at this time</em></p>
     <% end %>
-<%end%>
+<% end %>
 
 
 
@@ -55,7 +53,7 @@
 <% if @assignment.metareview_allowed(@topic_id) or @assignment.get_current_stage() == "Complete" %>
     <h2>Metareviews for "<%= @assignment.name %>"</h2>
 
-    <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1%>
+    <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1 %>
 
     <% else %>
         <h4>Number of Meta-Reviews Allowed: "<%= @assignment.num_metareviews_allowed %>"</h4>

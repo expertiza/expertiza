@@ -11,7 +11,7 @@ describe 'timestamps for student submissions' do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: '2200-12-23 03:33:23')
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: '2200-12-22T22:33:23.000-05:00')
     login_as("student2065")
     visit '/student_task/list'
 
@@ -19,7 +19,8 @@ describe 'timestamps for student submissions' do
 
   it 'displays review due dates along with its timestamps' do
     #checks whether the UI has above given deadline
-    page.html.should include('2200-12-23 03:33:23')
+    click_link "E1797-Test"
+    page.html.should include('2200-12-22T22:33:23.000-05:00')
   end
 
   it 'displays submitted hyperlink along with timestamp' do

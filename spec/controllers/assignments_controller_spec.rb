@@ -258,7 +258,7 @@ describe AssignmentsController do
               staggered_deadline: false,
               microtask: false,
               reviews_visible_to_all: false,
-              is_calibrated: false,
+              has_expert_review: false,
               availability_flag: true,
               reputation_algorithm: 'Lauw',
               simicheck: -1,

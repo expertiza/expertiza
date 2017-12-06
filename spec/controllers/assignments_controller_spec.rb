@@ -103,35 +103,9 @@ describe AssignmentsController do
   end
 
   describe '#create' do
-#<<<<<<< master
-    # params = {
-    #   assignment_form: {
-    #     assignment: {
-    #       instructor_id: 2,
-    #       course_id: 1,
-    #       max_team_size: 1,
-    #       id: 1,
-    #       name: 'test assignment',
-    #       directory_path: '/test',
-    #       spec_location: '',
-    #       show_teammate_reviews: false,
-    #       require_quiz: false,
-    #       num_quiz_questions: 0,
-    #       staggered_deadline: false,
-    #       microtask: false,
-    #       reviews_visible_to_all: false,
-    #       has_expert_review: false,
-    #       availability_flag: true,
-    #       reputation_algorithm: 'Lauw',
-    #       simicheck: -1,
-    #       simicheck_threshold: 100
-    #     }
-    #   }
-    # }
-#=======
     before(:each) do
-      allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
-      @params = {
+     allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
+       @params = {
         assignment_form: {
           assignment: {
             instructor_id: 2,
@@ -147,7 +121,7 @@ describe AssignmentsController do
             staggered_deadline: false,
             microtask: false,
             reviews_visible_to_all: false,
-            is_calibrated: false,
+            has_expert_review: false,
             availability_flag: true,
             reputation_algorithm: 'Lauw',
             simicheck: -1,
@@ -156,7 +130,6 @@ describe AssignmentsController do
         }
       }
     end
-#>>>>>>> master
     context 'when assignment_form is saved successfully' do
       it 'redirets to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)

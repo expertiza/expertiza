@@ -1,0 +1,13 @@
+<div>
+  <br/>
+  <div id="tabs-6">
+    <table>
+      <tr>
+        <td><label>Select the badges for nominations:<br/>Hold down Ctrl or Shift for multiple selection</label></td>
+        <td>
+          <%= select('selected_badges', 'badge_id', Badge.all.collect{|badge| [badge.name, badge.id]}, { selected: 1 }, { multiple:true, selected: 1 })%>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

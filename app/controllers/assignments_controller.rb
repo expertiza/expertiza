@@ -69,10 +69,22 @@ class AssignmentsController < ApplicationController
       assignment_form_key_nonexist_case_handler
       return
     end
+    add_badges_to_assignment
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     feedback_assignment_form_attributes_update
     redirect_to edit_assignment_path @assignment_form.assignment.id
+  end
+
+  def add_badges_to_assignment
+    selected_badges = params["selected_badges"]["badge_id"]
+    if selected_badges != nil
+      selected_badges.each do |badge_id|
+        if !badge_id.empty?
+          AssignmentBadge.create(assignment_id: params["id"], badge_id: badge_id, threshold: 95)
+        end
+      end
+    end
   end
 
   def show

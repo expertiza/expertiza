@@ -160,6 +160,7 @@ describe AssignmentsController do
         allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: '1', deadline_type_id: 2).and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         params = {id: 1}
         get :edit, params

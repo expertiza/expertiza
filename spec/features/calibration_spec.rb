@@ -121,8 +121,14 @@ describe 'expert review' do
           click_button 'Save'
           expect(page).to have_link('Calibration')
           click_link 'Due dates'
-          fill_in 'calibration', with: 'Date'
-          click_button 'Save'
+          fill_in 'datetimepicker_calibration_review', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
+          click_button 'submit_btn'
+          calibration_type_id = DeadlineType.where(name: 'calibration_review')[0].id
+          calibration_due_date = DueDate.find(12)
+          expect(calibration_due_date).to have_attributes(
+                                              deadline_type_id: calibration_type_id,
+                                              type: 'AssignmentDueDate'
+                                          )
         end
       end
     end

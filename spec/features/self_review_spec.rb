@@ -30,7 +30,6 @@ describe "self review testing", js: true  do
   end
 
 
-
   def add_self_review_scores
     # Load questionnaire with generic setup  
     login_as('student2065')
@@ -42,6 +41,7 @@ describe "self review testing", js: true  do
     expect(page).to have_content "Others' work"
     find_link( "Your work").click
    # expect(page).to have_content 'Review our own work'
+    expect(page).to have_content "Self Review:"
     click_button "Review our own work"
     find_link( "Begin").click
     # Fill in a textbox and a dropdown
@@ -95,8 +95,7 @@ describe "self review testing", js: true  do
     find_link( "Your scores").click
     #  The value should be equal to 40.00 when the peer review score is 3 and self review score is 5
     # these scores are set up in
-    score_displayed = page.evaluate_script("$('#computed_self_review_score').html();")
-    expect(score_displayed).to eql("40.00")    
+    expect(page).to have_content "40.00" 
    end
 
 

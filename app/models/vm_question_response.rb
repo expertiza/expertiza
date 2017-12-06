@@ -97,18 +97,18 @@ class VmQuestionResponse
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-        #add answer signature is changed to cater to both peer review and self review.
-        add_answer(answer,"ResponseReview")
+        # add answer signature is changed to cater to both peer review and self review.
+        add_answer(answer, "ResponseReview")
       end
     end
 
     # Adding answers to self review object for each questions in the questionnaires
-     if self_reviews
+    if self_reviews
       answers = Answer.where(response_id: self_reviews[0].response_id)
       answers.each do |answer|
-        add_answer(answer,"SelfReview")
+        add_answer(answer, "SelfReview")
       end
-    end   
+    end
   end
 
   def display_team_members
@@ -163,16 +163,16 @@ class VmQuestionResponse
   # This finds the total computed composite score by summing up all the self review scores that are computed in VmQuestionResponseRow
   # and gives a percentage value by averaging it with the number of questions
   def computed_self_review_score
-   total_self_review_composite_score =0
-   if @list_of_rows.length > 0
-    total_self_review_composite_score = @aggregate_self_review_composite_score * 100 / @list_of_rows.length
-   end
-  total_self_review_composite_score.round(2)
+    total_self_review_composite_score = 0
+    if !@list_of_rows.length.empty?
+      total_self_review_composite_score = @aggregate_self_review_composite_score * 100 / @list_of_rows.length
+    end
+    total_self_review_composite_score.round(2)
   end
 
   # Add answer method should be taking care of both self review and peer review
   # the type of review is sent to this method to take care of both these reviews
-  def add_answer(answer,review_type)
+  def add_answer(answer, review_type)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
  
@@ -209,13 +209,13 @@ class VmQuestionResponse
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
 
-      # Depending upon the type of review, the score generation has to take place. If the review is of type response, it pushes the 
+      # Depending upon the type of review, the score generation has to take place. If the review is of type response, it pushes the
       # peer review scores in the array for each question. If it is of type self review, then the scores are saved in a parameter called
       # self_review_score for each record and also the summation of these values are saved for later use.
       if review_type == "ResponseReview"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
+        row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
       else
-      row.self_review_score = VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts)
+        row.self_review_score = VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts)
       @aggregate_self_review_composite_score += row.weighted_diff_for_row
       end
     end

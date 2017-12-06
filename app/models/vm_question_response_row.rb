@@ -12,7 +12,7 @@ class VmQuestionResponseRow
     @score_row = []
 
     @countofcomments = 0
-  # The attribute self_review_score is set to -1. This particular variable is used to differentiate self review from the normal peer review score.
+    # The attribute self_review_score is set to -1. This particular variable is used to differentiate self review from the normal peer review score.
     @self_review_score = -1
   end
 

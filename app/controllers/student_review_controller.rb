@@ -59,7 +59,7 @@ class StudentReviewController < ApplicationController
     end
 
     @num_calibration_reviews_in_progress = @num_calibration_reviews_total - @num_calibration_reviews_completed
-        @num_regular_reviews_in_progress = @num_regular_reviews_total - @num_regular_reviews_completed
+    @num_regular_reviews_in_progress = @num_regular_reviews_total - @num_regular_reviews_completed
 
     # Calculate the number of metareviews that the user has completed so far.
     @num_metareviews_total = @metareview_mappings.size

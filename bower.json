@@ -30,6 +30,7 @@
     "prototypejs": "1.7.1",
     "highcharts": "4.2.7",
     "js-grid": "1.5.3",
-    "jquery-colorbox": "1.5.10"
+    "jquery-colorbox": "1.5.10",
+    "d3": "4.12.0"
   }
 }

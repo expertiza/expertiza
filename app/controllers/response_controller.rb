@@ -81,7 +81,6 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    flash[:error] = "Edit Reviews ..."
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
@@ -89,6 +88,7 @@ class ResponseController < ApplicationController
     @map = @response.map
     @map.lock current_user.id
     @contributor = @map.contributor
+
     set_all_responses
 
     if @prev.present?
@@ -104,8 +104,10 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
+
+    flash.now[:error] = "Edit reviews ..."
     render action: 'response'
-  end
+end
 
   # Update the response and answers when student "edit" existing response
   def update
@@ -158,6 +160,7 @@ class ResponseController < ApplicationController
       @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     end
 
+    flash.now[:error] = "New reviews ..."
     render action: 'response'
   end
 

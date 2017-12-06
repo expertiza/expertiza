@@ -1,8 +1,8 @@
 <script>
 jQuery(document).ready(function() {
     var last_activity_time = new Date();
-    var default_timeout_time_in_minutes = 0.1
-    var default_timeout_time_in_seconds = 20
+    var default_timeout_time_in_seconds = 3;
+    var default_timeout_time_countdown_in_seconds = 128;
     var timed_out = false;
 
     $( ".flash_error" ).hide();
@@ -27,7 +27,8 @@ jQuery(document).ready(function() {
     $(document).on( "keypress mousedown mousemove", function () {
       last_activity_time = new Date();
       timed_out = false;
-      default_timeout_time_in_seconds = 20
+      default_timeout_time_in_seconds = 3;
+      default_timeout_time_countdown_in_seconds = 128;
       $(".flash_error").hide();
     });
 
@@ -39,12 +40,23 @@ jQuery(document).ready(function() {
       setInterval(function () {
         var current_time = new Date();
         var time_difference_in_seconds = (current_time - last_activity_time) / 1000;
+        var time_out_time_string = "";
 
-        if (time_difference_in_seconds > default_timeout_time_in_minutes * 60) {
-          default_timeout_time_in_seconds = default_timeout_time_in_seconds - 1;
-          $(".flash_error").html("You review will be automatically saved and closed in " + default_timeout_time_in_seconds + " seconds if no activity is detected!");
+        if (time_difference_in_seconds > default_timeout_time_in_seconds) {
+          default_timeout_time_countdown_in_seconds--;
+
+          if(default_timeout_time_countdown_in_seconds > 120) {
+              time_out_time_string = Math.floor(default_timeout_time_countdown_in_seconds / 60) + " minutes  and " + (default_timeout_time_countdown_in_seconds % 60) + " seconds"
+          }
+          else if(default_timeout_time_countdown_in_seconds > 60) {
+            time_out_time_string = Math.floor(default_timeout_time_countdown_in_seconds / 60) + " minute  and " + (default_timeout_time_countdown_in_seconds % 60) + " seconds"
+          } else {
+            time_out_time_string = (default_timeout_time_countdown_in_seconds % 60) + " seconds"
+          }
+
+          $(".flash_error").html("You review will be automatically saved and closed in " + time_out_time_string + " if no activity is detected!");
           $(".flash_error").delay(100).fadeOut().fadeIn('slow');
-          if (default_timeout_time_in_seconds <= 0) {
+          if (default_timeout_time_countdown_in_seconds == 0) {
             $('#autosave_timeout_id').val(time_difference_in_seconds);
             timed_out = true;
             $(".flash_error").remove();

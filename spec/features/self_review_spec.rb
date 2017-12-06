@@ -39,7 +39,7 @@ describe "self review testing", js: true do
     # click on the link to review the submitted assignment
     find_link("Your work").click
     expect(page).to have_content "Self Review:"
-    click_button "Review our own work"
+    find_button("Review our own work").click
     find_link("Begin").click
     # Fill in a textbox and a dropdown
     fill_in "responses[0][comment]", with: "HelloWorld"

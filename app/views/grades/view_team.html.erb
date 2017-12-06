@@ -252,7 +252,7 @@
           <span> <%= vm.display_team_members %></span> <br>
           <%if vm.self_reviews%>
           <!-- Here, the information regarding the composite site is dispalyed when the mouse is hovered on the value. It describes the range amd also the interpretation of the score.-->
-          <h5>Self review score: <span class = "c5" id="computed_self_review_score" data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%. For our metrics the scores can be ranged as following : Improper Assessment (0 - 30), Moderate Assessment (30 - 60), Can do better (60 - 80), Perfect Assessment (80 - 100) " ><%= vm.computed_self_review_score.is_a?(Float)? sprintf("%.2f",vm.computed_self_review_score): vm.computed_self_review_score %></span></h5>
+          <h5>Self review score: <span class = "c5" id="compute_self_review_score" data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%. For our metrics the scores can be ranged as following : Improper Assessment (0 - 30), Moderate Assessment (30 - 60), Can do better (60 - 80), Perfect Assessment (80 - 100) " ><%= vm.compute_self_review_score.is_a?(Float)? sprintf("%.2f",vm.compute_self_review_score): vm.compute_self_review_score %></span></h5>
           <%end%>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>

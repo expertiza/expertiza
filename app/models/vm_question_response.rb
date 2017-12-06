@@ -162,9 +162,9 @@ class VmQuestionResponse
 
   # This finds the total computed composite score by summing up all the self review scores that are computed in VmQuestionResponseRow
   # and gives a percentage value by averaging it with the number of questions
-  def computed_self_review_score
+  def compute_self_review_score
     total_self_review_composite_score = 0
-    if !@list_of_rows.length.empty?
+    if !@list_of_rows.empty?
       total_self_review_composite_score = @aggregate_self_review_composite_score * 100 / @list_of_rows.length
     end
     total_self_review_composite_score.round(2)

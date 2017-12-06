@@ -105,10 +105,10 @@
    var myCircle = Circles.create({
     id:           'self-review-circle',
     radius:       35,
-    value:        <%= @vm.computed_self_review_score.to_i %>,
+    value:        <%= @vm.compute_self_review_score.to_i %>,
     maxValue:     100,
     width:        15,
-    text:         '<%=@vm.computed_self_review_score.to_i==-1? "N/A":@vm.computed_self_review_score.to_i%>',
+    text:         '<%=@vm.compute_self_review_score.to_i==-1? "N/A":@vm.compute_self_review_score.to_i%>',
     colors:       ['#99ffa4', '#077512'],
     duration:       700,
     textClass:      'self-review-circle'  

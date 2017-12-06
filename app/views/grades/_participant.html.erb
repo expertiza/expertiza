@@ -13,7 +13,7 @@
     rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate]
    # The self review score is displyed in the page. The computed self review score is assigned to a variable and that particular variable
    # is being displayed on the page.
-    self_review_score = @vm.computed_self_review_score
+    self_review_score = @vm.compute_self_review_score
 %>
 
 <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>

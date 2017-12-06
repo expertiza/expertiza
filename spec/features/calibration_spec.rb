@@ -12,7 +12,7 @@ describe 'expert review' do
   before(:each) do
     # assignment and topic
     create(:instructor)
-    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 1, staggered_deadline: true, is_calibrated: true)
+    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 1, staggered_deadline: true)
     create_list(:participant, 3)
     create(:topic)
     create(:topic, topic_name: "TestTopic")
@@ -28,7 +28,7 @@ describe 'expert review' do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
 
-    assignment_due('calibration', DateTime.now.in_time_zone + 10, 1, 1)
+
     assignment_due('submission', DateTime.now.in_time_zone + 20, 1, 1)
     assignment_due('review', DateTime.now.in_time_zone + 30, 1)
     assignment_due('submission', DateTime.now.in_time_zone + 40, 2)
@@ -78,9 +78,11 @@ describe 'expert review' do
            review_allowed_id: review_allowed_id)
   end
   def load_work (time1, time2, time3, time4, time5, time6, time7, time8, time9, stage)
+    assignment_due('calibration', DateTime.now.in_time_zone + 10, 1, 1)
     topic_due_at(time1, time2, time3, time4, time5, time6, time7, time8, time9)
     user = User.find_by_name('student2064')
     assignment = Assignment.find_by(name: "Assignment1665")
+    assignment.is_calibrated = true
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     click_link 'Assignment1665'
@@ -108,21 +110,19 @@ describe 'expert review' do
     context 'when clicking \'Calibration for training?\' checkbox and clicking \'save\' button' do
       context '\'Calibration\' due date' do
         it 'works correctly' do
-          # displays a new tab named \'Calibration\' and adds a calibration due date in \'Due dates\' tab'
           assignment = Assignment.where(name: "Assignment1665").first
           instructor = User.find_by(name: "instructor6")
           login_as("instructor6")
           stub_current_user(instructor, instructor.role.name, instructor.role)
           visit "/assignments/#{assignment.id}/edit"
           click_link 'General'
-          expect(page).to have_field('Calibration for training?')
-          page.check 'Calibration for training?'
-          click_on 'Save'
+          expect(page).to have_content('Calibration for training?')
+          find(:css, "#assignment_is_calibrated_field").set(true)
+          click_button 'Save'
           expect(page).to have_link('Calibration')
           click_link 'Due dates'
           fill_in 'calibration', with: 'Date'
-          # allows instructors to change and save date & time and permissions of calibration due date'
-
+          click_button 'Save'
         end
       end
     end
@@ -135,7 +135,6 @@ describe 'expert review' do
         load_work(DateTime.now.in_time_zone + 10, DateTime.now.in_time_zone + 20, DateTime.now.in_time_zone + 30,
                   DateTime.now.in_time_zone + 40, DateTime.now.in_time_zone + 50, DateTime.now.in_time_zone + 20,
                   DateTime.now.in_time_zone + 30, DateTime.now.in_time_zone + 40, DateTime.now.in_time_zone + 50,  "calibration")
-
         expect(page).to have_content("Calibration Review 1")
         expect(page).to have_content("View")
         click_link "View"
@@ -149,6 +148,8 @@ describe 'expert review' do
       load_work(DateTime.now.in_time_zone - 10, DateTime.now.in_time_zone - 20, DateTime.now.in_time_zone + 30,
                    DateTime.now.in_time_zone + 40, DateTime.now.in_time_zone + 50, DateTime.now.in_time_zone + 20,
                    DateTime.now.in_time_zone + 30, DateTime.now.in_time_zone + 40, DateTime.now.in_time_zone + 50, "review")
+      expect(page).to have_content("Number of reviews allowed: 3")
+
     end
     it 'shows \'Review 1, 2, 3...\' and \'Calibration review 1, 2, 3...\' on student_review#list page' do
       load_work(DateTime.now.in_time_zone - 10, DateTime.now.in_time_zone - 20, DateTime.now.in_time_zone + 30,

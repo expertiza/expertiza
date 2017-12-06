@@ -14,9 +14,10 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    if Rails.env.development? || Rails.env.test?
-      defn[:to] = 'expertiza.development@gmail.com'
-    end
+    #if Rails.env.development? || Rails.env.test?
+    #  defn[:to] = 'expertiza.development@gmail.com'
+    #end
+
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
@@ -33,6 +34,13 @@ class Mailer < ActionMailer::Base
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:bcc])
+  end
+
+  def request_user_message_2(defn)
+    @message = defn[:body][:message]
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])

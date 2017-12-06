@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027182114) do
+ActiveRecord::Schema.define(version: 20171108022507) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -425,6 +425,7 @@ ActiveRecord::Schema.define(version: 20171027182114) do
     t.string   "reason",         limit: 255
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
+    t.string   "intro",          limit: 255
   end
 
   create_table "response_maps", force: :cascade do |t|

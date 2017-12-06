@@ -378,4 +378,28 @@ FactoryGirl.define do
     content 'www.wolfware.edu'
     created_at Time.now
   end
+
+  factory :institution, class: Institution do
+    name 'North Carolina State University'
+  end
+
+  factory :studentx, class: User do
+    name 'studentx'
+    email 'studenx@ncsu.edu'
+
+  end
+
+  factory :requested_user, class: RequestedUser do
+    name 'requested_user'
+    fullname 'requested_userx'
+    email 'rq@ncsu.edu'
+  end
+
+  factory :requester, class: RequestedUser do
+    name 'requester1'
+    role_id  2
+    fullname 'requestor1,test'
+    institution_id 1
+    email 'requestor1@gmail.com'
+  end
 end

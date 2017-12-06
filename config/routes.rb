@@ -91,9 +91,11 @@ Expertiza::Application.routes.draw do
     collection do
       get 'list'
       post ':id', action: :update
+      delete ':id', action: :destroy
       get 'new_for'
     end
   end
+
 
   resources :course do
     collection do
@@ -533,6 +535,8 @@ Expertiza::Application.routes.draw do
       delete '', action: :destroy_all
     end
   end
+  post "/users/sned_to_request",controller: :users, action: :send_to_request
+  get '/users/send_mail',controller: :users, action: :send_mail
   post '/users/request_user_create', controller: :users, action: :request_user_create
   post '/users/create_approved_user', controller: :users, action: :create_approved_user
   get 'instructions/home'

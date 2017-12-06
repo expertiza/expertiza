@@ -250,6 +250,7 @@ development:
         - 45
         - 33
         - 50
+
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -496,6 +497,7 @@ development:
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
       anonymized_view: *24
+
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

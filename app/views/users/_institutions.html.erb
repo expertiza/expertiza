@@ -1,2 +1,7 @@
 <p><label for="user_institutions">Institution</label><br/>
-    <%= collection_select('user',:institution_id, Institution.all, :id, :name) %></p>
+  <%= collection_select('user',:institution_id, Institution.all, :id, :name,{include_blank: 'Not List'}) %></p>
+
+<p> If your institution is not list above, input here:</br>
+  <%= text_field 'institution', 'name'  %></p>
+
+

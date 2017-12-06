@@ -38,12 +38,12 @@ describe 'timestamps for student submissions' do
     # submit a generic file for this assignment
     click_link "E1797-Test"
     click_link "Your work"
-    file_path = Rails.root + "spec/features/timestamp_students_submissions_spec.rb"
+    file_path = Rails.root + "spec/features/timestamp_student_submissions_spec.rb"
     attach_file('uploaded_file', file_path)
     click_on 'Upload file'
     # expect the same file to be present in our graph
     page.all('a', text: 'Assignments')[1].click
     click_link "E1797-Test"
-    page.html.should include('timestamp_students_submissions_spec.rb')
+    page.html.should include('timestamp_student_submissions_spec.rb')
   end
 end

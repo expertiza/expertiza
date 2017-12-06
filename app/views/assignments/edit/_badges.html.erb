@@ -1,0 +1,21 @@
+<table>
+  <thead>
+  <tr>
+    <th>Icon</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Threshold</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @badges.each do |badge| %>
+    <tr>
+      <td style="text-align:center"><img src="<%= asset_path("badges/#{badge.image_name}") %>" title="<%= badge.name %>"></td>
+      <td><%= badge.name %></td>
+      <td><%= badge.description %></td>
+      <% badge_threshold =  AssignmentBadge.find_by(assignment_id: params[:id], badge_id: badge.id).threshold unless AssignmentBadge.find_by(assignment_id: params[:id], badge_id: badge.id).nil? %>
+      <td><%=text_field_tag('assignment_form[assignment][badge_'+badge.id.to_s+'_threshold]',badge_threshold) %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

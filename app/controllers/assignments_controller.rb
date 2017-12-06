@@ -62,6 +62,7 @@ class AssignmentsController < ApplicationController
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    @badges = Badge.all
   end
 
   def update
@@ -72,6 +73,7 @@ class AssignmentsController < ApplicationController
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     feedback_assignment_form_attributes_update
+    @badges = Badge.all
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 

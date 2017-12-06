@@ -37,7 +37,12 @@ class AssignmentForm
     else
       attributes[:assignment][:late_policy_id] = nil
     end
+
+    good_teammate_threshold=attributes[:assignment].delete("badge_2_threshold")
+    good_reviewer_threshold=attributes[:assignment].delete("badge_1_threshold")
+
     update_assignment(attributes[:assignment])
+    set_badge_threshold_for_assignment(attributes[:assignment][:id],good_reviewer_threshold,good_teammate_threshold)
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -214,6 +219,7 @@ class AssignmentForm
   # Save the assignment
   def save
     @assignment.save
+    set_badge_threshold_for_assignment(@assignment.id, nil, nil)
   end
 
   # create a node for the assignment
@@ -327,4 +333,68 @@ class AssignmentForm
       )
     end
   end
+
+  def set_badge_threshold_for_assignment(assignment_id, good_reviewer_threshold, good_teammate_threshold)
+
+
+
+    if good_reviewer_threshold.nil?
+      good_reviewer_threshold=95
+    else
+      good_reviewer_threshold = good_reviewer_threshold.to_i
+    end
+    if good_teammate_threshold.nil?
+      good_teammate_threshold=95
+    else
+      good_teammate_threshold = good_teammate_threshold.to_i
+    end
+
+    good_reviewer_badge= AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 1)
+    good_teammate_badge=AssignmentBadge.find_by_assignment_id_and_badge_id(assignment_id, 2)
+
+    if good_reviewer_badge.nil?
+      good_reviewer_badge= AssignmentBadge.create(assignment_id: assignment_id, badge_id: 1, threshold: good_reviewer_threshold)
+    else
+      good_reviewer_badge.threshold=good_reviewer_threshold
+    end
+    begin
+      good_reviewer_badge.save
+    rescue
+      flash[:error] = $ERROR_INFO
+    end
+
+    Participant.where(:parent_id => assignment_id).each do |participant|
+      awardedbadge = AwardedBadge.find_by(participant_id:participant.id, badge_id:good_reviewer_badge.badge_id)
+      reviewgrade = ReviewGrade.find_by_participant_id(participant.id).grade_for_reviewer unless ReviewGrade.find_by_participant_id(participant.id).nil?
+
+      if (awardedbadge == nil && reviewgrade && reviewgrade >= good_reviewer_threshold)
+        AwardedBadge.create(badge_id: 1, participant_id: participant.id)
+      end
+
+      if (awardedbadge != nil && reviewgrade < good_reviewer_threshold)
+        AwardedBadge.find_by(badge_id: 1, participant_id: participant.id).delete
+      end
+
+    end
+
+    if good_teammate_badge.nil?
+      good_teammate_badge = AssignmentBadge.create(assignment_id: assignment_id, badge_id: 2, threshold: good_reviewer_threshold)
+    else
+      good_teammate_badge.threshold = good_teammate_threshold
+    end
+    begin
+      good_teammate_badge.save
+    rescue
+      flash[:error] = $ERROR_INFO
+    end
+
+    Participant.where(parent_id: assignment_id).each do |participant|
+
+      teammate_review = TeammateReviewResponseMap.find_by(reviewee_id: participant.id)
+
+      teammate_review.update_good_teammate_badge unless teammate_review.nil?
+
+    end
+  end
+
 end

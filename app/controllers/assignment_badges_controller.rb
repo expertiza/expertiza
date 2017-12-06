@@ -1,0 +1,2 @@
+class AssignmentBadgesController < ApplicationController
+end

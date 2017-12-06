@@ -165,6 +165,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+    @map.update_good_teammate_badge if @map.is_a? TeammateReviewResponseMap
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 

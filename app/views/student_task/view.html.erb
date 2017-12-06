@@ -56,7 +56,8 @@ to display the label "Your team" in the student assignment tasks-->
         <% @alias_name = "Your readings" %>
       <% end %>
       <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
-      <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+      <!-- If assignment is calibrated, then others' work link is enabled because the partcipants should now be able to submit calibrated reviews -->
+      <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" or @assignment.is_calibrated?%>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>

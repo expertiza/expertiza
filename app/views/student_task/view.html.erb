@@ -260,12 +260,15 @@
            end
            unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
              @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+             puts @topic_name
+             @topic_name="#{@topic_name}".gsub("'", %q()) #look for single quotes in topic names and remove them as they will interfere with JS parser
+             puts @topic_name
              { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "review", :content => "Peer Review - Round "+response_value_iterator.round.to_s+"<split> Review for: #{@topic_name}"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          elsif review_mapping_iterator.type=="SelfReviewResponseMap"
            unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
              @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "selfReview", :content => "Self Feedback - Round "+response_value_iterator.round.to_s+"<split>Self Feedback"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "selfReview", :content => "Self Review - Round "+response_value_iterator.round.to_s+"<split>Self Review"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
          elsif review_mapping_iterator.type=="TeammateReviewResponseMap"
            unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
@@ -296,9 +299,10 @@
     for(i=0;  i<visualization_JSON.length; i++) {
         temp=visualization_JSON[i].content.split("<split>");
         if(href_JSON[i]=='')
-            visualization_JSON[i].content = temp[0]+"<br>"+temp.slice(1);
+            visualization_JSON[i].content = temp[0]+"<br>"+temp.slice(1); //if no hyperlink is present display plain text
         else
             visualization_JSON[i].content = "<a href="+href_JSON[i]+" target='_blank'><b><u>"+temp[0]+"</u></b></a><br>"+temp.slice(1);
+        // generating hyperlink only to relevant text only
     }
 </script>
 <!--code for visualization-->
@@ -312,7 +316,7 @@
     // Configuration for the Timeline
     var options = {
         zoomMin: 1000 * 60 * 60 * 24,             // one day in milliseconds
-        zoomMax: 1000 * 60 * 60 * 24 * 31 * 12     // about three months in milliseconds
+        zoomMax: 1000 * 60 * 60 * 24 * 31 * 12     // about one year in milliseconds
     };
 
     // Create a Timeline

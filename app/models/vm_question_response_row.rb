@@ -12,7 +12,7 @@ class VmQuestionResponseRow
     @score_row = []
 
     @countofcomments = 0
-# The attribute self_review_score is set to -1. This particular variable is used to differentiate self review from the normal peer review score.
+    # The attribute self_review_score is set to -1. This particular variable is used to differentiate self review from the normal peer review score.
     @self_review_score = -1
   end
 
@@ -29,7 +29,7 @@ class VmQuestionResponseRow
   attr_reader :score_row
 
   attr_reader :weight
-# self_review_score value is assigned to the class variable to access it in the code or to assign values.
+  # self_review_score value is assigned to the class variable to access it in the code or to assign values.
   attr_accessor :self_review_score
 
   # the question max score is the max score of the questionnaire, except if the question is a true/false, in which case

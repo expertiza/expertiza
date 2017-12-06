@@ -4,6 +4,7 @@
 class VmQuestionResponse
   @questionnaire = nil
   @assignment = nil
+  @self_reviews = nil # we will be storing the self review values in this variable, nil if no self review present
 
   def initialize(questionnaire, assignment=nil)
     @assignment = assignment
@@ -24,6 +25,9 @@ class VmQuestionResponse
     @rounds = rounds
     @round = round
     @name  = questionnaire.name
+    # this is the variable which contains the summation of differences between weighted self review and weighted peer review averages
+    # the weighted averages are calculated in model vm_question_response_score_cell and the values are summed up in add_answer method
+    @aggregate_self_review_composite_score = 0
   end
 
   attr_reader :name
@@ -49,6 +53,9 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
+      # This gets the self review scores that are saved as the part of self assesing that a user performs after submission
+      # Here the data will be nil, if no self review is done by the user.
+      self_reviews = SelfReviewResponseMap.get_assessments_for(team)
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping.present?
@@ -57,6 +64,8 @@ class VmQuestionResponse
         end
       end
       @list_of_reviews = reviews
+      # the self reviews that are returned by the self review response map is stored here to which add_answer is called to store the marks
+      @self_reviews = self_reviews
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
@@ -88,7 +97,16 @@ class VmQuestionResponse
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-        add_answer(answer)
+        # add answer signature is changed to cater to both peer review and self review.
+        add_answer(answer, "ResponseReview")
+      end
+    end
+
+    # Adding answers to self review object for each questions in the questionnaires
+    if self_reviews
+      answers = Answer.where(response_id: self_reviews[0].response_id)
+      answers.each do |answer|
+        add_answer(answer, "SelfReview")
       end
     end
   end
@@ -134,13 +152,30 @@ class VmQuestionResponse
 
   attr_reader :list_of_reviews
 
+  attr_reader :self_reviews
+
   attr_reader :list_of_rows
 
   attr_reader :list_of_reviewers
 
-  def add_answer(answer)
+  attr_reader :aggregate_self_review_composite_score
+
+  # This finds the total computed composite score by summing up all the self review scores that are computed in VmQuestionResponseRow
+  # and gives a percentage value by averaging it with the number of questions
+  def compute_self_review_score
+    total_self_review_composite_score = 0
+    if !@list_of_rows.empty?
+      total_self_review_composite_score = @aggregate_self_review_composite_score * 100 / @list_of_rows.length
+    end
+    total_self_review_composite_score.round(2)
+  end
+
+  # Add answer method should be taking care of both self review and peer review
+  # the type of review is sent to this method to take care of both these reviews
+  def add_answer(answer, review_type)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
+ 
     @list_of_rows.each do |row|
       next unless row.question_id == answer.question_id
       # Go ahead and calculate what the color code for this score should be.
@@ -173,7 +208,16 @@ class VmQuestionResponse
 
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
+
+      # Depending upon the type of review, the score generation has to take place. If the review is of type response, it pushes the
+      # peer review scores in the array for each question. If it is of type self review, then the scores are saved in a parameter called
+      # self_review_score for each record and also the summation of these values are saved for later use.
+      if review_type == "ResponseReview"
+        row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
+      else
+        row.self_review_score = VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts)
+      @aggregate_self_review_composite_score += row.weighted_diff_for_row
+      end
     end
   end
 

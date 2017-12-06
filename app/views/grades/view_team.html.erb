@@ -33,6 +33,7 @@
 <!--Obtain only review scores-->
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
 <h5>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h5>
+
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
@@ -42,6 +43,7 @@
  <b>No Submission</b>
 <% end %>
 </div><br>
+
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
@@ -86,17 +88,18 @@
 
           </span>
 
-          <table id="scoresTable" class="tbl_heat tablesorter">
+          <table id="scoresTable" class="tbl_heat tablesorter" >
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
+            <!-- 1799 -->
             <thead>
             <tr>
               <th class="sorter-true">Criterion<span></span></th>
-            
               <% i = 1 %>
-              <% vm.list_of_reviews.each do |review| %>
-                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
+              <% vm.list_of_reviews.each do |review| %>         
+                 <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
+                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-  toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>
+                    </th>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
@@ -108,13 +111,21 @@
                 Avg<span></span>
               </th>
               <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
+                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1 <%= @self_reviews%> </span>
+              <!-- Here, the metric of self review has been checked. The line checks if the self-review has the comments that have word count greater than 10. This shows the quality of the review done for the work-->
               </th>
-
+              <!--The self_review scores have been displayed beside the peer review scores in the defined form-->
+                <% if vm.self_reviews %>
+                      <th>
+                        Self Reviews
+                      </th>
+                <% end %>
+            
             </tr>
+
             </thead>
 
-
+            
             <% score_row_count = vm.list_of_rows.first.score_row.count %>
             <% j = 1 %>
             <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
@@ -144,9 +155,18 @@
                   <td  class = 'cf' align="right">
                     <%= row.average_score_for_row.to_s %>
                   </td>
+                 
                   <td  class = 'cf' align="center">
                     <%= row.countofcomments.to_s %>
                   </td>
+
+                   <% if vm.self_reviews %>
+                      <td class = "<%= row.self_review_score.color_code %>" align="center">
+                        <%= row.self_review_score.score_value%>
+                      </td>
+                      <!--The self review score has been displayed assigning a colour code to it. The valus has been displayed in the expected position.-->
+                   <% end %>
+
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
@@ -174,7 +194,22 @@
                                 <% end %>
                               </td>
                             </tr>
-                        <% end %>
+                     -    <% end %>
+                        <% if vm.self_reviews%>
+                          <tr>
+                            <td>
+                              Self Review
+                            </td>
+                            <!--Here, the self review scores have been given for the assignment.-->
+                            <td align="center" class = "<%=row.self_review_score.color_code%>">
+                             <%= row.self_review_score.score_value %>
+                            </td>
+                            <td >
+                              <!--The comments for all the questions have been taken care-->
+                             <%= row.self_review_score.comment %>
+                            </td>                       
+                          </tr>
+                       <%end%>  
                       </table>
                     </div>
                   </div>
@@ -188,7 +223,7 @@
               <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
                 <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                   <div style="background-color:#A9A9F5;padding:4px;">
-                    <table class="tbl_addlcmt">
+                    <table class="tbl_addlcmt" >
                       <thead>
                       <th>Review</th>
                       <th >Additional Comments</th>
@@ -208,12 +243,17 @@
             </tr>
 
           </table>
+
           <!-- Display the list of team members, for Peer Reviews. -->
           <div style="margin-top:5px"></div>
           <input class="btn btn-default" type="button" href="#" onclick="col_sort(<%=table_count%>)" data-toggle="tooltip" title="Sort reviews in ascending/descending order of the total score. Consecutive clicks will alternate between ascending and descending sort order" value="Sort by total review score"/>
           <br>
           <% table_count += 1%>
-          <span> <%= vm.display_team_members %></span>
+          <span> <%= vm.display_team_members %></span> <br>
+          <%if vm.self_reviews%>
+          <!-- Here, the information regarding the composite site is dispalyed when the mouse is hovered on the value. It describes the range amd also the interpretation of the score.-->
+          <h5>Self review score: <span class = "c5" id="compute_self_review_score" data-toggle="tooltip" title="The Self review score shows the amount of similarity between the Peer reviews and the Self Review. Ideally if the average review scores matches the self review scores, this score will be 100%. For our metrics the scores can be ranged as following : Improper Assessment (0 - 30), Moderate Assessment (30 - 60), Can do better (60 - 80), Perfect Assessment (80 - 100) " ><%= vm.compute_self_review_score.is_a?(Float)? sprintf("%.2f",vm.compute_self_review_score): vm.compute_self_review_score %></span></h5>
+          <%end%>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <div class="flash_warn">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>

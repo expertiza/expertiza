@@ -17,7 +17,7 @@
 
 <% def get_link_round_review_time(map_id, round, link) %>
     <% sum_time = 0 %>
-    <% links = SubmissiOnviewingevent.where(map_id: map_id, round: round, link: link) %>
+    <% links = SubmissionViewingEvent.where(map_id: map_id, round: round, link: link) %>
     <% links.each do |link_time| %>
         <% if link_time.end_at.nil? || link_time.start_at.nil? %>
             <% individual_time = 0 %>
@@ -57,7 +57,7 @@
         <% map_total_time = 0 %>
         <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
           <% @per_round_time = Array.new %>
-          <% @submissionviewingevent_match = SubmissiOnviewingevent.where(map_id: map.id, round:each_round)%>
+          <% @submissionviewingevent_match = SubmissionViewingEvent.where(map_id: map.id, round:each_round)%>
           <% @reviewed_object_id = map.reviewed_object_id %>
           <% @reviewee_id = map.reviewee_id %>
 

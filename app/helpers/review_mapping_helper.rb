@@ -191,8 +191,8 @@ module ReviewMappingHelper
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@time_spent_round_" + round.to_s,0) }
     (1..@assignment.num_review_rounds).each do |round|
       sum_time = 0
-      @response_times = ResponseTime.where(map_id: map_id, round: round)
-      @response_times.each do |link_time|
+      @submission_viewing_events = SubmissionViewingEvent.where(map_id: map_id, round: round)
+      @submission_viewing_events.each do |link_time|
         #start_time = link_time.start_at.nil?? 0: link_time.start_at
         #end_time = link_time.end_at.nil?? 0: link_time.end_at
         if link_time.start_at.nil? || link_time.end_at.nil?

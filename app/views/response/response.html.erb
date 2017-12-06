@@ -185,7 +185,7 @@ jQuery(document).ready(function() {
           async: false,
           url: '/submission_viewing_events/mark_end_time',
           data: $.param({
-            response_time: {map_id: map_id, round: round, end_at: ISODateString(t)}
+            submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
             }),
           success: function(json){
             var links = JSON.parse(JSON.stringify(json));

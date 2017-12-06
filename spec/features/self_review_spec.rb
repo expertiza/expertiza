@@ -24,7 +24,12 @@ describe "self review testing", js: true  do
     create(:assignment_questionnaire)
     create(:question)
 
+    handle = Capybara.current_session.driver.current_window_handle
+    Capybara.current_session.driver.maximize_window(handle)
+
   end
+
+
 
   def add_self_review_scores
     # Load questionnaire with generic setup  

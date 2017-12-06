@@ -40,6 +40,12 @@ background-color: #d3d3d3;
   background-color: #FFFFFF;
 }
 
+/* To underline scores which have a comment. */
+.underlined {
+    text-decoration: underline;
+    font-weight:bold;
+}
+
 .tbl_heat {
   border: 1px solid black;
   margin-top: -9px;

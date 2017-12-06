@@ -3,28 +3,36 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
-    case params[:action]
-    when 'edit' # If response has been submitted, no further editing allowed
+    response = user_id = nil
+    action = params[:action]
+    if %w(edit delete update view).include?(action)
       response = Response.find(params[:id])
+      user_id = response.map.reviewer.user_id if response.map.reviewer
+    end
+    case action
+    when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      return current_user_id?(response.map.reviewer.user_id)
+      return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      response = Response.find(params[:id])
-      return current_user_id?(response.map.reviewer.user_id)
+      return current_user_id?(user_id)
     when 'view'
-      response = Response.find(params[:id])
-      map = response.map
-      assignment = response.map.reviewer.assignment
-      # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
-      if map.is_a? ReviewResponseMap
-        reviewee_team = AssignmentTeam.find(map.reviewee_id)
-        return current_user_id?(response.map.reviewer.user_id) || reviewee_team.has_user(current_user) || current_user.role.name == 'Administrator' || (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
-      else
-        return current_user_id?(response.map.reviewer.user_id)
-      end
+      return edit_allowed?(response.map, user_id)
     else
       current_user
+    end
+  end
+
+  def edit_allowed?(map, user_id)
+    assignment = map.reviewer.assignment
+    # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
+    if map.is_a? ReviewResponseMap
+      reviewee_team = AssignmentTeam.find(map.reviewee_id)
+      return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
+        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
+        (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
+    else
+      return current_user_id?(user_id)
     end
   end
 
@@ -99,9 +107,9 @@ class ResponseController < ApplicationController
     @response_count = Response.where(map_id: @map.id).count
     @assignment_count = @assignment.rounds_of_reviews
 
-    if @response_count < @assignment_count
-      @current_round = @response_count + 1
-    end
+    # if @response_count < @assignment_count
+    #   @current_round = @response_count + 1
+    # end
 
     if @assignment
       @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
@@ -170,8 +178,7 @@ class ResponseController < ApplicationController
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
-    @map = Response.find_by_map_id(params[:id])
-
+    @map = Response.find_by(map_id: params[:id])
     if params[:return] == "feedback"
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
     elsif params[:return] == "teammate"
@@ -193,20 +200,19 @@ class ResponseController < ApplicationController
 
     @calibration_response_map = []
     @calibration_response =[]
-
+    @round_no=params[:round]
     @expertcalibrations = params[:calibration_response_map_id].split(',')
     @expertcalibrations.each do |cal|
       @calibration_response_map.push ReviewResponseMap.find(cal)
     end
     @calibration_response_map.each do |cal|
-      @calibration_response.push cal.response[0]
+      @calibration_response.push Response.where(map_id: cal.id, round: @round_no).first
     end
-
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
-    @review_response = review_response_map.response[0]
+    @review_response = Response.where(map_id: review_response_map.id , round: @round_no).first
     @assignment = Assignment.find(@calibration_response_map.first.reviewed_object_id)
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
+    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and used_in_round = ? and questionnaire_id IN (?)", @assignment.id, @round_no, @review_questionnaire_ids]).first
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
@@ -217,49 +223,28 @@ class ResponseController < ApplicationController
       return
     end
 
-    # Get all the participant(course or assignment) entries for this user
-    course_participants = CourseParticipant.where(user_id: session[:user].id)
-    assignment_participants = AssignmentParticipant.where(user_id: session[:user].id)
-
     # Get all the course survey deployments for this user
     @surveys = []
-    if course_participants
-      course_participants.each do |cp|
-        survey_deployments = CourseSurveyDeployment.where(parent_id: cp.parent_id)
+    [CourseParticipant, AssignmentParticipant].each do |participant_type|
+      # Get all the participant(course or assignment) entries for this user
+      participants = participant_type.where(user_id: session[:user].id)
+      next unless participants
+      participants.each do |p|
+        survey_deployment_type = (participant_type == CourseParticipant ? CourseSurveyDeployment : AssignmentSurveyDeployment)
+        survey_deployments = survey_deployment_type.where(parent_id: p.parent_id)
         next unless survey_deployments
         survey_deployments.each do |survey_deployment|
           next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
           @surveys <<
-          [
-            'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-            'survey_deployment_id' => survey_deployment.id,
-            'start_date' => survey_deployment.start_date,
-            'end_date' => survey_deployment.end_date,
-            'parent_id' => cp.parent_id,
-            'participant_id' => cp.id,
-            'global_survey_id' => survey_deployment.global_survey_id
-          ]
-        end
-      end
-    end
-
-    # Get all the assignment survey deployments for this user
-    if assignment_participants
-      assignment_participants.each do |ap|
-        survey_deployments = AssignmentSurveyDeployment.where(parent_id: ap.parent_id)
-        next unless survey_deployments
-        survey_deployments.each do |survey_deployment|
-          next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
-          @surveys <<
-          [
-            'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-            'survey_deployment_id' => survey_deployment.id,
-            'start_date' => survey_deployment.start_date,
-            'end_date' => survey_deployment.end_date,
-            'parent_id' => ap.parent_id,
-            'participant_id' => ap.id,
-            'global_survey_id' => survey_deployment.global_survey_id
-          ]
+              [
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date,
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => p.parent_id,
+                'participant_id' => p.id,
+                'global_survey_id' => survey_deployment.global_survey_id
+              ]
         end
       end
     end
@@ -330,7 +315,7 @@ class ResponseController < ApplicationController
   end
 
   def sort_questions(questions)
-    questions.sort {|a, b| a.seq <=> b.seq }
+    questions.sort_by(&:seq)
   end
 
   def create_answers(params, questions)

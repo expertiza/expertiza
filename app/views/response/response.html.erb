@@ -48,7 +48,7 @@ jQuery(document).ready(function() {
             <% end %>
         <% end %>
 
-        <%if @assignment.has_teams?%>
+        <%if @assignment.teams?%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
             <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
         <%else%>

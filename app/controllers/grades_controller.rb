@@ -4,7 +4,6 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
   include StudentTaskHelper
-  include AssignmentHelper
 
   def action_allowed?
     case params[:action]
@@ -51,7 +50,7 @@ class GradesController < ApplicationController
     @scores = @assignment.scores(@questions)
     averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
-    @avg_of_avg = mean(averages)
+    @avg_of_avg = averages.inject(0) {|sum, x| sum += x } / averages.size.to_f
     calculate_all_penalties(@assignment.id)
   end
 
@@ -90,17 +89,30 @@ class GradesController < ApplicationController
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
+  def view_supplementary_questionnaire(team, assignment, participant, questionnaire)
+    supp = nil
+    supp_questionnaire_id = Team.supplementary_rubric_by_team_id(team.id)
+    unless supp_questionnaire_id.nil?
+      supp = VmQuestionResponse.new(questionnaire, assignment)
+      supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
+      supp_questions = supp_questionnaire.questions
+      supp.add_questions(supp_questions)
+      supp.add_team_members(team)
+      supp.add_reviews(participant, team, assignment.varying_rubrics_by_round?)
+      supp.get_number_of_comments_greater_than_10_words
+    end
+    supp
+  end
+
   # method for alternative view
   def view_team
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
-    @team_id = @team.id
-    @questions = {}
+
     questionnaires = @assignment.questionnaires
-    retrieve_questions questionnaires
-    @pscore = @participant.scores(@questions)
     @vmlist = []
+    @supplist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
@@ -109,8 +121,11 @@ class GradesController < ApplicationController
                  AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
                end
       vm = VmQuestionResponse.new(questionnaire, @assignment)
-      vmquestions = questionnaire.questions
-      vm.add_questions(vmquestions)
+      questions = questionnaire.questions
+      vm.add_questions(questions)
+
+      @supplist << view_supplementary_questionnaire(@team, @assignment, @participant, questionnaire)
+
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words
@@ -328,9 +343,5 @@ class GradesController < ApplicationController
     else
       return true
     end
-  end
-
-  def mean(array)
-    array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
 end

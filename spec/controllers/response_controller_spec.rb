@@ -77,7 +77,7 @@ describe ResponseController do
       allow(Answer).to receive(:where).with(response_id: 1, question_id: 1).and_return([answer])
       params = {id: 1, return: 'assignment_edit'}
       get :edit, params
-      expect(controller.instance_variable_get(:@review_scores)).to eq([answer])
+      expect(controller.instance_variable_get(:@review_scores)).to eq([answer, answer])
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
       expect(controller.instance_variable_get(:@min)).to eq(0)
       expect(controller.instance_variable_get(:@max)).to eq(5)

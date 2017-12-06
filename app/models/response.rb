@@ -16,6 +16,29 @@ class Response < ActiveRecord::Base
     id
   end
 
+  def display_html_helper(questions, answers, questionnaire_max)
+    count = 0
+    code = ''
+    questions.each do |question|
+      if !question.is_a? QuestionnaireHeader and question.break_before == true
+        count += 1
+      end
+      answer = answers.find {|a| a.question_id == question.id }
+      row_class = count.even? ? "info" : "warning"
+      row_class = "" if question.is_a? QuestionnaireHeader
+      code += '<tr class="' + row_class + '"><td>'
+      if !answer.nil? or question.is_a? QuestionnaireHeader
+        code += if question.instance_of? Criterion or question.instance_of? Scale
+                  question.view_completed_question(count, answer, questionnaire_max)
+                else
+                  question.view_completed_question(count, answer)
+                end
+      end
+      code += '</td></tr>'
+    end
+    code
+  end
+
   def display_as_html(prefix = nil, count = nil, _file_url = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
@@ -46,34 +69,26 @@ class Response < ActiveRecord::Base
     end
 
     code += '<table id="review_' + str + '" style="display: none;" class="table table-bordered">'
-    count = 0
     answers = Answer.where(response_id: self.response_id)
 
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
-      # get the tag settings this questionnaire
-      tag_prompt_deployments = TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id)
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
-      # loop through questions so the the questions are displayed in order based on seq (sequence number)
-      questions.each do |question|
-        count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-        answer = answers.find {|a| a.question_id == question.id }
-        row_class = count.even? ? "info" : "warning"
-        row_class = "" if question.is_a? QuestionnaireHeader
-        code += '<tr class="' + row_class + '"><td>'
-        # if !answer.nil? or question.is_a? QuestionnaireHeader
-          code += if question.instance_of? Criterion
-                    # Answer Tags are enabled only for Criterion questions at the moment.
-                    question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
-                  elsif question.instance_of? Scale
-                    question.view_completed_question(count, answer, questionnaire_max)
-                  else
-                    question.view_completed_question(count, answer)
-                  end
-        # end
-        code += '</td></tr>'
+
+      # For supp_questionnaire
+      response_map = self.map
+      reviewee_id = response_map.reviewee_id
+      supp_questionnaire_id = Team.supplementary_rubric_by_team_id(reviewee_id)
+      unless supp_questionnaire_id.nil?
+        supp_questionnaire = Questionnaire.find(supp_questionnaire_id)
+        supp_questions = supp_questionnaire.questions.sort {|a, b| a.seq <=> b.seq }
       end
+
+      # loop through questions so the the questions are displayed in order based on seq (sequence number)
+      code += display_html_helper(questions, answers, questionnaire_max)
+      code += '<tr><td style="text-align: center"><h4>Supplementary Review Questions </h4></td></tr>'
+      code += display_html_helper(supp_questions, answers, questionnaire_max)
 
       comment = if !self.additional_comment.nil?
                   self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -241,6 +256,7 @@ class Response < ActiveRecord::Base
   def notify_instructor_on_difference
     response_map = self.map
     reviewer_participant_id = response_map.reviewer_id
+    @reviewee_id = response_map.reviewee_id
     reviewer_participanat = AssignmentParticipant.find(reviewer_participant_id)
     reviewer_name = User.find(reviewer_participanat.user_id).fullname
     reviewee_team = AssignmentTeam.find(response_map.reviewee_id)

@@ -262,5 +262,14 @@ class Team < ActiveRecord::Base
     team
   end
 
+  def self.supplementary_rubric_by_team_id(team_id)
+    team = Team.find(team_id)
+    if team.blank?
+      nil
+    else
+      team.supplementary_rubric
+    end
+  end
+
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 end

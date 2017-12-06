@@ -60,6 +60,38 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
+  def new_questionnaire
+    @questionnaire = Questionnaire.new
+    @questionnaire.private = false
+    @questionnaire.name = "SR_" + @team.id.to_s
+    @questionnaire.instructor_id = @team.id
+    @questionnaire.min_question_score = 0
+    @questionnaire.max_question_score = 5
+    @questionnaire.type = "ReviewQuestionnaire"
+    @questionnaire.display_type = "Review"
+    @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    @questionnaire
+  end
+
+  def manage_supplementary_rubric
+    @participant = AssignmentParticipant.find(params[:id])
+    @team = Team.find(@participant.team.id)
+    if @team.supplementary_rubric.nil?
+      @questionnaire = new_questionnaire
+      begin
+        @questionnaire.save
+        @team.supplementary_rubric = @questionnaire.id
+        @team.save
+        flash[:success] = 'You have successfully created a questionnaire!'
+      rescue
+        flash[:error] = $ERROR_INFO
+      end
+    else
+      @questionnaire = Questionnaire.find(@team.supplementary_rubric)
+    end
+    redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
+  end
+
   # Note: This is not used yet in the view until we all decide to do so
   def remove_hyperlink
     @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])

@@ -2,7 +2,9 @@ $=jQuery;
 
 $(function () {
     $("[data-toggle='tooltip']").tooltip();
-    $("#scoresTable").tablesorter();
+    $("#scoresTable").tablesorter({
+        cssInfoBlock: "avoid-sort"
+    });
 });
 
 var lesser = false;

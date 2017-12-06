@@ -13,7 +13,7 @@ class ResponseController < ApplicationController
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
       return current_user_id?(user_id)
-      # Deny access to anyone except reviewer & author's team
+    # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
       return current_user_id?(user_id)
     when 'view'
@@ -29,8 +29,8 @@ class ResponseController < ApplicationController
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
-        (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
+          (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
+          (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
       return current_user_id?(user_id)
     end
@@ -67,6 +67,9 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
     end
+    @questions_supp.each do |question|
+      @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
+    end
     render action: 'response'
   end
 
@@ -75,6 +78,8 @@ class ResponseController < ApplicationController
     return unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
+    map = @response.map
+    team_id = map.reviewee_id
     msg = ""
     begin
       @map = @response.map
@@ -82,6 +87,16 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+
+      @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(team_id)
+      unless @supp_questionnaire_id.nil?
+        @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
+        unless @supp_questionnaire.nil?
+          questions_supp = sort_questions(@supp_questionnaire.questions)
+          create_answers(params, questions_supp) unless params[:responses].nil?
+        end
+      end
+
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
       else
@@ -134,10 +149,17 @@ class ResponseController < ApplicationController
 
   def create
     @map = ResponseMap.find(params[:id])
+    @team_id = @map.reviewee_id
     set_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
+
+      @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@team_id)
+      unless @supp_questionnaire_id.nil?
+        @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
+      end
+
     else
       @round = nil
     end
@@ -151,6 +173,13 @@ class ResponseController < ApplicationController
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
+
+    # For Supp Questions
+    unless @supp_questionnaire.nil?
+      questions_supp = sort_questions(@supp_questionnaire.questions)
+      questions += questions_supp
+    end
+
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
@@ -252,7 +281,15 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
+
     @questions = sort_questions(@questionnaire.questions)
+
+    # For supp Questionnaire
+    unless @supp_questionnaire.nil?
+      @questions_supp = sort_questions(@supp_questionnaire.questions)
+    end
+    ###
+
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
@@ -263,6 +300,13 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
+
+      # For supp Questionnaire
+      @supp_questionnaire_id = Team.supplementary_rubric_by_team_id(@contributor.id)
+      unless @supp_questionnaire_id.nil?
+        @supp_questionnaire = Questionnaire.find(@supp_questionnaire_id)
+      end
+
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
@@ -289,6 +333,9 @@ class ResponseController < ApplicationController
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
     @questionnaire = @response.questionnaire_by_answer(answer)
+
+    answer_supp = @response.scores.last
+    @supp_questionnaire = @response.questionnaire_by_answer(answer_supp)
   end
 
   def set_dropdown_or_scale

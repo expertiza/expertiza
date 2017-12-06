@@ -1,56 +1,60 @@
 class SubmissionViewingEventsController < ApplicationController
-  before_action :set_submission_viewing_event, only: [:show, :edit, :update, :destroy]
-
-  # GET /submission_viewing_events
-  def index
-    @submission_viewing_events = SubmissionViewingEvent.all
+  def action_allowed?
+    true
   end
 
-  # GET /submission_viewing_events/1
-  def show
+  def record_start_time
+    map_id = params[:submission_viewing_event][:map_id]
+    round = params[:submission_viewing_event][:round]
+    link = params[:submission_viewing_event][:link]
+    start_at = params[:submission_viewing_event][:start_at]
+    # check if this link is already opened and timed
+    @submission_viewing_event_records = SubmissiOnviewingEvent.where(map_id: map_id, round: round, link: link)
+    # if opened, end these records with current time
+    if @submission_viewing_event_records
+      @submission_viewing_event_records.each do |time_record|
+        if time_record.end_at.nil?
+          time_record.update_attribute('end_at', start_at)
+        end
+      end
+    end
+    # create new response time record for current link
+    @submission_viewing_event = SubmissiOnviewingEvent.new(submission_viewing_event_params)
+    #@submission_viewing_event = SubmissiOnviewingEvent.new(params)
+    @submission_viewing_event.save
+    render :nothing => true
   end
 
-  # GET /submission_viewing_events/new
-  def new
-    @submission_viewing_event = SubmissionViewingEvent.new
-  end
-
-  # GET /submission_viewing_events/1/edit
-  def edit
-  end
-
-  # POST /submission_viewing_events
-  def create
-    @submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
-
-    if @submission_viewing_event.save
-      redirect_to @submission_viewing_event, notice: 'Submission viewing event was successfully created.'
-    else
-      render :new
+  def record_end_time
+    @data = params.require(:submission_viewing_event)
+    @submission_viewing_event_records = SubmissiOnviewingEvent.where(map_id: @data[:map_id], round: @data[:round], link: @data[:link])
+    @submission_viewing_event_records.each do |time_record|
+      if time_record.end_at.nil?
+        time_record.update_attribute('end_at', @data[:end_at])
+        break
+      end
+    end
+    respond_to do |format|
+      format.json {head :no_content}
     end
   end
 
-  # PATCH/PUT /submission_viewing_events/1
-  def update
-    if @submission_viewing_event.update(submission_viewing_event_params)
-      redirect_to @submission_viewing_event, notice: 'Submission viewing event was successfully updated.'
-    else
-      render :edit
+  def mark_end_time # mark end_at review time for all uncommited links/files
+    @data= params.require(:submission_viewing_event)
+    @linkArray=Array.new
+    @submissionviewingevent_matches = SubmissiOnviewingEvent.where(map_id: @data[:map_id], round: @data[:round])
+    @submissionviewingevent_matches.each do |submissionviewingevent_entry|
+      if submissionviewingevent_entry.end_at.nil?
+        @linkArray.push(submissionviewingevent_entry.link)
+        submissionviewingevent_entry.update_attribute('end_at', @data[:end_at])
+      end
+    end   
+    respond_to do|format|
+      format.json {render json: @linkArray}
     end
-  end
-
-  # DELETE /submission_viewing_events/1
-  def destroy
-    @submission_viewing_event.destroy
-    redirect_to submission_viewing_events_url, notice: 'Submission viewing event was successfully destroyed.'
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_submission_viewing_event
-      @submission_viewing_event = SubmissionViewingEvent.find(params[:id])
-    end
-
     # Only allow a trusted parameter "white list" through.
     def submission_viewing_event_params
       params.require(:submission_viewing_event).permit(:map_id, :round, :link, :start_at, :end_at)

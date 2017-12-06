@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :badge_nominations
   resources :user_pastebins
   resources :tag_prompts
   resources :track_notifications
@@ -541,6 +542,7 @@ Expertiza::Application.routes.draw do
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
+  get '/assignments/:id/nominations' => 'badge_nominations#index'
 
   root to: 'content_pages#view', page_name: 'home'
 

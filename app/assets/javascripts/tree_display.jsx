@@ -195,6 +195,9 @@ jQuery(document).ready(function() {
                 <a title="View review report" href={"/review_mapping/response_report?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-review-report-24.png" />
                 </a>
+                <a title="Badge assign" href={"/assignments/"+(parseInt(this.props.id)/2).toString()+"/nominations"}>
+                  <img src="/assets/tree_view/badges.png" width={24} height={24} />
+                </a>
               <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-survey-24.png" />
                 </a>

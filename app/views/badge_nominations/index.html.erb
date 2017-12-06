@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Badge Nominations</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Assignment</th>
+      <th>Participant</th>
+      <th>Badge</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @badge_nominations.each do |badge_nomination, index| %>
+      <tr>
+        <td><%= @assignment_name %></td>
+        <td><%= badge_nomination.participant.name %></td>
+        <td><%= badge_nomination.badge.name %></td>
+        <td><%= link_to 'Assign', :action => 'assign_badge', :id => badge_nomination.assignment_id %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

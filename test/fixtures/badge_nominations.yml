@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  assignment_id: 
+  participant_id: 
+  badge_id: 
+
+two:
+  assignment_id: 
+  participant_id: 
+  badge_id: 

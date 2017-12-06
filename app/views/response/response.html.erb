@@ -96,6 +96,14 @@ jQuery(document).ready(function() {
         <% end %></textarea>
     </p>
 
+    <p>
+      <label>Justification for Nomination</label>
+      <br/>
+      <% if @assignment.is_justification_required %>
+        <textarea rows="4" cols="50" placeholder="Justification Required"></textarea>
+      <% end %>
+    </p>
+
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>
     <%end%>

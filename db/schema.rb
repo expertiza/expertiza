@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027182114) do
+ActiveRecord::Schema.define(version: 20171206001152) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -284,6 +284,12 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
+  create_table "leaderboards", force: :cascade do |t|
+    t.integer "questionnaire_type_id", limit: 4
+    t.string  "name",                  limit: 255
+    t.string  "qtype",                 limit: 255
+  end
+
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -373,6 +379,11 @@ ActiveRecord::Schema.define(version: 20171027182114) do
 
   add_index "plagiarism_checker_comparisons", ["plagiarism_checker_assignment_submission_id"], name: "assignment_submission_index", using: :btree
 
+  create_table "plugin_schema_info", id: false, force: :cascade do |t|
+    t.string  "plugin_name", limit: 255
+    t.integer "version",     limit: 4
+  end
+
   create_table "question_advices", force: :cascade do |t|
     t.integer "question_id", limit: 4
     t.integer "score",       limit: 4
@@ -438,6 +449,16 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
+
+  create_table "response_times", force: :cascade do |t|
+    t.integer  "map_id",     limit: 4
+    t.string   "link",       limit: 255
+    t.integer  "round",      limit: 4
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "responses", force: :cascade do |t|
     t.integer  "map_id",             limit: 4,     default: 0,     null: false
@@ -580,6 +601,16 @@ ActiveRecord::Schema.define(version: 20171027182114) do
     t.integer  "assignment_id", limit: 4
   end
 
+  create_table "submission_viewing_events", force: :cascade do |t|
+    t.integer  "map_id",     limit: 4
+    t.integer  "round",      limit: 4
+    t.string   "link",       limit: 255
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "suggestion_comments", force: :cascade do |t|
     t.text     "comments",      limit: 65535
     t.string   "commenter",     limit: 255
@@ -608,6 +639,21 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   end
 
   add_index "survey_deployments", ["questionnaire_id"], name: "fk_rails_7c62b6ef2b", using: :btree
+
+  create_table "survey_participants", force: :cascade do |t|
+    t.integer "user_id",              limit: 4
+    t.integer "survey_deployment_id", limit: 4
+  end
+
+  create_table "survey_responses", force: :cascade do |t|
+    t.integer "score",                limit: 4
+    t.text    "comments",             limit: 65535
+    t.integer "assignment_id",        limit: 4,     default: 0, null: false
+    t.integer "question_id",          limit: 4,     default: 0, null: false
+    t.integer "survey_id",            limit: 4,     default: 0, null: false
+    t.string  "email",                limit: 255
+    t.integer "survey_deployment_id", limit: 4
+  end
 
   create_table "system_settings", force: :cascade do |t|
     t.string  "site_name",                 limit: 255, default: "", null: false

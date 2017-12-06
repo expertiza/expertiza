@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :submission_viewing_events
   resources :user_pastebins
   resources :tag_prompts
   resources :track_notifications

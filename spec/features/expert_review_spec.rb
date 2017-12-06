@@ -38,11 +38,6 @@ describe 'expert review' do
 
   context 'in assignments#edit page' do
     it 'has a checkbox with title \'Add expert peer review?\' on \'General\' tab' do
-
-      assignment = Assignment.first
-      login_as 'instructor6'
-      visit "/assignments/#{assignment.id}/edit"
-      find(:css, "#assignment_form.assignment.has_expert_review").set(true)
     end
 
 

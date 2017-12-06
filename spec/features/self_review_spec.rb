@@ -28,7 +28,7 @@ describe "self review testing", js: true do
   end
 
   def add_self_review_scores
-    # Login as student2065 to submit the self-review 
+    # Login as student2065 to submit the self-review
     login_as('student2065')
     expect(page).to have_content "User: student2065"
     expect(page).to have_content "TestAssignment"
@@ -58,7 +58,7 @@ describe "self review testing", js: true do
     visit '/student_task/list'
   end
 
-  # method for peer-reviewing the same assignment 
+  # method for peer-reviewing the same assignment
   def add_peer_review_scores
     # Login as a different student "student2064"
     visit_new_user "student2064"
@@ -96,7 +96,7 @@ describe "self review testing", js: true do
     find_link("Your scores").click
     # The value should be equal to 40.00 when the peer review score is 3 and self review score is 5
     # these scores are set up in the factory
-    expect(page).to have_content "40.00" 
+    expect(page).to have_content "40.00"
   end
 
   it "validate scores" do

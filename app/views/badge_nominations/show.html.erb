@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Assignment:</strong>
+  <%= @badge_nomination.assignment %>
+</p>
+
+<p>
+  <strong>Participant:</strong>
+  <%= @badge_nomination.participant %>
+</p>
+
+<p>
+  <strong>Badge:</strong>
+  <%= @badge_nomination.badge %>
+</p>
+
+<%= link_to 'Edit', edit_badge_nomination_path(@badge_nomination) %> |
+<%= link_to 'Back', badge_nominations_path %>

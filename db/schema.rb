@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171129224807) do
+ActiveRecord::Schema.define(version: 20171201232504) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -110,6 +110,7 @@ ActiveRecord::Schema.define(version: 20171129224807) do
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
+    t.boolean  "is_justification_required"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -143,6 +144,18 @@ ActiveRecord::Schema.define(version: 20171129224807) do
 
   add_index "awarded_badges", ["badge_id"], name: "index_awarded_badges_on_badge_id", using: :btree
   add_index "awarded_badges", ["participant_id"], name: "index_awarded_badges_on_participant_id", using: :btree
+
+  create_table "badge_nominations", force: :cascade do |t|
+    t.integer  "assignment_id",  limit: 4
+    t.integer  "participant_id", limit: 4
+    t.integer  "badge_id",       limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "badge_nominations", ["assignment_id"], name: "index_badge_nominations_on_assignment_id", using: :btree
+  add_index "badge_nominations", ["badge_id"], name: "index_badge_nominations_on_badge_id", using: :btree
+  add_index "badge_nominations", ["participant_id"], name: "index_badge_nominations_on_participant_id", using: :btree
 
   create_table "badges", force: :cascade do |t|
     t.text     "name",        limit: 65535
@@ -779,6 +792,9 @@ ActiveRecord::Schema.define(version: 20171129224807) do
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "awarded_badges", "badges"
   add_foreign_key "awarded_badges", "participants"
+  add_foreign_key "badge_nominations", "assignments"
+  add_foreign_key "badge_nominations", "badges"
+  add_foreign_key "badge_nominations", "participants"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"

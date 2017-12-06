@@ -93,6 +93,14 @@
     </td>
   </tr>
 
+  <tr>
+    <td style='padding:5px' id='is_justification_required'>
+      <input name="assignment_form[assignment][is_justification_required]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_justification_required]', 'true', @assignment_form.assignment.is_justification_required) %>
+      <%= label_tag('assignment_form[assignment][is_justification_required]', 'Is Justification required for nomination of badges?') %>
+    </td>
+  </tr>
+
   <!--#E1600-->
   <!-- self review flag should be the last checkbox in review strategy tab while editing/creating assignment-->
   <tr>

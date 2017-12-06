@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171201232504) do
+ActiveRecord::Schema.define(version: 20171206045206) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -110,7 +110,7 @@ ActiveRecord::Schema.define(version: 20171201232504) do
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
-    t.boolean  "is_justification_required"
+    t.boolean  "is_justification_required",                default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

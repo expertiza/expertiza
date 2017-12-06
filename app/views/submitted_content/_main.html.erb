@@ -7,15 +7,15 @@
 <% end %>
 <br/>
 <% if participant.team.hyperlinks.try(:length) %>
-  <% if local_assigns[:response_check] %>
-    <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage, :map_id => map_id, :response_check => response_check, :round => round} %>
+  <% if local_assigns[:submission_check] %>
+    <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage, :map_id => map_id, :submission_check => submission_check, :round => round} %>
   <% else %>
     <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
   <% end %>
 <% end %>
 
-<% if local_assigns[:response_check] %>
-  <%= render partial: 'submitted_content/submitted_files', locals: {:participant => participant, stage: @stage, :map_id => map_id, :response_check => response_check, :round => round, origin: ''} %>
+<% if local_assigns[:submission_check] %>
+  <%= render partial: 'submitted_content/submitted_files', locals: {:participant => participant, stage: @stage, :map_id => map_id, :submission_check => submission_check, :round => round, origin: ''} %>
 <% else %>
   <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
 <% end %>

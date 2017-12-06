@@ -24,7 +24,8 @@
 
         <!--Team name-->
         <% if @assignment.max_team_size > 1 %>
-          <td bgcolor= <%= bgcolor %>><%= team.name %>
+          <% team_name_color = get_team_name_color_in_list_submission(team) %>
+          <td bgcolor= <%= bgcolor %>><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
             <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
@@ -60,4 +61,5 @@
       </tr>
     <% end %>
   </table>
+  <p> **In "Team name" column, text in <i style = "color:blue">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #986633">brown</i> indicates that the submission grade has been assigned.</p>
 </div>

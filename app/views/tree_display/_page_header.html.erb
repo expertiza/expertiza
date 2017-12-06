@@ -35,7 +35,7 @@
       </TD>
       <TD width="5%" align="left"><%= submit_tag "Sort" %></TD>
     </TR>
-    Search: &nbsp
+    Search: &nbsp;
 
     <%= label_tag(:search_string, "") %>
     <%= text_field_tag(:search_string) %>
@@ -55,14 +55,14 @@
       <% end %>>Assignments
       </option>
     </select>
-    &nbsp &nbsp
+    &nbsp; &nbsp;
     <%= submit_tag("Search") %>
 
-    &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
     <%= submit_tag("Reset") %>
 
     </br></br>
-    Filter: &nbsp
+    Filter: &nbsp;
     <select name='filternode' style="width: 17em">
       <option value='ACN'
       <% if @filternode == 'ACN' %>selected
@@ -73,10 +73,10 @@
       <% end %>>Questionnare by assignment name
       </option>
     </select>
-    &nbsp
+    &nbsp;
     <%= label_tag(:filter_string, "") %>
     <%= text_field_tag(:filter_string) %>
-    &nbsp &nbsp
+    &nbsp; &nbsp;
     <%= submit_tag("Filter") %>
   </TABLE>
   <% if @root %>

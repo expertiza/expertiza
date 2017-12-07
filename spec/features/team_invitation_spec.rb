@@ -25,7 +25,8 @@ describe 'Team invitation testing' do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create(:assignment_due_date, teammate_review_allowed_id: 1, deadline_type: DeadlineType.where(name: 'submission').first, due_at: Time.now.in_time_zone + 1.day)
+    create(:assignment_due_date, teammate_review_allowed_id: 1,
+           deadline_type: DeadlineType.where(name: 'submission').first, due_at: Time.now.in_time_zone + 1.day)
   end
   it 'should verify that list of students displayed does not have a team or has a single member team only' do
     # specify assignment team size to be greater than 1
@@ -39,10 +40,10 @@ describe 'Team invitation testing' do
     move_to_your_team
     expect(page).to have_selector('table#table-send-request')
     # expected count is number of rows + 1 (for header)
-    expect(page).to have_selector('table#table-send-request tr', :count => 3)
+    expect(page).to have_selector('table#table-send-request tr', count: 3)
     # expected cound for td is number of rows * entry each row
     # table header is not included as it is tr th
-    expect(page).to have_selector('table#table-send-request tr td', :count => 6)
+    expect(page).to have_selector('table#table-send-request tr td', count: 6)
   end
   it 'should not display any invitation link if user does not have a team' do
     # make sure student doesn't have a team

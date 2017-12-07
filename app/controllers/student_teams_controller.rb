@@ -71,20 +71,24 @@ class StudentTeamsController < ApplicationController
         @can_send_invitation = false
         @has_team = false
       else
-        current_team_size = @student.team.participants.length
-        if current_team_size == allowed_team_size
-          @can_send_invitation = false
-        else
-          if @teammate_review_allowed
-            @can_send_invitation = false
-          else
-            @can_send_invitation = true
-          end
-        end
+        check_invitation_for_team(allowed_team_size)
       end
     end
 
     prepare_participant_list
+  end
+
+  def check_invitation_for_team(allowed_team_size)
+    current_team_size = @student.team.participants.length
+    if current_team_size == allowed_team_size
+      @can_send_invitation = false
+    else
+      if @teammate_review_allowed
+        @can_send_invitation = false
+      else
+        @can_send_invitation = true
+      end
+    end
   end
 
   # prepares a map of participants who dont have a team or whose team is a single member team
@@ -104,33 +108,24 @@ class StudentTeamsController < ApplicationController
     end
   end
 
-
-
-  # create a team
-  def create_team(team_name)
-    existing_assignments = AssignmentTeam.where name: team_name, parent_id: student.parent_id
+  def create
+    existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
+    # check if the team name is in use
     if existing_assignments.empty?
-      team = AssignmentTeam.new(name: team_name, parent_id: student.parent_id)
+      if params[:team][:name].nil? || params[:team][:name].empty?
+        flash[:notice] = 'The team name is empty.'
+        redirect_to view_student_teams_path student_id: student.id
+        return
+      end
+      team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
       team.save
       parent = AssignmentNode.find_by_node_object_id student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find student.user_id
       team.add_member user, team.parent_id
-    end
-    return team
-  end
-
-  def create
-    # check if the team name is in use
-    if params[:team][:name].nil? || params[:team][:name].empty?
-      flash[:notice] = 'The team name is empty.'
-      redirect_to view_student_teams_path student_id: student.id
-      return
-    end
-    team = create_team params[:team][:name]
-    unless team == nil
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
+
     else
       flash[:notice] = 'That team name is already in use.'
       redirect_to view_student_teams_path student_id: student.id

@@ -1,11 +1,19 @@
 require 'rspec'
 
+def move_to_assignment(assignment_name)
+  expect(page).to have_content assignment_name
+  click_link assignment_name
+end
+
+def move_to_team_page(team_link)
+  expect(page).to have_content team_link
+  click_link team_link
+end
+
 def move_to_your_team
   login_as(User.where(role_id: 2).first.name)
-  expect(page).to have_content @assignment.name
-  click_link @assignment.name
-  expect(page).to have_content "Your team"
-  click_link "Your team"
+  move_to_assignment @assignment.name
+  move_to_team_page "Your team"
 end
 
 describe 'Team invitation testing' do
@@ -25,8 +33,10 @@ describe 'Team invitation testing' do
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
-    create(:assignment_due_date, teammate_review_allowed_id: 1,
-           deadline_type: DeadlineType.where(name: 'submission').first, due_at: Time.now.in_time_zone + 1.day)
+    create(:assignment_due_date,
+           teammate_review_allowed_id: 1,
+           deadline_type: DeadlineType.where(name: 'submission').first,
+           due_at: Time.now.in_time_zone + 1.day)
   end
   it 'should verify that list of students displayed does not have a team or has a single member team only' do
     # specify assignment team size to be greater than 1

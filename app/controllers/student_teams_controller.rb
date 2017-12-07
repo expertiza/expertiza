@@ -65,13 +65,13 @@ class StudentTeamsController < ApplicationController
     allowed_team_size = @student.assignment.max_team_size
     min_team_size = 1
     @has_team = true
-    @can_send_invitation = false;
+    @can_send_invitation = false
     if allowed_team_size > min_team_size
-      if @student.team == nil
+      if @student.team.nil?
         @can_send_invitation = false
         @has_team = false
       else
-        check_invitation_for_team(allowed_team_size)
+        @can_send_invitation = check_invitation_for_team(allowed_team_size)
       end
     end
 
@@ -80,32 +80,24 @@ class StudentTeamsController < ApplicationController
 
   def check_invitation_for_team(allowed_team_size)
     current_team_size = @student.team.participants.length
-    if current_team_size == allowed_team_size
-      @can_send_invitation = false
-    else
-      if @teammate_review_allowed
-        @can_send_invitation = false
-      else
-        @can_send_invitation = true
-      end
-    end
+    return false if current_team_size == allowed_team_size || @teammate_review_allowed
+    return true
   end
 
   # prepares a map of participants who dont have a team or whose team is a single member team
   def prepare_participant_list
     # prepare map only if student is eligible to send invitation
     # must be called after check_invitation_criteria
-    if @can_send_invitation
-      # find list of students to show for sending invitations
-      # find participants for the assignment
-      # find team participant mapping from teams_users
-      # check the size of the team
-      # if team_size > 1 reject
-      # if team_size = 1, include
-      # if no_team, participant is alone without team, include
-      # exclude current student
-      @participant_map = extract_assignment_participants(student.parent_id.to_s, student.user_id.to_s)
-    end
+
+    # find list of students to show for sending invitations
+    # find participants for the assignment
+    # find team participant mapping from teams_users
+    # check the size of the team
+    # if team_size > 1 reject
+    # if team_size = 1, include
+    # if no_team, participant is alone without team, include
+    # exclude current student
+    @participant_map = extract_assignment_participants(student.parent_id.to_s, student.user_id.to_s) if @can_send_invitation
   end
 
   def create

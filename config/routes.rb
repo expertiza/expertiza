@@ -73,13 +73,6 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  # resources :auth, :except => [:show, :index] do
-  #   collection do
-  #     post :login
-  #     post :logout
-  #   end
-  # end
-
   post :login, to: "auth#login"
   post :logout, to: "auth#logout"
 

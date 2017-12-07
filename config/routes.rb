@@ -23,7 +23,7 @@ Expertiza::Application.routes.draw do
 
   resources :join_team_requests
 
-  resources :admin do
+  resources :admin, except: [:show] do
     collection do
       get :list_super_administrators
       get :list_administrators
@@ -73,12 +73,18 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :auth do
-    collection do
-      post :login
-      post :logout
-    end
-  end
+  # resources :auth, :except => [:show, :index] do
+  #   collection do
+  #     post :login
+  #     post :logout
+  #   end
+  # end
+
+  post :login, to: "auth#login"
+  post :logout, to: "auth#logout"
+
+  get '/auth/*path', to: redirect('/')
+
 
   resources :content_pages do
     collection do
@@ -143,7 +149,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :impersonate do
+  resources :impersonate, except: [:index, :show] do
     collection do
       get :start
       post :impersonate
@@ -238,13 +244,13 @@ Expertiza::Application.routes.draw do
 
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
 
-  resources :profile do
+  resources :profile, :except => [:show] do
     collection do
       get :edit
     end
   end
 
-  resources :publishing do
+  resources :publishing, except: [:show] do
     collection do
       get :view
       post :update_publish_permissions
@@ -300,7 +306,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :response do
+  resources :response, except: [:index, :show] do
     collection do
       get :new_feedback
       get :view
@@ -361,7 +367,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :sign_up_sheet do
+  resources :sign_up_sheet, :except => [:index] do
     collection do
       get :signup
       get :delete_signup
@@ -420,6 +426,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       get :view
+      get '/*other', to: redirect('/student_task/list')
     end
   end
 

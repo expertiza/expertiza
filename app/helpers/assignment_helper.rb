@@ -152,12 +152,16 @@ module AssignmentHelper
     participants.each do |participant|
       participant_id = participant.user_id
       next if participant.team_id.nil?
-      team_users_all = TeamsUser.where(team_id: participant.team_id)
-      if team_users_all.size == 1
-        add_to_participant_list(participant_id, participant_map)
-      else
-        participant_map.delete(participant_id)
-      end
+      alter_participant_map(participant, participant_id, participant_map)
+    end
+  end
+
+  def alter_participant_map(participant, participant_id, participant_map)
+    team_users_all = TeamsUser.where(team_id: participant.team_id)
+    if team_users_all.size == 1
+      add_to_participant_list(participant_id, participant_map)
+    else
+      participant_map.delete(participant_id)
     end
   end
 
@@ -165,17 +169,15 @@ module AssignmentHelper
     if excluded_id.nil?
       join_query = 'LEFT JOIN teams_users ON teams_users.user_id = participants.user_id
                     LEFT JOIN teams ON teams_users.team_id = teams.id and teams.parent_id = participants.parent_id'
-      participants = Participant
-                         .joins(join_query)
-                         .where('participants.parent_id = ?', assignment_id)
-                         .select("participants.*, teams_users.*, teams.*")
+      participants = Participant.joins(join_query)
+                                .where('participants.parent_id = ?', assignment_id)
+                                .select("participants.*, teams_users.*, teams.*")
     else
       join_query = 'LEFT JOIN teams_users ON teams_users.user_id = participants.user_id
                     LEFT JOIN teams ON teams_users.team_id = teams.id and teams.parent_id = participants.parent_id'
-      participants = Participant
-                         .joins(join_query)
-                         .where('participants.parent_id = ? and participants.user_id <> ?', assignment_id, excluded_id)
-                         .select("participants.*, teams_users.*, teams.*")
+      participants = Participant.joins(join_query)
+                                .where('participants.parent_id = ? and participants.user_id <> ?', assignment_id, excluded_id)
+                                .select("participants.*, teams_users.*, teams.*")
     end
     participants
   end

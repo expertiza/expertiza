@@ -32,6 +32,11 @@ class DeadlineRight < ActiveRecord::Base
       'submission_allowed' => NO,
       'can_review' => NO,
       'review_of_review_allowed' => OK
+    },
+    'calibration_review' => {
+      'submission_allowed' => NO,
+      'can_review' => OK,
+      'review_of_review_allowed' => NO
     }
   }.freeze
 end

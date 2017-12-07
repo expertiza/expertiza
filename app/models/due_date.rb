@@ -86,7 +86,7 @@ class DueDate < ActiveRecord::Base
         end
       end
     else
-      next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
+      next_due_date = AssignmentDueDate.where(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now]).order('due_at').first
     end
     next_due_date
   end

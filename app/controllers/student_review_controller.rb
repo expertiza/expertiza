@@ -5,10 +5,12 @@ class StudentReviewController < ApplicationController
      'Administrator',
      'Super-Administrator',
      'Student'].include? current_role_name and
-    ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
+        ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
   end
 
   def list
+    @regular_review_mappings = []
+    @calibration_review_mappings = []
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
@@ -20,21 +22,48 @@ class StudentReviewController < ApplicationController
 
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     # if it is an calibrated assignment, change the response_map order in a certain way
-    @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5 } if @assignment.is_calibrated == true
+    @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5} if @assignment.is_calibrated == true
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
 
+
+    @calibration_deadline = @assignment.due_dates.find_by_deadline_type_id(12)
+
+
     @num_reviews_total = @review_mappings.size
     # Add the reviews which are requested and not began.
-    @num_reviews_completed = 0
+    @num_regular_reviews_completed = 0
+    @num_calibration_reviews_completed = 0
+    @num_regular_reviews_total = 0
+    @num_calibration_reviews_total = 0
+    assignment_submission_due_date = @assignment.due_dates.select {|due_date| due_date.deadline_type_id == 1}.first.due_at
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+
+      next if map.response.empty?
+      if map.response.last.updated_at < assignment_submission_due_date
+        @num_calibration_reviews_completed += 1 if map.response.last.is_submitted
+      else
+        # @regular_review_mappings.push(map)
+        @num_regular_reviews_completed += 1 if map.response.last.is_submitted
+      end
+      # puts @calibration_review_mappings.to_s
+    end
+    @review_mappings.each do |map|
+      if map.updated_at < assignment_submission_due_date
+        @calibration_review_mappings.push(map)
+        @num_calibration_reviews_total += 1
+      else
+        @regular_review_mappings.push(map)
+        @num_regular_reviews_total += 1
+      end
     end
 
-    @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
+    @num_calibration_reviews_in_progress = @num_calibration_reviews_total - @num_calibration_reviews_completed
+    @num_regular_reviews_in_progress = @num_regular_reviews_total - @num_regular_reviews_completed
+
     # Calculate the number of metareviews that the user has completed so far.
-    @num_metareviews_total       = @metareview_mappings.size
-    @num_metareviews_completed   = 0
+    @num_metareviews_total = @metareview_mappings.size
+    @num_metareviews_completed = 0
     @metareview_mappings.each do |map|
       @num_metareviews_completed += 1 unless map.response.empty?
     end

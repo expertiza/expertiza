@@ -317,6 +317,7 @@ FactoryGirl.define do
     type 'ReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
+  
   end
 
   factory :question, class: Criterion do
@@ -349,8 +350,8 @@ FactoryGirl.define do
 
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
-    reviewer_id 1
     type 'ReviewResponseMap'
     calibrate_to 0
   end

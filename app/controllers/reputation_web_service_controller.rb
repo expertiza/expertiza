@@ -51,8 +51,13 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
-    assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
+#<<<<<<< master
+    assignment_ids << another_assignment_id unless another_assignment_id == 0
+    ReviewResponseMap.where('reviewed_object_id in (?) and expert_review_to = ?', assignment_ids, false).each do |response_map|
+#=======
+    #assignment_ids << another_assignment_id unless another_assignment_id.zero?
+    #ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
+#>>>>>>> master
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !has_topic)

@@ -104,8 +104,8 @@ describe AssignmentsController do
 
   describe '#create' do
     before(:each) do
-      allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
-      @params = {
+     allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
+       @params = {
         assignment_form: {
           assignment: {
             instructor_id: 2,
@@ -121,7 +121,7 @@ describe AssignmentsController do
             staggered_deadline: false,
             microtask: false,
             reviews_visible_to_all: false,
-            is_calibrated: false,
+            has_expert_review: false,
             availability_flag: true,
             reputation_algorithm: 'Lauw',
             simicheck: -1,
@@ -159,7 +159,12 @@ describe AssignmentsController do
           .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
         allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
-        allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
+        assignment_array = [assignment_due_date]
+        allow(assignment_array).to receive(:order).and_return(assignment_array)
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: "1").and_return(assignment_array)
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return(assignment_array)
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: 1, deadline_type_id: 2).and_return(assignment_array)
+
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         params = {id: 1}
         get :edit, params
@@ -204,6 +209,36 @@ describe AssignmentsController do
     end
 
     context 'when params has key :assignment_form' do
+#<<<<<<< master
+      # params = {
+      #   id: 1,
+      #   course_id: 1,
+      #   assignment_form: {
+      #     assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+      #                                 "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+      #     assignment: {
+      #       instructor_id: 2,
+      #       course_id: 1,
+      #       max_team_size: 1,
+      #       id: 2,
+      #       name: 'test assignment',
+      #       directory_path: '/test',
+      #       spec_location: '',
+      #       show_teammate_reviews: false,
+      #       require_quiz: false,
+      #       num_quiz_questions: 0,
+      #       staggered_deadline: false,
+      #       microtask: false,
+      #       reviews_visible_to_all: false,
+      #       has_expert_review: false,
+      #       availability_flag: true,
+      #       reputation_algorithm: 'Lauw',
+      #       simicheck: -1,
+      #       simicheck_threshold: 100
+      #     }
+      #   }
+      # }
+#=======
       before(:each) do
         assignment_questionnaire = double('AssignmentQuestionnaire')
         allow(AssignmentQuestionnaire).to receive(:new).with(any_args).and_return(assignment_questionnaire)
@@ -228,7 +263,7 @@ describe AssignmentsController do
               staggered_deadline: false,
               microtask: false,
               reviews_visible_to_all: false,
-              is_calibrated: false,
+              has_expert_review: false,
               availability_flag: true,
               reputation_algorithm: 'Lauw',
               simicheck: -1,
@@ -237,6 +272,7 @@ describe AssignmentsController do
           }
         }
       end
+#>>>>>>> master
       context 'when the timezone preference of current user is nil and assignment form updates attributes successfully' do
         it 'shows an error message and redirects to assignments#edit page' do
           instructor.timezonepref = nil

@@ -54,6 +54,10 @@ class Assignment < ActiveRecord::Base
     @has_topics ||= !sign_up_topics.empty?
   end
 
+  def has_expert_review?
+    self.has_expert_review
+  end
+    
   def calibrated?
     self.is_calibrated
   end

@@ -49,8 +49,38 @@ class AssignmentsController < ApplicationController
     if current_user.timezonepref.nil?
       flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
     end
-    edit_params_setting
-    assignment_form_assignment_staggered_deadline?
+
+    @topics = SignUpTopic.where(assignment_id: params[:id])
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
+    @user = current_user
+
+    @assignment = Assignment.where(id: params[:id]).first
+    @assignment_count = @assignment.rounds_of_reviews
+    @due_dates = AssignmentDueDate.where(parent_id: @assignment.id, deadline_type_id: 2).order("round")
+
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
+    @reviewvarycheck = false
+    @due_date_nameurl_notempty = false
+    @due_date_nameurl_notempty_checkbox = false
+    @metareview_allowed = false
+    @metareview_allowed_checkbox = false
+    @signup_allowed = false
+    @signup_allowed_checkbox = false
+    @drop_topic_allowed = false
+    @drop_topic_allowed_checkbox = false
+    @team_formation_allowed = false
+    @team_formation_allowed_checkbox = false
+    @participants_count = @assignment_form.assignment.participants.size
+    @teams_count = @assignment_form.assignment.teams.size
+
+    if @assignment_form.assignment.staggered_deadline == true
+      @review_rounds = @assignment_form.assignment.num_review_rounds
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 1 }
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 2 }
+    end
+
+    # Check if name and url in database is empty before webpage displays
     @due_date_all.each do |dd|
       check_due_date_nameurl_notempty(dd)
       adjust_timezone_when_due_date_present(dd)

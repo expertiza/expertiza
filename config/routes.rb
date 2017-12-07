@@ -307,7 +307,7 @@ Expertiza::Application.routes.draw do
       get :remove_hyperlink
       get :saving
       get :redirection
-      get :show_calibration_results_for_student
+      get :show_expert_review_results_for_student
       post :custom_create
       get :pending_surveys
     end

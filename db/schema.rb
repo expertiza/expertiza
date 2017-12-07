@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027182114) do
+ActiveRecord::Schema.define(version: 20171125232609) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -88,7 +88,7 @@ ActiveRecord::Schema.define(version: 20171027182114) do
     t.boolean  "use_bookmark"
     t.boolean  "can_review_same_topic",                    default: true
     t.boolean  "can_choose_topic_to_review",               default: true
-    t.boolean  "is_calibrated",                            default: false
+    t.boolean  "has_expert_review",                        default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                             default: true
@@ -434,7 +434,7 @@ ActiveRecord::Schema.define(version: 20171027182114) do
     t.string   "type",               limit: 255, default: "",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "calibrate_to",                   default: false
+    t.boolean  "expert_review_to",               default: false
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree

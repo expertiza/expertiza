@@ -28,7 +28,7 @@ describe ReviewMappingController do
         allow(AssignmentParticipant).to receive_message_chain(:where, :first)
           .with(parent_id: '1', user_id: 1).with(no_args).and_return(participant)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
-          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
+          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', expert_review_to: true).with(no_args).and_return(review_response_map)
         params = {id: 1, team_id: 1}
         session = {user: build(:instructor, id: 1)}
         get :add_calibration, params, session
@@ -43,9 +43,9 @@ describe ReviewMappingController do
         allow(AssignmentParticipant).to receive(:create)
           .with(parent_id: '1', user_id: 1, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle').and_return(participant)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
-          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(nil)
+          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', expert_review_to: true).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create)
-          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
+          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', expert_review_to: true).and_return(review_response_map)
         params = {id: 1, team_id: 1}
         session = {user: build(:instructor, id: 1)}
         get :add_calibration, params, session
@@ -441,7 +441,7 @@ describe ReviewMappingController do
 
       context 'when calibrated params are not 0' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
-          allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)
+          allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, expert_review_to: 1)
             .and_return([double('ReviewResponseMap', reviewee_id: 2)])
           allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
@@ -600,8 +600,8 @@ describe ReviewMappingController do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1', questionnaire_id: [1, 2, 3])
           .and_return([assignment_questionnaire])
         allow(assignment_questionnaire).to receive_message_chain(:questionnaire, :questions).and_return([double('Question', type: 'Criterion')])
-        allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
-        allow(ReviewResponseMap).to receive_message_chain(:select, :where).with('id').with(reviewed_object_id: '1', calibrate_to: 0)
+        allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', expert_review_to: 1).and_return([review_response_map])
+        allow(ReviewResponseMap).to receive_message_chain(:select, :where).with('id').with(reviewed_object_id: '1', expert_review_to: 0)
           .and_return([1, 2])
         allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
         params = {

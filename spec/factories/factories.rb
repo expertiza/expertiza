@@ -1,4 +1,8 @@
 FactoryGirl.define do
+  factory :institution, class: Institution do
+    name 'North Carolina State University'
+  end
+
   factory :role_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil

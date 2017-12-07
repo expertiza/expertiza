@@ -521,30 +521,26 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
-      get 'set_anonymized_view'
+      get :set_anonymized_view
       get :keys
+      post :create_requested_user_record
+      post :create_approved_user
     end
   end
-
-  get '/versions/search', controller: :versions, action: :search
 
   resources :versions do
     collection do
+      get :search
       delete '', action: :destroy_all
     end
   end
-  post '/users/request_user_create', controller: :users, action: :request_user_create
-  post '/users/create_approved_user', controller: :users, action: :create_approved_user
   get 'instructions/home'
-  get '/users/show_selection', controller: :users, action: :show_selection
-  get '/users/list', controller: :users, action: :list
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 
-  get 'users/list', :to => 'users#list'
   get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
   get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
   get '/submitted_content/submit_file', :to => 'submitted_content#submit_file'

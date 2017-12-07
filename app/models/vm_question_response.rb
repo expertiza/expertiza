@@ -2,7 +2,18 @@
 # represents each table in the view_team view.
 # the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
-  def initialize(questionnaire, round, rounds)
+  @questionnaire = nil
+  @assignment = nil
+
+  def initialize(questionnaire, assignment=nil)
+    @assignment = assignment
+    @questionnaire = questionnaire
+    if questionnaire.type == "ReviewQuestionnaire"
+      @round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+    end
+
+    @rounds = @assignment.rounds_of_reviews
+
     @list_of_rows = []
     @list_of_reviewers = []
     @list_of_reviews = []
@@ -61,8 +72,8 @@ class VmQuestionResponse
         participant = Participant.find(review_mapping.reviewer_id)
         # commenting out teamreviews. I just realized that teammate reviews are hidden during the current semester,
         # and I don't know how to implement the logic, so I'm being safe.
-        # @listofreviewers << participant
-        # @listofreviews << review
+        @list_of_reviewers << participant
+        @list_of_reviews << review
       end
     elsif @questionnaire_type == "MetareviewQuestionnaire"
       reviews = participant.metareviews
@@ -145,9 +156,24 @@ class VmQuestionResponse
         color_code_number = 1 if color_code_number == 0
       end
 
+      # Find out the tag prompts assosiated with the question
+      tag_deps = TagPromptDeployment.where(questionnaire_id: @questionnaire.id, assignment_id: @assignment.id)
+      vm_tag_prompts = []
+
+      question = Question.find(answer.question_id)
+
+      # check if the tag prompt applies for thsi question type and if the comment length is above the threshold
+      # if it does, then associate this answer with the tag_prompt and tag deployment (the setting)
+      tag_deps.each do |tag_dep|
+        if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold
+          vm_tag_prompts.append(VmTagPromptAnswer.new(answer, TagPrompt.find(tag_dep.tag_prompt_id),tag_dep))
+        end
+      end
+      # end tag_prompt code
+
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments))
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
     end
   end
 

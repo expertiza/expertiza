@@ -87,7 +87,7 @@ class Assessment360Controller < ApplicationController
     overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
     grades = 0
     if reviews.count > 0
-      reviews.each {|review| grades += review.get_average_score.to_i }
+      reviews.each {|review| grades += review.average_score.to_i }
       avg_grades = (grades * 1.0 / reviews.count).round
       hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end

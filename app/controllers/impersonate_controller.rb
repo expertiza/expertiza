@@ -1,10 +1,14 @@
 class ImpersonateController < ApplicationController
+  include SecurityHelper
+
   def action_allowed?
-    case params[:action]
-    when 'impersonate'
-      true
-    when 'start'
-      true
+    if ['Student'].include? current_role_name
+      !session[:super_user].nil?
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
     end
   end
 
@@ -14,27 +18,33 @@ class ImpersonateController < ApplicationController
   end
 
   def start
+    if !request.GET.empty?
+      flash[:error] = "This page doesn't take any query string."
+    end
   end
 
   def impersonate
-    # default error message
-    if params[:user] && params[:user][:name]
+    if params[:user]
       message = "No user exists with the name '#{params[:user][:name]}'."
+    elsif params[:impersonate]
+      message = "No user exists with the name '#{params[:impersonate][:name]}'."
     end
-
     begin
       original_user = session[:super_user] || session[:user]
-
       # Impersonate using form on /impersonate/start
       if params[:impersonate].nil?
-        user = User.find_by_name(params[:user][:name])
+        # check if special chars /\?<>|&$# are used to avoid html tags or system command
+        if warn_for_special_chars(params[:user][:name], "Username")
+          redirect_back
+          return
+        end
+        user = User.find_by(name: params[:user][:name])
         if user
           unless original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
             redirect_back
             return
           end
-
           session[:super_user] = session[:user] if session[:super_user].nil?
           AuthController.clear_user_info(session, nil)
           session[:user] = user
@@ -46,14 +56,18 @@ class ImpersonateController < ApplicationController
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
-          user = User.find_by_name(params[:impersonate][:name])
+          # check if special chars /\?<>|&$# are used to avoid html tags or system command
+          if warn_for_special_chars(params[:impersonate][:name], "Username")
+            redirect_back
+            return
+          end
+          user = User.find_by(name: params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user
               flash[:error] = "You cannot impersonate #{params[:user][:name]}."
               redirect_back
               return
             end
-
             AuthController.clear_user_info(session, nil)
             session[:user] = user
           else

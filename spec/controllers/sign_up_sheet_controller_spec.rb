@@ -1,225 +1,462 @@
-include LogInHelper
-
 describe SignUpSheetController do
+  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
+  let(:instructor) { build(:instructor, id: 6) }
+  let(:student) { build(:student, id: 8) }
+  let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
+  let(:topic) { build(:topic, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
+  let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
+  let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
+  let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
+  let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
+  let(:bid) { Bid.new(topic_id: 1, priority: 1) }
+
   before(:each) do
-    instructor.save
-    @user = User.find_by_name("instructor")
+    allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    stub_current_user(instructor, instructor.role.name, instructor.role)
+    allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+    allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
+    allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 8).and_return(participant)
+    allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+    allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+  end
 
-    @assignment = Assignment.where(name: 'My assignment').first || Assignment.new("name" => "My assignment",
-                                                                                  "instructor_id" => @user.id)
-    @assignment.save
-
-    @topic1 = SignUpTopic.new(topic_name: "Topic1",
-                              topic_identifier: "Ch10",
-                              assignment_id: @assignment.id,
-                              max_choosers: 2)
-    @topic1.save
-
-    @topic2 = SignUpTopic.new(topic_name: "Topic2",
-                              topic_identifier: "Ch10",
-                              assignment_id: @assignment.id,
-                              max_choosers: 2)
-    @topic2.save
-
-    # simulate authorized session
-    allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return('Instructor')
-    allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(TRUE)
+  describe '#new' do
+    it 'builds a new sign up topic and renders sign_up_sheet#new page' do
+      params = {id: 1}
+      get :new, params
+      expect(controller.instance_variable_get(:@sign_up_topic).assignment).to eq(assignment)
+      expect(response).to render_template(:new)
+    end
   end
 
   describe '#create' do
-    it "is able to create topic for assignment" do
-      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-      expect(response).to redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
+    context 'when topic cannot be found' do
+      context 'when new topic can be saved successfully' do
+        it 'sets up a new topic and redirects to assignment#edit page' do
+          allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
+          allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
+          allow(topic).to receive(:save).and_return('OK')
+          params = {
+            id: 1,
+            topic: {
+              topic_identifier: 1,
+              topic_name: 'Hello world!',
+              max_choosers: 1,
+              category: '',
+              micropayment: 1
+            }
+          }
+
+          post :create, params
+          expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        end
+      end
+
+      context 'when new topic cannot be saved successfully' do
+        it 'sets up a new topic and renders sign_up_sheet#new page' do
+          allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
+          allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
+          allow(topic).to receive(:save).and_return('OK')
+          params = {
+            id: 1,
+            topic: {
+              topic_identifier: 1,
+              topic_name: 'Hello world!',
+              category: '',
+              micropayment: 1
+            }
+          }
+          post :create, params
+          expect(response).to render_template(:new)
+        end
+      end
     end
 
-    it "is able to update a topic for assignment that already has max choosers set" do
-      sign_up_topic = SignUpTopic.new
-      sign_up_topic.max_choosers = 2
-      allow(SignUpTopic).to receive_message_chain(:where, :first).with(any_args) { sign_up_topic }
+    context 'when topic can be found' do
+      it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page' do
+        allow(SignedUpTeam).to receive(:find_by_topic_id).with(1).and_return(signed_up_team)
+        allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: true).and_return([signed_up_team2])
+        allow(Team).to receive(:find).with(2).and_return(team)
+        allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
+        params = {
+          id: 1,
+          topic: {
+            topic_identifier: 666,
+            topic_name: 'Hello world!',
+            max_choosers: 2,
+            category: '666',
+            micropayment: 1
+          }
+        }
+        post :create, params
+        expect(SignedUpTeam.first.is_waitlisted).to be false
+        expect(response).to redirect_to('/sign_up_sheet/add_signup_topics_staggered?id=1')
+      end
+    end
+  end
 
-      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-      expect(response).to redirect_to(redirect_to(action: 'add_signup_topics', id: @assignment.id))
+  describe '#destroy' do
+    context 'when topic can be found' do
+      it 'redirects to assignment#edit page' do
+        allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
+        params = {id: 1, assignment_id: 1}
+        post :destroy, params
+        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+      end
     end
 
-    it "is able to update a topic for assignment that needs the waitlisted users updated" do
-      sign_up_topic = SignUpTopic.new
-      sign_up_topic.max_choosers = 0
-      allow(SignUpTopic).to receive_message_chain(:where, :first).with(any_args) { sign_up_topic }
-
-      allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
-      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-      expect(response).to redirect_to(redirect_to(action: 'add_signup_topics', id: @assignment.id))
-    end
-
-    it "is able to update a topic for assignment but warn when max_choosers is too much" do
-      sign_up_topic = SignUpTopic.new
-      sign_up_topic.max_choosers = 4
-      allow(SignUpTopic).to receive_message_chain(:where, :first).with(any_args) { sign_up_topic }
-
-      allow(SignedUpTeam).to receive(:find_by_topic_id) { SignedUpTeam.new }
-
-      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-      expect(response).to redirect_to(redirect_to(action: 'add_signup_topics', id: @assignment.id))
-      expect(flash[:error]).to eq('The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.')
-    end
-
-    it "is able to update a topic with a microtask" do
-      @assignment.microtask = true
-      @assignment.save
-      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-      expect(response).to redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
-    end
-
-    it "is able to update a topic with staggard deadlines" do
-      @assignment.staggered_deadline = true
-      @assignment.save
-      get :create, id: @assignment.id, topic: {topic_name: "New Topic", max_choosers: 2, topic_identifier: "Ch1", category: "Programming"}
-      expect(response).to redirect_to(edit_assignment_path(@assignment.id) + "#tabs-5")
-    end
-
-    it "will fail gracefully when a topic cannot be saved" do
-      get :create, id: @assignment.id, topic: {topic_name: "New Topic", topic_identifier: "Ch1", category: "Programming"}
-      expect(response).to render_template("sign_up_sheet/new")
+    context 'when topic cannot be found' do
+      it 'shows an error flash message and redirects to assignment#edit page' do
+        allow(SignUpTopic).to receive(:find).with('1').and_return(nil)
+        allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
+        params = {id: 1, assignment_id: 1}
+        post :destroy, params
+        expect(flash[:error]).to eq('The topic could not be deleted.')
+        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+      end
     end
   end
 
-  it "is able to edit topic" do
-    get :edit, id: @topic1.id
-    expect(response).to be_success
-  end
-
-  it "is able to delete topic" do
-    delete :destroy, id: @topic1.id, assignment_id: @assignment.id
-    expect(response).to redirect_to edit_assignment_path(@assignment.id) + "#tabs-5"
-  end
-
-  xdescribe "Save topic deadlines" do
-    it "redirects to edit assignment page" do
-      session[:duedates] = [@topic1, @topic2]
-      assignment = double(Assignment)
-      allow(assignment).to receive(:num_review_rounds) { 0 }
-      allow(SignUpTopic).to receive("where").and_return([])
-      post :save_topic_deadlines, due_date: NIL, assignment_id:                                     @assignment.id
-      expect(response).to redirect_to edit_assignment_url(id:                                                                @assignment.id)
-    end
-
-    it "saves deadlines for topics with staggered deadlines" do
-      session[:duedates] = [@topic1, @topic2]
-      assignment = double(Assignment)
-      allow(assignment).to receive(:num_review_rounds) { 0 }
-      allow(SignUpTopic).to receive("where").and_return([@topic1])
-      topic_duedate = TopicDueDate.new
-      allow(TopicDueDate).to receive(:where) { topic_duedate }
-      allow(topic_duedate).to receive(:update_attributes)
-      allow(topic_duedate).to receive(:first) { topic_duedate }
-
-      deadline_type = DeadlineType.new
-      deadline_type.id = 0
-      allow(DeadlineType).to receive(:where) { deadline_type }
-
-      post :save_topic_deadlines, due_date:                                        "15_submission_1_due_date", assignment_id: @assignment.id
-      expect(response).to redirect_to edit_assignment_url(id:                                                                @assignment.id)
-    end
-
-    it "updates deadline for topics for multiple review rounds" do
-      session[:duedates] = [@topic1, @topic2]
-
-      assignment = double(Assignment)
-      allow(Assignment).to receive(:find) { assignment }
-      allow(assignment).to receive(:num_review_rounds).and_return(2)
-
-      allow(SignUpTopic).to receive("where").and_return([@topic1])
-
-      deadline_type = DeadlineType.new
-      deadline_type.id = 0
-      allow(deadline_type).to receive(:first) { deadline_type }
-      allow(deadline_type).to receive(:update_attributes)
-      allow(deadline_type).to receive(:first) { deadline_type }
-
-      topic_duedate = TopicDueDate.new
-      allow(TopicDueDate).to receive(:where) { topic_duedate }
-      allow(topic_duedate).to receive(:update_attributes)
-      allow(topic_duedate).to receive(:first) { topic_duedate }
-      allow(DeadlineType).to receive(:where) { topic_duedate }
-
-      post :save_topic_deadlines, due_date: "15_submission_1_due_date", assignment_id: @assignment.id
-      expect(response).to redirect_to edit_assignment_url(id: @assignment.id)
+  describe '#edit' do
+    it 'renders sign_up_sheet#edit page' do
+      params = {id: 1}
+      get :edit, params
+      expect(response).to render_template(:edit)
     end
   end
-end
 
-describe SignUpSheetController do
+  describe '#update' do
+    context 'when topic cannot be found' do
+      it 'shows an error flash message and redirects to assignment#edit page' do
+        allow(SignUpTopic).to receive(:find).with('1').and_return(nil)
+        params = {id: 1, assignment_id: 1}
+        post :update, params
+        expect(flash[:error]).to eq('The topic could not be updated.')
+        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+      end
+    end
+
+    context 'when topic can be found' do
+      it 'updates current topic and redirects to assignment#edit page' do
+        allow(SignUpTopic).to receive(:find).with('2').and_return(build(:topic, id: 2))
+        allow(SignedUpTeam).to receive(:find_by_topic_id).with(2).and_return(signed_up_team)
+        allow(SignedUpTeam).to receive(:where).with(topic_id: 2, is_waitlisted: true).and_return([signed_up_team2])
+        allow(Team).to receive(:find).with(2).and_return(team)
+        allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
+        allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+          .with("The topic: \"Hello world!\" has been successfully updated. ").and_return('OK')
+        params = {
+          id: 2,
+          assignment_id: 1,
+          topic: {
+            topic_identifier: 666,
+            topic_name: 'Hello world!',
+            max_choosers: 2,
+            category: '666',
+            micropayment: 1
+          }
+        }
+        post :update, params
+        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+      end
+    end
+  end
+
+  describe '#list' do
   before(:each) do
-    @assignment = create(:assignment)
-    @topic1 = create(:topic, topic_name: "Design Patterns")
-    @topic2 = create(:topic, topic_name: "MVC Framework")
-    create(:deadline_type, name: "signup")
-    create(:deadline_type, name: "team_formation")
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_type, name: "metareview")
-    create(:deadline_type, name: "drop_topic") # Must Have an ID of 6
-    create(:deadline_right)
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "drop_topic").first, due_at: DateTime.now.in_time_zone - 1.day)
-
-    create_list(:participant, 2)
-    @student1 = User.where(role_id: 2).first
-    @student2 = User.where(role_id: 2).second
-
-    @team1 = create(:assignment_team, name: "Team1", submitted_hyperlinks: nil)
-    @team2 = create(:assignment_team, name: "Team2")
-    create(:team_user, user: @student2, team: @team2)
-    create(:signed_up_team, team_id: 2, topic: @topic2)
-
-    # Simulate Authorized Session
-    instructor.save
-    @user = User.find_by_name("instructor")
-    allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return('Instructor')
-    allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(TRUE)
+    allow(SignUpTopic).to receive(:find_slots_filled).with(1).and_return([topic])
+        allow(SignUpTopic).to receive(:find_slots_waitlisted).with(1).and_return([])
+        allow(SignUpTopic).to receive(:where).with(assignment_id: 1, private_to: nil).and_return([topic])
+        allow(participant).to receive(:team).and_return(team)
   end
+  
+    context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
+      it 'renders sign_up_sheet#intelligent_topic_selection page' do
+        assignment.is_intelligent = true
+        allow(Bid).to receive_message_chain(:where, :order).with(team_id: 1).with(:priority).and_return([double('Bid', topic_id: 1)])
+        allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
+        params = {id: 1}
+        session = {user: instructor}
+        get :list, params, session
+        expect(controller.instance_variable_get(:@bids).size).to eq(1)
+        expect(controller.instance_variable_get(:@sign_up_topics)).to be_empty
+        expect(response).to render_template('sign_up_sheet/intelligent_topic_selection')
+      end
+    end
 
-  describe "Instructor singup user" do
-    it "adds user to topic with no signed up team" do
-      post :signup_as_instructor_action, username: @student1.name, assignment_id: @assignment.id, topic_id: @topic1.id
-      expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
-    end
-    it "checks that a user already has a topic" do
-      create(:team_user, user: @student1, team: @team1)
-      create(:signed_up_team, team_id: 1, topic: @topic1)
-      post :signup_as_instructor_action, username: @student1.name, assignment_id: @assignment.id, topic_id: @topic2.id
-      expect(flash[:error]).to eq('The student has already signed up for a topic!')
-    end
-    it "checks to make sure the user exists" do
-      post :signup_as_instructor_action, username: "asifljasdlf", assignment_id: @assignment.id, topic_id: @topic1.id
-      expect(flash[:error]).to eq('That student does not exist!')
-    end
-    it "checks to make sure the user is registered for the assignment" do
-      student = create(:student)
-      post :signup_as_instructor_action, username: student.name, assignment_id: @assignment.id, topic_id: @topic1.id
-      expect(flash[:error]).to eq('The student is not registered for the assignment!')
-    end
-    it "redirects back to topics page" do
-      post :signup_as_instructor_action, username: @student1.name, assignment_id: @assignment.id, topic_id: @topic1.id
-      expect(response).to redirect_to edit_assignment_url(id: @assignment.id)
+    context 'when current assignment is not intelligent assignment and has submission duedate (deadline_type_id 1)' do
+      it 'renders sign_up_sheet#list page' do
+        allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])
+        allow(SignUpTopic).to receive(:find_by).with(1).and_return(topic)
+        params = {id: 1}
+        get :list, params
+        expect(response).to render_template(:list)
+      end
     end
   end
 
-  describe "Instructor delete signup" do
-    it "checks to see if the user has already submitted their work" do
-      post :delete_signup_as_instructor, id: 2, topic_id: @topic2.id
-      expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
+  describe '#sign_up' do
+    context 'when SignUpSheet.signup_team method return nil' do
+      it 'shows an error flash message and redirects to sign_up_sheet#list page' do
+        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
+        params = {id: 1}
+        session = {user: instructor}
+        get :sign_up, params, session
+        expect(flash[:error]).to eq('You\'ve already signed up for a topic!')
+        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+      end
     end
-    it "checks to see if the deadline has passed" do
-      create(:team_user, user: @student1, team: @team1)
-      create(:signed_up_team, team_id: 1, topic: @topic1)
-      post :delete_signup_as_instructor, id: 1, topic_id: @topic1.id
-      expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
+  end
+
+  describe '#signup_as_instructor_action' do
+    context 'when user cannot be found' do
+      it 'shows an flash error message and redirects to assignment#edit page' do
+        allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
+        allow(User).to receive(:find).with(8).and_return(student)
+        allow(Team).to receive(:find).with(1).and_return(team)
+        params = {username: 'no name', assignment_id: 1}
+        get :signup_as_instructor_action, params
+        expect(flash[:error]).to eq('That student does not exist!')
+        expect(response).to redirect_to('/assignments/1/edit')
+      end
     end
-    it "redirects back to topics page" do
-      post :delete_signup_as_instructor, id: 2, topic_id: @topic2.id
-      expect(response).to redirect_to edit_assignment_url(id: @assignment.id)
+
+    context 'when user can be found' do
+      before(:each) do
+        allow(User).to receive(:find_by).with(name: 'no name').and_return(student)
+      end
+
+      context 'when an assignment_participant can be found' do
+        before(:each) do
+          allow(AssignmentParticipant).to receive(:exists?).with(user_id: 8, parent_id: '1').and_return(true)
+        end
+
+        context 'when creating team related objects successfully' do
+          it 'shows a flash success message and redirects to assignment#edit page' do
+            allow(SignedUpTeam).to receive(:find_team_users).with('1', 8).and_return([team])
+            allow(team).to receive(:t_id).and_return(1)
+            allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
+            allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
+            allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
+            params = {
+              username: 'no name',
+              assignment_id: 1,
+              topic_id: 1
+            }
+            get :signup_as_instructor_action, params
+            expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
+            expect(response).to redirect_to('/assignments/1/edit')
+          end
+        end
+
+        context 'when creating team related objects unsuccessfully' do
+          it 'shows a flash error message and redirects to assignment#edit page' do
+            allow(SignedUpTeam).to receive(:find_team_users).with('1', 8).and_return([])
+            allow(User).to receive(:find).with(8).and_return(student)
+            allow(Assignment).to receive(:find).with(1).and_return(assignment)
+            allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
+            allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
+            params = {
+              username: 'no name',
+              assignment_id: 1
+            }
+            get :signup_as_instructor_action, params
+            expect(flash[:error]).to eq('The student has already signed up for a topic!')
+            expect(response).to redirect_to('/assignments/1/edit')
+          end
+        end
+      end
+
+      context 'when an assignment_participant cannot be found' do
+        it 'shows a flash error message and redirects to assignment#edit page' do
+          allow(AssignmentParticipant).to receive(:exists?).with(user_id: 8, parent_id: '1').and_return(false)
+          params = {
+            username: 'no name',
+            assignment_id: 1
+          }
+          get :signup_as_instructor_action, params
+          expect(flash[:error]).to eq('The student is not registered for the assignment!')
+          expect(response).to redirect_to('/assignments/1/edit')
+        end
+      end
+    end
+  end
+
+  describe '#delete_signup' do
+    before(:each) do
+      allow(participant).to receive(:team).and_return(team)
+    end
+
+    context 'when either submitted files or hyperlinks of current team are not empty' do
+      it 'shows a flash error message and redirects to sign_up_sheet#list page' do
+        allow(assignment).to receive(:instructor).and_return(instructor)
+        params = {id: 1}
+        get :delete_signup, params
+        expect(flash[:error]).to eq('You have already submitted your work, so you are not allowed to drop your topic.')
+        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+      end
+    end
+
+    context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
+      it 'shows a flash error message and redirects to sign_up_sheet#list page' do
+        due_date.due_at = DateTime.now.in_time_zone - 1.day
+        allow(assignment.due_dates).to receive(:find_by_deadline_type_id).with(6).and_return(due_date)
+        allow(team).to receive(:submitted_files).and_return([])
+        allow(team).to receive(:hyperlinks).and_return([])
+        params = {id: 1}
+        get :delete_signup, params
+        expect(flash[:error]).to eq('You cannot drop your topic after the drop topic deadline!')
+        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+      end
+    end
+
+    context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
+      it 'shows a flash success message and redirects to sign_up_sheet#list page' do
+        allow(team).to receive(:submitted_files).and_return([])
+        allow(team).to receive(:hyperlinks).and_return([])
+        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
+        allow(team).to receive(:t_id).and_return(1)
+        params = {id: 1, topic_id: 1}
+        session = {user: instructor}
+        get :delete_signup, params, session
+        expect(flash[:success]).to eq('You have successfully dropped your topic!')
+        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+      end
+    end
+  end
+
+  describe '#delete_signup_as_instructor' do
+    before(:each) do
+      allow(Team).to receive(:find).with('1').and_return(team)
+      allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(double('TeamsUser', user: student))
+      allow(AssignmentParticipant).to receive(:find_by).with(user_id: 8, parent_id: 1).and_return(participant)
+      allow(participant).to receive(:team).and_return(team)
+    end
+
+    context 'when either submitted files or hyperlinks of current team are not empty' do
+      it 'shows a flash error message and redirects to assignment#edit page' do
+        allow(assignment).to receive(:instructor).and_return(instructor)
+        params = {id: 1}
+        get :delete_signup_as_instructor, params
+        expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
+        expect(response).to redirect_to('/assignments/1/edit')
+      end
+    end
+
+    context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
+      it 'shows a flash error message and redirects to assignment#edit page' do
+        due_date.due_at = DateTime.now.in_time_zone - 1.day
+        allow(assignment.due_dates).to receive(:find_by_deadline_type_id).with(6).and_return(due_date)
+        allow(team).to receive(:submitted_files).and_return([])
+        allow(team).to receive(:hyperlinks).and_return([])
+        params = {id: 1}
+        get :delete_signup_as_instructor, params
+        expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
+        expect(response).to redirect_to('/assignments/1/edit')
+      end
+    end
+
+    context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is nil' do
+      it 'shows a flash success message and redirects to assignment#edit page' do
+        allow(team).to receive(:submitted_files).and_return([])
+        allow(team).to receive(:hyperlinks).and_return([])
+        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
+        allow(team).to receive(:t_id).and_return(1)
+        params = {id: 1, topic_id: 1}
+        session = {user: instructor}
+        get :delete_signup_as_instructor, params, session
+        expect(flash[:success]).to eq('You have successfully dropped the student from the topic!')
+        expect(response).to redirect_to('/assignments/1/edit')
+      end
+    end
+  end
+
+  describe '#set_priority' do
+    it 'sets priority of bidding topic and redirects to sign_up_sheet#list page' do
+      allow(participant).to receive(:team).and_return(team)
+      allow(Bid).to receive(:where).with(team_id: 1).and_return([bid])
+      allow(Bid).to receive_message_chain(:where, :map).with(team_id: 1).with(no_args).and_return([1])
+      allow(Bid).to receive(:where).with(topic_id: '1', team_id: 1).and_return([bid])
+      allow_any_instance_of(Array).to receive(:update_all).with(priority: 1).and_return([bid])
+      params = {
+        participant_id: 1,
+        assignment_id: 1,
+        topic: ['1']
+      }
+      post :set_priority, params
+      expect(response).to redirect_to('/sign_up_sheet/list?assignment_id=1')
+    end
+  end
+
+  describe '#save_topic_deadlines' do
+    context 'when topic_due_date cannot be found' do
+      it 'creates a new topic_due_date record and redirects to assignment#edit page' do
+        assignment.due_dates = [due_date, due_date2]
+        allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([topic])
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
+        allow(DeadlineType).to receive(:find_by_name).with(any_args).and_return(double('DeadlineType', id: 1))
+        allow(TopicDueDate).to receive(:create).with(any_args).and_return(double('TopicDueDate'))
+        params = {
+          assignment_id: 1,
+          due_date: {}
+        }
+        post :save_topic_deadlines, params
+        expect(response).to redirect_to('/assignments/1/edit')
+      end
+    end
+
+    context 'when topic_due_date can be found' do
+      it 'updates the existing topic_due_date record and redirects to assignment#edit page' do
+        assignment.due_dates = [due_date, due_date2]
+        allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([topic])
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
+        allow(DeadlineType).to receive(:find_by_name).with(any_args).and_return(double('DeadlineType', id: 1))
+        topic_due_date = double('TopicDueDate')
+        allow(TopicDueDate).to receive(:where).with(parent_id: 1, deadline_type_id: 1, round: 1).and_return([topic_due_date])
+        allow(topic_due_date).to receive(:update_attributes).with(any_args).and_return(topic_due_date)
+        params = {
+          assignment_id: 1,
+          due_date: {}
+        }
+        post :save_topic_deadlines, params
+        expect(response).to redirect_to('/assignments/1/edit')
+      end
+    end
+  end
+
+  describe '#show_team' do
+    it 'renders show_team page' do
+      allow(SignedUpTeam).to receive(:where).with("topic_id = ?", '1').and_return([signed_up_team])
+      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', user_id: 1)])
+      allow(User).to receive(:find).with(1).and_return(student)
+      params = {assignment_id: 1, id: 1}
+      get :show_team, params
+      expect(response).to render_template(:show_team)
+    end
+  end
+
+  describe '#switch_original_topic_to_approved_suggested_topic' do
+    it 'redirects to sign_up_sheet#list page' do
+      allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])
+      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', team_id: 1, user_id: 8)])
+      allow(Team).to receive(:find).with(1).and_return(team)
+      team.parent_id = 1
+      allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([signed_up_team])
+      allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: 1).and_return([signed_up_team])
+      allow(SignUpSheet).to receive(:signup_team).with(1, 8, 1).and_return('OK!')
+      params = {
+        id: 1,
+        topic_id: 1
+      }
+      session = {user: instructor}
+      get :switch_original_topic_to_approved_suggested_topic, params, session
+      expect(response).to redirect_to('/sign_up_sheet/list?id=1')
     end
   end
 end

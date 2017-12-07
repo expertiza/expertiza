@@ -26,7 +26,7 @@ module AssignmentHelper
     courses.each do |course|
       options << [course.name, course.id]
     end
-    options
+    options.uniq.sort
   end
 
   # round=0 added by E1450
@@ -201,5 +201,13 @@ module AssignmentHelper
   def add_to_participant_list(participant_id, participant_map)
     return if participant_id.nil?
     participant_map[participant_id] = User.find(participant_id) unless participant_map.key?(participant_id)
+  end
+
+  def get_team_name_color_in_list_submission(team)
+    if team.try(:grade_for_submission) && team.try(:comment_for_submission)
+      '#986633' # brown. submission grade has been assigned.
+    else
+      'blue' # submission grade is not assigned yet.
+    end
   end
 end

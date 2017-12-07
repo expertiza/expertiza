@@ -77,7 +77,7 @@ FactoryGirl.define do
   factory :answer, class: Answer do
     question { Question.first || association(:question) }
     response { Response.first || association(:response) }
-    answer { 1 || assocaiton(:answer) }
+    answer 1
     comments 'Answer text'
   end
 end

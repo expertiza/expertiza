@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/assets/response.js" ></script>
 <script>
 jQuery(document).ready(function() {
     jQuery('#Submit').click(function(e){
@@ -14,17 +15,6 @@ jQuery(document).ready(function() {
             locationBased: true,
             autoRelease: true
         }); 
-    });
-    $(function() {
-        $('.review-rating').each(function(index, el) {
-            var $El = $(el);
-            $El.barrating({
-                theme: 'fontawesome-stars',
-                initialRating: $El.attr('data-current-rating'),
-                showSelectedRating: true,
-            });
-        });
-       // $('select').barrating('show');
     });
 })
 </script>
@@ -82,8 +72,9 @@ jQuery(document).ready(function() {
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
+<div id="save_progress"></div>
 
-<%= form_tag :action => @next_action, :id => @modified_object do %>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
@@ -119,7 +110,7 @@ jQuery(document).ready(function() {
 
     <br/>
     <br>
-    <%= submit_tag "Save "+@title, :name => "save" %>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>

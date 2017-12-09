@@ -149,23 +149,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def new_writer
-    @user = User.new
-    render 'new_writer_signup.html.erb'
-  end
-
-  def create_writer
-    @user = User.new(user_params)
-    @user.role_id = 8;
-    @user.is_new_user = 1;
-    if @user.save
-      flash[:success] = "Your account has been successfully created"
-      render 'new_writer_signup.html.erb'
-    else
-      render 'new_writer_signup.html.erb'
-    end
-  end
-
   def create_approved_user
     @user = RequestedUser.find params[:id]
     @user.status = params[:status]

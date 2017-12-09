@@ -123,10 +123,10 @@ describe ResponseController do
       it 'raise an error and redirects to response#saving page' do
         allow(review_response).to receive(:update_attribute).with('additional_comment', 'some comments').and_raise('ERROR!')
         params = {
-          id: 1,
-          review: {
-            comments: 'some comments'
-          }
+            id: 1,
+            review: {
+                comments: 'some comments'
+            }
         }
         post :update, params
         expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21')
@@ -143,14 +143,14 @@ describe ResponseController do
         allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
         allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
         params = {
-          id: 1,
-          review: {
-            comments: 'some comments'
-          },
-          responses: {
-            '0' => {score: 98, comment: 'LGTM'}
-          },
-          isSubmit: 'No'
+            id: 1,
+            review: {
+                comments: 'some comments'
+            },
+            responses: {
+                '0' => {score: 98, comment: 'LGTM'}
+            },
+            isSubmit: 'No'
         }
         post :update, params
         expect(response).to redirect_to('/response/saving?id=1')
@@ -172,9 +172,9 @@ describe ResponseController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
       params = {
-        id: 1,
-        feedback: '',
-        return: ''
+          id: 1,
+          feedback: '',
+          return: ''
       }
       get :new, params
       # expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
@@ -235,16 +235,16 @@ describe ResponseController do
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
       allow_any_instance_of(Response).to receive(:email).and_return('OK!')
       params = {
-        id: 1,
-        review: {
-          questionnaire_id: '1',
-          round: 1,
-          comments: 'no comment'
-        },
-        responses: {
-          '0' => {score: 98, comment: 'LGTM'}
-        },
-        isSubmit: 'No'
+          id: 1,
+          review: {
+              questionnaire_id: '1',
+              round: 1,
+              comments: 'no comment'
+          },
+          responses: {
+              '0' => {score: 98, comment: 'LGTM'}
+          },
+          isSubmit: 'No'
       }
       # post :create, params
       # bexpect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
@@ -256,8 +256,8 @@ describe ResponseController do
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
       allow(review_response_map).to receive(:save).and_return(review_response_map)
       params = {
-        id: 1,
-        return: ''
+          id: 1,
+          return: ''
       }
       post :saving, params
       expect(response).to redirect_to('/response/redirection?id=1&return=')
@@ -342,7 +342,7 @@ describe ResponseController do
         allow(CourseParticipant).to receive(:where).with(user_id: 6).and_return([double('CourseParticipant', id: 8, parent_id: 1)])
         allow(AssignmentParticipant).to receive(:where).with(user_id: 6).and_return([participant])
         survey_deployment = double('SurveyDeployment', id: 1, questionnaire_id: 1, global_survey_id: 1,
-                                                       start_date: DateTime.now.in_time_zone - 1.day, end_date: DateTime.now.in_time_zone + 1.day)
+                                   start_date: DateTime.now.in_time_zone - 1.day, end_date: DateTime.now.in_time_zone + 1.day)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
         allow(CourseSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
         participant.parent_id = 1

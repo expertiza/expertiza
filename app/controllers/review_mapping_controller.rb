@@ -258,6 +258,7 @@ class ReviewMappingController < ApplicationController
     redirect_to :back
   end
 
+  # E17A0 Unlock review from Review Mappings
   def unlock_review
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
     if review_response_map

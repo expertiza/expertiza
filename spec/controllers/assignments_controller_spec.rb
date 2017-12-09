@@ -1,7 +1,7 @@
 describe AssignmentsController do
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
-                       participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
+          participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
   let(:assignment_form) { double('AssignmentForm') }
   let(:admin) { build(:admin) }
@@ -181,28 +181,28 @@ describe AssignmentsController do
     before(:each) do
       allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
       @params = {
-        assignment_form: {
-          assignment: {
-            instructor_id: 2,
-            course_id: 1,
-            max_team_size: 1,
-            id: 1,
-            name: 'test assignment',
-            directory_path: '/test',
-            spec_location: '',
-            show_teammate_reviews: false,
-            require_quiz: false,
-            num_quiz_questions: 0,
-            staggered_deadline: false,
-            microtask: false,
-            reviews_visible_to_all: false,
-            is_calibrated: false,
-            availability_flag: true,
-            reputation_algorithm: 'Lauw',
-            simicheck: -1,
-            simicheck_threshold: 100
+          assignment_form: {
+              assignment: {
+                  instructor_id: 2,
+                  course_id: 1,
+                  max_team_size: 1,
+                  id: 1,
+                  name: 'test assignment',
+                  directory_path: '/test',
+                  spec_location: '',
+                  show_teammate_reviews: false,
+                  require_quiz: false,
+                  num_quiz_questions: 0,
+                  staggered_deadline: false,
+                  microtask: false,
+                  reviews_visible_to_all: false,
+                  is_calibrated: false,
+                  availability_flag: true,
+                  reputation_algorithm: 'Lauw',
+                  simicheck: -1,
+                  simicheck_threshold: 100
+              }
           }
-        }
       }
     end
     context 'when assignment_form is saved successfully' do
@@ -211,7 +211,7 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
-          .with('Assignment "test assignment" has been created successfully. ').and_return(true)
+                                                            .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -231,7 +231,7 @@ describe AssignmentsController do
       it 'shows an error flash message and renders edit page' do
         allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([double('SignUpTopic'), double('SignUpTopic')])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1')
-          .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+                                              .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
         allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
@@ -255,8 +255,8 @@ describe AssignmentsController do
         it 'shows a note flash message and redirects to tree_display#index page' do
           allow(assignment).to receive(:save).and_return(true)
           params = {
-            id: 1,
-            course_id: 1
+              id: 1,
+              course_id: 1
           }
           post :update, params
           expect(flash[:note]).to eq('The assignment was successfully saved.')
@@ -268,8 +268,8 @@ describe AssignmentsController do
         it 'shoes an error flash message and redirects to assignments#edit page' do
           allow(assignment).to receive(:save).and_return(false)
           params = {
-            id: 1,
-            course_id: 1
+              id: 1,
+              course_id: 1
           }
           post :update, params
           expect(flash[:error]).to eq('Failed to save the assignment: ')
@@ -284,32 +284,32 @@ describe AssignmentsController do
         allow(AssignmentQuestionnaire).to receive(:new).with(any_args).and_return(assignment_questionnaire)
         allow(assignment_questionnaire).to receive(:save).and_return(true)
         @params = {
-          id: 1,
-          course_id: 1,
-          assignment_form: {
-            assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
-                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
-            assignment: {
-              instructor_id: 2,
-              course_id: 1,
-              max_team_size: 1,
-              id: 2,
-              name: 'test assignment',
-              directory_path: '/test',
-              spec_location: '',
-              show_teammate_reviews: false,
-              require_quiz: false,
-              num_quiz_questions: 0,
-              staggered_deadline: false,
-              microtask: false,
-              reviews_visible_to_all: false,
-              is_calibrated: false,
-              availability_flag: true,
-              reputation_algorithm: 'Lauw',
-              simicheck: -1,
-              simicheck_threshold: 100
+            id: 1,
+            course_id: 1,
+            assignment_form: {
+                assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+                                            "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+                assignment: {
+                    instructor_id: 2,
+                    course_id: 1,
+                    max_team_size: 1,
+                    id: 2,
+                    name: 'test assignment',
+                    directory_path: '/test',
+                    spec_location: '',
+                    show_teammate_reviews: false,
+                    require_quiz: false,
+                    num_quiz_questions: 0,
+                    staggered_deadline: false,
+                    microtask: false,
+                    reviews_visible_to_all: false,
+                    is_calibrated: false,
+                    availability_flag: true,
+                    reputation_algorithm: 'Lauw',
+                    simicheck: -1,
+                    simicheck_threshold: 100
+                }
             }
-          }
         }
       end
       context 'when the timezone preference of current user is nil and assignment form updates attributes successfully' do
@@ -382,7 +382,7 @@ describe AssignmentsController do
     context 'confirmation before assignment reviews are deleted' do
       it 'shows a flash error when no reviews are there to be deleted and redirects to assignment edit' do
         params = {
-          assignment_id: 1
+            assignment_id: 1
         }
         session = {user: instructor}
         @response_count = response_map.count
@@ -396,7 +396,7 @@ describe AssignmentsController do
     context 'when assignment reviews are deleted successfully' do
       it 'shows a flash not when there are reviews to be deleted and redirects to assignment edit' do
         params = {
-          assignment_id: 1
+            assignment_id: 1
         }
         session = {user: instructor}
         ResponseMap.create(id: 1, reviewed_object_id: 1, type: 'ReviewResponseMap')
@@ -416,8 +416,8 @@ describe AssignmentsController do
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:delete).with('true').and_return(true)
         params = {
-          id: 1,
-          force: 'true'
+            id: 1,
+            force: 'true'
         }
         session = {user: instructor}
         post :delete, params, session
@@ -433,8 +433,8 @@ describe AssignmentsController do
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:delete).with('true').and_raise('You cannot delete this assignment!')
         params = {
-          id: 1,
-          force: 'true'
+            id: 1,
+            force: 'true'
         }
         session = {user: instructor}
         post :delete, params, session

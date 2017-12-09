@@ -1,2 +1,17 @@
+<script>
+$(document).ready(function(){
+  $('#user_institution_id').change(function() {
+    if(this.value == "") {
+      $('#institution_name').show();
+      $('#name_of_other_institution').show();
+    }else{
+      $('#institution_name').hide();
+      $('#name_of_other_institution').hide();
+    }
+  });
+});
+</script>
 <p><label for="user_institutions">Institution</label><br/>
-    <%= collection_select('user',:institution_id, Institution.all, :id, :name) %></p>
+    <%= collection_select('user',:institution_id, Institution.all.order(:name), :id, :name, {include_blank: 'Other', selected: 1}) %></p>
+    <label id="name_of_other_institution" style="display: none">Name of other instituion: </label><br/>
+    <%= text_field 'institution', 'name', style: 'display: none' %></p>

@@ -460,7 +460,7 @@ function addDaysOrMonth(mul, type) {
     <br>
 <% end %>
 
-<% if @assignment_form.assignment.has_topics? %>
+<% if @assignment_form.assignment.topics? %>
     <input name="signupAllowed" type="hidden" value="false" />
     <%= check_box_tag('signupAllowed', 'true', @signup_allowed,:onclick=>"removeOrAddSignup()" ) %>
     <%= label_tag('signupAllowed', 'Use signup deadline') %><br/>
@@ -514,7 +514,7 @@ function addDaysOrMonth(mul, type) {
         <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'team_formation').due_at %>
             addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
         <% end %>
-        <% if @assignment_form.assignment.has_topics? %>
+        <% if @assignment_form.assignment.topics? %>
             <% if due_date(@assignment_form.assignment, 'signup').due_at %>
                 addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'signup', 0,<%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
             <% end %>

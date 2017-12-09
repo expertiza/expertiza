@@ -1,0 +1,29 @@
+%h1 Listing research_papers
+
+%table
+  %thead
+    %tr
+      %th Name
+      %th Topic
+      %th Date
+      %th Author
+      %th Conference
+      %th
+      %th
+      %th
+
+  %tbody
+    - @research_papers.each do |research_paper|
+      %tr
+        %td= research_paper.name
+        %td= research_paper.topic
+        %td= research_paper.date
+        %td= research_paper.author_id
+        %td= research_paper.conference
+        %td= link_to 'Show', research_paper
+        %td= link_to 'Edit', edit_research_paper_path(research_paper)
+        %td= link_to 'Destroy', research_paper, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Research paper', new_research_paper_path

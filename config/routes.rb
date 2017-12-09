@@ -1,5 +1,6 @@
 Expertiza::Application.routes.draw do
 
+  resources :research_papers
   resources :user_pastebins
   resources :tag_prompts
   resources :track_notifications

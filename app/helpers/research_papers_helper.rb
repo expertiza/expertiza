@@ -1,0 +1,2 @@
+module ResearchPapersHelper
+end

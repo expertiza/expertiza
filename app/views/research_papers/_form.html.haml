@@ -1,0 +1,25 @@
+= form_for @research_paper do |f|
+  - if @research_paper.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@research_paper.errors.count, "error")} prohibited this research_paper from being saved:"
+      %ul
+        - @research_paper.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+  .field
+    = f.label :topic
+    = f.text_field :topic
+  .field
+    = f.label :date
+    = f.date_select :date
+  .field
+    = f.label :author_id
+    = f.number_field :author_id
+  .field
+    = f.label :conference
+    = f.text_field :conference
+  .actions
+    = f.submit 'Save'

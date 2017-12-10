@@ -62,6 +62,7 @@ gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'octokit'
 gem 'timecop', '0.8.1'
+gem 'chartjs-ror'
 
 group :development do
   gem 'daemons'

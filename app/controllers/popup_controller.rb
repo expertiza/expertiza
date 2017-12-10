@@ -111,6 +111,26 @@ class PopupController < ApplicationController
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+
+    @keys = @review_final_versions.keys
+    @questions = {}
+    @num_responses = {}
+    @response_ids = {}
+    @teams = {}
+
+    @keys.each do |key|
+      questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
+      @questions[key] = Question.where(questionnaire_id: questionnaire_id)
+      @response_ids[key] = @review_final_versions[key][:response_ids]
+
+      @teams[key] = []
+      @response_ids[key].each do |response_id|
+        @teams[key] << Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)
+      end
+
+      @num_responses[key] = @response_ids[key].length
+    end
+
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

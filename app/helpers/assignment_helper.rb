@@ -167,15 +167,15 @@ module AssignmentHelper
 
   def get_participants(assignment_id, excluded_id)
     if excluded_id.nil?
-      join_query = 'LEFT JOIN teams_users ON teams_users.user_id = participants.user_id
+      team_to_participant_join_query = 'LEFT JOIN teams_users ON teams_users.user_id = participants.user_id
                     LEFT JOIN teams ON teams_users.team_id = teams.id and teams.parent_id = participants.parent_id'
-      participants = Participant.joins(join_query)
+      participants = Participant.joins(team_to_participant_join_query)
                                 .where('participants.parent_id = ?', assignment_id)
                                 .select("participants.*, teams_users.*, teams.*")
     else
-      join_query = 'LEFT JOIN teams_users ON teams_users.user_id = participants.user_id
+      team_to_participant_join_query = 'LEFT JOIN teams_users ON teams_users.user_id = participants.user_id
                     LEFT JOIN teams ON teams_users.team_id = teams.id and teams.parent_id = participants.parent_id'
-      participants = Participant.joins(join_query)
+      participants = Participant.joins(team_to_participant_join_query)
                                 .where('participants.parent_id = ? and participants.user_id <> ?', assignment_id, excluded_id)
                                 .select("participants.*, teams_users.*, teams.*")
     end

@@ -1,6 +1,4 @@
 <h1>Editing Assignment: <%=@assignment_form.assignment.name%></h1>
-
-
   <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
     <div class= "chart-table" id="tabs">
       <ul>
@@ -84,13 +82,22 @@
         jQuery(document).ready(function () {
           jQuery("#submit_btn").click(function(e) {
             var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
-            if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
-              alert("Maxinum number of members per team must be greater than 1!");
-              e.preventDefault()
+            var reviewer_is_team_field = jQuery('#reviewer_is_team_field').val();
+            var reviewer_is_team = jQuery('#assignment_form_assignment_reviewer_is_team').is(':checked');
+            alert(reviewer_is_team_field + " " + reviewer_is_team);
+            if (reviewer_is_team === true) {
+                if (confirm("The review strategy for this assignment has changed. Do you want to delete the current assignment reviews?")) {
+                    alert("Deleting reviews ... <%= @assignment_form.assignment.reviewer_is_team %>")
+                }
             }
+
+            if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
+            alert("Maxinum number of members per team must be greater than 1!");
+            e.preventDefault()
+          }
         })
 
-        jQuery("#tabs").tabs({
+          jQuery("#tabs").tabs({
           beforeActivate: function (event, ui) {
             var deleteTeam = 0;
             var frm = jQuery("#assignment_form");

@@ -121,6 +121,7 @@
     <td>
       <input name="assignment_form[assignment][reviewer_is_team]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][reviewer_is_team]', 'true', @assignment_form.assignment.reviewer_is_team) %>
+      <%= hidden_field_tag('reviewer_is_team_field', @assignment_form.assignment.reviewer_is_team) %>
       <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Reviews are to be performed by teams.') %>
     </td>
   </tr>

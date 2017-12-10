@@ -66,7 +66,7 @@
     </div>
     <script>
       var useBookmarkChanged = function () {
-          jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove()
+          jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove();
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {
             addQuestionnaireTableRow(
@@ -80,17 +80,16 @@
       }
 
         jQuery(document).ready(function () {
-          jQuery("#submit_btn").click(function(e) {
+            var reviewer_is_team_original_value = jQuery('#assignment_form_assignment_reviewer_is_team').is(':checked');
+
+            jQuery("#submit_btn").click(function(e) {
             var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
-            var reviewer_is_team_field = jQuery('#reviewer_is_team_field').val();
-            var reviewer_is_team = jQuery('#assignment_form_assignment_reviewer_is_team').is(':checked');
-            alert(reviewer_is_team_field + " " + reviewer_is_team);
-            if (reviewer_is_team === true) {
+            var reviewer_is_team_new_value = jQuery('#assignment_form_assignment_reviewer_is_team').is(':checked');
+            if (reviewer_is_team_original_value !== reviewer_is_team_new_value) {
                 if (confirm("The review strategy for this assignment has changed. Do you want to delete the current assignment reviews?")) {
-                    alert("Deleting reviews ... <%= @assignment_form.assignment.reviewer_is_team %>")
+                    jQuery("#delete_assignment_reviews").val(true);
                 }
             }
-
             if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
             alert("Maxinum number of members per team must be greater than 1!");
             e.preventDefault()

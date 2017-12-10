@@ -330,7 +330,13 @@ class AssignmentsController < ApplicationController
     @assignment.course_id = params[:course_id]
 
     if @assignment.save
-      flash[:note] = 'The assignment was successfully saved.'
+      if (params[:delete_assignment_reviews] == 'true')
+        @assignment_form.assignment.delete_reviews
+        flash[:note] = 'The assignment was successfully saved and all reviews deleted.'
+      else
+        flash[:note] = 'The assignment was successfully saved.'
+      end
+
       redirect_to list_tree_display_index_path
     else
       flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
@@ -357,7 +363,12 @@ class AssignmentsController < ApplicationController
 
   def feedback_assignment_form_attributes_update
     if @assignment_form.update_attributes(assignment_form_params, current_user)
-      flash[:note] = 'The assignment was successfully saved....'
+      if params[:delete_assignment_reviews] == 'true'
+        @assignment_form.assignment.delete_reviews
+        flash[:note] = 'The assignment was successfully saved and all reviews deleted.'
+      else
+        flash[:note] = 'The assignment was successfully saved.'
+      end
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end

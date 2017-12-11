@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
 
   include AccessHelper
+  include WriterSessionsHelper
 
   # You want to get exceptions in development, but not in production.
   unless Rails.application.config.consider_all_requests_local

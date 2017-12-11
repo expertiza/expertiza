@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Research Papers</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Topic</th>
+      <th>Date</th>
+      <th>Conference</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @research_papers.each do |research_paper| %>
+      <tr>
+        <td><%= research_paper.name %></td>
+        <td><%= research_paper.topic %></td>
+        <td><%= research_paper.date %></td>
+        <td><%= research_paper.conference %></td>
+        <td><%= link_to 'Show', research_paper %></td>
+        <td><%= link_to 'Edit', edit_research_paper_path(research_paper) %></td>
+        <td><%= link_to 'Destroy', research_paper, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Research paper', new_research_paper_path %>

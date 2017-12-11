@@ -64,6 +64,7 @@ GEM
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
+    bcrypt (3.1.11)
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     builder (3.2.2)
@@ -451,6 +452,7 @@ DEPENDENCIES
   activerecord-session_store
   airbrake
   awesome_nested_set
+  bcrypt (~> 3.1.7)
   bind-it
   capistrano
   capistrano-db-tasks
@@ -523,3 +525,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
+
+BUNDLED WITH
+   1.16.0

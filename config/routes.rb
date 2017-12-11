@@ -555,6 +555,11 @@ Expertiza::Application.routes.draw do
   get ':controller(/:action(/:id))(.:format)'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   match '*path' => 'content_pages#view', via: [:get, :post] unless Rails.env.development?
+
   get 'conference_review/signup', :to => 'writers#new'
   post 'create_writer', :to => 'writers#create'
+  get 'conference_review/login', :to => 'writer_sessions#new'
+  post 'conference_review/login', :to => 'writer_sessions#create'
+  delete 'conference_review/logout', :to => 'writer_sessions#delete'
+
 end

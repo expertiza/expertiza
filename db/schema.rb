@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171209211743) do
+ActiveRecord::Schema.define(version: 20171211164212) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -314,6 +314,13 @@ ActiveRecord::Schema.define(version: 20171209211743) do
     t.boolean  "active_flag"
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+  end
+
+  create_table "paper_writer_mappings", force: :cascade do |t|
+    t.integer  "writer_id",  limit: 4
+    t.integer  "paper_id",   limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
   end
 
   create_table "participants", force: :cascade do |t|

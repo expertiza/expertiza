@@ -15,7 +15,7 @@ class WritersController < ApplicationController
     puts @user.to_s
     if @user.save
       flash[:success] = "Your account has been successfully created"
-      render 'new.html.erb'
+      render 'writer_sessions/new.html.erb'
     else
       render 'new.html.erb'
     end

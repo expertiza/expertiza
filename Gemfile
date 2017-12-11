@@ -61,7 +61,7 @@ gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
 gem 'timecop', '0.8.1'
-gem 'bcrypt', '~> 3.1.7', platforms: :ruby
+
 
 group :development do
   gem 'daemons'

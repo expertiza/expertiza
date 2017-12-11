@@ -86,6 +86,8 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    chartjs-ror (3.3.1)
+      rails (>= 3.1)
     childprocess (0.5.6)
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.0)
@@ -235,6 +237,8 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
+    octokit (4.7.0)
+      sawyer (~> 0.8.0, >= 0.5.3)
     omniauth (1.2.2)
       hashie (>= 1.2, < 4)
       rack (~> 1.0)
@@ -378,6 +382,9 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (~> 1.1)
+    sawyer (0.8.1)
+      addressable (>= 2.3.5, < 2.6)
+      faraday (~> 0.8, < 1.0)
     scrypt (2.0.2)
       ffi-compiler (>= 0.0.2)
       rake
@@ -456,6 +463,7 @@ DEPENDENCIES
   capistrano-db-tasks
   capistrano-rails
   capybara (~> 2.7, >= 2.7.1)
+  chartjs-ror
   coffee-rails
   coveralls
   daemons
@@ -485,6 +493,7 @@ DEPENDENCIES
   lingua
   mysql2
   nokogiri (~> 1.6.8)
+  octokit
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail
@@ -523,6 +532,3 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-BUNDLED WITH
-   1.11.2

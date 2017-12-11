@@ -1,69 +1,149 @@
-<h2> Review scores </h2>
 
-<%keys = @review_final_versions.keys%>
-<%keys.each do |key|%>
-  <h3><%=key%></h3>
-  <table border="1">
+<style>
+  .table-fixed thead {
+    width: 100%;
+  }
+  .table-fixed tbody {
+    height: 600px;
+    overflow-y: auto;
+    width: 100%;
+  }
+  .table-fixed tbody {
+    display: block;
+  }
+  .table-fixed tbody td, .table-fixed thead > tr> th {
+    float: left;
+    border-bottom-width: 0;
+  }
 
-    <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>
-    <%questions = Question.where(questionnaire_id: questionnaire_id)%>
-    <%num_responses = @review_final_versions[key][:response_ids].length%>
-    <% questions.each do |question|%>
+  .table-striped > thead > tr> th:nth-child(even) {
+    background-color: rgb(216,238,246);
+    text-align: center;
+  }
+
+  .table-striped > thead > tr> th:nth-child(odd) {
+    background-color: rgb(254,248,227);
+    text-align: center;
+  }
+
+  .table-striped > tbody > tr:nth-child(odd){
+    background-color: rgb(254,248,227);
+    vertical-align: middle;
+  }
+
+  .table-striped > tbody > tr:nth-child(even){
+    background-color: rgb(216,238,246);
+    vertical-align: middle;
+  }
+
+</style>
+
+<h4 align="center">
+  Team Review report
+</h4>
+
+
+<% @keys.each do |key| %>
+    <h3><%= key %></h3>
+
+    <% unless @num_responses[key] > 0 %>
+        <% next %>
+    <% end %>
+
+
+    <div class="container-fluid">
+        <div class="panel panel-default">
+
+    <table class="table table-striped table-fixed">
+
+      <thead>
+      <tr class = "row">
+        <% @teams[key].each do |team| %>
+            <th class="col-lg-<%= 12/@teams[key].length %>" style="text-align: center;">
+              <%= team.name %><br/><br/>
+              <% team.author_names.each do |name| %>
+                  <%= name %><br/>
+              <% end %>
+            </th>
+        <% end %>
+      </tr>
+      </thead>
+
+      <tbody>
+      <% @questions[key].each do |question| %>
+          <tr>
+            <td class="col-lg-12" style="background-color: white;">
+              <b><%= question.txt %></b>
+            </td>
+          </tr>
+
+          <% answers = [] %>
+          <% @response_ids[key].each_with_index do |response_id| %>
+              <% answers << Answer.where(response_id: response_id, question_id: question.id).first %>
+          <% end %>
+
+          <% if question.type == "Checkbox" %>
+              <tr>
+                <% answers.each do |answer| %>
+                    <% unless answer.nil? %>
+                        <td class="col-lg-<%= 12/@teams[key].length %>" align="center">
+                          <% if answer.answer == 1 %>
+                          <b><span style="font-size:1.5em; color:#6de255" class="glyphicon glyphicon-ok "></span></b>
+                              <% else if answer.answer == 0 %>
+                              <b><span style="font-size:1.5em; color:#cc2b1d" class="glyphicon glyphicon-remove"></span></b>
+                        </td>
+                              <% end %>
+                          <% end %>
+                    <% else %>
+                        <td class="col-lg-<%= 12/@teams[key].length %>" align="center">
+                          <b></b>
+                        </td>
+                    <% end %>
+                <% end %>
+              </tr>
+          <% else %>
+              <% answers.each_with_index do |answer, index| %>
+                  <% unless answer.nil? %>
+
+                      <tr>
+                        <td class="col-lg-2" align="center">
+                          <%= @teams[key][index].name %>
+                        </td>
+                        <td class="col-lg-1" align="center">
+                          <%= answer.answer %>
+                        </td>
+                        <td class="col-lg-9">
+                          <%= answer.comments %>
+                        </td>
+                      </tr>
+
+                  <% else %>
+                      <tr></tr>
+                  <% end %>
+              <% end %>
+          <% end %>
+
+      <% end %>
 
       <tr>
-        <th  align = 'left'> [Question] <%= question.txt%> </th>
+        <td class="col-lg-12" style="background-color: white;">
+          <b>Additional Comment</b>
+        </td>
       </tr>
-      <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
-        <tr>
-          <td width="60%"> Reviewee </td>
-          <td width="10%"> Score </td>
-          <td width="30%"> Comments </td>
-        </tr>
-      <%else%>
-        <%next%>
-      <%end%>
 
-      <%@review_final_versions[key][:response_ids].each do |response_id|%>
-        <%answer = Answer.where(response_id: response_id, question_id: question.id).first%>
-          <%if !answer.nil?%>
-            <tr>
-              <%team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)%>
-              <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id, 
-                                                        reviewer_id: @reviewer_id,
-                                                        reviewee_id: team.id ).last %>
-              <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
-              <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
-              <% col_color = 'black' %>
-              <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
-              <!--Reviewee-->
-              <td>
-                <p style="color: <%= col_color%>"><%=team.name%> <br>
-                <%team.author_names.each do |name|%>
-                  <%= name %> <br>
-                <%end%></p>
-              </td>
-              <!--Score-->
-              <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
-              <!--Comments-->
-              <td align = 'left'><p style="color: <%= col_color%>"><%= answer.comments %></p></td>
-            </tr>
-          <%else%>
-                <td>N/A</td>
-            <td>N/A</td>
-            <td>N/A</td>
-          <%end%>
-      <%end%>
-    <%end%>
-    <tr>
-      <th align = 'left'> Additional Comment</th>
-    </tr>
+      <% @response_ids[key].each_with_index do |response_id, index| %>
+          <tr>
+            <td class="col-lg-1" align="center">
+              <%= @teams[key][index].name %>
+            </td>
+            <td class="col-lg-11">
+              <%= Response.find(response_id).additional_comment %>
+            </td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table><br/>
+    </div>
+    </div>
+<% end %>
 
-    <%@review_final_versions[key][:response_ids].each do |response_id|%>
-      <tr>
-        <td> <%= Response.find(response_id).additional_comment%> </td>
-      </tr>
-    <%end%>
-    </table>
-
-<% end #loop for keys%>
-<br/>

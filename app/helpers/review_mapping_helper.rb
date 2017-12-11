@@ -40,6 +40,15 @@ module ReviewMappingHelper
 
   def get_team_name_color_in_review_report(response_map)
     if Response.exists?(map_id: response_map.id)
+      responses = Response.where(map_id: response_map.id)
+      if (responses.length > 1)
+        responses.sort_by {|obj| obj.updated_at}
+        responses.reverse
+
+        last_response = responses[0].is_submitted ? responses[0]:responses[1]
+        return 'green' unless update?(last_response)
+      end
+
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
       if review_graded_at.nil? ||
@@ -91,6 +100,8 @@ module ReviewMappingHelper
   end
 
   def sort_reviewer_by_review_volume_desc
+    return @reviewers if @reviewers.empty?
+
     @reviewers.each do |r|
       r.overall_avg_vol,
       r.avg_vol_in_round_1,

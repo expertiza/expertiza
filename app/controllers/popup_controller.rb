@@ -110,6 +110,8 @@ class PopupController < ApplicationController
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
+    @reviewer = Participant.find(@reviewer_id)
+    @assignment = Assignment.find(@assignment_id)
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
 
     @keys = @review_final_versions.keys

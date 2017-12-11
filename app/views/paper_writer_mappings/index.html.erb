@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Paper Writer Mappings</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Writer</th>
+      <th>Paper</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @paper_writer_mappings.each do |paper_writer_mapping| %>
+      <tr>
+        <td><%= paper_writer_mapping.writer_id %></td>
+        <td><%= paper_writer_mapping.paper_id %></td>
+        <td><%= link_to 'Show', paper_writer_mapping %></td>
+        <td><%= link_to 'Edit', edit_paper_writer_mapping_path(paper_writer_mapping) %></td>
+        <td><%= link_to 'Destroy', paper_writer_mapping, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Paper writer mapping', new_paper_writer_mapping_path %>

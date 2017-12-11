@@ -1,0 +1,16 @@
+= form_for @paper_writer_mapping do |f|
+  - if @paper_writer_mapping.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@paper_writer_mapping.errors.count, "error")} prohibited this paper_writer_mapping from being saved:"
+      %ul
+        - @paper_writer_mapping.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :writer_id
+    = f.number_field :writer_id
+  .field
+    = f.label :paper_id
+    = f.number_field :paper_id
+  .actions
+    = f.submit 'Save'

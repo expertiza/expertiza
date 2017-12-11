@@ -72,8 +72,8 @@ class ReviewResponseMap < ResponseMap
       reviewer_participant = AssignmentParticipant.find_by_user_id_and_assignment_id(reviewer_user.id, assignment_id)
       raise ArgumentError, "Reviewer user is not a participant in this assignment." if reviewer_participant.nil?
 
-      if ReviewResponseMap.find_by(reviewed_object_id: assignment_id, reviewer_id: reviewer_participant.id, reviewee_id: reviewee_team.id, calibrate_to: false).nil?
-        ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_participant.id, reviewee_id: reviewee_team.id, calibrate_to: false)
+      if ReviewResponseMap.find_by(reviewed_object_id: assignment_id, reviewer_id: reviewer_participant.id, reviewee_id: reviewee_team.id, expert_review_to: false).nil?
+        ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_participant.id, reviewee_id: reviewee_team.id, expert_review_to: false)
       end
 
       index += 1
@@ -137,7 +137,7 @@ class ReviewResponseMap < ResponseMap
     if review_user.nil?
       # This is not a search, so find all reviewers for this assignment
       response_maps_with_distinct_participant_id =
-        ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and calibrate_to = ?", id, type, 0])
+        ResponseMap.select("DISTINCT reviewer_id").where(["reviewed_object_id = ? and type = ? and expert_review_to = ?", id, type, 0])
       @reviewers = []
       response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
         @reviewers << AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id)

@@ -75,7 +75,7 @@ describe "assignment function" do
         directory_path: 'testDirectory',
         spec_location: 'testLocation',
         microtask: true,
-        is_calibrated: true,
+        has_expert_review: true,
         availability_flag: false
       )
     end
@@ -216,7 +216,7 @@ describe "assignment function" do
 
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-        is_calibrated: true
+        has_expert_review: true
       )
     end
   end
@@ -277,7 +277,7 @@ describe "assignment function" do
         directory_path: 'testDirectory1',
         spec_location: 'testLocation1',
         microtask: true,
-        is_calibrated: true
+        has_expert_review: true
       )
     end
 

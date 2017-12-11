@@ -163,7 +163,7 @@ FactoryGirl.define do
     num_metareviews_required 3
     num_reviews_allowed 3
     num_metareviews_allowed 3
-    is_calibrated false
+    has_expert_review false
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -357,7 +357,7 @@ FactoryGirl.define do
     reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
     type 'ReviewResponseMap'
-    calibrate_to 0
+    expert_review_to 0
   end
 
   factory :meta_review_response_map, class: MetareviewResponseMap do
@@ -365,7 +365,7 @@ FactoryGirl.define do
     reviewee { AssignmentParticipant.first || association(:participant) }
     reviewer_id 1
     type 'MetareviewResponseMap'
-    calibrate_to 0
+    expert_review_to 0
   end
 
   factory :response, class: Response do

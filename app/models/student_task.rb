@@ -108,7 +108,7 @@ class StudentTask
     @teams.each do |team|
       next unless team.is_a?(AssignmentTeam)
       # Teammates in calibration assignment should not be counted in teaming requirement.
-      next if Assignment.find(team.parent_id).is_calibrated
+      next if Assignment.find(team.parent_id).has_expert_review
       @teammates = []
       @course_id = Assignment.find(team.parent_id).course_id
       @team_participants = Team.find(team.id).participants

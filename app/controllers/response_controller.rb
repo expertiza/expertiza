@@ -184,12 +184,14 @@ class ResponseController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
+    elsif current_role_name == "Teaching Assistant" or current_role_name == "Instructor"
+      redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
   end
 
-  def show_calibration_results_for_student
+  def show_expert_review_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
     @calibration_response = calibration_response_map.response[0]

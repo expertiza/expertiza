@@ -1,4 +1,5 @@
-<%= form_for @resume, html: { multipart: true } do |f| %>
+<% @research_paper = ResearchPaper.find(session[:paper_id]) %>
+<%= form_for(@research_paper) do |f| %>
     <%= f.label :attachment %>
     <%= f.file_field :attachment %>
 <%= f.submit "Save" %>

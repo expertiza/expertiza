@@ -69,6 +69,10 @@ class ResearchPapersController < ApplicationController
     redirect_to research_papers_url, notice: 'Research paper was successfully destroyed.'
   end
 
+  def upload
+    render 'research_papers/upload.html.erb'
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_research_paper
@@ -77,6 +81,6 @@ class ResearchPapersController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def research_paper_params
-      params.require(:research_paper).permit(:name, :topic, :date, :conference)
+      params.require(:research_paper).permit(:name, :topic, :date, :conference, :attachment)
     end
 end

@@ -1,6 +1,6 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Listing Research Papers</h1>
+<h2>Listing Research Papers</h2>
 
 <table>
   <thead>
@@ -20,9 +20,10 @@
         <td><%= research_paper.topic %></td>
         <td><%= research_paper.date %></td>
         <td><%= research_paper.conference %></td>
-        <td><%= link_to 'Show', research_paper %></td>
-        <td><%= link_to 'Edit', edit_research_paper_path(research_paper) %></td>
-        <td><%= link_to 'Destroy', research_paper, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <% session[:paper_id] = research_paper.id %>
+        <td><%= link_to 'Show', display_paper_commands_path %></td>
+        <td><%#= link_to 'Edit', edit_research_paper_path(research_paper) %></td>
+        <td><%#= link_to 'Destroy', research_paper, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

@@ -19,6 +19,10 @@ class ResearchPapersController < ApplicationController
   def show
   end
 
+  def display_paper_commands
+    render 'research_papers/display_paper_commands.erb'
+  end
+
   # GET /research_papers/new
   def new
     @research_paper = ResearchPaper.new

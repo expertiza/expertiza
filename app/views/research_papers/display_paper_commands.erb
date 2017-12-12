@@ -1,0 +1,15 @@
+<% @research_paper = ResearchPaper.find(session[:paper_id]) %>
+<h2>Submit or review work for <%= @research_paper.name %></h2>
+<ul>
+<li><%= link_to 'Your Work', @research_paper %> (View your work) </li>
+<br>
+<li><%= link_to 'Your Team', @research_paper %> (view and manage your team) </li>
+<br>
+<li><%= link_to 'Edit paper Details', edit_research_paper_path(@research_paper)%> </li>
+<br>
+<li><%= link_to 'Upload Paper'%></li>
+<br>
+<li><%= link_to 'Your Scores'%> (View FeedBack on your work) </li>
+<br>
+</ul>
+<%= link_to 'Back', research_papers_url %>

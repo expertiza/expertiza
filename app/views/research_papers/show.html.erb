@@ -19,12 +19,6 @@
   <strong>Conference:</strong>
   <%= @research_paper.conference %>
 </p>
-<% @paper_writers = PaperWriterMapping.where(paper_id: @research_paper.id) %>
-<% @paper_writers.each do |paper_writer|%>
-    <% @user = User.find_by(id: paper_writer.writer_id) %>
-    <%= @user.name %>
-    <br>
-<% end %>
 
 <%= link_to 'Edit', edit_research_paper_path(@research_paper) %> |
-<%= link_to 'Back', research_papers_path %>
+<%= link_to 'Back', display_paper_commands_path %>

@@ -19,6 +19,17 @@ class ResearchPapersController < ApplicationController
   def show
   end
 
+  def display_paper_commands
+    if(params[:from])
+      session[:paper_id] = params[:research_paper]
+    end
+    render 'research_papers/display_paper_commands.erb'
+  end
+
+  def display_contributors
+    render 'research_papers/display_contributors.erb'
+  end
+
   # GET /research_papers/new
   def new
     @research_paper = ResearchPaper.new

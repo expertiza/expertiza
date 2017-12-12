@@ -13,14 +13,18 @@
 
   <tbody>
     <% @paper_writer_mappings.each do |paper_writer_mapping| %>
+      <% if paper_writer_mapping.paper_id == session[:paper_id] %>
       <tr>
-        <td><%= paper_writer_mapping.writer_id %></td>
-        <td><%= paper_writer_mapping.paper_id %></td>
-        <td><%= link_to 'Show', paper_writer_mapping %></td>
-        <td><%= link_to 'Edit', edit_paper_writer_mapping_path(paper_writer_mapping) %></td>
-        <td><%= link_to 'Destroy', paper_writer_mapping, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <% @user = User.find_by(id: paper_writer_mapping.writer_id) %>
+        <td><%= @user.name %></td>
+        <td><%#= paper_writer_mapping.paper_id %></td>
+        <td><%#= link_to 'Show', paper_writer_mapping %></td>
+        <td><%#= link_to 'Edit', edit_paper_writer_mapping_path(paper_writer_mapping) %></td>
+        <td><%#= link_to 'Destroy', paper_writer_mapping, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
+      <% end %>
     <% end %>
+    <%= link_to 'Add Contributors', conference_review_signup_path %>
   </tbody>
 </table>
 

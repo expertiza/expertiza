@@ -1,0 +1,10 @@
+<h2>Contributors</h2>
+<% @research_paper = ResearchPaper.find(session[:paper_id]) %>
+<% @paper_writers = PaperWriterMapping.where(paper_id: @research_paper.id) %>
+<% @paper_writers.each do |paper_writer|%>
+    <% @user = User.find_by(id: paper_writer.writer_id) %>
+    <b><%= @user.name %></b>
+    <br>
+<% end %>
+<br>
+<%= link_to 'Add Contributors', conference_review_signup_path %>

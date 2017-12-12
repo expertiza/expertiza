@@ -1,0 +1,5 @@
+<%= form_for @resume, html: { multipart: true } do |f| %>
+    <%= f.label :attachment %>
+    <%= f.file_field :attachment %>
+<%= f.submit "Save" %>
+<% end %>

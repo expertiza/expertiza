@@ -3,7 +3,7 @@
 <ul>
 <li><%= link_to 'Your Work', @research_paper %> (View your work) </li>
 <br>
-<li><%= link_to 'Your Team', @research_paper %> (view and manage your team) </li>
+<li><%= link_to 'Your Team', display_contributors_path %> (view and manage your team) </li>
 <br>
 <li><%= link_to 'Edit paper Details', edit_research_paper_path(@research_paper)%> </li>
 <br>

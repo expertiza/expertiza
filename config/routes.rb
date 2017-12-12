@@ -565,4 +565,5 @@ Expertiza::Application.routes.draw do
 
   get 'display_paper/commands', :to => 'research_papers#display_paper_commands'
   get 'paper_writer/index', :to => 'paper_writer_mappings#index'
+  get 'display/contributors', :to => 'research_papers#display_contributors'
 end

@@ -561,7 +561,7 @@ Expertiza::Application.routes.draw do
   post 'create_writer', :to => 'writers#create'
   get 'conference_review/login', :to => 'writer_sessions#new'
   post 'conference_review/login', :to => 'writer_sessions#create'
-  delete 'conference_review/logout', :to => 'writer_sessions#delete'
+  delete 'conference_review/logout', :to => 'writer_sessions#destroy'
 
   get 'display_paper/commands', :to => 'research_papers#display_paper_commands'
   get 'paper_writer/index', :to => 'paper_writer_mappings#index'

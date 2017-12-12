@@ -7,7 +7,7 @@
 
 .li {
   transition: all 200ms ease-in;
-  height: 200px;
+  height: 140px;
 }
 
 .timestamp
@@ -25,7 +25,8 @@
   transition: all 200ms ease-in;
 }
 .status h4 {
-  font-weight: 600;
+  font-weight: 550;
+  width: 80px;
 }
 .status:before {
   content: "";

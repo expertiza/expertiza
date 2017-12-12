@@ -1,23 +1,24 @@
 <link rel="stylesheet" type="text/css" href="timeline.scss">
 <div class= "scrollable">
-
-<ul class="timeline" id="timeline">
-
-  <% @timeline_list.each do |tl| %>
-  <li class="li complete">
-    <div class="timestamp">
-      <span class="date"><%= tl[:updated_at] %><span>
-    </div>
-    <div class="status">
-      <% if !(tl[:id].nil?) %>
-        <h4><%= link_to tl[:label], timeline_redirect_path(tl[:id])%></h4>
-      <% elsif !(tl[:link].nil?) %>
-        <h4><%= link_to tl[:label], tl[:link]%></h4>
-      <% else %>
-        <h4><%= tl[:label] %></h4>
-      <% end %>
-    </div>
-  <% end %>
- </ul>
-
- </div>
+   <ul class="timeline" id="timeline">
+      <% @timeline_list.each do |tl| %>
+      <% unless tl[:updated_at] > Time.now %>
+      <li class="li complete">
+         <% else %>
+      <li class="li">
+         <% end %>
+         <div class="timestamp">
+            <span class="date"><%= tl[:updated_at] %><span>
+         </div>
+         <div class="status">
+            <% if !(tl[:id].nil?) %>
+            <h4><%= link_to tl[:label], timeline_redirect_path(tl[:id])%></h4>
+            <% elsif !(tl[:link].nil?) %>
+            <h4><%= link_to tl[:label], tl[:link]%></h4>
+            <% else %>
+            <h4><%= tl[:label] %></h4>
+            <% end %>
+         </div>
+         <% end %>
+   </ul>
+</div>

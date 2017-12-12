@@ -134,6 +134,7 @@ class StudentTask
     @dues.each do |dd|
       tmp = {}
       tmp[:label] = dd.deadline_type.name + ' Deadline'
+      tmp[:label] = tmp[:label].split.map(&:capitalize).join(' ')
       tmp[:link] = nil
       unless dd.due_at.nil?
         tmp[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
@@ -148,6 +149,7 @@ class StudentTask
     @submissions.each do |sr|
       tmp = {}
       tmp[:label] = sr.operation
+      tmp[:label] = tmp[:label].split.map(&:capitalize).join(' ')
       tmp[:updated_at] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
       unless sr.operation == 'Submit File' || sr.operation == 'Remove File'
         tmp[:link] = sr.content
@@ -164,6 +166,7 @@ class StudentTask
       @response = Response.where(map_id: rm.id)
       next if @response[0].nil?
       tmp[:label] = 'Round ' + @response[0].round.to_s + ' Review'
+      tmp[:label] = tmp[:label].split.map(&:capitalize).join(' ')
       tmp[:updated_at] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
       tmp[:id] = @response[0].id
       @timeline_list << tmp

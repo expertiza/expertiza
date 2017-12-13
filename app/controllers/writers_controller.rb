@@ -24,7 +24,6 @@ class WritersController < ApplicationController
       @user.role_id = 7
       @user.is_new_user = 1
       if @user.save
-        puts "******************"
         puts session[:user_id]
         flash[:success] = "Contributor has been added to your paper" + session[:paper_id].to_s
         @body = 'Login at www.expertiza.ncsu.edu/conference_review/signup'+'\n Name'+ @user.name+'\n Email ' + @user.email+'Login with above details'

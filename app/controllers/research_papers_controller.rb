@@ -7,8 +7,6 @@ class ResearchPapersController < ApplicationController
 
   # GET /research_papers
   def index
-    puts "*********************"
-    puts session[:user_id].to_s
     @research_papers = ResearchPaper.where(author_id: session[:user_id])
     if @research_papers.nil?
       @research_papers = ResearchPaper.all

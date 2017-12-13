@@ -58,6 +58,7 @@ jQuery(document).ready(function() {
         $(".flash_error").html("You review will be automatically saved and closed in " + time_out_time_string + " if no activity is detected!");
         $(".flash_error").delay(100).fadeOut().fadeIn('slow');
         if (default_timeout_time_countdown_in_seconds == 0) {
+          var time_difference_in_seconds = (current_time - last_activity_time) / 1000;
           $('#autosave_timeout_id').val(time_difference_in_seconds);
           timed_out = true;
           $(".flash_error").remove();

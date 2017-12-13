@@ -118,6 +118,8 @@ end
     # E17A0 Show a flash message when a response is automatically saved after a period of inactivity
     if params[:autosave_timeout].to_i > 0
       msg = "Your response was automatically saved after #{(params[:autosave_timeout].to_i / 60).round} minutes of inactivity."
+    else
+      msg = "Your response was successfully saved."
     end
 
     begin
@@ -211,7 +213,13 @@ end
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     create_answers(params, questions) if params[:responses]
-    msg = "Your response was successfully saved."
+
+    if params[:autosave_timeout].to_i > 0
+      msg = "Your response was automatically saved after #{(params[:autosave_timeout].to_i / 60).round} minutes of inactivity."
+    else
+      msg = "Your response was successfully saved."
+    end
+
     error_msg = ''
 
     if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?

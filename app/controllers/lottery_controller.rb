@@ -9,6 +9,7 @@ class LotteryController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
+
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   def run_intelligent_assignment
     priority_info = []
@@ -24,18 +25,84 @@ class LotteryController < ApplicationController
       end
       team.users.each { |user| priority_info << { pid: user.id, ranks: bids } if bids.uniq != [0] }
     end
-    data = { users: priority_info, max_team_size: assignment.max_team_size }
-    url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
-    begin
-      response = RestClient.post url, data.to_json, content_type: :json, accept: :json
-      # store each summary in a hashmap and use the question as the key
-      teams = JSON.parse(response)["teams"]
-      create_new_teams_for_bidding_response(teams, assignment)
-      run_intelligent_bid(assignment)
-    rescue => err
-      flash[:error] = err.message
+    is_assignment = false #dummy variable for testing purpose
+    #TO-DO:a flag variable needs to be created to toggle between topic assignment and conference reviews
+    if is_assignment
+      begin
+        data = { users: priority_info, max_team_size: assignment.max_team_size }
+        url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
+        response = RestClient.post url, data.to_json, content_type: :json, accept: :json
+        # store each summary in a hashmap and use the question as the key
+        teams = JSON.parse(response)["teams"]
+        create_new_teams_for_bidding_response(teams, assignment)
+        run_intelligent_bid(assignment)
+      rescue => err
+        flash[:error] = err.message
+      end
+
+    else
+      #Method parameters are reused from assignment bidding. Need to updated with conference variables
+      #all related variable calls need to be updated in the below method
+      run_conference_bid assignment.teams, assignment, assignment.max_reviews_per_submission, 3
     end
+
     redirect_to controller: 'tree_display', action: 'list'
+  end
+  def run_conference_bid teams, assignment, topic_per_team, team_per_topic
+    incomplete_teams = Hash.new(0)
+    incomplete_topics = Hash.new(0)
+    all_topics=[]
+    all_topics = assignment.sign_up_topics
+    score_list=Array.new(teams.length*all_topics.length){Array.new(3)}
+    sorted_list=Array.new(teams.length*all_topics.length){Array.new(3)}
+    temp=[]
+    base = 10
+    p = 0
+    #looping through each team to calculate score for each topic in the assignment
+    teams.each do |t|
+      incomplete_teams.store(t.id,0)
+      team_bids = Bid.where(team_id: t.id)
+      denom = 0
+      b_length = team_bids.length
+      (1..b_length).each do |i|
+        denom = denom+all_topics.length - i
+      end
+      #Score calculation based on bid priority
+      all_topics.each do |j|
+        if(team_bids.any?{|tb| tb.topic_id == j.id})
+          bid_priority = Bid.where(team_id:t.id,topic_id:j.id).first.priority
+          score = base+((all_topics.length+1-bid_priority)*base*all_topics.length) / denom
+        elsif(team_bids.length!=0)
+          score = base-(base*all_topics.length)/denom
+        else
+          score = base
+        end
+        score_list[p][0] = score
+        score_list[p][1] = t.id
+        score_list[p][2] = j.id
+        p+=1
+      end
+    end
+    sorted_list = score_list.sort_by{|e| [e[0],e[1],e[2]]}.each{|line| p line}
+    sorted_list.reverse!
+    puts sorted_list
+    all_topics.each do |k|
+      incomplete_topics.store(k.id,0)
+    end
+    if(all_topics.length*team_per_topic<teams.length)
+      flash[:error] = 'There are not enough reviews to be assigned'
+    end
+
+    #Assigning topics to teams based on highest score
+    sorted_list.each do |s|
+      if((incomplete_topics[s[2]]<team_per_topic) && (incomplete_teams[s[1]]<topic_per_team))
+        SignedUpTeam.create(team_id: s[1], topic_id: s[2])
+        incomplete_teams[s[1]]+=1
+        incomplete_topics[s[2]]+=1
+      end
+    end
+    assignment.update_attribute(:is_intelligent,false)
+    flash[:notice] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
   end
 
   def create_new_teams_for_bidding_response(teams, assignment)
@@ -86,8 +153,8 @@ class LotteryController < ApplicationController
     # Getting signuptopics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? and max_choosers > 0', params[:id])
     unassigned_teams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).any? }
-    unassigned_teams.sort! do |t1, t2| 
-      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=> 
+    unassigned_teams.sort! do |t1, t2|
+      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
       [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
     team_bids = []

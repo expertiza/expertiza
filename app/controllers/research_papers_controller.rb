@@ -7,8 +7,6 @@ class ResearchPapersController < ApplicationController
 
   # GET /research_papers
   def index
-    puts "*********************"
-    puts PaperWriterMapping.where(writer_id: session[:user_id])
     @papers = PaperWriterMapping.where(writer_id: session[:user_id]).select(:paper_id)
     @research_papers = ResearchPaper.where(id: @papers)
     if @research_papers.nil?
@@ -21,7 +19,7 @@ class ResearchPapersController < ApplicationController
   end
 
   def display_paper_commands
-    if(params[:from])
+    if (params[:from])
       session[:paper_id] = params[:research_paper]
     end
     render 'research_papers/display_paper_commands.erb'
@@ -76,7 +74,9 @@ class ResearchPapersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
+
+  # Use callbacks to share common setup or constraints between actions.
+
     def set_research_paper
       @research_paper = ResearchPaper.find(params[:id])
     end

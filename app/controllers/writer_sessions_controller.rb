@@ -8,7 +8,7 @@ class WriterSessionsController < ApplicationController
 
   def create
     user = User.find_by(email: params[:session][:email])
-    if user #&& user.valid_password?(params[:session][:password])
+    if user
       flash.now[:success] = 'Welcome!'
       log_in(user)
       redirect_to research_papers_url

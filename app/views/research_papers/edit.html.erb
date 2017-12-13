@@ -1,9 +1,8 @@
 <h1>Editing Research Paper</h1>
 
 <%= render 'form' %>
-<%= puts "***************"%>
-<%= puts session[:user_id] %>
+
 <%= session[:paper_id] = @research_paper.id %>
-<%= link_to 'Add Contributors', conference_review_signup_path %>
+<%= link_to 'Add Contributors', conference_review_signup_path %> |
 <%= link_to 'Show', @research_paper %> |
-<%= link_to 'Back', research_papers_path %>
+<%= link_to 'Back', display_paper_commands_path %>

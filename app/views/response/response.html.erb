@@ -1,69 +1,71 @@
 <script>
 jQuery(document).ready(function() {
-    var last_activity_time = new Date();
-    var default_timeout_time_in_seconds = 3;
-    var default_timeout_time_countdown_in_seconds = 128;
-    var timed_out = false;
 
-    $( ".flash_error" ).hide();
-    jQuery('#Submit').click(function(e){
-      if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      } else {
-        jQuery('#isSubmit').val('Yes');
-      }
-    })
+  // E17A0 After 15 minuts of inactivity, a 5 minute countdown to autosave begins
+  var last_activity_time = new Date();
+  var default_timeout_time_in_seconds = 900;
+  var default_timeout_time_countdown_in_seconds = 300;
+  var timed_out = false;
 
-    $(function(){
-      $("form").sisyphus({
-          locationBased: true,
-          autoRelease: true
-      });
-    });
-
-    // E17AO When user presses a key, moves or clicks mouse, reset last activity time to current time and begin countdown
-    $(document).on( "keypress mousedown mousemove", function () {
-      last_activity_time = new Date();
-      timed_out = false;
-      default_timeout_time_in_seconds = 3;
-      default_timeout_time_countdown_in_seconds = 128;
-      $(".flash_error").hide();
-    });
-
-    // E17A0 Check every   seconds to see if browser idle for more than 20 minutes
-    // E17A0 After browser is idle for 15 ,minutes, begin a countdown to autosave with a flashing notice
-    // E17AO If idle for more than 20 minutes, save review
-    if(!timed_out) {
-      setInterval(function () {
-        var current_time = new Date();
-        var time_difference_in_seconds = (current_time - last_activity_time) / 1000;
-        var time_out_time_string = "";
-
-        if (time_difference_in_seconds > default_timeout_time_in_seconds) {
-          default_timeout_time_countdown_in_seconds--;
-
-          if(default_timeout_time_countdown_in_seconds > 120) {
-              time_out_time_string = Math.floor(default_timeout_time_countdown_in_seconds / 60) + " minutes  and " + (default_timeout_time_countdown_in_seconds % 60) + " seconds"
-          }
-          else if(default_timeout_time_countdown_in_seconds > 60) {
-            time_out_time_string = Math.floor(default_timeout_time_countdown_in_seconds / 60) + " minute  and " + (default_timeout_time_countdown_in_seconds % 60) + " seconds"
-          } else {
-            time_out_time_string = (default_timeout_time_countdown_in_seconds % 60) + " seconds"
-          }
-
-          $(".flash_error").html("You review will be automatically saved and closed in " + time_out_time_string + " if no activity is detected!");
-          $(".flash_error").delay(100).fadeOut().fadeIn('slow');
-          if (default_timeout_time_countdown_in_seconds == 0) {
-            $('#autosave_timeout_id').val(time_difference_in_seconds);
-            timed_out = true;
-            $(".flash_error").remove();
-            $("#Save").click();
-          }
-        }
-      }, 1000);
+  $( ".flash_error" ).hide();
+  jQuery('#Submit').click(function(e){
+    if(!confirm('Once a review has been submitted, you cannot edit it again')){
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    } else {
+      jQuery('#isSubmit').val('Yes');
     }
+  })
+
+  $(function(){
+    $("form").sisyphus({
+        locationBased: true,
+        autoRelease: true
+    });
+  });
+
+  // E17AO When user presses a key, moves or clicks mouse, reset last activity time to current time and begin countdown
+  $(document).on( "keypress mousedown mousemove", function () {
+    last_activity_time = new Date();
+    timed_out = false;
+    default_timeout_time_in_seconds = 900;
+    default_timeout_time_countdown_in_seconds = 300;
+    $(".flash_error").hide();
+  });
+
+  // E17A0 Check every   seconds to see if browser idle for more than 20 minutes
+  // E17A0 After browser is idle for 15 ,minutes, begin a countdown to autosave with a flashing notice
+  // E17AO If idle for more than 20 minutes, save review
+  if(!timed_out) {
+    setInterval(function () {
+      var current_time = new Date();
+      var time_difference_in_seconds = (current_time - last_activity_time) / 1000;
+      var time_out_time_string = "";
+
+      if (time_difference_in_seconds > default_timeout_time_in_seconds) {
+        default_timeout_time_countdown_in_seconds--;
+
+        if(default_timeout_time_countdown_in_seconds > 120) {
+            time_out_time_string = Math.floor(default_timeout_time_countdown_in_seconds / 60) + " minutes  and " + (default_timeout_time_countdown_in_seconds % 60) + " seconds"
+        }
+        else if(default_timeout_time_countdown_in_seconds > 60) {
+          time_out_time_string = Math.floor(default_timeout_time_countdown_in_seconds / 60) + " minute  and " + (default_timeout_time_countdown_in_seconds % 60) + " seconds"
+        } else {
+          time_out_time_string = (default_timeout_time_countdown_in_seconds % 60) + " seconds"
+        }
+
+        $(".flash_error").html("You review will be automatically saved and closed in " + time_out_time_string + " if no activity is detected!");
+        $(".flash_error").delay(100).fadeOut().fadeIn('slow');
+        if (default_timeout_time_countdown_in_seconds == 0) {
+          $('#autosave_timeout_id').val(time_difference_in_seconds);
+          timed_out = true;
+          $(".flash_error").remove();
+          $("#Save").click();
+        }
+      }
+    }, 1000);
+  }
 })
 </script>
 
@@ -139,12 +141,11 @@ jQuery(document).ready(function() {
     <% end %>
 
     <!--#E17A0 Formatted this section to have a list and not have leading white spaces-->
-      <div><label for="review_comments">Additional Comments</label></div>
-      <% if controller.action_name != 'new' and @response.additional_comment != nil %>
-        <% additional_review_comments = @response.additional_comment.strip if !@response.nil? %>
-      <% end %>
-      <div><textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden"><%= additional_review_comments %></textarea></div>
-
+    <div><label for="review_comments">Additional Comments</label></div>
+    <% if controller.action_name != 'new' and @response.additional_comment != nil %>
+      <% additional_review_comments = @response.additional_comment.strip if !@response.nil? %>
+    <% end %>
+    <div><textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden"><%= additional_review_comments %></textarea></div>
 
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>

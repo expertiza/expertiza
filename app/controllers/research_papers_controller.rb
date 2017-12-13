@@ -48,6 +48,7 @@ class ResearchPapersController < ApplicationController
       @paper_writer_map.writer_id = session[:user_id]
       @paper_writer_map.paper_id = @research_paper.id
       @paper_writer_map.save
+      session[:paper_id] = @research_paper.id
       redirect_to @research_paper, notice: 'Research paper was successfully created.'
     else
       render :new

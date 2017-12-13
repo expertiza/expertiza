@@ -46,6 +46,7 @@ class PaperWriterMappingsController < ApplicationController
   end
 
   private
+
     # Use callbacks to share common setup or constraints between actions.
     def set_paper_writer_mapping
       @paper_writer_mapping = PaperWriterMapping.find(params[:id])

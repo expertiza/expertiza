@@ -1,4 +1,5 @@
 class TrelloMetricsFetcher
+  # Responses for fetching the metrics from the trello board.
   require 'trello'
   require 'json'
   require 'concurrent'
@@ -16,6 +17,7 @@ class TrelloMetricsFetcher
 
   class << self
     def supports_url?(url)
+      # checks whether the url is supported or not.
       if !url.nil?
         params = SOURCE[:REGEX].match(url)
         !params.nil?
@@ -26,6 +28,7 @@ class TrelloMetricsFetcher
   end
 
   def initialize(params)
+    # initializes a Fetcher object with following attributes.
     @url = params[:url]
 		@team_filter = params[:team_filter].nil? ? lambda { |email,login| true } : params[:team_filter]
     @loaded = false
@@ -36,6 +39,10 @@ class TrelloMetricsFetcher
   end
 
 	def fetch_content
+    # Fetches the information from the url of the trello board.
+    # This method will help to get two metrics: completeness and personal contribution
+    # completeness is (# of completed tasks / # of total tasks)
+    # personal contribution is (# of completed tasks by a person / # of total completed tasks)
 		params = SOURCE[:REGEX].match(@url)
 		if !params.nil?
       @board_id = params['board_id']
@@ -69,6 +76,7 @@ class TrelloMetricsFetcher
 	end
 
   def is_loaded?
+    # Returns whether this fetcher object has fetched the information or not.
     @loaded
   end
 end

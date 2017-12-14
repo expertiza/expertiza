@@ -15,7 +15,8 @@ class SubmissionViewingEventsController < ApplicationController
     if @submission_viewing_event_records
       @submission_viewing_event_records.each do |time_record|
         if time_record.end_at.nil?
-          time_record.update_attribute('end_at', start_at)
+          # time_record.update_attribute('end_at', start_at)
+          time_record.destroy
         end
       end
     end

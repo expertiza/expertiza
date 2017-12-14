@@ -21,6 +21,7 @@ class ResponseController < ApplicationController
 
         # E17A0 If instructor deletes reviews while a student has opened the student review page, no responses can be found by ActiveRecord
         # E17A0 In this case, when the review is not found, an error is returned
+        user_id = response_map.reviewer.user_id if response_map.reviewer
         return false if response_map.is_locked? && response_map.locked_by != current_user.id
         return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
       end
@@ -39,9 +40,9 @@ class ResponseController < ApplicationController
       case action
       when 'edit' # If response has been submitted, no further editing allowed
         return false if response.is_submitted
-        return false if response_map.is_locked? && response_map.locked_by != current_user.id
+        return false if response_map.is_locked? && (response_map.locked_by != current_user.id)
         return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
-      # Deny access to anyone except reviewer & author's team
+        # Deny access to anyone except reviewer & author's team
       when 'delete', 'update', 'unlock'
         return current_user_id?(user_id) || response_map.reviewer_is_team_member?(current_user.id)
       when 'view'
@@ -62,7 +63,7 @@ class ResponseController < ApplicationController
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
           (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
           (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id)) ||
-          map.reviewer_is_team_member?(current_user.id) || !(map.is_locked? && map.locked_by != current_user.id)
+          map.reviewer_is_team_member?(current_user.id)
     else
       return current_user_id?(user_id)
     end

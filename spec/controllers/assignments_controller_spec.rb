@@ -317,7 +317,7 @@ describe AssignmentsController do
           instructor.timezonepref = nil
           allow(User).to receive(:find).and_return(double('User', timezonepref: 'Eastern Time (US & Canada)'))
           post :update, @params
-          expect(flash[:note]).to eq('The assignment was successfully saved....')
+          expect(flash[:note]).to eq('The assignment was successfully saved.')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. "\
                                       "For now we assume you are in Eastern Time (US & Canada)")
           expect(response).to redirect_to('/assignments/2/edit')
@@ -327,7 +327,7 @@ describe AssignmentsController do
       context 'when the timezone preference of current user is not nil and assignment form updates attributes successfully' do
         it 'shows an error message and redirects to assignments#edit page' do
           post :update, @params
-          expect(flash[:note]).to eq('The assignment was successfully saved....')
+          expect(flash[:note]).to eq('The assignment was successfully saved.')
           expect(flash[:error]).to be nil
           expect(response).to redirect_to('/assignments/2/edit')
         end

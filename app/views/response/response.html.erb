@@ -142,8 +142,8 @@ jQuery(document).ready(function() {
       var round = <%= @current_round %>;
       var current_window_timer = null;
       var auto_window_timer = null;
-      var time_out_interval = 20000; // in milliseconds, checkout end time when not interaction on review page
-      var time_period = 10000; // automaticall record end time every minunte
+      var time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+      var time_period = 30000; // automaticall record end time every minunte
       var timer_flag = false;
       startTimer();
       resetTimer();

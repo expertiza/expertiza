@@ -11,6 +11,7 @@
     rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview]
     rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback]
     rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate]
+    self_review_score = @vm.computed_self_review_score
 %>
 
 <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
@@ -142,6 +143,10 @@
       <% end %>
       </TD>
     <% end %>
+    <TD align="center">
+         <%= self_review_score.is_a?(Float)?sprintf("%.2f",self_review_score):rscore_review.my_avg %><%= score_postfix %>
+    </TD>
+
 </TR>
 
 <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>

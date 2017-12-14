@@ -141,16 +141,24 @@ jQuery(document).ready(function() {
       var map_id = <%= @map.id %>;
       var round = <%= @current_round %>;
       var current_window_timer = null;
-      var time_out_interval = 10000; // in milliseconds
+      var auto_window_timer = null;
+      var time_out_interval = 20000; // in milliseconds, checkout end time when not interaction on review page
+      var time_period = 10000; // automaticall record end time every minunte
+      var timer_flag = false;
       startTimer();
+      resetTimer();
+      autoTimer();
 
       function timeoutAction(){
-        // window.focus();
+        window.focus();
+        timer_flag = false;
         markEndTime();
         if(confirm("Are you still reviewing your submissions? Press OK to continue")){
           startTimer();
+          resetTimer();
         } else {
           clearTimeout(current_window_timer);
+          clearInterval(auto_window_timer);
           $("#timeout_flag").val("true");
           //markEndTime();
           alert("The page has not been interacted for a long time, and will close reference windows and go back!");
@@ -158,13 +166,27 @@ jQuery(document).ready(function() {
         }
       }
 
+      function autoTimer(){
+        clearInterval(auto_window_timer);
+        auto_window_timer = setInterval(autoRecordTime, time_period);
+      }
+
+      function autoRecordTime(){
+        markEndTime();
+        if (timer_flag == true){
+          startTimer();
+        }
+      }
+
       function resetTimer() {
         clearTimeout(current_window_timer);
         current_window_timer = setTimeout(timeoutAction, time_out_interval);
+        timer_flag = true;
       }
 
       function startTimer() {
-        resetTimer();
+        // resetTimer();
+        // autoTimer();
         $("#timeout_flag").val("false");
         $("#restart_file_timing_flag").val("true");
         $("#restart_link_timing_flag").val("true");

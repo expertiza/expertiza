@@ -188,7 +188,7 @@ module ReviewMappingHelper
   end
 
   def get_time_spent_on_review_for_certain_team_for_each_round(map_id)
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@time_spent_round_" + round.to_s, 0) }
+    (1..@assignment.num_review_rounds).each { |round| instance_variable_set("@time_spent_round_" + round.to_s, 0) }
     (1..@assignment.num_review_rounds).each do |round|
       sum_time = 0
       @submission_viewing_events = SubmissionViewingEvent.where(map_id: map_id, round: round)
@@ -202,7 +202,7 @@ module ReviewMappingHelper
           end_time = link_time.end_at
           individual_time = (end_time.to_i - start_time.to_i) / 60.0
         end
-        individual_time = individual_time < 0 ? 0 : individual_time
+        individual_time = individual_time < 0? 0 : individual_time
         sum_time = individual_time + sum_time
       end
       if sum_time > 0

@@ -1,7 +1,7 @@
 class SubmissionViewingEventsController < ApplicationController
-  # def action_allowed?
-  #   return true
-  # end
+  def action_allowed?
+    true
+  end
 
   # record time when link or file is opened in new window
   def record_start_time
@@ -29,7 +29,7 @@ class SubmissionViewingEventsController < ApplicationController
     submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
     submission_viewing_event_records.each do |time_record|
       if time_record.end_at.nil?
-        time_record.update_attribute('end_at', @data[:end_at])
+        time_record.update_attribute('end_at', data[:end_at])
         break
       end
     end
@@ -46,7 +46,7 @@ class SubmissionViewingEventsController < ApplicationController
     submission_viewing_event_records.each do |submissionviewingevent_entry|
       if submissionviewingevent_entry.end_at.nil?
         @link_array.push(submissionviewingevent_entry.link)
-        submissionviewingevent_entry.update_attribute('end_at', @data[:end_at])
+        submissionviewingevent_entry.update_attribute('end_at', data[:end_at])
       end
     end
     respond_to do |format|

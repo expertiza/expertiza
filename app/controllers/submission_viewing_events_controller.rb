@@ -25,8 +25,8 @@ class SubmissionViewingEventsController < ApplicationController
 
   # record time when link or file window is closed
   def record_end_time
-    @data = params.require(:submission_viewing_event)
-    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: @data[:map_id], round: @data[:round], link: @data[:link])
+    data = params.require(:submission_viewing_event)
+    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
     submission_viewing_event_records.each do |time_record|
       if time_record.end_at.nil?
         time_record.update_attribute('end_at', @data[:end_at])
@@ -40,9 +40,9 @@ class SubmissionViewingEventsController < ApplicationController
 
   # mark end_at review time for all uncommited links/files
   def mark_end_time
-    @data = params.require(:submission_viewing_event)
+    data = params.require(:submission_viewing_event)
     @link_array = []
-    submission_viewing_event_records  = SubmissionViewingEvent.where(map_id: @data[:map_id], round: @data[:round])
+    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round])
     submission_viewing_event_records.each do |submissionviewingevent_entry|
       if submissionviewingevent_entry.end_at.nil?
         @link_array.push(submissionviewingevent_entry.link)

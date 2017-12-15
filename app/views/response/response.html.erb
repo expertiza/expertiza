@@ -48,16 +48,21 @@ jQuery(document).ready(function() {
             <% end %>
         <% end %>
 
+        <% @submission_check = true %>
+        <%= hidden_field_tag :timeout_flag, :id => 'timeout_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_link_timing_flag, :id => 'restart_link_timing_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_file_timing_flag, :id => 'restart_file_timing_flag', :value => 'false' %>
         <%if @assignment.teams?%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
+            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
         <%else%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id)} %>
+            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
         <%end%>
         <hr/>
     <% end %>
 <% end %>
+
 <!-- display all versions available -->
 <% @responses_versions = Array.new %>
 <% @responses_versions = @map.get_all_versions() %>
@@ -129,3 +134,95 @@ jQuery(document).ready(function() {
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+<% if @submission_check %>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var map_id = <%= @map.id %>;
+      var round = <%= @current_round %>;
+      var current_window_timer = null;
+      var auto_window_timer = null;
+      var time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+      var time_period = 30000; // automaticall record end time every minunte
+      var timer_flag = false;
+      startTimer();
+      resetTimer();
+      autoTimer();
+
+      function timeoutAction(){
+        window.focus();
+        timer_flag = false;
+        markEndTime();
+        if(confirm("Are you still reviewing your submissions? Press OK to continue")){
+          startTimer();
+          resetTimer();
+        } else {
+          clearTimeout(current_window_timer);
+          clearInterval(auto_window_timer);
+          $("#timeout_flag").val("true");
+          //markEndTime();
+          alert("The page has not been interacted for a long time, and will close reference windows and go back!");
+          window.history.back();
+        }
+      }
+
+      function autoTimer(){
+        clearInterval(auto_window_timer);
+        auto_window_timer = setInterval(autoRecordTime, time_period);
+      }
+
+      function autoRecordTime(){
+        markEndTime();
+        if (timer_flag == true){
+          startTimer();
+        }
+      }
+
+      function resetTimer() {
+        clearTimeout(current_window_timer);
+        current_window_timer = setTimeout(timeoutAction, time_out_interval);
+        timer_flag = true;
+      }
+
+      function startTimer() {
+        // resetTimer();
+        // autoTimer();
+        $("#timeout_flag").val("false");
+        $("#restart_file_timing_flag").val("true");
+        $("#restart_link_timing_flag").val("true");
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.onload = resetTimer;
+        document.onmousedown = resetTimer; // touchscreen presses
+        document.ontouchstart = resetTimer;
+        document.onclick = resetTimer;     // touchpad clicks
+        document.onscroll = resetTimer;    // scrolling with arrow keys
+      }
+
+      function markEndTime() {
+        var  t = new Date();
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          async: false,
+          url: '/submission_viewing_events/mark_end_time',
+          data: $.param({
+            submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
+            }),
+          success: function(json){
+            var links = JSON.parse(JSON.stringify(json));
+            for (lk in links)
+              console.log(lk+" review time is complete!");
+          },
+          error: function(json){
+            console.log("review time failed to save!");
+          }
+        });
+      }
+
+      $(":submit").click(function(){
+          markEndTime();
+      });
+    });
+  </script>
+<% end %>

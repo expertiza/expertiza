@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Map:
+  = @submission_viewing_event.map_id
+%p
+  %b Round:
+  = @submission_viewing_event.round
+%p
+  %b Link:
+  = @submission_viewing_event.link
+%p
+  %b Start at:
+  = @submission_viewing_event.start_at
+%p
+  %b End at:
+  = @submission_viewing_event.end_at
+
+= link_to 'Edit', edit_submission_viewing_event_path(@submission_viewing_event)
+\|
+= link_to 'Back', submission_viewing_events_path

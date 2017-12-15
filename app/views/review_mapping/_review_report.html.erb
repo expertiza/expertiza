@@ -1,6 +1,6 @@
- <%@l = -1 %>
-      <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
-      <div class = 'reviewreport'>
+ <% @l = -1 %>
+<!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
+<div class = 'reviewreport'>
   <!-- Added headers for tablesorter -->
   
 <script type='text/javascript'>
@@ -36,7 +36,7 @@ $("#myTable tbody").sortable().disableSelection();
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
             <td bgcolor=<%= @bgcolor %>>
-              <%= link_to user.name, impersonate_impersonate_path(:user => {:name => user.name}), :method => :post %>
+              <%= link_to user.name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id %>
               (<%= user.fullname %>)
             </td>
             <!--# reviews done-->
@@ -87,6 +87,7 @@ $("#myTable tbody").sortable().disableSelection();
           <% @response_maps.each_with_index do |ri, index| %>
             <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
+                <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: ri.id} %>
                 <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
             <%end %>
           <%end %>

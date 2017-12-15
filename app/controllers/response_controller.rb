@@ -53,6 +53,7 @@ class ResponseController < ApplicationController
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
+    @current_round = @response.round
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
@@ -75,6 +76,7 @@ class ResponseController < ApplicationController
     return unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
+    @current_round = @response.round
     msg = ""
     begin
       @map = @response.map

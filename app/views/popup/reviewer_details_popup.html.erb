@@ -41,7 +41,7 @@
   <div>
     <table width="100%">
       <tr>
-        <th align="right">Reviewee id </th>
+        <th align="right">Reviewed Team</th>
         <th align="right">Total Time (mins)</th>  
         <th align="right">Round </th>
         <th align="right">Links</th>
@@ -70,9 +70,10 @@
                 <% link_list.push(submissionviewingevent_entry.link) %>
                 <tr>
                 <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
-                  <td><%= @reviewee_id %></td>
-                  <td id="<%= reviewee_count.to_s %>"></td>
-                  <td><%= submissionviewingevent_entry.round %></td>
+                  <% team = Team.find(@reviewee_id) %>
+                  <td><%= team.name %></td>
+                  <td id="<%= reviewee_count.to_s %>" align="center"></td>
+                  <td align="center"><%= submissionviewingevent_entry.round %></td>
                 <% else %>        <!--- Else print dummy-->
                   <td><%= @dummy %></td>  
                   <td><%= @dummy %></td>

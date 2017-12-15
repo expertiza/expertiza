@@ -1,7 +1,9 @@
-describe "TrelloLoaderAdaptee" do
+# This rspec file is used to test that the TrelloLoaderAdaptee can use the
+# TrelloMetricsFetcher object to fetch the metrics and store them to the database.
 
+describe "TrelloLoaderAdaptee" do
   it "cannot load data with a team and assignment" do
-    params = { :url => "https://trello.com/b/rU4qGAt4/517-test-board"}
+    params = {url: "https://trello.com/b/rU4qGAt4/517-test-board"}
 
     expect(TrelloMetricsFetcher.supports_url?(params[:url])).to be true
     expect(TrelloLoaderAdaptee.can_load?(params)).to be false
@@ -17,9 +19,9 @@ describe "TrelloLoaderAdaptee" do
     dp2 = create(:metric_data_point_type, name: "checked_items", source: MetricDataPointType.sources[:trello], id: 3)
     dp3 = create(:metric_data_point_type, name: "users_contributions", source: MetricDataPointType.sources[:trello], id: 4)
     params = {
-      :url => "https://trello.com/b/rU4qGAt4/517-test-board",
-      :assignment => assignment,
-      :team => team
+      url: "https://trello.com/b/rU4qGAt4/517-test-board",
+      assignment: assignment,
+      team: team
     }
     expect(TrelloMetricsFetcher.supports_url?(params[:url])).to be true
     expect(TrelloLoaderAdaptee.can_load?(params)).to be true

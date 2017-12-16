@@ -1,6 +1,7 @@
 <table>
   <% review_no = 1 %>
   <% mappings.each do |map| %>
+      <%@sorted_responses=[]%>
       <%- # ACS Have metareviews done for all teams   -%>
       <%- # removed code that handles team and individual assignments differently   -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
@@ -24,16 +25,22 @@
                   <% end %>
               <% end %>
 
-              <%if !@assignment.is_anonymous %>
+              <%if !@assignment.is_anonymous%>
                 &nbsp; (author: <%= participant.fullname%>)
               <%end%>
             </td>
 
             <td>&nbsp;</td>
-            <% if !(map.response.empty?) %>
-                <% @sorted_responses = Response.where(map_id: map.id) %>
+            <% if !map.response.empty? %>
+                <% array_not_empty = 0 %>
+                <% @sorted_responses = Array.new %>
+                <% @prev = Response.where(:map_id => map.id) %>
+                <% for element in @prev %>
+                    <% array_not_empty = 1 %>
+                    <% @sorted_responses << element %>
+                <% end %>
 
-                <% unless @sorted_responses.empty? %>
+                <% if (array_not_empty == 1) %>
                     <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
                     <% @latest_response = @sorted_responses.last %>
 
@@ -52,9 +59,9 @@
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
-                      <% if last_response_round == current_round%>
+                      <% if (last_response_round == current_round)%>
                         <td>
-                          <% unless @latest_response.is_submitted %>
+                          <% if (!@latest_response.is_submitted) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
                           <%end%>
                         </td>
@@ -83,43 +90,20 @@
       <% end %>
 
      <% if map.type.to_s != "MetareviewResponseMap" %>
-       <% unless @sorted_responses.nil? %>
-         <% @sorted_responses = @sorted_responses.reverse %>
+       <% if @sorted_responses !=nil %>
          <table class="grades" style=" font-style: italic; margin-left: 90px;">
-
-           <!-- Check if update since last response (which is first in array after reverse) -->
-           <% update_time = get_update_time(@sorted_responses[0]) %>
-           <% unless update_time[:submission].nil? %>
-               <tr>
-                 <td colspan="10">There is an update on links or files since your last review. Update at --
-                   <%= update_time[:submission].getlocal("-05:00") %></td>
-               </tr>
-           <% end %>
-           <% unless update_time[:link_to_content].nil? %>
-               <tr>
-                 <td colspan="10">There is an update on GitHub since your last review. Update at --
-                   <%= update_time[:link_to_content].getlocal("-05:00") %></td>
-               </tr>
-           <% end %>
-
-           <% previous_response = false %>
-           <% @sorted_responses.each do |response| %>
-               <% if response.is_submitted %>
-                   <% previous_response = true %>
-                   <tr>
-                     <td colspan="10">
-                       <%= link_to "Review done at -- #{response.updated_at.getlocal("-05:00")}",
-                                   {:controller => 'response', :action => 'view', :id => response.id} %>
-                     </td>
-                   </tr>
-               <% end %>
-           <% end %>
-
-           <% unless previous_response %>
+         <% if (@sorted_responses.size > 1) %>
+           <%@sorted_responses = @sorted_responses.reverse%>
+           <% for i in 1..@sorted_responses.size-1 %>
              <tr>
-               <td> <font color="gray" style="font-style: italic;">No previous versions available</font></td>
+               <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].created_at}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
              </tr>
            <% end %>
+         <% else %>
+           <tr>
+             <td> <font color="gray" style="font-style: italic;">No previous versions available</font></td>
+           </tr>
+         <% end %>
          </table>
        <% end %>
      <% end %>

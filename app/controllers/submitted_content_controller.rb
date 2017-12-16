@@ -112,14 +112,7 @@ class SubmittedContentController < ApplicationController
                           operation: "Submit File")
     # send message to reviewers when submission has been updated
     # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
-    assignment = Assignment.find(participant.parent_id)
-    response_maps = ResponseMap.where(reviewed_object_id: assignment.id, reviewee_id: participant.team)
-    response_maps.each do |map|
-      reviewer = map.reviewer
-      response_id = map.response.sort.last.id
-      email(assignment, reviewer, response_id)
-    end
-
+    participant.assignment.email(participant.id) rescue nil
     if params[:origin] == 'review'
       redirect_to :back
     else
@@ -242,18 +235,5 @@ class SubmittedContentController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
     # check one assignment has topics or not
     (!@topics.empty? and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.empty?
-  end
-
-  def email(assignment, reviewer, response_id)
-    defn = {}
-    defn[:body] = {}
-    defn[:subject] = "One of your reviewed submissions for " + assignment.name + " has just been revised"
-    defn[:body][:partial_name] = "update"
-    defn[:body][:type] = "submission"
-    defn[:body][:obj_name] = assignment.name
-    defn[:body][:first_name] = User.find(reviewer.user.id).fullname
-    defn[:body][:link] = 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s
-    defn[:to] = User.find(reviewer.user.id).email
-    Mailer.sync_message(defn).deliver_now
   end
 end

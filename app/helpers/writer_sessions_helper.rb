@@ -18,4 +18,3 @@ module WriterSessionsHelper
     @current_user = nil
   end
 end
-

@@ -1,0 +1,32 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @research_paper.name %>
+</p>
+
+<p>
+  <strong>Topic:</strong>
+  <%= @research_paper.topic %>
+</p>
+
+<p>
+  <strong>Date:</strong>
+  <%= @research_paper.date %>
+</p>
+
+<p>
+  <strong>Conference:</strong>
+  <%= @research_paper.conference %>
+</p>
+<p>
+  <strong> Download Paper</strong>
+  <% if @research_paper.attachment_url == nil %>
+      No paper Uploaded
+  <% else %>
+      <%= link_to "Download Paper", @research_paper.attachment_url %>
+  <% end %>
+</p>
+
+<%= link_to 'Edit', edit_research_paper_path(@research_paper) %> |
+<%= link_to 'Back', display_paper_commands_path %>

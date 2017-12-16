@@ -1,0 +1,18 @@
+<h1>New Writer Signup</h1>
+
+<%= form_for @user , :url => url_for(:controller => 'users', :action => 'create_writer') do |f|%>
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+    <br>
+    <%= f.label :email %>
+    <%= f.text_field :email %>
+    <br>
+    <%= f.label :password %>
+    <%= f.text_field :crypted_password %>
+    <br>
+    <%#= f.label :confirmpassword %>
+    <%#= f.text_field :confirmpassword%>
+
+    <%=submit_tag "Create Writer"%>
+
+<%end%>

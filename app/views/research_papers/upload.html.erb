@@ -1,0 +1,9 @@
+<% @research_paper = ResearchPaper.find(session[:paper_id]) %>
+<%= form_for(@research_paper) do |f| %>
+    <%= f.label :attachment %>
+    <%= f.file_field :attachment %>
+<%= f.submit "Save" %>
+
+<% end %>
+<br>
+<%= link_to "Back", display_paper_commands_path %>

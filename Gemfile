@@ -11,6 +11,7 @@ gem 'bind-it'
 gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
+gem 'carrierwave', '~> 0.9'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'

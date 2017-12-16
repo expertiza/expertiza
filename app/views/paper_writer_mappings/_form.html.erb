@@ -1,0 +1,25 @@
+<%= form_for(@paper_writer_mapping) do |f| %>
+  <% if @paper_writer_mapping.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@paper_writer_mapping.errors.count, "error") %> prohibited this paper_writer_mapping from being saved:</h2>
+
+      <ul>
+      <% @paper_writer_mapping.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :writer_id %><br>
+    <%= f.number_field :writer_id %>
+  </div>
+  <div class="field">
+    <%= f.label :paper_id %><br>
+    <%= f.number_field :paper_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

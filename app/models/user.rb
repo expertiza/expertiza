@@ -195,6 +195,11 @@ class User < ActiveRecord::Base
     end
   end
 
+  def password_authenticate(password)
+    @password = password
+    true
+  end
+
   # locate User based on provided login.
   # If user supplies e-mail or name, the
   # helper will try to find that User account.

@@ -45,12 +45,12 @@ class PaperWriterMappingsController < ApplicationController
 
   private
 
-    # Use callbacks to share common setup or constraints between actions.
+  # Use callbacks to share common setup or constraints between actions.
   def set_paper_writer_mapping
     @paper_writer_mapping = PaperWriterMapping.find(params[:id])
   end
 
-    # Only allow a trusted parameter "white list" through.
+  # Only allow a trusted parameter "white list" through.
   def paper_writer_mapping_params
     params.require(:paper_writer_mapping).permit(:writer_id, :paper_id)
   end

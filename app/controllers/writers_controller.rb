@@ -16,7 +16,7 @@ class WritersController < ApplicationController
       render 'writer_sessions/new.html.erb'
     elsif @user.save
       flash[:success] = "Writer has been added to your paper" + session[:paper_id].to_s
-      #send_mail
+      send_mail
       paper_writer_mapping
       redirect_to research_papers_url
     else

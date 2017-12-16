@@ -45,8 +45,6 @@ class Mailer < ActionMailer::Base
     @first_name = defn[:body][:first_name]
     @partial_name = defn[:body][:partial_name]
 
-    @link = defn[:body][:link] if defn[:body][:link].nil?
-
     if Rails.env.development? || Rails.env.test?
       defn[:to] = 'expertiza.development@gmail.com'
     end

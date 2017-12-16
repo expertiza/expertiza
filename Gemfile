@@ -11,6 +11,7 @@ gem 'bind-it'
 gem 'capistrano'
 gem "capistrano-db-tasks", require: false
 gem 'capistrano-rails'
+gem 'carrierwave', '~> 0.9'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
@@ -60,7 +61,6 @@ gem 'will_paginate'
 gem 'zip-zip'
 gem 'react-rails', '~> 1.0'
 gem 'jquery-tablesorter'
-gem 'carrierwave', '~> 0.9'
 gem 'timecop', '0.8.1'
 
 group :development do

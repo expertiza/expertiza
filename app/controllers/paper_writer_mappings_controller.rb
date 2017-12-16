@@ -7,8 +7,7 @@ class PaperWriterMappingsController < ApplicationController
   end
 
   # GET /paper_writer_mappings/1
-  def show
-  end
+  def show() end
 
   # GET /paper_writer_mappings/new
   def new
@@ -16,8 +15,7 @@ class PaperWriterMappingsController < ApplicationController
   end
 
   # GET /paper_writer_mappings/1/edit
-  def edit
-  end
+  def edit() end
 
   # POST /paper_writer_mappings
   def create
@@ -47,13 +45,13 @@ class PaperWriterMappingsController < ApplicationController
 
   private
 
-    # Use callbacks to share common setup or constraints between actions.
-    def set_paper_writer_mapping
-      @paper_writer_mapping = PaperWriterMapping.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_paper_writer_mapping
+    @paper_writer_mapping = PaperWriterMapping.find(params[:id])
+  end
 
-    # Only allow a trusted parameter "white list" through.
-    def paper_writer_mapping_params
-      params.require(:paper_writer_mapping).permit(:writer_id, :paper_id)
-    end
+  # Only allow a trusted parameter "white list" through.
+  def paper_writer_mapping_params
+    params.require(:paper_writer_mapping).permit(:writer_id, :paper_id)
+  end
 end

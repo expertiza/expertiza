@@ -15,11 +15,10 @@ class ResearchPapersController < ApplicationController
   end
 
   # GET /research_papers/1
-  def show
-  end
+  def show() end
 
   def display_paper_commands
-    if (params[:from])
+    if params[:from]
       session[:paper_id] = params[:research_paper]
     end
     render 'research_papers/display_paper_commands.erb'
@@ -35,8 +34,7 @@ class ResearchPapersController < ApplicationController
   end
 
   # GET /research_papers/1/edit
-  def edit
-  end
+  def edit() end
 
   # POST /research_papers
   def create
@@ -77,12 +75,12 @@ class ResearchPapersController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
 
-    def set_research_paper
-      @research_paper = ResearchPaper.find(params[:id])
-    end
+  def set_research_paper
+    @research_paper = ResearchPaper.find(params[:id])
+  end
 
-    # Only allow a trusted parameter "white list" through.
-    def research_paper_params
-      params.require(:research_paper).permit(:name, :topic, :date, :conference, :attachment)
-    end
+  # Only allow a trusted parameter "white list" through.
+  def research_paper_params
+    params.require(:research_paper).permit(:name, :topic, :date, :conference, :attachment)
+  end
 end

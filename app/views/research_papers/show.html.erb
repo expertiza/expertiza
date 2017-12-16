@@ -19,11 +19,14 @@
   <strong>Conference:</strong>
   <%= @research_paper.conference %>
 </p>
-<%= puts "********************" %>
-<%= puts @research_paper.attachment %>
 <p>
-  <% if !@research_paper.attachment.nil? %>
+  <%= puts @research_paper.attachment %>
+  <%= puts "*******************" %>
+
   <strong> Download Paper</strong>
+  <% if @research_paper.attachment_url == nil %>
+      No paper Uploaded
+  <% else %>
       <%= link_to "Download Paper", @research_paper.attachment_url %>
   <% end %>
 </p>

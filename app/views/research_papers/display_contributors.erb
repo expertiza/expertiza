@@ -1,4 +1,4 @@
-<h2>Contributors</h2>
+<h2>Writers</h2>
 <% @research_paper = ResearchPaper.find(session[:paper_id]) %>
 <% @paper_writers = PaperWriterMapping.where(paper_id: @research_paper.id) %>
 <% @paper_writers.each do |paper_writer|%>
@@ -7,5 +7,5 @@
     <br>
 <% end %>
 <br>
-<%= link_to 'Add Contributors', conference_review_signup_path %> |
+<%= link_to 'Add Writer', conference_review_signup_path %> |
 <%= link_to 'Back', display_paper_commands_path %>

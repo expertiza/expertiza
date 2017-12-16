@@ -40,6 +40,15 @@ module ReviewMappingHelper
 
   def get_team_name_color_in_review_report(response_map)
     if Response.exists?(map_id: response_map.id)
+      responses = Response.where(map_id: response_map.id)
+      if (responses.length > 1)
+        responses.sort_by {|obj| obj.updated_at}
+        responses.reverse
+
+        last_response = responses[0].is_submitted ? responses[0]:responses[1]
+        return 'green' unless update?(last_response)
+      end
+
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
       if review_graded_at.nil? ||
@@ -91,12 +100,19 @@ module ReviewMappingHelper
   end
 
   def sort_reviewer_by_review_volume_desc
+    return @reviewers if @reviewers.empty?
+
     @reviewers.each do |r|
       r.overall_avg_vol,
       r.avg_vol_in_round_1,
       r.avg_vol_in_round_2,
       r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
+    @overall_avg_vol = (@reviewers.inject(0){|sum,r| sum + r.overall_avg_vol})/@reviewers.length
+    @avg_vol_in_round_1 = @reviewers.inject(0){|sum,r| sum + r.avg_vol_in_round_1}/@reviewers.length
+    @avg_vol_in_round_2 = @reviewers.inject(0){|sum,r| sum + r.avg_vol_in_round_2}/@reviewers.length
+    @avg_vol_in_round_3 = @reviewers.inject(0){|sum,r| sum + r.avg_vol_in_round_3}/@reviewers.length
+
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
@@ -107,6 +123,78 @@ module ReviewMappingHelper
     metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
     metric += ")"
     metric.html_safe
+  end
+
+  def display_volume_chart(reviewer)
+    labels = ["1st", "2nd", "3rd"]
+    volume_data = [];
+    avg_data = [];
+
+    round = 0
+    if @avg_vol_in_round_1 > 0
+     round = 1
+     volume_data.push(reviewer.avg_vol_in_round_1)
+     avg_data.push(@avg_vol_in_round_1)
+    end
+    if @avg_vol_in_round_2 > 0
+      round = 2
+      volume_data.push(reviewer.avg_vol_in_round_2)
+      avg_data.push(@avg_vol_in_round_2)
+    end
+    if @avg_vol_in_round_3 > 0
+      round = 3
+      volume_data.push(reviewer.avg_vol_in_round_3)
+      avg_data.push(@avg_vol_in_round_3)
+    end
+
+    labels = labels[0..round - 1]
+    labels.push("Total")
+
+    volume_data.push(reviewer.overall_avg_vol)
+    avg_data.push(@overall_avg_vol)
+
+    data = {
+
+        labels: labels,
+        datasets: [
+            {
+                label: nil,
+                background_color: "rgba(85,86,172,255)",
+                border_color: "rgba(220,220,220,1)",
+                data: volume_data
+
+            },
+            {
+                label: nil,
+                background_color: "rgba(156,31,20,255)",
+                border_color: "rgba(151,187,205,1)",
+                data: avg_data
+
+            }
+        ]
+    }
+
+    options = {
+
+        legend: {
+            position: 'right',
+            display: false
+        },
+        width: "200",
+        height: "200",
+
+        scales:{
+            xAxes:[{ticks:{beginAtZero:true,
+                           stepSize:50,
+                           max:400
+            }}],
+            yAxes:[{barPercentage: 0.8,
+                    categoryPercentage: 0.8
+                   }]
+        }
+    }
+
+    chart('horizontal_bar', data, options)
   end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)

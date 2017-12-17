@@ -3,7 +3,7 @@ class QuestionnairesController < ApplicationController
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)
-
+  require 'active_support/core_ext'
   before_action :authorize
 
   def action_allowed?
@@ -109,6 +109,29 @@ class QuestionnairesController < ApplicationController
   def edit
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
+
+    @form_data = build_form_string
+  end
+
+  def build_form_string
+    
+    form_string = %&[&
+    first_control = true
+    
+    for question in @questionnaire.questions
+     if !first_control
+       form_string.concat(%&,&)
+     else
+       first_control = false
+     end 
+     
+     form_string.concat(question.build_form_data_string)
+
+    end
+
+    form_string.concat(%&]&)
+    
+    return form_string
   end
 
   def update
@@ -165,59 +188,312 @@ class QuestionnairesController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-  # Zhewei: This method is used to add new questions when editing questionnaire.
-  def add_new_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-    ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
-      if question.is_a? ScoredQuestion
-        question.weight = 1
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
-      end
-      question.size = '50, 3' if question.is_a? Criterion
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
-      begin
-        question.save
-      rescue
-        flash[:error] = $ERROR_INFO
-      end
-    end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
-  end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
     questionnaire_id = params[:id]
+    @questionnaire = Questionnaire.find(params[:id])
+    form_controls_string = params[:form_controls]
+    
     begin
-      if params[:save]
-        params[:question].each_pair do |k, v|
-          @question = Question.find(k)
-          # example of 'v' value
-          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-          v.each_pair do |key, value|
-            @question.send(key + '=', value) if @question.send(key) != value
-          end
-
-          @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+    
+      controls = process_form_controls_string(form_controls_string, questionnaire_id)
+      
+      questionnaire_in_use = used_in_review
+      
+      if !questionnaire_in_use
+        for question in @questionnaire.questions
+          question.delete
         end
+        
+        add_questions controls
+      else
+        modify_questions controls
       end
     rescue
       flash[:error] = $ERROR_INFO
     end
-
+  
     export if params[:export]
     import if params[:import]
-
+  
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif !questionnaire_id.nil?
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
+  end
+  
+  def add_questions(controls)
+    
+    controls.each do |key, val|
+      val["type"].constantize.create(val)
+    end 
+    flash[:success] = "All questions has been successfully saved!"
+  end
+  
+  def modify_questions(controls)
+    
+    # 1) Loop through the existing questions and compare them based on order and type. If there are any discrepancies
+    #    set the flash message to say that the form could not be updated by adding, removing, or rearranging controls
+    #    after any reviews have been completed using the questionnaire.
+    begin
+    
+      if @questionnaire.questions.length != controls.length
+        flash[:error] = "A questionnaire which is already in use cannot be changed to add, remove, or rearrange controls."
+        return
+      end
+      
+      control_index = 0
+      for question in @questionnaire.questions
+        if question.type != controls.values[control_index]["type"]
+          flash[:error] = "A questionnaire which is already in use cannot be changed to add, remove, or rearrange controls."
+          return
+        end
+        control_index += 1
+      end
+      
+      # No errors have been detected so we will allow the question attributes to be updated based on the values in the controls
+      control_index = 0
+      for question in @questionnaire.questions
+      
+        control = controls.values[control_index]
+        control_index += 1
+        
+        if question.type === control["type"]
+          case question.type
+            when "Criterion"
+              question.txt = control["txt"]
+              question.weight = control["weight"]
+              question.size = control["size"]
+              question.min_label = control["min_label"]
+              question.max_label = control["max_label"]
+              question.save
+            when "Scale"
+              question.txt = control["txt"]
+              question.weight = control["weight"]
+              question.min_label = control["min_label"]
+              question.max_label = control["max_label"]
+              question.save
+            when "Dropdown"
+              question.txt = control["txt"]
+              question.alternatives = control["alternatives"]
+              question.save
+            when "Checkbox"
+              question.txt = control["txt"]
+              question.save
+            when "TextArea"
+              question.txt = control["txt"]
+              question.size = control["size"]
+              question.save
+            when "TextField"
+              question.txt = control["txt"]
+              question.size = control["size"]
+              question.save
+            when "UploadFile"
+              question.txt = control["txt"]
+              question.save
+            when "SectionHeader"
+              question.txt = control["txt"]
+              question.save
+            when "TableHeader"
+              question.txt = control["txt"]
+              question.save
+            when "ColumnHeader"
+              question.txt = control["txt"]
+              question.save
+          end
+        else
+          flash[:error] = "A questionnaire which is already in use cannot be changed to add, remove, or rearrange controls."
+          return
+        end
+      end
+    rescue
+      flash[:error] = "Error occurred while trying to a modify a questionnaire that is already in use: #{$ERROR_INFO} -- #{controls} "
+    end
+  end
+  
+  def used_in_review
+    for question in @questionnaire.questions
+      answer = Answer.find_by question_id: question.id
+      return true unless answer.nil?
+    end
+    
+    return false
+  end
+  
+  def process_form_controls_string(form_controls_string, questionnaire_id)
+    weight = 1
+    max_label = "Strongly agree"
+    min_label = "Strongly disagree"
+    break_before = 1
+    default_text_size = "30"
+    default_textarea_size = "60, 5"
+    default_criterion_size = "50, 3"
+    
+    controls = { }
+    sequence = 0
+    
+    for control in form_controls_string.split('{"type":"')
+      control_type = control.split('"')[0]
+      
+      control_hash = Hash.new
+      
+      case control_type
+        when 'criterion'
+          txt = control.split('"label":"')[1].split('"')[0]
+          control_hash["type"] = "Criterion"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["weight"] = weight
+          control_hash["seq"] = sequence += 10
+          control_hash["size"] = default_criterion_size
+          control_hash["break_before"] = break_before
+          control_hash["min_label"] = min_label
+          control_hash["max_label"] = max_label
+          
+          controls[sequence] = control_hash
+          
+        when 'radio-group'
+          txt = control.split('"label":"')[1].split('"')[0]
+          control_hash["type"] = "Scale"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["weight"] = weight
+          control_hash["seq"] = sequence += 10
+          control_hash["break_before"] = break_before
+          control_hash["min_label"] = min_label
+          control_hash["max_label"] = max_label
+          
+          controls[sequence] = control_hash
+          
+        when 'select'
+          txt = control.split('"label":"')[1].split('"')[0]
+          
+          values = control.split('"values":[{')[1].split(']')[0].split('"label":"')
+          alternatives_array = Array.new
+          for value in values
+            alternative = value.split('"')[0]
+            if alternative != nil
+              alternatives_array.push(alternative)
+            end
+          end
+          alternatives = alternatives_array.join("|")
+          
+          control_hash["type"] = "Dropdown"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          control_hash["alternatives"] = alternatives
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+          
+        when 'checkbox-group'
+          txt = control.split('"label":"')[2].split('"')[0]
+          
+          control_hash["type"] = "Checkbox"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+          
+        when 'textarea'
+          txt = control.split('"label":"')[1].split('"')[0]
+          
+          maxlength = ""
+          rows = ""
+          textarea_size = ""
+          if control.index('"maxlength":"') != nil && control.index('"rows":"') != nil
+            maxlength = control.split('"maxlength":"')[1].split('"')[0]
+            rows = control.split('"rows":"')[1].split('"')[0]
+            textarea_size = maxlength + ', ' + rows
+          end
+          
+          control_hash["type"] = "TextArea"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          if maxlength.empty? || rows.empty?
+            control_hash["size"] = default_textarea_size
+          else
+            control_hash["size"] = textarea_size
+          end
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+          
+        when 'text'
+          txt = control.split('"label":"')[1].split('"')[0]
+          
+          maxlength = ""
+          if control.index('"maxlength":"') != nil
+            maxlength = control.split('"maxlength":"')[1].split('"')[0]
+          end
+          
+          control_hash["type"] = "TextField"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          if maxlength.empty?
+            control_hash["size"] = default_text_size
+          else
+            control_hash["size"] = maxlength
+          end
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+          
+        when 'file'
+          txt = control.split('"label":"')[1].split('"')[0]
+          
+          control_hash["type"] = "UploadFile"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+    
+        when 'header'
+          txt = control.split('"label":"')[1].split('"')[0]
+          
+          control_hash["type"] = "SectionHeader"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+  
+        when 'table-header'
+          txt = control.split('"label":"')[1].split('"')[0]
+          
+          control_hash["type"] = "TableHeader"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+         
+        when 'column-header'
+          txt = control.split('"label":"')[1].split('"')[0]
+          
+          control_hash["type"] = "ColumnHeader"
+          control_hash["questionnaire_id"] = questionnaire_id
+          control_hash["txt"] = txt
+          control_hash["seq"] = sequence += 10
+          control_hash["break_before"] = break_before
+          
+          controls[sequence] = control_hash
+          
+      end
+    end
+    
+    return controls
   end
 
   #=========================================================================================================
@@ -576,3 +852,4 @@ class QuestionnairesController < ApplicationController
     end
   end
 end
+

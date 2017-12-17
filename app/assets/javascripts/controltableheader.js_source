@@ -1,0 +1,41 @@
+// !! THIS IS THE SOURCE, BUT NOT THE EXECUTABLE SOURCE !!
+// This is the source for the custom jQuery formBuilder table header control. The jQuery
+// formBuilder uses ES5 javascript but the controls are written in ES6. This source
+// was transpiled into ES5 using https://babeljs.io/repl/, the resultant code was 
+// given the extension .es5.js and placed in the app/assets/javascripts directory.
+
+// configure the class for runtime loading
+if (!window.fbControls) window.fbControls = new Array();
+window.fbControls.push(function (controlClass) {
+  
+  /**
+   * Table Header control class
+   */
+  class controlTableHeader extends controlClass {
+
+    /**
+     * Class configuration - return the icons & label related to this control
+     * @returndefinition object
+     */
+    static get definition() {
+      return {
+        i18n: {
+          default: 'Table Header'
+        }
+      };
+    }
+
+    build() {
+      return this.markup('div', null, {id: this.config.name});
+    }
+
+    onRender() {
+      var $header = $('<h2>Table Header</h2>');
+      $('#' + this.config.name).html('').append( $header );
+    }    
+  }
+
+  // register table-header control with formbuilder
+  controlClass.register('table-header', controlTableHeader);
+});
+

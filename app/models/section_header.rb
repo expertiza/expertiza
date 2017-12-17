@@ -8,4 +8,8 @@ class SectionHeader < QuestionnaireHeader
     html = '<b style="color: #986633; font-size: x-large">' + self.txt + '</b>'
     html.html_safe
   end
+
+  def build_form_data_string
+    return %&{"type":"header","label":"#{self.txt.gsub('"', '\\\\\"')}","subtype":"h1"}&
+  end
 end

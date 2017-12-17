@@ -32,56 +32,57 @@
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
-  <table id="question_actions_table">
+  <table id="question_actions_table" width="100%">
     <tr>
       <td>
-        <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
-          <%= submit_tag 'Add' %>
-          <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
-          <%= select "question", "type", 
-              {"Criterion" =>"Criterion",
-               "Scale"=>"Scale",
-               "Dropdown"=>"Dropdown",
-               "Checkbox"=>"Checkbox",
-               "TextArea"=>"TextArea",
-               "TextField"=>"TextField",
-               "UploadFile"=>"UploadFile",
-               "SectionHeader"=>"SectionHeader",
-               "TableHeader"=>"TableHeader",
-               "ColumnHeader"=>"ColumnHeader",
-               } %> question(s)
-        <% end %>
+        <div id="fb-editor" style="background-color: #eee; padding: 10px 10px 10px 10px;"></div>
+        <script>
+          jQuery(function($) {
+            var fbTemplate = document.getElementById('fb-editor');
+            var options = {
+              disableFields: ['autocomplete', 'number', 'date', 'hidden', 'paragraph', 'button'],
+              disabledActionButtons: ['data', 'clear', 'save'],
+              disabledAttrs: [
+                'access',
+                'className',
+                'description',
+                'max',
+                'min',
+                'multiple',
+                'name',
+                'other',
+                'placeholder',
+                'required',
+                'step',
+                'style',
+                'subtype',
+                'toggle',
+                'value'
+              ],
+              controlOrder: ['criterion', 'radio-group', 'select', 'checkbox-group', 'textarea', 'text', 'file', 'header', 'table-header'],
+              formData: '<%= @form_data.gsub(/\\/, "\\\\\\").gsub(/\r?\n/, "<BR />").html_safe %>', 
+            };
+            var fb = $(fbTemplate).formBuilder(options);
+          
+
+            $('#submit_form').on('submit', function() {
+              $('#form_controls').val(fb.actions.getData('json'));
+            });
+          });
+
+
+        </script>
       </td>
     </tr>
   </table>
-  
-  <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private] do %>
-    <table id="questions_table">
-      <tr>
-        <th class="head" align="center" width="30">Action</td>
-        <th class="head" align="center" width="30">Seq</td>
-        <th class="head" align="center" width="300">Question</td>
-        <th class="head" align="center" width="100">Type</td>
-        <th class="head" align="center">Weight</td>
-      </tr>
-      <% i = 1 %>
-      <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-      <% for @question in questions %>
-        <%=@question.edit(i)%>
-        <% i += 1 %>
-      <% end %>
-    </table>
-    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save" %>
-    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
-    <hr/>
-    <h4>Import/Export (from/to CSV format)</h4>
-    <input type="file" name="csv" />
-    <br />
-    <input type="submit" name="import" value="Import questions"/>
-    <br />
-    <input type="submit" name="export" value="Export questions to CSV"%>
-  <% end %>
-<% end %>
+  <BR/>
 
+  <%= form_tag({:action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private]}, :id=>'submit_form') do %>
+    <%= hidden_field_tag 'form_controls' %>
+    <input type="submit" name="save" value="Save"/>
+    <input type="submit" name="view_advice" value="Edit/View advice"/>
+  <% end %>
+<% end %>   
 <BR/>
+
 

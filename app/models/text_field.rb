@@ -27,4 +27,8 @@ class TextField < TextResponse
     end
     html.html_safe
   end
+
+  def build_form_data_string
+    return %&{"type":"text","label":"#{self.txt.gsub('"', '\\\\\"')}","maxlength":"#{self.size}"}&
+  end
 end

@@ -72,4 +72,22 @@ class Scale < ScoredQuestion
     html += '<B>Score:</B> <FONT style="BACKGROUND-COLOR:gold">' + answer.answer.to_s + '</FONT> out of <B>' + questionnaire_max.to_s + '</B></TD>'
     html.html_safe
   end
+
+  def build_form_data_string
+    @questionnaire = Questionnaire.find(self.questionnaire_id)
+    
+    min_question_score = @questionnaire.min_question_score 
+    max_question_score = @questionnaire.max_question_score 
+    
+    form_string = %&{"type":"radio-group","label":"#{self.txt.gsub('"', '\\\\\"')}","inline":true,"values":[&
+    first_score = true
+    for score in min_question_score..max_question_score
+      !first_score ? form_string.concat(%&,&) : first_score = false
+
+      form_string.concat(%&{"label":"#{score}"}&) 
+    end
+    form_string.concat(%&]}&)
+    
+    return form_string
+  end
 end

@@ -206,4 +206,8 @@ class Criterion < ScoredQuestion
     html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
+
+  def build_form_data_string
+    return %&{"type":"criterion","label":"#{self.txt.gsub('"', '\\\\\"')}"}&
+  end
 end

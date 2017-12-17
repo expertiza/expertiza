@@ -29,4 +29,8 @@ class UploadFile < Question
   def view_completed_question(count, files)
     # Use "display_directory_tree" method in "app/helpers/submitted_content_helper.rb"
   end
+
+  def build_form_data_string
+    return %&{"type":"file","label":"#{self.txt.gsub('"', '\\\\\"')}"}&
+  end
 end

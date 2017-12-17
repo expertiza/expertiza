@@ -56,4 +56,19 @@ class Dropdown < UnscoredQuestion
 
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
+
+  def build_form_data_string
+    alternatives = self.alternatives.split("|")
+    form_string = %&{"type":"select","label":"#{self.txt.gsub('"', '\\\\\"')}","values":[&
+    
+    first_alternative = true
+    alternatives.each { |alt|
+      !first_alternative ? form_string.concat(%&,&) : first_alternative = false
+
+      form_string.concat(%&{"label":"#{alt.gsub('"', '\\\\\"')}"}&)     
+    } 
+    form_string.concat(%&]}&) 
+    
+    return form_string
+  end
 end

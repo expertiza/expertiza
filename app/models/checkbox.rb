@@ -139,4 +139,8 @@ class Checkbox < UnscoredQuestion
            end
     html
   end
+
+  def build_form_data_string
+    return %&{"type":"checkbox-group","label":" ","values":[{"label":"#{self.txt.gsub('"', '\\\\\"')}"}]}&
+  end
 end

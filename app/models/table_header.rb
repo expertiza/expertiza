@@ -10,4 +10,8 @@ class TableHeader < QuestionnaireHeader
     html += '<table class="general" style="border: 2; text-align: left; width: 100%">'
     html.html_safe
   end
+
+  def build_form_data_string
+    return %&{"type":"table-header","label":"#{self.txt.gsub('"', '\\\\\"')}","subtype":"h2"}&
+  end
 end

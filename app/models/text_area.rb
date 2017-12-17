@@ -21,4 +21,9 @@ class TextArea < TextResponse
     html += '&nbsp;' * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>') + '<BR/><BR/>'
     html.html_safe
   end
+
+  def build_form_data_string
+    sizes = self.size.split(",")
+    return %&{"type":"textarea","label":"#{self.txt.gsub('"', '\\\\\"')}","rows":"#{sizes[1].strip}","maxlength":"#{sizes[0].strip}"}&
+  end
 end

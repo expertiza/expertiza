@@ -10,4 +10,8 @@ class ColumnHeader < QuestionnaireHeader
     html += '<th style="width: 15%">' + self.txt + '</th>'
     html.html_safe
   end
+
+  def build_form_data_string
+    return %&{"type":"column-header","label":"#{self.txt.gsub('"', '\\\\\"')}","subtype":"h3"}&
+  end
 end

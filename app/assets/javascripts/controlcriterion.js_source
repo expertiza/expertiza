@@ -1,0 +1,43 @@
+// !! THIS IS THE SOURCE, BUT NOT THE EXECUTABLE SOURCE !!
+// This is the source for the custom jQuery formBuilder criterion control. The jQuery
+// formBuilder uses ES5 javascript but the controls are written in ES6. This source
+// was transpiled into ES5 using https://babeljs.io/repl/, the resultant code was 
+// given the extension .es5.js and placed in the app/assets/javascripts directory.
+
+// configure the class for runtime loading
+if (!window.fbControls) window.fbControls = [];
+window.fbControls.push(function(controlClass, allControlClasses) {
+  let controlTextarea = allControlClasses.textarea;
+  /**
+   * Criterion control class
+   */
+  class controlCriterion extends controlTextarea {
+
+    /**
+     * Class configuration - return the icons & label related to this control
+     * @returndefinition object
+     */
+    static get definition() {
+      return {
+        i18n: {
+          default: 'Criterion'
+        }
+      };
+    }
+
+    build() {
+      return this.markup('div', null, {id: this.config.name});
+    }
+
+    onRender() {
+      var $select = $('<select><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><textarea rows="5" cols="50">);
+      /**var $textarea = $('<textarea rows="5" cols="50">');
+      $select.concat($textarea);*/
+      $('#' + this.config.name).html('').append( $select );
+    }    
+  }
+
+  // register criterion control with formbuilder
+  controlTextarea.register('criterion', controlCriterion);
+});
+

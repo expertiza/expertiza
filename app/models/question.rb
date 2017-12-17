@@ -77,6 +77,13 @@ class Question < ActiveRecord::Base
     0
   end
 
+  # This method will build a string in the format needed for the jQuery Formbuilder
+  # designer to represent this question as a form control. Should be overriden for 
+  # each question type.
+  def build_form_data_string
+    return %&{"type":"header","label":"Unknown Type:#{type}"}& # default string
+  end
+
   # this method return questions (question_ids) in one assignment whose comments field are meaningful (ScoredQuestion and TextArea)
   def self.get_all_questions_with_comments_available(assignment_id)
     question_ids = []

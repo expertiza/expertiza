@@ -345,12 +345,32 @@ class QuestionnairesController < ApplicationController
           control_hash["type"] = "Criterion"
           control_hash["questionnaire_id"] = questionnaire_id
           control_hash["txt"] = txt
+
           control_hash["weight"] = weight
+          if control.include? %&"weight":"&
+            control_hash["weight"] = control.split('"weight":"')[1].split('"')[0].to_i
+          end
+
           control_hash["seq"] = sequence += 10
+
           control_hash["size"] = default_criterion_size
+          if control.index('"maxlength":"') != nil && control.index('"rows":"') != nil
+            maxlength = control.split('"maxlength":"')[1].split('"')[0]
+            rows = control.split('"rows":"')[1].split('"')[0]
+            control_hash["size"] = maxlength + ', ' + rows
+          end
+
           control_hash["break_before"] = break_before
+
           control_hash["min_label"] = min_label
+          if control.include? %&"min_label":"&
+            control_hash["min_label"] = control.split('"min_label":"')[1].split('"')[0]
+          end
+
           control_hash["max_label"] = max_label
+          if control.include? %&"max_label":"&
+            control_hash["max_label"] = control.split('"max_label":"')[1].split('"')[0]
+          end
           
           controls[sequence] = control_hash
           
@@ -359,11 +379,24 @@ class QuestionnairesController < ApplicationController
           control_hash["type"] = "Scale"
           control_hash["questionnaire_id"] = questionnaire_id
           control_hash["txt"] = txt
+         
           control_hash["weight"] = weight
+          if control.include? %&"weight":"&
+            control_hash["weight"] = control.split('"weight":"')[1].split('"')[0].to_i
+          end
+          
           control_hash["seq"] = sequence += 10
           control_hash["break_before"] = break_before
-          control_hash["min_label"] = min_label
-          control_hash["max_label"] = max_label
+          
+          control_hash["min_label"] = min_label   
+          if control.include? %&"min_label":"&
+            control_hash["min_label"] = control.split('"min_label":"')[1].split('"')[0]
+          end
+       
+          control_hash["max_label"] = max_label 
+          if control.include? %&"max_label":"&
+            control_hash["max_label"] = control.split('"max_label":"')[1].split('"')[0]
+          end
           
           controls[sequence] = control_hash
           
@@ -402,25 +435,18 @@ class QuestionnairesController < ApplicationController
           
         when 'textarea'
           txt = control.split('"label":"')[1].split('"')[0]
-          
-          maxlength = ""
-          rows = ""
-          textarea_size = ""
+         
+          control_hash["size"] = default_textarea_size 
           if control.index('"maxlength":"') != nil && control.index('"rows":"') != nil
             maxlength = control.split('"maxlength":"')[1].split('"')[0]
             rows = control.split('"rows":"')[1].split('"')[0]
-            textarea_size = maxlength + ', ' + rows
+            control_hash["size"] = maxlength + ', ' + rows
           end
           
           control_hash["type"] = "TextArea"
           control_hash["questionnaire_id"] = questionnaire_id
           control_hash["txt"] = txt
           control_hash["seq"] = sequence += 10
-          if maxlength.empty? || rows.empty?
-            control_hash["size"] = default_textarea_size
-          else
-            control_hash["size"] = textarea_size
-          end
           control_hash["break_before"] = break_before
           
           controls[sequence] = control_hash

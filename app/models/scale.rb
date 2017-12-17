@@ -86,8 +86,8 @@ class Scale < ScoredQuestion
 
       form_string.concat(%&{"label":"#{score}"}&) 
     end
-    form_string.concat(%&]}&)
-    
+    form_string.concat(%&],"weight":"#{self.weight}","min_label":"#{self.min_label}","max_label":"#{self.max_label}"}&)
+ 
     return form_string
   end
 end

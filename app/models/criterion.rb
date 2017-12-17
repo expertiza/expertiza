@@ -208,6 +208,7 @@ class Criterion < ScoredQuestion
   end
 
   def build_form_data_string
-    return %&{"type":"criterion","label":"#{self.txt.gsub('"', '\\\\\"')}"}&
+    sizes = self.size.split(",")
+    return %&{"type":"criterion","label":"#{self.txt.gsub('"', '\\\\\"')}","rows":"#{sizes[1].strip}","maxlength":"#{sizes[0].strip}","weight":"#{self.weight}","min_label":"#{self.min_label}","max_label":"#{self.max_label}"}&
   end
 end

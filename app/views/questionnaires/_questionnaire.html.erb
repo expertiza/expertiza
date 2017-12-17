@@ -40,7 +40,21 @@
           jQuery(function($) {
             var fbTemplate = document.getElementById('fb-editor');
             var options = {
-              disableFields: ['autocomplete', 'number', 'date', 'hidden', 'paragraph', 'button'],
+              fields: [
+                {
+                  label: 'Scale',
+                  type: 'radio-group',
+                  inline: 'true',
+                  values: {
+                    'label': '0'
+                  }
+                },
+                {
+                  label: 'Dropdown',
+                  type: 'select',
+                }
+              ],
+              disableFields: ['autocomplete', 'number', 'date', 'hidden', 'paragraph', 'button', 'radio-group', 'select'],
               disabledActionButtons: ['data', 'clear', 'save'],
               disabledAttrs: [
                 'access',
@@ -55,10 +69,54 @@
                 'required',
                 'step',
                 'style',
-                'subtype',
                 'toggle',
                 'value'
               ],
+              typeUserDisabledAttrs: {
+                'textarea': [ 'subtype' ],
+                'file': [ 'subtype' ]
+              },
+              typeUserAttrs: {
+                criterion: {
+                  min_label: {
+                    label: 'Min Label',
+                    maxlength: '40'
+                  },
+                  max_label: {
+                    label: 'Max Label',
+                    maxlength: '40'
+                  },
+                  maxlength: {
+                    label: 'Max Length',
+                    style: 'width: 80px'
+                  },
+                  rows: {
+                    label: 'Rows',
+                    maxlength: '5',
+                    style: 'width: 80px'
+                  },
+                  weight: {
+                    label: 'Weight',
+                    maxlength: '2',
+                    style: 'width: 80px'
+                  }
+                },
+                'radio-group': {
+                  min_label: {
+                    label: 'Min Label',
+                    maxlength: '40'
+                  },
+                  max_label: {
+                    label: 'Max Label',
+                    maxlength: '40'
+                  },
+                  weight: {
+                    label: 'Weight',
+                    maxlength: '2',
+                    style: 'width: 80px'
+                  }
+                }
+              },
               controlOrder: ['criterion', 'radio-group', 'select', 'checkbox-group', 'textarea', 'text', 'file', 'header', 'table-header'],
               formData: '<%= @form_data.gsub(/\\/, "\\\\\\").gsub(/\r?\n/, "<BR />").html_safe %>', 
             };

@@ -155,6 +155,15 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--"available to student?" should be the last checkbox-->
+  <tr>
+    <td style='padding:5px' id='assignment_type_id_field'>
+      <input name="assignment_form[assignment][type_id]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][type_id]', 'true', @assignment_form.assignment.type_id) %>
+      <%= label_tag('assignment_form[assignment][type_id]', 'Assignment Type_id?') %>
+    </td>
+  </tr>
+
   <tr>
     <td style='padding:5px' id='assignment_reputation_algorithm_field'>
       <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->

@@ -16,6 +16,8 @@ class LotteryController < ApplicationController
     assignment = Assignment.find_by(id: params[:id])
     topics = assignment.sign_up_topics
     teams = assignment.teams
+    puts 'assignment.type'
+    puts assignment.type_id
     teams.each do |team|
       # grab student id and list of bids
       bids = []
@@ -25,9 +27,8 @@ class LotteryController < ApplicationController
       end
       team.users.each { |user| priority_info << { pid: user.id, ranks: bids } if bids.uniq != [0] }
     end
-    is_assignment = false #dummy variable for testing purpose
-    #TO-DO:a flag variable needs to be created to toggle between topic assignment and conference reviews
-    if is_assignment
+    is_assignment = assignment.type_id
+    if !is_assignment
       begin
         data = { users: priority_info, max_team_size: assignment.max_team_size }
         url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
@@ -43,6 +44,7 @@ class LotteryController < ApplicationController
     else
       #Method parameters are reused from assignment bidding. Need to updated with conference variables
       #all related variable calls need to be updated in the below method
+      puts 'Running conference'
       run_conference_bid assignment.teams, assignment, assignment.max_reviews_per_submission, 3
     end
 

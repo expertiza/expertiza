@@ -118,7 +118,7 @@
                 }
               },
               controlOrder: ['criterion', 'radio-group', 'select', 'checkbox-group', 'textarea', 'text', 'file', 'header', 'table-header'],
-              formData: '<%= @form_data.gsub(/\\/, "\\\\\\").gsub(/\r?\n/, "<BR />").html_safe %>', 
+              formData: '<%= @form_data.gsub(/\\/, "\\\\\\").gsub("'", "\\\\'").gsub(/\r?\n/, "<BR />").html_safe %>', 
             };
             var fb = $(fbTemplate).formBuilder(options);
           

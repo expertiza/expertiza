@@ -23,7 +23,11 @@ class TextArea < TextResponse
   end
 
   def build_form_data_string
-    sizes = self.size.split(",")
-    return %&{"type":"textarea","label":"#{self.txt.gsub('"', '\\\\\"')}","rows":"#{sizes[1].strip}","maxlength":"#{sizes[0].strip}"}&
+    if !(self.size.nil?) && self.size.include?(",")
+      sizes = self.size.split(",")
+      return %&{"type":"textarea","label":"#{self.txt.gsub('"', '\\\\\"')}","rows":"#{sizes[1].strip}","maxlength":"#{sizes[0].strip}"}&
+    else
+      return %&{"type":"textarea","label":"#{self.txt.gsub('"', '\\\\\"')}"}&
+    end
   end
 end

@@ -1,12 +1,19 @@
 Expertiza::Application.routes.draw do
 
   resources :user_pastebins
+  resources :tag_prompts
   resources :track_notifications
   resources :notifications
   resources :submission_records
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
+
+  resources :answer_tags do
+    collection do
+      post :create_edit
+    end
+  end
 
   resources :bookmarks do
     collection do
@@ -16,7 +23,7 @@ Expertiza::Application.routes.draw do
 
   resources :join_team_requests
 
-  resources :admin do
+  resources :admin, except: [:show] do
     collection do
       get :list_super_administrators
       get :list_administrators
@@ -66,12 +73,11 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :auth do
-    collection do
-      post :login
-      post :logout
-    end
-  end
+  post :login, to: "auth#login"
+  post :logout, to: "auth#logout"
+
+  get '/auth/*path', to: redirect('/')
+
 
   resources :content_pages do
     collection do
@@ -136,7 +142,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :impersonate do
+  resources :impersonate, except: [:index, :show] do
     collection do
       get :start
       post :impersonate
@@ -231,13 +237,13 @@ Expertiza::Application.routes.draw do
 
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
 
-  resources :profile do
+  resources :profile, :except => [:show] do
     collection do
       get :edit
     end
   end
 
-  resources :publishing do
+  resources :publishing, except: [:show] do
     collection do
       get :view
       post :update_publish_permissions
@@ -289,10 +295,11 @@ Expertiza::Application.routes.draw do
   resources :questions do
     collection do
       get :delete
+      get :types
     end
   end
 
-  resources :response do
+  resources :response, except: [:index, :show] do
     collection do
       get :new_feedback
       get :view
@@ -353,7 +360,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :sign_up_sheet do
+  resources :sign_up_sheet, :except => [:index] do
     collection do
       get :signup
       get :delete_signup
@@ -383,13 +390,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :statistics do
-    collection do
-      get :list_surveys
-      get :list
-      get :view_responses
-    end
-  end
+  # resources :statistics do
+  #   collection do
+  #     get :list_surveys
+  #     get :list
+  #     get :view_responses
+  #   end
+  # end
 
   resources :student_quizzes do
     collection do
@@ -412,6 +419,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       get :view
+      get '/*other', to: redirect('/student_task/list')
     end
   end
 
@@ -513,30 +521,26 @@ Expertiza::Application.routes.draw do
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name
-      get 'set_anonymous_mode'
+      get :set_anonymized_view
       get :keys
+      post :create_requested_user_record
+      post :create_approved_user
     end
   end
-
-  get '/versions/search', controller: :versions, action: :search
 
   resources :versions do
     collection do
+      get :search
       delete '', action: :destroy_all
     end
   end
-  post '/users/request_user_create', controller: :users, action: :request_user_create
-  post '/users/create_approved_user', controller: :users, action: :create_approved_user
   get 'instructions/home'
-  get '/users/show_selection', controller: :users, action: :show_selection
-  get '/users/list', controller: :users, action: :list
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
   get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
 
   root to: 'content_pages#view', page_name: 'home'
 
-  get 'users/list', :to => 'users#list'
   get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
   get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
   get '/submitted_content/submit_file', :to => 'submitted_content#submit_file'

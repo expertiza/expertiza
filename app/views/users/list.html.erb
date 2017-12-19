@@ -17,7 +17,6 @@
   <table>
     <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
     <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th></tr>
-
     <% for user in @users %>
       <% if ((params[:show] != 'true' && !user.name.include?("_hidden")) || params[:show] == 'true')%>
         <tr class="exp">

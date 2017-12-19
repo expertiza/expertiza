@@ -1,6 +1,7 @@
 class NotificationsController < ApplicationController
   before_action :set_notification, only: [:show, :edit, :update, :destroy]
-
+  helper_method :validate_params
+  include SecurityHelper
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
     ['Instructor',
@@ -35,6 +36,11 @@ class NotificationsController < ApplicationController
 
   # POST /notifications
   def create
+    if params[:notification] && (warn_for_special_chars(params[:notification][:subject], "Subject") ||
+        warn_for_special_chars(params[:notification][:description], "Description"))
+      redirect_back
+      return
+    end
     @notification = Notification.new(notification_params)
 
     if @notification.save
@@ -46,6 +52,10 @@ class NotificationsController < ApplicationController
 
   # PATCH/PUT /notifications/1
   def update
+    if !params_valid?
+      redirect_back
+      return
+    end
     respond_to do |format|
       if @notification.update(notification_params)
         format.html { redirect_to @notification, notice: 'Notification was successfully updated.' }

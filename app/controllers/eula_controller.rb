@@ -1,6 +1,10 @@
 class EulaController < ApplicationController
   def action_allowed?
-    current_role_name.eql?("Student")
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant',
+     'Student'].include? current_role_name
   end
 
   def display

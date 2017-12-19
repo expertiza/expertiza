@@ -144,7 +144,7 @@ module ReviewAssignment
   end
 
   def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! {|contributor| contributor.has_user(User.find(reviewer.user_id)) }
+    contributor_set.reject! {|contributor| contributor.user?(User.find(reviewer.user_id)) }
     contributor_set
   end
 
@@ -163,8 +163,8 @@ module ReviewAssignment
 
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
-    raise 'Please select a topic' if has_topics? && topic.nil?
-    raise 'This assignment does not have topics' if !has_topics? && topic
+    raise 'Please select a topic' if topics? && topic.nil?
+    raise 'This assignment does not have topics' if !topics? && topic
     # This condition might happen if the reviewer waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.

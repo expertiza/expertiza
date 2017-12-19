@@ -38,18 +38,18 @@ module ReviewMappingHelper
     [response_maps, bgcolor, rspan, line_num]
   end
 
-  def get_team_name_color(response_map)
+  def get_team_name_color_in_review_report(response_map)
     if Response.exists?(map_id: response_map.id)
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
       if review_graded_at.nil? ||
         (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
-        "blue"
+        'blue' # review grade is not assigned or updated yet.
       else
-        "green"
+        'brown' # review grades has been assigned.
       end
     else
-      "red"
+      'red' # review is not finished yet.
     end
   end
 
@@ -132,7 +132,7 @@ module ReviewMappingHelper
       user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
       author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
       feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.get_total_score} / #{feedback_response.get_maximum_score}"
+      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
     end
     author_feedback_avg_score
   end

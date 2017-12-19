@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20171218225313) do
 
   create_table "answer_tags", force: :cascade do |t|

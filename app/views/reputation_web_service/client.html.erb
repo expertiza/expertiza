@@ -48,7 +48,7 @@
 <%= " + #{@another_assignment.name} (#{@another_assignment.id})" unless @another_assignment.nil? %>
 <%= " + round #{@round_num}" unless @assignment.nil? %>
 <%= " + #{@algorithm} algorithm" unless @assignment.nil? %>
-<%= " + #{@additional_info}" unless @additional_info.empty? %>
+<%= " + #{@additional_info}" unless @additional_info.try(:empty?) %>
 <br/><br/>
 
 <!--Beautified request and response message-->
@@ -68,9 +68,9 @@
 <!--Minified request and response message-->
 <b>Minified request and response message</b><br/>
 <p style="background-color: #fdf6e3; color: #657b83; padding: 5px; word-wrap: break-word;">
-	<%=@request_body unless @request_body.empty? %><br/><br/>
-	<%="Response #{@response.code} #{@response.message}:
-          #{@response.body}" unless @response == '' %>
+	<%=@request_body unless @request_body.try(:empty?) %><br/><br/>
+	<%="Response #{@response.try(:code)} #{@response.try(:message)}:
+          #{@response.try(:body)}" unless @response == '' %>
 </p>
 
 

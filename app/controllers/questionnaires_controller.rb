@@ -67,7 +67,7 @@ class QuestionnairesController < ApplicationController
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
       parent = FolderNode.find_by_node_object_id(tree_folder.id)
       QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-      flash[:success] = 'You have successfully created a questionnaire!'
+      flash[:success] = 'You have successfully created a blank questionnaire.'
     rescue
       flash[:error] = $ERROR_INFO
     end
@@ -138,7 +138,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
     begin
       @questionnaire.update_attributes(questionnaire_params)
-      flash[:success] = 'The questionnaire has been successfully updated!'
+      flash[:success] = 'The questionnaire has been successfully updated.'
     rescue
       flash[:error] = $ERROR_INFO
     end
@@ -229,7 +229,7 @@ class QuestionnairesController < ApplicationController
     controls.each do |key, val|
       val["type"].constantize.create(val)
     end 
-    flash[:success] = "All questions has been successfully saved!"
+    flash[:success] = "All questions has been successfully saved."
   end
   
   def modify_questions(controls)

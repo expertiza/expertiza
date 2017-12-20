@@ -30,9 +30,7 @@ window.fbControls.push(function(controlClass, allControlClasses) {
     }
 
     onRender() {
-      var $select = $('<select><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><textarea rows="5" cols="50">);
-      /**var $textarea = $('<textarea rows="5" cols="50">');
-      $select.concat($textarea);*/
+      var $select = $('<select class="review-rating" data-current-rating ="3.5"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><textarea rows="5" cols="50">');
       $('#' + this.config.name).html('').append( $select );
     }    
   }

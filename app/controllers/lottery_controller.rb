@@ -73,12 +73,12 @@ class LotteryController < ApplicationController
 
     sorted_list = generate_score_list teams , all_topics
 
-
-
+    var_temp = ((all_topics.length * assignment.max_reviews_per_submission) / teams.length).ceil
+    var_temp = [var_temp , assignment.max_reviews_per_submission].min
 
     #Assigning topics to teams based on highest score
     sorted_list.each do |s|
-      if((incomplete_topics[s.topic_id]<max_limit_of_topics[s.topic_id]) && (incomplete_teams[s.team_id]<assignment.max_reviews_per_submission))
+      if((incomplete_topics[s.topic_id]<max_limit_of_topics[s.topic_id]) && (incomplete_teams[s.team_id]<var_temp))
 
         SignedUpTeam.create(team_id: s.team_id, topic_id: s.topic_id)
 
@@ -130,7 +130,8 @@ class LotteryController < ApplicationController
       user_ids.each_with_index do |user_id, index|
         original_team_ids.each do |original_team_id|
           team_user = TeamsUser.find_by(user_id: user_id, team_id: original_team_id)
-          next unless team_user          if index.zero?
+          next unless team_user
+          if index.zero?
             # keep the original team of 1st user if exists and ask later students join in this team
             current_team = AssignmentTeam.find_by(id: team_user.team_id)
             parent = TeamNode.find_by(parent_id: assignment.id, node_object_id: current_team.id)

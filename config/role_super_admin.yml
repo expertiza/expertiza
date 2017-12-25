@@ -365,6 +365,7 @@ development:
         - 17
         - 16
         - 15
+        - 51
       6: &13 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 3
@@ -613,6 +614,16 @@ development:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymous_mode"
+      51: &37 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 112
+        id: 51
+        label: Pending Requests
+        name: show/pending requests
+        parent:
+        parent_id: 46
+        site_controller_id: 10
+        url: "/users/list_pending_requested"
     by_name:
       home: *1
       admin: *2
@@ -649,6 +660,7 @@ development:
       show/administrators: *34
       show/instructors: *35
       anonymized_view: *36
+      show/pending requests: *37
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node
@@ -1643,6 +1655,7 @@ production:
         - 17
         - 16
         - 15
+        - 51
       6: &13 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 3
@@ -1891,6 +1904,16 @@ production:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymous_mode"
+      51: &37 !ruby/object:Menu::Node
+       content_page_id:
+       controller_action_id: 112
+       id: 51
+       label: Pending Requests
+       name: show/pending requests
+       parent:
+       parent_id: 46
+       site_controller_id: 10
+       url: "/users/list_pending_requested"
     by_name:
       home: *1
       admin: *2
@@ -1927,6 +1950,7 @@ production:
       show/administrators: *34
       show/instructors: *35
       anonymized_view: *36
+      show/pending requests: *37
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node

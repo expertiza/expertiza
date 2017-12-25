@@ -1,4 +1,8 @@
 FactoryGirl.define do
+  factory :institution, class: Institution do
+    name 'North Carolina State University'
+  end
+
   factory :role_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil
@@ -317,6 +321,7 @@ FactoryGirl.define do
     type 'ReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
+  
   end
 
   factory :quizquestionnaire, class: QuizQuestionnaire do
@@ -367,8 +372,8 @@ FactoryGirl.define do
 
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
-    reviewer_id 1
     type 'ReviewResponseMap'
     calibrate_to 0
   end
@@ -411,5 +416,15 @@ FactoryGirl.define do
     user 'student1234'
     content 'www.wolfware.edu'
     created_at Time.now
+  end
+
+  factory :requested_user, class: RequestedUser do
+    name 'requester1'
+    role_id 2
+    fullname 'requester, requester'
+    institution_id 1
+    email 'requester1@test.com'
+    status 'Under Review'
+    self_introduction 'no one'
   end
 end

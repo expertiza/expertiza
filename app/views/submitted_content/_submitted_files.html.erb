@@ -19,24 +19,21 @@
 
 <% if (files.length > 0 or stage != "Finished")  %>
   <% if same_team_flag && stage != "Finished" %>
-    <b>Submit a file:</b><br/>
+    <h4>&#8226; Submit a file:</h4>
     <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
       <!--<input type="checkbox" name="unzip" value=""/> Unzip submission-->
       <div class="form-group">
         <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
       </div>
       <%= submit_tag 'Upload file', class: 'btn btn-default' %>
-      <br>
+      <br/><br/>
     <% end %>
   <% end %>
 
   <%= form_tag({:controller=>'submitted_content',:action=>'folder_action', :id => participant.id, :origin => origin ||= nil}, {:multipart => true, id: 'folder-action-form'}) do %>
-
     <% if files.length > 0 and participant.team.directory_num != nil and participant.team.directory_num >= 0 %>
-
       <% if same_team_flag && stage != "Finished" %>
-
-        <div style="padding-bottom:0.6em"><strong>File actions</strong>
+        <div style="padding-bottom:0.6em"><h5>File actions:</h5>
         <!--<input type="button" onclick="createNewFolder()"     value="Create new folder"    />
           <input type="button" onclick="copySelectedFile()"    value="Copy selected file"   />
           <input type="button" onclick="moveSelectedFile()"    value="Move selected file"   />

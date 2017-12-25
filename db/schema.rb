@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027182114) do
+ActiveRecord::Schema.define(version: 20171207210858) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -416,15 +416,15 @@ ActiveRecord::Schema.define(version: 20171027182114) do
   end
 
   create_table "requested_users", force: :cascade do |t|
-    t.string   "name",           limit: 255
-    t.integer  "role_id",        limit: 4
-    t.string   "fullname",       limit: 255
-    t.string   "institution_id", limit: 255
-    t.string   "email",          limit: 255
-    t.string   "status",         limit: 255
-    t.string   "reason",         limit: 255
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.string   "name",              limit: 255
+    t.integer  "role_id",           limit: 4
+    t.string   "fullname",          limit: 255
+    t.string   "institution_id",    limit: 255
+    t.string   "email",             limit: 255
+    t.string   "status",            limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.text     "self_introduction", limit: 65535
   end
 
   create_table "response_maps", force: :cascade do |t|

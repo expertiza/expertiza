@@ -99,7 +99,7 @@ ActiveRecord::Schema.define(version: 20171225035651) do
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
-    t.boolean  "type_id",                                  default: false
+
     t.boolean  "is_conference?",                           default: false
   end
 

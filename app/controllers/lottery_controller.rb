@@ -16,8 +16,7 @@ class LotteryController < ApplicationController
     assignment = Assignment.find_by(id: params[:id])
     topics = assignment.sign_up_topics
     teams = assignment.teams
-puts 'teams'
-puts teams
+
     teams.each do |team|
       # grab student id and list of bids
       bids = []
@@ -29,14 +28,12 @@ puts teams
     end
 
     data = { users: priority_info, max_team_size: assignment.max_team_size }
-    puts 'data:'
-    puts data
+
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     response = RestClient.post url, data.to_json, content_type: :json, accept: :json
     # store each summary in a hashmap and use the question as the key
     teams = JSON.parse(response)["teams"]
-    puts 'teams from webservice:'
-    puts teams
+
     create_new_teams_for_bidding_response(teams, assignment)
 
     
@@ -76,8 +73,7 @@ puts teams
 
     sorted_list = generate_score_list teams , all_topics
 
-    puts 'sorted_list:'
-    puts sorted_list
+
 
 
     #Assigning topics to teams based on highest score
@@ -118,7 +114,7 @@ puts teams
         else
           score = base
         end
-        puts t.id, j.id, score
+
         score_list[p] = BidScore.new(1000 / score,t.id,j.id)
         p+= 1
       end
@@ -134,8 +130,7 @@ puts teams
       user_ids.each_with_index do |user_id, index|
         original_team_ids.each do |original_team_id|
           team_user = TeamsUser.find_by(user_id: user_id, team_id: original_team_id)
-          next unless team_user
-          if index.zero?
+          next unless team_user          if index.zero?
             # keep the original team of 1st user if exists and ask later students join in this team
             current_team = AssignmentTeam.find_by(id: team_user.team_id)
             parent = TeamNode.find_by(parent_id: assignment.id, node_object_id: current_team.id)

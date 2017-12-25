@@ -45,6 +45,8 @@ class LotteryController < ApplicationController
       end
 
     else
+      #updating the assignment so that we get the new team information which is created in create_new_teams_for_bidding_response method
+      assignment = Assignment.find(params[:id])
       run_conference_bid assignment
     end
 

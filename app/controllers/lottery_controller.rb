@@ -9,6 +9,7 @@ class LotteryController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
+
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   def run_intelligent_assignment
     priority_info = []
@@ -24,18 +25,103 @@ class LotteryController < ApplicationController
       end
       team.users.each { |user| priority_info << { pid: user.id, ranks: bids } if bids.uniq != [0] }
     end
+
     data = { users: priority_info, max_team_size: assignment.max_team_size }
+    puts 'data:'
+    puts data
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
-    begin
-      response = RestClient.post url, data.to_json, content_type: :json, accept: :json
-      # store each summary in a hashmap and use the question as the key
-      teams = JSON.parse(response)["teams"]
-      create_new_teams_for_bidding_response(teams, assignment)
-      run_intelligent_bid(assignment)
-    rescue => err
-      flash[:error] = err.message
+    response = RestClient.post url, data.to_json, content_type: :json, accept: :json
+    # store each summary in a hashmap and use the question as the key
+    teams = JSON.parse(response)["teams"]
+    puts 'teams from webservice:'
+    puts teams
+    create_new_teams_for_bidding_response(teams, assignment)
+
+    
+    if !assignment.is_conference?
+      begin
+        run_intelligent_bid(assignment)
+      rescue => err
+        flash[:error] = err.message
+      end
+
+    else
+      run_conference_bid assignment
     end
+
     redirect_to controller: 'tree_display', action: 'list'
+  end
+  def run_conference_bid  assignment
+    incomplete_teams = Hash.new(0)
+    incomplete_topics = Hash.new(0)
+    max_limit_of_topics = Hash.new(0)
+    max_topics_for_assignment = 0
+    teams = assignment.teams
+    all_topics = assignment.sign_up_topics
+    #looping through each topic to get the max limit of them and total topic count for the assignment
+    all_topics.each do |topic|
+      #intializing the topics hash with topic id and 0 as default
+      incomplete_topics.store(topic.id,0)
+      max_limit_of_topics.store(topic.id,topic.max_choosers)
+      max_topics_for_assignment =max_topics_for_assignment + topic.max_choosers
+    end
+    teams.each do |t|
+      #intializing the hash with team id as key and 0 as default
+      incomplete_teams.store(t.id,0)
+    end
+
+    sorted_list=[]
+
+    sorted_list = generate_score_list teams , all_topics
+
+    puts 'sorted_list:'
+    puts sorted_list
+
+
+    #Assigning topics to teams based on highest score
+    sorted_list.each do |s|
+      if((incomplete_topics[s.topic_id]<max_limit_of_topics[s.topic_id]) && (incomplete_teams[s.team_id]<assignment.max_reviews_per_submission))
+
+        SignedUpTeam.create(team_id: s.team_id, topic_id: s.topic_id)
+
+        incomplete_teams[s.team_id]+= 1
+        incomplete_topics[s.topic_id]+= 1
+      end
+    end
+
+    #updating the assignment with is inteligent as false so that we should be able to run the assignment twice
+    assignment.update_attribute(:is_intelligent,false)
+    flash[:notice] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
+  end
+
+  def generate_score_list teams , all_topics
+    score_list=[]
+    base = 10
+    p = 0
+    #looping through each team to calculate score for each topic in the assignment
+    teams.each do |t|
+      team_bids = Bid.where(team_id: t.id)
+      denom = 0
+      b_length = team_bids.length
+      (1..b_length).each do |i|
+        denom = denom + all_topics.length - i
+      end
+      #Score calculation based on bid priority
+      all_topics.each do |j|
+        if(team_bids.any?{|tb| tb.topic_id == j.id})
+          bid_priority = Bid.where(team_id: t.id,topic_id: j.id).first.priority
+          score = base + ((all_topics.length+1-bid_priority) * base * all_topics.length) / denom
+        elsif(team_bids.length!=0)
+          score = base - (base * all_topics.length) /denom
+        else
+          score = base
+        end
+        score_list[p] = BidScore.new(1000 / score,t.id,j.id)
+        p+= 1
+      end
+    end
+    #sorting the array based on the scores, team id and then topic ids
+    sorted_list = score_list.sort_by{|e| [e.score,e.team_id,e.topic_id]}.each{|line| p line}
   end
 
   def create_new_teams_for_bidding_response(teams, assignment)
@@ -57,6 +143,9 @@ class LotteryController < ApplicationController
           team_user.team_user_node.destroy
           team_user.destroy
           # transfer biddings from old team to new team
+          Bid.where(team_id: original_team_id).each do ||
+
+          end
           Bid.where(team_id: original_team_id).update_all(team_id: current_team.id)
         end
         team_user = TeamsUser.find_by(user_id: user_id, team_id: current_team.id)
@@ -86,8 +175,8 @@ class LotteryController < ApplicationController
     # Getting signuptopics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? and max_choosers > 0', params[:id])
     unassigned_teams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).any? }
-    unassigned_teams.sort! do |t1, t2| 
-      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=> 
+    unassigned_teams.sort! do |t1, t2|
+      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
       [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
     team_bids = []
@@ -137,3 +226,5 @@ class LotteryController < ApplicationController
     end
   end
 end
+
+

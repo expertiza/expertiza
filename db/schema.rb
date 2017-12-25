@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20171225035651) do
 
   create_table "answer_tags", force: :cascade do |t|
@@ -99,7 +100,6 @@ ActiveRecord::Schema.define(version: 20171225035651) do
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
-
     t.boolean  "is_conference?",                           default: false
   end
 

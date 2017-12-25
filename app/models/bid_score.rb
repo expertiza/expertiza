@@ -5,7 +5,7 @@ class BidScore
 
   attr_accessor :score, :team_id, :topic_id
   validates_presence_of :name, :team_id, :topic_id
-
+# Since the toics assignment is done by sorting of scores, this object keeps track of every bid: score, topic and team
   def initialize(score,teamId,topicId)
     @score = score
     @team_id = teamId

@@ -16,6 +16,8 @@ class LotteryController < ApplicationController
     assignment = Assignment.find_by(id: params[:id])
     topics = assignment.sign_up_topics
     teams = assignment.teams
+puts 'teams'
+puts teams
     teams.each do |team|
       # grab student id and list of bids
       bids = []
@@ -104,7 +106,7 @@ class LotteryController < ApplicationController
       denom = 0
       b_length = team_bids.length
       (1..b_length).each do |i|
-        denom = denom + all_topics.length - i
+        denom = denom + all_topics.length - i + 1
       end
       #Score calculation based on bid priority
       all_topics.each do |j|
@@ -116,6 +118,7 @@ class LotteryController < ApplicationController
         else
           score = base
         end
+        puts t.id, j.id, score
         score_list[p] = BidScore.new(1000 / score,t.id,j.id)
         p+= 1
       end

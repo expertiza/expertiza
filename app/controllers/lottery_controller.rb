@@ -55,6 +55,7 @@ class LotteryController < ApplicationController
     incomplete_topics = Hash.new(0)
     max_limit_of_topics = Hash.new(0)
     max_topics_for_assignment = 0
+    base = 100
     teams = assignment.teams
     all_topics = assignment.sign_up_topics
     #looping through each topic to get the max limit of them and total topic count for the assignment
@@ -72,13 +73,16 @@ class LotteryController < ApplicationController
     sorted_list=[]
 
     sorted_list = generate_score_list teams , all_topics
-
-    var_temp = ((all_topics.length * assignment.max_reviews_per_submission) / teams.length).ceil
-    var_temp = [var_temp , assignment.max_reviews_per_submission].min
+    #we are adjusting the max limit of teams with below formaula so that topic assignments is done in a balancing way
+    balanced_max_limit_of_teams = ((all_topics.length * assignment.max_reviews_per_submission) / teams.length.to_f).ceil
+    balanced_max_limit_of_teams = [balanced_max_limit_of_teams , assignment.max_reviews_per_submission].min
 
     #Assigning topics to teams based on highest score
     sorted_list.each do |s|
-      if((incomplete_topics[s.topic_id]<max_limit_of_topics[s.topic_id]) && (incomplete_teams[s.team_id]<var_temp))
+      #we are adjusting the max limit of topics with below formaula so that topic assignments is done in a balancing way
+      balanced_max_limit_of_topics = ((teams.length * max_limit_of_topics[s.topic_id]) / all_topics.length.to_f).ceil
+      balanced_max_limit_of_topics = [balanced_max_limit_of_topics , max_limit_of_topics[s.topic_id]].min
+      if((incomplete_topics[s.topic_id]< (s.score < base ? max_limit_of_topics[s.topic_id] : balanced_max_limit_of_topics) ) && (incomplete_teams[s.team_id]<  (s.score < base ? assignment.max_reviews_per_submission : balanced_max_limit_of_teams)   ))
 
         SignedUpTeam.create(team_id: s.team_id, topic_id: s.topic_id)
 

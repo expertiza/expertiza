@@ -1,29 +1,9 @@
 Expertiza::Application.routes.draw do
 
-  resources :user_pastebins
-  resources :tag_prompts
-  resources :track_notifications
-  resources :notifications
-  resources :submission_records
-  get 'auth/:provider/callback', to: 'auth#google_login'
-  get 'auth/failure', to: 'content_pages#view'
-  post 'impersonate/impersonate', to: 'impersonate#impersonate'
-
-  resources :answer_tags do
-    collection do
-      post :create_edit
-    end
-  end
-
-  resources :bookmarks do
-    collection do
-      post :save_bookmark_rating_score
-    end
-  end
-
-  resources :join_team_requests
-
-  resources :admin, except: [:show] do
+  ###
+  # Please insert new routes alphabetically!
+  ###
+  resources :admin, only: [] do
     collection do
       get :list_super_administrators
       get :list_administrators
@@ -35,34 +15,36 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :advertise_for_partner do
+  resources :advertise_for_partner, only: [:new, :create, :edit, :update] do
     collection do
-      get :edit
       get :remove
       post ':id', action: :update
     end
   end
 
-
-
-  resources :advice do
+  resources :advice, only: [] do
     collection do
       post :save_advice
     end
   end
 
-  resources :assessment360 do
+  resources :answer_tags, only: [:index] do
     collection do
-      get :one_course_all_assignments
+      post :create_edit
+    end
+  end
+
+  resources :assessment360, only: [] do
+    collection do
+      # get :one_course_all_assignments
       get :all_students_all_reviews
-      get :one_student_all_reviews
-      get :one_assignment_all_students
+      # get :one_student_all_reviews
+      # get :one_assignment_all_students
     end
   end
 
   resources :assignments do
     collection do
-      get :delete
       get :associate_assignment_with_course
       get :copy
       get :toggle_access
@@ -73,11 +55,12 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  post :login, to: "auth#login"
-  post :logout, to: "auth#logout"
-
-  get '/auth/*path', to: redirect('/')
-
+  resources :bookmarks, except: [:index, :show] do
+    collection do
+      get :list
+      post :save_bookmark_rating_score
+    end
+  end
 
   resources :content_pages do
     collection do
@@ -88,15 +71,14 @@ Expertiza::Application.routes.draw do
 
   resources :controller_actions do
     collection do
-      get 'list'
+      get :list
       post ':id', action: :update
-      get 'new_for'
+      get :new_for
     end
   end
 
-  resources :course do
+  resources :course, only: [:new, :create, :edit, :update] do
     collection do
-      get :delete
       get :toggle_access
       get :copy
       get :view_teaching_assistants
@@ -106,13 +88,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course_evaluation do
-    collection do
-      get :list
-    end
-  end
-
-  resources :eula do
+  resources :eula, only: [] do
     collection do
       get :accept
       get :decline
@@ -120,7 +96,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :export_file do
+  resources :export_file, only: [] do
     collection do
       get :start
       get :export
@@ -129,46 +105,41 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :grades do
+  resources :grades, only: [:edit, :update] do
     collection do
       get :view
       get :view_team
       get :view_reviewer
       get :view_my_scores
-      get :view_my_scores_new
       get :instructor_review
       post :remove_hyperlink
       post :save_grade_and_comment_for_submission
     end
   end
 
-  resources :impersonate, except: [:index, :show] do
+  resources :impersonate, only: [] do
     collection do
       get :start
       post :impersonate
     end
   end
 
-  resources :import_file do
+  resources :import_file, only: [] do
     collection do
       get :start
+      get :import
       post :import
     end
   end
 
-  get '/import_file/import', controller: :import_file, action: :import
-
   resources :institution do
     collection do
       get :list
-      get :show
-      get :new
-      post :create
       post ':id', action: :update
     end
   end
 
-  resources :invitations do
+  resources :invitations, only: [:new, :create] do
     collection do
       get :cancel
       get :accept
@@ -179,12 +150,10 @@ Expertiza::Application.routes.draw do
   resources :join_team_requests do
     collection do
       post :decline
-      get :edit
     end
   end
 
-  resources 'late_policies'
-
+  resources :late_policies
   resources :markup_styles
 
   resources :menu_items do
@@ -197,7 +166,9 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :participants do
+  resources :notifications
+
+  resources :participants, only: [:destroy] do
     collection do
       get :add
       post :add
@@ -207,7 +178,6 @@ Expertiza::Application.routes.draw do
       get :change_handle
       get :inherit
       get :bequeath_all
-      post :delete
       get :inherit
       get :bequeath_all
       post :update_authorizations
@@ -217,7 +187,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :password_retrieval do
+  resources :password_retrieval, only: [] do
     collection do
       get :forgotten
       get :reset_password
@@ -226,24 +196,9 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :permissions, constraints: {id: /\d+/} do
-    collection do
-      get :list
-      get ':id', action: :show
-      post ':id', action: :update
-      delete ':id', action: :destroy
-    end
-  end
+  resources :profile, only: [:edit, :update]
 
-  post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
-
-  resources :profile, :except => [:show] do
-    collection do
-      get :edit
-    end
-  end
-
-  resources :publishing, except: [:show] do
+  resources :publishing, only: [] do
     collection do
       get :view
       post :update_publish_permissions
@@ -255,30 +210,20 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :questionnaires do
+  resources :questionnaires, only: [:new, :create, :edit, :update] do
     collection do
       get :copy
-      get :new
-      get :edit
       get :list
       post :list_questionnaires
       get :new_quiz
+      get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access
       get :view
-      get :delete
-      post :create
       post :create_quiz_questionnaire
       post :update_quiz
       post :add_new_questions
       post :save_all_questions
-    end
-  end
-
-  resources :reputation_web_service do
-    collection do
-      get :client
-      post :send_post_request
     end
   end
 
@@ -294,16 +239,21 @@ Expertiza::Application.routes.draw do
 
   resources :questions do
     collection do
-      get :delete
       get :types
     end
   end
 
-  resources :response, except: [:index, :show] do
+  resources :reputation_web_service, only: [] do
+    collection do
+      get :client
+      post :send_post_request
+    end
+  end
+
+  resources :response, only: [:new, :create, :edit, :update] do
     collection do
       get :new_feedback
       get :view
-      post :delete
       get :remove_hyperlink
       get :saving
       get :redirection
@@ -313,7 +263,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :review_mapping do
+  resources :review_mapping, only: [] do
     collection do
       post :add_metareviewer
       get :add_reviewer
@@ -321,9 +271,6 @@ Expertiza::Application.routes.draw do
       post :add_self_reviewer
       get :add_self_reviewer
       get :add_user_to_assignment
-      get :assign_metareviewer_dynamically
-      get :assign_reviewer_dynamically
-      post :assign_reviewer_dynamically
       get :auto_complete_for_user_name
       get :delete_all_metareviewers
       get :delete_outstanding_reviewers
@@ -337,10 +284,13 @@ Expertiza::Application.routes.draw do
       get :select_reviewer
       get :select_mapping
       post :assign_quiz_dynamically
+      get :assign_reviewer_dynamically
+      post :assign_reviewer_dynamically
+      get :assign_metareviewer_dynamically
       post :assign_metareviewer_dynamically
       post :automatic_review_mapping
       post :automatic_review_mapping_staggered
-      #E1600
+      # E1600
       post :start_self_review
       post :save_grade_and_comment_for_reviewer
       get :unsubmit_review
@@ -354,20 +304,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :roles_permissions do
-    collection do
-      get :new_permission_for_role
-    end
-  end
-
-  resources :sign_up_sheet, :except => [:index] do
+  resources :sign_up_sheet, except: [:index, :show] do
     collection do
       get :signup
       get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :delete_signup
-      get :edit
       get :list
       get :signup_topics
       get :signup
@@ -385,23 +328,14 @@ Expertiza::Application.routes.draw do
 
   resources :site_controllers do
     collection do
-      get 'list'
-      get 'new_called'
+      get :list
+      get :new_called
     end
   end
 
-  # resources :statistics do
-  #   collection do
-  #     get :list_surveys
-  #     get :list
-  #     get :view_responses
-  #   end
-  # end
-
-  resources :student_quizzes do
+  resources :student_quizzes, only: [:index] do
     collection do
       post :student_quizzes
-      get :index
       post :record_response
       get :finished_quiz
       get :take_quiz
@@ -409,13 +343,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :student_review do
+  resources :student_review, only: [] do
     collection do
       get :list
     end
   end
 
-  resources :student_task do
+  resources :student_task, only: [] do
     collection do
       get :list
       get :view
@@ -423,24 +357,21 @@ Expertiza::Application.routes.draw do
     end
   end
 
-
-  resources :student_teams do
-
+  resources :student_teams, only: [:create, :edit, :update] do
     collection do
       get :view
-      get :edit
       get :remove_participant
       get :auto_complete_for_user_name
     end
   end
 
-  resources :submitted_content do
+  resources :submitted_content, only: [:edit] do
     collection do
       get :download
-      get :edit
       get :folder_action
       get :remove_hyperlink
       post :remove_hyperlink
+      get :submit_file
       post :submit_file
       post :folder_action
       post :submit_hyperlink
@@ -449,35 +380,21 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :suggestion do
+  resources :submission_records, only: [:index]
+
+  resources :suggestion, only: [:show, :new, :create] do
     collection do
       get :list
       post :submit
       post :student_submit
       post :update_suggestion
-    end      
-  end
-
-  resources :survey do
-    collection do
-      get :assign
     end
   end
 
-  resources :survey_deployment do
+  resources :survey_deployment, only: [:new, :create] do
     collection do
       get :list
-      get :delete
-      post :delete # change
       get :reminder_thread
-    end
-  end
-
-  resources :survey_response do
-    collection do
-      get :view_responses
-    	get :begin_survey
-    	get :comments
     end
   end
 
@@ -487,30 +404,33 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :teams do
+  resources :teams, only: [:new, :create, :edit, :update] do
     collection do
       get :list
-      #post ':id', action: :create_teams
+      # post ':id', action: :create_teams
       post :create_teams
       post :inherit
     end
   end
 
-  resources :teams_users do
+  resources :teams_users, only: [:new, :create] do
     collection do
-      post :create
+      post :list
     end
   end
 
-  resources :tree_display do
+  resources :tag_prompts, except: [:new, :edit]
+  resources :track_notifications, only: [:index]
+
+  resources :tree_display, only: [] do
     collection do
-      get ':action'
-      post 'list'
-      post 'children_node_ng'
-      post 'children_node_2_ng'
-      post 'bridge_to_is_available'
-      get 'session_last_open_tab'
-      get 'set_session_last_open_tab'
+      get :action
+      post :list
+      post :children_node_ng
+      post :children_node_2_ng
+      post :bridge_to_is_available
+      get :session_last_open_tab
+      get :set_session_last_open_tab
     end
   end
 
@@ -528,30 +448,29 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :versions do
+  resources :user_pastebins
+
+  resources :versions, only: [:index, :show, :destroy] do
     collection do
       get :search
       delete '', action: :destroy_all
     end
   end
+  
+  root to: 'content_pages#view', page_name: 'home'
+  post :login, to: 'auth#login'
+  post :logout, to: 'auth#logout'
+  get 'auth/:provider/callback', to: 'auth#google_login'
+  get 'auth/failure', to: 'content_pages#view'
+  get '/auth/*path', to: redirect('/')
+  get ':controller(/:action(/:id))(.:format)'
+  match '*path' => 'content_pages#view', :via => [:get, :post] unless Rails.env.development?
+  post 'impersonate/impersonate', to: 'impersonate#impersonate'
+  post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
   get '/menu/*name', controller: :menu_items, action: :link
   get ':page_name', controller: :content_pages, action: :view, method: :get
-  get '/submitted_content/submit_hyperlink' => 'submitted_content#submit_hyperlink'
-
-  root to: 'content_pages#view', page_name: 'home'
-
-  get '/submitted_content/remove_hyperlink', :to => 'submitted_content#remove_hyperlink'
-  get '/submitted_content/submit_hyperlink', :to => 'submitted_content#submit_hyperlink'
-  get '/submitted_content/submit_file', :to => 'submitted_content#submit_file'
-  get '/review_mapping/assign_reviewer_dynamically', :to => 'review_mapping#assign_reviewer_dynamically'
-  get '/review_mapping/assign_metareviewer_dynamically', :to => 'review_mapping#assign_metareviewer_dynamically'
-  get 'response/', :to => 'response#saving'
-
-  get 'question/select_questionnaire_type', :controller => "questionnaire", :action => 'select_questionnaire_type'
-  get ':controller/service.wsdl', :action => 'wsdl'
-
-  get ':controller(/:action(/:id))(.:format)'
+  get 'response/', to: 'response#saving'
+  get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
-  match '*path' => 'content_pages#view', via: [:get, :post] unless Rails.env.development?
 end

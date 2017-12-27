@@ -1,5 +1,4 @@
 Expertiza::Application.routes.draw do
-
   ###
   # Please insert new routes alphabetically!
   ###
@@ -15,7 +14,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :advertise_for_partner, only: [:new, :create, :edit, :update] do
+  resources :advertise_for_partner, only: %i[new create edit update] do
     collection do
       get :remove
       post ':id', action: :update
@@ -55,7 +54,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :bookmarks, except: [:index, :show] do
+  resources :bookmarks, except: %i[index show] do
     collection do
       get :list
       post :save_bookmark_rating_score
@@ -77,7 +76,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, only: [:new, :create, :edit, :update] do
+  resources :course, only: %i[new create edit update] do
     collection do
       get :toggle_access
       get :copy
@@ -105,7 +104,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :grades, only: [:edit, :update] do
+  resources :grades, only: %i[edit update] do
     collection do
       get :view
       get :view_team
@@ -139,7 +138,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :invitations, only: [:new, :create] do
+  resources :invitations, only: %i[new create] do
     collection do
       get :cancel
       get :accept
@@ -196,7 +195,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :profile, only: [:edit, :update]
+  resources :profile, only: %i[edit update]
 
   resources :publishing, only: [] do
     collection do
@@ -210,7 +209,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :questionnaires, only: [:new, :create, :edit, :update] do
+  resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
       get :list
@@ -250,7 +249,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :response, only: [:new, :create, :edit, :update] do
+  resources :response, only: %i[new create edit update] do
     collection do
       get :new_feedback
       get :view
@@ -304,7 +303,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :sign_up_sheet, except: [:index, :show] do
+  resources :sign_up_sheet, except: %i[index show] do
     collection do
       get :signup
       get :delete_signup
@@ -357,7 +356,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :student_teams, only: [:create, :edit, :update] do
+  resources :student_teams, only: %i[create edit update] do
     collection do
       get :view
       get :remove_participant
@@ -382,7 +381,7 @@ Expertiza::Application.routes.draw do
 
   resources :submission_records, only: [:index]
 
-  resources :suggestion, only: [:show, :new, :create] do
+  resources :suggestion, only: %i[show new create] do
     collection do
       get :list
       post :submit
@@ -391,7 +390,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :survey_deployment, only: [:new, :create] do
+  resources :survey_deployment, only: %i[new create] do
     collection do
       get :list
       get :reminder_thread
@@ -404,7 +403,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :teams, only: [:new, :create, :edit, :update] do
+  resources :teams, only: %i[new create edit update] do
     collection do
       get :list
       # post ':id', action: :create_teams
@@ -413,13 +412,13 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :teams_users, only: [:new, :create] do
+  resources :teams_users, only: %i[new create] do
     collection do
       post :list
     end
   end
 
-  resources :tag_prompts, except: [:new, :edit]
+  resources :tag_prompts, except: %i[new edit]
   resources :track_notifications, only: [:index]
 
   resources :tree_display, only: [] do
@@ -450,13 +449,13 @@ Expertiza::Application.routes.draw do
 
   resources :user_pastebins
 
-  resources :versions, only: [:index, :show, :destroy] do
+  resources :versions, only: %i[index show destroy] do
     collection do
       get :search
       delete '', action: :destroy_all
     end
   end
-  
+
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
@@ -464,7 +463,7 @@ Expertiza::Application.routes.draw do
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')
   get ':controller(/:action(/:id))(.:format)'
-  match '*path' => 'content_pages#view', :via => [:get, :post] unless Rails.env.development?
+  match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'

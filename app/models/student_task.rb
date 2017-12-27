@@ -128,61 +128,62 @@ class StudentTask
     @students_teamed
   end
 
-  # Assignment due dates data
-  def self.get_duedate_data(assignment_id, _timeline_list)
-    @dues = DueDate.where(parent_id: assignment_id)
-    @dues.each do |dd|
-      tmp = {}
-      tmp[:label] = dd.deadline_type.name + ' Deadline'
-      tmp[:label] = tmp[:label].split.map(&:capitalize).join(' ')
-      tmp[:link] = nil
+  def self.get_due_date_data(assignment, timeline_list)
+    assignment.due_dates.each do |dd|
+      timeline = { label: (dd.deadline_type.name + ' Deadline').humanize }
       unless dd.due_at.nil?
-        tmp[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M:%S')
-        @timeline_list << tmp
+        timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
+        timeline_list << timeline
       end
     end
   end
 
-  # submitted links and file data
-  def self.get_submission_data(assignment_id, team_id, _timeline_list)
-    @submissions = SubmissionRecord.where(team_id: team_id, assignment_id: assignment_id)
-    @submissions.each do |sr|
-      tmp = {}
-      tmp[:label] = sr.operation
-      tmp[:label] = tmp[:label].split.map(&:capitalize).join(' ')
-      tmp[:updated_at] = sr.updated_at.strftime('%a, %d %b %Y %H:%M:%S')
-      unless sr.operation == 'Submit File' || sr.operation == 'Remove File'
-        tmp[:link] = sr.content
+  def self.get_submission_data(assignment, team, timeline_list)
+    SubmissionRecord.where(team_id: team.id, assignment_id: assignment.id).each do |sr|
+      timeline = {
+        label: sr.operation.humanize,
+        updated_at: sr.updated_at.strftime('%a, %d %b %Y %H:%M')
+      }
+      if sr.operation == 'Submit Hyperlink' || sr.operation == 'Remove Hyperlink'
+        timeline[:link] = sr.content
       end
-      @timeline_list << tmp
+      timeline_list << timeline
     end
   end
 
-  # assignment review data
-  def self.get_review_data(participant_id, _timeline_list)
-    @response_map = ResponseMap.where(reviewer_id: participant_id)
-    @response_map.each do |rm|
-      tmp = {}
-      @response = Response.where(map_id: rm.id)
-      next if @response[0].nil?
-      tmp[:label] = 'Round ' + @response[0].round.to_s + ' Review'
-      tmp[:label] = tmp[:label].split.map(&:capitalize).join(' ')
-      tmp[:updated_at] = @response[0].updated_at.strftime('%a, %d %b %Y %H:%M:%S')
-      tmp[:id] = @response[0].id
-      @timeline_list << tmp
+  def self.get_peer_review_data(participant, timeline_list)
+    ReviewResponseMap.where(reviewer_id: participant.id).each do |rm|
+      response = Response.where(map_id: rm.id).last
+      next if response.nil?
+      timeline = {
+        id: response.id,
+        label: ('Round ' + response.round.to_s + ' Peer Review').humanize,
+        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
+      }
+      timeline_list << timeline
+    end
+  end
+
+  def self.get_author_feedback_data(participant, timeline_list)
+    FeedbackResponseMap.where(reviewer_id: participant.id).each do |rm|
+      response = Response.where(map_id: rm.id).last
+      next if response.nil?
+      timeline = {
+        id: response.id,
+        label: 'Author feedback',
+        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
+      }
+      timeline_list << timeline
     end
   end
 
   # static method for the building timeline data
-  def self.get_timeline_data(assignment_id, participant_id, team_id)
-    @timeline_list = []
-    # Assignment duedate datapoints
-    get_duedate_data(assignment_id, @timeline_list)
-    # Studnet's link and file submissions datapoints
-    get_submission_data(assignment_id, team_id, @timeline_list)
-    # Student's assignment review performed datapoints
-    get_review_data(participant_id, @timeline_list)
-    # List is sorted and returned
-    @timeline_list.sort_by {|f| Time.zone.parse f[:updated_at] }
+  def self.get_timeline_data(assignment, participant, team)
+    timeline_list = []
+    get_due_date_data(assignment, timeline_list)
+    get_submission_data(assignment, team, timeline_list)
+    get_peer_review_data(participant, timeline_list)
+    get_author_feedback_data(participant, timeline_list)
+    timeline_list.sort_by {|f| Time.zone.parse f[:updated_at] }
   end
 end

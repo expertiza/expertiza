@@ -30,7 +30,7 @@ gem 'jquery-datetimepicker-rails'
 gem 'json', '~> 1.8', '>= 1.8.3'
 gem 'lingua'
 gem 'mysql2'
-gem 'nokogiri', '~> 1.6.8'
+gem 'nokogiri', '~> 1.8'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
@@ -79,7 +79,7 @@ group :test do
   gem 'guard-rspec'
   gem "factory_girl_rails", "~> 4.0"
   gem 'launchy'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 3.6'
   gem 'shoulda'
 end
 

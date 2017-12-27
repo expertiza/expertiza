@@ -36,12 +36,11 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
   # Using xvfb to Run Tests That Require a GUI (https://docs.travis-ci.com/user/gui-and-headless-browsers/)
-  # - "export DISPLAY=:99.0"
-  # - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
-  # - sleep 3 # give xvfb some time to start
+  - "export DISPLAY=:99.0"
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
+  - sleep 3 # give xvfb some time to start
 script:
-  # - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake 2> /dev/null"
-  - bundle exec rspec
+  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake 2> /dev/null"
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 services:

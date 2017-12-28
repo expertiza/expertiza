@@ -28,10 +28,8 @@ module StudentTaskHelper
 
 
   def populate_visjs_elements
-
     current_folder = DisplayOption.new
     current_folder.name = ""
-
     @href_arr= Array.new
     #<!-- @href_arr is used to store all the hyperlinks for each visualized object -->
     @duedates = DueDate.where("parent_id = #{@assignment.id}")
@@ -44,8 +42,7 @@ module StudentTaskHelper
       end
     end
 
-
-    #<!-- display only if submissions are made-->
+    # <!-- display only if submissions are made-->
     unless @team.nil?
       @submissions = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"
 
@@ -93,9 +90,7 @@ module StudentTaskHelper
             end
             unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
               @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-              puts @topic_name
               @topic_name="#{@topic_name}".gsub("'", %q()) #look for single quotes in topic names and remove them as they will interfere with JS parser
-              puts @topic_name
               { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "review", :content => "Peer Review - Round "+response_value_iterator.round.to_s+"<split> Review for: #{@topic_name}"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
             end
           elsif review_mapping_iterator.type=="SelfReviewResponseMap"
@@ -106,7 +101,6 @@ module StudentTaskHelper
           elsif review_mapping_iterator.type=="TeammateReviewResponseMap"
             unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
               reviewee = ResponseMap.where(:reviewer_id => "#{review_mapping_iterator.reviewer_id}", :id =>"#{review_mapping_iterator.id}").pluck(:reviewee_id)
-              puts reviewee.to_s+" "+review_mapping_iterator.reviewer_id.to_s+" "+review_mapping_iterator.id.to_s
               user_id = Participant.where(:id=> "#{reviewee[0]}").pluck(:user_id)
               reviewee_name = User.where(:id=>"#{user_id[0]}").pluck(:name)
               @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)

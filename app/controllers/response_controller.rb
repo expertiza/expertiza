@@ -165,6 +165,11 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+    # Call Teammate Badge
+    participant = Participant.find(@map.reviewee_id)
+    teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
+    assignment_id = participant.parent_id
+    AwardedBadge.award(participant.id,assignment_id,teammate_review_score,"GoodTeammate")
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 

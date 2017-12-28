@@ -431,6 +431,10 @@ class ReviewMappingController < ApplicationController
   end
 
   def save_grade_and_comment_for_reviewer
+    # AwardedBadges method
+    badgeName = "GoodReviewer"
+    AwardedBadge.award(params[:participant_id],params[:assignment_id],params[:grade_for_reviewer],badgeName)
+    
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
     if review_grade.nil?
       review_grade = ReviewGrade.create(participant_id: params[:participant_id])

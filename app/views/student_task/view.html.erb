@@ -1,86 +1,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
-<style type="text/css">
-  body, html, input {
-    font-family: sans-serif;
-    font-size: 12pt;
-  }
 
-  #visualization {
-    position: relative;
-  }
+<link href="custom_vis.css" rel="stylesheet" type="text/css" />
 
-  .menu {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 10px;
-    z-index: 9999;
-  }
-  .vis-timeline {
-    border: 2px solid purple;
-  //font-family:  purisa, 'comic sans', cursive;
-  //font-size: 12pt;
-    background: #ffecea;
-  }
 
-  .vis-item {
-    border-color: #F991A3;
-    background-color: cornsilk;
-  //font-size: 15pt;
-    color: purple;
-    box-shadow: 5px 5px 20px rgba(128,128,128, 0.5);
-  }
-
-  .vis-item,
-  .vis-item.vis-line {
-    border-width: 3px;
-  }
-
-  .vis-item.vis-dot {
-    border-width: 10px;
-    border-radius: 10px;
-  }
-
-  .vis-item.vis-selected, .vis-item.fileUpload.vis-selected, .vis-item.hyperlinkUpload.vis-selected, .vis-item.reviewDue.vis-selected, .vis-item.submissionDue.vis-selected, .vis-item.feedback.vis-selected, .vis-item.review.vis-selected, .vis-item.selfReview.vis-selected, .vis-item.teamReview.vis-selected  {
-    border-color: black;
-    background-color: white;
-    color : black;
-    font-size: 12pt;
-  }
-
-  .vis-time-axis .vis-text {
-    color: purple;
-    padding-top: 10px;
-    padding-left: 10px;
-  }
-
-  .vis-time-axis .vis-text.vis-major {
-    font-weight: bold;
-  }
-
-  .vis-time-axis .vis-grid.vis-minor {
-    border-width: 2px;
-    border-color: pink;
-  }
-
-  .vis-time-axis .vis-grid.vis-major {
-    border-width: 2px;
-    border-color: #F991A3;
-  }
-  .vis-item.hyperlinkUpload,.vis-item.fileUpload  {
-    background-color: springgreen;
-    border-color: green;
-  }
-  .vis-item.submissionDue,.vis-item.reviewDue {
-    background-color: lightsalmon;
-    border-color: brown;
-  }
-  .vis-item.feedback,.vis-item.review,.vis-item.selfReview,.vis-item.teamReview {
-    background-color: cornsilk;
-    border-color: indianred;
-  }
-</style>
 
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
@@ -265,26 +188,26 @@
              puts @topic_name
              { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "review", :content => "Peer Review - Round "+response_value_iterator.round.to_s+"<split> Review for: #{@topic_name}"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
            end
-         elsif review_mapping_iterator.type=="SelfReviewResponseMap"
-           unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-             @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "selfReview", :content => "Self Review - Round "+response_value_iterator.round.to_s+"<split>Self Review"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+           elsif review_mapping_iterator.type=="SelfReviewResponseMap"
+              unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
+                @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+                { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "selfReview", :content => "Self Review - Round "+response_value_iterator.round.to_s+"<split>Self Review"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+              end
+           elsif review_mapping_iterator.type=="TeammateReviewResponseMap"
+              unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
+                reviewee = ResponseMap.where(:reviewer_id => "#{review_mapping_iterator.reviewer_id}", :id =>"#{review_mapping_iterator.id}").pluck(:reviewee_id)
+                puts reviewee.to_s+" "+review_mapping_iterator.reviewer_id.to_s+" "+review_mapping_iterator.id.to_s
+                user_id = Participant.where(:id=> "#{reviewee[0]}").pluck(:user_id)
+                reviewee_name = User.where(:id=>"#{user_id[0]}").pluck(:name)
+                @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+                { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "teamReview", :content => "Team Review - Round "+response_value_iterator.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+              end
+           else
+              unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
+                @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
+                { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "feedback", :content => "Feedback - Round "+response_value_iterator.round.to_s+"<split>Feedback"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+              end
            end
-         elsif review_mapping_iterator.type=="TeammateReviewResponseMap"
-           unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-             reviewee = ResponseMap.where(:reviewer_id => "#{review_mapping_iterator.reviewer_id}", :id =>"#{review_mapping_iterator.id}").pluck(:reviewee_id)
-             puts reviewee.to_s+" "+review_mapping_iterator.reviewer_id.to_s+" "+review_mapping_iterator.id.to_s
-             user_id = Participant.where(:id=> "#{reviewee[0]}").pluck(:user_id)
-             reviewee_name = User.where(:id=>"#{user_id[0]}").pluck(:name)
-             @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "teamReview", :content => "Team Review - Round "+response_value_iterator.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
-           end
-         else
-           unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-             @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-             { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "feedback", :content => "Feedback - Round "+response_value_iterator.round.to_s+"<split>Feedback"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
-           end
-         end
        end
      end
    end %>
@@ -302,7 +225,7 @@
             visualization_JSON[i].content = temp[0]+"<br>"+temp.slice(1); //if no hyperlink is present display plain text
         else
             visualization_JSON[i].content = "<a href="+href_JSON[i]+" target='_blank'><b><u>"+temp[0]+"</u></b></a><br>"+temp.slice(1);
-        // generating hyperlink only to relevant text only
+            // generating hyperlink only to relevant text only
     }
 </script>
 <!--code for visualization-->
@@ -350,4 +273,6 @@
 
 <br>
 <br>
+
 <a href="javascript:window.history.back()">Back</a>
+

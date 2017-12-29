@@ -2,8 +2,9 @@ Expertiza
 =========
 
 [![Build Status](https://travis-ci.org/expertiza/expertiza.svg?branch=master)](https://travis-ci.org/expertiza/expertiza)
-[![Code Climate](https://codeclimate.com/github/expertiza/expertiza/badges/gpa.svg)](https://codeclimate.com/github/expertiza/expertiza)
 [![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=master)](https://coveralls.io/github/expertiza/expertiza?branch=master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/f3a41f16c2b6e45aa9d4/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f3a41f16c2b6e45aa9d4/test_coverage)](https://codeclimate.com/github/expertiza/expertiza/test_coverage)
 #### Peer review system
 
 Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.

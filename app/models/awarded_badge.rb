@@ -4,8 +4,9 @@ class AwardedBadge < ActiveRecord::Base
   
   # Called from response_controller.rb and review_mapping_controller for GoodTeammate and GoodReviewer Badges respectively
   # Also handles score updates (deleting assigned badges if no longer valid)
-  def self.award(participant_id, score, assignment_badge, badge_id)
-    if assignment_badge and score >= assignment_badge.threshold
+  def self.award(participant_id, score, assignment_badge_threshold, badge_id)
+    assignment_badge_threshold ||= 95
+    if score >= assignment_badge_threshold
       AwardedBadge.create!(participant_id: participant_id, badge_id: badge_id)
     end
   end
@@ -19,7 +20,7 @@ class AwardedBadge < ActiveRecord::Base
     review_grades = ReviewGrade.where(participant_id: participants.ids)
     assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: assignment_id)
     review_grades.each do |review_grade|
-      AwardedBadge.award(review_grade.participant_id, review_grade.grade_for_reviewer, assignment_badge, badge_id)
+      AwardedBadge.award(review_grade.participant_id, review_grade.grade_for_reviewer, assignment_badge.try(:threshold), badge_id)
     end
   end
 
@@ -30,7 +31,7 @@ class AwardedBadge < ActiveRecord::Base
     assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: assignment_id)
     participants.each do |p|
       score = AwardedBadge.get_teammate_review_score(p)
-      AwardedBadge.award(p.id, score, assignment_badge, badge_id)
+      AwardedBadge.award(p.id, score, assignment_badge.try(:threshold), badge_id)
     end
   end
 

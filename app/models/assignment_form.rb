@@ -332,8 +332,8 @@ class AssignmentForm
   def set_badge_threshold_for_assignment(assignment_id, badges)
     badge_threshold_hash = {}
     ['Good Teammate', 'Good Reviewer'].each do |badge_name|
-      badge_threshold_hash[badge_name] = badges["badge_#{badge_name}_threshold"].to_i
-      badge_threshold_hash[badge_name] = 95 if badge_threshold_hash[badge_name].zero?
+      badge_threshold_hash[badge_name] = badges["badge_#{badge_name}_threshold"].to_i if badges and badges.key?("badge_#{badge_name}_threshold")
+      badge_threshold_hash[badge_name] = 95 if badge_threshold_hash[badge_name].nil? or badge_threshold_hash[badge_name].zero?
     end
     AssignmentBadge.save_badge_populate_awarded_badges(badge_threshold_hash, assignment_id)
   end

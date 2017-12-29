@@ -25,4 +25,13 @@ module StudentTaskHelper
     return !self_review.try(:is_submitted) if self_review
     true
   end
+
+  def get_awarded_badges(participant)
+    info = ''
+    participant.awarded_badges.each do |awarded_badge|
+      badge = awarded_badge.badge
+      info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
+    end
+    info.html_safe
+  end
 end

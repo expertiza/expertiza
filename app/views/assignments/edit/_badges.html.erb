@@ -1,7 +1,21 @@
-<h3> Badges </h3>
-<ul>
-	<li>Good Reviewer Badge  : <br><img height = 'auto' width = '50px' src='/assets/badges/goodReviewer.png'/>
-	Threshold: <input type="text" name="GoodReviewerThreshold" id="GoodReviewerThresholdInput"/></li>
-	<li>Good Teammate Badge : <br><img height = 'auto' width = '50px' src='/assets/badges/goodTeammate.png'/>
-	Threshold: <input type="text" name="GoodTeammateThreshold" id="GoodTeammateThresholdInput"/></li>
-</ul>
+<table>
+  <thead>
+  <tr>
+    <th>Badge</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Threshold</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @badges.each do |badge| %>
+    <tr>
+      <td style="text-align:center"><img width = "30px" src=<%= "/assets/badges/#{badge.image_name}" %> title="<%= badge.name %>"></td>
+      <td><%= badge.name %></td>
+      <td><%= badge.description %></td>
+      <% badge_threshold =  AssignmentBadge.find_by(assignment_id: params[:id], badge_id: badge.id).threshold rescue 95 %>
+      <td><%= number_field_tag("assignment_form[badge][badge_#{badge.name}_threshold]", badge_threshold ,min: 0, max: 100, maxlength: 3, size: 3, style: 'width: 4em') %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -1,28 +1,18 @@
 <% userid << participant.user_id %>
 <tr class= "exp">
-  <td ><%= link_to User.find(participant.user_id).name, impersonate_impersonate_path(:user => {:name => User.find(participant.user_id).name}), :method => :post %></td>
-  <td ><%= link_to User.find(participant.user_id).fullname, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
-  <td>
-   <% @student_badges.each do |student_badge| %>
-      <% if student_badge[2] == participant.user_id %>
-      	<% student_badge.each do |each_badge| %>
-      		<% if (each_badge && !each_badge.is_a?(Integer)) %>
-       	 		<%= each_badge %>
-       	 	<% end %>
-       	<% end %>
-      <% end %>
-    <% end %>
-  </td>
-  <td><a href="mailto: <%= User.find(participant.user_id).email %>"><%= User.find(participant.user_id).email %></a></td>
-  <td ><%= User.find(participant.user_id).role.name %></td>
-  <td  align="center"><%= (User.find(User.find(participant.user_id).parent_id)).name %></td>
-  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_review) %></td>
-  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_submission) %></td>
-  <td align="center" ><%= User.yesorno(User.find(participant.user_id).email_on_review_of_review) %></td>
-  <td align="center" ><%= participant.can_submit == false ? 'no' : 'yes' %></td>
-  <td align="center" ><%= participant.can_review == false ? 'no' : 'yes' %></td>
-  <td align="center" ><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>
-  <td align="center" ><%= participant.handle %></td>
+  <td ><%= link_to participant.user.name, impersonate_impersonate_path(:user => {:name => participant.user.name}), :method => :post %></td>
+  <td ><%= link_to participant.user.fullname, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
+  <td><a href="mailto: <%= participant.user.email %>"><%= participant.user.email %></a></td>
+  <td><%= participant.user.role.name %></td>
+  <td align = "center"><%= (User.find(participant.user.parent_id)).name %></td>
+  <td align = "left"><%= get_awarded_badges(participant) %></td>
+  <td align = "center"><%= User.yesorno(participant.user.email_on_review) %></td>
+  <td align = "center"><%= User.yesorno(participant.user.email_on_submission) %></td>
+  <td align = "center"><%= User.yesorno(participant.user.email_on_review_of_review) %></td>
+  <td align = "center"><%= participant.can_submit == false ? 'no' : 'yes' %></td>
+  <td align = "center"><%= participant.can_review == false ? 'no' : 'yes' %></td>
+  <td align = "center"><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>
+  <td align = "center"><%= participant.handle %></td>
 
   <td align="center" ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
 

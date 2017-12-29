@@ -29,6 +29,8 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
+  has_many :assignment_badges, dependent: :destroy
+  has_many :badges, through: :assignment_badges
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review

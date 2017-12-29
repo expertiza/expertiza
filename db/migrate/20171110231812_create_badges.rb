@@ -12,6 +12,6 @@ class CreateBadges < ActiveRecord::Migration
                  image_name: 'good-reviewer.png'
     Badge.create name: 'Good Teammate',
                  description: 'This badge is awarded to students who receive very high teammate review scores.',
-                 image_name: '/good-teammate.png'
+                 image_name: 'good-teammate.png'
   end
 end

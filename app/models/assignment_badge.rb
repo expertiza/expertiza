@@ -4,45 +4,31 @@ class AssignmentBadge < ActiveRecord::Base
 
   def self.get_threshold(name, assignment_id)
     badge_id = Badge.get_id_from_name(name) 
-    b = AssignmentBadge.where("assignment_id = ? AND badge_id = ?",assignment_id,badge_id)[0]
-    b.threshold
+    AssignmentBadge.find_by(assignment_id: assignment_id, badge_id: badge_id).try(:threshold)
   end
 
-  def self.saveBadge(thresholdHash,assignment_id)
-  	if exists?(assignment_id)
-  		update(thresholdHash,assignment_id)
+  def self.save_badge_populate_awarded_badges(badge_threshold_hash, assignment_id)
+  	if AssignmentBadge.exists?(assignment_id: assignment_id)
+  		update(badge_threshold_hash, assignment_id)
   	else
-  		create(thresholdHash,assignment_id)
+  		create(badge_threshold_hash, assignment_id)
   	end
+    AwardedBadge.award_good_reviewer_badge(assignment_id)
+    AwardedBadge.award_good_teammate_badge(assignment_id)
   end
 
   # Store in the model entry with appropriate values - First time call
-  def self.create(thresholdHash,assignment_id)
-  	Badge.all.each do |badge|
-  		current_threshold = badge.name + "Threshold"	
-	  	ab = AssignmentBadge.new(:badge_id => badge.id,:assignment_id => assignment_id, :threshold => thresholdHash[current_threshold])
-	  	ab.save!
-  	end
+  def self.create(badge_threshold_hash, assignment_id)
+    badge_threshold_hash.each do |badge_name, threshold|
+      badge_id = Badge.get_id_from_name(name)
+      AssignmentBadge.create(badge_id: badge_id, assignment_id: assignment_id, threshold: threshold)
+    end
   end
 
-  def self.update(thresholdHash,assignment_id)
-  	badgeHash = {}
-  	Badge.all.each do |badge|
-  		badgeHash[badge.id] = badge.name + "Threshold"
-  	end  	
-  	@@a.each do |assignment_badge|
-  		assignment_badge.threshold = thresholdHash[badgeHash[assignment_badge.badge_id]]
-  		assignment_badge.save!
-  	end
-  end
-
-  # Check whether assignment badge with this id exists in this model
-  def self.exists?(assignment_id)
-  	@@a = AssignmentBadge.where(:assignment_id => assignment_id)
-  	if @@a.empty?
-  		false
-  	else
-  		true
-  	end
+  def self.update(badge_threshold_hash, assignment_id)
+    AssignmentBadge.where(assignment_id: assignment_id).each do |assignment_badge|
+      badge = assignment_badge.badge
+      assignment_badge.update_attributes(threshold: badge_threshold_hash[badge.name])
+    end
   end
 end

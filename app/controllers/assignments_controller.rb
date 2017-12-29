@@ -62,51 +62,17 @@ class AssignmentsController < ApplicationController
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    @badges = @assignment_form.assignment.badges
   end
 
   def update
-    assignment_id = params["assignment_form"]["assignment"]["id"]
-    if(params["GoodTeammateThreshold"].to_s != "")
-      goodTeammateThreshold = params["GoodTeammateThreshold"]
-    else
-      if(AssignmentBadge.exists?(assignment_id))
-        goodTeammateThreshold = AssignmentBadge.get_threshold("GoodTeammate",assignment_id)
-      else
-        goodTeammateThreshold = 95
-      end
-    end
-    if(params["GoodReviewerThreshold"].to_s != "")
-      goodReviewerThreshold = params["GoodReviewerThreshold"]
-    else
-      if(AssignmentBadge.exists?(assignment_id))
-        goodReviewerThreshold = AssignmentBadge.get_threshold("GoodReviewer",assignment_id)
-      else
-        goodReviewerThreshold = 95
-      end
-    end
-   
-    thresholdHash  = Hash[
-      "GoodTeammateThreshold" => goodTeammateThreshold,
-      "GoodReviewerThreshold" => goodReviewerThreshold
-    ]
-    AssignmentBadge.saveBadge(thresholdHash,assignment_id)
-    if(AssignmentBadge.exists?(assignment_id))
-      # Update entries in Awarded Badges for this assignment
-      if(params["GoodReviewerThreshold"].to_s != "")
-        AwardedBadge.updateGoodReviewerBadge(assignment_id)
-      end
-      if(params["GoodTeammateThreshold"].to_s != "")
-        AwardedBadge.updateGoodTeammateBadge(assignment_id)
-      end
-    end
- 
     unless params.key?(:assignment_form)
       assignment_form_key_nonexist_case_handler
       return
     end
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
-    feedback_assignment_form_attributes_update
+    update_feedback_assignment_form_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 
@@ -373,7 +339,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def feedback_assignment_form_attributes_update
+  def update_feedback_assignment_form_attributes
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else

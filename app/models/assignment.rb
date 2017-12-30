@@ -289,6 +289,10 @@ class Assignment < ActiveRecord::Base
     self.microtask.nil? ? false : self.microtask
   end
 
+  def has_badge?
+    self.has_badge.nil? ? false : self.has_badge
+  end
+
   # add a new participant to this assignment
   # manual addition
   # user_name - the user account name of the participant to add

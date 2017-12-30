@@ -5,7 +5,9 @@
   <td><a href="mailto: <%= participant.user.email %>"><%= participant.user.email %></a></td>
   <td><%= participant.user.role.name %></td>
   <td align = "center"><%= (User.find(participant.user.parent_id)).name %></td>
-  <td align = "left"><%= get_awarded_badges(participant) %></td>
+  <% if participant.assignment.has_badge? %>
+    <td align = "left"><%= get_awarded_badges(participant) %></td>
+  <% end %>
   <td align = "center"><%= User.yesorno(participant.user.email_on_review) %></td>
   <td align = "center"><%= User.yesorno(participant.user.email_on_submission) %></td>
   <td align = "center"><%= User.yesorno(participant.user.email_on_review_of_review) %></td>

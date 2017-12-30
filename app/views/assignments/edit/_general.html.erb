@@ -111,6 +111,15 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--Badge-->
+  <tr>
+    <td style='padding:5px' id='assignment_has_badge_field'>
+      <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
+      <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
+    </td>
+  </tr>
+
   <!--staggered_deadline-->
   <tr>
     <td style='padding:5px' id='assignment_staggered_deadline_field'>
@@ -136,22 +145,11 @@ function microtaskChanged() {
     </td>
   </tr>
 
-
   <tr>
     <td style='padding:5px' id='assignment_is_calibrated_field'>
       <input name="assignment_form[assignment][is_calibrated]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_calibrated]', 'true', @assignment_form.assignment.is_calibrated) %>
       <%= label_tag('assignment_form[assignment][is_calibrated]', 'Calibration for training?') %>
-    </td>
-
-  </tr>
-
-  <!--"available to student?" should be the last checkbox-->
-  <tr>
-    <td style='padding:5px' id='assignment_availability_flag_field'>
-      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
-      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
     </td>
   </tr>
 
@@ -177,6 +175,7 @@ function microtaskChanged() {
       <br>(Filter that refers to % text same between 2 docs)</br>
     </td>
   </tr>
+
   <!-- Start answer tagging code -->
   <tr>
     <td style='padding:5px'>
@@ -186,6 +185,15 @@ function microtaskChanged() {
     </td>
   </tr>
   <!-- End answer tagging code -->
+
+  <!--"available to student?" should be the last checkbox-->
+  <tr>
+    <td style='padding:5px' id='assignment_availability_flag_field'>
+      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
+      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
+    </td>
+  </tr>
 </table>
 
 

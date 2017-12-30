@@ -1,0 +1,32 @@
+<% if @has_team && @can_send_invitation %>
+
+    <table style="width:80%" align="center" id="table-send-request">
+      <tr style="border: 1px outset #000000; ">
+        <th class="head">Student ID</th>
+        <th class="head">Student Name</th>
+        <% if @student %>
+          <th class="head">Action</th>
+        <% end %>
+      </tr>
+
+      <% @participant_map.each { |key, participant| %>
+              <tr>
+                <td><%= participant.name %></td>
+                <td><%= participant.fullname %></td>
+                <% if @student %>
+                  <td style="padding: 5px;">
+                    <%= form_tag :controller => 'invitations', :action => 'create' do %>
+                        <%= hidden_field_tag 'team_id', @student.team.id %>
+                        <%= hidden_field_tag 'student_id', @student.id %>
+                        <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
+                        <%= hidden_field_tag 'user[name]', participant.name %>
+                        <input type='submit' value='Invite'/>
+                    <% end %>
+                  </td>
+                <% end %>
+              </tr>
+      <% } %>
+    </table>
+<% else %>
+    <p>You need to create a team to see who all are available to send invites or create advertisements.</p><br>
+<% end %>

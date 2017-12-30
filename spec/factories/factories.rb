@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :institution, class: Institution do
     name 'North Carolina State University'
   end
@@ -164,6 +164,7 @@ FactoryGirl.define do
     num_reviews_allowed 3
     num_metareviews_allowed 3
     is_calibrated false
+    has_badge false
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -392,5 +393,22 @@ FactoryGirl.define do
     email 'requester1@test.com'
     status 'Under Review'
     self_introduction 'no one'
+  end
+
+  factory :badge, class: Badge do
+    name 'Good Reviewer'
+    description 'description'
+    image_name 'good-reviewer.png'
+  end
+
+  factory :assignment_badge, class: AssignmentBadge do
+    badge { Badge.first || association(:badge) }
+    assignment { Assignment.first || association(:assignment) }
+    threshold 95
+  end
+  
+  factory :awarded_badge, class: AwardedBadge do
+    badge { Badge.first || association(:badge) }
+    participant { AssignmentParticipant.first || association(:participant) }
   end
 end

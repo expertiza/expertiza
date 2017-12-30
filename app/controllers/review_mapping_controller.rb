@@ -431,10 +431,6 @@ class ReviewMappingController < ApplicationController
   end
 
   def save_grade_and_comment_for_reviewer
-    # AwardedBadges method
-    badgeName = "GoodReviewer"
-    AwardedBadge.award(params[:participant_id],params[:assignment_id],params[:grade_for_reviewer],badgeName)
-    
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
     if review_grade.nil?
       review_grade = ReviewGrade.create(participant_id: params[:participant_id])
@@ -445,6 +441,13 @@ class ReviewMappingController < ApplicationController
     review_grade.reviewer_id = session[:user].id
     begin
       review_grade.save
+      # Award Good Reviewer Badge
+      assignment = Assignment.find_by(id: params[:assignment_id])
+      if assignment.has_badge?
+        badge_id = Badge.get_id_from_name('Good Reviewer')
+        assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: params[:assignment_id])
+        AwardedBadge.award(params[:participant_id], params[:grade_for_reviewer], assignment_badge.try(:threshold), badge_id)
+      end
     rescue
       flash[:error] = $ERROR_INFO
     end

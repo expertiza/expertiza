@@ -6,8 +6,8 @@ class AwardedBadge < ActiveRecord::Base
   # Also handles score updates (deleting assigned badges if no longer valid)
   def self.award(participant_id, score, assignment_badge_threshold, badge_id)
     assignment_badge_threshold ||= 95
-    if score >= assignment_badge_threshold
-      AwardedBadge.create!(participant_id: participant_id, badge_id: badge_id)
+    if score and score >= assignment_badge_threshold
+      AwardedBadge.create(participant_id: participant_id, badge_id: badge_id)
     end
   end
 
@@ -37,7 +37,7 @@ class AwardedBadge < ActiveRecord::Base
 
   def self.get_teammate_review_score(participant) 
     score = 0.0
-    return score if participant.team.nil?
+    return score if participant.nil? or participant.team.nil?
     teammate_reviews = participant.teammate_reviews
     return score if teammate_reviews.size == 0
     teammate_reviews.each do |teammate_review|

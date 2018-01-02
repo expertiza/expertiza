@@ -1,5 +1,5 @@
 class JoinTeamRequestsController < ApplicationController
-  before_action :check_team, only: [:create]
+  before_action :check_team_status, only: [:create]
   before_action :find_request, only: [:show, :edit, :update, :destroy, :decline]
 
   def action_allowed?
@@ -73,13 +73,11 @@ class JoinTeamRequestsController < ApplicationController
 
   private
 
-  def check_team
+  def check_team_status
     # check if the advertisement is from a team member and if so disallow requesting invitations
     team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
     team = Team.find(params[:team_id])
-
     return flash[:error] = "This team is full." if team.full?
-
     return flash[:error] = "You are already a member of this team." unless team_member.empty?
   end
 

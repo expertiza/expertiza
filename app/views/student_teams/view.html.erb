@@ -11,7 +11,7 @@
   <% end %>
 <% else %>
   <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
-  <%= link_to "Edit name", edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>
+    <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   <br/><br/>
   <b>Team members</b>
   <br/><br/>

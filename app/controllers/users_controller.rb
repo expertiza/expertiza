@@ -43,28 +43,16 @@ class UsersController < ApplicationController
 
   #
   # for anonymized view for demo purposes
-  # three scenarios:
-  # 1) when current user is anonymized view starter. change to anonymized view. 
-  #    (no session[:super_user], and current session_id == anonymized view starter session_id)
-  # 2) when current user is impersonated by anonymized view starter. change to anonymized view. 
-  #    (have session[:super_user], and current session_id != anonymized view starter session_id)
-  # 3) Other users. do not change to anonymized view. 
-  #    (no session[:super_user], and current session_id != anonymized view starter session_id)
   #
   def set_anonymized_view
-    anonymized_view = $redis.get('anonymized_view') || 'false'
-    anonymized_view_starter = $redis.get('anonymized_view_starter') || ''
-    anonymized_view = case anonymized_view
-                     when 'true'
-                      anonymized_view_starter = ''
-                      'false'
-                     when 'false'
-                       anonymized_view_starter += session[:user][:name]
-                       'true'
-                     end
-    $redis.set('anonymized_view', anonymized_view)
-    $redis.set('anonymized_view_starter', anonymized_view_starter)
-    $redis.set('anonymized_view_starter_session_id', session.id)
+    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
+    session[:ip] = request.remote_ip
+    if anonymized_view_starter_ips.include? session[:ip]
+      anonymized_view_starter_ips.delete!(" #{session[:ip]}")
+    else
+      anonymized_view_starter_ips += " #{session[:ip]}"
+    end
+    $redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
     redirect_to :back
   end
 

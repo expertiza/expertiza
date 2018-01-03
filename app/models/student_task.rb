@@ -100,7 +100,7 @@ class StudentTask
 
   delegate :topic, to: :participant
 
-  def self.teamed_students(user)
+  def self.teamed_students(user, ip_address = nil)
     @students_teamed = {} # {|h,k| h[k] = Hash.new(&h.default_proc)}
     @teammates = []
     @teams = user.teams
@@ -115,7 +115,7 @@ class StudentTask
       @team_participants = @team_participants.select {|participant| participant.name != user.name }
       @team_participants.each do |t|
         u = User.find(t.user_id)
-        @teammates << u.fullname
+        @teammates << u.fullname(ip_address)
       end
       next if @teammates.empty?
       if @students_teamed[@course_id].nil?

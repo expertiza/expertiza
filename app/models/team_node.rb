@@ -12,7 +12,7 @@ class TeamNode < Node
     nodes.where("teams.parent_id = ?", parent_id) if parent_id
   end
 
-  def get_name
+  def get_name(ip_address = nil)
     Team.find(self.node_object_id).name
   end
 

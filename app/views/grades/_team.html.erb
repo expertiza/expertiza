@@ -6,7 +6,7 @@
     <%= tscore[:team].name + ' ('+SignUpTopic.find(topic_id).topic_identifier+')' %>
   <% else %>
     <% if @assignment.max_team_size == 1 %>
-      <%= tscore[:team].users.first.name + ' (' + tscore[:team].users.first.fullname + ')' rescue '' %>
+      <%= tscore[:team].users.first.name(session[:ip]) + ' (' + tscore[:team].users.first.fullname(session[:ip]) + ')' rescue '' %>
     <% else %>
       <%= tscore[:team].name %>
     <% end %>

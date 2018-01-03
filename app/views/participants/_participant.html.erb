@@ -1,10 +1,10 @@
 <% userid << participant.user_id %>
 <tr class= "exp">
-  <td ><%= link_to participant.user.name, impersonate_impersonate_path(:user => {:name => participant.user.name}), :method => :post %></td>
-  <td ><%= link_to participant.user.fullname, :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
-  <td><a href="mailto: <%= participant.user.email %>"><%= participant.user.email %></a></td>
+  <td ><%= link_to participant.user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => participant.user.name(session[:ip])}), :method => :post %></td>
+  <td ><%= link_to participant.user.fullname(session[:ip]), :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
+  <td><a href="mailto: <%= participant.user.email(session[:ip]) %>"><%= participant.user.email(session[:ip]) %></a></td>
   <td><%= participant.user.role.name %></td>
-  <td align = "center"><%= (User.find(participant.user.parent_id)).name %></td>
+  <td align = "center"><%= (User.find(participant.user.parent_id)).name(session[:ip]) %></td>
   <% if participant.assignment.has_badge? %>
     <td align = "left"><%= get_awarded_badges(participant) %></td>
   <% end %>
@@ -14,7 +14,7 @@
   <td align = "center"><%= participant.can_submit == false ? 'no' : 'yes' %></td>
   <td align = "center"><%= participant.can_review == false ? 'no' : 'yes' %></td>
   <td align = "center"><%= participant.can_take_quiz == false ? 'no' : 'yes' %></td>
-  <td align = "center"><%= participant.handle %></td>
+  <td align = "center"><%= participant.handle(session[:ip]) %></td>
 
   <td align="center" ><%= link_to 'Remove', {:controller => controller, :action => 'destroy', :id => participant.id}, :method => :delete %></td>
 

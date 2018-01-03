@@ -474,7 +474,7 @@ development:
         parent:
         parent_id: 37
         site_controller_id: 35
-        url: "/users/set_anonymous_mode"
+        url: "/users/set_anonymized_view"
       51: &25 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 112
@@ -1459,7 +1459,7 @@ production:
         parent:
         parent_id: 37
         site_controller_id: 35
-        url: "/users/set_anonymous_mode"
+        url: "/users/set_anonymized_view"
       51: &25 !ruby/object:Menu::Node
        content_page_id:
        controller_action_id: 112

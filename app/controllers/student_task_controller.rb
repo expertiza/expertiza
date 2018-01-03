@@ -16,7 +16,7 @@ class StudentTaskController < ApplicationController
     @taskrevisions = @student_tasks.select(&:revision?)
 
     ######## Students Teamed With###################
-    @students_teamed_with = StudentTask.teamed_students current_user
+    @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip])
   end
 
   def view

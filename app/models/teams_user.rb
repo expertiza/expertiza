@@ -5,8 +5,8 @@ class TeamsUser < ActiveRecord::Base
   has_paper_trail
   attr_accessible :user_id, :team_id
 
-  def name
-    self.user.name
+  def name(ip_address = nil)
+    self.user.name(ip_address)
   end
 
   def delete

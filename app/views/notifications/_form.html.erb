@@ -12,6 +12,9 @@
   <% end %>
 
   <div class="field">
+    <%= f.select :course_id, course_options(session[:user]) %>
+  </div>
+  <div class="field">
     <%= f.label :subject %><br>
     <%= f.text_field :subject %>
   </div>

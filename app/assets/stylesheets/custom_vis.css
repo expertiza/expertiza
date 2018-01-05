@@ -1,0 +1,81 @@
+
+body, html, input {
+  font-family: sans-serif;
+  font-size: 12pt;
+}
+
+#visualization {
+    position: relative;
+}
+
+.menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px;
+    z-index: 9999;
+}
+
+.vis-timeline {
+    border: 2px solid purple ;
+//font-family:  purisa, 'comic sans', cursive;
+//font-size: 12pt;
+    background: #ffecea;
+}
+
+.vis-item {
+    border-color: #F991A3;
+    background-color: cornsilk;
+//font-size: 15pt;
+    color: purple;
+    box-shadow: 5px 5px 20px rgba(128,128,128, 0.5);
+}
+
+.vis-item,
+.vis-item.vis-line {
+    border-width: 3px;
+}
+
+.vis-item.vis-dot {
+    border-width: 10px;
+    border-radius: 10px;
+}
+
+.vis-item.vis-selected, .vis-item.fileUpload.vis-selected, .vis-item.hyperlinkUpload.vis-selected, .vis-item.reviewDue.vis-selected, .vis-item.submissionDue.vis-selected, .vis-item.feedback.vis-selected, .vis-item.review.vis-selected, .vis-item.selfReview.vis-selected, .vis-item.teamReview.vis-selected  {
+    border-color: black;
+    background-color: white;
+    color : black;
+    font-size: 12pt;
+}
+
+.vis-time-axis .vis-text {
+    color: purple;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+
+.vis-time-axis .vis-text.vis-major {
+    font-weight: bold;
+}
+
+.vis-time-axis .vis-grid.vis-minor {
+    border-width: 2px;
+    border-color: pink;
+}
+
+.vis-time-axis .vis-grid.vis-major {
+    border-width: 2px;
+    border-color: #F991A3;
+}
+.vis-item.hyperlinkUpload,.vis-item.fileUpload  {
+    background-color: springgreen;
+    border-color: green;
+}
+.vis-item.submissionDue,.vis-item.reviewDue {
+    background-color: lightsalmon;
+    border-color: brown;
+}
+.vis-item.feedback,.vis-item.review,.vis-item.selfReview,.vis-item.teamReview {
+    background-color: cornsilk;
+    border-color: indianred;
+}

@@ -83,7 +83,8 @@ module StudentTaskHelper
 
   def check_for_reviews
     # <!-- Reviews not yet started -->
-    unless @review_mappings.nil?
+    if @review_mappings
+
       @review_mappings.each do |review_mapping_iterator|
         @response_values = Response.where(:map_id => review_mapping_iterator.id)
         @visualization_data += @response_values.map do |response_value_iterator|

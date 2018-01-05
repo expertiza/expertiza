@@ -62,6 +62,7 @@ class AssignmentsController < ApplicationController
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    @badges = @assignment_form.assignment.badges
   end
 
   def update
@@ -71,7 +72,7 @@ class AssignmentsController < ApplicationController
     end
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
-    feedback_assignment_form_attributes_update
+    update_feedback_assignment_form_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 
@@ -338,7 +339,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def feedback_assignment_form_attributes_update
+  def update_feedback_assignment_form_attributes
     if @assignment_form.update_attributes(assignment_form_params, current_user)
       flash[:note] = 'The assignment was successfully saved....'
     else

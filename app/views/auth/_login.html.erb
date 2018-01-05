@@ -12,7 +12,7 @@
     <%= form_for :impersonate, url: '/impersonate/impersonate' do |f| %>
       <table>
         <tr>
-          <td>User: <%= current_user.name %></td>
+          <td>User: <%= current_user.name(session[:ip]) %></td>
         </tr>
 
         <tr><td><%= f.text_field :name, size: 12,
@@ -25,7 +25,7 @@
     <%= form_tag :controller => 'auth', :action => 'logout' do %>
       <table>
         <tr>
-          <td>User: <%= current_user.name %></td>
+          <td>User: <%= current_user.name(session[:ip]) %></td>
         </tr>
 
         <tr><td><%= submit_tag "Logout", id: 'logout-button' %></td></tr>

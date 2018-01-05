@@ -126,7 +126,7 @@ class TreeDisplayController < ApplicationController
   def update_instructor(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
     tmp_object["instructor"] = nil
-    tmp_object["instructor"] = User.find(instructor_id).name if instructor_id
+    tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
   end
 
   def update_tmp_obj(tmp_object, node)

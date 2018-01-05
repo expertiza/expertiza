@@ -6,8 +6,8 @@ class TeamUserNode < Node
     "teams_users"
   end
 
-  def get_name
-    TeamsUser.find(self.node_object_id).name
+  def get_name(ip_address = nil)
+    TeamsUser.find(self.node_object_id).name(ip_address)
   end
 
   def self.get(parent_id)

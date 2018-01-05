@@ -3,7 +3,7 @@ class Questionnaire < ActiveRecord::Base
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
   has_many :questions, dependent: :destroy # the collection of questions associated with this Questionnaire
   belongs_to :instructor # the creator of this questionnaire
-  has_many :assignment_questionnaires, class_name: 'AssignmentQuestionnaire', foreign_key: 'questionnaire_id', dependent: :destroy
+  has_many :assignment_questionnaires, dependent: :destroy
   has_many :assignments, through: :assignment_questionnaires
   has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy
 

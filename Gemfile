@@ -49,7 +49,7 @@ gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet', '0.1.3'
-gem 'sass-rails', '5.0.3'
+gem 'sass-rails'
 gem 'scrypt'
 gem 'seer'
 gem 'sprockets'
@@ -74,7 +74,7 @@ end
 
 group :test do
   gem 'database_cleaner'
-  gem "factory_girl_rails", "~> 4.0"
+  gem "factory_bot_rails"
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'

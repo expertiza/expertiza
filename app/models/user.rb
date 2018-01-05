@@ -14,6 +14,7 @@ class User < ActiveRecord::Base
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
+  has_many :track_notifications, dependent: :destroy
   belongs_to :parent, class_name: 'User'
   belongs_to :role
   validates_presence_of :name
@@ -88,53 +89,27 @@ class User < ActiveRecord::Base
     user_list.uniq
   end
 
-  #
-  # Zhewei: for anonymized view for demo purposes - 11/15/2017
-  # Four scenarios: (implemented as anonymized_view? method in user.rb and participant.rb )
-  # 1) when current user is anonymized view starter. change to anonymized view. 
-  #    (no session[:super_user], and current session_id == anonymized view starter session_id)
-  # 2) when current user is anonymized view starter, and display other users on the view. change to anonymized view. 
-  #    (no session[:super_user], and no current session_id, since other users do not login)
-  # 3) when current user is impersonated by anonymized view starter. change to anonymized view. 
-  #    (have session[:super_user], and super_user is anonymized_view_starter)
-  # 4) Other users. do not change to anonymized view. 
-  #    (no session[:super_user], and current session_id != anonymized view starter session_id)
-  #
-  def anonymized_view?
-    return false unless self and self.parent
-    curr_name = self[:name]
-    parent_name = self.try(:parent).try(:[], :name)
-    anonymized_view = $redis.get('anonymized_view')
-    anonymized_view_starter = $redis.get('anonymized_view_starter')
-    starter_session_id = $redis.get('anonymized_view_starter_session_id')
-    current_user_session_id = $redis.get("#{curr_name}_session_id")
-    session_data = Session.find_by(session_id: starter_session_id).try(:data)
-    if session_data
-      super_user = session_data['super_user']
-      return true if anonymized_view and anonymized_view == 'true' and anonymized_view_starter and 
-        ((super_user.nil? and current_user_session_id == starter_session_id) or # scenario 1
-         (super_user.nil? and current_user_session_id.nil? and $redis.get("#{parent_name}_session_id") == starter_session_id) or # scenario 2
-         (super_user and super_user[:name] == anonymized_view_starter)) # scenario 3
-      return false if super_user.nil? and current_user_session_id != starter_session_id # scenario 4
-    else
-      false
-    end
+  # Zhewei: anonymized view for demo purposes - 1/3/2018
+  def self.anonymized_view?(ip_address = nil)
+    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
+    return true if ip_address and anonymized_view_starter_ips.include? ip_address
+    return false
   end
 
-  def name
-    anonymized_view? ? self.role.name + ' ' + self.id.to_s : self[:name]
+  def name(ip_address = nil)
+    User.anonymized_view?(ip_address) ? self.role.name + ' ' + self.id.to_s : self[:name]
   end
 
-  def fullname
-    anonymized_view? ? self.role.name + ', ' + self.id.to_s : self[:fullname]
+  def fullname(ip_address = nil)
+    User.anonymized_view?(ip_address) ? self.role.name + ', ' + self.id.to_s : self[:fullname]
   end
 
-  def first_name
-    anonymized_view? ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+  def first_name(ip_address = nil)
+    User.anonymized_view?(ip_address) ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
-  def email
-    anonymized_view? ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
+  def email(ip_address = nil)
+    User.anonymized_view?(ip_address) ? self.role.name + '_' + self.id.to_s + '@mailinator.com' : self[:email]
   end
 
   def super_admin?

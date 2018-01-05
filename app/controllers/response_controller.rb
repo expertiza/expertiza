@@ -165,6 +165,14 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
+    # Award Good Teammate Badge
+    if @map.assignment.has_badge? and @map.is_a? TeammateReviewResponseMap
+      participant = Participant.find_by(id: @map.reviewee_id)
+      teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
+      badge_id = Badge.get_id_from_name('Good Teammate')
+      assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
+      AwardedBadge.award(participant.id, teammate_review_score, assignment_badge.try(:threshold), badge_id)
+    end
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 

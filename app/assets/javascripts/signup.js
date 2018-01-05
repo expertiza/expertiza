@@ -20,6 +20,31 @@ function toggleTeamsAndMembers(numTeams) {
     }
 }
 
+function showHideTeamMembersInTeamsListPage(){
+    var element = document.getElementById('teamsMembers');
+    var show = element.innerHTML == 'Hide all team members';
+    if (show){
+        element.innerHTML='Show all team members';
+    }else{
+        element.innerHTML='Hide all team members';
+    }
+    toggleTeamMembersInTeamsListPage();
+}
+
+function toggleTeamMembersInTeamsListPage(){
+    var trObjs = document.getElementsByName('team member');
+    for (var i = 0; i < trObjs.length; i++) {
+      if (trObjs[i].style.display == 'none') {
+        trObjs[i].style.display = '';
+      }
+      else {
+        trObjs[i].style.display = 'none';
+      }
+    }
+    alternate('theTable');
+    return false;
+};
+
 function toggleSingleTeamAndMember(i) {
     var elem = document.getElementById(i.toString() + "_myDiv");
     if (elem.style.display == 'none') {

@@ -44,9 +44,11 @@ module StudentTaskHelper
     @visualization_data = @duedates.map do |due|
       @href_arr.push(""); # empty hyperlink as we do not provide hyperlinks for submissions/reviews
       if due.deadline_type_id.eql? 1
-        {id: due.id, start: due.due_at, className: "submissionDue", content: "Round " + (due.round.to_s) + "<split>Submission due by " + '<br>' + due.due_at.strftime("%m/%d/%Y at %I:%M %p")}
+        {id: due.id, start: due.due_at, className: "submissionDue",
+         content: "Round " + (due.round.to_s) + "<split>Submission due by " + '<br>' + due.due_at.strftime("%m/%d/%Y at %I:%M %p")}
       else
-        {id: due.id, start: due.due_at, className: "reviewDue", content: "Round " + (due.round.to_s) + "<split>Review due by " + '<br>' + due.due_at.strftime("%m/%d/%Y at %I:%M %p")}
+        {id: due.id, start: due.due_at, className: "reviewDue",
+         content: "Round " + (due.round.to_s) + "<split>Review due by " + '<br>' + due.due_at.strftime("%m/%d/%Y at %I:%M %p")}
       end
     end
     check_for_submissions
@@ -55,8 +57,8 @@ module StudentTaskHelper
   def check_for_submissions
     # <!-- display only if submissions are made-->
     unless @team.nil?
-      @submissions = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id}
-      and content NOT IN (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"
+      @submissions = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content
+      NOT IN (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"
 
       @visualization_data += @submissions.map do |submission|
         # display_directory_tree(participant, files, true).html_safe
@@ -64,17 +66,19 @@ module StudentTaskHelper
           file = submission.content
           ret = ""
           if File.exist?(file) && File.directory?(file)
-            ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', id: participant.id, "current_folder[name]" => file
+            ret += link_to File.basename(file), controller: 'submitted_content', :action => 'edit', id: participant.id, "current_folder[name]" => file
           else
             ret += "\n      "
-            ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'download', id: @participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file)
+            ret += link_to File.basename(file), controller: 'submitted_content', :action => 'download', id: @participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file)
           end
           @href_arr.push(ret.split('"')[1])
           # only file name instead of entire relative path need to be displayed on timeline. Hence we push the same in content, appending created time to it
-          {id:  submission.id, start: submission.created_at, className: "fileUpload", content: (submission.content).split('/')[-1] + '<split>' + submission.created_at.strftime("%m/%d/%Y at %I:%M %p")}
+          {id:  submission.id, start: submission.created_at, className: "fileUpload",
+           content: (submission.content).split('/')[-1] + '<split>' + submission.created_at.strftime("%m/%d/%Y at %I:%M %p")}
         else
           @href_arr.push(submission.content)
-          {id: submission.id, start: submission.created_at, className: "hyperlinkUpload", content: submission.content + '<split>' + submission.created_at.strftime("%m/%d/%Y at %I:%M %p")}
+          {id: submission.id, start: submission.created_at, className: "hyperlinkUpload",
+           content: submission.content + '<split>' + submission.created_at.strftime("%m/%d/%Y at %I:%M %p")}
         end
       end
     end
@@ -85,7 +89,7 @@ module StudentTaskHelper
     # <!-- Reviews not yet started -->
     if @review_mappings
       @review_mappings.each do |review_mapping_iterator|
-        @response_values = Response.where(:map_id => review_mapping_iterator.id)
+        @response_values = Response.where(map_id: review_mapping_iterator.id)
         @visualization_data += @response_values.map do |response_value_iterator|
           if review_mapping_iterator.type == "ReviewResponseMap"
             review_mapping = ResponseMap.find(review_mapping_iterator.reviewed_object_id)
@@ -112,9 +116,9 @@ module StudentTaskHelper
             end
           elsif review_mapping_iterator.type == "TeammateReviewResponseMap"
             unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-              reviewee = ResponseMap.where(:reviewer_id => "#{review_mapping_iterator.reviewer_id}", :id => "#{review_mapping_iterator.id}").pluck(:reviewee_id)
+              reviewee = ResponseMap.where(reviewer_id: "#{review_mapping_iterator.reviewer_id}", id: "#{review_mapping_iterator.id}").pluck(:reviewee_id)
               user_id = Participant.where(id: "#{reviewee[0]}").pluck(:user_id)
-              reviewee_name = User.where(:id => "#{user_id[0]}").pluck(:name)
+              reviewee_name = User.where(id: "#{user_id[0]}").pluck(:name)
               @href_arr.push("../response/view?id = " + response_value_iterator.id.to_s)
               {id: response_value_iterator.id, start: response_value_iterator.created_at, className: "teamReview",
                content: "Team Review - Round " + response_value_iterator.round.to_s + "<split>Team review for #{reviewee_name[0]}" + '<br>' + response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p")}

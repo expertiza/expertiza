@@ -2,7 +2,7 @@ module StudentTaskHelper
   def get_review_grade_info(participant)
     info = ''
     if participant.try(:review_grade).try(:grade_for_reviewer).nil? ||
-       participant.try(:review_grade).try(:comment_for_reviewer).nil?
+        participant.try(:review_grade).try(:comment_for_reviewer).nil?
       result = "N/A"
     else
       info = "Score: " + participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/100\n"
@@ -14,7 +14,7 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
-    return true if !assignment.topics? and assignment.get_current_stage != "submission"
+    return true if !assignment.topic? and assignment.get_current_stage != "submission"
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
     sign_up_topics.each {|topic| return true if assignment.can_review(topic.id) }
     false
@@ -26,28 +26,39 @@ module StudentTaskHelper
     true
   end
 
+  def get_awarded_badges(participant)
+    info = ''
+    participant.awarded_badges.each do |awarded_badge|
+      badge = awarded_badge.badge
+      info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
+    end
+    info.html_safe
+  end
 
   def populate_visjs_elements
     current_folder = DisplayOption.new
     current_folder.name = ""
-    @href_arr= Array.new
-    #<!-- @href_arr is used to store all the hyperlinks for each visualized object -->
+    @href_arr = Array.new
+    # <!-- @href_arr is used to store all the hyperlinks for each visualized object -->
     @duedates = DueDate.where("parent_id = #{@assignment.id}")
     @visualization_data = @duedates.map do |due|
-      @href_arr.push(""); #empty hyperlink as we do not provide hyperlinks for submissions/reviews
+      @href_arr.push(""); # empty hyperlink as we do not provide hyperlinks for submissions/reviews
       if due.deadline_type_id.eql? 1
-        { :id => due.id, :start=> due.due_at, :className => "submissionDue", :content => "Round "+(due.round.to_s)+"<split>Submission due by "+'<br>'+due.due_at.strftime("%m/%d/%Y at %I:%M %p") }
+        {:id => due.id, :start => due.due_at, :className => "submissionDue", :content => "Round " + (due.round.to_s) + "<split>Submission due by " + '<br>' + due.due_at.strftime("%m/%d/%Y at %I:%M %p")}
       else
-        { :id => due.id, :start=> due.due_at, :className => "reviewDue", :content => "Round "+(due.round.to_s)+"<split>Review due by "+'<br>'+due.due_at.strftime("%m/%d/%Y at %I:%M %p") }
+        {:id => due.id, :start => due.due_at, :className => "reviewDue", :content => "Round " + (due.round.to_s) + "<split>Review due by " + '<br>' + due.due_at.strftime("%m/%d/%Y at %I:%M %p")}
       end
     end
+    check_for_submissions
+  end
 
+  def check_for_submissions
     # <!-- display only if submissions are made-->
     unless @team.nil?
       @submissions = SubmissionRecord.find_by_sql"select * from  submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and content NOT IN (select content from submission_records where assignment_id=#{@assignment.id} and team_id=#{@team.id} and UPPER(operation) Like 'REMOVE%')"
 
       @visualization_data += @submissions.map do |submission|
-        #display_directory_tree(participant, files, true).html_safe
+        # display_directory_tree(participant, files, true).html_safe
         if (submission.operation).eql?('Submit File')
           file = submission.content
           ret=""
@@ -62,17 +73,19 @@ module StudentTaskHelper
                            "current_folder[name]" => File.dirname(file)
           end
           @href_arr.push(ret.split('"')[1])
-          #only file name instead of entire relative path need to be displayed on timeline. Hence we push the same in content, appending created time to it
-          { :id => submission.id, :start=> submission.created_at, :className=> "fileUpload", :content => (submission.content).split('/')[-1]+'<split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+          # only file name instead of entire relative path need to be displayed on timeline. Hence we push the same in content, appending created time to it
+          {:id => submission.id, :start => submission.created_at, :className => "fileUpload", :content => (submission.content).split('/')[-1] + '<split>' + submission.created_at.strftime("%m/%d/%Y at %I:%M %p")}
         else
           @href_arr.push(submission.content)
-          { :id => submission.id, :start=> submission.created_at, :className=> "hyperlinkUpload" ,:content => submission.content+'<split>'+submission.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+          {:id => submission.id, :start => submission.created_at, :className => "hyperlinkUpload", :content => submission.content + '<split>' + submission.created_at.strftime("%m/%d/%Y at %I:%M %p")}
         end
       end
-
     end
+    check_for_reviews
+  end
 
-    #<!-- Reviews not yet started -->
+  def check_for_reviews
+    # <!-- Reviews not yet started -->
     unless @review_mappings.nil?
       @review_mappings.each do |review_mapping_iterator|
         @response_values = Response.where(:map_id => review_mapping_iterator.id)
@@ -83,38 +96,37 @@ module StudentTaskHelper
             topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
             if !topic_id.nil?
               if SignUpTopic.find(topic_id).topic_identifier != ''
-                @topic_name=SignUpTopic.find(topic_id).topic_identifier+": "+SignUpTopic.find(topic_id).topic_name
+                @topic_name=SignUpTopic.find(topic_id).topic_identifier + ": " + SignUpTopic.find(topic_id).topic_name
               else
                 @topic_name=SignUpTopic.find(topic_id).topic_name
               end
             end
             unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-              @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-              @topic_name="#{@topic_name}".gsub("'", %q()) #look for single quotes in topic names and remove them as they will interfere with JS parser
-              { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "review", :content => "Peer Review - Round "+response_value_iterator.round.to_s+"<split> Review for: #{@topic_name}"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+              @href_arr.push("../response/view?id=" + response_value_iterator.id.to_s)
+              @topic_name="#{@topic_name}".gsub("'", %q()) # look for single quotes in topic names and remove them as they will interfere with JS parser
+              {:id => response_value_iterator.id, :start => response_value_iterator.created_at, :className => "review", :content => "Peer Review - Round " + response_value_iterator.round.to_s + "<split> Review for: #{@topic_name}" + '<br>' + response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p")}
             end
           elsif review_mapping_iterator.type=="SelfReviewResponseMap"
             unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-              @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-              { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "selfReview", :content => "Self Review - Round "+response_value_iterator.round.to_s+"<split>Self Review"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+              @href_arr.push("../response/view?id=" + response_value_iterator.id.to_s)
+              {:id => response_value_iterator.id, :start => response_value_iterator.created_at, :className => "selfReview", :content => "Self Review - Round " + response_value_iterator.round.to_s + "<split>Self Review" + '<br>' + response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p")}
             end
           elsif review_mapping_iterator.type=="TeammateReviewResponseMap"
             unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-              reviewee = ResponseMap.where(:reviewer_id => "#{review_mapping_iterator.reviewer_id}", :id =>"#{review_mapping_iterator.id}").pluck(:reviewee_id)
-              user_id = Participant.where(:id=> "#{reviewee[0]}").pluck(:user_id)
-              reviewee_name = User.where(:id=>"#{user_id[0]}").pluck(:name)
-              @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-              { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "teamReview", :content => "Team Review - Round "+response_value_iterator.round.to_s+"<split>Team review for #{reviewee_name[0]}"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+              reviewee = ResponseMap.where(:reviewer_id => "#{review_mapping_iterator.reviewer_id}", :id => "#{review_mapping_iterator.id}").pluck(:reviewee_id)
+              user_id = Participant.where(:id => "#{reviewee[0]}").pluck(:user_id)
+              reviewee_name = User.where(:id => "#{user_id[0]}").pluck(:name)
+              @href_arr.push("../response/view?id = " + response_value_iterator.id.to_s)
+              {:id => response_value_iterator.id, :start => response_value_iterator.created_at, :className => "teamReview", :content => "Team Review - Round " + response_value_iterator.round.to_s + "<split>Team review for #{reviewee_name[0]}" + '<br>' + response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p")}
             end
           else
             unless response_value_iterator.nil? and response_value_iterator.is_submitted.zero?
-              @href_arr.push("../response/view?id="+response_value_iterator.id.to_s)
-              { :id => response_value_iterator.id, :start=> response_value_iterator.created_at, :className => "feedback", :content => "Feedback - Round "+response_value_iterator.round.to_s+"<split>Feedback"+'<br>'+response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p") }
+              @href_arr.push("../response/view?id = " + response_value_iterator.id.to_s)
+              {:id => response_value_iterator.id, :start => response_value_iterator.created_at, :className => "feedback", :content => "Feedback - Round " + response_value_iterator.round.to_s + "<split>Feedback" + '<br>' + response_value_iterator.created_at.strftime("%m/%d/%Y at %I:%M %p")}
             end
           end
         end
       end
     end
   end
-
 end

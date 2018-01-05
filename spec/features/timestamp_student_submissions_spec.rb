@@ -23,25 +23,25 @@ describe 'timestamps for student submissions' do
   end
 
   it 'displays submitted hyperlink along with timestamp' do
-    #submit a generic link for this assignment
+    # submit a generic link for this assignment
     click_link "E1797-Test"
     click_link "Your work"
     fill_in "submission", with: "http://www.google.com"
     click_button "Upload link"
-    #expect the same link to be present in our graph
+    # expect the same link to be present in our graph
     click_link "Back"
     page.html.should include('https://www.google.com')
   end
 
   it 'displays submitted file along with timestamp' do
-    #submit a generic file for this assignment
+    # submit a generic file for this assignment
     click_link "E1797-Test"
     click_link "Your work"
-    file_path = Rails.root + "spec/features/timestamp_students_submissions_spec.rb"
+    file_path = Rails.root + "app/views/student_task/view.html.erb"
     attach_file('uploaded_file', file_path)
     click_on 'Upload file'
-    #expect the same file to be present in our graph
+    # expect the same file to be present in our graph
     click_link "Back"
-    page.html.should include('timestamp_students_submissions_spec.rb')
+    page.html.should include('view.html.erb')
   end
 end

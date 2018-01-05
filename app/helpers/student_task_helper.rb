@@ -66,10 +66,10 @@ module StudentTaskHelper
           file = submission.content
           ret = ""
           if File.exist?(file) && File.directory?(file)
-            ret += link_to File.basename(file), controller: 'submitted_content', :action => 'edit', id: participant.id, "current_folder[name]" => file
+            ret += link_to File.basename(file), controller: 'submitted_content', action: 'edit', id: participant.id, "current_folder[name]" => file
           else
             ret += "\n      "
-            ret += link_to File.basename(file), controller: 'submitted_content', :action => 'download', id: @participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file)
+            ret += link_to File.basename(file), controller: 'submitted_content', action: 'download', id: @participant.id, download: File.basename(file), "current_folder[name]" => File.dirname(file)
           end
           @href_arr.push(ret.split('"')[1])
           # only file name instead of entire relative path need to be displayed on timeline. Hence we push the same in content, appending created time to it

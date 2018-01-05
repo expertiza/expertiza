@@ -34,7 +34,6 @@ module StudentTaskHelper
     end
     info.html_safe
   end
-<<<<<<< HEAD
 
   def populate_visjs_elements
     current_folder = DisplayOption.new
@@ -130,6 +129,4 @@ module StudentTaskHelper
       end
     end
   end
-=======
 end
->>>>>>> 17f321bb9a2c5dda2b40b5271b4fc4e07f72853b

@@ -1,4 +1,8 @@
-FactoryGirl.define do
+FactoryBot.define do
+  factory :institution, class: Institution do
+    name 'North Carolina State University'
+  end
+
   factory :role_of_administrator, class: Role do
     name 'Administrator'
     parent_id nil
@@ -160,6 +164,7 @@ FactoryGirl.define do
     num_reviews_allowed 3
     num_metareviews_allowed 3
     is_calibrated false
+    has_badge false
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -317,6 +322,7 @@ FactoryGirl.define do
     type 'ReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
+  
   end
 
   factory :question, class: Criterion do
@@ -349,8 +355,8 @@ FactoryGirl.define do
 
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
-    reviewer_id 1
     type 'ReviewResponseMap'
     calibrate_to 0
   end
@@ -377,5 +383,32 @@ FactoryGirl.define do
     user 'student1234'
     content 'www.wolfware.edu'
     created_at Time.now
+  end
+
+  factory :requested_user, class: RequestedUser do
+    name 'requester1'
+    role_id 2
+    fullname 'requester, requester'
+    institution_id 1
+    email 'requester1@test.com'
+    status 'Under Review'
+    self_introduction 'no one'
+  end
+
+  factory :badge, class: Badge do
+    name 'Good Reviewer'
+    description 'description'
+    image_name 'good-reviewer.png'
+  end
+
+  factory :assignment_badge, class: AssignmentBadge do
+    badge { Badge.first || association(:badge) }
+    assignment { Assignment.first || association(:assignment) }
+    threshold 95
+  end
+  
+  factory :awarded_badge, class: AwardedBadge do
+    badge { Badge.first || association(:badge) }
+    participant { AssignmentParticipant.first || association(:participant) }
   end
 end

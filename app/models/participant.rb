@@ -7,6 +7,7 @@ class Participant < ActiveRecord::Base
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
+  has_many :awarded_badges
   has_one :review_grade
 
   PARTICIPANT_TYPES = %w(Course Assignment).freeze
@@ -33,16 +34,16 @@ class Participant < ActiveRecord::Base
     assignment.stage_deadline topic_id
   end
 
-  def name
-    self.user.name
+  def name(ip_address = nil)
+    self.user.name(ip_address)
   end
 
-  def fullname
-    self.user.fullname
+  def fullname(ip_address = nil)
+    self.user.fullname(ip_address)
   end
 
-  def handle
-    $redis.get('anonymous_mode') == 'true' ? 'handle' : self[:handle]
+  def handle(ip_address = nil)
+    User.anonymized_view?(ip_address) ? 'handle' : self[:handle]
   end
 
   def delete(force = nil)

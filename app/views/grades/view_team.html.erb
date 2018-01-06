@@ -1,31 +1,47 @@
-<style>
-th.tablesorter-headerAsc{
-  background-image: url(<%= asset_path("up-arrow.png") %>);
-  background-size: 15px 15px;
-  background-repeat: no-repeat;
-  background-position: center right;
-  padding-right: 15px;
-}
-
-th.tablesorter-headerDesc{
-  background-image: url(<%= asset_path("down-arrow.png") %>);
-  background-size: 15px 15px;
-  background-repeat: no-repeat;
-  background-position: center right;
-  padding-right: 15px;
-}
-
-th.sorter-true.tablesorter-headerUnSorted{
-  background-image: url(<%= asset_path("sort.png") %>);
-  background-size: 15px 7px;
-  background-repeat: no-repeat;
-  background-position: center right;
-  padding-right: 15px;
-}
-</style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
+<script type="text/javascript">
+  toggle_tag_prompt = function() {
+    $('.tag_prompt_container').toggle();
+  };
+
+
+  $( document ).ready(function() {
+    $('#tag_prompt_toggler').click(function () {
+      if ($('#tag_prompt_toggler').text() == "hide tags")
+        $('#tag_prompt_toggler').text("show tags")
+      else
+        $('#tag_prompt_toggler').text("hide tags")
+    });
+  });
+
+  function toggleFunction(elementId) {
+    var target = document.getElementById(elementId);
+    if (target.style.display === 'none') {
+        target.style.display = 'block';
+    } else {
+        target.style.display = 'none';
+    }
+}
+</script>
 <h1>Summary Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
+<!--Obtain topic name from assignment helper-->
+<% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
+<% if @assignment.topics? %>
+  <h5>Topic: <%= topic_id + '. ' + topic_name %></h5>
+<% end %>
+<!--Obtain only review scores-->
+<% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
+<h5>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h5>
+<!--Toggle submission-->
+<button onclick="toggleFunction('<%= @participant.id.to_s%>')">Show Submission</button>
+<div id="<%= @participant.id.to_s%>" style="display:none;">
+<% if @participant.team.hyperlinks.try(:length) %>
+  <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
+  <% else %>
+ <b>No Submission</b>
+<% end %>
+</div><br>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
@@ -62,6 +78,9 @@ th.sorter-true.tablesorter-headerUnSorted{
                 <%end %>
               </h4>
               <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+            <% if @assignment.is_answer_tagging_allowed %>
+            <span class="spn_qsttog" id="tag_prompt_toggler" title="Click to display/hide tags" onclick="toggle_tag_prompt()">hide tags</span>
+            <% end %>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
@@ -72,15 +91,14 @@ th.sorter-true.tablesorter-headerUnSorted{
             <thead>
             <tr>
               <th class="sorter-true">Criterion<span></span></th>
-              <th class="sorter-false">Max</th>
-
+            
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
                   <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
+                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                   <% end %>
                   <% i += 1 %>
@@ -105,13 +123,12 @@ th.sorter-true.tablesorter-headerUnSorted{
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                 <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
-                  <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <%= j.to_s %>   </td>
-                  <td class = 'cf' > <%= row.question_max_score %>   </td>
+                  <td class = 'cf' data-toggle="tooltip" title="<%= row.questionText %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-                        <%= score.score_value.to_s %>
+                        <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
 
@@ -146,7 +163,16 @@ th.sorter-true.tablesorter-headerUnSorted{
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td><%= row.score_row[index].comment %></td>
+                              <td>
+                                <%= row.score_row[index].comment %>
+                                <% if row.score_row[index].vm_prompts.count > 0 %>
+                                    <div id="tag_prompt_container" class="tag_prompt_container">
+                                      <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
+                                          <%= vm_tag_prompt.tag_prompt.html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
+                                      <% end %>
+                                    </div>
+                                <% end %>
+                              </td>
                             </tr>
                         <% end %>
                       </table>
@@ -204,7 +230,7 @@ th.sorter-true.tablesorter-headerUnSorted{
 <% else %>
   <%= form_tag 'save_grade_and_comment_for_submission', remote: true do %>
     <%= hidden_field_tag :participant_id, params[:id] %>
-    <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3,   placeholder: 'Grade' %><br/>
+    <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %><br/>
     <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment' %>
     <%= submit_tag 'Save' %>
   <% end %>

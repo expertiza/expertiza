@@ -25,10 +25,7 @@ th.sorter-true.tablesorter-headerUnSorted{
   background-position: center right;
   padding-right: 15px;
 }
-.underlined{
-    text-decoration: underline;
-    font-weight:bold;
-  }
+
 </style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <script type = "text/javascript" language = "javascript">
@@ -42,20 +39,17 @@ function toggleFunction(elementId) {
     }
 }
       
-      </script>
+</script>
 <h1>Review Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
 <button onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
-
-
-     <div id="<%= @type + @participant.id.to_s%>" style="display:none;">
+<div id="<%= @type + @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
   <% else %>
  <b>No Submission</b>
 <% end %>
-
-      </div><br>
+</div><br>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
@@ -109,7 +103,7 @@ function toggleFunction(elementId) {
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
                   <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname.to_s %>
+                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                   <% end %>
                   <% i += 1 %>

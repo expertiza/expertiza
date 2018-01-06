@@ -1,7 +1,7 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -25,6 +25,7 @@ class AssignmentForm
     assignment_form.assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id)
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
+    assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     assignment_form
   end
 
@@ -39,12 +40,14 @@ class AssignmentForm
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
+    set_badge_threshold_for_assignment(attributes[:assignment][:id], attributes[:badge]) if @assignment.has_badge?
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue
       add_to_delayed_queue
     end
+    update_tag_prompt_deployments(attributes[:tag_prompt_deployments])
     !@has_errors
   end
 
@@ -82,6 +85,39 @@ class AssignmentForm
     end
   end
 
+  # s required by answer tagging
+  def update_tag_prompt_deployments(attributes)
+    unless attributes.nil?
+      attributes.each do |key, value|
+        if value.key?('deleted')
+          TagPromptDeployment.where(id: value['deleted']).delete_all
+        end
+        # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
+        next unless value.key?('tag_prompt')
+        for i in 0..value['tag_prompt'].count - 1
+          tag_dep = nil
+          if !(value['id'][i] == "undefined" or value['id'][i] == "null" or value['id'][i].nil?)
+            tag_dep = TagPromptDeployment.find(value['id'][i])
+            if tag_dep
+              tag_dep.update(assignment_id: @assignment.id,
+                             questionnaire_id: key,
+                             tag_prompt_id: value['tag_prompt'][i],
+                             question_type: value['question_type'][i],
+                             answer_length_threshold: value['answer_length_threshold'][i])
+            end
+          else
+            tag_dep = TagPromptDeployment.new(assignment_id: @assignment.id,
+                                              questionnaire_id: key,
+                                              tag_prompt_id: value['tag_prompt'][i],
+                                              question_type: value['question_type'][i],
+                                              answer_length_threshold: value['answer_length_threshold'][i]).save
+          end
+        end
+      end
+    end
+  end
+  # end required by answer tagging
+
   # code to save due dates
   def update_due_dates(attributes, user)
     return false unless attributes
@@ -115,28 +151,35 @@ class AssignmentForm
     duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
-      due_at = due_date.due_at.to_s(:db)
-      Time.parse(due_at)
-      due_at = Time.parse(due_at)
-      mi = find_min_from_now(due_at)
-      diff = mi - due_date.threshold * 60
-      next unless diff > 0
-      dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, deadline_type, due_date.due_at.to_s(:db)),
-                              1, diff.minutes.from_now)
-      change_item_type(dj.id)
-      due_date.update_attribute(:delayed_job_id, dj.id)
+      diff_btw_time_left_and_threshold, min_left = get_time_diff_btw_due_date_and_now(due_date)
+      next unless diff_btw_time_left_and_threshold > 0
+      delayed_job = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
+      due_date.update_attribute(:delayed_job_id, delayed_job.id)
       # If the deadline type is review, add a delayed job to drop outstanding review
       if deadline_type == "review"
-        dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_outstanding_reviews", due_date.due_at.to_s(:db)),
-                                1, mi.minutes.from_now)
-        change_item_type(dj.id)
+        add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left)
       end
       # If the deadline type is team_formation, add a delayed job to drop one member team
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
-      dj = DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "drop_one_member_topics", due_date.due_at.to_s(:db)),
-                              1, mi.minutes.from_now)
-      change_item_type(dj.id)
+      add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left)
     end
+  end
+
+  def get_time_diff_btw_due_date_and_now(due_date)
+    due_at = due_date.due_at.to_s(:db)
+    Time.parse(due_at)
+    due_at = Time.parse(due_at)
+    time_left_in_min = find_min_from_now(due_at)
+    diff_btw_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
+    [diff_btw_time_left_and_threshold, time_left_in_min]
+  end
+
+  # add DelayedJob into queue and return it
+  def add_delayed_job(assignment, deadline_type, due_date, min_left)
+    delayed_job = DelayedJob.enqueue(DelayedMailer.new(assignment.id, deadline_type, due_date.due_at.to_s(:db)),
+                                     1, min_left.minutes.from_now)
+    change_item_type(delayed_job.id)
+    delayed_job
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
@@ -149,7 +192,7 @@ class AssignmentForm
 
   # Change the item_type displayed in the log
   def change_item_type(delayed_job_id)
-    log = Version.where(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: delayed_job_id).first
+    log = Version.find_by(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: delayed_job_id)
     log.update_attribute(:item_type, "DelayedMailer") # Change the item type in the log
   end
 
@@ -284,5 +327,14 @@ class AssignmentForm
         questionnaire_weight: aq.questionnaire_weight
       )
     end
+  end
+
+  def set_badge_threshold_for_assignment(assignment_id, badges)
+    badge_threshold_hash = {}
+    ['Good Teammate', 'Good Reviewer'].each do |badge_name|
+      badge_threshold_hash[badge_name] = badges["badge_#{badge_name}_threshold"].to_i if badges and badges.key?("badge_#{badge_name}_threshold")
+      badge_threshold_hash[badge_name] = 95 if badge_threshold_hash[badge_name].nil? or badge_threshold_hash[badge_name].zero?
+    end
+    AssignmentBadge.save_badge_populate_awarded_badges(badge_threshold_hash, assignment_id)
   end
 end

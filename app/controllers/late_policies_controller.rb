@@ -17,15 +17,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  private def instructor_id
-    late_policy.try(:instructor_id) ||
-    current_user.instructor_id
-  end
-
-  private def late_policy
-    @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
-  end
-
   # GET /late_policies
   # GET /late_policies.xml
   def index
@@ -138,5 +129,14 @@ class LatePoliciesController < ApplicationController
 
   def late_policy_params
     params.require(:late_policy).permit(:policy_name, :penalty_per_unit, :penalty_unit, :max_penalty)
+  end
+
+  def instructor_id
+    late_policy.try(:instructor_id) ||
+    current_user.instructor_id
+  end
+
+  def late_policy
+    @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
   end
 end

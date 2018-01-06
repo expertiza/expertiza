@@ -3,52 +3,44 @@ class AdvertiseForPartnerController < ApplicationController
     current_user.role.name.eql?("Student")
   end
 
-  # adds a new advertise for partners entry in team table...
-  def new
-  end
+  def new; end
 
-  # removes an entry from team table for corresponding team who requested to remove their advertisement for partner request
-  def remove
-    team = Team.find(params[:team_id])
-    team.advertise_for_partner = false
-    team.comments_for_advertisement = nil
-    team.save
-
-    assignment = Assignment.find(Team.find(params[:team_id]).parent_id)
-    participant = AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
-    redirect_to view_student_teams_path student_id: participant.id
-  end
-
-  # update the team table with newly created advertise for partner request for the corresponding team
   def create
-    team = Team.find(params[:id])
-    team.advertise_for_partner = true
-    team.comments_for_advertisement = params[:comments_for_advertisement]
-    team.save
-
-    assignment = Assignment.find(Team.find(params[:id]).parent_id)
-    participant = AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
+    team = AssignmentTeam.find_by(id: params[:id])
+    team.update_attributes(advertise_for_partner: true, comments_for_advertisement: params[:comments_for_advertisement])
+    participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: session[:user].id)
     redirect_to view_student_teams_path student_id: participant.id
   end
 
-  # update the advertisement when done with editing #####This should be edit rather than update....
+  def edit
+    @team = AssignmentTeam.find_by(id: params[:team_id])
+  end
+
   def update
-    @team = Team.find(params[:id])
-    # @team.comments_for_advertisement = params[:comments_for_advertisement]
-    Team.update(params[:id], comments_for_advertisement: params[:comments_for_advertisement])
-    assignment = Assignment.find(Team.find(params[:id]).parent_id)
-    participant = AssignmentParticipant.where(parent_id: assignment.id, user_id: session[:user].id).first
-    if @team.save
-      flash[:notice] = 'Your advertisement was successfully updated!'
-      redirect_to view_student_teams_path student_id: participant.id
-    else
+    begin
+      @team = AssignmentTeam.find_by(id: params[:id])
+      @team.update_attributes(comments_for_advertisement: params[:comments_for_advertisement])
+      participant = AssignmentParticipant.find_by(parent_id: @team.assignment.id, user_id: session[:user].id)
+    rescue StandardError
       flash[:error] = 'An error occurred and your advertisement was not updated!'
+      render action: 'edit'
+    else
+      flash[:success] = 'Your advertisement was successfully updated!'
       redirect_to view_student_teams_path student_id: participant.id
     end
   end
 
-  # find the team who wants to edit their advertisement
-  def edit
-    @team = Team.find(params[:team_id])
+  def remove
+    begin
+      team = AssignmentTeam.find_by(id: params[:team_id])
+      team.update_attributes(advertise_for_partner: false, comments_for_advertisement: nil)
+      participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: session[:user].id)
+    rescue StandardError
+      flash[:error] = 'An error occurred and your advertisement was not removed!'
+      redirect_to :back
+    else
+      flash[:success] = 'Your advertisement was successfully removed!'
+      redirect_to view_student_teams_path student_id: participant.id
+    end
   end
 end

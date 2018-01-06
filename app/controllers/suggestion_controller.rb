@@ -110,21 +110,23 @@ class SuggestionController < ApplicationController
   # If the user submits a suggestion and gets it approved -> Send email
   # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
   def send_email
-    proposer = User.find(@user_id)
-    teams_users = TeamsUser.where(team_id: @team_id)
-    cc_mail_list = []
-    teams_users.each do |teams_user|
-      cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
+    proposer = User.find_by(id: @user_id)
+    if proposer
+      teams_users = TeamsUser.where(team_id: @team_id)
+      cc_mail_list = []
+      teams_users.each do |teams_user|
+        cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
+      end
+      Mailer.suggested_topic_approved_message(
+        to: proposer.email,
+        cc: cc_mail_list,
+        subject: "Suggested topic '#{@suggestion.title}' has been approved",
+        body: {
+          approved_topic_name: @suggestion.title,
+          proposer: proposer.name
+        }
+      ).deliver_now!
     end
-    Mailer.suggested_topic_approved_message(
-      to: proposer.email,
-      cc: cc_mail_list,
-      subject: "Suggested topic '#{@suggestion.title}' has been approved",
-      body: {
-        approved_topic_name: @suggestion.title,
-        proposer: proposer.name
-      }
-    ).deliver_now!
   end
 
   def notification
@@ -188,9 +190,11 @@ class SuggestionController < ApplicationController
 
   def approve
     @suggestion = Suggestion.find(params[:id])
-    @user_id = User.where(name: @suggestion.unityID).first.id
-    @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
-    @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    @user_id = User.find_by(name: @suggestion.unityID).try(:id)
+    if @user_id
+      @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
+      @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    end
     @signuptopic = SignUpTopic.new
     @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
     @signuptopic.topic_name = @suggestion.title

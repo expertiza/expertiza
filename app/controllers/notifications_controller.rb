@@ -1,6 +1,7 @@
 class NotificationsController < ApplicationController
   before_action :set_notification, only: [:show, :edit, :update, :destroy]
-
+  helper_method :validate_params
+  include SecurityHelper
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
     ['Instructor',
@@ -35,10 +36,16 @@ class NotificationsController < ApplicationController
 
   # POST /notifications
   def create
+    if params[:notification] && (warn_for_special_chars(params[:notification][:subject], "Subject") ||
+        warn_for_special_chars(params[:notification][:description], "Description"))
+      redirect_back
+      return
+    end
     @notification = Notification.new(notification_params)
 
     if @notification.save
-      redirect_to @notification, notice: 'Notification was successfully created.'
+      redirect_to @notification
+      flash[:success] = 'Notification was successfully created.'
     else
       render :new
     end
@@ -46,12 +53,11 @@ class NotificationsController < ApplicationController
 
   # PATCH/PUT /notifications/1
   def update
-    respond_to do |format|
-      if @notification.update(notification_params)
-        format.html { redirect_to @notification, notice: 'Notification was successfully updated.' }
-      else
-        format.html { render :edit }
-      end
+    if @notification.update(notification_params)
+      redirect_to @notification
+      flash[:success] = 'Notification was successfully updated.'
+    else
+      render :edit
     end
   end
 
@@ -63,7 +69,8 @@ class NotificationsController < ApplicationController
       notification.destroy if notification.notification == @notification.id
     end
     @notification.destroy
-    redirect_to notifications_url, notice: 'Notification was successfully destroyed.'
+    redirect_to notifications_url
+    flash[:success] = 'Notification was successfully destroyed.'
   end
 
   private
@@ -75,6 +82,6 @@ class NotificationsController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def notification_params
-    params.require(:notification).permit(:subject, :description, :expiration_date, :active_flag)
+    params.require(:notification).permit(:course_id, :subject, :description, :expiration_date, :active_flag)
   end
 end

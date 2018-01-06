@@ -3,7 +3,7 @@
 
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>
-  <% if @assignment.is_microtask? %>
+  <% if @assignment.microtask? %>
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
 
@@ -18,7 +18,7 @@
   <td align="center">
   <% if SignUpSheet.has_teammate_ads?(topic.id) %>
       <%# link_to :controller => 'sign_up_sheet', :action => 'show_team', :assignment_id=>params[:id], :id=>topic.id do %>
-      <%= link_to image_tag('ad.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'sign_up_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>
+      <%= link_to image_tag('ad_horn.png', :border => 0, :title => 'Ad', :align => 'middle', :style => 'width: 24px; height:24px'), :controller=>'sign_up_sheet', :action=> 'show_team', :assignment_id=>@assignment.id, :id=>topic.id%>
   <% end %>
   </td>
 <% end %>

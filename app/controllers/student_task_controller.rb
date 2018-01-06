@@ -16,7 +16,7 @@ class StudentTaskController < ApplicationController
     @taskrevisions = @student_tasks.select(&:revision?)
 
     ######## Students Teamed With###################
-    @students_teamed_with = StudentTask.teamed_students current_user
+    @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip])
   end
 
   def view
@@ -32,6 +32,8 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    # Timeline feature
+    @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end
 
   def others_work

@@ -1,0 +1,18 @@
+<link rel = "stylesheet" type="text/css" href = "/assets/timeline.scss">
+<div class = "scrollable">
+   <ul class = "timeline" id = "timeline">
+      <% @timeline_list.each do |tl| %>
+         <% if tl[:updated_at] > Time.now %><li class = "li"><% else %><li class = "li complete"><% end %>
+            <div class = "timestamp">
+               <p><%= tl[:updated_at] %></p>
+            </div>
+            <div class = "status">
+               <% if tl[:id] %><p><%= link_to tl[:label], controller: 'response', action: 'view', id: tl[:id], target: '_blank' %></p> <!--peer review-->
+               <% elsif tl[:link] %><p><%= link_to tl[:label], tl[:link] %></p> <!--submitted hyperlinks-->
+               <% else %><p><%= tl[:label] %></p> <!--due dates-->
+               <% end %>
+            </div>
+         </li>
+      <% end %>
+   </ul>
+</div>

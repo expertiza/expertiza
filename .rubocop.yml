@@ -38,7 +38,7 @@ Style/RedundantBegin:
 
 # Adopt a consistent multi-line method chaining style. 
 # There are two popular styles in the Ruby community, both of which are considered good.
-Style/DotPosition:
+Layout/DotPosition:
   Enabled: false
 
 # Single quotes being faster is hardly measurable and only affects parse time.
@@ -57,10 +57,10 @@ Style/RaiseArgs:
   Enabled: false
 
 # This cop checks the indentation of the right hand side operand in binary operations that span more than one line.
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   Enabled: false
 
-Style/SpaceInsideBlockBraces:
+Layout/SpaceInsideBlockBraces:
   # The space here provides no real gain in readability while consuming
   # horizontal space that could be used for a better parameter name.
   # Also {| differentiates better from a hash than { | does.
@@ -72,7 +72,7 @@ Style/RescueModifier:
 
 # No trailing space differentiates better from the block:
 # foo} means hash, foo } means block.
-Style/SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
 # The and and or keywords are banned. It's just not worth it. Always use && and || instead

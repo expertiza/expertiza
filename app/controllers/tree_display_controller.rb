@@ -1,5 +1,6 @@
 class TreeDisplayController < ApplicationController
   helper :application
+  include SecurityHelper
 
   def action_allowed?
     true
@@ -125,7 +126,7 @@ class TreeDisplayController < ApplicationController
   def update_instructor(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
     tmp_object["instructor"] = nil
-    tmp_object["instructor"] = User.find(instructor_id).name if instructor_id
+    tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
   end
 
   def update_tmp_obj(tmp_object, node)
@@ -189,6 +190,9 @@ class TreeDisplayController < ApplicationController
 
   # for child nodes
   def children_node_ng
+    if !json_valid? (params[:reactParams][:child_nodes])
+      flash[:error] = "Invalid JSON in the TreeList"
+    end
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     child_nodes.each do |node|

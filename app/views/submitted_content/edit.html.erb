@@ -4,7 +4,7 @@
 <%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage, :can_submit =>@can_submit} %>
 
 <!--#E1600-->
-<!--Luanch self_review partial if self reviews are enabled for a given assignment-->
+<!--Launch self_review partial if self reviews are enabled for a given assignment-->
 <% if (@map.instance_of? SelfReviewResponseMap or @map.nil?) and (@assignment.is_selfreview_enabled == true)%>
     <br/><br/>
     <%= render partial: 'submitted_content/self_review', locals: {participant: @participant, stage: @stage, origin: ''} %>

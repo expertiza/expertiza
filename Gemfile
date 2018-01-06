@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.6'
+gem 'rails', '~> 4.2.7.1'
 
 ## Gems in Alphabetical Order
 
@@ -20,16 +20,18 @@ gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', re
 gem 'fastercsv'
 gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
-gem "googlecharts", require: "gchart"
 gem 'gdata', require: false
+gem "googlecharts", require: "gchart"
 gem 'haml-rails'
-gem 'jquery-rails'
-gem 'jquery-ui-sass-rails'
+gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'
+gem 'jquery-rails'
+gem 'jquery-tablesorter'
+gem 'jquery-ui-sass-rails'
 gem 'json', '~> 1.8', '>= 1.8.3'
 gem 'lingua'
 gem 'mysql2'
-gem 'nokogiri', '~> 1.6.8'
+gem 'nokogiri', '~> 1.8'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'
 gem 'paper_trail'
@@ -37,48 +39,47 @@ gem 'protected_attributes'
 gem 'rails4-autocomplete'
 gem 'rake'
 gem 'rb-readline'
+gem 'react-rails', '~> 1.0'
 gem "recaptcha", require: "recaptcha/rails"
-gem 'rest-client', '~> 1.8'
 gem 'RedCloth'
-gem 'redis-rails'
 gem 'redis-namespace'
+gem 'redis-rails'
+gem 'rest-client', '~> 1.8'
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet', '0.1.3'
+gem 'sass-rails'
 gem 'scrypt'
-gem 'sass-rails', '5.0.3'
 gem 'seer'
 gem 'sprockets'
 gem 'stanford-core-nlp'
 gem 'superfish-rails'
 gem 'therubyracer'
 gem 'thin'
+gem 'timecop', '0.8.1'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-gem 'react-rails', '~> 1.0'
-gem 'jquery-tablesorter'
-gem 'timecop', '0.8.1'
 
 group :development do
   gem 'daemons'
   gem 'pry'
-  gem 'pry-remote'
   gem 'pry-nav'
+  gem 'pry-remote'
+  gem 'quiet_assets'
   gem 'rubocop'
   gem 'selenium-webdriver', '~> 3.4', '>= 3.4.4'
-  gem 'quiet_assets'
 end
 
 group :test do
   gem 'database_cleaner'
+  gem "factory_bot_rails"
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
-  gem "factory_girl_rails", "~> 4.0"
   gem 'launchy'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 3.6'
   gem 'shoulda'
 end
 

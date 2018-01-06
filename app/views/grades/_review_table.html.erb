@@ -14,9 +14,9 @@
 		<% for review in reviews %>
        <td align="center">
        <% if controller.action_name != "view_my_scores"%>
-         &nbsp;<%= review.map.reviewer.fullname %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
+         &nbsp;<%= review.map.reviewer.fullname(session[:ip]) %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
 		   <% else %>
-         &nbsp;<%= review.map.reviewer.fullname%>&nbsp;
+         &nbsp;<%= review.map.reviewer.fullname(session[:ip]) %>&nbsp;
 		   <% end %>
 		   </td>	    
     <% end %>
@@ -30,7 +30,7 @@
 		   <td align="center">
              <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>
              <% if controller.action_name != "view_my_scores" %>
-               <input type="hidden" id="mailer_<%= review.map.reviewer.fullname %>_grade" name="mailer[<%= review.map.reviewer.fullname %>_grade]" value="<%= score  %>">
+               <input type="hidden" id="mailer_<%= review.map.reviewer.fullname(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.fullname(session[:ip]) %>_grade]" value="<%= score %>">
              <% end %>
              <%if score==-1%>
                <%= sprintf("--") %>% &nbsp;

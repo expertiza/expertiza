@@ -9,7 +9,7 @@ class AdviceController < ApplicationController
   def edit_advice
     @questionnaire = Questionnaire.find(params[:id])
 
-    for question in @questionnaire.questions
+    @questionnaire.questions.each do |question|
       num_questions = if question.is_a?(ScoredQuestion)
                         @questionnaire.max_question_score - @questionnaire.min_question_score
                       else
@@ -30,11 +30,10 @@ class AdviceController < ApplicationController
   # save the advice for a questionnaire
   def save_advice
     @questionnaire = Questionnaire.find(params[:id])
-
     begin
       unless params[:advice].nil?
-        for advice_key in params[:advice].keys
-          QuestionAdvice.update(advice_key, advice: params[:advice][advice_key.to_sym][:advice])
+        params[:advice].each_key do |advice_key|
+          advice_key.update_attributes(advice: params[:advice][advice_key.to_sym][:advice])
         end
         flash[:notice] = "The advice was successfully saved!"
       end

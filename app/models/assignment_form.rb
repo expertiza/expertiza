@@ -89,9 +89,7 @@ class AssignmentForm
   def update_tag_prompt_deployments(attributes)
     unless attributes.nil?
       attributes.each do |key, value|
-        if value.key?('deleted')
-          TagPromptDeployment.where(id: value['deleted']).delete_all
-        end
+        TagPromptDeployment.where(id: value['deleted']).delete_all if value.key?('deleted')
         # assume if tag_prompt is there, then id, question_type, answer_length_threshold must also be there since the inputs are coupled
         next unless value.key?('tag_prompt')
         for i in 0..value['tag_prompt'].count - 1
@@ -156,9 +154,7 @@ class AssignmentForm
       delayed_job = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
       due_date.update_attribute(:delayed_job_id, delayed_job.id)
       # If the deadline type is review, add a delayed job to drop outstanding review
-      if deadline_type == "review"
-        add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left)
-      end
+      add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left) if deadline_type == "review"
       # If the deadline type is team_formation, add a delayed job to drop one member team
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
       add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left)
@@ -296,9 +292,7 @@ class AssignmentForm
     new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
-    if new_assign.directory_path.present?
-      new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy')
-    end
+    new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
     new_assign.copy_flag = true
     if new_assign.save
       Assignment.record_timestamps = true

@@ -322,7 +322,6 @@ FactoryBot.define do
     type 'ReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
-  
   end
 
   factory :question, class: Criterion do
@@ -406,7 +405,7 @@ FactoryBot.define do
     assignment { Assignment.first || association(:assignment) }
     threshold 95
   end
-  
+
   factory :awarded_badge, class: AwardedBadge do
     badge { Badge.first || association(:badge) }
     participant { AssignmentParticipant.first || association(:participant) }

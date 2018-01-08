@@ -18,9 +18,7 @@ class ImpersonateController < ApplicationController
   end
 
   def start
-    if !request.GET.empty?
-      flash[:error] = "This page doesn't take any query string."
-    end
+    flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
 
   def impersonate

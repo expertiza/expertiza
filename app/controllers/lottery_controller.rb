@@ -22,9 +22,9 @@ class LotteryController < ApplicationController
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
         bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
-      team.users.each { |user| priority_info << { pid: user.id, ranks: bids } if bids.uniq != [0] }
+      team.users.each {|user| priority_info << {pid: user.id, ranks: bids} if bids.uniq != [0] }
     end
-    data = { users: priority_info, max_team_size: assignment.max_team_size }
+    data = {users: priority_info, max_team_size: assignment.max_team_size}
     url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
     begin
       response = RestClient.post url, data.to_json, content_type: :json, accept: :json
@@ -32,7 +32,7 @@ class LotteryController < ApplicationController
       teams = JSON.parse(response)["teams"]
       create_new_teams_for_bidding_response(teams, assignment)
       run_intelligent_bid(assignment)
-    rescue => err
+    rescue StandardError => err
       flash[:error] = err.message
     end
     redirect_to controller: 'tree_display', action: 'list'
@@ -41,7 +41,8 @@ class LotteryController < ApplicationController
   def create_new_teams_for_bidding_response(teams, assignment)
     original_team_ids = assignment.teams.map(&:id)
     teams.each do |user_ids|
-      current_team, parent = nil, nil
+      current_team = nil
+      parent = nil
       user_ids.each_with_index do |user_id, index|
         original_team_ids.each do |original_team_id|
           team_user = TeamsUser.find_by(user_id: user_id, team_id: original_team_id)
@@ -51,7 +52,7 @@ class LotteryController < ApplicationController
             current_team = team_user.team
             parent = TeamNode.find_by(parent_id: assignment.id, node_object_id: current_team.id)
             break if current_team and parent
-            current_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(10000).to_s, parent_id: assignment.id)
+            current_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(10_000).to_s, parent_id: assignment.id)
             parent = TeamNode.create(parent_id: assignment.id, node_object_id: current_team.id)
           end
           team_user.team_user_node.destroy
@@ -86,8 +87,8 @@ class LotteryController < ApplicationController
     # Getting signuptopics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? and max_choosers > 0', params[:id])
     unassigned_teams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).any? }
-    unassigned_teams.sort! do |t1, t2| 
-      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=> 
+    unassigned_teams.sort! do |t1, t2|
+      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
       [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
     team_bids = []
@@ -95,7 +96,7 @@ class LotteryController < ApplicationController
       topic_bids = []
       sign_up_topics.each do |topic|
         bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        topic_bids << { topic_id: topic.id, priority: bid.priority } if bid
+        topic_bids << {topic_id: topic.id, priority: bid.priority} if bid
       end
       topic_bids.sort! {|b| b[:priority] }
       team_bids << {team_id: team.id, bids: topic_bids}

@@ -2,7 +2,7 @@ class Bookmark < ActiveRecord::Base
   belongs_to :user
   belongs_to :topic
   has_many :bookmark_ratings
-  validates_presence_of :url
-  validates_presence_of :title
-  validates_presence_of :description
+  validates :url, presence: true
+  validates :title, presence: true
+  validates :description, presence: true
 end

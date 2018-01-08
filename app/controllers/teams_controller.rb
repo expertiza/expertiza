@@ -17,13 +17,13 @@ class TeamsController < ApplicationController
   end
 
   def list
-    allowed_types = %w(Assignment Course)
+    allowed_types = %w[Assignment Course]
     session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
     begin
-      @root_node = Object.const_get(session[:team_type] + "Node").find_by_node_object_id(params[:id])
+      @root_node = Object.const_get(session[:team_type] + "Node").find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
   end
@@ -80,9 +80,7 @@ class TeamsController < ApplicationController
         topic_id = @signUps.first.topic_id
         next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
         # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-        if next_wait_listed_team
-          SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team)
-        end
+        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
       end
 
       @signUps.destroy_all if @signUps

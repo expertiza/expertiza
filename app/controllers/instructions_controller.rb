@@ -3,6 +3,5 @@ class InstructionsController < ApplicationController
     true
   end
 
-  def home
-  end
+  def home; end
 end

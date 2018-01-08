@@ -27,9 +27,7 @@ class ReviewMappingController < ApplicationController
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
     end
     map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
-    if map.nil?
-      map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true)
-    end
+    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
 
@@ -71,7 +69,7 @@ class ReviewMappingController < ApplicationController
         else
           raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
         end
-      rescue => e
+      rescue StandardError => e
         msg = e.message
       end
     end
@@ -135,7 +133,6 @@ class ReviewMappingController < ApplicationController
         @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save
       end
-
     rescue Exception => e
       flash[:alert] = e.nil? ? $ERROR_INFO : e
     end
@@ -156,7 +153,7 @@ class ReviewMappingController < ApplicationController
       MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
                                    reviewer_id: reviewer.id,
                                    reviewee_id: mapping.reviewer.id)
-    rescue => e
+    rescue StandardError => e
       msg = e.message
     end
     redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
@@ -174,11 +171,9 @@ class ReviewMappingController < ApplicationController
   def get_reviewer(user, assignment, reg_url)
     begin
       reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
-      if reviewer.nil?
-        raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
-      end
+      raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
       reviewer
-    rescue => e
+    rescue StandardError => e
       flash[:error] = e.message
     end
   end
@@ -250,7 +245,7 @@ class ReviewMappingController < ApplicationController
 
     begin
       mapping.delete
-    rescue
+    rescue StandardError
       flash[:error] = "A delete action failed:<br/>" + $ERROR_INFO.to_s + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
     end
 
@@ -432,9 +427,7 @@ class ReviewMappingController < ApplicationController
 
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
-    if review_grade.nil?
-      review_grade = ReviewGrade.create(participant_id: params[:participant_id])
-    end
+    review_grade = ReviewGrade.create(participant_id: params[:participant_id]) if review_grade.nil?
     review_grade.grade_for_reviewer = params[:grade_for_reviewer] if params[:grade_for_reviewer]
     review_grade.comment_for_reviewer = params[:comment_for_reviewer] if params[:comment_for_reviewer]
     review_grade.review_graded_at = Time.now
@@ -448,7 +441,7 @@ class ReviewMappingController < ApplicationController
         assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: params[:assignment_id])
         AwardedBadge.award(params[:participant_id], params[:grade_for_reviewer], assignment_badge.try(:threshold), badge_id)
       end
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'review_mapping', action: 'response_report', id: params[:assignment_id]
@@ -470,7 +463,7 @@ class ReviewMappingController < ApplicationController
         raise "Self review already assigned!"
       end
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id]
-    rescue => e
+    rescue StandardError => e
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: e.message
     end
   end
@@ -605,7 +598,7 @@ class ReviewMappingController < ApplicationController
 
       begin
         selected_participants.each {|index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create }
-      rescue
+      rescue StandardError
         flash[:error] = "Automatic assignment of reviewer failed."
       end
       iterator += 1

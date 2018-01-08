@@ -27,7 +27,7 @@ describe SignUpSheet do
       allow(AssignmentDueDate).to receive(:first) { nil }
 
       deadlineType = double('DeadlineType')
-      allow(DeadlineType).to receive(:find_by_name) { deadlineType }
+      allow(DeadlineType).to receive(:find_by) { deadlineType }
       allow(deadlineType).to receive(:id) { nil }
 
       expect(SignUpSheet.add_signup_topic(2)).to eq(0 => {"id" => 0, "topic_identifier" => "topic_identifier", "topic_name" => "topic_name", "submission_1" => nil})
@@ -51,7 +51,7 @@ describe SignUpSheet do
       allow(AssignmentDueDate).to receive(:first) { assignment_due_date }
 
       deadlineType = double(DeadlineType)
-      allow(DeadlineType).to receive(:find_by_name) { deadlineType }
+      allow(DeadlineType).to receive(:find_by) { deadlineType }
       allow(deadlineType).to receive(:id) { nil }
       expect(SignUpSheet.add_signup_topic(2)).to eq(0 => {"id" => 0, "topic_identifier" => "topic_identifier", "topic_name" => "topic_name", "submission_1" => "2000-01-01 00:00:00", "review_1" => "2000-01-01 00:00:00", "submission_2" => "2000-01-01 00:00:00"})
     end

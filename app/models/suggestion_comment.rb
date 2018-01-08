@@ -1,4 +1,4 @@
 class SuggestionComment < ActiveRecord::Base
-  validates_presence_of :comments
+  validates :comments, presence: true
   belongs_to :suggestion
 end

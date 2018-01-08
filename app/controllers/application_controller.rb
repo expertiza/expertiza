@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-
   include AccessHelper
 
   # You want to get exceptions in development, but not in production.
@@ -8,7 +7,7 @@ class ApplicationController < ActionController::Base
       redirect_to root_path
     end
   end
-  
+
   # forcing SSL only in the production mode
   force_ssl if Rails.env.production?
 
@@ -17,8 +16,7 @@ class ApplicationController < ActionController::Base
   before_action :set_time_zone
   before_action :authorize
 
-  def self.verify(_args)
-  end
+  def self.verify(_args); end
 
   def current_user_role?
     current_user.role.name

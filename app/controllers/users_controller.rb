@@ -3,7 +3,7 @@ require 'will_paginate/array'
 class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [:destroy, :create, :update],
+  verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
 
   def action_allowed?
@@ -68,7 +68,7 @@ class UsersController < ApplicationController
   end
 
   def show_selection
-    @user = User.find_by_name(params[:user][:name])
+    @user = User.find_by(name: params[:user][:name])
     if !@user.nil?
       get_role
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
@@ -101,20 +101,20 @@ class UsersController < ApplicationController
 
   def new
     @user = User.new
-    @rolename = Role.find_by_name(params[:role])
+    @rolename = Role.find_by(name: params[:role])
     foreign
   end
 
   def request_new
     flash[:warn] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
-    @rolename = Role.find_by_name(params[:role])
+    @rolename = Role.find_by(name: params[:role])
     roles_for_request_sign_up
   end
 
   def create
     # if the user name already exists, register the user by email address
-    check = User.find_by_name(params[:user][:name])
+    check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
     @user = User.new(user_params)
     @user.institution_id = params[:user][:institution_id]
@@ -132,9 +132,7 @@ class UsersController < ApplicationController
       # ensures that these users have a default value of 15% for notifications.
       # TAs and Students do not need a default. TAs inherit the default from the instructor,
       # Students do not have any checks for this information.
-      if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-        AssignmentQuestionnaire.create(user_id: @user.id)
-      end
+      AssignmentQuestionnaire.create(user_id: @user.id) if @user.role.name == "Instructor" or @user.role.name == "Administrator"
       undo_link("The user \"#{@user.name}\" has been successfully created. ")
       redirect_to action: 'list'
     else
@@ -153,7 +151,7 @@ class UsersController < ApplicationController
     # The super admin receives a mail about a new user request with the user name
     user_existed = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
     requested_user_saved = requested_user.save
-    if !user_existed and requested_user_saved 
+    if !user_existed and requested_user_saved
       super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
       super_users.each do |super_user|
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
@@ -222,9 +220,7 @@ class UsersController < ApplicationController
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
     # eg. /users/5408?name=5408
-    if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
-      @user.name += '_hidden'
-    end
+    @user.name += '_hidden' if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
 
     if @user.update_attributes(params[:user])
       flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
@@ -243,7 +239,7 @@ class UsersController < ApplicationController
       # Participant.delete(true)
       @user.destroy
       flash[:note] = undo_link("The user \"#{@user.name}\" has been successfully deleted.")
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
 
@@ -299,7 +295,7 @@ class UsersController < ApplicationController
 
   def requested_user_params
     params.require(:user).permit(:name, :role_id, :fullname, :institution_id, :email)
-      .merge(self_introduction: params[:requested_user][:self_introduction])
+          .merge(self_introduction: params[:requested_user][:self_introduction])
   end
 
   def get_role

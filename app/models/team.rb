@@ -19,7 +19,7 @@ class Team < ActiveRecord::Base
 
   # Delete the given team
   def delete
-    TeamsUser.where(team_id: self.id).each(&:destroy)
+    TeamsUser.where(team_id: self.id).find_each(&:destroy)
     node = TeamNode.find_by(node_object_id: self.id)
     node.destroy if node
     self.destroy
@@ -54,9 +54,7 @@ class Team < ActiveRecord::Base
 
   # Add memeber to the team
   def add_member(user, _assignment_id = nil)
-    if user?(user)
-      raise "The user #{user.name} is already a member of the team #{self.name}"
-    end
+    raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
     can_add_member = false
     unless full?
       can_add_member = true
@@ -86,9 +84,7 @@ class Team < ActiveRecord::Base
   # Check if the team exists
   def self.check_for_existing(parent, name, team_type)
     list = Object.const_get(team_type + 'Team').where(parent_id: parent.id, name: name)
-    unless list.empty?
-      raise TeamExistsError, "The team name #{name} is already in use."
-    end
+    raise TeamExistsError, "The team name #{name} is already in use." unless list.empty?
   end
 
   # Algorithm
@@ -96,7 +92,7 @@ class Team < ActiveRecord::Base
   # Adding participants to teams that have two slots. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
     participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + "Participant")
-    participants = participants.sort { rand(3) - 1 }
+    participants = participants.sort { rand(-1..1) }
     users = participants.map {|p| User.find(p.user_id) }.to_a
     # find teams still need team members and users who are not in any team
     teams = Team.where(parent_id: parent.id, type: parent.class.to_s + "Team").to_a
@@ -116,13 +112,9 @@ class Team < ActiveRecord::Base
     # sort teams by decreasing team size
     teams.sort_by {|team| Team.size(team.id) }.reverse!
     # insert users who are not in any team to teams still need team members
-    if !users.empty? and !teams.empty?
-      assign_single_users_to_teams(min_team_size, parent, teams, users)
-    end
+    assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? and !teams.empty?
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
-    unless users.empty?
-      create_team_from_single_users(min_team_size, parent, team_type, users)
-    end
+    create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
   end
 
   def self.create_team_from_single_users(min_team_size, parent, team_type, users)
@@ -172,9 +164,7 @@ class Team < ActiveRecord::Base
       if user.nil?
         raise ImportError, "The user #{row[index].to_s.strip} was not found. <a href='/users/new'>Create</a> this user?"
       else
-        if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
-          add_member(user)
-        end
+        add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
       end
       index += 1
     end
@@ -213,9 +203,7 @@ class Team < ActiveRecord::Base
   # Handle existence of the duplicate team
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
     return name if team.nil? # no duplicate
-    if handle_dups == "ignore" # ignore: do not create the new team
-      return nil
-    end
+    return nil if handle_dups == "ignore" # ignore: do not create the new team
     if handle_dups == "rename" # rename: rename new team
       if teamtype.is_a?(CourseTeam)
         return self.generate_team_name(Course.find(id).name)

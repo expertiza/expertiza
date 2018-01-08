@@ -108,9 +108,7 @@ class ReputationWebServiceController < ApplicationController
     end
     request_body = {}
     @results.each_with_index do |record, _index|
-      unless request_body.key?('submission' + record[1].to_s)
-        request_body['submission' + record[1].to_s] = {}
-      end
+      request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
     # sort the 2-dimention hash

@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = user_id = nil
     action = params[:action]
-    if %w(edit delete update view).include?(action)
+    if %w[edit delete update view].include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
@@ -29,7 +29,7 @@ class ResponseController < ApplicationController
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || 
+        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
         (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
       return current_user_id?(user_id)
@@ -57,7 +57,7 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     set_all_responses
     if @prev.present?
-      @sorted = @review_scores.sort {|m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+      @sorted = @review_scores.sort {|m1, m2| m1.version_num and m2.version_num ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
     @modified_object = @response.response_id
@@ -65,7 +65,7 @@ class ResponseController < ApplicationController
     set_content
     @review_scores = []
     @questions.each do |question|
-      @review_scores << Answer.where(response_id: @response.response_id, question_id:  question.id).first
+      @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     render action: 'response'
   end
@@ -87,10 +87,8 @@ class ResponseController < ApplicationController
       else
         @response.update_attribute('is_submitted', false)
       end
-      if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-        @response.notify_instructor_on_difference
-      end
-    rescue
+      @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+    rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
@@ -104,17 +102,15 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     set_content(true)
-    if @assignment
-      @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
-    end
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     render action: 'response'
   end
 
   def new_feedback
     review = Response.find(params[:id])
     if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  review.map.assignment.id).first
-      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id:  reviewer.id).first
+      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
       if map.nil?
         # if no feedback exists by dat user den only create for dat particular response/review
         map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
@@ -154,9 +150,7 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-    if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-      @response.notify_instructor_on_difference
-    end
+    @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
@@ -313,10 +307,8 @@ class ResponseController < ApplicationController
   def create_answers(params, questions)
     # create score if it is not found. If it is found update it otherwise update it
     params[:responses].each_pair do |k, v|
-      score = Answer.where(response_id: @response.id, question_id:  questions[k.to_i].id).first
-      unless score
-        score = Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      end
+      score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
+      score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       score.update_attribute('answer', v[:score])
       score.update_attribute('comments', v[:comment])
     end

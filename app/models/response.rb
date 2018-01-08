@@ -22,9 +22,7 @@ class Response < ActiveRecord::Base
     # feedback.  Currently this is only done if the rubric is Author Feedback.
     # It doesn't seem necessary to print out the rubric type in the case of
     # a ReviewResponseMap.
-    if self.map.type.to_s == 'FeedbackResponseMap'
-      identifier += "<h3>Feedback from author</h3>"
-    end
+    identifier += "<h3>Feedback from author</h3>" if self.map.type.to_s == 'FeedbackResponseMap'
     if prefix # has prefix means view_score page in instructor end
       self_id = prefix + '_' + self.id.to_s
       code = construct_instructor_html identifier, self_id, count
@@ -43,9 +41,7 @@ class Response < ActiveRecord::Base
     sum = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      if !s.answer.nil? && question.is_a?(ScoredQuestion)
-        sum += s.answer * question.weight
-      end
+      sum += s.answer * question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
     end
     sum
   end
@@ -71,9 +67,7 @@ class Response < ActiveRecord::Base
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      if !s.answer.nil? && question.is_a?(ScoredQuestion)
-        total_weight += question.weight
-      end
+      total_weight += question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -101,7 +95,6 @@ class Response < ActiveRecord::Base
   end
 
   def questionnaire_by_answer(answer)
-
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
     else
@@ -203,23 +196,23 @@ class Response < ActiveRecord::Base
     reviewee_name = User.find(reviewee_participant.user_id).fullname
     assignment = Assignment.find(reviewer_participant.parent_id)
     Mailer.notify_grade_conflict_message(
-        to: assignment.instructor.email,
-        subject: 'Expertiza Notification: A review score is outside the acceptable range',
-        body: {
-            reviewer_name: reviewer_name,
-            type: 'review',
-            reviewee_name: reviewee_name,
-            new_score: total_score.to_f / maximum_score,
-            assignment: assignment,
-            conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
-            summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-            assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-        }
+      to: assignment.instructor.email,
+      subject: 'Expertiza Notification: A review score is outside the acceptable range',
+      body: {
+        reviewer_name: reviewer_name,
+        type: 'review',
+        reviewee_name: reviewee_name,
+        new_score: total_score.to_f / maximum_score,
+        assignment: assignment,
+        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
+        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+      }
     ).deliver_now
   end
 
   private
-  
+
   def construct_instructor_html identifier, self_id, count
     identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
     identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
@@ -245,7 +238,7 @@ class Response < ActiveRecord::Base
       questionnaire = self.questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
-      # get the tag settings this questionnaire   
+      # get the tag settings this questionnaire
       tag_prompt_deployments = TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id)
       code = add_table_rows questionnaire_max, questions, answers, code
     end
@@ -258,7 +251,7 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max,questions,answers,code
+  def add_table_rows questionnaire_max, questions, answers, code
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|

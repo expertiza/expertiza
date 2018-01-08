@@ -17,8 +17,8 @@ describe QuestionnairesController do
       question_advice = build(:question_advice)
       allow(QuestionAdvice).to receive(:where).with(question_id: 1).and_return([question_advice])
       tree_folder = double('TreeFolder', id: 1)
-      allow(TreeFolder).to receive(:find_by_name).with('Review').and_return(tree_folder)
-      allow(FolderNode).to receive(:find_by_node_object_id).with(1).and_return(double('FolderNode', id: 1))
+      allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(tree_folder)
+      allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode', id: 1))
       allow(QuestionnaireNode).to receive(:find_or_create_by).with(parent_id: 1, node_object_id: 2).and_return(double('QuestionnaireNode'))
       allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
       params = {id: 1}
@@ -76,7 +76,7 @@ describe QuestionnairesController do
       session = {user: double('Instructor', id: 6)}
       tree_folder = double('TreeFolder', id: 1)
       allow(TreeFolder).to receive_message_chain(:where, :first).with(['name like ?', 'Review']).with(no_args).and_return(tree_folder)
-      allow(FolderNode).to receive(:find_by_node_object_id).with(1).and_return(double('FolderNode', id: 1))
+      allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode', id: 1))
       allow(QuestionnaireNode).to receive(:create).with(parent_id: 1, node_object_id: 1, type: 'QuestionnaireNode').and_return(double('QuestionnaireNode'))
       post :create, params, session
       expect(flash[:success]).to eq('You have successfully created a questionnaire!')
@@ -142,8 +142,8 @@ describe QuestionnairesController do
           session = {user: build(:teaching_assistant, id: 1)}
           allow(Ta).to receive(:get_my_instructor).with(1).and_return(6)
           # save
-          allow(TreeFolder).to receive(:find_by_name).with('Review').and_return(double('TreeFolder', id: 1))
-          allow(FolderNode).to receive(:find_by_node_object_id).with(1).and_return(double('FolderNode'))
+          allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(double('TreeFolder', id: 1))
+          allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode'))
           allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
           post :create_quiz_questionnaire, params, session
           expect(flash[:note]).to be nil

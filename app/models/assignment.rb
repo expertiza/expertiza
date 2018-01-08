@@ -121,7 +121,7 @@ class Assignment < ActiveRecord::Base
       reviewer = response_map.reviewer
       reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
     end
-    reviewers = reviewers.sort {|a, b| a[1] <=> b[1] }
+    reviewers = reviewers.sort_by {|a| a[1] }
     min_metareviews = reviewers.first[1]
     reviewers.reject! {|reviewer| reviewer[1] == min_metareviews }
     response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
@@ -169,9 +169,7 @@ class Assignment < ActiveRecord::Base
           round_sym = ("review" + i.to_s).to_sym
           grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
           total_num_of_assessments += assessments.size
-          unless grades_by_rounds[round_sym][:avg].nil?
-            total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
-          end
+          total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
         end
         # merge the grades from multiple rounds
         scores[:teams][index.to_s.to_sym][:scores] = {}
@@ -208,12 +206,12 @@ class Assignment < ActiveRecord::Base
       raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
     end
     path_text = ""
-    if !self.course_id.nil? && self.course_id > 0
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
-        FileHelper.clean_path(self.course.directory_path) + '/'
-    else
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
-    end
+    path_text = if !self.course_id.nil? && self.course_id > 0
+                  Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
+                    FileHelper.clean_path(self.course.directory_path) + '/'
+                else
+                  Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
+                end
     path_text += FileHelper.clean_path(self.directory_path)
     path_text
   end
@@ -253,14 +251,14 @@ class Assignment < ActiveRecord::Base
     begin
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each {|map| map.delete(force) }
-    rescue
+    rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each {|map| map.delete(force) }
-    rescue
+    rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
@@ -273,7 +271,7 @@ class Assignment < ActiveRecord::Base
     # The size of an empty directory is 2
     # Delete the directory if it is empty
     directory = Dir.entries(Rails.root + '/pg_data/' + self.directory_path) rescue nil
-    if !(self.directory_path.nil? or self.directory_path.empty?) and !directory.nil?
+    if self.directory_path.present? and !directory.nil?
       if directory.size == 2
         Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
       else
@@ -298,9 +296,11 @@ class Assignment < ActiveRecord::Base
   # user_name - the user account name of the participant to add
   def add_participant(user_name, can_submit, can_review, can_take_quiz)
     user = User.find_by(name: user_name)
-    raise "The user account with the name #{user_name} does not exist. Please <a href='" +
-      url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
-    participant = AssignmentParticipant.find_by(parent_id: self.id, user_id:  user.id)
+    if user.nil?
+      raise "The user account with the name #{user_name} does not exist. Please <a href='" +
+        url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
+    end
+    participant = AssignmentParticipant.find_by(parent_id: self.id, user_id: user.id)
     raise "The user #{user.name} is already a participant." if participant
     new_part = AssignmentParticipant.create(parent_id: self.id,
                                             user_id: user.id,
@@ -362,7 +362,7 @@ class Assignment < ActiveRecord::Base
   def stage_deadline(topic_id = nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    (due_date.nil? || due_date == 'Finished') ? due_date : due_date.due_at.to_s
+    due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
 
   def num_review_rounds
@@ -384,7 +384,7 @@ class Assignment < ActiveRecord::Base
   def get_current_stage(topic_id = nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
-    (due_date.nil? || due_date == 'Finished') ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+    due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)
@@ -430,9 +430,7 @@ class Assignment < ActiveRecord::Base
     @uniq_rounds.each do |round_num|
       @uniq_response_type.each do |res_type|
         round_type = check_empty_rounds(@answers, round_num, res_type)
-        unless round_type.nil?
-          csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
-        end
+        csv << [round_type, '---', '---', '---', '---', '---', '---', '---'] unless round_type.nil?
         @answers[round_num][res_type].each do |answer|
           csv << csv_row(detail_options, answer)
         end
@@ -562,9 +560,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.export_data_fields(options)
-    team[:scores] ?
-      tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
-      tcsv.push('---', '---', '---') if options['team_score'] == 'true'
+    if options['team_score'] == 'true'
+      team[:scores] ?
+        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+        tcsv.push('---', '---', '---')
+    end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',
                                 feedback: 'author_feedback_score',

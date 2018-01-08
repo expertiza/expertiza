@@ -5,10 +5,10 @@ class AnswerTagsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'index', 'create_edit'
-        ['Instructor',
-         'Teaching Assistant',
-         'Student',
-         'Administrator'].include? current_role_name
+      ['Instructor',
+       'Teaching Assistant',
+       'Student',
+       'Administrator'].include? current_role_name
     end
   end
 
@@ -17,18 +17,12 @@ class AnswerTagsController < ApplicationController
     @tag_prompts = []
 
     tag_deployments = TagPromptDeployment.all
-    if params.key?(:assignment_id)
-      tag_deployments = tag_deployments.where(assignment_id: params[:assignment_id])
-    end
-    if params.key?(:questionnaire_id)
-      tag_deployments = tag_deployments.where(questionnaire_id: params[:questionnaire_id])
-    end
+    tag_deployments = tag_deployments.where(assignment_id: params[:assignment_id]) if params.key?(:assignment_id)
+    tag_deployments = tag_deployments.where(questionnaire_id: params[:questionnaire_id]) if params.key?(:questionnaire_id)
 
     tag_deployments.each do |tag_dep|
       stored_tags_records = AnswerTag.where(tag_prompt_deployment_id: tag_dep.id)
-      if params.key?(:user_id)
-        stored_tags_records = stored_tags_records.where(user_id: params[:user_id])
-      end
+      stored_tags_records = stored_tags_records.where(user_id: params[:user_id]) if params.key?(:user_id)
       stored_tags_records.each do |stored_tag|
         @tag_prompts.append stored_tag
       end
@@ -48,6 +42,5 @@ class AnswerTagsController < ApplicationController
   end
 
   # DELETE /answer_tags/1
-  def destroy
-  end
+  def destroy; end
 end

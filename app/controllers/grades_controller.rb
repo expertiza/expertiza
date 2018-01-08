@@ -106,7 +106,7 @@ class GradesController < ApplicationController
     # to render the html tables.
     questionnaires.each do |questionnaire|
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-                 AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+                 AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
                end
       vm = VmQuestionResponse.new(questionnaire, @assignment)
       vmquestions = questionnaire.questions
@@ -158,7 +158,7 @@ class GradesController < ApplicationController
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
-    if sprintf("%.2f", total_score) != params[:participant][:grade]
+    if format("%.2f", total_score) != params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
                   "The computed score will be used for " + participant.user.name + "."
@@ -177,11 +177,11 @@ class GradesController < ApplicationController
     @team.comment_for_submission = params[:comment_for_submission]
     begin
       @team.save
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
-  end 
+  end
 
   private
 
@@ -219,23 +219,19 @@ class GradesController < ApplicationController
 
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
-        if @total_penalty > l_policy.max_penalty
-          @total_penalty = l_policy.max_penalty
-        end
+        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
         calculate_penatly_attributes(@participant) if calculate_for_participants
       end
       assign_all_penalties(participant, penalties)
     end
-    unless @assignment.is_penalty_calculated
-      @assignment.update_attribute(:is_penalty_calculated, true)
-    end
+    @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
   end
 
   def calculate_penatly_attributes(_participant)
     deadline_type_id = [1, 2, 5]
-    penalties_symbols = [:submission, :review, :meta_review]
+    penalties_symbols = %i[submission review meta_review]
     deadline_type_id.zip(penalties_symbols).each do |id, symbol|
-      CalculatedPenalty.create({deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol]})
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
     end
   end
 
@@ -250,12 +246,12 @@ class GradesController < ApplicationController
 
   def make_chart
     @grades_bar_charts = {}
-    participant_score_types = [:metareview, :feedback, :teammate]
+    participant_score_types = %i[metareview feedback teammate]
     if @pscore[:review]
       scores = []
       if @assignment.varying_rubrics_by_round?
         (1..@assignment.rounds_of_reviews).each do |round|
-          responses = @pscore[:review][:assessments].reject {|response| response.round != round }
+          responses = @pscore[:review][:assessments].select {|response| response.round == round }
           scores = scores.concat(get_scores_for_chart(responses, 'review' + round.to_s))
           scores -= [-1.0]
         end
@@ -264,7 +260,7 @@ class GradesController < ApplicationController
         remove_negative_scores_and_build_charts(:review)
       end
     end
-    participant_score_types.each { |symbol| remove_negative_scores_and_build_charts(symbol) }
+    participant_score_types.each {|symbol| remove_negative_scores_and_build_charts(symbol) }
   end
 
   def remove_negative_scores_and_build_charts(symbol)
@@ -293,7 +289,7 @@ class GradesController < ApplicationController
     GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
       data = scores
       bc.data "Line green", data, '990000'
-      bc.axis :y, range: [0, data.max], positions: [data.min, data.max]
+      bc.axis :y, range: [0, data.max], positions: data.minmax
       bc.show_legend = false
       bc.stacked = false
       bc.width_spacing_options(bar_width: (width - 30) / (data.size + 1), bar_spacing: 1, group_spacing: spacing)

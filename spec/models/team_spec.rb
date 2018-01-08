@@ -8,7 +8,6 @@ describe Team do
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
-
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
   end
@@ -26,6 +25,7 @@ describe Team do
 
   describe '#delete' do
     it 'deletes the current team and related objects and return self' do
+      allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
       allow(team_user).to receive(:destroy).and_return(team_user)
       node = double('TeamNode')
       allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(node)
@@ -143,7 +143,7 @@ describe Team do
   describe '.randomize_all_by_parent' do
     it 'forms teams and assigns team members automatically' do
       allow(Participant).to receive(:where).with(parent_id: 1, type: 'AssignmentParticipant')
-        .and_return([participant, participant2, participant3])
+                                           .and_return([participant, participant2, participant3])
       allow(User).to receive(:find).with(1).and_return(user)
       allow(User).to receive(:find).with(2).and_return(user2)
       allow(User).to receive(:find).with(3).and_return(user3)
@@ -235,6 +235,8 @@ describe Team do
 
       context 'when handle_dups option is replace' do
         it 'deletes the old team' do
+          allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
+          allow(team_user).to receive(:destroy).and_return(team_user)
           expect(Team.handle_duplicate(team, 'no name', 1, 'replace', CourseTeam.new)).to eq('no name')
         end
       end

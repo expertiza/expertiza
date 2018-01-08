@@ -12,7 +12,7 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).select {|a| !a.participants.empty? }
+    @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
     if @course_participants.empty?
       flash[:error] = "There is no course participant in course #{course.name}"
@@ -25,14 +25,14 @@ class Assessment360Controller < ApplicationController
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-    %w(teammate meta).each do |type|
+    %w[teammate meta].each do |type|
       instance_variable_set("@overall_#{type}_review_grades", {})
       instance_variable_set("@overall_#{type}_review_count", {})
     end
     @course_participants.each do |cp|
       # for each assignment
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-      %w(teammate meta).each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
+      %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|

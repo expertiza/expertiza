@@ -9,7 +9,7 @@ class StudentTaskController < ApplicationController
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
-    @student_tasks.reject! {|t| !t.assignment.availability_flag }
+    @student_tasks.select! {|t| t.assignment.availability_flag }
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
@@ -53,15 +53,12 @@ class StudentTaskController < ApplicationController
 
     @review_phase = next_due_date.deadline_type_id
     if next_due_date.review_of_review_allowed_id == DeadlineRight::LATE or next_due_date.review_of_review_allowed_id == DeadlineRight::OK
-      if @review_phase == DeadlineType.find_by_name("metareview").id
-        @can_view_metareview = true
-      end
+      @can_view_metareview = true if @review_phase == DeadlineType.find_by(name: "metareview").id
     end
 
     @review_mappings = ResponseMap.where(reviewer_id: @participant.id)
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
-  def your_work
-  end
+  def your_work; end
 end

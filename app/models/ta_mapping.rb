@@ -3,7 +3,7 @@ class TaMapping < ActiveRecord::Base
   belongs_to :ta
   has_paper_trail
   def self.get_course_id(user_id)
-    TaMapping.find_by_ta_id(user_id).course_id
+    TaMapping.find_by(ta_id: user_id).course_id
   end
 
   def self.get_courses(user_id)

@@ -4,7 +4,7 @@ describe 'AssignmentTeam' do
 
   describe "#hyperlinks" do
     it "should have a valid parent id" do
-      expect(team.parent_id).to be_instance_of(Fixnum)
+      expect(team.parent_id).to be_kind_of(Integer)
     end
 
     it "should return the hyperlinks submitted by the team as a text" do
@@ -26,7 +26,7 @@ describe 'AssignmentTeam' do
       if @my_submitted_hyperlinks.length > 1
         @my_submitted_hyperlinks.each do |line|
           @url = line[2, line.size]
-          expect(@url).to match(/\A#{URI.regexp(%w(http https))}\z/) if line.size > 3
+          expect(@url).to match(/\A#{URI.regexp(%w[http https])}\z/) if line.size > 3
         end
       end
     end

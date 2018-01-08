@@ -62,9 +62,7 @@ class SignedUpTeam < ActiveRecord::Base
       old_teams_signups.each do |old_teams_signup|
         if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
           first_waitlisted_signup = SignedUpTeam.find_by(topic_id: old_teams_signup.topic_id, is_waitlisted:  true)
-          unless first_waitlisted_signup.nil?
-            Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id)
-          end
+          Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id) unless first_waitlisted_signup.nil?
         end
         old_teams_signup.destroy
       end

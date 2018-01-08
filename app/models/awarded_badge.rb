@@ -1,14 +1,12 @@
 class AwardedBadge < ActiveRecord::Base
   belongs_to :badge
   belongs_to :participant
-  
+
   # Called from response_controller.rb and review_mapping_controller for GoodTeammate and GoodReviewer Badges respectively
   # Also handles score updates (deleting assigned badges if no longer valid)
   def self.award(participant_id, score, assignment_badge_threshold, badge_id)
     assignment_badge_threshold ||= 95
-    if score and score >= assignment_badge_threshold
-      AwardedBadge.create(participant_id: participant_id, badge_id: badge_id)
-    end
+    AwardedBadge.create(participant_id: participant_id, badge_id: badge_id) if score and score >= assignment_badge_threshold
   end
 
   # When threshold is created/updated in Assignment edit page
@@ -35,13 +33,13 @@ class AwardedBadge < ActiveRecord::Base
     end
   end
 
-  def self.get_teammate_review_score(participant) 
+  def self.get_teammate_review_score(participant)
     score = 0.0
     return score if participant.nil? or participant.team.nil?
     teammate_reviews = participant.teammate_reviews
-    return score if teammate_reviews.size == 0
+    return score if teammate_reviews.empty?
     teammate_reviews.each do |teammate_review|
-      score += (teammate_review.total_score.to_f / teammate_review.maximum_score.to_f)   
+      score += (teammate_review.total_score.to_f / teammate_review.maximum_score.to_f)
     end
     score / teammate_reviews.size * 100
   end

@@ -33,9 +33,7 @@ module ReviewAssignment
 
     # if this assignment does not allow reviewer to review other artifacts on the same topic,
     # remove those teams from candidate list.
-    unless self.can_review_same_topic?
-      contributor_set = reject_by_same_topic(contributor_set, reviewer)
-    end
+    contributor_set = reject_by_same_topic(contributor_set, reviewer) unless self.can_review_same_topic?
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -82,7 +80,7 @@ module ReviewAssignment
     contributor_set = Array.new(contributors)
 
     # Reject contributors that have no submissions
-    contributor_set.reject! {|contributor| !contributor.has_submissions? }
+    contributor_set.select!(&:has_submissions?)
 
     # Filter submissions already reviewed by reviewer
     contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
@@ -102,9 +100,7 @@ module ReviewAssignment
   # Parameter assignment_team is the candidate assignment team, it cannot be a team w/o submission, or have reviewed by reviewer, or reviewer's own team.
   # (guaranteed by candidate_assignment_teams_to_review method)
   def assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-    if assignment_team.nil?
-      raise "There are no more submissions available for that review right now. Try again later."
-    end
+    raise "There are no more submissions available for that review right now. Try again later." if assignment_team.nil?
 
     assignment_team.assign_reviewer(reviewer)
   end
@@ -130,9 +126,7 @@ module ReviewAssignment
     if reviewer_team
       topic_id = reviewer_team.topic
       # it is also possible that this reviewer has team, but this team has no topic yet, if so, do nothing
-      if topic_id
-        contributor_set = contributor_set.reject {|contributor| contributor.topic == topic_id }
-      end
+      contributor_set = contributor_set.reject {|contributor| contributor.topic == topic_id } if topic_id
     end
 
     contributor_set

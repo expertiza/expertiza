@@ -29,13 +29,13 @@ class InvitationsController < ApplicationController
     participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', user.id, student.parent_id).first
     return unless participant
     old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
-     # Status code A for accepted
+    # Status code A for accepted
     old_entry.update_attribute("status", 'A') if old_entry
   end
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.where("LOWER(name) LIKE ?", "%#{search}%") unless search.blank?
+    @users = User.where("LOWER(name) LIKE ?", "%#{search}%") if search.present?
   end
 
   def accept

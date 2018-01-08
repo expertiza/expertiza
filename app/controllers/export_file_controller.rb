@@ -63,7 +63,7 @@ class ExportFileController < ApplicationController
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
 
-    allowed_models = %w(Assignment
+    allowed_models = %w[Assignment
                         AssignmentParticipant
                         AssignmentTeam
                         CourseParticipant
@@ -71,7 +71,7 @@ class ExportFileController < ApplicationController
                         MetareviewResponseMap
                         ReviewResponseMap
                         User
-                        Team)
+                        Team]
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
         csv << Object.const_get(params[:model]).export_fields(params[:options])

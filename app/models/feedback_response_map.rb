@@ -9,9 +9,9 @@ class FeedbackResponseMap < ResponseMap
 
   def show_review
     if self.review
-      return self.review.display_as_html
+      self.review.display_as_html
     else
-      return "No review was performed"
+      "No review was performed"
     end
   end
 
@@ -20,7 +20,7 @@ class FeedbackResponseMap < ResponseMap
   end
 
   def questionnaire
-    self.assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire')
+    self.assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire')
   end
 
   def contributor

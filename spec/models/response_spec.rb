@@ -144,7 +144,7 @@ describe Response do
   describe '.get_volume_of_review_comments' do
     it 'returns volumes of review comments in each round' do
       allow(Response).to receive(:concatenate_all_review_comments).with(1, 1)
-        .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
+                                                                  .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
       expect(Response.get_volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
     end
   end
@@ -153,7 +153,7 @@ describe Response do
     before(:each) do
       allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
     end
-  
+
     context 'when count is 0' do
       it 'returns false' do
         allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).with([response], response).and_return([0, 0])
@@ -169,7 +169,7 @@ describe Response do
           allow(response).to receive(:maximum_score).and_return(100)
           allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
           allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-            .and_return(double('AssignmentQuestionnaire', notification_limit: 5.0))
+                                                             .and_return(double('AssignmentQuestionnaire', notification_limit: 5.0))
           expect(response.significant_difference?).to be true
         end
       end

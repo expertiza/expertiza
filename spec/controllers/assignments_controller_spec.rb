@@ -156,7 +156,7 @@ describe AssignmentsController do
       it 'shows an error flash message and renders edit page' do
         allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([double('SignUpTopic'), double('SignUpTopic')])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1')
-          .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+                                                         .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
         allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])

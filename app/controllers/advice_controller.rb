@@ -33,7 +33,7 @@ class AdviceController < ApplicationController
     begin
       unless params[:advice].nil?
         params[:advice].each_key do |advice_key|
-          advice_key.update_attributes(advice: params[:advice][advice_key.to_sym][:advice])
+          QuestionAdvice.update(advice_key, advice: params[:advice][advice_key.to_sym][:advice])
         end
         flash[:notice] = "The advice was successfully saved!"
       end

@@ -14,7 +14,7 @@ module GradesHelper
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])
       @assignment_id = @assignment.id
-    elsif %w(view_my_scores view_review).include? params[:action]
+    elsif %w[view_my_scores view_review].include? params[:action]
       @assignment_id = Participant.find(params[:id]).parent_id
     end
     has_team = @assignment.max_team_size > 1
@@ -73,7 +73,7 @@ module GradesHelper
     # to render the html tables.
     questionnaires.each do |questionnaire|
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-                 AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+                 AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
                end
       next unless questionnaire.type == type
       vm = VmQuestionResponse.new(questionnaire, @assignment)
@@ -94,12 +94,12 @@ module GradesHelper
       return 10_003
     elsif question.is_a? ScoredQuestion
       return 9311 + row.question_max_score
-    else 
+    else
       return 9998
     end
   end
 
   def underlined?(score)
-    return "underlined" unless score.comment.blank?
+    return "underlined" if score.comment.present?
   end
 end

@@ -5,7 +5,7 @@ class SubmittedContentController < ApplicationController
      'Administrator',
      'Super-Administrator',
      'Student'].include? current_role_name and
-    ((%w(edit).include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
+    ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
     one_team_can_submit_work?
   end
 
@@ -17,9 +17,7 @@ class SubmittedContentController < ApplicationController
     @assignment = @participant.assignment
     # ACS We have to check if this participant has team or not
     # hence use team count for the check
-    if @participant.team.nil?
-      SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil)
-    end
+    SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
@@ -52,7 +50,7 @@ class SubmittedContentController < ApplicationController
                                 user: @participant.name,
                                 assignment_id: @participant.assignment.id,
                                 operation: "Submit Hyperlink")
-      rescue
+      rescue StandardError
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
       undo_link("The link has been successfully submitted.")
@@ -72,10 +70,10 @@ class SubmittedContentController < ApplicationController
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
     SubmissionRecord.create(team_id: team.id,
-                          content: hyperlink_to_delete,
-                          user: @participant.name,
-                          assignment_id: assignment.id,
-                          operation: "Remove Hyperlink")
+                            content: hyperlink_to_delete,
+                            user: @participant.name,
+                            assignment_id: assignment.id,
+                            operation: "Remove Hyperlink")
     action = (assignment.submission_allowed(topic_id) ? 'edit' : 'view')
     redirect_to action: action, id: @participant.id
   end
@@ -87,9 +85,7 @@ class SubmittedContentController < ApplicationController
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
-    if params[:current_folder]
-      @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name])
-    end
+    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
     curr_directory = if params[:origin] == 'review'
                        participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
                      else
@@ -106,10 +102,10 @@ class SubmittedContentController < ApplicationController
     assignment = Assignment.find(participant.parent_id)
     team = participant.team
     SubmissionRecord.create(team_id: team.id,
-                          content: full_filename,
-                          user: participant.name,
-                          assignment_id: assignment.id,
-                          operation: "Submit File")
+                            content: full_filename,
+                            user: participant.name,
+                            assignment_id: assignment.id,
+                            operation: "Submit File")
     # send message to reviewers when submission has been updated
     # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
     participant.assignment.email(participant.id) rescue nil
@@ -125,9 +121,7 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
-    if params[:current_folder]
-      @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name])
-    end
+    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
     if params[:faction][:delete]
       delete_selected_files
     elsif params[:faction][:rename]
@@ -151,7 +145,7 @@ class SubmittedContentController < ApplicationController
       raise "Cannot send a whole folder." if File.directory?(folder_name + "/" + file_name)
       raise "File does not exist." unless File.exist?(folder_name + "/" + file_name)
       send_file(folder_name + "/" + file_name, disposition: 'inline')
-    rescue => e
+    rescue StandardError => e
       flash[:error] = e.message
     end
   end
@@ -171,7 +165,7 @@ class SubmittedContentController < ApplicationController
     begin
         FileHelper.move_file(old_filename, newloc)
         flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
-      rescue => e
+      rescue StandardError => e
         flash[:error] = "There was a problem moving the file: " + e.message
       end
   end
@@ -182,7 +176,7 @@ class SubmittedContentController < ApplicationController
     begin
       raise "A file already exists in this directory with the name \"#{params[:faction][:rename]}\"" if File.exist?(new_filename)
       File.send("rename", old_filename, new_filename)
-    rescue => e
+    rescue StandardError => e
       flash[:error] = "There was a problem renaming the file: " + e.message
     end
   end
@@ -194,10 +188,10 @@ class SubmittedContentController < ApplicationController
     assignment = participant.try(:assignment)
     team = participant.try(:team)
     SubmissionRecord.create(team_id: team.try(:id),
-                          content: filename,
-                          user: participant.try(:name),
-                          assignment_id: assignment.try(:id),
-                          operation: "Remove File")
+                            content: filename,
+                            user: participant.try(:name),
+                            assignment_id: assignment.try(:id),
+                            operation: "Remove File")
   end
 
   def copy_selected_file
@@ -207,7 +201,7 @@ class SubmittedContentController < ApplicationController
       raise "A file with this name already exists. Please delete the existing file before copying." if File.exist?(new_filename)
       raise "The referenced file does not exist." unless File.exist?(old_filename)
       FileUtils.cp_r(old_filename, new_filename)
-    rescue => e
+    rescue StandardError => e
       flash[:error] = "There was a problem copying the file: " + e.message
     end
   end
@@ -219,14 +213,14 @@ class SubmittedContentController < ApplicationController
     begin
       FileHelper.create_directory_from_path(newloc)
       flash[:note] = "The directory #{params[:faction][:create]} was created."
-    rescue => e
+    rescue StandardError => e
       flash[:error] = e.message
     end
   end
 
   # if one team do not hold a topic (still in waitlist), they cannot submit their work.
   def one_team_can_submit_work?
-    return true unless %w(submit_file, submit_hyperlink).include? action_name # should work only when submit_file/hyperlink is called
+    return true unless %w[submit_file submit_hyperlink].include? action_name # should work only when submit_file/hyperlink is called
     @participant = if params[:id].nil?
                      AssignmentParticipant.find(params[:hyperlinks][:participant_id])
                    else

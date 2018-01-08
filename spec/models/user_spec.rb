@@ -297,7 +297,7 @@ describe User do
     it 'exports only current role and parent' do
       @csv = []
       User.export(@csv, nil, 'role' => 'true', 'parent' => 'true')
-      expect(@csv).to eq([%w(Student Instructor)])
+      expect(@csv).to eq([%w[Student Instructor]])
     end
 
     it 'exports only email_options' do
@@ -326,7 +326,7 @@ describe User do
 
     it 'exports only current role and parent' do
       expect(User.export_fields('role' => 'true', 'parent' => 'true'))
-        .to eq(%w(role parent))
+        .to eq(%w[role parent])
     end
 
     it 'exports only email_options' do

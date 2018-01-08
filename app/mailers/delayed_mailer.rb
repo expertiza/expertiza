@@ -50,12 +50,8 @@ class DelayedMailer
       if self.deadline_type == "drop_one_member_topics"
         drop_one_member_topics if assignment.team_assignment?
       end
-      if self.deadline_type == "drop_outstanding_reviews"
-        drop_outstanding_reviews
-      end
-      if self.deadline_type == "compare_files_with_simicheck"
-        perform_simicheck_comparisons(self.assignment_id)
-      end
+      drop_outstanding_reviews if self.deadline_type == "drop_outstanding_reviews"
+      perform_simicheck_comparisons(self.assignment_id) if self.deadline_type == "compare_files_with_simicheck"
     end
   end
 
@@ -66,7 +62,7 @@ class DelayedMailer
              else
                find_team_members_email_for_all_topics(sign_up_topics)
              end
-    email_reminder(emails, self.deadline_type) if emails and !emails.empty?
+    email_reminder(emails, self.deadline_type) if emails.present?
   end
 
   def find_team_members_email
@@ -138,9 +134,7 @@ class DelayedMailer
     Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
     @count += 1
     if @count % 3 == 0
-      if assignment.instructor.copy_of_emails
-        emails << assignment.instructor.email
-      end
+      emails << assignment.instructor.email if assignment.instructor.copy_of_emails
 
       # emails<< "expertiza-support@lists.ncsu.edu"
     end

@@ -8,9 +8,9 @@ module SummaryHelper
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
 
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
-      self.summary = Hash.new
-      self.avg_scores_by_round = Hash.new
-      self.avg_scores_by_criterion = Hash.new
+      self.summary = ({})
+      self.avg_scores_by_round = ({})
+      self.avg_scores_by_criterion = ({})
 
       # get all answers for each question and send them to summarization WS
       questions.keys.each do |round|
@@ -40,7 +40,6 @@ module SummaryHelper
       end
       self
     end
-
 
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
@@ -91,11 +90,11 @@ module SummaryHelper
       # @avg_scores_by_reviewee[team]
       # @avg_score_round[reviewee][round]
       # @avg_scores_by_criterion[reviewee][round][criterion]
-      self.summary = Hash.new
-      self.avg_scores_by_reviewee = Hash.new
-      self.avg_scores_by_round = Hash.new
-      self.avg_scores_by_criterion = Hash.new
-      self.reviewers = Hash.new
+      self.summary = ({})
+      self.avg_scores_by_reviewee = ({})
+      self.avg_scores_by_round = ({})
+      self.avg_scores_by_criterion = ({})
+      self.reviewers = ({})
       threads = []
 
       # get all criteria used in each round
@@ -109,7 +108,6 @@ module SummaryHelper
         self.avg_scores_by_reviewee[reviewee.name] = 0.0
         self.avg_scores_by_round[reviewee.name] = []
         self.avg_scores_by_criterion[reviewee.name] = []
-
 
         # get the name of reviewers for display only
         self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
@@ -169,7 +167,7 @@ module SummaryHelper
         sum_json = RestClient.post summary_ws_url, param.to_json, content_type: :json, accept: :json
         # store each summary in a hashmap and use the question as the key
         summary = JSON.parse(sum_json)["summary"]
-      rescue => err
+      rescue StandardError => err
         summary = err.message
       end
       summary
@@ -270,7 +268,7 @@ module SummaryHelper
     end
   end
 
-  extend self
+  module_function
 end
 
 # end required by autosummary

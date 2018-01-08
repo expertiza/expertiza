@@ -153,7 +153,7 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
       begin
         check("assignment_form_assignment_staggered_deadline")
-      rescue
+      rescue StandardError
         return
       end
       page.driver.browser.switch_to.alert.accept

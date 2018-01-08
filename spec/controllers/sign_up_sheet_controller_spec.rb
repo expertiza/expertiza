@@ -78,7 +78,7 @@ describe SignUpSheetController do
 
     context 'when topic can be found' do
       it 'updates the existing topic and redirects to sign_up_sheet#add_signup_topics_staggered page' do
-        allow(SignedUpTeam).to receive(:find_by_topic_id).with(1).and_return(signed_up_team)
+        allow(SignedUpTeam).to receive(:find_by).with(topic_id: 1).and_return(signed_up_team)
         allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: true).and_return([signed_up_team2])
         allow(Team).to receive(:find).with(2).and_return(team)
         allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
@@ -145,7 +145,7 @@ describe SignUpSheetController do
     context 'when topic can be found' do
       it 'updates current topic and redirects to assignment#edit page' do
         allow(SignUpTopic).to receive(:find).with('2').and_return(build(:topic, id: 2))
-        allow(SignedUpTeam).to receive(:find_by_topic_id).with(2).and_return(signed_up_team)
+        allow(SignedUpTeam).to receive(:find_by).with(topic_id: 2).and_return(signed_up_team)
         allow(SignedUpTeam).to receive(:where).with(topic_id: 2, is_waitlisted: true).and_return([signed_up_team2])
         allow(Team).to receive(:find).with(2).and_return(team)
         allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
@@ -169,13 +169,13 @@ describe SignUpSheetController do
   end
 
   describe '#list' do
-  before(:each) do
-    allow(SignUpTopic).to receive(:find_slots_filled).with(1).and_return([topic])
-        allow(SignUpTopic).to receive(:find_slots_waitlisted).with(1).and_return([])
-        allow(SignUpTopic).to receive(:where).with(assignment_id: 1, private_to: nil).and_return([topic])
-        allow(participant).to receive(:team).and_return(team)
-  end
-  
+    before(:each) do
+      allow(SignUpTopic).to receive(:find_slots_filled).with(1).and_return([topic])
+      allow(SignUpTopic).to receive(:find_slots_waitlisted).with(1).and_return([])
+      allow(SignUpTopic).to receive(:where).with(assignment_id: 1, private_to: nil).and_return([topic])
+      allow(participant).to receive(:team).and_return(team)
+    end
+
     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
       it 'renders sign_up_sheet#intelligent_topic_selection page' do
         assignment.is_intelligent = true
@@ -306,11 +306,12 @@ describe SignUpSheetController do
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to sign_up_sheet#list page' do
         due_date.due_at = DateTime.now.in_time_zone - 1.day
-        allow(assignment.due_dates).to receive(:find_by_deadline_type_id).with(6).and_return(due_date)
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
         params = {id: 1}
-        get :delete_signup, params
+        session = {user: instructor}
+        get :delete_signup, params, session
         expect(flash[:error]).to eq('You cannot drop your topic after the drop topic deadline!')
         expect(response).to redirect_to('/sign_up_sheet/list?id=1')
       end
@@ -352,7 +353,7 @@ describe SignUpSheetController do
     context 'when both submitted files and hyperlinks of current team are empty and drop topic deadline is not nil and its due date has already passed' do
       it 'shows a flash error message and redirects to assignment#edit page' do
         due_date.due_at = DateTime.now.in_time_zone - 1.day
-        allow(assignment.due_dates).to receive(:find_by_deadline_type_id).with(6).and_return(due_date)
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
         params = {id: 1}

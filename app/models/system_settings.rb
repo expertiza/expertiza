@@ -10,14 +10,12 @@ class SystemSettings < ActiveRecord::Base
   end
 
   def default_markup_style
-    unless @default_markup_style
-      @default_markup_style = if self.default_markup_style_id
+    @default_markup_style ||= if self.default_markup_style_id
                                 MarkupStyle.find(self.default_markup_style_id)
                               else
                                 MarkupStyle.new(id: nil,
                                                 name: '(None)')
                               end
-    end
     @default_markup_style
   end
 
@@ -44,9 +42,7 @@ class SystemSettings < ActiveRecord::Base
 
     pages << "Site default page" if self.site_default_page_id == pageid
     pages << "Not found page" if self.not_found_page_id == pageid
-    if self.permission_denied_page_id == pageid
-      pages << "Permission denied page"
-    end
+    pages << "Permission denied page" if self.permission_denied_page_id == pageid
     pages << "Session expired page" if self.session_expired_page_id == pageid
 
     if !pages.empty?

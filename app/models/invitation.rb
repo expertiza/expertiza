@@ -3,7 +3,7 @@ class Invitation < ActiveRecord::Base
   belongs_to :from_user, class_name: "User", foreign_key: "from_id"
 
   def self.remove_waitlists_for_team(topic_id, _assignment_id)
-    first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted:  true).first
+    first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
 
     # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
     first_waitlisted_signup.is_waitlisted = false
@@ -16,7 +16,7 @@ class Invitation < ActiveRecord::Base
   # Remove all invites sent by a user for an assignment.
   def self.remove_users_sent_invites_for_assignment(user_id, assignment_id)
     invites = Invitation.where('from_id = ? and assignment_id = ?', user_id, assignment_id)
-    invites.each{ |invite| invite.destroy }
+    invites.each(&:destroy)
   end
 
   # After a users accepts an invite, the teams_users table needs to be updated.
@@ -67,7 +67,7 @@ class Invitation < ActiveRecord::Base
   end
 
   def self.is_invited?(invitee_user_id, invited_user_id, assignment_id)
-    sent_invitation = Invitation.where('from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"', 
+    sent_invitation = Invitation.where('from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"',
                                        invitee_user_id, invited_user_id, assignment_id)
     return true if sent_invitation.empty?
     false

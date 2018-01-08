@@ -88,9 +88,7 @@ module AssignmentAnalytic
   def questionnaire_types
     questionnaire_type_list = []
     self.questionnaires.each do |questionnaire|
-      unless self.questionnaires.include?(questionnaire.type)
-        questionnaire_type_list << questionnaire.type
-      end
+      questionnaire_type_list << questionnaire.type unless self.questionnaires.include?(questionnaire.type)
     end
     questionnaire_type_list
   end
@@ -109,9 +107,7 @@ module AssignmentAnalytic
       assignment.questionnaire_types.each do |questionnaire_type|
         questionnaire_list = []
         assignment.questionnaires.each do |questionnaire|
-          if questionnaire.type == questionnaire_type
-            questionnaire_list << questionnaire
-          end
+          questionnaire_list << questionnaire if questionnaire.type == questionnaire_type
           return false if questionnaire_list.count > 1
         end
       end

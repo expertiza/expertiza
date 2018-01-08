@@ -44,12 +44,12 @@ module ReviewMappingHelper
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
       if review_graded_at.nil? ||
         (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
-        'blue' # review grade is not assigned or updated yet.
+        'blue' # REVIEW: grade is not assigned or updated yet.
       else
-        'brown' # review grades has been assigned.
+        'brown' # REVIEW: grades has been assigned.
       end
     else
-      'red' # review is not finished yet.
+      'red' # REVIEW: is not finished yet.
     end
   end
 
@@ -81,9 +81,9 @@ module ReviewMappingHelper
   end
 
   def get_min_max_avg_value_for_review_report(round, team_id)
-    [:max, :min, :avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && [:max, :min, :avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
-      [:max, :min, :avg].each do |metric|
+    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
+    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
+      %i[max min avg].each do |metric|
         metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
         instance_variable_set('@' + metric.to_s, metric_value)
       end
@@ -116,9 +116,7 @@ module ReviewMappingHelper
     if !team.nil? and !participant.nil?
       review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
-      if files and !files.empty?
-        html += display_review_files_directory_tree(participant, files)
-      end
+      html += display_review_files_directory_tree(participant, files) if files.present?
     end
     html.html_safe
   end
@@ -149,9 +147,7 @@ module ReviewMappingHelper
     answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
     comments = answer_with_link.try(:comments)
     html = ''
-    if comments and !comments.empty? and comments.start_with?('http')
-      html += display_hyperlink_in_peer_review_question(comments)
-    end
+    html += display_hyperlink_in_peer_review_question(comments) if comments.present? and comments.start_with?('http')
     html.html_safe
   end
 

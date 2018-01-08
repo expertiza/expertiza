@@ -28,17 +28,13 @@ class QuestionnairesController < ApplicationController
   end
 
   def new
-    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
-      @questionnaire = Object.const_get(params[:model].split.join).new
-    end
+    @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
   end
 
   def create
-    questionnaire_private = params[:questionnaire][:private] == "true" ? true : false
+    questionnaire_private = params[:questionnaire][:private] == "true"
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
-    if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
-      @questionnaire = Object.const_get(params[:questionnaire][:type]).new
-    end
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
     begin
       @questionnaire.private = questionnaire_private
       @questionnaire.name = params[:questionnaire][:name]
@@ -65,10 +61,10 @@ class QuestionnairesController < ApplicationController
       @questionnaire.save
       # Create node
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
-      parent = FolderNode.find_by_node_object_id(tree_folder.id)
+      parent = FolderNode.find_by(node_object_id: tree_folder.id)
       QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
       flash[:success] = 'You have successfully created a questionnaire!'
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
@@ -91,14 +87,10 @@ class QuestionnairesController < ApplicationController
 
       save_choices @questionnaire.id
 
-      if @successful_create == true
-        flash[:note] = "The quiz was successfully created."
-      end
+      flash[:note] = "The quiz was successfully created." if @successful_create == true
       redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
     else # if it is not a quiz questionnaire
-      if session[:user].role.name == "Teaching Assistant"
-        @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id)
-      end
+      @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == "Teaching Assistant"
       save
 
       redirect_to controller: 'tree_display', action: 'list'
@@ -116,7 +108,7 @@ class QuestionnairesController < ApplicationController
     begin
       @questionnaire.update_attributes(questionnaire_params)
       flash[:success] = 'The questionnaire has been successfully updated!'
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     redirect_to edit_questionnaire_path(@questionnaire.id.to_s.to_sym)
@@ -135,9 +127,7 @@ class QuestionnairesController < ApplicationController
         questions = @questionnaire.questions
         # if this rubric had some answers, flash error
         questions.each do |question|
-          unless question.answers.empty?
-            raise "There are responses based on this rubric, we suggest you do not delete it."
-          end
+          raise "There are responses based on this rubric, we suggest you do not delete it." unless question.answers.empty?
         end
         questions.each do |question|
           advices = question.question_advices
@@ -148,7 +138,7 @@ class QuestionnairesController < ApplicationController
         questionnaire_node.delete
         @questionnaire.delete
         undo_link("The questionnaire \"#{name}\" has been successfully deleted.")
-      rescue => e
+      rescue StandardError => e
         flash[:error] = e.message
       end
     end
@@ -182,7 +172,7 @@ class QuestionnairesController < ApplicationController
       question.size = '30' if question.is_a? TextField
       begin
         question.save
-      rescue
+      rescue StandardError
         flash[:error] = $ERROR_INFO
       end
     end
@@ -206,7 +196,7 @@ class QuestionnairesController < ApplicationController
           flash[:success] = 'All questions has been successfully saved!'
         end
       end
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
 
@@ -292,7 +282,7 @@ class QuestionnairesController < ApplicationController
   def update_quiz
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.nil?
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid] 
+      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
       return
     end
     if params['save'] && params[:question].try(:keys)
@@ -382,8 +372,8 @@ class QuestionnairesController < ApplicationController
     save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
     # We do not create node for quiz questionnaires
     if @questionnaire.type != "QuizQuestionnaire"
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
+      pFolder = TreeFolder.find_by(name: @questionnaire.display_type)
+      parent = FolderNode.find_by(node_object_id: pFolder.id)
       # create_new_node_if_necessary(parent)
     end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
@@ -423,7 +413,7 @@ class QuestionnairesController < ApplicationController
       end
 
       next unless should_delete
-      question.question_advices.each{ |advice| advice.destroy }
+      question.question_advices.each(&:destroy)
       # keep track of the deleted questions
       @deleted_questions.push(question)
       question.destroy
@@ -445,9 +435,7 @@ class QuestionnairesController < ApplicationController
         else
           # Update existing question.
           question = Question.find(question_key)
-          unless question.update_attributes(params[:question][question_key])
-            Rails.logger.info(question.errors.messages.inspect)
-          end
+          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
           end
 
       end
@@ -470,11 +458,11 @@ class QuestionnairesController < ApplicationController
                     0
                   end
           if q_type == "MultipleChoiceCheckbox"
-            if params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-            else
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-            end
+            q = if params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s
+                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+                else
+                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                end
             q.save
           elsif q_type == "TrueFalse"
             if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
@@ -489,11 +477,11 @@ class QuestionnairesController < ApplicationController
               q.save
             end
           else
-            if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-            else
-              q = QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-            end
+            q = if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
+                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+                else
+                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                end
             q.save
           end
         end
@@ -504,7 +492,7 @@ class QuestionnairesController < ApplicationController
   end
 
   def questionnaire_params
-    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score, 
+    params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
   end
 
@@ -543,9 +531,7 @@ class QuestionnairesController < ApplicationController
       questions.each do |question|
         new_question = question.dup
         new_question.questionnaire_id = @questionnaire.id
-        if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
-          new_question.size = '50,3'
-        end
+        new_question.size = '50,3' if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
         new_question.save!
         advices = QuestionAdvice.where(question_id: question.id)
         next if advices.empty?
@@ -556,18 +542,18 @@ class QuestionnairesController < ApplicationController
         end
       end
 
-      pFolder = TreeFolder.find_by_name(@questionnaire.display_type)
-      parent = FolderNode.find_by_node_object_id(pFolder.id)
+      pFolder = TreeFolder.find_by(name: @questionnaire.display_type)
+      parent = FolderNode.find_by(node_object_id: pFolder.id)
       QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully.")
       redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
-    rescue
+    rescue StandardError
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO
       redirect_to action: 'list', controller: 'tree_display'
     end
   end
 
-  def assign_instructor_id 
+  def assign_instructor_id
     # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
     if session[:user].role.name != "Teaching Assistant"
       session[:user].id

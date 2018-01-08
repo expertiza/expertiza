@@ -31,7 +31,7 @@ module OnTheFlyCalc
         questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
         contributors.each do |contributor|
           assessments = ReviewResponseMap.get_assessments_for(contributor)
-          assessments = assessments.reject {|assessment| assessment.round != round }
+          assessments = assessments.select {|assessment| assessment.round == round }
           scores[contributor.id] = {} if round == 1
           scores[contributor.id][round] = {}
           scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
@@ -149,7 +149,7 @@ def scores_varying_rubrics
     @response_maps.each do |response_map|
       reviewer = @review_scores[response_map.reviewer_id]
       @corresponding_response = Response.where('map_id = ?', response_map.id)
-      @corresponding_response = @corresponding_response.reject {|response| response.round != round } unless @corresponding_response.empty?
+      @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
       @respective_scores = {}
       @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
       calc_review_score

@@ -2,8 +2,8 @@ class ControllerAction < ActiveRecord::Base
   belongs_to :site_controller
   belongs_to :permission
 
-  validates_presence_of :name
-  validates_uniqueness_of :name, scope: 'site_controller_id'
+  validates :name, presence: true
+  validates :name, uniqueness: {scope: 'site_controller_id'}
 
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
 
@@ -17,14 +17,12 @@ class ControllerAction < ActiveRecord::Base
   end
 
   def permission
-    unless @permission
-      @permission = if self.permission_id
+    @permission ||= if self.permission_id
                       Permission.find(self.permission_id)
                     else
                       Permission.new(id: nil,
                                      name: "(default -- #{self.controller.permission.name})")
                     end
-    end
     @permission
   end
 
@@ -34,9 +32,9 @@ class ControllerAction < ActiveRecord::Base
 
   def fullname
     if self.site_controller_id and self.site_controller_id > 0
-      return "#{self.controller.name}: #{self.name}"
+      "#{self.controller.name}: #{self.name}"
     else
-      return self.name.to_s
+      self.name.to_s
       end
   end
 
@@ -75,7 +73,7 @@ class ControllerAction < ActiveRecord::Base
   end
 
   def self.find_for_permission(p_ids)
-    if p_ids && !p_ids.empty?
+    if p_ids.present?
       where(['permission_id in (?)', p_ids]).order('name')
     else
       []

@@ -5,28 +5,26 @@ class TagPrompt < ActiveRecord::Base
 
   def html_control(tag_prompt_deployment, answer)
     html = ""
-    if !answer.nil?
+    unless answer.nil?
       stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id)
 
       length_valid = false
-      if not tag_prompt_deployment.answer_length_threshold.nil?
-        if not answer.comments.nil? and (answer.comments.length > tag_prompt_deployment.answer_length_threshold)
-          length_valid = true
-        end
+      if !tag_prompt_deployment.answer_length_threshold.nil?
+        length_valid = true if !answer.comments.nil? and (answer.comments.length > tag_prompt_deployment.answer_length_threshold)
       else
         length_valid = true
       end
 
       if length_valid and answer.question.type.eql?(tag_prompt_deployment.question_type)
         case self.control_type.downcase
-          when "slider"
-            html = slider_control(answer, tag_prompt_deployment, stored_tags)
-          when "checkbox"
-            html = checkbox_control(answer, tag_prompt_deployment, stored_tags)
+        when "slider"
+          html = slider_control(answer, tag_prompt_deployment, stored_tags)
+        when "checkbox"
+          html = checkbox_control(answer, tag_prompt_deployment, stored_tags)
         end
       end
     end
-    return html.html_safe
+    html.html_safe
   end
 
   def checkbox_control(answer, tag_prompt_deployment, stored_tags)
@@ -46,7 +44,7 @@ class TagPrompt < ActiveRecord::Base
     html += '<label for="' + control_id + '">&nbsp;'
     html += self.prompt.to_s + '</label>'
     html += '</div>'
-    return html
+    html
   end
 
   def slider_control(answer, tag_prompt_deployment, stored_tags)
@@ -77,6 +75,6 @@ class TagPrompt < ActiveRecord::Base
     html += ' <div class="toggle-caption">' + self.prompt.to_s + '</div>'
     html += '</div>'
 
-    return html
+    html
   end
 end

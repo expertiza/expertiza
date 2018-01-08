@@ -10,7 +10,7 @@ class Participant < ActiveRecord::Base
   has_many :awarded_badges
   has_one :review_grade
 
-  PARTICIPANT_TYPES = %w(Course Assignment).freeze
+  PARTICIPANT_TYPES = %w[Course Assignment].freeze
 
   def team
     TeamsUser.where(user: user).first.try :team
@@ -20,7 +20,7 @@ class Participant < ActiveRecord::Base
     response_maps.map(&:response)
   end
 
-  validates_numericality_of :grade, allow_nil: true
+  validates :grade, numericality: {allow_nil: true}
 
   delegate :course, to: :assignment
 
@@ -48,7 +48,7 @@ class Participant < ActiveRecord::Base
 
   def delete(force = nil)
     maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', self.id, self.id)
-    if force or ((maps.nil? or maps.empty?) and
+    if force or (maps.blank? and
                  self.team.nil?)
       force_delete(maps)
     else
@@ -106,7 +106,7 @@ class Participant < ActiveRecord::Base
 
     if self.assignment.varying_rubrics_by_round? # for "vary rubric by rounds" feature -Yang
       self.assignment.questionnaires.each do |questionnaire|
-        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(self.assignment.id, questionnaire.id).used_in_round
+        round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
         questionnaire_symbol = if !round.nil?
                                  (questionnaire.symbol.to_s + round.to_s).to_sym
                                else
@@ -154,15 +154,9 @@ class Participant < ActiveRecord::Base
   # Get authorization from permissions.
   def self.get_authorization(can_submit, can_review, can_take_quiz)
     authorization = 'participant'
-    if can_submit == false and can_review == true and can_take_quiz == true
-      authorization = 'reader'
-    end
-    if can_submit == true and can_review == false and can_take_quiz == false
-      authorization = 'submitter'
-    end
-    if can_submit == false and can_review == true and can_take_quiz == false
-      authorization = 'reviewer'
-    end
+    authorization = 'reader' if can_submit == false and can_review == true and can_take_quiz == true
+    authorization = 'submitter' if can_submit == true and can_review == false and can_take_quiz == false
+    authorization = 'reviewer' if can_submit == false and can_review == true and can_take_quiz == false
     authorization
   end
 

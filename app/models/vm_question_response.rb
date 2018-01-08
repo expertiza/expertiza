@@ -5,7 +5,7 @@ class VmQuestionResponse
   @questionnaire = nil
   @assignment = nil
 
-  def initialize(questionnaire, assignment=nil)
+  def initialize(questionnaire, assignment = nil)
     @assignment = assignment
     @questionnaire = questionnaire
     if questionnaire.type == "ReviewQuestionnaire"
@@ -166,7 +166,7 @@ class VmQuestionResponse
       # if it does, then associate this answer with the tag_prompt and tag deployment (the setting)
       tag_deps.each do |tag_dep|
         if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold
-          vm_tag_prompts.append(VmTagPromptAnswer.new(answer, TagPrompt.find(tag_dep.tag_prompt_id),tag_dep))
+          vm_tag_prompts.append(VmTagPromptAnswer.new(answer, TagPrompt.find(tag_dep.tag_prompt_id), tag_dep))
         end
       end
       # end tag_prompt code
@@ -184,9 +184,7 @@ class VmQuestionResponse
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         @list_of_rows.each do |row|
-          if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
-            row.countofcomments = row.countofcomments + 1
-          end
+          row.countofcomments = row.countofcomments + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
         end
       end
     end

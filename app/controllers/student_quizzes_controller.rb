@@ -4,7 +4,7 @@ class StudentQuizzesController < ApplicationController
      'Instructor',
      'Teaching Assistant'].include? current_role_name or
     (current_role_name.eql?("Student") and
-      ((%w(index).include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
+      ((%w[index].include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
   end
 
   def index
@@ -84,9 +84,7 @@ class StudentQuizzesController < ApplicationController
                   0
                 end
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score
-        if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
-          valid = false
-        end
+        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
         scores.push(new_score)
       end
     end
@@ -118,7 +116,7 @@ class StudentQuizzesController < ApplicationController
   end
 
   def graded?(response, question)
-    Answer.where(question_id: question.id, response_id:  response.id).first
+    Answer.where(question_id: question.id, response_id: response.id).first
   end
 
   # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.

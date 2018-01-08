@@ -26,7 +26,7 @@ class Role < ActiveRecord::Base
   end
 
   def self.student
-    @@student_role ||= find_by_name 'Student'
+    @@student_role ||= find_by name: 'Student'
   end
 
   def student?
@@ -46,15 +46,15 @@ class Role < ActiveRecord::Base
   end
 
   def self.ta
-    @@ta_role ||= find_by_name 'Teaching Assistant'
+    @@ta_role ||= find_by name: 'Teaching Assistant'
   end
 
   def self.instructor
-    @@instructor_role ||= find_by_name 'Instructor'
+    @@instructor_role ||= find_by name: 'Instructor'
   end
 
   def self.administrator
-    @@administrator_role ||= find_by_name 'Administrator'
+    @@administrator_role ||= find_by name: 'Administrator'
   end
 
   def self.admin
@@ -62,7 +62,7 @@ class Role < ActiveRecord::Base
   end
 
   def self.superadministrator
-    @@superadministrator_role ||= find_by_name 'Super-Administrator'
+    @@superadministrator_role ||= find_by name: 'Super-Administrator'
   end
 
   def super_admin?

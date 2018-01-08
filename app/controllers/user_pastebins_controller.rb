@@ -1,5 +1,5 @@
 class UserPastebinsController < ApplicationController
-  before_action :set_user_pastebin, only: [:show, :edit, :update, :destroy]
+  before_action :set_user_pastebin, only: %i[show edit update destroy]
 
   def action_allowed?
     case params[:action]
@@ -14,11 +14,9 @@ class UserPastebinsController < ApplicationController
   # GET /user_pastebins
   def index
     begin
-
       json = UserPastebin.get_current_user_pastebin_json current_user
       render json: json
-
-    rescue => e
+    rescue StandardError => e
       flash[:error] = e.message
     end
   end

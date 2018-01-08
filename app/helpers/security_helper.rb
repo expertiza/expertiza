@@ -5,9 +5,9 @@ module SecurityHelper
 
   def contains_special_chars?(str)
     special = special_chars
-    regex = /[#{special.gsub(/./){|char| "\\#{char}"}}]/
+    regex = /[#{special.gsub(/./) {|char| "\\#{char}" }}]/
 
-    return !(str =~ regex).nil?
+    !(str =~ regex).nil?
   end
 
   def warn_for_special_chars(str, field_name)
@@ -15,7 +15,7 @@ module SecurityHelper
       flash[:error] = field_name + " must not contain special characters '" + special_chars + "'."
       return true
     end
-    return false
+    false
   end
 
   def json_valid?(str)

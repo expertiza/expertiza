@@ -17,11 +17,11 @@ class User < ActiveRecord::Base
   has_many :track_notifications, dependent: :destroy
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  validates_presence_of :name
-  validates_uniqueness_of :name
+  validates :name, presence: true
+  validates :name, uniqueness: true
 
-  validates_presence_of :email, message: "can't be blank"
-  validates_format_of :email, with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true
+  validates :email, presence: {message: "can't be blank"}
+  validates :email, format: {with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true}
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
   after_create :email_welcome
@@ -93,7 +93,7 @@ class User < ActiveRecord::Base
   def self.anonymized_view?(ip_address = nil)
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     return true if ip_address and anonymized_view_starter_ips.include? ip_address
-    return false
+    false
   end
 
   def name(ip_address = nil)
@@ -131,7 +131,7 @@ class User < ActiveRecord::Base
 
   def valid_password?(password)
     Authlogic::CryptoProviders::Sha1.stretches = 1
-    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, *[self.password_salt.to_s + password])
+    Authlogic::CryptoProviders::Sha1.matches?(crypted_password, self.password_salt.to_s + password)
   end
 
   # Resets the password to be mailed to the user
@@ -218,9 +218,7 @@ class User < ActiveRecord::Base
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
       for participant in participants
-        if participant.permission_granted
-          AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant])
-        end
+        AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant]) if participant.permission_granted
       end
     end
 
@@ -241,14 +239,10 @@ class User < ActiveRecord::Base
     users = User.all
     users.each do |user|
       tcsv = []
-      if options["personal_details"] == "true"
-        tcsv.push(user.name, user.fullname, user.email)
-      end
+      tcsv.push(user.name, user.fullname, user.email) if options["personal_details"] == "true"
       tcsv.push(user.role.name) if options["role"] == "true"
       tcsv.push(user.parent.name) if options["parent"] == "true"
-      if options["email_options"] == "true"
-        tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails)
-      end
+      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
       tcsv.push(user.handle) if options["handle"] == "true"
       csv << tcsv
     end
@@ -260,14 +254,10 @@ class User < ActiveRecord::Base
 
   def self.export_fields(options)
     fields = []
-    if options["personal_details"] == "true"
-      fields.push("name", "full name", "email")
-    end
+    fields.push("name", "full name", "email") if options["personal_details"] == "true"
     fields.push("role") if options["role"] == "true"
     fields.push("parent") if options["parent"] == "true"
-    if options["email_options"] == "true"
-      fields.push("email on submission", "email on review", "email on metareview")
-    end
+    fields.push("email on submission", "email on review", "email on metareview") if options["email_options"] == "true"
     fields.push("handle") if options["handle"] == "true"
     fields
   end

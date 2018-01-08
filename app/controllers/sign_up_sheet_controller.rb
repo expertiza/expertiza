@@ -21,7 +21,7 @@ class SignUpSheetController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name and
-      ((%w(list).include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
       ['Instructor',
        'Teaching Assistant',
@@ -36,7 +36,7 @@ class SignUpSheetController < ApplicationController
   include DeadlineHelper
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [:destroy, :create, :update],
+  verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
 
   # Prepares the form for adding a new topic. Used in conjunction with create
@@ -140,7 +140,7 @@ class SignUpSheetController < ApplicationController
   # staggered means that different topics can have different deadlines.
   def redirect_to_sign_up(assignment_id)
     assignment = Assignment.find(assignment_id)
-    (assignment.staggered_deadline == true) ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
+    assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
   end
 
   # simple function that redirects to assignment->edit->topic panel to display /add_signup_topics or the /add_signup_topics_staggered page
@@ -162,7 +162,7 @@ class SignUpSheetController < ApplicationController
     team_id = @participant.team.try(:id)
 
     if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority) 
+      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
       signed_up_topics = []
       @bids.each do |bid|
         sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
@@ -174,14 +174,12 @@ class SignUpSheetController < ApplicationController
     end
 
     @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(7)
-    @drop_topic_deadline = @assignment.due_dates.find_by_deadline_type_id(6)
+    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
-    unless @assignment.due_dates.find_by_deadline_type_id(1).nil?
-      if !@assignment.staggered_deadline? and @assignment.due_dates.find_by_deadline_type_id(1).due_at < Time.now
-        @show_actions = false
-      end
+    unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
+      @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
 
       # Find whether the user has signed up for any topics; if so the user won't be able to
       # sign up again unless the former was a waitlisted topic
@@ -194,9 +192,7 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
                          end
     end
-    if @assignment.is_intelligent
-      render 'sign_up_sheet/intelligent_topic_selection' and return
-    end
+    render 'sign_up_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
   end
 
   def sign_up
@@ -205,9 +201,7 @@ class SignUpSheetController < ApplicationController
     # Always use team_id ACS
     # s = Signupsheet.new
     # Team lazy initialization: check whether the user already has a team for this assignment
-    unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
-      flash[:error] = "You've already signed up for a topic!"
-    end
+    flash[:error] = "You've already signed up for a topic!" unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
     redirect_to action: 'list', id: params[:id]
   end
 
@@ -236,7 +230,7 @@ class SignUpSheetController < ApplicationController
   def delete_signup
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
-    drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
+    drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
     # A student who has already submitted work should not be allowed to drop his/her topic!
     # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
     # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
@@ -258,7 +252,7 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(team.parent_id)
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
-    drop_topic_deadline = assignment.due_dates.find_by_deadline_type_id(6)
+    drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "The student has already submitted their work, so you are not allowed to remove them."
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
@@ -319,7 +313,7 @@ class SignUpSheetController < ApplicationController
         @topic_review_due_date = due_dates[topics[index].id.to_s + '_review_' + i.to_s + '_due_date']
         @assignment_submission_due_date = DateTime.parse(@assignment_submission_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
         @assignment_review_due_date = DateTime.parse(@assignment_review_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
-        %w(submission review).each do |deadline_type|
+        %w[submission review].each do |deadline_type|
           deadline_type_id = DeadlineType.find_by_name(deadline_type).id
           next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
           topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
@@ -386,7 +380,7 @@ class SignUpSheetController < ApplicationController
     end
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
     waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
-    unless waitlisted_teams.blank?
+    if waitlisted_teams.present?
       waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
       SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)
     end
@@ -402,9 +396,7 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-    if @assignment.microtask?
-      @sign_up_topic.micropayment = params[:topic][:micropayment]
-    end
+    @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
     if @assignment.staggered_deadline?
       topic_set = []
       topic = @sign_up_topic.id
@@ -431,7 +423,7 @@ class SignUpSheetController < ApplicationController
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by_topic_id(topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
       topic.max_choosers = params[:topic][:max_choosers]
     else
       if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i

@@ -2,7 +2,7 @@ class ParticipantsController < ApplicationController
   autocomplete :user, :name
 
   def action_allowed?
-    if %w(change_handle update_duties).include? params[:action]
+    if %w[change_handle update_duties].include? params[:action]
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -18,7 +18,7 @@ class ParticipantsController < ApplicationController
 
   def list
     if Participant::PARTICIPANT_TYPES.include? params[:model]
-      @root_node = Object.const_get(params[:model] + "Node").find_by_node_object_id(params[:id])
+      @root_node = Object.const_get(params[:model] + "Node").find_by(node_object_id: params[:id])
       @parent = Object.const_get(params[:model]).find(params[:id])
     end
     begin
@@ -27,7 +27,7 @@ class ParticipantsController < ApplicationController
       # E726 Fall2012 Changes Begin
       @authorization = params[:authorization]
       # E726 Fall2012 Changes End
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
   end
@@ -44,10 +44,10 @@ class ParticipantsController < ApplicationController
       elsif curr_object.is_a?(Course)
         curr_object.add_participant(params[:user][:name])
       end
-      user = User.find_by_name(params[:user][:name])
-      @participant = curr_object.participants.find_by_user_id(user.id)
+      user = User.find_by(name: params[:user][:name])
+      @participant = curr_object.participants.find_by(user_id: user.id)
       undo_link("The user <b>#{params[:user][:name]}</b> has successfully been added.")
-    rescue
+    rescue StandardError
       url_for controller: 'users', action: 'new'
       flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
     end
@@ -80,7 +80,7 @@ class ParticipantsController < ApplicationController
     begin
       participant.destroy
       flash[:note] = undo_link("The user \"#{participant.user.name}\" has been successfully removed as a participant.")
-    rescue
+    rescue StandardError
       flash[:error] = 'The delete action failed: At least one review mapping or team membership exist for this participant.'
     end
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
@@ -158,7 +158,7 @@ class ParticipantsController < ApplicationController
     begin
         contributor.destroy
         flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
-      rescue
+      rescue StandardError
         flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
       end
     redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
@@ -180,7 +180,7 @@ class ParticipantsController < ApplicationController
       team.users {|team_user| users.append(get_user_info(team_user, assignment)) }
       team_info[:users] = users
       @has_topics = get_signup_topics_for_assignment(assignment_id, team_info, team.id)
-      team_without_topic = !SignedUpTeam.where("team_id = ?", team.id).any?
+      team_without_topic = SignedUpTeam.where("team_id = ?", team.id).none?
       next if @has_topics && team_without_topic
       @teams_info.append(team_info)
     end
@@ -204,9 +204,7 @@ class ParticipantsController < ApplicationController
     has_signature = false
     signature_valid = false
     assignment.participants.each do |participant|
-      if team_user.id == participant.user.id
-        permission_granted = participant.permission_granted?
-      end
+      permission_granted = participant.permission_granted? if team_user.id == participant.user.id
     end
     # If permission is granted, set the publisting rights string
     user[:pub_rights] = permission_granted ? "Granted" : "Denied"

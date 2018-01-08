@@ -5,7 +5,7 @@ class HttpRequest
   class << self
     # IP addresses and local URLs will not match, must include http(s)
     def valid_url?(url)
-      /^#{URI.regexp}$/.match(url)
+      /^#{URI::DEFAULT_PARSER.make_regexp}$/.match(url)
     end
 
     def get(url, limit = 5)

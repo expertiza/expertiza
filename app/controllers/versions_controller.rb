@@ -1,5 +1,5 @@
 class VersionsController < ApplicationController
-  before_action :conflict?, except: [:index, :destroy, :destroy_all]
+  before_action :conflict?, except: %i[index destroy destroy_all]
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -39,7 +39,7 @@ class VersionsController < ApplicationController
 
   # test if someone else has edited the same item to undo
   def conflict?
-    @version = Version.find_by_id(params[:id])
+    @version = Version.find_by(id: params[:id])
     if @version
       @versions = Version.where("whodunnit = ? AND created_at = ?", @version.version_author, @version.created_at)
       @versions.each do |v|
@@ -63,7 +63,7 @@ class VersionsController < ApplicationController
         if v.reify
           begin
             v.reify.save!
-          rescue => e
+          rescue StandardError => e
             @versions.delete(v)
           end
         else

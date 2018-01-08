@@ -59,9 +59,7 @@ class Criterion < ScoredQuestion
     advice_total_length = 0
 
     question_advices.each do |question_advice|
-      if question_advice.advice && question_advice.advice != ""
-        advice_total_length += question_advice.advice.length
-      end
+      advice_total_length += question_advice.advice.length if question_advice.advice && question_advice.advice != ""
     end
 
     if !question_advices.empty? and advice_total_length > 0
@@ -114,9 +112,9 @@ class Criterion < ScoredQuestion
 
         html += j.to_s
         if j == questionnaire_min
-          html += "-" + self.min_label if self.min_label && !self.min_label.empty?
+          html += "-" + self.min_label if self.min_label.present?
         elsif j == questionnaire_max
-          html += "-" + self.max_label if self.max_label && !self.max_label.empty?
+          html += "-" + self.max_label if self.max_label.present?
         end
         html += "</option>"
       end
@@ -172,8 +170,7 @@ class Criterion < ScoredQuestion
   def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
 
-
-    score = (answer && !answer.answer.nil?) ? answer.answer.to_s : "-"
+    score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
     score_percent = if score != "-"
                       answer.answer * 1.0 / questionnaire_max
                     else

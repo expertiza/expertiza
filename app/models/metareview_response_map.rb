@@ -12,11 +12,11 @@ class MetareviewResponseMap < ResponseMap
       @prev.each do |element|
         @sorted_array << element if element.map_id == self.review_mapping.map_id
       end
-      @sorted = @sorted_array.sort {|m1, m2| (m1.version_num and m2.version_num) ? m1.version_num <=> m2.version_num : (m1.version_num ? -1 : 1) }
+      @sorted = @sorted_array.sort {|m1, m2| m1.version_num and m2.version_num ? m1.version_num <=> m2.version_num : (m1.version_num ? -1 : 1) }
       # return all the lists in ascending order.
-      return @sorted
+      @sorted
     else
-      return nil # "<I>No review was performed.</I><br/><hr/><br/>"
+      nil # "<I>No review was performed.</I><br/><hr/><br/>"
     end
   end
 
@@ -28,7 +28,7 @@ class MetareviewResponseMap < ResponseMap
   end
 
   def questionnaire
-    self.assignment.questionnaires.find_by_type('MetareviewQuestionnaire')
+    self.assignment.questionnaires.find_by(type: 'MetareviewQuestionnaire')
   end
 
   def get_title
@@ -53,45 +53,35 @@ class MetareviewResponseMap < ResponseMap
   end
 
   def self.import(row, _session, id)
-    if row.length < 3
-      raise ArgumentError.new("Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>")
-    end
+    raise ArgumentError.new("Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>") if row.length < 3
 
     index = 2
     while index < row.length
       # ACS Make All contributors as teams
-      contributor = AssignmentTeam.where(name: row[0].to_s.strip, parent_id:  id).first
+      contributor = AssignmentTeam.where(name: row[0].to_s.strip, parent_id: id).first
 
-      if contributor.nil?
-        raise ImportError, "Contributor, " + row[0].to_s + ", was not found."
-      end
+      raise ImportError, "Contributor, " + row[0].to_s + ", was not found." if contributor.nil?
 
-      ruser = User.find_by_name(row[1].to_s.strip)
-      reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id:  id).first
-      if reviewee.nil?
-        raise ImportError, "Reviewee,  " + row[1].to_s + ", for contributor, " + contributor.name + ", was not found."
-        end
+      ruser = User.find_by(name: row[1].to_s.strip)
+      reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id: id).first
+      raise ImportError, "Reviewee,  " + row[1].to_s + ", for contributor, " + contributor.name + ", was not found." if reviewee.nil?
 
-      muser = User.find_by_name(row[index].to_s.strip)
-      reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
+      muser = User.find_by(name: row[index].to_s.strip)
+      reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id: id).first
       if reviewer.nil?
         raise ImportError, "Metareviewer,  " + row[index].to_s + ", for contributor, " + contributor.name + ", and reviewee, " + row[1].to_s + ", was not found."
         end
 
       # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
-      if reviewmapping.nil?
-        raise ImportError, "No review mapping was found for contributor, " + contributor.name + ", and reviewee, " + row[1].to_s + "."
-      end
+      reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id: reviewee.id).first
+      raise ImportError, "No review mapping was found for contributor, " + contributor.name + ", and reviewee, " + row[1].to_s + "." if reviewmapping.nil?
 
       existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
       # if no mappings have already been imported for this combination
       # create it.
 
-      if existing_mappings.empty?
-        MetareviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: reviewmapping.map_id)
-      end
+      MetareviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: reviewmapping.map_id) if existing_mappings.empty?
 
       index += 1
           end

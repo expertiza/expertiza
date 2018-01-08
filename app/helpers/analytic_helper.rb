@@ -58,7 +58,7 @@ module AnalyticHelper
 
   #======== sorting ============#
   def sort_by_name(array_of_arrays)
-    array_of_arrays.sort {|x, y| x[0] <=> y[0] }
+    array_of_arrays.sort_by {|a| a[0] }
   end
 
   #======= helper data formatting =====#

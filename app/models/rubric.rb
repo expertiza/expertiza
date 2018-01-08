@@ -10,9 +10,9 @@ class Rubric < Questionnaire
   # see http://blog.hasmanythrough.com/2007/1/15/basic-rails-association-cardinality
 
   # can these be inherited too?
-  validates_presence_of :name
-  validates_numericality_of :max_question_score
-  validates_numericality_of :min_question_score
+  validates :name, presence: true
+  validates :max_question_score, numericality: true
+  validates :min_question_score, numericality: true
 
   def update_mapping
     redirect_to action: 'list', type_id: type_id

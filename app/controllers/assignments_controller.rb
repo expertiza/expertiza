@@ -4,7 +4,7 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if %w(edit update list_submissions).include? params[:action]
+    if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
       ['Super-Administrator',
        'Administrator'].include? current_role_name or
@@ -46,9 +46,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
-    if current_user.timezonepref.nil?
-      flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
-    end
+    flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
     assignment_form_assignment_staggered_deadline?
     @due_date_all.each do |dd|
@@ -83,7 +81,7 @@ class AssignmentsController < ApplicationController
   def path
     begin
       file_path = @assignment.path
-    rescue
+    rescue StandardError
       file_path = nil
     end
     file_path
@@ -120,7 +118,7 @@ class AssignmentsController < ApplicationController
         @assignment_form.delete(params[:force])
         flash[:success] = "The assignment was successfully deleted."
       end
-    rescue => e
+    rescue StandardError => e
       flash[:error] = e.message
     end
 
@@ -164,9 +162,9 @@ class AssignmentsController < ApplicationController
 
   # check whether rubrics are set before save assignment
   def empty_rubrics_list
-    rubrics_list = %w(ReviewQuestionnaire
+    rubrics_list = %w[ReviewQuestionnaire
                       MetareviewQuestionnaire AuthorFeedbackQuestionnaire
-                      TeammateReviewQuestionnaire BookmarkRatingQuestionnaire)
+                      TeammateReviewQuestionnaire BookmarkRatingQuestionnaire]
     @assignment_questionnaires.each do |aq|
       next if aq.questionnaire_id.nil?
 
@@ -174,13 +172,9 @@ class AssignmentsController < ApplicationController
         rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
       end
     end
-    if @assignment_form.assignment.max_team_size == 1
-      rubrics_list.delete("TeammateReviewQuestionnaire")
-    end
+    rubrics_list.delete("TeammateReviewQuestionnaire") if @assignment_form.assignment.max_team_size == 1
     rubrics_list.delete("MetareviewQuestionnaire") unless @metareview_allowed
-    unless @assignment_form.assignment.use_bookmark
-      rubrics_list.delete("BookmarkRatingQuestionnaire")
-    end
+    rubrics_list.delete("BookmarkRatingQuestionnaire") unless @assignment_form.assignment.use_bookmark
     rubrics_list
   end
 
@@ -195,7 +189,7 @@ class AssignmentsController < ApplicationController
   end
 
   def due_date_nameurl_notempty?(dd)
-    (!dd.deadline_name.nil? && !dd.deadline_name.empty?) || (!dd.description_url.nil? && !dd.description_url.empty?)
+    dd.deadline_name.present? || dd.description_url.present?
   end
 
   def meta_review_allowed?(dd)
@@ -271,9 +265,7 @@ class AssignmentsController < ApplicationController
   end
 
   def adjust_timezone_when_due_date_present(dd)
-    if dd.due_at.present?
-      dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
-    end
+    dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref) if dd.due_at.present?
   end
 
   def validate_due_date
@@ -299,13 +291,9 @@ class AssignmentsController < ApplicationController
   end
 
   def handle_assignment_directory_path_nonexist_case_and_answer_tagging
-    if @assignment_form.assignment.directory_path.nil? || @assignment_form.assignment.directory_path.empty?
-      flash.now[:error] = "You did not specify your submission directory."
-    end
+    flash.now[:error] = "You did not specify your submission directory." if @assignment_form.assignment.directory_path.blank?
 
-    if @assignment_form.assignment.is_answer_tagging_allowed
-      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
-    end
+    @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
 
   # helper methods for update

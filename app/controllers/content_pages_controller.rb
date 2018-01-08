@@ -1,6 +1,6 @@
 class ContentPagesController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [:destroy, :create, :update],
+  verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
 
   def action_allowed?
@@ -27,15 +27,13 @@ class ContentPagesController < ApplicationController
   end
 
   def view
-    @content_page = ContentPage.find_by_name(params[:page_name])
-    unless @content_page
-      @content_page = if @settings
+    @content_page = ContentPage.find_by(name: params[:page_name])
+    @content_page ||= if @settings
                         ContentPage.find(@settings.not_found_page_id)
                       else
                         ContentPage.new(id: nil,
                                         content: '(no such page)')
                       end
-    end
   end
 
   def view_default
@@ -59,7 +57,7 @@ class ContentPagesController < ApplicationController
       flash[:notice] = 'The content page was successfully created.'
       Role.rebuild_cache
       redirect_to action: 'list'
-    rescue
+    rescue StandardError
       foreign
 
       render action: 'new'

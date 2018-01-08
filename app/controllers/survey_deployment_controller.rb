@@ -7,8 +7,8 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def survey_deployment_types
-    %w(AssignmentSurveyDeployment
-       CourseSurveyDeployment)
+    %w[AssignmentSurveyDeployment
+       CourseSurveyDeployment]
   end
 
   def survey_deployment_type
@@ -58,7 +58,7 @@ class SurveyDeploymentController < ApplicationController
 
   def create
     if params[:add_global_survey]
-      global = GlobalSurveyQuestionnaire.find_by_private(false)
+      global = GlobalSurveyQuestionnaire.find_by(private: false)
       if global.nil?
         flash[:error] = "No global survey available"
         return redirect_to action: 'new'
@@ -115,7 +115,7 @@ class SurveyDeploymentController < ApplicationController
     @chart_data_table = []
     responses_for_all_questions.each do |response|
       data_table_row = []
-      data_table_row << %w(Label Number)
+      data_table_row << %w[Label Number]
       label_value = @range_of_scores.first
       response.each_with_index do |response_value, _index|
         data_table_row << [label_value.to_s, response_value]
@@ -167,7 +167,7 @@ class SurveyDeploymentController < ApplicationController
         response_list = Response.where(map_id: response_map.id)
         response_list.each do |response|
           an_answer = Answer.where(question_id: question.id, response_id: response.id).first
-          answers << an_answer unless an_answer.blank?
+          answers << an_answer if an_answer.present?
         end
       end
       all_answers << answers unless answers.empty?

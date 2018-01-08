@@ -112,7 +112,7 @@ class StudentTask
       @teammates = []
       @course_id = Assignment.find(team.parent_id).course_id
       @team_participants = Team.find(team.id).participants
-      @team_participants = @team_participants.select {|participant| participant.name != user.name }
+      @team_participants = @team_participants.reject {|participant| participant.name == user.name }
       @team_participants.each do |t|
         u = User.find(t.user_id)
         @teammates << u.fullname(ip_address)
@@ -130,7 +130,7 @@ class StudentTask
 
   def self.get_due_date_data(assignment, timeline_list)
     assignment.due_dates.each do |dd|
-      timeline = { label: (dd.deadline_type.name + ' Deadline').humanize }
+      timeline = {label: (dd.deadline_type.name + ' Deadline').humanize}
       unless dd.due_at.nil?
         timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
         timeline_list << timeline
@@ -139,20 +139,18 @@ class StudentTask
   end
 
   def self.get_submission_data(assignment_id, team_id, timeline_list)
-    SubmissionRecord.where(team_id: team_id, assignment_id: assignment_id).each do |sr|
+    SubmissionRecord.where(team_id: team_id, assignment_id: assignment_id).find_each do |sr|
       timeline = {
         label: sr.operation.humanize,
         updated_at: sr.updated_at.strftime('%a, %d %b %Y %H:%M')
       }
-      if sr.operation == 'Submit Hyperlink' || sr.operation == 'Remove Hyperlink'
-        timeline[:link] = sr.content
-      end
+      timeline[:link] = sr.content if sr.operation == 'Submit Hyperlink' || sr.operation == 'Remove Hyperlink'
       timeline_list << timeline
     end
   end
 
   def self.get_peer_review_data(participant_id, timeline_list)
-    ReviewResponseMap.where(reviewer_id: participant_id).each do |rm|
+    ReviewResponseMap.where(reviewer_id: participant_id).find_each do |rm|
       response = Response.where(map_id: rm.id).last
       next if response.nil?
       timeline = {
@@ -165,7 +163,7 @@ class StudentTask
   end
 
   def self.get_author_feedback_data(participant_id, timeline_list)
-    FeedbackResponseMap.where(reviewer_id: participant_id).each do |rm|
+    FeedbackResponseMap.where(reviewer_id: participant_id).find_each do |rm|
       response = Response.where(map_id: rm.id).last
       next if response.nil?
       timeline = {

@@ -11,7 +11,7 @@ class PasswordRetrievalController < ApplicationController
     if params[:user][:email].nil? || params[:user][:email].strip.empty?
       flash[:error] = "Please enter an e-mail address."
     else
-      user = User.find_by_email(params[:user][:email])
+      user = User.find_by(email: params[:user][:email])
       if user
         url_format = "/password_edit/check_reset_url?token="
         token = SecureRandom.urlsafe_base64

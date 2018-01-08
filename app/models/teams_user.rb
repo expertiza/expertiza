@@ -10,14 +10,13 @@ class TeamsUser < ActiveRecord::Base
   end
 
   def delete
-    TeamUserNode.find_by_node_object_id(self.id).destroy
+    TeamUserNode.find_by(node_object_id: self.id).destroy
     team = self.team
     self.destroy
     team.delete if team.teams_users.empty?
   end
 
-  def get_team_members(team_id)
-  end
+  def get_team_members(team_id); end
 
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
@@ -33,7 +32,7 @@ class TeamsUser < ActiveRecord::Base
   # Determines whether a team is empty of not
   def self.is_team_empty(team_id)
     team_members = TeamsUser.where("team_id = ?", team_id)
-    team_members.nil? || team_members.empty?
+    team_members.blank?
   end
 
   # Add member to the team they were invited to and accepted the invite for
@@ -41,9 +40,7 @@ class TeamsUser < ActiveRecord::Base
     users_teams = TeamsUser.where(['user_id = ?', invitee_user_id])
     for team in users_teams
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
-      unless new_team.nil?
-        can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id)
-      end
+      can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id) unless new_team.nil?
     end
     can_add_member
   end

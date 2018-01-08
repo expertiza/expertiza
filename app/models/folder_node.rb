@@ -12,9 +12,9 @@ class FolderNode < Node
 
   def get_partial_name
     if self.parent_id.nil?
-      return self.get_name.downcase + "_folder_actions"
+      self.get_name.downcase + "_folder_actions"
     else
-      return "questionnaire_types_actions"
+      "questionnaire_types_actions"
     end
   end
 

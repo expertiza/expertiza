@@ -2,8 +2,8 @@ class SiteController < ActiveRecord::Base
   has_many :controller_actions
   belongs_to :permission
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
+  validates :name, presence: true
+  validates :name, uniqueness: true
 
   scope :builtin, -> { where(builtin: 1).order(:name) }
   scope :application, -> { where('builtin is null or builtin = 0').order(:name) }
@@ -20,9 +20,7 @@ class SiteController < ActiveRecord::Base
     classes = {}
 
     ObjectSpace.each_object(Class) do |klass|
-      if klass.respond_to?(:controller_name) && klass.superclass.to_s == ApplicationController.to_s
-        classes[klass.controller_name] = klass
-      end
+      classes[klass.controller_name] = klass if klass.respond_to?(:controller_name) && klass.superclass.to_s == ApplicationController.to_s
     end
 
     classes

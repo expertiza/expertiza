@@ -49,7 +49,7 @@ describe AssignmentParticipant do
   describe '#scores' do
     before(:each) do
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-        .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
+                                                         .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
       allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
       allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
@@ -107,7 +107,7 @@ describe AssignmentParticipant do
         question_hash = {review: question}
         score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-          .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
+                                                           .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
         allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response])
         allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.compute_assignment_score(question_hash, scores)
@@ -122,7 +122,7 @@ describe AssignmentParticipant do
         question_hash = {review: question}
         score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
+                                                           .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.compute_assignment_score(question_hash, scores)

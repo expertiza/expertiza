@@ -99,7 +99,8 @@ class Ta < User
 
   def self.get_user_list(user)
     courses = Ta.get_mapped_courses(user.id)
-    participants, user_list = [], []
+    participants = []
+    user_list = []
     courses.each do |course_id|
       course = Course.find(course_id)
       participants << course.get_participants

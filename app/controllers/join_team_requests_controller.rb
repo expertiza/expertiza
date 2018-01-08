@@ -1,6 +1,6 @@
 class JoinTeamRequestsController < ApplicationController
   before_action :check_team_status, only: [:create]
-  before_action :find_request, only: [:show, :edit, :update, :destroy, :decline]
+  before_action :find_request, only: %i[show edit update destroy decline]
 
   def action_allowed?
     current_role_name.eql?("Student")

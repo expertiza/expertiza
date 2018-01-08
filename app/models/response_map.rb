@@ -38,7 +38,7 @@ class ResponseMap < ActiveRecord::Base
   # return latest versions of the response given by reviewer
   def self.get_reviewer_assessments_for(team, reviewer)
     map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
-    Response.where(map_id: map).sort {|m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
+    Response.where(map_id: map).sort {|m1, m2| m1.version_num and m2.version_num ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
   end
 
   # Placeholder method, override in derived classes if required.
@@ -76,7 +76,7 @@ class ResponseMap < ActiveRecord::Base
     mappings.each do |mapping|
       begin
         mapping.delete(force)
-      rescue
+      rescue StandardError
         failedCount += 1
       end
     end

@@ -19,7 +19,7 @@ class AssignmentParticipant < Participant
   # has_many    :quiz_responses,  :class_name => 'Response', :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'QuizResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to :user
-  validates_presence_of :handle
+  validates :handle, presence: true
   attr_accessor :overall_avg_vol
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
@@ -109,9 +109,7 @@ class AssignmentParticipant < Participant
     total_score = 0
     for i in 1..self.assignment.num_review_rounds
       round_sym = ("review" + i.to_s).to_sym
-      if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
-        next
-      end
+      next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
       length_of_assessments = scores[round_sym][:assessments].length.to_f
       scores[review_sym][:assessments] += scores[round_sym][:assessments]
       if !scores[round_sym][:scores][:max].nil? && scores[review_sym][:scores][:max] < scores[round_sym][:scores][:max]
@@ -120,9 +118,7 @@ class AssignmentParticipant < Participant
       if !scores[round_sym][:scores][:min].nil? && scores[review_sym][:scores][:min] > scores[round_sym][:scores][:min]
         scores[review_sym][:scores][:min] = scores[round_sym][:scores][:min]
       end
-      unless scores[round_sym][:scores][:avg].nil?
-        total_score += scores[round_sym][:scores][:avg] * length_of_assessments
-      end
+      total_score += scores[round_sym][:scores][:avg] * length_of_assessments unless scores[round_sym][:scores][:avg].nil?
     end
     if scores[review_sym][:scores][:max] == -999_999_999 && scores[review_sym][:scores][:min] == 999_999_999
       scores[review_sym][:scores][:max] = 0

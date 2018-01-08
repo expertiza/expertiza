@@ -80,7 +80,7 @@ describe ReviewMappingController do
         user = double('User', id: 1)
         allow(User).to receive(:from_params).with(any_args).and_return(user)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1)
-          .and_return([double('AssignmentParticipant', id: 1, name: 'no one')])
+                                                       .and_return([double('AssignmentParticipant', id: 1, name: 'no one')])
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
@@ -442,7 +442,7 @@ describe ReviewMappingController do
       context 'when calibrated params are not 0' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)
-            .and_return([double('ReviewResponseMap', reviewee_id: 2)])
+                                                     .and_return([double('ReviewResponseMap', reviewee_id: 2)])
           allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
           params = {
@@ -535,7 +535,7 @@ describe ReviewMappingController do
     context 'when type is ReviewResponseMap' do
       it 'renders response_report page with corresponding data' do
         allow(ReviewResponseMap).to receive(:review_response_report).with('1', assignment, 'ReviewResponseMap', 'no one')
-          .and_return([participant, participant1])
+                                                                    .and_return([participant, participant1])
         allow(assignment).to receive(:compute_reviews_hash).and_return('1' => 'good')
         allow(assignment).to receive(:compute_avg_and_ranges_hash).and_return(avg: 94, range: [90, 99])
         params = {
@@ -553,7 +553,7 @@ describe ReviewMappingController do
         it 'renders response_report page with corresponding data' do
           allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
           allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap')
-            .and_return([participant, participant1], [1, 2], [3, 4], [])
+                                                                          .and_return([participant, participant1], [1, 2], [3, 4], [])
           params = {
             id: 1,
             report: {type: 'FeedbackResponseMap'}
@@ -567,7 +567,7 @@ describe ReviewMappingController do
         it 'renders response_report page with corresponding data' do
           allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
           allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap')
-            .and_return([participant, participant1], [1, 2, 3, 4])
+                                                                          .and_return([participant, participant1], [1, 2, 3, 4])
           params = {
             id: 1,
             report: {type: 'FeedbackResponseMap'}
@@ -598,11 +598,11 @@ describe ReviewMappingController do
         allow(ReviewQuestionnaire).to receive(:select).with('id').and_return([1, 2, 3])
         assignment_questionnaire = double('AssignmentQuestionnaire')
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1', questionnaire_id: [1, 2, 3])
-          .and_return([assignment_questionnaire])
+                                                         .and_return([assignment_questionnaire])
         allow(assignment_questionnaire).to receive_message_chain(:questionnaire, :questions).and_return([double('Question', type: 'Criterion')])
         allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
         allow(ReviewResponseMap).to receive_message_chain(:select, :where).with('id').with(reviewed_object_id: '1', calibrate_to: 0)
-          .and_return([1, 2])
+                                                                          .and_return([1, 2])
         allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
         params = {
           id: 1,
@@ -617,9 +617,9 @@ describe ReviewMappingController do
     context 'when type is PlagiarismCheckerReport' do
       it 'renders response_report page with corresponding data' do
         allow(PlagiarismCheckerAssignmentSubmission).to receive_message_chain(:where, :pluck).with(assignment_id: '1').with(:id)
-          .and_return([double('PlagiarismCheckerAssignmentSubmission', id: 1)])
+                                                                                             .and_return([double('PlagiarismCheckerAssignmentSubmission', id: 1)])
         allow(PlagiarismCheckerAssignmentSubmission).to receive(:where).with(plagiarism_checker_assignment_submission_id: 1)
-          .and_return([double('PlagiarismCheckerAssignmentSubmission')])
+                                                                       .and_return([double('PlagiarismCheckerAssignmentSubmission')])
         params = {
           id: 1,
           report: {type: 'PlagiarismCheckerReport'}
@@ -652,7 +652,7 @@ describe ReviewMappingController do
       allow(TeamsUser).to receive(:find_by_sql).with(
         ["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", 1, '1']
       )
-        .and_return([double('TeamsUser', t_id: 1)])
+                                               .and_return([double('TeamsUser', t_id: 1)])
     end
 
     context 'when self review response map does not exist' do

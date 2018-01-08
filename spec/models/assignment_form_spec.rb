@@ -160,7 +160,7 @@ describe AssignmentForm do
   describe '#change_item_type' do
     it 'changes the item_type displayes in the log' do
       allow(Version).to receive(:find_by).with(item_type: 'Delayed::Backend::ActiveRecord::Job', item_id: 1)
-        .and_return(Version.new(item_type: 'some type', item_id: 1, event: 'create'))
+                                         .and_return(Version.new(item_type: 'some type', item_id: 1, event: 'create'))
       expect(assignment_form.change_item_type(1)).to be true
     end
   end

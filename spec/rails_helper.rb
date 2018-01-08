@@ -55,7 +55,7 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   def login_as(user_name)
-    user = User.find_by_name(user_name)
+    user = User.find_by(name: user_name)
     msg = user.to_yaml
     File.open('log/diagnostic.txt', 'a') {|f| f.write msg }
 

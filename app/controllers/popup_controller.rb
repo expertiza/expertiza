@@ -73,7 +73,7 @@ class PopupController < ApplicationController
     if params[:id2].nil?
       @scores = nil
     else
-      @reviewid = Response.find_by_map_id(params[:id2]).id
+      @reviewid = Response.find_by(map_id: params[:id2]).id
       @pid = ResponseMap.find(params[:id2]).reviewer_id
       @reviewer_id = Participant.find(@pid).user_id
       # @reviewer_id = ReviewMapping.find(params[:id2]).reviewer_id
@@ -85,9 +85,7 @@ class PopupController < ApplicationController
       @revqids = AssignmentQuestionnaire.where(["assignment_id = ?", @assignment.id])
       @revqids.each do |rqid|
         rtype = Questionnaire.find(rqid.questionnaire_id).type
-        if rtype == 'ReviewQuestionnaire'
-          @review_questionnaire_id = rqid.questionnaire_id
-        end
+        @review_questionnaire_id = rqid.questionnaire_id if rtype == 'ReviewQuestionnaire'
       end
       if @review_questionnaire_id
         @review_questionnaire = Questionnaire.find(@review_questionnaire_id)

@@ -102,18 +102,12 @@ end
       max = questionnaire.max_question_score
       min = questionnaire.min_question_score
 
-      if !max.nil? && !min.nil?
-        QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)", question.id, max, min])
-      end
+      QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)", question.id, max, min]) if !max.nil? && !min.nil?
 
       for i in (questionnaire.min_question_score..questionnaire.max_question_score)
         qas = QuestionAdvice.where("question_id = ? AND score = ?", question.id, i)
-        if qas.first.nil?
-          question.question_advices << QuestionAdvice.new(score: i)
-        end
-        if qas.size > 1
-          QuestionAdvice.delete(["question_id = ? AND score = ?", question.id, i])
-        end
+        question.question_advices << QuestionAdvice.new(score: i) if qas.first.nil?
+        QuestionAdvice.delete(["question_id = ? AND score = ?", question.id, i]) if qas.size > 1
 
       end
     end

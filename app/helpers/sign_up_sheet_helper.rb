@@ -32,7 +32,7 @@ module SignUpSheetHelper
   # Render topic row for intelligent topic selection.
   def get_intelligent_topic_row(topic, selected_topics, max_team_size = 3)
     row_html = ''
-    if !selected_topics.nil? && !selected_topics.empty?
+    if selected_topics.present?
       selected_topics.each do |selected_topic|
         row_html = if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
                      '<tr bgcolor="yellow">'
@@ -58,7 +58,7 @@ module SignUpSheetHelper
   # Render the participant info for a topic and assignment.
   def render_participant_info(topic, assignment, participants)
     html = ''
-    if !participants.nil? && !participants.empty?
+    if participants.present?
       chooser_present = false
       participants.each do |participant|
         next unless topic.id == participant.topic_id
@@ -68,9 +68,7 @@ module SignUpSheetHelper
           html += '<a href="/sign_up_sheet/delete_signup_as_instructor/' + participant.team_id.to_s + '?topic_id=' + topic.id.to_s + '"">'
           html += '<img border="0" align="middle" src="/assets/delete_icon.png" title="Drop Student"></a>'
         end
-        if participant.is_waitlisted
-          html += '<font color="red">(waitlisted)</font>'
-        end
+        html += '<font color="red">(waitlisted)</font>' if participant.is_waitlisted
         html += '<br/>'
       end
       html += 'No choosers.' unless chooser_present

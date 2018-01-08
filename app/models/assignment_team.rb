@@ -64,7 +64,7 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    !self.submitted_files.empty? or !self.submitted_hyperlinks.blank?
+    !self.submitted_files.empty? or self.submitted_hyperlinks.present?
   end
 
   # Get Participants of the team
@@ -158,7 +158,7 @@ class AssignmentTeam < Team
   end
 
   def hyperlinks
-    self.submitted_hyperlinks.blank? ? [] : YAML.load(self.submitted_hyperlinks)
+    self.submitted_hyperlinks.blank? ? [] : YAML.safe_load(self.submitted_hyperlinks)
   end
 
   # Appends the hyperlink to a list that is stored in YAML format in the DB

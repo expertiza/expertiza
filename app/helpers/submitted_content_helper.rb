@@ -38,7 +38,7 @@ module SubmittedContentHelper
         ret += File.mtime(file).to_s
         ret += "\n   </td>\n   </tr>"
         index += 1
-      rescue
+      rescue StandardError
       end
     end
     ret += "\n</table><br/>"
@@ -62,7 +62,7 @@ module SubmittedContentHelper
                           :download => File.basename(file),
                           "current_folder[name]" => File.dirname(file)
         end
-      rescue
+      rescue StandardError
         flash[:error] = $ERROR_INFO
       end
     end
@@ -83,9 +83,7 @@ module SubmittedContentHelper
       disp = file + "/" + path
       display = File.basename(file) + "/" + path
       ret += "<li>"
-      if @check_stage != "Complete" && @flag == false
-        ret += "<input type=radio id='chk_files' name='chk_files' value='#{index}'>"
-      end
+      ret += "<input type=radio id='chk_files' name='chk_files' value='#{index}'>" if @check_stage != "Complete" && @flag == false
       ret += "<input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='" + File.dirname(disp) + "/" + File.basename(path) + "'>"
       if File.ftype(disp) == "directory"
         ret += "<a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/assets/up.png'></a>&nbsp;"

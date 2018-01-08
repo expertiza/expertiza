@@ -8,8 +8,8 @@ class SignUpTopic < ActiveRecord::Base
   has_paper_trail
 
   # the below relations have been added to make it consistent with the database schema
-  validates_presence_of :topic_name, :assignment_id, :max_choosers
-  validates_length_of :topic_identifier, maximum: 10
+  validates :topic_name, :assignment_id, :max_choosers, presence: true
+  validates :topic_identifier, length: {maximum: 10}
 
   # This method is not used anywhere
   # def get_team_id_from_topic_id(user_id)
@@ -85,7 +85,7 @@ class SignUpTopic < ActiveRecord::Base
       unless assignment.is_intelligent?
         if signup_record.try(:is_waitlisted) == false
           # find the first wait listed user if exists
-          first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted:  true).first
+          first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
 
           unless first_waitlisted_user.nil?
             # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
@@ -117,9 +117,7 @@ class SignUpTopic < ActiveRecord::Base
     num_of_users_promotable.times do
       next_wait_listed_team = SignedUpTeam.where(topic_id: self.id, is_waitlisted: true).first
       # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-      if next_wait_listed_team
-        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team)
-      end
+      SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
     end
   end
 
@@ -133,7 +131,7 @@ class SignUpTopic < ActiveRecord::Base
   def users_on_waiting_list
     waitlisted_signed_up_teams = SignedUpTeam.where(topic_id: self.id, is_waitlisted: 1)
     waitlisted_users = []
-    unless waitlisted_signed_up_teams.blank?
+    if waitlisted_signed_up_teams.present?
       waitlisted_signed_up_teams.each do |waitlisted_signed_up_team|
         assignment_team = AssignmentTeam.find(waitlisted_signed_up_team.team_id)
         waitlisted_users << assignment_team.users

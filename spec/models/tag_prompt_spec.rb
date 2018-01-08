@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe TagPrompt do
-
   let(:ct_criterion) { Criterion.new id: 1, type: "Criterion", seq: 1.0, txt: "test txt", weight: 1 }
   let(:ct_cbox) { Criterion.new id: 1, type: "Checkbox", seq: 1.0, txt: "test txt", weight: 1 }
   let(:ct_text) { Criterion.new id: 1, type: "Text", seq: 1.0, txt: "test txt", weight: 1 }

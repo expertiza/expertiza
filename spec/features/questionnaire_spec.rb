@@ -1,6 +1,6 @@
 include InstructorInterfaceHelperSpec
 
-question_type = %w(Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader)
+question_type = %w[Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader]
 
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
@@ -96,7 +96,7 @@ describe "Questionnaire tests for instructor interface" do
 
   describe "Edit and delete a question" do
     question_type.each do |q_type|
-      %w(edit delete).each do |q_command|
+      %w[edit delete].each do |q_command|
         it "is able to " + q_command + " " + q_type + " question" do
           load_question q_type
           choose_check_type q_command

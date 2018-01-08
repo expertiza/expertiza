@@ -64,7 +64,7 @@ describe "Staggered deadline test" do
 
   # impersonate student to submit work
   def submit_topic(name, topic, work)
-    user = User.find_by_name(name)
+    user = User.find_by(name: name)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit topic # signup topic
@@ -93,7 +93,7 @@ describe "Staggered deadline test" do
     # impersonate each participant and check their topic's current stage
 
     # ####student 1:
-    user = User.find_by_name('student2064')
+    user = User.find_by(name: 'student2064')
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "review"
@@ -110,7 +110,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content 'No topic is selected. Please go back and select a topic.'
 
     # Although student2065 is in submission stage, he or she can still review other's work.
-    user = User.find_by_name('student2065')
+    user = User.find_by(name: 'student2065')
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "submission"
@@ -145,7 +145,7 @@ describe "Staggered deadline test" do
     # impersonate each participant and check their topic's current stage
 
     # ##first student:
-    user = User.find_by_name('student2064')
+    user = User.find_by(name: 'student2064')
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "review"
@@ -171,7 +171,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content "View"
 
     # ##second student
-    user = User.find_by_name('student2065')
+    user = User.find_by(name: 'student2065')
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "review"
@@ -213,7 +213,7 @@ describe "Staggered deadline test" do
     change_due(2, 2, 2, DateTime.now.in_time_zone - 10)
 
     # impersonate each participant and check their topic's current stage
-    user = User.find_by_name('student2064')
+    user = User.find_by(name: 'student2064')
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "Finished"
@@ -226,7 +226,7 @@ describe "Staggered deadline test" do
     # it should not able to choose topic for review
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
 
-    user = User.find_by_name('student2065')
+    user = User.find_by(name: 'student2065')
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     expect(page).to have_content "Finished"

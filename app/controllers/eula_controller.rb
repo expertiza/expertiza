@@ -7,8 +7,7 @@ class EulaController < ApplicationController
      'Student'].include? current_role_name
   end
 
-  def display
-  end
+  def display; end
 
   def accept
     session[:user].update_attribute('is_new_user', 0)

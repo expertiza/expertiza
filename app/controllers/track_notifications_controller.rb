@@ -21,6 +21,6 @@ class TrackNotificationsController < ApplicationController
   private
 
   def track_notification_params
-    params.permit(:notification, :user_id)
+    params.permit(:notification_id, :user_id)
   end
 end

@@ -66,7 +66,7 @@ class NotificationsController < ApplicationController
     # Remove any hidden notifications
     @individual_notification = TrackNotification.all
     @individual_notification.each do |notification|
-      notification.destroy if notification.notification == @notification.id
+      notification.destroy if notification.notification_id == @notification.id
     end
     @notification.destroy
     redirect_to notifications_url

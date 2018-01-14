@@ -25,7 +25,7 @@ class BookmarksController < ApplicationController
     begin
       Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
       flash[:success] = 'Your bookmark has been successfully created!'
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     redirect_to action: 'list', id: params[:topic_id]

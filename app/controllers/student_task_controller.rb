@@ -9,14 +9,14 @@ class StudentTaskController < ApplicationController
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
-    @student_tasks.reject! {|t| !t.assignment.availability_flag }
+    @student_tasks.select! {|t| t.assignment.availability_flag }
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
     @taskrevisions = @student_tasks.select(&:revision?)
 
     ######## Students Teamed With###################
-    @students_teamed_with = StudentTask.teamed_students current_user
+    @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip])
   end
 
   def view
@@ -32,6 +32,8 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    # Timeline feature
+    @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end
 
   def others_work
@@ -51,15 +53,12 @@ class StudentTaskController < ApplicationController
 
     @review_phase = next_due_date.deadline_type_id
     if next_due_date.review_of_review_allowed_id == DeadlineRight::LATE or next_due_date.review_of_review_allowed_id == DeadlineRight::OK
-      if @review_phase == DeadlineType.find_by_name("metareview").id
-        @can_view_metareview = true
-      end
+      @can_view_metareview = true if @review_phase == DeadlineType.find_by(name: "metareview").id
     end
 
     @review_mappings = ResponseMap.where(reviewer_id: @participant.id)
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
-  def your_work
-  end
+  def your_work; end
 end

@@ -15,7 +15,7 @@ class CourseController < ApplicationController
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where role_id=6") unless search.blank?
+    @users = User.find_by_sql("select * from users where role_id=6") if search.present?
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
@@ -36,13 +36,13 @@ class CourseController < ApplicationController
     if params[:course][:directory_path] and @course.directory_path != params[:course][:directory_path]
       begin
         FileHelper.delete_directory(@course)
-      rescue
+      rescue StandardError
         flash[:error] = $ERROR_INFO
       end
 
       begin
         FileHelper.create_directory_from_path(params[:course][:directory_path])
-      rescue
+      rescue StandardError
         flash[:error] = $ERROR_INFO
       end
     end
@@ -70,12 +70,11 @@ class CourseController < ApplicationController
         CourseNode.create(node_object_id: new_course.id)
       end
 
-      undo_link("The course \"#{orig_course.name}\" has been successfully copied. 
-        The copy is currently associated with an existing location from the original course. 
+      undo_link("The course \"#{orig_course.name}\" has been successfully copied.
+        The copy is currently associated with an existing location from the original course.
         This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
       redirect_to controller: 'course', action: 'edit', id: new_course.id
-
-    rescue
+    rescue StandardError
       flash[:error] = 'The course was not able to be copied: ' + $ERROR_INFO
       redirect_to controller: 'tree_display', action: 'list'
     end
@@ -105,7 +104,7 @@ class CourseController < ApplicationController
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO # "The following error occurred while saving the course: #"+
       redirect_to action: 'new'
     end
@@ -116,7 +115,7 @@ class CourseController < ApplicationController
     @course = Course.find(params[:id])
     begin
       FileHelper.delete_directory(@course)
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     @course.destroy
@@ -129,7 +128,7 @@ class CourseController < ApplicationController
     @course.private = !@course.private
     begin
       @course.save!
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     @access = @course.private == true ? "private" : "public"
@@ -144,14 +143,14 @@ class CourseController < ApplicationController
 
   def add_ta
     @course = Course.find(params[:course_id])
-    @user = User.find_by_name(params[:user][:name])
+    @user = User.find_by(name: params[:user][:name])
     if @user.nil?
       flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" does not exist."
     elsif !TaMapping.where(ta_id: @user.id, course_id: @course.id).empty?
       flash.now[:error] = "The user inputted \"" + params[:user][:name] + "\" is already a TA for this course."
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
-      @user.role = Role.find_by_name 'Teaching Assistant'
+      @user.role = Role.find_by name: 'Teaching Assistant'
       @user.save
 
       @course = @ta_mapping
@@ -167,7 +166,7 @@ class CourseController < ApplicationController
     # if the user does not have any other TA mappings, then the role should be changed to student
     other_ta_mappings_num = TaMapping.where(ta_id: @ta_mapping.ta_id).size - 1
     if other_ta_mappings_num == 0
-      @ta.role = Role.find_by_name 'Student'
+      @ta.role = Role.find_by name: 'Student'
       @ta.save
     end
     @ta_mapping.destroy

@@ -1,6 +1,6 @@
 class ControllerActionsController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [:destroy, :create, :update],
+  verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :index}
 
   def action_allowed?
@@ -35,8 +35,7 @@ class ControllerActionsController < ApplicationController
   end
 
   def create
-    if params[:controller_action][:specific_name] and
-      !params[:controller_action][:specific_name].empty?
+    if params[:controller_action][:specific_name].present?
       params[:controller_action][:name] =
         params[:controller_action][:specific_name]
     end

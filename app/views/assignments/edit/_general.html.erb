@@ -111,6 +111,15 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--Badge-->
+  <tr>
+    <td style='padding:5px' id='assignment_has_badge_field'>
+      <input name="assignment_form[assignment][has_badge]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][has_badge]', 'true', @assignment_form.assignment.has_badge) %>
+      <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
+    </td>
+  </tr>
+
   <!--staggered_deadline-->
   <tr>
     <td style='padding:5px' id='assignment_staggered_deadline_field'>
@@ -136,22 +145,11 @@ function microtaskChanged() {
     </td>
   </tr>
 
-
   <tr>
     <td style='padding:5px' id='assignment_is_calibrated_field'>
       <input name="assignment_form[assignment][is_calibrated]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_calibrated]', 'true', @assignment_form.assignment.is_calibrated) %>
       <%= label_tag('assignment_form[assignment][is_calibrated]', 'Calibration for training?') %>
-    </td>
-
-  </tr>
-
-  <!--"available to student?" should be the last checkbox-->
-  <tr>
-    <td style='padding:5px' id='assignment_availability_flag_field'>
-      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
-      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
     </td>
   </tr>
 
@@ -163,20 +161,39 @@ function microtaskChanged() {
 
     </td>
   </tr>
-  <tr>
-    <td style='padding:5px' id='assignment_simicheck_field'>
+  <tr colspan="3">
+    <td style='padding:5px'>
+      <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" <%= "checked" if @assignment_form.assignment.simicheck != -1 %> onclick="useSimicheckChanged()"></input>
+      <%= label_tag('toggle_simicheck_setting', 'Use simicheck?') %>
+    </td>
+    <td style='padding:5px' id='assignment_simicheck_field' <%= "hidden" if @assignment_form.assignment.simicheck == -1 %> >
       <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
       <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, :selected => @assignment_form.assignment.simicheck) %><b> hours</b>
-    </td>
-  </tr>
-  <tr>
-    <td style='padding:5px' id='assignment_simicheck_threshold'>
+      <br></br>
       <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
       <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, :selected => @assignment_form.assignment.simicheck_threshold) %><b> %</b>
       <br>(Filter that refers to % text same between 2 docs)</br>
     </td>
   </tr>
 
+  <!-- Start answer tagging code -->
+  <tr>
+    <td style='padding:5px'>
+      <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
+      <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
+      <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow feedback comments to be tagged by the author?') %>
+    </td>
+  </tr>
+  <!-- End answer tagging code -->
+
+  <!--"available to student?" should be the last checkbox-->
+  <tr>
+    <td style='padding:5px' id='assignment_availability_flag_field'>
+      <input name="assignment_form[assignment][availability_flag]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][availability_flag]', 'true', @assignment_form.assignment.availability_flag) %>
+      <%= label_tag('assignment_form[assignment][availability_flag]', 'Available to students?') %>
+    </td>
+  </tr>
 </table>
 
 
@@ -246,6 +263,16 @@ function microtaskChanged() {
         jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
       } else {
         jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
+      }
+    }
+
+    function useSimicheckChanged(){
+      if (jQuery('#toggle_simicheck_setting').is(':checked')) {
+        jQuery('#assignment_simicheck_field').show();
+        jQuery('#assignment_simicheck_threshold').show();
+      } else {
+        jQuery('#assignment_simicheck_field').hide();
+        jQuery('#assignment_simicheck_threshold').hide();
       }
     }
 

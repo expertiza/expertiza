@@ -1,10 +1,12 @@
+
+
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
       Submit or Review work for <%= @assignment.name %>
   <% else %>
       Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
-  
+
 </h1>
 
 <div class="flash_note">
@@ -16,7 +18,7 @@
 <ul>
   <%if @topics.size > 0 %>
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
-      <li> 
+      <li>
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>
@@ -26,7 +28,7 @@
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
     <% if @authorization == 'participant' %>
-      <li> 
+      <li>
         <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
         (View and manage your team)
       </li>
@@ -76,20 +78,20 @@ to display the label "Your team" in the student assignment tasks-->
         <% end %>
         (Take quizzes over the work you have read)
       </li>
-    <% end %> 
+    <% end %>
   <%end%>
-  
+
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>
       <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
       <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
         <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
       <% else %>
-        <%= link_to "Your scores", :controller => 'grades', :action => 'view_my_scores', :id => @participant.id %> 
-        (View feedback on your work)  &nbsp;  <%= link_to "Alternate View", :controller => 'grades', :action => 'view_team', :id => @participant.id %>
+        <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %>
+        (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
       <% end %>
     </li>
-  <% end %> 
+  <% end %>
     <%if @can_provide_suggestions == true %>
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>
@@ -101,4 +103,10 @@ to display the label "Your team" in the student assignment tasks-->
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
   </ul>
   <br>
+
+  <br/>
+  <br/>
+  <%= render 'timeline' %>
+  <br/>
+  <br/>
   <a href="javascript:window.history.back()">Back</a>

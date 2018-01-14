@@ -1,5 +1,6 @@
 class TreeDisplayController < ApplicationController
   helper :application
+  include SecurityHelper
 
   def action_allowed?
     true
@@ -125,7 +126,7 @@ class TreeDisplayController < ApplicationController
   def update_instructor(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
     tmp_object["instructor"] = nil
-    tmp_object["instructor"] = User.find(instructor_id).name if instructor_id
+    tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
   end
 
   def update_tmp_obj(tmp_object, node)
@@ -134,7 +135,7 @@ class TreeDisplayController < ApplicationController
       "creation_date" => node.get_creation_date,
       "updated_date" => node.get_modified_date,
       "institution" => Institution.where(id: node.retrieve_institution_id),
-      "private" => node.get_instructor_id == session[:user].id ? true : false
+      "private" => node.get_instructor_id == session[:user].id
     }
     tmp_object.merge!(tmp)
   end
@@ -161,9 +162,7 @@ class TreeDisplayController < ApplicationController
           "name" => node.get_name,
           "type" => node.type
         }
-        if node_type == 'Courses' || node_type == "Assignments"
-          courses_assignments_obj(node_type, tmp_object, node)
-        end
+        courses_assignments_obj(node_type, tmp_object, node) if node_type == 'Courses' || node_type == "Assignments"
         res[node_type] << tmp_object
       end
     end
@@ -189,6 +188,7 @@ class TreeDisplayController < ApplicationController
 
   # for child nodes
   def children_node_ng
+    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? (params[:reactParams][:child_nodes])
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     child_nodes.each do |node|
@@ -273,9 +273,7 @@ class TreeDisplayController < ApplicationController
           "creation_date" => child.get_creation_date,
           "updated_date" => child.get_modified_date
         }
-        if node_type == 'CourseNode' || node_type == "AssignmentNode"
-          coursenode_assignmentnode(res2, child)
-        end
+        coursenode_assignmentnode(res2, child) if node_type == 'CourseNode' || node_type == "AssignmentNode"
         res << res2
       end
     end

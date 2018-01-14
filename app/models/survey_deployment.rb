@@ -1,6 +1,6 @@
 class SurveyDeployment < ActiveRecord::Base
-  validates_presence_of :start_date
-  validates_presence_of :end_date
+  validates :start_date, presence: true
+  validates :end_date, presence: true
   validate :valid_start_end_time?
 
   def valid_start_end_time?
@@ -20,10 +20,8 @@ class SurveyDeployment < ActiveRecord::Base
   end
 
   # implemented in both AssignmentSurveyDeployment and CourseSurveyDeployment models
-  def parent_name
-  end
+  def parent_name; end
 
   # implemented in both AssignmentSurveyDeployment and CourseSurveyDeployment models
-  def response_maps
-  end
+  def response_maps; end
 end

@@ -18,7 +18,7 @@ class QuestionsController < ApplicationController
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
-  verify method: :post, only: [:destroy, :create, :update],
+  verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
 
   # List all questions in paginated view
@@ -74,9 +74,15 @@ class QuestionsController < ApplicationController
     begin
       question.destroy
       flash[:success] = "You have successfully deleted the question!"
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
+  end
+
+  # required for answer tagging
+  def types
+    types = Question.distinct.pluck(:type)
+    render json: types.to_a
   end
 end

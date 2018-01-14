@@ -13,7 +13,7 @@
 # Additionally, objects that are not unique to quizzing but
 # which show up in the relationships can be found in
 # factories.rb.
-FactoryGirl.define do
+FactoryBot.define do
   # Quiz Questionnaire is the main representation of a quiz
   # in the Expertiza model. It shares a one-to-many relationship
   # with QuizQuestion and QuizResponseMap, and foreign keys
@@ -76,8 +76,8 @@ FactoryGirl.define do
   # quiz question and quiz response.
   factory :answer, class: Answer do
     question { Question.first || association(:question) }
-    response_id { Response.first.id || association(:response_id).id }
-    answer { 1 || assocaiton(:answer) }
+    response { Response.first || association(:response) }
+    answer 1
     comments 'Answer text'
   end
 end

@@ -17,9 +17,9 @@ class PopupController < ApplicationController
       @maxscore = questionnaire.max_question_score
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)
-      @total_percentage = @response.get_average_score
-      @sum = @response.get_total_score
-      @total_possible = @response.get_maximum_score
+      @total_percentage = @response.average_score
+      @sum = @response.total_score
+      @total_possible = @response.maximum_score
     end
 
     @maxscore = 5 if @maxscore.nil?
@@ -50,11 +50,11 @@ class PopupController < ApplicationController
         instance_variable_set('@scores_round_' + round.to_s, Answer.where(response_id: response.id))
         questionnaire = Response.find(response.id).questionnaire_by_answer(instance_variable_get('@scores_round_' + round.to_s).first)
         instance_variable_set('@max_score_round_' + round.to_s, questionnaire.max_question_score ||= 5)
-        total_percentage = response.get_average_score
+        total_percentage = response.average_score
         total_percentage += '%' if total_percentage.is_a? Float
         instance_variable_set('@total_percentage_round_' + round.to_s, total_percentage)
-        instance_variable_set('@sum_round_' + round.to_s, response.get_total_score)
-        instance_variable_set('@total_possible_round_' + round.to_s, response.get_maximum_score)
+        instance_variable_set('@sum_round_' + round.to_s, response.total_score)
+        instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
       end
     end
   end
@@ -73,7 +73,7 @@ class PopupController < ApplicationController
     if params[:id2].nil?
       @scores = nil
     else
-      @reviewid = Response.find_by_map_id(params[:id2]).id
+      @reviewid = Response.find_by(map_id: params[:id2]).id
       @pid = ResponseMap.find(params[:id2]).reviewer_id
       @reviewer_id = Participant.find(@pid).user_id
       # @reviewer_id = ReviewMapping.find(params[:id2]).reviewer_id
@@ -85,9 +85,7 @@ class PopupController < ApplicationController
       @revqids = AssignmentQuestionnaire.where(["assignment_id = ?", @assignment.id])
       @revqids.each do |rqid|
         rtype = Questionnaire.find(rqid.questionnaire_id).type
-        if rtype == 'ReviewQuestionnaire'
-          @review_questionnaire_id = rqid.questionnaire_id
-        end
+        @review_questionnaire_id = rqid.questionnaire_id if rtype == 'ReviewQuestionnaire'
       end
       if @review_questionnaire_id
         @review_questionnaire = Questionnaire.find(@review_questionnaire_id)

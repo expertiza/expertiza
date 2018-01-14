@@ -7,28 +7,22 @@ class ResponseMap < ActiveRecord::Base
   end
 
   # return latest versions of the responses
-  def self.get_assessments_for(participant)
+  def self.get_assessments_for(team)
     responses = []
     stime = Time.now
-    if participant
-
+    if team
       @array_sort = []
       @sort_to = []
-
-      # get all the versions
-      maps = where(reviewee_id: participant.id)
+      maps = where(reviewee_id: team.id)
       maps.each do |map|
         next if map.response.empty?
-
         @all_resp = Response.where(map_id: map.map_id).last
-
         if map.type.eql?('ReviewResponseMap')
           # If its ReviewResponseMap then only consider those response which are submitted.
           @array_sort << @all_resp if @all_resp.is_submitted
         else
           @array_sort << @all_resp
         end
-
         # sort all versions in descending order and get the latest one.
         # @sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
         @sort_to = @array_sort.sort # { |m1, m2| (m1.updated_at and m2.updated_at) ? m2.updated_at <=> m1.updated_at : (m1.version_num ? -1 : 1) }
@@ -42,9 +36,9 @@ class ResponseMap < ActiveRecord::Base
   end
 
   # return latest versions of the response given by reviewer
-  def self.get_reviewer_assessments_for(participant, reviewer)
-    map = where(reviewee_id: participant.id, reviewer_id: reviewer.id)
-    Response.where(map_id: map).sort {|m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
+  def self.get_reviewer_assessments_for(team, reviewer)
+    map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
+    Response.where(map_id: map).sort {|m1, m2| m1.version_num and m2.version_num ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
   end
 
   # Placeholder method, override in derived classes if required.
@@ -82,7 +76,7 @@ class ResponseMap < ActiveRecord::Base
     mappings.each do |mapping|
       begin
         mapping.delete(force)
-      rescue
+      rescue StandardError
         failedCount += 1
       end
     end

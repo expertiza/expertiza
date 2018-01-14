@@ -19,9 +19,9 @@ class QuizQuestionnaire < Questionnaire
   def compute_weighted_score(scores)
     if scores[:quiz][:scores][:avg]
       # dont bracket and to_f the whole thing - you get a 0 in the result.. what you do is just to_f the 100 part .. to get the fractions
-      return scores[:quiz][:scores][:avg] * 100 / 100.to_f
+      scores[:quiz][:scores][:avg] * 100 / 100.to_f
     else
-      return 0
+      0
       end
     end
 

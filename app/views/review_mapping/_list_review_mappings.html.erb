@@ -51,20 +51,21 @@
           <%@topics = nil%>
         <%end%>
       <%end %>
+      <!--Topics-->
       <td><%=@topics%></td>
     <%end%>
 
-      <!--removed code that handles team and individual assignments differently-->
+      <!--Contributor-->
       <% if assignment.max_team_size < 2 %>
           <td style="vertical-align:top;">
           <% user_id = TeamsUser.where(team_id: contributor.id).first.user_id %>
-          <%= User.find(user_id).fullname %>&nbsp;(<%= User.find(user_id).name %>)<br/>
+          <%= User.find(user_id).fullname(session[:ip]) %>&nbsp;(<%= User.find(user_id).name(session[:ip]) %>)<br/>
       <% else %>
           <td style="vertical-align:top;"><%= contributor.name %><br/>
           <% team_members = TeamsUser.where(team_id: contributor.id) %>
           <% team_members.each do |team_member| %>
-              <font size="1"><%= User.find(team_member['user_id']).fullname %>&nbsp;
-              (<%= User.find(team_member['user_id']).name %>)</font><br/>
+              <font size="1"><%= User.find(team_member['user_id']).fullname(session[:ip]) %>&nbsp;
+              (<%= User.find(team_member['user_id']).name(session[:ip]) %>)</font><br/>
           <% end %>
       <% end %>
 
@@ -95,8 +96,10 @@
               bgcolor2 = "#E8E8BA"
             end
           %>
+
+        <!--Reviewed by-->
         <tr style="background-color:<%=bgcolor2%>">
-          <td width="50%" style="vertical-align:top;"><%= map.reviewer.name %> (<%= map.reviewer.fullname %>)
+          <td width="50%" style="vertical-align:top;"><%= map.reviewer.name(session[:ip]) %> (<%= map.reviewer.fullname(session[:ip]) %>)
             <div style="text-align:right">
               <div id="review_status<%=map.map_id%>">
                 <% if(Response.where(map_id: map.map_id).last.nil?) %>
@@ -114,6 +117,7 @@
             </div>
           </td>
 
+          <!--Metareviewed by-->
           <td width="50%">
             <table width="100%">
               <% rmappings = MetareviewResponseMap.where(reviewed_object_id: map.map_id)
@@ -129,7 +133,7 @@
                 end %>
 
               <tr style="background-color:<%=bgcolor3%>">
-                <td><%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
+                <td><%= rmap.reviewer.name(session[:ip]) %> (<%= rmap.reviewer.fullname(session[:ip]) %>)
                   <div style="text-align:right">
                     <%= link_to 'delete', :action => 'delete_metareviewer', :id => rmap.map_id %><br/>
                   </div>

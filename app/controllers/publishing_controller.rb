@@ -39,9 +39,7 @@ class PublishingController < ApplicationController
   def grant
     # Lookup the specific assignment (if any) that the user is granting publishing rights to.
     # This will be nil when the user is granting to all past assignments.
-    unless params[:id].nil?
-      @participant = AssignmentParticipant.find(params[:id])
-    end
+    @participant = AssignmentParticipant.find(params[:id]) unless params[:id].nil?
     @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
     end
 
@@ -57,7 +55,7 @@ class PublishingController < ApplicationController
     begin
       AssignmentParticipant.grant_publishing_rights(private_key, participants)
       redirect_to action: 'view'
-    rescue
+    rescue StandardError
       flash[:notice] = 'The private key you inputted was invalid.'
       if !params[:id].nil?
         redirect_to action: 'grant', id: participants[0].id

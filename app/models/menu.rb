@@ -25,31 +25,22 @@ class Menu
       @content_page_id = (item.content_page.id if item.content_page)
 
       @url = ''
-      if item.controller_action
-        @url = if item.controller_action.url_to_use and
-          !item.controller_action.url_to_use.empty?
-                 item.controller_action.url_to_use
-               else
-                 "/#{item.controller_action.controller.name}/#{item.controller_action.name}"
-               end
-      else
-        @url = "/#{item.content_page.name}"
-      end
+      @url = if item.controller_action
+               item.controller_action.url_to_use.presence || "/#{item.controller_action.controller.name}/#{item.controller_action.name}"
+             else
+               "/#{item.content_page.name}"
+             end
     end
 
     def site_controller
       unless @site_controller
-        if @site_controller_id
-          @site_controller = SiteController.find(@site_controller_id)
-        end
+        @site_controller = SiteController.find(@site_controller_id) if @site_controller_id
       end
     end
 
     def controller_action
       unless @controller_action
-        if @controller_action_id
-          @controller_action = ControllerAction.find(@controller_action_id)
-        end
+        @controller_action = ControllerAction.find(@controller_action_id) if @controller_action_id
       end
     end
 
@@ -77,9 +68,7 @@ class Menu
 
     items = nil
     if role
-      unless role.cache[:credentials].permission_ids.nil?
-        items = MenuItem.items_for_permissions(role.cache[:credentials].permission_ids)
-      end
+      items = MenuItem.items_for_permissions(role.cache[:credentials].permission_ids) unless role.cache[:credentials].permission_ids.nil?
     else # No role given: build menu of everything
       items = MenuItem.items_for_permissions
     end
@@ -106,9 +95,7 @@ class Menu
         end
       end # if items.size > 0
 
-      if @root.children and !@root.children.empty?
-        select(@by_id[@root.children[0]].name)
-      end
+      select(@by_id[@root.children[0]].name) if @root.children.present?
     end # if items
   end
 
@@ -129,7 +116,7 @@ class Menu
         node = @by_id[node.parent_id]
       end
       @vector.unshift @root
-      return @by_name[name]
+      @by_name[name]
     end
   end
 

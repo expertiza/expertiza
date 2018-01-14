@@ -4,7 +4,7 @@
       <tr><%= render :partial => 'table_header' %></tr>
       <br/>
       <% i=1 %>
-      <% @suggested_topics = get_suggested_topics(@assignment_id) %>
+      <% @suggested_topics = get_suggested_topics(@assignment.id) %>
       <%if !@suggested_topics.nil? %>
           <% @suggested_topics.each do |topic| %>
               <tr>

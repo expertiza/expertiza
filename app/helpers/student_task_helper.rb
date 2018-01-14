@@ -14,7 +14,7 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
-    return true if !assignment.has_topics? and assignment.get_current_stage != "submission"
+    return true if !assignment.topics? and assignment.get_current_stage != "submission"
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
     sign_up_topics.each {|topic| return true if assignment.can_review(topic.id) }
     false
@@ -24,5 +24,14 @@ module StudentTaskHelper
     self_review = SelfReviewResponseMap.where(reviewer_id: participant_id).first.try(:response).try(:last)
     return !self_review.try(:is_submitted) if self_review
     true
+  end
+
+  def get_awarded_badges(participant)
+    info = ''
+    participant.awarded_badges.each do |awarded_badge|
+      badge = awarded_badge.badge
+      info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
+    end
+    info.html_safe
   end
 end

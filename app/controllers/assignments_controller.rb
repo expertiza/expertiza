@@ -4,13 +4,13 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if %w(edit update list_submissions).include? params[:action]
+    if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
-      return true if ['Super-Administrator', 'Administrator'].include? current_role_name
-      return true if assignment.instructor_id == current_user.try(:id)
-      return true if TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) && (TaMapping.where(course_id: assignment.course_id).include? TaMapping.where(ta_id: current_user.try(:id), course_id: assignment.course_id).first)
-      return true if assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
-      return false
+      ['Super-Administrator',
+       'Administrator'].include? current_role_name or
+      assignment.instructor_id == current_user.try(:id) or
+      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+      assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
     else
       ['Super-Administrator',
        'Administrator',
@@ -46,106 +46,31 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
-    # give an error message is instructor have not set the time zone.
-    if current_user.timezonepref.nil?
-      flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines."
-    end
-    @topics = SignUpTopic.where(assignment_id: params[:id])
-    @assignment_form = AssignmentForm.create_form_object(params[:id])
-    @user = current_user
-
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
-    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @reviewvarycheck = false
-    @due_date_nameurl_notempty = false
-    @due_date_nameurl_notempty_checkbox = false
-    @metareview_allowed = false
-    @metareview_allowed_checkbox = false
-    @signup_allowed = false
-    @signup_allowed_checkbox = false
-    @drop_topic_allowed = false
-    @drop_topic_allowed_checkbox = false
-    @team_formation_allowed = false
-    @team_formation_allowed_checkbox = false
-    @participants_count = @assignment_form.assignment.participants.size
-    @teams_count = @assignment_form.assignment.teams.size
-
-    if @assignment_form.assignment.staggered_deadline == true
-      @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 1 }
-      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == 2 }
-    end
-
-    # Check if name and url in database is empty before webpage displays
+    flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
+    edit_params_setting
+    assignment_form_assignment_staggered_deadline?
     @due_date_all.each do |dd|
-      @due_date_nameurl_notempty = is_due_date_nameurl_notempty(dd)
-      @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
-      @metareview_allowed = is_meta_review_allowed?(dd)
-      @drop_topic_allowed = is_drop_topic_allowed?(dd)
-      @signup_allowed = is_signup_allowed?(dd)
-      @team_formation_allowed = is_team_formation_allowed?(dd)
-
-      if dd.due_at.present?
-        dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref)
-      end
-      if  @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
-          (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
-        break
-      end
+      check_due_date_nameurl_notempty(dd)
+      adjust_timezone_when_due_date_present(dd)
+      break if validate_due_date
     end
-
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
-        @reviewvarycheck = 1
-        break
-      end
-    end
+    check_assignment_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
-
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
-    if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
-      rubrics_needed = needed_rubrics(empty_rubrics_list)
-      flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
-    end
-
-    if @assignment_form.assignment.directory_path.nil? || @assignment_form.assignment.directory_path.empty?
-      flash.now[:error] = "You did not specify your submission directory."
-    end
+    handle_rubrics_not_assigned_case
+    handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    @badges = @assignment_form.assignment.badges
   end
 
   def update
     unless params.key?(:assignment_form)
-      @assignment = Assignment.find(params[:id])
-      @assignment.course_id = params[:course_id]
-      if @assignment.save
-        flash[:note] = 'The assignment was successfully saved.'
-        redirect_to list_tree_display_index_path
-      else
-        flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
-        redirect_to edit_assignment_path @assignment.id
-      end
+      assignment_form_key_nonexist_case_handler
       return
     end
-
-    @assignment_form = AssignmentForm.create_form_object(params[:id])
-    @assignment_form.assignment.instructor ||= current_user
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
-      q[:questionnaire_id].empty?
-    end
-
-    if current_user.timezonepref.nil?
-      parent_id = current_user.parent_id
-      parent_timezone = User.find(parent_id).timezonepref
-      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
-      current_user.timezonepref = parent_timezone
-    end
-    if @assignment_form.update_attributes(assignment_form_params, current_user)
-      flash[:note] = 'The assignment was successfully saved....'
-    else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
-    end
+    retrieve_assignment_form
+    handle_current_user_timezonepref_nil
+    update_feedback_assignment_form_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 
@@ -153,40 +78,15 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # GET_PATH (Helper function for CREATE and UPDATE)
-  #  return the file location if there is any for the assignment
-  # TODO: to be depreicated
-  #--------------------------------------------------------------------------------------------------------------------
   def path
     begin
       file_path = @assignment.path
-    rescue
+    rescue StandardError
       file_path = nil
     end
     file_path
   end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # COPY_PARTICIPANTS_FROM_COURSE
-  #  if assignment and course are given copy the course participants to assignment
-  # TODO: to be tested
-  #--------------------------------------------------------------------------------------------------------------------
-  def copy_participants_from_course
-    if params[:assignment][:course_id]
-      begin
-        Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
-      rescue
-        flash[:error] = $ERROR_INFO
-      end
-    end
-  end
-
-  #-------------------------------------------------------------------------------------------------------------------
-  # COPY
-  # Creates a copy of an assignment along with dates and submission directory
-  # TODO: need to be tested
-  #-------------------------------------------------------------------------------------------------------------------
   def copy
     @user = current_user
     session[:copy_flag] = true
@@ -195,7 +95,11 @@ class AssignmentsController < ApplicationController
     new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
       new_assign = Assignment.find(new_assign_id)
-      flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment.  If you do not want this to happen, change the submission directory in the new copy of the assignment.' if old_assign.directory_path == new_assign.directory_path
+      if old_assign.directory_path == new_assign.directory_path
+        flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
+          "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
+          "If you do not want this to happen, change the submission directory in the new copy of the assignment."
+      end
       redirect_to edit_assignment_path new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
@@ -203,10 +107,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  #--------------------------------------------------------------------------------------------------------------------
-  # DELETE
-  # TODO: not been cleanup yep
-  #--------------------------------------------------------------------------------------------------------------------
   def delete
     begin
       @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -218,16 +118,17 @@ class AssignmentsController < ApplicationController
         @assignment_form.delete(params[:force])
         flash[:success] = "The assignment was successfully deleted."
       end
-    rescue => e
+    rescue StandardError => e
       flash[:error] = e.message
     end
+
     redirect_to list_tree_display_index_path
   end
 
   def index
     set_up_display_options("ASSIGNMENT")
     @assignments = super(Assignment)
-    #    @assignment_pages, @assignments = paginate :assignments, :per_page => 10
+    # @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
 
   def delayed_mailer
@@ -257,24 +158,23 @@ class AssignmentsController < ApplicationController
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
+  private
+
   # check whether rubrics are set before save assignment
   def empty_rubrics_list
-    rubrics_list = %w(ReviewQuestionnaire
+    rubrics_list = %w[ReviewQuestionnaire
                       MetareviewQuestionnaire AuthorFeedbackQuestionnaire
-                      TeammateReviewQuestionnaire BookmarkRatingQuestionnaire)
+                      TeammateReviewQuestionnaire BookmarkRatingQuestionnaire]
     @assignment_questionnaires.each do |aq|
       next if aq.questionnaire_id.nil?
+
       rubrics_list.reject! do |rubric|
         rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
       end
     end
-    if @assignment_form.assignment.max_team_size == 1
-      rubrics_list.delete("TeammateReviewQuestionnaire")
-    end
+    rubrics_list.delete("TeammateReviewQuestionnaire") if @assignment_form.assignment.max_team_size == 1
     rubrics_list.delete("MetareviewQuestionnaire") unless @metareview_allowed
-    unless @assignment_form.assignment.use_bookmark
-      rubrics_list.delete("BookmarkRatingQuestionnaire")
-    end
+    rubrics_list.delete("BookmarkRatingQuestionnaire") unless @assignment_form.assignment.use_bookmark
     rubrics_list
   end
 
@@ -288,38 +188,24 @@ class AssignmentsController < ApplicationController
     needed_rub
   end
 
-  def is_due_date_nameurl_notempty(dd)
-    (!dd.deadline_name.nil? && !dd.deadline_name.empty?) || (!dd.description_url.nil? && !dd.description_url.empty?)
+  def due_date_nameurl_notempty?(dd)
+    dd.deadline_name.present? || dd.description_url.present?
   end
 
-  def is_meta_review_allowed?(dd)
-    status = false
-    if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_METAREVIEW
-      status = true
-    end
-    status
+  def meta_review_allowed?(dd)
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_METAREVIEW
   end
 
-  def is_drop_topic_allowed?(dd)
-    status = false
-    if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC
-      status = true
-    end
-    status
+  def drop_topic_allowed?(dd)
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC
   end
 
-  def is_signup_allowed?(dd)
-    status = false
-    status = true if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SIGN_UP
-    status
+  def signup_allowed?(dd)
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SIGN_UP
   end
 
-  def is_team_formation_allowed?(dd)
-    status = false
-    if dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
-      status = true
-    end
-    status
+  def team_formation_allowed?(dd)
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
 
   def update_nil_dd_deadline_name(due_date_all)
@@ -333,10 +219,121 @@ class AssignmentsController < ApplicationController
     due_date_all.each do |dd|
       dd.description_url ||= ''
     end
+
     due_date_all
   end
 
-  private
+  # helper methods for edit
+  def edit_params_setting
+    @topics = SignUpTopic.where(assignment_id: params[:id])
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
+    @user = current_user
+
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
+    @reviewvarycheck = false
+    @due_date_nameurl_notempty = false
+    @due_date_nameurl_notempty_checkbox = false
+    @metareview_allowed = false
+    @metareview_allowed_checkbox = false
+    @signup_allowed = false
+    @signup_allowed_checkbox = false
+    @drop_topic_allowed = false
+    @drop_topic_allowed_checkbox = false
+    @team_formation_allowed = false
+    @team_formation_allowed_checkbox = false
+    @participants_count = @assignment_form.assignment.participants.size
+    @teams_count = @assignment_form.assignment.teams.size
+  end
+
+  def assignment_form_assignment_staggered_deadline?
+    if @assignment_form.assignment.staggered_deadline == true
+      @review_rounds = @assignment_form.assignment.num_review_rounds
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_SUBMISSION }
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_REVIEW }
+    end
+    @assignment_form.assignment.staggered_deadline == true
+  end
+
+  def check_due_date_nameurl_notempty(dd)
+    @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
+    @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
+    @metareview_allowed = meta_review_allowed?(dd)
+    @drop_topic_allowed = drop_topic_allowed?(dd)
+    @signup_allowed = signup_allowed?(dd)
+    @team_formation_allowed = team_formation_allowed?(dd)
+  end
+
+  def adjust_timezone_when_due_date_present(dd)
+    dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref) if dd.due_at.present?
+  end
+
+  def validate_due_date
+    @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+  end
+
+  def check_assignment_questionnaires_usage
+    @assignment_questionnaires.each do |aq|
+      unless aq.used_in_round.nil?
+        @reviewvarycheck = 1
+        break
+      end
+    end
+  end
+
+  def handle_rubrics_not_assigned_case
+    if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
+      rubrics_needed = needed_rubrics(empty_rubrics_list)
+      flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
+          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+    end
+  end
+
+  def handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    flash.now[:error] = "You did not specify your submission directory." if @assignment_form.assignment.directory_path.blank?
+
+    @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
+  end
+
+  # helper methods for update
+  def assignment_form_key_nonexist_case_handler
+    @assignment = Assignment.find(params[:id])
+    @assignment.course_id = params[:course_id]
+
+    if @assignment.save
+      flash[:note] = 'The assignment was successfully saved.'
+      redirect_to list_tree_display_index_path
+    else
+      flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
+      redirect_to edit_assignment_path @assignment.id
+    end
+  end
+
+  def retrieve_assignment_form
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
+    @assignment_form.assignment.instructor ||= current_user
+    params[:assignment_form][:assignment_questionnaire].reject! do |q|
+      q[:questionnaire_id].empty?
+    end
+  end
+
+  def handle_current_user_timezonepref_nil
+    if current_user.timezonepref.nil?
+      parent_id = current_user.parent_id
+      parent_timezone = User.find(parent_id).timezonepref
+      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
+      current_user.timezonepref = parent_timezone
+    end
+  end
+
+  def update_feedback_assignment_form_attributes
+    if @assignment_form.update_attributes(assignment_form_params, current_user)
+      flash[:note] = 'The assignment was successfully saved....'
+    else
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+    end
+  end
 
   def assignment_form_params
     params.require(:assignment_form).permit!

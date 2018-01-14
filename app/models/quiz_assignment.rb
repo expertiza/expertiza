@@ -25,8 +25,8 @@ module QuizAssignment
 
   # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
   def contributor_for_quiz(reviewer, topic)
-    raise "Please select a topic." if has_topics? and topic.nil?
-    raise "This assignment does not have topics." if !has_topics? and topic
+    raise "Please select a topic." if topics? and topic.nil?
+    raise "This assignment does not have topics." if !topics? and topic
 
     # This condition might happen if the reviewer/quiz taker waited too much time in the
     # select topic page and other students have already selected this topic.
@@ -58,7 +58,7 @@ module QuizAssignment
   end
 
   def quiz_taken_by?(contributor, reviewer)
-    quiz_id = QuizQuestionnaire.find_by_instructor_id(contributor.id).id
+    quiz_id = QuizQuestionnaire.find_by(instructor_id: contributor.id).id
     QuizResponseMap.where('reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?',
                           contributor.id, reviewer.id, quiz_id).count > 0
   end

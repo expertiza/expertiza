@@ -29,7 +29,6 @@ class Assignment < ActiveRecord::Base
   has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
-
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
@@ -51,8 +50,12 @@ class Assignment < ActiveRecord::Base
   end
   alias team_assignment team_assignment?
 
-  def has_topics?
+  def topics?
     @has_topics ||= !sign_up_topics.empty?
+  end
+
+  def calibrated?
+    self.is_calibrated
   end
 
   def self.set_courses_to_assignment(user)
@@ -67,7 +70,7 @@ class Assignment < ActiveRecord::Base
     FileHelper.update_file_location(oldpath, newpath)
   end
 
-  def has_teams?
+  def teams?
     @has_teams ||= !self.teams.empty?
   end
 
@@ -91,14 +94,13 @@ class Assignment < ActiveRecord::Base
   # Returns a review (response) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
-
     # Reject response maps without responses
     response_map_set.reject! {|response_map| response_map.response.empty? }
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
     response_map_set.reject! do |response_map|
-      (response_map.reviewee == metareviewer) or response_map.reviewer.includes?(metareviewer)
+      response_map.reviewee == metareviewer or response_map.reviewer == metareviewer
     end
     raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
 
@@ -133,7 +135,7 @@ class Assignment < ActiveRecord::Base
   def metareview_mappings
     mappings = []
     self.review_mappings.each do |map|
-      m_map = MetareviewResponseMap.find_by_reviewed_object_id(map.id)
+      m_map = MetareviewResponseMap.find_by(reviewed_object_id: map.id)
       mappings << m_map unless m_map.nil?
     end
     mappings
@@ -146,80 +148,57 @@ class Assignment < ActiveRecord::Base
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
   def scores(questions)
-    if $redis.keys.include? "assgt_#{self.id}_team_scores"
-      scores = RedisHelper.fetch_hash_data("assgt_#{self.id}_team_scores")
-      # Zhewei: fetch teams and participants objects
-      # redis can only store strings instead of objects
-      scores[:teams].each {|k, v| scores[:teams][k][:team] = AssignmentTeam.find(v[:team][:id]) }
-      scores[:participants].each do |key, value|
-        value.each do |k, v|
-          if k == :participant
-            scores[:participants][key][k] = AssignmentParticipant.find_by(id: v[:id])
-          elsif v.is_a? Hash and v.has_key? :assessments and v[:assessments]
-            v[:assessments].each_with_index do |assessment, i|
-              scores[:participants][key][k][:assessments][i] = Response.find_by(id: v[:assessments][i][:id])
-            end
+    scores = {}
+    scores[:participants] = {}
+    self.participants.each do |participant|
+      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
+    end
+    scores[:teams] = {}
+    index = 0
+    self.teams.each do |team|
+      scores[:teams][index.to_s.to_sym] = {}
+      scores[:teams][index.to_s.to_sym][:team] = team
+      if self.varying_rubrics_by_round?
+        grades_by_rounds = {}
+        total_score = 0
+        total_num_of_assessments = 0 # calculate grades for each rounds
+        (1..self.num_review_rounds).each do |i|
+          assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
+          round_sym = ("review" + i.to_s).to_sym
+          grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+          total_num_of_assessments += assessments.size
+          unless grades_by_rounds[round_sym][:avg].nil?
+            total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
           end
         end
-      end
-    else
-      scores = {}
-      scores[:participants] = {}
-      self.participants.each do |participant|
-        scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
-      end
-      scores[:teams] = {}
-      index = 0
-      self.teams.each do |team|
-        scores[:teams][index.to_s.to_sym] = {}
-        scores[:teams][index.to_s.to_sym][:team] = team
-        if self.varying_rubrics_by_round?
-          calculate_scores_in_varying_rubric_by_round_assignment(questions, scores, team, index)
-        else
-          assessments = ReviewResponseMap.get_assessments_for(team)
-          scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
+        # merge the grades from multiple rounds
+        scores[:teams][index.to_s.to_sym][:scores] = {}
+        scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
+        scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
+        scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
+        (1..self.num_review_rounds).each do |i|
+          round_sym = ("review" + i.to_s).to_sym
+          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
+            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
+          end
+          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
+            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
+          end
         end
-        RedisHelper.store_hash_data("assgt_#{self.id}_team_scores", scores)
-        index += 1
+        if total_num_of_assessments != 0
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
+        else
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
+          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
+        end
+      else
+        assessments = ReviewResponseMap.get_assessments_for(team)
+        scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
       end
+      index += 1
     end
     scores
-  end
-
-  def calculate_scores_in_varying_rubric_by_round_assignment(questions, scores, team, index)
-    grades_by_rounds = {}
-    total_score = 0
-    total_num_of_assessments = 0 # calculate grades for each rounds
-    (1..self.num_review_rounds).each do |i|
-      assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
-      round_sym = ("review" + i.to_s).to_sym
-      grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
-      total_num_of_assessments += assessments.size
-      unless grades_by_rounds[round_sym][:avg].nil?
-        total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f
-      end
-    end
-    # merge the grades from multiple rounds
-    scores[:teams][index.to_s.to_sym][:scores] = {}
-    scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
-    scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
-    scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-    (1..self.num_review_rounds).each do |i|
-      round_sym = ("review" + i.to_s).to_sym
-      if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
-        scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
-      end
-      if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
-        scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
-      end
-    end
-    if total_num_of_assessments != 0
-      scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
-    else
-      scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
-      scores[:teams][index.to_s.to_sym][:scores][:max] = 0
-      scores[:teams][index.to_s.to_sym][:scores][:min] = 0
-    end
   end
 
   def path
@@ -228,10 +207,10 @@ class Assignment < ActiveRecord::Base
     end
     path_text = ""
     if !self.course_id.nil? && self.course_id > 0
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/' +
-        FileHelper.clean_path(Course.find(self.course_id).directory_path) + '/'
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
+        FileHelper.clean_path(self.course.directory_path) + '/'
     else
-      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(User.find(self.instructor_id).name) + '/'
+      path_text = Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
     end
     path_text += FileHelper.clean_path(self.directory_path)
     path_text
@@ -304,7 +283,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Check to see if assignment is a microtask
-  def is_microtask?
+  def microtask?
     self.microtask.nil? ? false : self.microtask
   end
 
@@ -312,7 +291,7 @@ class Assignment < ActiveRecord::Base
   # manual addition
   # user_name - the user account name of the participant to add
   def add_participant(user_name, can_submit, can_review, can_take_quiz)
-    user = User.find_by_name(user_name)
+    user = User.find_by(name: user_name)
     raise "The user account with the name #{user_name} does not exist. Please <a href='" +
       url_for(controller: 'users', action: 'new') + "'>create</a> the user first." if user.nil?
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id:  user.id)
@@ -327,7 +306,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def create_node
-    parent = CourseNode.find_by_node_object_id(self.course_id)
+    parent = CourseNode.find_by(node_object_id: self.course_id)
     node = AssignmentNode.create(node_object_id: self.id)
     node.parent_id = parent.id unless parent.nil?
     node.save
@@ -395,6 +374,7 @@ class Assignment < ActiveRecord::Base
     next_due_date
   end
 
+  # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
     due_date = find_current_stage(topic_id)
@@ -402,7 +382,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id).where(used_in_round: round)
+    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
     # for program 1 like assignment, if same rubric is used in both rounds,
     # the 'used_in_round' field in 'assignment_questionnaires' will be null,
     # since one field can only store one integer
@@ -426,16 +406,12 @@ class Assignment < ActiveRecord::Base
 
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options.value?('true')
-
     @assignment = Assignment.find(parent_id)
-
     @answers = {} # Contains all answer objects for this assignment
-
     # Find all unique response types
     @uniq_response_type = ResponseMap.uniq.pluck(:type)
     # Find all unique round numbers
     @uniq_rounds = Response.uniq.pluck(:round)
-
     # create the nested hash that holds all the answers organized by round # and response type
     @uniq_rounds.each do |round_num|
       @answers[round_num] = {}
@@ -443,18 +419,14 @@ class Assignment < ActiveRecord::Base
         @answers[round_num][res_type] = []
       end
     end
-
     @answers = generate_answer(@answers, @assignment)
-
     # Loop through each round and response type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
       @uniq_response_type.each do |res_type|
         round_type = check_empty_rounds(@answers, round_num, res_type)
-
         unless round_type.nil?
           csv << [round_type, '---', '---', '---', '---', '---', '---', '---']
         end
-
         @answers[round_num][res_type].each do |answer|
           csv << csv_row(detail_options, answer)
         end
@@ -486,10 +458,8 @@ class Assignment < ActiveRecord::Base
     tcsv = []
     @response = Response.find(answer.response_id)
     map = ResponseMap.find(@response.map_id)
-
     @reviewee = Team.find_by id: map.reviewee_id
     @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
-
     reviewer = Participant.find(map.reviewer_id).user
     tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
     tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
@@ -506,14 +476,12 @@ class Assignment < ActiveRecord::Base
   def self.generate_answer(answers, assignment)
     # get all response maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
-
     # for each map, get the response & answer associated with it
     @response_maps_for_assignment.each do |map|
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
       # for this response, get the answer associated with it
       @response_for_this_map.each do |resp|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
-
         @answer.each do |ans|
           answers[resp.round][map.type].push(ans)
         end
@@ -550,10 +518,9 @@ class Assignment < ActiveRecord::Base
     @assignment = Assignment.find(parent_id)
     @questions = {}
     questionnaires = @assignment.questionnaires
-
     questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round?
-        round = AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
         questionnaire_symbol = if round.nil?
                                  questionnaire.symbol
                                else
@@ -565,9 +532,12 @@ class Assignment < ActiveRecord::Base
       @questions[questionnaire_symbol] = questionnaire.questions
     end
     @scores = @assignment.scores(@questions)
-
     return csv if @scores[:teams].nil?
+    export_data(csv, @scores, options)
+  end
 
+  def self.export_data(csv, scores, options)
+    @scores = scores
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
@@ -580,29 +550,30 @@ class Assignment < ActiveRecord::Base
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-
-      team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['team_score'] == 'true'
-
-      pscore[:review] ?
-        tcsv.push(pscore[:review][:scores][:max], pscore[:review][:scores][:min], pscore[:review][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['submitted_score']
-
-      pscore[:metareview] ?
-        tcsv.push(pscore[:metareview][:scores][:max], pscore[:metareview][:scores][:min], pscore[:metareview][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['metareview_score']
-
-      pscore[:feedback] ?
-        tcsv.push(pscore[:feedback][:scores][:max], pscore[:feedback][:scores][:min], pscore[:feedback][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['author_feedback_score']
-
-      pscore[:teammate] ?
-        tcsv.push(pscore[:teammate][:scores][:max], pscore[:teammate][:scores][:min], pscore[:teammate][:scores][:avg]) :
-        tcsv.push('---', '---', '---') if options['teammate_review_score']
-
-      tcsv.push(pscore[:total_score])
+      export_data_fields(options)
       csv << tcsv
+    end
+  end
+
+  def self.export_data_fields(options)
+    team[:scores] ?
+      tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+      tcsv.push('---', '---', '---') if options['team_score'] == 'true'
+    review_hype_mapping_hash = {review: 'submitted_score',
+                                metareview: 'metareview_score',
+                                feedback: 'author_feedback_score',
+                                teammate: 'teammate_review_score'}
+    review_hype_mapping_hash.each do |review_type, score_name|
+      export_individual_data_fields(review_type, score_name)
+    end
+    tcsv.push(pscore[:total_score])
+ end
+
+  def self.export_individual_data_fields(review_type, score_name)
+    if pscore[review_type]
+      tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
+    else
+      tcsv.push('---', '---', '---') if options[score_name]
     end
   end
 
@@ -621,6 +592,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by_name(type).id }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 end

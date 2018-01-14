@@ -1,4 +1,4 @@
 class Suggestion < ActiveRecord::Base
-  validates_presence_of :title, :description
+  validates :title, :description, presence: true
   has_many :suggestion_comments
 end

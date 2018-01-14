@@ -108,7 +108,7 @@ class SignUpSheet < ActiveRecord::Base
         process_review_round(assignment_id, duedate, round, topic)
       end
 
-      deadline_type_subm = DeadlineType.find_by_name('metareview').id
+      deadline_type_subm = DeadlineType.find_by(name: 'metareview').id
       duedate_subm = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_subm).first
       subm_string = duedate_subm.nil? ? nil : DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
       duedate['submission_' + (@review_rounds + 1).to_s] = subm_string
@@ -144,9 +144,9 @@ class SignUpSheet < ActiveRecord::Base
     end
 
     def find_topic_duedates(round, topic)
-      deadline_type_subm = DeadlineType.find_by_name('submission').id
+      deadline_type_subm = DeadlineType.find_by(name: 'submission').id
       duedate_subm = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_subm, round: round).first
-      deadline_type_rev = DeadlineType.find_by_name('review').id
+      deadline_type_rev = DeadlineType.find_by(name: 'review').id
       duedate_rev = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_rev, round: round).first
       [duedate_rev, duedate_subm]
     end

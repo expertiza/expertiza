@@ -41,18 +41,14 @@ module CourseHelper
       # find all assignment the student participated in
       assignment_participant_list = AssignmentParticipant.where(user_id: user.id)
       assignment_participant_list.each do |assignment_participant|
-        unless assignment_participant.assignment.course.nil?
-          course_id_list << assignment_participant.assignment.course.id
-        end
+        course_id_list << assignment_participant.assignment.course.id unless assignment_participant.assignment.course.nil?
       end
       # find all teams the student participated in
       teams_users = TeamsUser.where(user_id: user.id)
       teams_users.each do |teams_user|
         team = Team.find(teams_user.team_id)
         if team.is_a?(AssignmentTeam)
-          unless team.assignment.course.nil?
-            course_id_list << team.assignment.course.id
-          end
+          course_id_list << team.assignment.course.id unless team.assignment.course.nil?
         elsif team.is_a?(CourseTeam)
           course_id_list << team.course.id
         end

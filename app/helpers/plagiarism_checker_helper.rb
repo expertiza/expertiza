@@ -54,7 +54,7 @@ module PlagiarismCheckerHelper
   # Upload file
   def self.upload_file(assignment_submission_simicheck_id, team_id, parsed_text, file_number)
     # Set up filename structure: "teamID_000N.txt"
-    filename = "team" + team_id.to_s + "_%04d.txt" % file_number
+    filename = "team" + team_id.to_s + format("_%04d.txt", file_number)
     # Set up full filepath (in tmp dir)
     filepath = "tmp/" + filename
     # Create new file using parsed text
@@ -94,7 +94,7 @@ module PlagiarismCheckerHelper
       get_sim_link_response = SimiCheckWebService.visualize_comparison(assignment_submission_simicheck_id, f1_id, f2_id)
       sim_link = 'https://www.simicheck.com' + get_sim_link_response.body
 
-      as_id = PlagiarismCheckerAssignmentSubmission.find_by_simicheck_id(assignment_submission_simicheck_id).id
+      as_id = PlagiarismCheckerAssignmentSubmission.find_by(simicheck_id: assignment_submission_simicheck_id).id
       comparison = PlagiarismCheckerComparison.new(plagiarism_checker_assignment_submission_id: as_id,
                                                    similarity_link: sim_link,
                                                    similarity_percentage: percent_similar,

@@ -17,15 +17,6 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  private def instructor_id
-    late_policy.try(:instructor_id) ||
-    current_user.instructor_id
-  end
-
-  private def late_policy
-    @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
-  end
-
   # GET /late_policies
   # GET /late_policies.xml
   def index
@@ -65,9 +56,7 @@ class LatePoliciesController < ApplicationController
   # POST /late_policies.xml
   def create
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-    if invalid_penalty_per_unit
-      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
-    end
+    flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
     if same_policy_name == LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
       flash[:error] = "A policy with the same name already exists."
     end
@@ -78,7 +67,7 @@ class LatePoliciesController < ApplicationController
         @late_policy.save!
         flash[:notice] = "The penalty policy was successfully created."
         redirect_to action: 'index'
-      rescue
+      rescue StandardError
         flash[:error] = "The following error occurred while saving the penalty policy: "
         redirect_to action: 'new'
       end
@@ -92,9 +81,7 @@ class LatePoliciesController < ApplicationController
   def update
     @penalty_policy = LatePolicy.find(params[:id])
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-    if invalid_penalty_per_unit
-      flash[:error] = "The maximum penalty cannot be less than penalty per unit."
-    end
+    flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
     same_policy_name = false
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name
@@ -109,7 +96,7 @@ class LatePoliciesController < ApplicationController
         LatePolicy.update_calculated_penalty_objects(@penalty_policy)
         flash[:notice] = "The late policy was successfully updated."
         redirect_to action: 'index'
-      rescue
+      rescue StandardError
         flash[:error] = "The following error occurred while updating the penalty policy: "
         redirect_to action: 'edit', id: params[:id]
       end
@@ -128,7 +115,7 @@ class LatePoliciesController < ApplicationController
     @penalty_policy = LatePolicy.find(params[:id])
     begin
       @penalty_policy.destroy
-    rescue
+    rescue StandardError
       flash[:error] = "This policy is in use and hence cannot be deleted."
     end
     redirect_to controller: 'late_policies', action: 'index'
@@ -138,5 +125,14 @@ class LatePoliciesController < ApplicationController
 
   def late_policy_params
     params.require(:late_policy).permit(:policy_name, :penalty_per_unit, :penalty_unit, :max_penalty)
+  end
+
+  def instructor_id
+    late_policy.try(:instructor_id) ||
+    current_user.instructor_id
+  end
+
+  def late_policy
+    @penalty_policy ||= @late_policy || LatePolicy.find(params[:id]) if params[:id]
   end
 end

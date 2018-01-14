@@ -1,5 +1,5 @@
 class TextResponse < Question
-  validates_presence_of :size
+  validates :size, presence: true
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(_count)
@@ -25,9 +25,7 @@ class TextResponse < Question
     html.html_safe
   end
 
-  def complete
-  end
+  def complete; end
 
-  def view_completed_question
-  end
+  def view_completed_question; end
 end

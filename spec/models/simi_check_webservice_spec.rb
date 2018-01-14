@@ -6,7 +6,7 @@ xdescribe "SimiCheckWebservice" do
       begin
         response = SimiCheckWebService.get_similarity_nxn(comp_id)
         is_success = (response.code == 200)
-      rescue
+      rescue StandardError
         print '.'
         sleep(2)
         next

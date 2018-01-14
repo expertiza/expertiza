@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-
   include AccessHelper
 
   # You want to get exceptions in development, but not in production.
@@ -8,17 +7,16 @@ class ApplicationController < ActionController::Base
       redirect_to root_path
     end
   end
-  
+
   # forcing SSL only in the production mode
   force_ssl if Rails.env.production?
 
-  helper_method :current_user, :current_user_role?, :anonymous_mode?
+  helper_method :current_user, :current_user_role?
   protect_from_forgery with: :exception
   before_action :set_time_zone
   before_action :authorize
 
-  def self.verify(_args)
-  end
+  def self.verify(_args); end
 
   def current_user_role?
     current_user.role.name
@@ -110,7 +108,7 @@ class ApplicationController < ActionController::Base
     # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
     # Get the Instructor::QUESTIONNAIRE constant
     @display_options ||= eval "#{current_user_role.class}::#{object_type}"
-    end
+  end
 
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.

@@ -12,12 +12,10 @@ class Node < ActiveRecord::Base
   has_many :children, class_name: Node, foreign_key: 'parent_id'
 
   # Retrieves the nodes of this type
-  def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil)
-  end
+  def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil); end
 
   # Retrieves the children of this node
-  def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
-  end
+  def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil); end
 
   # Retrieves the action partial for this node
   def get_partial_name
@@ -33,26 +31,20 @@ class Node < ActiveRecord::Base
 
   # Retrieves the corresponding model for the
   # node's object type
-  def self.table
-  end
+  def self.table; end
 
   # Retreives the node's object name
-  def get_name
-  end
+  def get_name; end
 
   # Retrieves the node's object directory
-  def get_directory
-  end
+  def get_directory; end
 
   # Retrieves the node's object create_at
-  def get_creation_date
-  end
+  def get_creation_date; end
 
   # Retrieves the node's object create_at
-  def get_modified_date
-  end
+  def get_modified_date; end
 
   # Retrieves the type of children this node has
-  def get_child_type
-  end
+  def get_child_type; end
 end

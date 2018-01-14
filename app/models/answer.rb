@@ -3,6 +3,7 @@ require 'analytic/score_analytic'
 class Answer < ActiveRecord::Base
   include ScoreAnalytic
   belongs_to :question
+  belongs_to :response
 
   # Computes the total score for a *list of assessments*
   # parameters
@@ -10,7 +11,7 @@ class Answer < ActiveRecord::Base
   #  questions - the list of questions that was filled out in the process of doing those assessments
   def self.compute_scores(assessments, questions)
     scores = {}
-    if !assessments.nil? && !assessments.empty?
+    if assessments.present?
       scores[:max] = -999_999_999
       scores[:min] = 999_999_999
       total_score = 0
@@ -19,9 +20,7 @@ class Answer < ActiveRecord::Base
         curr_score = get_total_score(response: [assessment], questions: questions)
 
         scores[:max] = curr_score if curr_score > scores[:max]
-        if curr_score < scores[:min] and curr_score != -1
-          scores[:min] = curr_score
-        end
+        scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
 
         # Check if the review is invalid. If is not valid do not include in score calculation
         if @invalid == 1 or curr_score == -1
@@ -65,9 +64,7 @@ class Answer < ActiveRecord::Base
       # which means student did not assign any score before save the peer review.
       # If we do not check here, to_f method will convert nil to 0, at that time, we cannot figure out the reason behind 0 point,
       # whether is reviewer assign all questions 0 or reviewer did not finish any thing and save directly.
-      weighted_score = unless questionnaireData[0].weighted_score.nil?
-                         questionnaireData[0].weighted_score.to_f
-                       end
+      weighted_score = (questionnaireData[0].weighted_score.to_f unless questionnaireData[0].weighted_score.nil?)
       sum_of_weights = questionnaireData[0].sum_of_weights.to_f
       # Zhewei: we need add questions' weights only their answers are not nil in DB.
       all_answers_for_curr_response = Answer.where(response_id: @response.id)
@@ -124,4 +121,12 @@ class Answer < ActiveRecord::Base
     question_answers
   end
   # end added by ferry, required for the summarization
+
+  # start added by ferry for answer tagging
+  def get_reviewee_from_answer(answer)
+    resp = Response.find(answer.response_id)
+    map = ResponseMap find(resp.map_id)
+    map.reviewee_id
+  end
+  # end added by ferry for answer tagging
 end

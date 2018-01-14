@@ -30,7 +30,7 @@ class QuizResponseMap < ResponseMap
     return 'N/A' if response_id.nil? # this quiz has not been taken yet
 
     questions.each do |question|
-      score = Answer.where(response_id: response_id, question_id:  question.id).first
+      score = Answer.where(response_id: response_id, question_id: question.id).first
       if score.nil?
         # The quiz has been taken but not all the answers are stored correctly.
         return 'N/A'

@@ -28,7 +28,7 @@ module FileHelper
       elsif newpath # nil oldpath
         create_directory_from_path(newpath)
       end
-    rescue
+    rescue StandardError
     end
   end
 
@@ -50,7 +50,7 @@ module FileHelper
     begin
       entries = Dir.entries(in_object.path)
       FileUtils.remove_dir(in_object.path) if entries and entries.size == 2
-    rescue => e
+    rescue StandardError => e
       raise "An error occurred while deleting the directory: " + e.message
     end
   end
@@ -58,7 +58,7 @@ module FileHelper
   def self.create_directory(in_object)
     begin
       FileUtils.mkdir_p(in_object.path) unless File.exist? in_object.path
-    rescue => e
+    rescue StandardError => e
       raise "An error occurred while creating this directory: " + e.message
     end
   end
@@ -66,7 +66,7 @@ module FileHelper
   def self.create_directory_from_path(path)
     begin
       FileUtils.mkdir_p(path) unless File.exist? path
-    rescue => e
+    rescue StandardError => e
       raise "An error occurred while creating this directory: " + e.message
     end
   end

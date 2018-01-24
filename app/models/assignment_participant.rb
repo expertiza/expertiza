@@ -1,7 +1,5 @@
 require 'uri'
 require 'yaml'
-require 'file_support'
-require 'import_support'
 # Code Review: Notice that Participant overloads two different concepts:
 #              contribution and participant (see fields of the participant table).
 #              Consider creating a new table called contributions.
@@ -24,8 +22,6 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
-  include FileSupport
-  extend ImportSupport
 
   def dir_path
     assignment.try :directory_path
@@ -179,6 +175,20 @@ class AssignmentParticipant < Participant
     BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = []
+
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each {|f| files << f }
+      end
+      files << file
+    end
+    files
+  end
+
   def team
     AssignmentTeam.team(self)
   end
@@ -186,7 +196,13 @@ class AssignmentParticipant < Participant
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row, _row_header = nil, session, id)
-    user = AssignmentParticipant.check_info_and_create(row, _row_header = nil, session)
+    raise ArgumentError, "No user id has been specified." if row.empty?
+    user = User.find_by(name:row[0])
+    if user.nil?
+      raise ArgumentError, "The record containing #{row[0]} does not have enough items." if row.length < 4
+      attributes = ImportFileHelper.define_attributes(row)
+      user = ImportFileHelper.create_new_user(attributes, session)
+    end
     raise ImportError, "The assignment with id \"" + id.to_s + "\" was not found." if Assignment.find(id).nil?
     unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
       new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)

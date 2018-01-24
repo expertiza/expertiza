@@ -42,7 +42,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :assignments do
+  resources :assignments, except: [:destroy] do
     collection do
       get :associate_assignment_with_course
       get :copy
@@ -131,7 +131,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :institution do
+  resources :institution, except: [:destroy] do
     collection do
       get :list
       post ':id', action: :update
@@ -462,14 +462,14 @@ Expertiza::Application.routes.draw do
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')
-  get ':controller(/:action(/:id))(.:format)'
-  match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  get '/menu/*name', controller: :menu_items, action: :link
+  get ':page_name', controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
-  get '/menu/*name', controller: :menu_items, action: :link
-  get ':page_name', controller: :content_pages, action: :view, method: :get
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
+  get ':controller(/:action(/:id))(.:format)'
+  match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
 end

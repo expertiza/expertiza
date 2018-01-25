@@ -1,3 +1,8 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+
+<link href="custom_vis.css" rel="stylesheet" type="text/css" />
+
 
 
 <h1>
@@ -13,100 +18,169 @@
   Next: Click the activity you wish to perform on the assignment titled: <%= @assignment.name %>
 </div>
 <% if @assignment.spec_location && @assignment.spec_location.length > 0 %>
-  <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
+    <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
   <%if @topics.size > 0 %>
-    <% if @authorization == 'participant' || @authorization == 'submitter' %>
-      <li>
-        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
-        (Sign up for a topic)
-      </li>
-    <% end %>
+      <% if @authorization == 'participant' || @authorization == 'submitter' %>
+          <li>
+            <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
+            (Sign up for a topic)
+          </li>
+      <% end %>
   <%end%>
-<!--ACS Here we need to know the size of the team to decide whether or not
-to display the label "Your team" in the student assignment tasks-->
+  <!--ACS Here we need to know the size of the team to decide whether or not
+  to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
-    <% if @authorization == 'participant' %>
-      <li>
-        <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
-        (View and manage your team)
-      </li>
-    <% end %>
+      <% if @authorization == 'participant' %>
+          <li>
+            <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
+            (View and manage your team)
+          </li>
+      <% end %>
   <%end%>
   <% if @authorization == 'participant' or @can_submit == true %>
-    <li>
-      <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
-      <% if @topic_id.nil? and @topics.size > 0 %>
-        <font color="gray">Your work</font> (You have to choose a topic first)
-      <% else %>
-        <% if @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+      <li>
+        <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
+        <% if @topic_id.nil? and @topics.size > 0 %>
+            <font color="gray">Your work</font> (You have to choose a topic first)
         <% else %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
+            <% if @assignment.submission_allowed(@topic_id) %>
+                <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+            <% else %>
+                <%= link_to 'Your work', :controller => 'submitted_content', :action => 'view', :id => @participant.id %> (Submit and view your work)
+            <% end %>
         <% end %>
-      <% end %>
-    </li>
+      </li>
   <% end %>
 
   <% if @authorization == 'participant' or @can_review == true %>
-    <li>
-      <!--alias_name means if one participant is a reader, it will show 'Your readings' to see others' work; if one participant is not a reader, it will show 'Others' work' on the screen.-->
-      <% if @authorization != 'reader' %>
-        <% @alias_name = "Others' work" %>
-      <% else %>
-        <% @alias_name = "Your readings" %>
-      <% end %>
-      <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
-      <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
-        <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
-      <% else %>
-        <font color="gray"><%= @alias_name%></font>
-      <% end %>
-      (Give feedback to others on their work)
-    </li>
+      <li>
+        <!--alias_name means if one participant is a reader, it will show 'Your readings' to see others' work; if one participant is not a reader, it will show 'Others' work' on the screen.-->
+        <% if @authorization != 'reader' %>
+            <% @alias_name = "Others' work" %>
+        <% else %>
+            <% @alias_name = "Your readings" %>
+        <% end %>
+        <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
+        <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+            <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+        <% else %>
+            <font color="gray"><%= @alias_name%></font>
+        <% end %>
+        (Give feedback to others on their work)
+      </li>
   <% end %>
 
-    <!--Quiz-->
+  <!--Quiz-->
   <%if @assignment.require_quiz%>
-    <% if @authorization == 'participant' or @can_take_quiz == true %>
-      <li>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
-          <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
-        <% else %>
-          <font color="gray">Take quizzes</font>
-        <% end %>
-        (Take quizzes over the work you have read)
-      </li>
-    <% end %>
+      <% if @authorization == 'participant' or @can_take_quiz == true %>
+          <li>
+            <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
+                <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
+            <% else %>
+                <font color="gray">Take quizzes</font>
+            <% end %>
+            (Take quizzes over the work you have read)
+          </li>
+      <% end %>
   <%end%>
 
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
-    <li>
-      <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
-      <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
-        <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
-      <% else %>
-        <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %>
-        (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
-      <% end %>
-    </li>
+      <li>
+        <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
+        <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
+            <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
+        <% else %>
+            <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %>
+            (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
+        <% end %>
+      </li>
   <% end %>
-    <%if @can_provide_suggestions == true %>
+  <%if @can_provide_suggestions == true %>
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
-    <% end %>
+  <% end %>
 
-    <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
+  <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
-    <% end %>
-    <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
-  </ul>
-  <br>
+  <% end %>
+  <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+</ul>
+<br>
 
-  <br/>
-  <br/>
-  <%= render 'timeline' %>
-  <br/>
-  <br/>
-  <a href="javascript:window.history.back()">Back</a>
+<div id="visualization">
+  <div class="menu">
+    <input id="zoomIn" value="Zoom in" type="button">
+    <input id="zoomOut" value="Zoom out" type="button">
+    <input id="moveLeft" value="Move left" type="button">
+    <input id="moveRight" value="Move right" type="button">
+    <input id="Recenter" value="Recenter" type="button">
+  </div>
+</div>
+
+<% populate_visjs_elements %>
+
+<script>
+    // converting @visualization_data array to javascript compatible JSON object
+    var visualization_JSON = JSON.parse('<%=raw  @visualization_data.to_json%>');
+    var href_JSON = JSON.parse('<%= @href_arr.to_json.html_safe%>')
+
+    var temp;
+    //temp is temporary variable used to generate hyperlinks from content
+    for(i=0;  i<visualization_JSON.length; i++) {
+        temp=visualization_JSON[i].content.split("<split>");
+        if(href_JSON[i]=='')
+            visualization_JSON[i].content = temp[0]+"<br>"+temp.slice(1); //if no hyperlink is present display plain text
+        else
+            visualization_JSON[i].content = "<a href="+href_JSON[i]+" target='_blank'><b><u>"+temp[0]+"</u></b></a><br>"+temp.slice(1);
+        // generating hyperlink only to relevant text only
+    }
+</script>
+<!--code for visualization-->
+<script type="text/javascript">
+    // DOM element where the Timeline will be attached
+    var container = document.getElementById('visualization');
+
+    // Create a DataSet (allows two way data-binding)
+    var items = new vis.DataSet(visualization_JSON);
+
+    // Configuration for the Timeline
+    var options = {
+        zoomMin: 1000 * 60 * 60 * 24,             // one day in milliseconds
+        zoomMax: 1000 * 60 * 60 * 24 * 31 * 12     // about one year in milliseconds
+    };
+
+    // Create a Timeline
+    var timeline = new vis.Timeline(container, items, options);
+</script>
+
+<script>
+    var visualization_window=timeline.range.getRange();
+    function move (percentage) {
+        var range = timeline.getWindow();
+        var interval = range.end - range.start;
+
+        timeline.setWindow({
+            start: range.start.valueOf() - interval * percentage,
+            end:   range.end.valueOf()   - interval * percentage
+        });
+    }
+
+    // attach events to the navigation buttons
+    // zoom percentage in zoomin/zoomout can be adjusted below by passing paramenter. Similar is the case for move left/right
+    document.getElementById('zoomIn').onclick    = function () { timeline.zoomIn( 0.2); };
+    document.getElementById('zoomOut').onclick   = function () { timeline.zoomOut( 0.2); };
+    document.getElementById('moveLeft').onclick  = function () { move( 0.2); };
+    document.getElementById('moveRight').onclick = function () { move(-0.2); };
+    document.getElementById('Recenter').onclick  = function () {
+        var visualization_window_start = new Date(visualization_window.start);
+        var visualization_window_end = new Date(visualization_window.end);
+        timeline.setWindow(visualization_window_start, visualization_window_end, { animation: true });
+    };
+</script>
+
+<br>
+<br>
+
+<a href="javascript:window.history.back()">Back</a>

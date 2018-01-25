@@ -32,6 +32,8 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    @review_mappings = ResponseMap.where(reviewer_id: @participant.id)
+    @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end

@@ -50,7 +50,7 @@ class ReviewResponseMap < ResponseMap
     reviewee_user = User.find_by(name: reviewee_user_name)
     raise ArgumentError, "Cannot find reviewee user." if reviewee_user.nil?
 
-    reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, assignment_id: assignment_id)
+    reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, parent_id: assignment_id)
     raise ArgumentError, "Reviewee user is not a participant in this assignment." if reviewee_participant.nil?
 
     reviewee_team = AssignmentTeam.team(reviewee_participant)
@@ -69,7 +69,7 @@ class ReviewResponseMap < ResponseMap
       raise ArgumentError, "Cannot find reviewer user." if reviewer_user.nil?
       next if reviewer_user_name.empty?
 
-      reviewer_participant = AssignmentParticipant.find_by(user_id: reviewer_user.id, assignment_id: assignment_id)
+      reviewer_participant = AssignmentParticipant.find_by(user_id: reviewer_user.id, parent_id: assignment_id)
       raise ArgumentError, "Reviewer user is not a participant in this assignment." if reviewer_participant.nil?
 
       if ReviewResponseMap.find_by(reviewed_object_id: assignment_id, reviewer_id: reviewer_participant.id, reviewee_id: reviewee_team.id, calibrate_to: false).nil?

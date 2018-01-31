@@ -14,6 +14,8 @@ class Rubric < Questionnaire
   validates :max_question_score, numericality: true
   validates :min_question_score, numericality: true
 
+  attr_accessible
+
   def update_mapping
     redirect_to action: 'list', type_id: type_id
   end

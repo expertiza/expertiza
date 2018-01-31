@@ -6,6 +6,7 @@ class ControllerAction < ActiveRecord::Base
   validates :name, uniqueness: {scope: 'site_controller_id'}
 
   attr_accessor :controller, :permission, :url, :allowed, :specific_name
+  attr_accessible
 
   scope :order_by_controller_and_action, -> {
     joins('left outer join site_controllers on site_controller_id = site_controllers.id').

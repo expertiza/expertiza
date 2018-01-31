@@ -1,6 +1,7 @@
 class DueDate < ActiveRecord::Base
   validate :due_at_is_valid_datetime
   #  has_paper_trail
+  attr_accessible :id
 
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]

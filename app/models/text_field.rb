@@ -1,4 +1,6 @@
 class TextField < TextResponse
+  attr_accessible
+
   def complete(count, answer = nil)
     html = if self.type == 'TextField' and self.break_before == true
              '<li>'

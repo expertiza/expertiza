@@ -8,6 +8,8 @@ class Response < ActiveRecord::Base
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
+  attr_accessible :map_id, :additional_comment, :round, :is_submitted
+
   alias map response_map
   attr_accessor :difficulty_rating
   delegate :questionnaire, :reviewee, :reviewer, to: :map

@@ -2,6 +2,9 @@ class DeadlineRight < ActiveRecord::Base
   NO = 1
   LATE = 2
   OK   = 3
+
+  attr_accessible :name
+
   DEFAULT_PERMISSION = {
     'signup' => {
       'submission_allowed' => OK,

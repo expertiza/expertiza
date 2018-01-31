@@ -9,14 +9,13 @@ class ProfileController < ApplicationController
   end
 
   def update
-    params.permit!
     @user = session[:user]
 
     unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?
       aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
       aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
     end
-    if @user.update_attributes(params[:user])
+    if @user.update_attributes(user_params)
       flash[:success] = 'Your profile was successfully updated.'
     else
       flash[:error] = 'An error occurred and your profile could not updated.'

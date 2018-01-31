@@ -173,8 +173,8 @@ class UsersController < ApplicationController
     requested_user.status = params[:status]
     if requested_user.status.nil?
       flash[:error] = "Please Approve or Reject before submitting"
-    elsif requested_user.update_attributes(params[:user])
-      flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
+    elsif @user.update_attributes(user_params)
+      flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
     end
     if requested_user.status == "Approved"
       new_user = User.new
@@ -215,14 +215,14 @@ class UsersController < ApplicationController
   end
 
   def update
-    params.permit!
+    # params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
     # eg. /users/5408?name=5408
     @user.name += '_hidden' if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
 
-    if @user.update_attributes(params[:user])
+    if @user.update_attributes(user_params)
       flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
       redirect_to @user
     else
@@ -296,6 +296,12 @@ class UsersController < ApplicationController
   def requested_user_params
     params.require(:user).permit(:name, :role_id, :fullname, :institution_id, :email)
           .merge(self_introduction: params[:requested_user][:self_introduction])
+  end
+
+  def assignment_questionnaire_params(params_hash)
+    params_local = params
+    params_local[:assignment_questionnaire] = params_hash
+    params_local.require(:assignment_questionnaire).permit(:user_id)
   end
 
   def get_role

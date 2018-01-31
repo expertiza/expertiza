@@ -1,4 +1,6 @@
 class TableHeader < QuestionnaireHeader
+  attr_accessible
+
   def complete(_count, _answer = nil)
     html = '<br/><big><b>' + self.txt + '</b></big><br/>'
     html += '<table class="general" style="border: 2; text-align: left; width: 100%">'

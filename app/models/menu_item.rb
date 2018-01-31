@@ -1,6 +1,6 @@
 class MenuItem < ActiveRecord::Base
-  attr_accessor :controller_action, :content_page
-
+  attr_accessor
+  attr_accessible
   validates :name, presence: true
   validates :name, uniqueness: true
 

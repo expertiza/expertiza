@@ -3,6 +3,8 @@ class SurveyDeployment < ActiveRecord::Base
   validates :end_date, presence: true
   validate :valid_start_end_time?
 
+  attr_accessible :questionnaire_id, :start_date, :end_date, :parent_id
+
   def valid_start_end_time?
     if end_date.nil? || start_date.nil?
       errors[:base] << "The start and end time should be specified."

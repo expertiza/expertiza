@@ -43,4 +43,10 @@ class AdvertiseForPartnerController < ApplicationController
       redirect_to view_student_teams_path student_id: participant.id
     end
   end
+
+  def team_params(params_hash)
+    params_local = params
+    params_local[:team] = params_hash unless nil == params_hash
+    params_local.require(:team).permit(:id, :comments_for_advertisement)
+  end
 end

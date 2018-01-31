@@ -18,7 +18,7 @@ class SuggestionController < ApplicationController
   end
 
   def add_comment
-    @suggestioncomment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
+    @suggestioncomment = SuggestionComment.new(suggestion_comment_params)
     @suggestioncomment.suggestion_id = params[:id]
     @suggestioncomment.commenter = session[:user].name
     if @suggestioncomment.save
@@ -55,9 +55,7 @@ class SuggestionController < ApplicationController
   end
 
   def update_suggestion
-    Suggestion.find(params[:id]).update_attributes(title: params[:suggestion][:title],
-                                                   description: params[:suggestion][:description],
-                                                   signup_preference: params[:suggestion][:signup_preference])
+    Suggestion.find(params[:id]).update_attributes(suggestion_params)
     redirect_to action: 'new', id: Suggestion.find(params[:id]).assignment_id
   end
 
@@ -102,7 +100,8 @@ class SuggestionController < ApplicationController
     new_team = AssignmentTeam.create(name: 'Team' + @user_id.to_s + '_' + rand(1000).to_s,
                                      parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
     t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
-    SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
+    params[:signed_up_team] = {topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0}
+    SignedUpTeam.create(signed_up_team_params)
     parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
@@ -186,6 +185,14 @@ class SuggestionController < ApplicationController
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description,
                                        :status, :unityID, :signup_preference)
+  end
+
+  def suggestion_comment_params
+    params.require(:suggestion_comment).permit(:vote, :comments)
+  end
+
+  def signed_up_team_params
+    params.require(:signed_up_team).permit(:topic_id, :team_id, :is_waitlisted)
   end
 
   def approve

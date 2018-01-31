@@ -83,8 +83,10 @@ class StudentQuizzesController < ApplicationController
                 else
                   0
                 end
-        new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score
-        valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
+        new_score = Answer.new(answer_params(comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score))
+        if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
+          valid = false
+        end
         scores.push(new_score)
       end
     end
@@ -128,5 +130,13 @@ class StudentQuizzesController < ApplicationController
         @quiz_questionnaires.push questionnaire
       end
     end
+  end
+
+  private
+
+  def answer_params(params_hash)
+    params_local = params
+    params_local[:answer] = params_hash unless nil == params_hash
+    params_local.require(:answer).permit(:comments, :question_id, :response_id, :answer)
   end
 end

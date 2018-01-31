@@ -42,4 +42,10 @@ class AdviceController < ApplicationController
     end
     redirect_to action: 'edit_advice', id: params[:id]
   end
+
+  def question_advice_params(params_hash)
+    params_local = params
+    params_local[:question_advice] = params_hash unless nil == params_hash
+    params_local.require(:question_advice).permit(:advice)
+  end
 end

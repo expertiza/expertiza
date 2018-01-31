@@ -3,6 +3,9 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
+
+  attr_accessible
+
   # START of contributor methods, shared with AssignmentParticipant
 
   # Whether this team includes a given participant or not
@@ -176,7 +179,7 @@ class AssignmentTeam < Team
     end
     files
   end
-  
+
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
     raise 'The hyperlink cannot be empty!' if hyperlink.empty?

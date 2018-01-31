@@ -7,19 +7,19 @@ class QuestionnaireNode < Node
   end
 
   def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
-    if show
-      conditions = if User.find(user_id).role.name != "Teaching Assistant"
+    conditions = if show
+                   if User.find(user_id).role.name != "Teaching Assistant"
                      'questionnaires.instructor_id = ?'
                    else
                      'questionnaires.instructor_id in (?)'
-                   end
-    else
-      conditions = if User.find(user_id).role.name != "Teaching Assistant"
+                                end
+                 else
+                   if User.find(user_id).role.name != "Teaching Assistant"
                      '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
                    else
                      '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
-                   end
-    end
+                                end
+                 end
 
     values = if User.find(user_id).role.name != "Teaching Assistant"
                user_id
@@ -34,7 +34,7 @@ class QuestionnaireNode < Node
     end
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
-    if Questionnaire.column_names.include? sortvar and %w(ASC DESC asc desc).include? sortorder
+    if Questionnaire.column_names.include? sortvar and %w[ASC DESC asc desc].include? sortorder
       self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}")
     end
   end

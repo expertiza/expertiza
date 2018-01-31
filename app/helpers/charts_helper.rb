@@ -72,12 +72,12 @@ module ChartsHelper
     color = ""
 
     if ratio < 1.0
-      level = sprintf("%02x", 256 * ratio)
+      level = format("%02x", 256 * ratio)
       color = "ff" + level + level
     elsif ratio == 1.0
       color = "ffffff"
     else
-      level = sprintf("%02x", 256 * (2.0 - ratio))
+      level = format("%02x", 256 * (2.0 - ratio))
       color = level + "ff" + level
     end
 

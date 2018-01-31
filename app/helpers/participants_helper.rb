@@ -14,7 +14,7 @@ module ParticipantsHelper
 
   def self.define_attributes(line_split, config)
     attributes = {}
-    attributes["role_id"] = Role.find_by_name "Student"
+    attributes["role_id"] = Role.find_by name: "Student"
     attributes["name"] = line_split[config["name"].to_i]
     attributes["fullname"] = config["fullname"]
     attributes["email"] = line_split[config["email"].to_i]
@@ -26,7 +26,7 @@ module ParticipantsHelper
   end
 
   def self.define_user(attrs, session, params, home_page)
-    user = User.find_by_name(attrs["name"])
+    user = User.find_by(name: attrs["name"])
     user = create_new_user(attrs, session) if user.nil?
     if !params[:course_id].nil?
       participant = add_user_to_course(params, user)

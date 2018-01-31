@@ -8,9 +8,9 @@ module SummaryHelper
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
 
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
-      self.summary = Hash.new
-      self.avg_scores_by_round = Hash.new
-      self.avg_scores_by_criterion = Hash.new
+      self.summary = ({})
+      self.avg_scores_by_round = ({})
+      self.avg_scores_by_criterion = ({})
 
       # get all answers for each question and send them to summarization WS
       questions.keys.each do |round|
@@ -50,7 +50,7 @@ module SummaryHelper
       self.summary = Array.new(nround)
       self.avg_scores_by_criterion = Array.new(nround)
       self.avg_scores_by_round = Array.new(nround)
-
+      threads = []
       rubric = get_questions_by_assignment(assignment)
 
       for round in 0..nround - 1
@@ -66,14 +66,14 @@ module SummaryHelper
 
           max_score = get_max_score_for_question(question)
           # process each question in a seperate thread
-          Thread.new do
+          threads << Thread.new do
             comments = break_up_comments_to_sentences(answers_questions)
             # store each avg in a hashmap and use the question as the key
             self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, max_score)
-            self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url)
+            self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
           end
           # Wait for all threads to end
-          Thread.list.each do |t|
+          threads.each do |t|
             # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
             t.join if t != Thread.current
           end
@@ -90,11 +90,12 @@ module SummaryHelper
       # @avg_scores_by_reviewee[team]
       # @avg_score_round[reviewee][round]
       # @avg_scores_by_criterion[reviewee][round][criterion]
-      self.summary = Hash.new
-      self.avg_scores_by_reviewee = Hash.new
-      self.avg_scores_by_round = Hash.new
-      self.avg_scores_by_criterion = Hash.new
-      self.reviewers = Hash.new
+      self.summary = ({})
+      self.avg_scores_by_reviewee = ({})
+      self.avg_scores_by_round = ({})
+      self.avg_scores_by_criterion = ({})
+      self.reviewers = ({})
+      threads = []
 
       # get all criteria used in each round
       rubric = get_questions_by_assignment(assignment)
@@ -119,8 +120,8 @@ module SummaryHelper
 
           # iterate each round and get answers
           # if use the same rubric, only use rubric[0]
-          rubric_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
-          rubric_used.each do |q|
+          rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+          rubric_questions_used.each do |q|
             next if q.type.eql?("SectionHeader")
             summary[reviewee.name][round][q.txt] = ""
             self.avg_scores_by_criterion[reviewee.name][round][q.txt] = 0.0
@@ -137,17 +138,17 @@ module SummaryHelper
             # summarize the comments by calling the summarization Web Service
 
             # since it'll do a lot of request, do this in seperate threads
-            Thread.new do
+            threads << Thread.new do
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
           end
-          self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_used)
+          self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_questions_used)
         end
         self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
       end
 
       # Wait for all threads to end
-      Thread.list.each do |t|
+      threads.each do |t|
         t.join if t != Thread.current
       end
 
@@ -166,7 +167,7 @@ module SummaryHelper
         sum_json = RestClient.post summary_ws_url, param.to_json, content_type: :json, accept: :json
         # store each summary in a hashmap and use the question as the key
         summary = JSON.parse(sum_json)["summary"]
-      rescue => err
+      rescue StandardError => err
         summary = err.message
       end
       summary
@@ -267,7 +268,7 @@ module SummaryHelper
     end
   end
 
-  extend self
+  module_function
 end
 
 # end required by autosummary

@@ -4,6 +4,7 @@ class GradesController < ApplicationController
   helper :penalty
   include PenaltyHelper
   include StudentTaskHelper
+  include AssignmentHelper
 
   def action_allowed?
     case params[:action]
@@ -75,18 +76,15 @@ class GradesController < ApplicationController
     @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
     retrieve_questions questionnaires
-
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
     calculate_all_penalties(@assignment.id)
-
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
-
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
@@ -98,19 +96,21 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-
+    @questions = {}
     questionnaires = @assignment.questionnaires
+    retrieve_questions questionnaires
+    @pscore = @participant.scores(@questions)
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
     questionnaires.each do |questionnaire|
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-                 AssignmentQuestionnaire.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id).used_in_round
+                 AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
                end
-      vm = VmQuestionResponse.new(questionnaire, @round, @assignment.rounds_of_reviews)
-      questions = questionnaire.questions
-      vm.add_questions(questions)
+      vm = VmQuestionResponse.new(questionnaire, @assignment)
+      vmquestions = questionnaire.questions
+      vm.add_questions(vmquestions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words
@@ -128,35 +128,21 @@ class GradesController < ApplicationController
 
   def instructor_review
     participant = AssignmentParticipant.find(params[:id])
-
-    reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id:  participant.assignment.id).first
-    if reviewer.nil?
-      reviewer = AssignmentParticipant.create(user_id: session[:user].id, parent_id: participant.assignment.id)
-      reviewer.set_handle
-    end
-
+    reviewer = AssignmentParticipant.find_or_create_by(user_id: session[:user].id, parent_id: participant.assignment.id)
+    reviewer.set_handle if reviewer.new_record?
     review_exists = true
-
-    if participant.assignment.team_assignment?
-      reviewee = participant.team
-      review_mapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
-
-      if review_mapping.nil?
-        review_exists = false
-        review_mapping = ReviewResponseMap.create(reviewee_id: participant.team.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
-        review = Response.find_by_map_id(review_mapping.map_id)
-
-        if review_exists
-          redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
-        else
-          redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
-        end
-      end
+    reviewee = participant.team
+    review_mapping = ReviewResponseMap.find_or_create_by(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: participant.assignment.id)
+    if review_mapping.new_record?
+      review_exists = false
+    else
+      review = Response.find_by(map_id: review_mapping.map_id)
     end
-  end
-
-  def open
-    send_file(params['fname'], disposition: 'inline')
+    if review_exists
+      redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
+    else
+      redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
+    end
   end
 
   # This method is used from edit methods
@@ -172,7 +158,7 @@ class GradesController < ApplicationController
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
-    if sprintf("%.2f", total_score) != params[:participant][:grade]
+    if format("%.2f", total_score) != params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
                   "The computed score will be used for " + participant.user.name + "."
@@ -191,7 +177,7 @@ class GradesController < ApplicationController
     @team.comment_for_submission = params[:comment_for_submission]
     begin
       @team.save
-    rescue
+    rescue StandardError
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
@@ -208,7 +194,7 @@ class GradesController < ApplicationController
     if @participant.assignment.max_team_size > 1
       team = @participant.team
       unless team.nil?
-        unless team.has_user session[:user]
+        unless team.user? session[:user]
           flash[:error] = 'You are not on the team that wrote this feedback'
           redirect_to '/'
           return true
@@ -219,19 +205,6 @@ class GradesController < ApplicationController
       return true unless current_user_id?(reviewer.try(:user_id))
     end
     false
-  end
-
-  def get_body_text(submission)
-    if submission
-      role = "reviewer"
-      item = "submission"
-    else
-      role = "metareviewer"
-      item = "review"
-    end
-    "Hi ##[recipient_name],
-        You submitted a score of ##[recipients_grade] for assignment ##[assignment_name] that varied greatly from another " + role + "'s score for the same " + item + ".
-        The Expertiza system has brought this to my attention."
   end
 
   def calculate_all_penalties(assignment_id)
@@ -246,72 +219,55 @@ class GradesController < ApplicationController
 
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
-        if @total_penalty > l_policy.max_penalty
-          @total_penalty = l_policy.max_penalty
-        end
+        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
         calculate_penatly_attributes(@participant) if calculate_for_participants
       end
       assign_all_penalties(participant, penalties)
     end
-    unless @assignment.is_penalty_calculated
-      @assignment.update_attribute(:is_penalty_calculated, true)
-    end
+    @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
   end
 
   def calculate_penatly_attributes(_participant)
-    penalty_attr1 = {deadline_type_id: 1, participant_id: @participant.id, penalty_points: penalties[:submission]}
-    CalculatedPenalty.create(penalty_attr1)
-
-    penalty_attr2 = {deadline_type_id: 2, participant_id: @participant.id, penalty_points: penalties[:review]}
-    CalculatedPenalty.create(penalty_attr2)
-
-    penalty_attr3 = {deadline_type_id: 5, participant_id: @participant.id, penalty_points: penalties[:meta_review]}
-    CalculatedPenalty.create(penalty_attr3)
+    deadline_type_id = [1, 2, 5]
+    penalties_symbols = %i[submission review meta_review]
+    deadline_type_id.zip(penalties_symbols).each do |id, symbol|
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
+    end
   end
 
   def assign_all_penalties(participant, penalties)
-    @all_penalties[participant.id] = {}
-    @all_penalties[participant.id][:submission] = penalties[:submission]
-    @all_penalties[participant.id][:review] = penalties[:review]
-    @all_penalties[participant.id][:meta_review] = penalties[:meta_review]
-    @all_penalties[participant.id][:total_penalty] = @total_penalty
+    @all_penalties[participant.id] = {
+      submission: penalties[:submission],
+      review: penalties[:review],
+      meta_review: penalties[:meta_review],
+      total_penalty: @total_penalty
+    }
   end
 
   def make_chart
     @grades_bar_charts = {}
+    participant_score_types = %i[metareview feedback teammate]
     if @pscore[:review]
       scores = []
       if @assignment.varying_rubrics_by_round?
-        for round in 1..@assignment.rounds_of_reviews
-          responses = @pscore[:review][:assessments].reject {|response| response.round != round }
+        (1..@assignment.rounds_of_reviews).each do |round|
+          responses = @pscore[:review][:assessments].select {|response| response.round == round }
           scores = scores.concat(get_scores_for_chart(responses, 'review' + round.to_s))
           scores -= [-1.0]
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
-        scores = get_scores_for_chart @pscore[:review][:assessments], 'review'
-        scores -= [-1.0]
-        @grades_bar_charts[:review] = bar_chart(scores)
+        remove_negative_scores_and_build_charts(:review)
       end
-
     end
+    participant_score_types.each {|symbol| remove_negative_scores_and_build_charts(symbol) }
+  end
 
-    if @pscore[:metareview]
-      scores = get_scores_for_chart @pscore[:metareview][:assessments], 'metareview'
+  def remove_negative_scores_and_build_charts(symbol)
+    if @participant_score and @participant_score[symbol]
+      scores = get_scores_for_chart @participant_score[symbol][:assessments], symbol.to_s
       scores -= [-1.0]
-      @grades_bar_charts[:metareview] = bar_chart(scores)
-    end
-
-    if @pscore[:feedback]
-      scores = get_scores_for_chart @pscore[:feedback][:assessments], 'feedback'
-      scores -= [-1.0]
-      @grades_bar_charts[:feedback] = bar_chart(scores)
-    end
-
-    if @pscore[:teammate]
-      scores = get_scores_for_chart @pscore[:teammate][:assessments], 'teammate'
-      scores -= [-1.0]
-      @grades_bar_charts[:teammate] = bar_chart(scores)
+      @grades_bar_charts[symbol] = bar_chart(scores)
     end
   end
 
@@ -333,7 +289,7 @@ class GradesController < ApplicationController
     GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
       data = scores
       bc.data "Line green", data, '990000'
-      bc.axis :y, range: [0, data.max], positions: [data.min, data.max]
+      bc.axis :y, range: [0, data.max], positions: data.minmax
       bc.show_legend = false
       bc.stacked = false
       bc.width_spacing_options(bar_width: (width - 30) / (data.size + 1), bar_spacing: 1, group_spacing: spacing)
@@ -355,11 +311,5 @@ class GradesController < ApplicationController
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
-  end
-
-  def mean_and_standard_deviation(array)
-    m = mean(array)
-    variance = array.inject(0) {|variance, x| variance += (x - m)**2 }
-    [m, Math.sqrt(variance / (array.size - 1))]
   end
 end

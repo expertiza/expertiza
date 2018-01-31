@@ -7,8 +7,9 @@ class Course < ActiveRecord::Base
   has_many :participants, class_name: 'CourseParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :course_teams, foreign_key: 'parent_id', dependent: :destroy
   has_one :course_node, foreign_key: "node_object_id", dependent: :destroy
+  has_many :notifications, dependent: :destroy
   has_paper_trail
-  validates_presence_of :name
+  validates :name, presence: true
   # Return any predefined teams associated with this course
   # Author: ajbudlon
   # Date: 7/21/2008
@@ -18,9 +19,7 @@ class Course < ActiveRecord::Base
 
   # Returns this object's submission directory
   def path
-    if self.instructor_id.nil?
-      raise "Path can not be created. The course must be associated with an instructor."
-    end
+    raise "Path can not be created. The course must be associated with an instructor." if self.instructor_id.nil?
     Rails.root + "/pg_data/" + FileHelper.clean_path(User.find(self.instructor_id).name) + "/" + FileHelper.clean_path(self.directory_path) + "/"
   end
 
@@ -33,7 +32,7 @@ class Course < ActiveRecord::Base
   end
 
   def add_participant(user_name)
-    user = User.find_by_name(user_name)
+    user = User.find_by(name: user_name)
     if user.nil?
       raise "No user account exists with the name " + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
@@ -54,7 +53,7 @@ class Course < ActiveRecord::Base
 
       begin
         self.add_participant(user.name)
-      rescue
+      rescue StandardError
         errors << $ERROR_INFO
       end
     end

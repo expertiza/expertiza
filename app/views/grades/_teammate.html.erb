@@ -16,7 +16,7 @@
   </TR>
 
   <TR  <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
-    <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname(session[:ip]) %>
     <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
   </FONT>
 </TD>

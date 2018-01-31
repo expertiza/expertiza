@@ -3,7 +3,6 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
-
   # START of contributor methods, shared with AssignmentParticipant
 
   # Whether this team includes a given participant or not
@@ -63,7 +62,7 @@ class AssignmentTeam < Team
 
   # Whether the team has submitted work or not
   def has_submissions?
-    !self.submitted_files.empty? or !self.submitted_hyperlinks.blank?
+    !self.submitted_files.empty? or self.submitted_hyperlinks.present?
   end
 
   # Get Participants of the team
@@ -71,7 +70,7 @@ class AssignmentTeam < Team
     users = self.users
     participants = []
     users.each do |user|
-      participant = AssignmentParticipant.where(user_id: user.id, parent_id: self.parent_id).first
+      participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: self.parent_id)
       participants << participant unless participant.nil?
     end
     participants
@@ -100,20 +99,6 @@ class AssignmentTeam < Team
   end
 
   # Return the files residing in the directory of team submissions
-  def files(directory)
-    files_list = Dir[directory + "/*"]
-    files = []
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each {|f| files << f }
-      end
-      files << file
-    end
-    files
-  end
-
   # Main calling method to return the files residing in the directory of team submissions
   def submitted_files(path = self.path)
     files = []
@@ -147,7 +132,9 @@ class AssignmentTeam < Team
 
   # Add Participants to the current Assignment Team
   def add_participant(assignment_id, user)
-    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted) if AssignmentParticipant.where(parent_id: assignment_id, user_id: user.id).first.nil?
+    if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id).nil?
+      AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
+    end
   end
 
   # Return the parent Assignment
@@ -169,13 +156,27 @@ class AssignmentTeam < Team
   end
 
   def hyperlinks
-    self.submitted_hyperlinks.blank? ? [] : YAML.load(self.submitted_hyperlinks)
+    self.submitted_hyperlinks.blank? ? [] : YAML.safe_load(self.submitted_hyperlinks)
   end
 
   # Appends the hyperlink to a list that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL
 
+  def files(directory)
+    files_list = Dir[directory + "/*"]
+    files = []
+
+    files_list.each do |file|
+      if File.directory?(file)
+        dir_files = files(file)
+        dir_files.each {|f| files << f }
+      end
+      files << file
+    end
+    files
+  end
+  
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
     raise 'The hyperlink cannot be empty!' if hyperlink.empty?

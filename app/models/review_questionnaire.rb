@@ -24,9 +24,7 @@ class ReviewQuestionnaire < Questionnaire
       maps.each do |map|
         next if map.response.empty?
         map.response.each do |response|
-          if response.round == round && response.is_submitted
-            responses << response
-          end
+          responses << response if response.round == round && response.is_submitted
         end
       end
       # responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])

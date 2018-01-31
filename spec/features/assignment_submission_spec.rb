@@ -17,7 +17,7 @@ describe "assignment submisstion test" do
   end
 
   def signup_topic
-    user = User.find_by_name("student2064")
+    user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic

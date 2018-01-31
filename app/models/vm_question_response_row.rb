@@ -44,9 +44,7 @@ class VmQuestionResponseRow
   def average_score_for_row
     row_average_score = 0.0
     @score_row.each do |score|
-      if score.score_value.is_a? Numeric
-        row_average_score += score.score_value.to_f
-      end
+      row_average_score += score.score_value.to_f if score.score_value.is_a? Numeric
     end
     row_average_score /= @score_row.length.to_f
     row_average_score.round(2)

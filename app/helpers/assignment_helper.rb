@@ -26,7 +26,7 @@ module AssignmentHelper
     courses.each do |course|
       options << [course.name, course.id]
     end
-    options
+    options.uniq.sort
   end
 
   # round=0 added by E1450
@@ -60,7 +60,7 @@ module AssignmentHelper
 
     if due_dates[round].nil? or round < 0
       due_date = AssignmentDueDate.new
-      due_date.deadline_type_id = DeadlineType.find_by_name(type).id
+      due_date.deadline_type_id = DeadlineType.find_by(name: type).id
       # creating new round
       # TODO: add code to assign default permission to the newly created due_date according to the due_date type
       due_date.submission_allowed_id = AssignmentDueDate.default_permission(type, 'submission_allowed')
@@ -75,13 +75,13 @@ module AssignmentHelper
   def questionnaire(assignment, type, round_number)
     # E1450 changes
     if round_number.nil?
-      questionnaire = assignment.questionnaires.find_by_type(type)
+      questionnaire = assignment.questionnaires.find_by(type: type)
     else
-      ass_ques = assignment.assignment_questionnaires.find_by_used_in_round(round_number)
+      ass_ques = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
       # make sure the assignment_questionnaire record is not empty
       unless ass_ques.nil?
         temp_num = ass_ques.questionnaire_id
-        questionnaire = assignment.questionnaires.find_by_id(temp_num)
+        questionnaire = assignment.questionnaires.find_by(id: temp_num)
       end
     end
     # E1450 end
@@ -92,7 +92,7 @@ module AssignmentHelper
 
   # number added by E1450
   def assignment_questionnaire(assignment, type, number)
-    questionnaire = assignment.questionnaires.find_by_type(type)
+    questionnaire = assignment.questionnaires.find_by(type: type)
 
     if questionnaire.nil?
       default_weight = {}
@@ -117,12 +117,12 @@ module AssignmentHelper
     else
       # E1450 changes
       if number.nil?
-        assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
+        assignment.assignment_questionnaires.find_by(questionnaire_id: questionnaire.id)
       else
-        assignment_by_usedinround = assignment.assignment_questionnaires.find_by_used_in_round(number)
+        assignment_by_usedinround = assignment.assignment_questionnaires.find_by(used_in_round: number)
         # make sure the assignment found by used in round is not empty
         if assignment_by_usedinround.nil?
-          assignment.assignment_questionnaires.find_by_questionnaire_id(questionnaire.id)
+          assignment.assignment_questionnaires.find_by(questionnaire_id: questionnaire.id)
         else
           assignment_by_usedinround
         end
@@ -144,5 +144,13 @@ module AssignmentHelper
       participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first
     end
     [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
+  end
+
+  def get_team_name_color_in_list_submission(team)
+    if team.try(:grade_for_submission) && team.try(:comment_for_submission)
+      '#986633' # brown. submission grade has been assigned.
+    else
+      'blue' # submission grade is not assigned yet.
+    end
   end
 end

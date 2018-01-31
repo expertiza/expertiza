@@ -15,37 +15,37 @@ class CourseNode < Node
 
   # returns: list of CourseNodes based on query
   # the get method will return all courses meeting the criteria, but the method name is necessary due to polymorphism
-  def self.get(sortvar = 'name', sortorder = 'desc', user_id = nil, show = nil, _parent_id = nil, search = nil)
+  def self.get(sortvar = 'name', _sortorder = 'desc', user_id = nil, show = nil, _parent_id = nil, _search = nil)
     sortvar = 'created_at'
     if Course.column_names.include? sortvar
       self.includes(:course).where([get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)])
-        .order("courses.#{sortvar} desc")
+          .order("courses.#{sortvar} desc")
     end
   end
 
   # get the query conditions for a public course
   def self.get_course_query_conditions(show = nil, user_id = nil)
     current_user = User.find_by(id: user_id)
-    if show and current_user
-      conditions = if current_user.is_teaching_assistant? == false
+    conditions = if show and current_user
+                   if current_user.teaching_assistant? == false
                      "courses.instructor_id = #{user_id}"
                    else
                      'courses.id in (?)'
-                   end
-    else
-      conditions = if current_user.is_teaching_assistant? == false
+                                end
+                 else
+                   if current_user.teaching_assistant? == false
                      "(courses.private = 0 or courses.instructor_id = #{user_id})"
                    else
                      "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
-                   end
-    end
+                                end
+                 end
     conditions
   end
 
   # get the courses managed by the user
   def self.get_courses_managed_by_user(user_id = nil)
     current_user = User.find(user_id)
-    values = if current_user.is_teaching_assistant? == false
+    values = if current_user.teaching_assistant? == false
                user_id
              else
                Ta.get_mapped_courses(user_id)
@@ -55,8 +55,8 @@ class CourseNode < Node
 
   # get parent id
   def self.get_parent_id
-    folder = TreeFolder.find_by_name('Courses')
-    parent = FolderNode.find_by_node_object_id(folder.id)
+    folder = TreeFolder.find_by(name: 'Courses')
+    parent = FolderNode.find_by(node_object_id: folder.id)
     if parent
       return parent.id
     else

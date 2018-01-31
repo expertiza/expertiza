@@ -13,8 +13,8 @@ class StudentTeamsController < ApplicationController
 
   attr_writer :student
 
-  before_action :team, only: [:edit, :update]
-  before_action :student, only: [:view, :update, :edit, :create, :remove_participant]
+  before_action :team, only: %i[edit update]
+  before_action :student, only: %i[view update edit create remove_participant]
 
   def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
@@ -23,14 +23,14 @@ class StudentTeamsController < ApplicationController
         'Administrator',
         'Super-Administrator',
         'Student'].include? current_role_name and
-       ((%w(view).include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
+       ((%w[view].include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
       # make sure the student is the owner if they are trying to create it
-      return current_user_id? student.user_id if %w(create).include? action_name
+      return current_user_id? student.user_id if %w[create].include? action_name
       # make sure the student belongs to the group before allowed them to try and edit or update
-      return team.get_participants.map(&:user_id).include? current_user.id if %w(edit update).include? action_name
-      return true
+      return team.get_participants.map(&:user_id).include? current_user.id if %w[edit update].include? action_name
+      true
     else
-      return false
+      false
     end
   end
 
@@ -51,9 +51,7 @@ class StudentTeamsController < ApplicationController
 
     current_team = @student.team
 
-    @users_on_waiting_list = if @student.assignment.has_topics? && current_team && current_team.topic
-                               SignUpTopic.find(current_team.topic).users_on_waiting_list
-                             end
+    @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
 
     @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
   end
@@ -62,14 +60,14 @@ class StudentTeamsController < ApplicationController
     existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
     # check if the team name is in use
     if existing_assignments.empty?
-      if params[:team][:name].nil? || params[:team][:name].empty?
+      if params[:team][:name].blank?
         flash[:notice] = 'The team name is empty.'
         redirect_to view_student_teams_path student_id: student.id
         return
       end
       team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
       team.save
-      parent = AssignmentNode.find_by_node_object_id student.parent_id
+      parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find student.user_id
       team.add_member user, team.parent_id
@@ -82,8 +80,7 @@ class StudentTeamsController < ApplicationController
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
@@ -146,9 +143,7 @@ class StudentTeamsController < ApplicationController
           next unless non_waitlisted_users.length < max_choosers
           first_waitlisted_team = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true
           # moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
-          if first_waitlisted_team
-            SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team)
-          end
+          SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
         end
       end
     end
@@ -173,6 +168,6 @@ class StudentTeamsController < ApplicationController
 
   def review
     @assignment = Assignment.find params[:assignment_id]
-    redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by_type('AuthorFeedbackQuestionnaire').id
+    redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
   end
 end

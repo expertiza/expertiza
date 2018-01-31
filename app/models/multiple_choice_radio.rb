@@ -75,9 +75,7 @@ class MultipleChoiceRadio < QuizQuestion
       end
       correct_count += 1 if value.key?(:iscorrect)
     end
-    if correct_count == 0
-      valid = "Please select a correct answer for all questions"
-    end
+    valid = "Please select a correct answer for all questions" if correct_count == 0
     valid
   end
 end

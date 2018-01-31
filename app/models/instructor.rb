@@ -1,6 +1,6 @@
 class Instructor < User
   has_many :questionnaires
-  
+
   QUESTIONNAIRE = [['My questionnaires', 'list_mine'],
                    ['All public questionnaires', 'list_all']].freeze
 
@@ -31,5 +31,23 @@ class Instructor < User
       ta_mappings.each {|mapping| ta_ids << mapping.ta_id } unless ta_mappings.empty?
     end
     ta_ids
+  end
+
+  def self.get_user_list(user)
+    participants = []
+    user_list = []
+    Course.where(instructor_id: user.id).find_each do |course|
+      participants << course.get_participants
+    end
+    Assignment.where(instructor_id: user.id).find_each do |assignment|
+      participants << assignment.participants
+    end
+    participants.each do |p_s|
+      next if p_s.empty?
+      p_s.each do |p|
+        user_list << p.user if user.role.hasAllPrivilegesOf(p.user.role)
+      end
+    end
+    user_list
   end
 end

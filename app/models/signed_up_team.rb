@@ -6,7 +6,7 @@ class SignedUpTeam < ActiveRecord::Base
   validates :topic_id, :team_id, presence: true
   scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
 
-  def self.find_team_participants(assignment_id)
+  def self.find_team_participants(assignment_id, ip_address = nil)
     @participants = SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
                                 .select('signed_up_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
                                   sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
@@ -24,13 +24,13 @@ class SignedUpTeam < ActiveRecord::Base
 
       participant_names.each do |participant_name|
         if !team_name_added
-          names = "[" + participant_name.team_name + "] " + participant_name.u_name + " "
+          names = "[" + participant_name.team_name + "] " + User.find_by(name: participant_name.u_name).name(ip_address) + " "
           participant.team_name_placeholder = participant_name.team_name
-          participant.user_name_placeholder = participant_name.u_name + " "
+          participant.user_name_placeholder = User.find_by(name: participant_name.u_name).name(ip_address) + " "
           team_name_added = true
         else
-          names += participant_name.u_name + " "
-          participant.user_name_placeholder += participant_name.u_name + " "
+          names += User.find_by(name: participant_name.u_name).name(ip_address) + " "
+          participant.user_name_placeholder += User.find_by(name: participant_name.u_name).name(ip_address) + " "
         end
       end
       @participants[i].name = names
@@ -62,9 +62,7 @@ class SignedUpTeam < ActiveRecord::Base
       old_teams_signups.each do |old_teams_signup|
         if old_teams_signup.is_waitlisted == false # i.e., if the old team was occupying a slot, & thus is releasing a slot ...
           first_waitlisted_signup = SignedUpTeam.find_by(topic_id: old_teams_signup.topic_id, is_waitlisted:  true)
-          unless first_waitlisted_signup.nil?
-            Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id)
-          end
+          Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id) unless first_waitlisted_signup.nil?
         end
         old_teams_signup.destroy
       end

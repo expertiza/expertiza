@@ -19,7 +19,7 @@ class LatePolicy < ActiveRecord::Base
   # it return true if there's another policy with the same name under current instructor else false
   def self.check_policy_with_same_name(late_policy_name, instructor_id)
     @policy = LatePolicy.where(policy_name: late_policy_name)
-    if !@policy.nil? && !@policy.empty?
+    if @policy.present?
       @policy.each do |p|
         next unless p.instructor_id == instructor_id
         return true

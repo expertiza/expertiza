@@ -38,18 +38,18 @@ module ReviewMappingHelper
     [response_maps, bgcolor, rspan, line_num]
   end
 
-  def get_team_name_color(response_map)
+  def get_team_name_color_in_review_report(response_map)
     if Response.exists?(map_id: response_map.id)
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
       if review_graded_at.nil? ||
         (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
-        "blue"
+        'blue' # REVIEW: grade is not assigned or updated yet.
       else
-        "green"
+        'brown' # REVIEW: grades has been assigned.
       end
     else
-      "red"
+      'red' # REVIEW: is not finished yet.
     end
   end
 
@@ -81,9 +81,9 @@ module ReviewMappingHelper
   end
 
   def get_min_max_avg_value_for_review_report(round, team_id)
-    [:max, :min, :avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && [:max, :min, :avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
-      [:max, :min, :avg].each do |metric|
+    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
+    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
+      %i[max min avg].each do |metric|
         metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
         instance_variable_set('@' + metric.to_s, metric_value)
       end
@@ -116,9 +116,7 @@ module ReviewMappingHelper
     if !team.nil? and !participant.nil?
       review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
-      if files and !files.empty?
-        html += display_review_files_directory_tree(participant, files)
-      end
+      html += display_review_files_directory_tree(participant, files) if files.present?
     end
     html.html_safe
   end
@@ -132,7 +130,7 @@ module ReviewMappingHelper
       user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
       author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
       feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.get_total_score} / #{feedback_response.get_maximum_score}"
+      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
     end
     author_feedback_avg_score
   end
@@ -149,9 +147,7 @@ module ReviewMappingHelper
     answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
     comments = answer_with_link.try(:comments)
     html = ''
-    if comments and !comments.empty? and comments.start_with?('http')
-      html += display_hyperlink_in_peer_review_question(comments)
-    end
+    html += display_hyperlink_in_peer_review_question(comments) if comments.present? and comments.start_with?('http')
     html.html_safe
   end
 

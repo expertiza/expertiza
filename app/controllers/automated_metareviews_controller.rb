@@ -12,7 +12,7 @@ class AutomatedMetareviewsController < ApplicationController
   def list
     @automated_metareview = AutomatedMetareview.new
     # pass in the response id as a parameter
-    @response = Response.find_by_map_id(params[:id])
+    @response = Response.find_by(map_id: params[:id])
     @automated_metareview.calculate_metareview_metrics(@response, params[:id])
     if @automated_metareview.save!
       flash[:notice] = 'The automated meta-review was saved!'
@@ -26,51 +26,23 @@ class AutomatedMetareviewsController < ApplicationController
                                                                 avg(tone_neutral) as neutral, avg(quantity) as quantity from automated_metareviews where response_id <> ?", @automated_metareview.response_id])[0]
     unless avg_existing_metareviews.nil?
       # if any of the values are -ve, set them as 0 (for graph display)
-      if avg_existing_metareviews.relevance.nil? or avg_existing_metareviews.relevance < 0
-        avg_existing_metareviews.relevance = 0
-      end
-      if avg_existing_metareviews.summative.nil? or avg_existing_metareviews.summative.to_f < 0
-        avg_existing_metareviews.summative = 0
-      end
-      if avg_existing_metareviews.problem.nil? or avg_existing_metareviews.problem.to_f < 0
-        avg_existing_metareviews.problem = 0
-      end
-      if avg_existing_metareviews.advisory.nil? or avg_existing_metareviews.advisory.to_f < 0
-        avg_existing_metareviews.advisory = 0
-      end
-      if avg_existing_metareviews.positive.nil? or avg_existing_metareviews.positive.to_f < 0
-        avg_existing_metareviews.positive = 0
-      end
-      if avg_existing_metareviews.negative.nil? or avg_existing_metareviews.negative.to_f < 0
-        avg_existing_metareviews.negative = 0
-      end
-      if avg_existing_metareviews.neutral.nil? or avg_existing_metareviews.neutral.to_f < 0
-        avg_existing_metareviews.neutral = 0
-      end
+      avg_existing_metareviews.relevance = 0 if avg_existing_metareviews.relevance.nil? or avg_existing_metareviews.relevance < 0
+      avg_existing_metareviews.summative = 0 if avg_existing_metareviews.summative.nil? or avg_existing_metareviews.summative.to_f < 0
+      avg_existing_metareviews.problem = 0 if avg_existing_metareviews.problem.nil? or avg_existing_metareviews.problem.to_f < 0
+      avg_existing_metareviews.advisory = 0 if avg_existing_metareviews.advisory.nil? or avg_existing_metareviews.advisory.to_f < 0
+      avg_existing_metareviews.positive = 0 if avg_existing_metareviews.positive.nil? or avg_existing_metareviews.positive.to_f < 0
+      avg_existing_metareviews.negative = 0 if avg_existing_metareviews.negative.nil? or avg_existing_metareviews.negative.to_f < 0
+      avg_existing_metareviews.neutral = 0 if avg_existing_metareviews.neutral.nil? or avg_existing_metareviews.neutral.to_f < 0
     end
 
     # for current metareview values
-    if @automated_metareview.relevance.to_f < 0
-      @automated_metareview.relevance = 0
-    end
-    if @automated_metareview.content_summative.to_f < 0
-      @automated_metareview.content_summative = 0
-    end
-    if @automated_metareview.content_problem.to_f < 0
-      @automated_metareview.content_problem = 0
-    end
-    if @automated_metareview.content_advisory.to_f < 0
-      @automated_metareview.content_advisory = 0
-    end
-    if @automated_metareview.tone_positive.to_f < 0
-      @automated_metareview.tone_positive = 0
-    end
-    if @automated_metareview.tone_negative.to_f < 0
-      @automated_metareview.tone_negative = 0
-    end
-    if @automated_metareview.tone_neutral.to_f < 0
-      @automated_metareview.tone_neutral = 0
-    end
+    @automated_metareview.relevance = 0 if @automated_metareview.relevance.to_f < 0
+    @automated_metareview.content_summative = 0 if @automated_metareview.content_summative.to_f < 0
+    @automated_metareview.content_problem = 0 if @automated_metareview.content_problem.to_f < 0
+    @automated_metareview.content_advisory = 0 if @automated_metareview.content_advisory.to_f < 0
+    @automated_metareview.tone_positive = 0 if @automated_metareview.tone_positive.to_f < 0
+    @automated_metareview.tone_negative = 0 if @automated_metareview.tone_negative.to_f < 0
+    @automated_metareview.tone_neutral = 0 if @automated_metareview.tone_neutral.to_f < 0
     # creating the arrays to be graphed
     current_metareview_data = [@automated_metareview.relevance.to_f, @automated_metareview.content_summative.to_f,
                                @automated_metareview.content_problem.to_f, @automated_metareview.content_advisory.to_f, @automated_metareview.tone_positive.to_f,

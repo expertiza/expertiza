@@ -43,10 +43,8 @@ class MenuItemsController < ApplicationController
 
   def create
     # Flash an error if neither an action nor a page has been selected
-    if (params[:menu_item][:controller_action_id].nil? or
-        params[:menu_item][:controller_action_id].empty?) and
-        (params[:menu_item][:content_page_id].nil? or
-            params[:menu_item][:content_page_id].empty?)
+    if params[:menu_item][:controller_action_id].blank? and
+        params[:menu_item][:content_page_id].blank?
       flash[:error] = "You must specify either an action or a page!"
       @menu_item = MenuItem.new(menu_item_params)
       @parent_item = MenuItem.find(params[:menu_item][:parent_id])
@@ -79,10 +77,8 @@ class MenuItemsController < ApplicationController
 
   def update
     # Flash an error if neither an action nor a page has been selected
-    if (params[:menu_item][:controller_action_id].nil? or
-        params[:menu_item][:controller_action_id].empty?) and
-        (params[:menu_item][:content_page_id].nil? or
-            params[:menu_item][:content_page_id].empty?)
+    if params[:menu_item][:controller_action_id].blank? and
+        params[:menu_item][:content_page_id].blank?
       flash[:error] = "You must specify either an action or a page!"
       edit
       render action: 'edit'

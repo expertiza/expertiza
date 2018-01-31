@@ -15,9 +15,7 @@ class SubmissionContentFetcher
     def code_factory(url)
       params = {"url" => url}
 
-      if GithubPullRequestFetcher.supports_url?(url)
-        return GithubPullRequestFetcher.new(params)
-      end
+      return GithubPullRequestFetcher.new(params) if GithubPullRequestFetcher.supports_url?(url)
       nil
     end
 

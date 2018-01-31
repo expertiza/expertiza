@@ -15,11 +15,11 @@ module ManageTeamHelper
   end
 
   # check if the user specified by 'user' already belongs to team specified by 'team_id'
-  def has_user(user, team_id)
-    if TeamsUser.where(team_id: team_id, user_id:  user.id).first
-      return true
+  def user?(user, team_id)
+    if TeamsUser.where(team_id: team_id, user_id: user.id).first
+      true
     else
-      return false
+      false
     end
   end
 end

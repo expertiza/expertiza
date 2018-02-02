@@ -85,6 +85,7 @@ group :test do
   gem 'launchy'
   gem 'rspec-rails', '~> 3.6'
   gem 'shoulda'
+  gem 'mutant-rspec', '~> 0.8.8'
 end
 
 group :assets do

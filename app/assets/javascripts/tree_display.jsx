@@ -80,7 +80,6 @@ jQuery(document).ready(function() {
             <span>
               <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
-              <a title={this.props.private? "Make public" : "Make private"} href={"/"+newNodeType+"/toggle_access?id="+(parseInt(this.props.id)/2).toString()}><img src={"/assets/tree_view/lock-"+(this.props.private? "off-" : "")+"disabled-icon-24.png"} /></a>
             </span>
           )
         }
@@ -219,28 +218,13 @@ jQuery(document).ready(function() {
               )
             }
             // if ends
-            moreContent.push(
-              <span>
-                <a title="View delayed jobs" href={"/assignments/delayed_mailer?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-delayed-mailer.png" />
-                </a>
-              </span>
-            )
+            
             if (this.props.has_topic) {
                 // Moved content out of this to the block outside this containing "if" statement
             }
           }
           // if ends
 
-          // Moved it out of if (this.props.has_topic) and if(this.props.is_available),
-          // Since view_publishing_rights should be visible for all the assignments
-           moreContent.push(
-            <span>
-              <a title="View publishing rights" href={"/participants/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-publish-rights-24.png" />
-              </a>
-            </span>
-          )
         } else if (newNodeType === 'questionnaires'){
           moreContent.push(
             <span>

@@ -23,6 +23,7 @@
     "bootstrap": "~3.3.7",
     "bootstrap-sass": "~3.3.7",
     "jquery": "~1.9.1",
+    "jquery-confirm": "~2.7.0",
     "react": "~0.13.3",
     "react-simpletabs": "^0.7.0",
     "react-bootstrap-treeview": "0.1.0",

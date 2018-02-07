@@ -32,6 +32,7 @@ jQuery(document).ready(function() {
     },
     render: function() {
       var moreContent = []
+      var buttonContent = ""
       var moreButtonStyle = {
         "display": "",
         "padding": "0 2px"
@@ -86,6 +87,14 @@ jQuery(document).ready(function() {
         moreContent.push(
           <span>
             <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
+          </span>
+        )
+        moreContent.push(
+          <span class="dropdown">
+            <button class="dropdown-link btn btn-sm btn-primary">···</button>
+            <span class="dropdown-content">
+              
+            </span>
           </span>
         )
         if (newNodeType === 'course') {

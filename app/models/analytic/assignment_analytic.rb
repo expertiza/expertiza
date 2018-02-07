@@ -72,18 +72,6 @@ module AssignmentAnalytic
     end
   end
 
-  # return students that are participating in the assignment
-  # assumptions: all team_participant for all of the teams are in assignment participant
-  # def students
-  #  list = Array.new
-  #  self.participants.each do |participant|
-  #    if participant.user.role_id == Role.student.id
-  #      list << participant
-  #    end
-  #  end
-  #  list
-  # end
-
   # return all questionnaire types associated this assignment
   def questionnaire_types
     questionnaire_type_list = []
@@ -122,73 +110,4 @@ module AssignmentAnalytic
   def review_questionnaire
     questionnaire_of_type("ReviewQuestionnaire")
   end
-
-  #====unused in version 1=========#
-  #========== word count ==========#
-  # def review_word_counts
-  #  list = Array.new
-  #  self.teams.each do |team|
-  #    list << team.total_word_count
-  #  end
-  #  if (list.empty?)
-  #    [0]
-  #  else
-  #    list
-  #  end
-  # end
-  #
-  # def total_review_word_count
-  #  review_word_counts.inject(:+)
-  # end
-  #
-  # def average_review_word_count
-  #  if num_teams == 0
-  #    0
-  #  end
-  #  total_review_word_count.to_f/num_teams
-  # end
-  #
-  # def max_review_word_count
-  #  review_word_counts.max
-  # end
-  #
-  # def min_review_word_count
-  #  review_word_counts.min
-  # end
-
-  #========== character count ==========#
-  # def review_character_counts
-  #  list = Array.new
-  #  self.teams.each do |team|
-  #    list << team.total_character_count
-  #  end
-  #  if (list.empty?)
-  #    [0]
-  #  else
-  #    list
-  #  end
-  # end
-  #
-  # def total_review_character_count
-  #  review_character_counts.inject(:+)
-  # end
-  #
-  # def average_review_character_count
-  #  if num_teams == 0
-  #    0
-  #  end
-  #  total_review_character_count.to_f/num_teams
-  # end
-  #
-  # def max_review_character_count
-  #  review_character_counts.max
-  # end
-  #
-  # def min_review_character_count
-  #  review_character_counts.min
-  # end
-
-  # def num_students
-  #  self.students.count
-  # end
 end

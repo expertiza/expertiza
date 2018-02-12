@@ -10,7 +10,7 @@ class TextField < TextResponse
     html += '<input id="responses_' + count.to_s + '_comments" label=' + self.txt + ' name="responses[' + count.to_s + '][comment]" size=' + self.size.to_s + ' type="text"'
     html += 'value="' + answer.comments unless answer.nil?
     html += '">'
-    html += '</li><BR/><BR/>' if self.type == 'TextField' and self.break_before == false
+    html += '<BR/><BR/>' if self.type == 'TextField' and self.break_before == false
     html.html_safe
   end
 

@@ -18,6 +18,7 @@
 //= require jquery_ujs
 //= require jquery-colorbox
 //= require jquery.colorbox
+//= require tinymce-jquery
 //= require jquery.datetimepicker
 //= require jquery.datetimepicker/init
 //= require hoverIntent
@@ -31,6 +32,7 @@
 //= require jquery.datetimepicker
 //= require jquery-tablesorter
 //= require awesome_input
+//= require jquery-bar-rating/jquery.barrating
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

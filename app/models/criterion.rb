@@ -101,9 +101,9 @@ class Criterion < ScoredQuestion
     end
 
     if dropdown_or_scale == 'dropdown'
-      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]">'
+      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" data-current-rating =' + answer.answer.to_s + '>'
       html += "<option value = ''>--</option>"
-      questionnaire_max.downto(questionnaire_min).each do |j|
+      questionnaire_min.upto(questionnaire_max).each do |j|
         html += if !answer.nil? and j == answer.answer
                   '<option value=' + j.to_s + ' selected="selected">'
                 else
@@ -118,9 +118,9 @@ class Criterion < ScoredQuestion
         end
         html += "</option>"
       end
-      html += "</select></div>"
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
-       ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+      html += "</select></div><br><br>"
+      html += '<textarea' + ' id="responses_' + count.to_s + '_comments"' \
+       ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
       html += '</textarea></td></br><br/>'
     elsif dropdown_or_scale == 'scale'
@@ -158,7 +158,7 @@ class Criterion < ScoredQuestion
 
       html += '<td width="10%"></td></tr></table>'
       html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
-        ' name="responses[' + count.to_s + '][comment]" style="overflow:hidden;">'
+        ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
       html += '</textarea><br/><br/>'
 
@@ -199,7 +199,7 @@ class Criterion < ScoredQuestion
     html += '</td>'
     if answer && !answer.comments.nil?
       html += '<td style="padding-left:10px">'
-      html += answer.comments.gsub("<", "&lt;").gsub(">", "&gt;").gsub(/\n/, '<BR/>')
+      html += '<br>' + answer.comments.html_safe
       html += '</td>'
       #### start code to show tag prompts ####
       unless tag_prompt_deployments.nil?

@@ -9,7 +9,7 @@ class TextArea < TextResponse
     end
     html = '<li><p><label for="responses_' + count.to_s + '">' + self.txt + '</label></p>'
     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden" value="">'
-    html += '<p><textarea cols="' + cols + '" rows="' + rows + '" id="responses_' + count.to_s + '_comments" name="responses[' + count.to_s + '][comment]" >'
+    html += '<p><textarea cols="' + cols + '" rows="' + rows + '" id="responses_' + count.to_s + '_comments" name="responses[' + count.to_s + '][comment]" class="tinymce">'
     html += answer.comments unless answer.nil?
     html += '</textarea>'
     html += '</p></li>'

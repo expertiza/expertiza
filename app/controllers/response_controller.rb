@@ -73,6 +73,7 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     return unless action_allowed?
+    return if params[:id].nil? # avoid request from autosave if the id is invalid
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
@@ -129,6 +130,7 @@ class ResponseController < ApplicationController
   end
 
   def create
+    return if params[:id].nil? # avoid request from autosave if the id is invalid
     @map = ResponseMap.find(params[:id])
     set_all_responses
     if params[:review][:questionnaire_id]
@@ -156,6 +158,7 @@ class ResponseController < ApplicationController
   end
 
   def saving
+    return if params[:id].nil? # avoid request from autosave if the id is invalid
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save

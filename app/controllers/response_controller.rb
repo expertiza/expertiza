@@ -37,9 +37,7 @@ class ResponseController < ApplicationController
   end
 
   def delete
-    map_id = params[:map_id] #pass map_id as a hidden field in the review form
-    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
-    @map = ResponseMap.find(map_id)
+    redirect_to controller: 'response', action: view if params[:id].nil? # avoid request from autosave if the id is invalid
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
@@ -55,9 +53,7 @@ class ResponseController < ApplicationController
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
-    map_id = params[:map_id] #pass map_id as a hidden field in the review form
-    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
-    @map = ResponseMap.find(map_id)
+    @response = Response.find(params[:id])
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
@@ -82,9 +78,7 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     msg = ""
     begin
-      map_id = params[:map_id] #pass map_id as a hidden field in the review form
-      map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
-      @map = ResponseMap.find(map_id)
+      @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
@@ -136,8 +130,8 @@ class ResponseController < ApplicationController
   end
 
   def create
-    map_id = params[:map_id] #pass map_id as a hidden field in the review form
-    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
+    map_id = params[:id] if !params[:id].nil?
+    map_id = params[:map_id] # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
 
     set_all_responses
@@ -167,7 +161,7 @@ class ResponseController < ApplicationController
 
   def saving
     map_id = params[:map_id] #pass map_id as a hidden field in the review form
-    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
+    map_id = params[:id] if params[:map_id].nil?
     @map = ResponseMap.find(map_id)
     @return = params[:return]
     @map.save

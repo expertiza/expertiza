@@ -37,7 +37,6 @@ class ResponseController < ApplicationController
   end
 
   def delete
-    redirect_to controller: 'response', action: view if params[:id].nil? # avoid request from autosave if the id is invalid
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
@@ -130,10 +129,9 @@ class ResponseController < ApplicationController
   end
 
   def create
-    map_id = params[:id] if !params[:id].nil?
-    map_id = params[:map_id] # pass map_id as a hidden field in the review form
+    map_id = params[:id]
+    map_id = params[:map_id] if !params[:map_id].nil?# pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
-
     set_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
@@ -142,12 +140,19 @@ class ResponseController < ApplicationController
       @round = nil
     end
     is_submitted = (params[:isSubmit] == 'Yes')
-    @response = Response.create(
-      map_id: @map.id,
-      additional_comment: params[:review][:comments],
-      round: @round,
-      is_submitted: is_submitted
-    )
+
+    if params[:saved].nil? || params[:saved] == "0" # a flag so the autosave doesn't create different versions. The value's changed by the javascript in response.js
+      @response = Response.create(
+          map_id: @map.id,
+          additional_comment: params[:review][:comments],
+          round: @round,
+          is_submitted: is_submitted
+      )
+    else
+      @response = Response.find_by(map_id: @map.id, round: @round)
+      @response.update(additional_comment: params[:review][:comments])
+    end
+
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
@@ -160,9 +165,7 @@ class ResponseController < ApplicationController
   end
 
   def saving
-    map_id = params[:map_id] #pass map_id as a hidden field in the review form
-    map_id = params[:id] if params[:map_id].nil?
-    @map = ResponseMap.find(map_id)
+    @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
     # Award Good Teammate Badge

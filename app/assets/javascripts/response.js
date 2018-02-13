@@ -14,6 +14,7 @@ autoSavePost = function() {
     if ($('.review_form').length > 0) {
         $('form').attr('data-remote', 'true');
         document.getElementById('save_review').click();
+        if($('input[name=saved]').value="0")$('input[name=saved]').val("1");
         $('form').removeAttr('data-remote');
     }
     $('#save_progress').html('<span id="tick"> &#10004; </span>' + 'Draft Autosaved at ' + time);

@@ -57,6 +57,7 @@
 
 <%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
+    <%= hidden_field_tag "saved", 0 %>
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>

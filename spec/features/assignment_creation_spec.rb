@@ -124,7 +124,7 @@ describe "assignment function" do
       )
     end
     # instructor can check "has quiz" box and set the number of quiz questions
-    it "is able to create with quiz" do
+    xit "is able to create with quiz" do
       login_as("instructor6")
       visit '/assignments/new?private=1'
 

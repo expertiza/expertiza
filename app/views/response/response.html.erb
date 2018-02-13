@@ -1,23 +1,4 @@
 <script type="text/javascript" src="/assets/response.js" ></script>
-<script>
-jQuery(document).ready(function() {
-    jQuery('#Submit').click(function(e){
-    if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-    }else{
-        jQuery('#isSubmit').val('Yes');
-    }
-    })
-    $(function(){
-        $("form").sisyphus({
-            locationBased: true,
-            autoRelease: true
-        }); 
-    });
-})
-</script>
 
 <!--including tinymce javascript-->
 <%= tinymce_assets %>
@@ -75,6 +56,7 @@ jQuery(document).ready(function() {
 <div id="save_progress"></div>
 
 <%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
+    <%= hidden_field_tag "map_id", @modified_object %>
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>

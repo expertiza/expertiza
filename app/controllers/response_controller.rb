@@ -37,6 +37,9 @@ class ResponseController < ApplicationController
   end
 
   def delete
+    map_id = params[:map_id] #pass map_id as a hidden field in the review form
+    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
+    @map = ResponseMap.find(map_id)
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
@@ -52,7 +55,9 @@ class ResponseController < ApplicationController
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
-    @response = Response.find(params[:id])
+    map_id = params[:map_id] #pass map_id as a hidden field in the review form
+    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
+    @map = ResponseMap.find(map_id)
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
@@ -73,12 +78,13 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     return unless action_allowed?
-    return if params[:id].nil? # avoid request from autosave if the id is invalid
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
     begin
-      @map = @response.map
+      map_id = params[:map_id] #pass map_id as a hidden field in the review form
+      map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
+      @map = ResponseMap.find(map_id)
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
@@ -108,7 +114,7 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = Response.find(params[:id])
+    review = Response.find(params[:id]) if !params[:id].nil?
     if review
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
@@ -130,8 +136,10 @@ class ResponseController < ApplicationController
   end
 
   def create
-    return if params[:id].nil? # avoid request from autosave if the id is invalid
-    @map = ResponseMap.find(params[:id])
+    map_id = params[:map_id] #pass map_id as a hidden field in the review form
+    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
+    @map = ResponseMap.find(map_id)
+
     set_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
@@ -158,8 +166,9 @@ class ResponseController < ApplicationController
   end
 
   def saving
-    return if params[:id].nil? # avoid request from autosave if the id is invalid
-    @map = ResponseMap.find(params[:id])
+    map_id = params[:map_id] #pass map_id as a hidden field in the review form
+    map_id = params[:id] if params[:map_id].nil? # legacy code, might be used by other view
+    @map = ResponseMap.find(map_id)
     @return = params[:return]
     @map.save
     # Award Good Teammate Badge

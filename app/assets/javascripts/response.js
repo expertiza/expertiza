@@ -33,5 +33,23 @@ jQuery(document).ready(function($){
     });
 });
 
+jQuery(document).ready(function() {
+    jQuery('#Submit').click(function(e){
+        if(!confirm('Once a review has been submitted, you cannot edit it again')){
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }else{
+            jQuery('#isSubmit').val('Yes');
+        }
+    })
+    $(function(){
+        $("form").sisyphus({
+            locationBased: true,
+            autoRelease: true
+        });
+    });
+})
+
 setTimeout(autoSavePost, 10000);
 

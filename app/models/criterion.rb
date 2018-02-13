@@ -101,7 +101,9 @@ class Criterion < ScoredQuestion
     end
 
     if dropdown_or_scale == 'dropdown'
-      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" data-current-rating =' + answer.answer.to_s + '>'
+      current_value = ""
+      current_value += 'data-current-rating =' + answer.answer.to_s if !answer.nil?
+      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
       html += "<option value = ''>--</option>"
       questionnaire_min.upto(questionnaire_max).each do |j|
         html += if !answer.nil? and j == answer.answer

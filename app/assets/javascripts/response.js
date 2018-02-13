@@ -21,7 +21,7 @@ autoSavePost = function() {
 };
 
 // add star rating option to each dropdown box in review form
-$(function() {
+jQuery(document).ready(function($){
     $('.review-rating').each(function(index, el) {
         var $El;
         $El = $(el);

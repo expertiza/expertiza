@@ -47,6 +47,7 @@ class AssignmentsController < ApplicationController
   def edit
     @assignment = Assignment.find(params[:id])
     @submissions = @assignment.find_due_dates('submission')
+    @reviews = @assignment.find_due_dates('review')
 
 
     # give an error message is instructor have not set the time zone.

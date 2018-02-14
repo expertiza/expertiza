@@ -2,7 +2,7 @@
 
 
   <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
-    <div class= "chart-table" id="tabs">
+    <div class= "table" id="tabs">
       <ul>
         <li><a href="#tabs-1" id="General">General</a></li>
         <li><a href="#tabs-2" id="Topics">Topics</a></li>
@@ -35,7 +35,7 @@
             <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
             <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>
-            <img src="/assets/info.png" title="If checked, it is possible that the auhtors review another artifact on the same topic "/>
+            <img src="/assets/info.png" title="If checked, it is possible that the authors review another artifact on the same topic "/>
             <br>
 
             <input name="assignment_form[assignment][can_choose_topic_to_review]" type="hidden" value="false"/>
@@ -72,7 +72,9 @@
           <%= render 'assignments/edit/badges' %>
         </div>
       <% end %>
-      <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
+      <div style="margin-bottom: 20px">
+      <%= button_tag "Save", :id => 'submit_btn', class: 'btn btn-md btn-default', :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
+    </div>
     </div>
     <script>
       var useBookmarkChanged = function () {

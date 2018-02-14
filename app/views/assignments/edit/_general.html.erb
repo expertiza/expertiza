@@ -30,34 +30,34 @@ function microtaskChanged() {
 
 <table id='assignment_general_info_table'>
 <tr class='heading'>
-<th width=30%></th>
-<th width=70%></th>
+<th width="0%"></th>
+<th width="100%"></th>
 </tr>
 
 <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
 <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
 <%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
 
-<tr>
+<tr style="text-align: center">
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
 </tr>
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
-<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), :selected => @assignment_form.assignment.course_id) %></td>
+<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
 </tr>
 
-<tr>
+<tr><div class="form-inline">
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px') %>  (Mandatory field. No space or special chars.)
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars.)
   <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
-</td>
+</td></div>
 </tr>
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
 </tr>
 </table>
 
@@ -66,12 +66,14 @@ function microtaskChanged() {
 
 <table id='assignment_general_setting_table'>
 <tr class='heading'>
-<th width=40%></th>
-<th width=60%></th>
+<th width=82%></th>
+<th width=100%></th>
   </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
+
+      <div class="form-inline">
       <% if(@assignment_form.assignment.max_team_size == 1)%>
         <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
       <% else %>
@@ -85,10 +87,12 @@ function microtaskChanged() {
       <!--Teammate reviews fields-->
       <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
       <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
-      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:20px'}) %>
+      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
+    
       </span>
+      </div>
     </td>
-      <td style='padding-left:50px' id='assignment_show_teammate_reviews'  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
+      <td id='assignment_show_teammate_reviews'  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
 
       <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
       <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
@@ -155,10 +159,11 @@ function microtaskChanged() {
 
   <tr>
     <td style='padding:5px' id='assignment_reputation_algorithm_field'>
+      <div class="form-inline">
       <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
       <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
-      <%= select('assignment_form[assignment]','reputation_algorithm', [['--', ''],['Lauw', 'Lauw'],['Hamer','Hamer']],:selected => @assignment_form.assignment.reputation_algorithm) %>
-
+      <%= select('assignment_form[assignment]','reputation_algorithm', [['--', ''],['Lauw', 'Lauw'],['Hamer','Hamer']], {:selected => @assignment_form.assignment.reputation_algorithm}, {:class => 'form-control', :style => 'width: 100px'}) %>
+      </div>
     </td>
   </tr>
   <tr colspan="3">
@@ -167,12 +172,14 @@ function microtaskChanged() {
       <%= label_tag('toggle_simicheck_setting', 'Use simicheck?') %>
     </td>
     <td style='padding:5px' id='assignment_simicheck_field' <%= "hidden" if @assignment_form.assignment.simicheck == -1 %> >
+      <div class="form-inline">
       <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
-      <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, :selected => @assignment_form.assignment.simicheck) %><b> hours</b>
+      <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, {:selected => @assignment_form.assignment.simicheck}, {:class => 'form-control', :style => 'width: 150px'}) %><b> hours</b>
       <br></br>
       <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
-      <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, :selected => @assignment_form.assignment.simicheck_threshold) %><b> %</b>
+      <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, {:selected => @assignment_form.assignment.simicheck_threshold}, {:class => 'form-control', :style => 'width: 50px'}) %><b> %</b>
       <br>(Filter that refers to % text same between 2 docs)</br>
+      </div>
     </td>
   </tr>
 

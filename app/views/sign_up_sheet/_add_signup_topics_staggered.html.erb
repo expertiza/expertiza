@@ -12,8 +12,11 @@
 <% end %>
 
   <% if @sign_up_topics.size != 0 %>
-    <table class="general" id="topics">
+    <table class="general table" id="topics">
+      <thead>
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+    </thead>
+    <tbody>
       <% i=1 %>
       <% for topic in @sign_up_topics %>
         <tr>
@@ -21,10 +24,11 @@
         </tr>
         <% i=i+1 %>
       <% end %>
+      </tbody>
     </table>
     <br/>
   <% else %>
-    <div class="flash_note"><%= "Signup topics have not yet been created." %></div>
+    <div class="flash_note alert alert-danger"><%= "Signup topics have not yet been created." %></div>
   <% end %>
 
 <% session[:return_to] = request.url %>

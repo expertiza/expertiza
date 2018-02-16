@@ -128,10 +128,18 @@ Expertiza::Application.routes.draw do
       get :start
       get :import
       post :import
+
+      # MAY BE ABLE TO PUT ROUTE HERE
+
     end
   end
 
-  resources :institution, except: [:destroy] do
+
+  get '/import_file/import', controller: :import_file, action: :import
+  get '/import_file/show', controller: :import_file, action: :show
+  post '/import_file/show', controller: :import_file, action: :show
+
+resources :institution, except: [:destroy] do
     collection do
       get :list
       post ':id', action: :update
@@ -318,7 +326,6 @@ Expertiza::Application.routes.draw do
       get :intelligent_sign_up
       get :intelligent_save
       get :signup_as_instructor
-      get :intelligent_topic_selection
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines

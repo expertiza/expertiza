@@ -1,0 +1,22 @@
+<h2>Importing from <strong><em><%= @current_file.original_filename %></em></strong></h2>
+<h2>Please Confirm the Columns for <strong><em><%= @model %></em></strong></h2>
+
+<br/>
+
+<% if @model == 'User' %>
+    <%= render 'import_file/user' %>
+<% elsif @model == 'AssignmentTeam' || @model == 'CourseTeam'%>
+    <%= render 'import_file/team' %>
+<% elsif @model == 'ReviewResponseMap' %>
+    <%= render 'import_file/reviewer' %>
+<% elsif @model == 'MetareviewResponseMap'%>
+    <%= render 'import_file/metareviewer' %>
+<% elsif @model == 'AssignmentParticipant' || @model == 'CourseParticipant' %>
+    <%=  render 'import_file/participant' %>
+<% elsif @model == 'SignUpTopic' %>
+  <%= render 'import_file/sign_up_topic' %>
+<% else %>
+    <h3 style="color:red">There was a problem with the @model in app/views/import_file/show.html.erb.</h3>
+<% end %>
+
+<a href="/import_file/start?expected_fields=<%= @expected_fields %>&model=<%= @model %>">Back</a>

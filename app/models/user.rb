@@ -142,7 +142,6 @@ class User < ActiveRecord::Base
   end
 
   def self.import(row_hash, _row_header, session, id = nil)
-
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
     user = User.find_by_name(row_hash[:name])
     if user.nil?

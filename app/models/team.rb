@@ -19,7 +19,7 @@ class Team < ActiveRecord::Base
 
   # Delete the given team
   def delete
-    TeamsUser.where(team_id: self.id).find_each(&:destroy)
+    TeamsUser.where(team_id: self.id).each{ |teams_user| teams_user.destroy }
     node = TeamNode.find_by(node_object_id: self.id)
     node.destroy if node
     self.destroy
@@ -52,7 +52,7 @@ class Team < ActiveRecord::Base
     (curr_team_size >= max_team_members)
   end
 
-  # Add memeber to the team
+  # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
     can_add_member = false
@@ -66,9 +66,9 @@ class Team < ActiveRecord::Base
     can_add_member
   end
 
-  # Define the size of the team
+  # Define the size of the team,
   def self.size(team_id)
-    TeamsUser.where(team_id: team_id).count
+    TeamsUser.where(["team_id = ?", team_id]).count
   end
 
   # Copy method to copy this team
@@ -88,8 +88,8 @@ class Team < ActiveRecord::Base
   end
 
   # Algorithm
-  # Start by adding participants to teams that have one slot.
-  # Adding participants to teams that have two slots. etc.
+  # Start by adding single members to teams that are one member too small.
+  # Add two-member teams to teams that two members too small. etc.
   def self.randomize_all_by_parent(parent, team_type, min_team_size)
     participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + "Participant")
     participants = participants.sort { rand(-1..1) }
@@ -156,48 +156,50 @@ class Team < ActiveRecord::Base
     end
   end
 
-  # Extract team members from the csv and push to DB
-  def import_team_members(starting_index, row)
-    index = starting_index
-    while index < row.length
-      user = User.find_by(name: row[index].to_s.strip)
+  # Extract team members from the csv and push to DB,  changed to hash by E1776
+  # todo check if the starting_index is necessary
+  def import_team_members(starting_index = 0, row_hash)
+    starting_index
+    index = 0
+    row_hash[:teammembers].each do |teammember|
+      next if index < starting_index # not sure this will work, hash is not ordered like array
+      user = User.find_by_name(teammember.to_s)
       if user.nil?
-        raise ImportError, "The user #{row[index].to_s.strip} was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user #{teammember.to_s} was not found. <a href='/users/new'>Create</a> this user?"
       else
-        add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
+        if TeamsUser.where(["team_id = ? and user_id = ?", id, user.id]).first.nil?
+        add_member(user, nil)
+        end
       end
       index += 1
     end
   end
 
-  # REFACTOR BEGIN:: class methods import export moved from course_team & assignment_team to here
-  # Import from csv
-  def self.import(row, id, options, teamtype)
-    raise ArgumentError, 'Not enough fields on this line.' if (row.length < 2 && options[:has_column_names] == "true") || (row.empty? && options[:has_column_names] != "true")
+  #  changed to hash by E1776
+  def self.import(row_hash, id, options, teamtype)
 
-    if options[:has_column_names] == "true"
-      name = row[0].to_s.strip
-      team = find_by(name: name, parent_id: id)
+    raise ArgumentError, "Not enough fields on this line." if (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
+    if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
+      name = row_hash[:teamname].to_s
+      team = where(["name =? && parent_id =?", name, id]).first
       team_exists = !team.nil?
       name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
-      index = 1
     else
-      if teamtype.is_a?(CourseTeam)
+      if teamtype.to_s == "CourseTeam"
         name = self.generate_team_name(Course.find(id).name)
-      elsif teamtype.is_a?(AssignmentTeam)
+      elsif teamtype.to_s == "AssignmentTeam"
         name = self.generate_team_name(Assignment.find(id).name)
       end
-      index = 0
     end
-
     if name
-      team = Object.const_get(teamtype.class.to_s).create_team_and_node(id)
+      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
       team.name = name
       team.save
     end
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-    team.import_team_members(index, row) unless team_exists && options[:handle_dups] == "ignore"
+
+    team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
 
   # Handle existence of the duplicate team
@@ -205,9 +207,9 @@ class Team < ActiveRecord::Base
     return name if team.nil? # no duplicate
     return nil if handle_dups == "ignore" # ignore: do not create the new team
     if handle_dups == "rename" # rename: rename new team
-      if teamtype.is_a?(CourseTeam)
+      if teamtype.to_s == "CourseTeam"                 #teamtype.is_a?(CourseTeam)
         return self.generate_team_name(Course.find(id).name)
-      elsif teamtype.is_a?(AssignmentTeam)
+      elsif  teamtype.to_s == "AssignmentTeam"         #teamtype.is_a?(AssignmentTeam)
         return self.generate_team_name(Assignment.find(id).name)
       end
     end
@@ -222,22 +224,22 @@ class Team < ActiveRecord::Base
   # Export the teams to csv
   def self.export(csv, parent_id, options, teamtype)
     if teamtype.is_a?(CourseTeam)
-      teams = CourseTeam.where(parent_id: parent_id)
+      teams = CourseTeam.where(["parent_id =?", parent_id])
     elsif teamtype.is_a?(AssignmentTeam)
-      teams = AssignmentTeam.where(parent_id: parent_id)
+      teams = AssignmentTeam.where(["parent_id =?", parent_id])
     end
     teams.each do |team|
       output = []
       output.push(team.name)
-      if options[:team_name] == "false"
-        teams_users = TeamsUser.where(team_id: team.id)
-        teams_users.each do |teams_user|
-          output.push(teams_user.user.name)
+      if options["team_name"] == "false"
+        team_members = TeamsUser.where(['team_id = ?', team.id])
+        team_members.each do |user|
+          output.push(user.name)
         end
       end
+      output.push(teams.name)
       csv << output
     end
-    csv
   end
 
   # Create the team with corresponding tree node

@@ -45,14 +45,12 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def self.import(row, _header, _session, assignment_id)
-    reviewee_user_name = row[0].strip
+  def self.import(row_hash, session, assignment_id)
+    reviewee_user_name = row_hash[:reviewee].to_s
     reviewee_user = User.find_by(name: reviewee_user_name)
     raise ArgumentError, "Cannot find reviewee user." if reviewee_user.nil?
-
     reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, parent_id: assignment_id)
     raise ArgumentError, "Reviewee user is not a participant in this assignment." if reviewee_participant.nil?
-
     reviewee_team = AssignmentTeam.team(reviewee_participant)
     if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
       reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s,
@@ -61,22 +59,16 @@ class ReviewResponseMap < ResponseMap
       team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
       TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
     end
-
-    index = 1
-    while index < row.length
-      reviewer_user_name = row[index].strip
+    row_hash[:reviewers].each do |reviewer|
+      reviewer_user_name = reviewer.to_s
       reviewer_user = User.find_by(name: reviewer_user_name)
       raise ArgumentError, "Cannot find reviewer user." if reviewer_user.nil?
       next if reviewer_user_name.empty?
-
       reviewer_participant = AssignmentParticipant.find_by(user_id: reviewer_user.id, parent_id: assignment_id)
       raise ArgumentError, "Reviewer user is not a participant in this assignment." if reviewer_participant.nil?
-
       if ReviewResponseMap.find_by(reviewed_object_id: assignment_id, reviewer_id: reviewer_participant.id, reviewee_id: reviewee_team.id, calibrate_to: false).nil?
         ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_participant.id, reviewee_id: reviewee_team.id, calibrate_to: false)
       end
-
-      index += 1
     end
   end
 

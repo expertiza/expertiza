@@ -525,6 +525,7 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   activerecord-session_store
+  activesupport (~> 4.2.7.1)
   airbrake
   awesome_nested_set
   bind-it

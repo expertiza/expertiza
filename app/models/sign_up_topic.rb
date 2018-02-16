@@ -16,24 +16,42 @@ class SignUpTopic < ActiveRecord::Base
   #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
   # end
 
-  def self.import(columns, session, _id = nil)
-    if columns.length < 3
-      raise ArgumentError, "The CSV File expects the format:
- Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
+  def self.import(row_hash, session, _id = nil)
+    if row_hash.length < 3
+      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
     end
-
-    topic = SignUpTopic.where(topic_name: columns[1], assignment_id: session[:assignment_id]).first
-
+    topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id]).first
     if topic.nil?
-      attributes = ImportTopicsHelper.define_attributes(columns)
+      attributes = ImportTopicsHelper.define_attributes(row_hash)
+
       ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
     else
-      topic.max_choosers = columns[2]
-      topic.topic_identifier = columns[0]
+      topic.max_choosers = row_hash[:max_choosers]
+      topic.topic_identifier = row_hash[:topic_identifier]
       # topic.assignment_id = session[:assignment_id]
       topic.save
     end
   end
+
+  # The old method is commented out below.
+  #
+  # def self.import(columns, session, _id = nil)
+  #   if columns.length < 3
+  #     raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
+  #   end
+  #
+  #   topic = SignUpTopic.where(topic_name: columns[1], assignment_id: session[:assignment_id]).first
+  #
+  #   if topic.nil?
+  #     attributes = ImportTopicsHelper.define_attributes(columns)
+  #     ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
+  #   else
+  #     topic.max_choosers = columns[2]
+  #     topic.topic_identifier = columns[0]
+  #     # topic.assignment_id = session[:assignment_id]
+  #     topic.save
+  #   end
+  # end
 
   def self.find_slots_filled(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")

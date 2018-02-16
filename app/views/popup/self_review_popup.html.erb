@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<div>
+<!--Zhewei: Both autor_feeback and teammate_review popup can use this page.-->
+<% if @response_id.nil? %>
+  <tr> <td align = "center">No review done yet.</td> </tr>
+  <br/>
+  <tr>
+    <th align = "left"> Reviewer score </th>
+  </tr>
+  <tr>
+    <td align = "center">--</td>
+  </tr>
+  <br/>
+<% else %>
+  <h3> Self Review of <%= @user_fullname %></h3>
+  <table>
+    <tr>
+      <th align = 'left' width = "50%"> Question </th>
+      <th width = "5%"> Score </th>
+      <th width = "45%"> Comments </th>
+    </tr>
+    <% @scores.each do |s|%>
+      <tr>
+        <td align = 'left'> <%= Question.find(s.question_id).txt %></td>
+        <%if Question.find(s.question_id).is_a?(ScoredQuestion) %>
+          <td align = 'center'> <%= s.answer %>/<%= @maxscore %></td>
+        <%else%>
+          <td align = 'center'> <%= s.answer %></td>
+        <%end%>
+        <td align = 'left'> <%= s.comments %> </td>
+      </tr>
+    <%end%>
+    <tr>
+      <th>Reviewer Score (Σ weighted score/Σ weighted available score)</th>
+      <td align = "center"><%= @sum %>/<%= @total_possible %> </td>
+      <td align = "left"> = <%= @total_percentage.is_a?(Float)?  sprintf("%.2f", @total_percentage).to_s+"%" :@total_percentage%></td>
+    </table>
+
+    <table >
+      <tr>
+        <th> Additional Comment</th>
+      </tr>
+      <tr>
+        <%if @response.additional_comment.nil? %>
+          <td> No Comments </td>
+        <%else%>
+          <td> <%= @response.additional_comment %> </td>
+        <%end%>
+      </tr>
+    </table>
+  <%end%>
+  <br/>
+  <div class="footer">
+    <%= link_to 'Back', :controller=> 'review_mapping', :action=>'response_report', :id=>@id%>
+  </div>
+</div>

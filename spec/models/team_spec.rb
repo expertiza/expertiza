@@ -166,8 +166,8 @@ describe Team do
     context 'when cannot find a user by name' do
       it 'raises an ImportError' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
-        expect { team.import_team_members(0, {"name" => 'no name'}) }.to raise_error(ImportError,
-                                                                           "The user no name was not found. <a href='/users/new'>Create</a> this user?")
+        expect { team.import_team_members(0, {teammembers: ['no name']}) }.to raise_error(ImportError,
+                                                                           "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
       end
     end
 
@@ -176,7 +176,7 @@ describe Team do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
         allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
-        expect(team.import_team_members(0, {"name" => 'no name'})).to be nil
+        expect(team.import_team_members(0, {teammembers: ['no name']})).to eq(['no name'])
       end
     end
   end
@@ -191,7 +191,7 @@ describe Team do
 
     # E1776 (Fall 2017)
     #
-    # The tests below are no longer reflective of the current import that uses hash.
+    # The tests below are no longer reflective of the current import that uses row_hash ==> {teammembers: ['name', 'name'], teamname: 'teamname'}.
     #
     # context 'when has_column_names option is true' do
     #   it 'handles duplicated teams and imports team members' do

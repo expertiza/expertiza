@@ -94,7 +94,7 @@ class ImportFileController < ApplicationController
           end
           options = eval(params[:options])
           options[:has_teamname] = params[:has_teamname]
-          Team.import(row_hash,params[:id], options, teamtype)
+          Team.import(row_hash, params[:id], options, teamtype)
         end
       rescue
         errors << $ERROR_INFO

@@ -163,13 +163,11 @@ class Team < ActiveRecord::Base
     index = 0
     row_hash[:teammembers].each do |teammember|
       next if index < starting_index # not sure this will work, hash is not ordered like array
-      user = User.find_by_name(teammember.to_s)
+      user = User.find_by(name: teammember.to_s)
       if user.nil?
-        raise ImportError, "The user #{teammember.to_s} was not found. <a href='/users/new'>Create</a> this user?"
+        raise ImportError, "The user '#{teammember.to_s}' was not found. <a href='/users/new'>Create</a> this user?"
       else
-        if TeamsUser.where(team_id: id, user_id: user.id).first.nil?
-        add_member(user, nil)
-        end
+        add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
       end
       index += 1
     end
@@ -231,15 +229,15 @@ class Team < ActiveRecord::Base
     teams.each do |team|
       output = []
       output.push(team.name)
-      if options["team_name"] == "false"
+      if options[:team_name] == "false"
         team_members = TeamsUser.where(team_id: team.id)
         team_members.each do |user|
           output.push(user.name)
         end
       end
-      output.push(teams.name)
       csv << output
     end
+    csv
   end
 
   # Create the team with corresponding tree node

@@ -68,7 +68,7 @@ class Team < ActiveRecord::Base
 
   # Define the size of the team,
   def self.size(team_id)
-    TeamsUser.where(["team_id = ?", team_id]).count
+    TeamsUser.where(team_id: team_id).count
   end
 
   # Copy method to copy this team
@@ -167,7 +167,7 @@ class Team < ActiveRecord::Base
       if user.nil?
         raise ImportError, "The user #{teammember.to_s} was not found. <a href='/users/new'>Create</a> this user?"
       else
-        if TeamsUser.where(["team_id = ? and user_id = ?", id, user.id]).first.nil?
+        if TeamsUser.where(team_id: id, user_id: user.id).first.nil?
         add_member(user, nil)
         end
       end
@@ -185,9 +185,9 @@ class Team < ActiveRecord::Base
       team_exists = !team.nil?
       name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
     else
-      if teamtype.to_s == "CourseTeam"
+      if teamtype.is_a?(CourseTeam)
         name = self.generate_team_name(Course.find(id).name)
-      elsif teamtype.to_s == "AssignmentTeam"
+      elsif teamtype.is_a?(AssignmentTeam)
         name = self.generate_team_name(Assignment.find(id).name)
       end
     end
@@ -207,9 +207,9 @@ class Team < ActiveRecord::Base
     return name if team.nil? # no duplicate
     return nil if handle_dups == "ignore" # ignore: do not create the new team
     if handle_dups == "rename" # rename: rename new team
-      if teamtype.to_s == "CourseTeam"                 #teamtype.is_a?(CourseTeam)
+      if teamtype.is_a?(CourseTeam)
         return self.generate_team_name(Course.find(id).name)
-      elsif  teamtype.to_s == "AssignmentTeam"         #teamtype.is_a?(AssignmentTeam)
+      elsif  teamtype.is_a?(AssignmentTeam)
         return self.generate_team_name(Assignment.find(id).name)
       end
     end
@@ -224,15 +224,15 @@ class Team < ActiveRecord::Base
   # Export the teams to csv
   def self.export(csv, parent_id, options, teamtype)
     if teamtype.is_a?(CourseTeam)
-      teams = CourseTeam.where(["parent_id =?", parent_id])
+      teams = CourseTeam.where(parent_id: parent_id)
     elsif teamtype.is_a?(AssignmentTeam)
-      teams = AssignmentTeam.where(["parent_id =?", parent_id])
+      teams = AssignmentTeam.where(parent_id: parent_id)
     end
     teams.each do |team|
       output = []
       output.push(team.name)
       if options["team_name"] == "false"
-        team_members = TeamsUser.where(['team_id = ?', team.id])
+        team_members = TeamsUser.where(team_id: team.id)
         team_members.each do |user|
           output.push(user.name)
         end

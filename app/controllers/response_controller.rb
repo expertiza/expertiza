@@ -57,7 +57,7 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     set_all_responses
     if @prev.present?
-      @sorted = @review_scores.sort {|m1, m2| m1.version_num and m2.version_num ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+      @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i and m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
     @modified_object = @response.response_id

@@ -5,6 +5,7 @@
     <%@l = -1 %>
 
     <% @authors.each do |r| %>
+      <% next unless r %>
       <% if @assignment.varying_rubrics_by_round? %>
         <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 
       <% else %>

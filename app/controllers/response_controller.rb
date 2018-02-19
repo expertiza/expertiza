@@ -160,7 +160,7 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     error_msg = ""
     @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-    @response.email
+    # @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 

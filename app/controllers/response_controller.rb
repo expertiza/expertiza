@@ -150,7 +150,11 @@ class ResponseController < ApplicationController
       )
     else
       @response = Response.find_by(map_id: @map.id, round: @round)
-      @response.update(additional_comment: params[:review][:comments])
+      if !@response.nil?
+        @response.update(additional_comment: params[:review][:comments]) # ignore if autoupdate try to save when the response object is not yet created.
+      else
+        logger.error("Can't find response with '#{@map.id}' and round '#{@round}' to update, even though params[:saved] = #{params[:saved]}")
+      end
     end
 
     # ,:version_num=>@version)

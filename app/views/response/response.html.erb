@@ -1,3 +1,22 @@
+<script>
+  jQuery(document).ready(function() {
+    jQuery('#Submit').click(function(e){
+      if(!confirm('Once a review has been submitted, you cannot edit it again')){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }else{
+        jQuery('#isSubmit').val('Yes');
+      }
+    })
+    $(function(){
+      $("form").sisyphus({
+        locationBased: true,
+        autoRelease: true
+      });
+    });
+  })
+</script>
 <script type="text/javascript" src="/assets/response.js" ></script>
 
 <!--including tinymce javascript-->
@@ -53,7 +72,7 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx">&nbsp;Activate auto save?&nbsp;&nbsp;<div id="save_progress"></div>
+<input type="checkbox" id="autosave_cbx" checked>&nbsp;Activate auto save every 90 seconds?&nbsp;&nbsp;<div id="save_progress"></div>
 
 <%= form_tag({:action => @next_action}, :html => {:autocomplete => "off"}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>

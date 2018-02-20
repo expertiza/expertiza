@@ -85,7 +85,8 @@ class ResponseController < ApplicationController
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
       else
-        @response.update_attribute('is_submitted', false)
+        # this won't work, since the auto update click edit in the background and override the submit. Don't think this is necessary anyway
+        # @response.update_attribute('is_submitted', false)
       end
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError

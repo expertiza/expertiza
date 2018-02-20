@@ -22,27 +22,47 @@ var vis = (function(){
     }
 })();
 
-// triggers in every 10 seconds to save the draft version of the review
-var interval = 90000
+// AUTO SAVE: triggers every 60 seconds to save the draft version of the review
+var interval = 60000
+var last_save = new Date()
 var autoSavePost = function() {
-    var dt, time;
-    dt = new Date;
-    time = dt.getHours() + ':' + dt.getMinutes() + ':' + dt.getSeconds();
-
-    //if it's was in the background, don't autosae to save bandwi
+    //if it's was in the background, don't auto save to reduce bandwidth
     if(vis() && document.getElementById("autosave_cbx").checked) {
-        if ($('.review_form').length > 0) {
-            $('form').attr('data-remote', 'true');
-            document.getElementById('save_review').click();
-            if ($('input[name=saved]').value = "0")$('input[name=saved]').val("1");
-            $('form').removeAttr('data-remote');
-        }
-        $('#save_progress').html('<span id="tick"> &#10004; </span>' + 'Draft Autosaved at ' + time);
+        executeSave();
     }
     setTimeout(autoSavePost, interval);
 };
 
-jQuery(document).ready(function(){setTimeout(autoSavePost, interval)});
+function executeSave(){
+    diff = (new Date().getTime() - last_save.getTime())/1000;
+    // ignore saving unless the last save was more than 5s
+    if (diff>5 && $('.review_form').length > 0) {
+        $('form').attr('data-remote', 'true');
+        document.getElementById('save_review').click();
+        last_save = new Date;
+        if ($('input[name=saved]').value = "0")$('input[name=saved]').val("1");
+        $('form').removeAttr('data-remote');
+    }
+    $('#save_progress').html('<span id="tick"> &#10004; </span>' + 'Draft Autosaved at ' + last_save.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
+}
+
+jQuery(document).ready(function(){
+    // workaround because all script are loaded in every pages now. need to clean it up
+    if (document.title.includes("response")){
+        // start saving review every interval of time
+        setTimeout(autoSavePost, interval);
+        autosave_lbl = document.getElementById("autosave_cbx_lbl")
+        if (autosave_lbl)
+            autosave_lbl.innerHTML = "&nbsp;Activate auto save every " + interval / 1000 + " seconds?&nbsp;&nbsp;"
+        vis(function () {
+            // save review when the window is sent to background
+            if (!vis()) {
+                executeSave();
+            }
+        });
+    }
+});
+// END AUTO SAVE
 
 // add star rating option to each dropdown box in review form
 jQuery(document).ready(function($){

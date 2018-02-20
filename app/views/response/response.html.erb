@@ -1,5 +1,11 @@
 <script>
   jQuery(document).ready(function() {
+    jQuery('#save_review').click(function(){
+      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Review saved!')
+      setTimeout(function(){
+        $('#save_confirm').html('')
+      }, 5000);
+    });
     jQuery('#Submit').click(function(e){
       if(!confirm('Once a review has been submitted, you cannot edit it again')){
         e.preventDefault();
@@ -7,6 +13,7 @@
         return;
       }else{
         jQuery('#isSubmit').val('Yes');
+        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
       }
     })
     $(function(){
@@ -72,7 +79,7 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx" checked>&nbsp;Activate auto save every 90 seconds?&nbsp;&nbsp;<div id="save_progress"></div>
+<input type="checkbox" id="autosave_cbx" checked><label id="autosave_cbx_lbl" for="autosave_cbx">&nbsp;Activate auto save every 90 seconds?&nbsp;&nbsp;</label><div id="save_progress"></div>
 
 <%= form_tag({:action => @next_action}, :html => {:autocomplete => "off"}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
@@ -112,6 +119,7 @@
 
     <br/>
     <br>
+    <div id="save_confirm"></div>
     <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>

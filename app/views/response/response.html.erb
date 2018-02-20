@@ -2,7 +2,6 @@
 
 <!--including tinymce javascript-->
 <%= tinymce_assets %>
-
 <% if @map.survey? %>
     <h1><%= @header %> <%= @title %> for <%= @map.survey_parent.name %></h1>
 <% else %>
@@ -43,6 +42,7 @@
         <hr/>
     <% end %>
 <% end %>
+
 <!-- display all versions available -->
 <% @responses_versions = Array.new %>
 <% @responses_versions = @map.get_all_versions() %>
@@ -53,9 +53,9 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<div id="save_progress"></div>
+<input type="checkbox" id="autosave_cbx">&nbsp;Activate auto save?&nbsp;&nbsp;<div id="save_progress"></div>
 
-<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
+<%= form_tag({:action => @next_action}, :html => {:autocomplete => "off"}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", 0 %>
     <% if @next_action.eql?'update' %>

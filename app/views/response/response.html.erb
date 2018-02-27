@@ -79,7 +79,7 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx" checked><label id="autosave_cbx_lbl" for="autosave_cbx">&nbsp;Activate auto save every 90 seconds?&nbsp;&nbsp;</label><div id="save_progress"></div>
+<input type="checkbox" id="autosave_cbx" checked><label id="autosave_cbx_lbl" for="autosave_cbx">&nbsp;Auto save your respond every 90 seconds?&nbsp;&nbsp;</label><div id="save_progress"></div>
 
 <%= form_tag({:action => @next_action}, :html => {:autocomplete => "off"}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>

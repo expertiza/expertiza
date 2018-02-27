@@ -110,9 +110,9 @@
 
     <div style="text-align:center">
       <% if @has_header == 'true' %>
-          <button type="button" class="btn btn-primary" onclick="column_form.submit()">Import <%= @model %></button>
+          <button type="button" class="btn btn-primary" onclick="column_form.submit()">Import Topics</button>
       <% else %>
-          <button type="button" class="btn btn-primary" onclick="checkTopicForDuplicatesAndRequiredColumns(<%= @optional_count %>)">Import <%= @model %></button>
+          <button type="button" class="btn btn-primary" onclick="checkTopicForDuplicatesAndRequiredColumns(<%= @optional_count %>)">Import Topics</button>
       <% end %>
     </div>
 

@@ -43,7 +43,7 @@ function executeSave(){
         if ($('input[name=saved]').value = "0")$('input[name=saved]').val("1");
         $('form').removeAttr('data-remote');
     }
-    $('#save_progress').html('<span id="tick"> &#10004; </span>' + 'Draft Autosaved at ' + last_save.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
+    $('#save_progress').html('<span id="tick"> &#10004; </span>' + 'Draft was saved at ' + last_save.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
 }
 
 jQuery(document).ready(function(){
@@ -53,7 +53,7 @@ jQuery(document).ready(function(){
         setTimeout(autoSavePost, interval);
         autosave_lbl = document.getElementById("autosave_cbx_lbl")
         if (autosave_lbl)
-            autosave_lbl.innerHTML = "&nbsp;Activate auto save every " + interval / 1000 + " seconds?&nbsp;&nbsp;"
+            autosave_lbl.innerHTML = "&nbsp;Auto save your respond every " + interval / 1000 + " seconds?&nbsp;&nbsp;"
         vis(function () {
             // save review when the window is sent to background
             if (!vis()) {

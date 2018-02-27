@@ -1,7 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<%= form_tag :action => 'response_report', :id => @id do %>
-  <select name='report[type]' style="width: 15em">
+<%= form_tag :action => 'response_report', :id => @id, :class => "form-inline" do %>
+  <table>
+    <tr>
+      <td><select name='report[type]' style="width: 15em" class="form-control">
     <option value='ReviewResponseMap' selected>
       Review report
     </option>
@@ -33,8 +35,13 @@
           Plagiarism Checker Report
         </option>
     <% end %>
-  </select>
-  <%= submit_tag("Submit") %>
+  </select></td>
+      <td align = "right"><%= submit_tag("Submit", :class => "btn btn-default") %></td>
+    </tr>
+
+  </table>
+  
+  
 <% end %>
 
 <% if @type == "ReviewResponseMap" %>
@@ -46,14 +53,14 @@
       </div>
 
 
-      <div id="searchform" style = " border: solid; border-width: 1px; border-color: #986633;">
+      <div id="searchform">
 
         <%= form_for :user, :url => {:action => 'response_report', :id => @id} do |n| %>
             <table>
               <tr>
                 <th>Reviewer's Name</th>
-                <td><%= n.text_field :fullname %></td>
-                <td align = "right"><%= submit_tag "Search"%></td>
+                <td><%= n.text_field :fullname, :class => "form-control"%></td>
+                <td align = "right"><%= submit_tag "Search", :class => "btn btn-default"%></td>
               </tr>
 
             </table>

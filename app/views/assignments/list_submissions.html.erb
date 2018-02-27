@@ -9,30 +9,40 @@
   <% headers["Participant name"] = "18%" %>
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
-<%= create_report_table_header(headers) %>
+<table class="table table-striped" style="margin-top: 50px">
+    <thead>
+      <% if @assignment.topics? %>
+        <td width="16%" style="font-weight: bold; font-size: 15px;">Topic name</td>
+      <% end %>
+      <% if @assignment.max_team_size > 1 %>
+        <td width="14%" style="font-weight: bold; font-size: 15px;">Team name</td>
+        <td width="18%" style="font-weight: bold; font-size: 15px;">Team member(s)</td>
+      <% else %>
+        <td width="18%" style="font-weight: bold; font-size: 15px;">Participant name</td>
+      <% end %>                              
+    </thead>
     <% @l = -1 %>
     <% @teams.each do |team| %>
       <% @l = @l+1 %>
       <tr>
-        <% bgcolor = @l.even? ? "#ffffff" : "#DDDDBB" %>
         <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
         <!--Topic name-->
         <% if @assignment.topics? %>
-          <td bgcolor= <%= bgcolor %>><%= topic_identifier + '. ' + topic_name %></td>
+          <td><%= topic_identifier + '. ' + topic_name %></td>
         <% end %>
 
         <!--Team name-->
         <% if @assignment.max_team_size > 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td bgcolor= <%= bgcolor %>><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
+          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
             <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
         <% end %>
 
         <!--Team member(s) / Participant name-->
-          <td bgcolor= <%= bgcolor %>>
+          <td>
               <% users_for_curr_team.each do |user| %>
                   <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
                   (<%= user.fullname(session[:ip])%>)<br>
@@ -40,7 +50,7 @@
           </td>
 
         <!--Submitted item(s)-->
-        <td bgcolor= <%= bgcolor %>>
+        <td>
         <!--Display submitted hyperlinks-->
           <% participant = participants.compact.first %>
           <%= link_to "Show Submission Records", submission_records_path(team_id: team.id) %>
@@ -61,5 +71,5 @@
       </tr>
     <% end %>
   </table>
-  <p> **In "Team name" column, text in <i style = "color:blue">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #986633">brown</i> indicates that the submission grade has been assigned.</p>
+  <p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
 </div>

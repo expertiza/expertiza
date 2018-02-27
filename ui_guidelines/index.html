@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <title>Expertiza Design Library</title>
+
+         <!-- Bootstrap CSS CDN -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <!-- Our Custom CSS -->
+        <link rel="stylesheet" href="style4.css">
+    </head>
+    <body>
+
+
+
+        <div class="wrapper">
+            <!-- Sidebar Holder -->
+            <nav id="sidebar">
+                <div class="sidebar-header">
+                    <h3><a href="index4.html">Expertiza UI Design Library</a></h3>
+                    <strong><i class="glyphicon glyphicon-education"></i></strong>
+                </div>
+
+                <ul class="list-unstyled components">
+                    <li class="active">
+                        <a href="index4.html" data-toggle="collapse" aria-expanded="false">
+                            <i class="glyphicon glyphicon-home"></i>
+                            Home Page
+                        </a>
+                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                            <li><a href="#">Navbar</a></li>
+                            <li><a href="#">Crousel</a></li>
+                            <li><a href="#">Content</a></li>
+                            <li><a href="#">Footer</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="icons.html">
+                            <i class="glyphicon glyphicon-asterisk"></i>
+                            Icons
+                        </a>
+                        <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false">
+                            <i class="glyphicon glyphicon-th-list"></i>
+                            Tables
+                        </a>
+                        <ul class="collapse list-unstyled" id="pageSubmenu">
+                            <li><a href="#">Table Type 1</a></li>
+                            <li><a href="#">Table Type 2</a></li>
+                            <li><a href="#">Table Type 3</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" aria-expanded="false">
+                            <i class="glyphicon glyphicon-file"></i>
+                            Forms and Buttons
+                        </a>
+                    </li>
+                    <li>
+                        <a href="text.html" aria-expanded="false">
+                            <i class="glyphicon glyphicon-text-background"></i>
+                            Text
+                        </a>
+                    </li>
+                    <li>
+                        <a href="more.html" aria-expanded="false">
+                            <i class="glyphicon glyphicon-ice-lolly"></i>
+                            More Elements
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" aria-expanded="false">
+                            <i class="glyphicon glyphicon-sunglasses"></i>
+                            Component
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" aria-expanded="false">
+                                
+                            <i class="glyphicon glyphicon-heart-empty"></i>
+                            Some Element
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" aria-expanded="false">
+                            <i class="glyphicon glyphicon-rub"></i>
+                            TBD
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" aria-expanded="false">
+                            <i class="glyphicon glyphicon-book"></i>
+                            Docs
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="list-unstyled CTAs">
+                    <li><a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">Fork us on Github</a></li>
+                    <li><a href="https://bootstrapious.com/p/bootstrap-sidebar" class="article">Expertiza Common UI Guidelines</a></li>
+                </ul>
+            </nav>
+
+            <!-- Page Content Holder -->
+            <div id="content">
+
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+
+                        <div class="navbar-header">
+                            <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn" style="background-color: rgb(186, 0, 0)">
+                                <i class="glyphicon glyphicon-menu-hamburger"></i>
+                            </button>
+                        </div>
+
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="index4.html">Home</a></li>
+                                <li><a href="#">About Expertiza</a></li>
+                                <li><a href="#">Team</a></li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+				
+				
+
+                <h2>Expertiza UI Design Library</h2>
+                <p>For the Homepage we have only used one CSS class apart from native bootstrap and that is for crousel. However, this css class is not necessary for other pages unless you want to include a crousel on your page.</p>
+                <p>To make a page similar to Homepage following steps can be followed.</p>
+               
+                <p><h4><a id="To_add_Crousel_4"></a>To add Crousel</h4>
+                
+                Add an outer div <code>&lt;div class=&quot;carousel slide&quot; data-ride=&quot;carousel&quot;&gt;</code>.</p>
+               
+                <p>Inside this div you can define optional page indicators with <code>&lt;ol&gt;</code> Tag</p>
+                
+                <p>After this to include the data or items in crousel use <code>&lt;div class=&quot;carousel-inner&quot; role=&quot;listbox&quot;&gt;</code>.</p>
+                <p>Inside this div define individual items like <code>&lt;div class=&quot;item&quot;&gt;</code></p>
+                <p> make an item active use <code>&lt;div class=&quot;item active&quot;&gt;</code></p>
+                
+                </div>
+        </div>
+
+
+
+
+
+        <!-- jQuery CDN -->
+         <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+         <!-- Bootstrap Js CDN -->
+         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+         <script type="text/javascript">
+             $(document).ready(function () {
+                 $('#sidebarCollapse').on('click', function () {
+                     $('#sidebar').toggleClass('active');
+                 });
+             });
+         </script>
+    </body>
+</html>

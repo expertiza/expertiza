@@ -10,6 +10,31 @@ jQuery(document).ready(function() {
     }
   }
 
+  function formatDate(date) {
+    var month = new Array();
+    month[0] = "January";
+    month[1] = "February";
+    month[2] = "March";
+    month[3] = "April";
+    month[4] = "May";
+    month[5] = "June";
+    month[6] = "July";
+    month[7] = "August";
+    month[8] = "September";
+    month[9] = "October";
+    month[10] = "November";
+    month[11] = "December";
+
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+    return month[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() + " - " + strTime;
+  }
+
   function showIntelligentAssignmentDialog() {
     jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
   }
@@ -498,8 +523,12 @@ jQuery(document).ready(function() {
         }
       }
       if (this.props.creation_date && this.props.updated_date) {
-        creation_date = this.props.creation_date.replace("T", "<br/>")
-        updated_date = this.props.updated_date.replace("T", "<br/>")
+        creation = this.props.creation_date
+        updated = this.props.updated_date
+
+        creation_date = formatDate(new Date(creation))
+        updated_date = formatDate(new Date(updated))
+
       }
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()

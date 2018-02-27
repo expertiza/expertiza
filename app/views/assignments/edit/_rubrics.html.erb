@@ -51,8 +51,8 @@
         html += "<tr>"
         html += "<td>Add tag prompts</td>"
         html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
-        html += "<button type='button' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + questionnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
-        html += "<button type='button' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\",\"" + deleted_input_id + "\")'>-Tag prompt-</button>"
+        html += "<button type='button' class='btn btn-default' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + questionnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
+        html += "<button type='button' class='btn btn-default' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\",\"" + deleted_input_id + "\")'>-Tag prompt-</button>"
         html += "</td></tr>"
         <% end %>
         questionnaire_table.last().after(html);

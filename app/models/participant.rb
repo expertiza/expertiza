@@ -9,7 +9,20 @@ class Participant < ActiveRecord::Base
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
   has_many :awarded_badges
   has_one :review_grade
-  attr_accessible
+  attr_accessible :can_submit,
+                  :can_review,
+                  :user_id,
+                  :parent_id,
+                  :submitted_at,
+                  :permission_granted,
+                  :penalty_accumulated,
+                  :grade,
+                  :type,
+                  :handle,
+                  :time_stamp,
+                  :digital_signature,
+                  :duty,
+                  :can_take_quiz
 
   PARTICIPANT_TYPES = %w[Course Assignment].freeze
 

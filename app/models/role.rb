@@ -5,7 +5,7 @@ class Role < ActiveRecord::Base
   belongs_to :parent, class_name: 'Role'
   has_many :users
 
-  attr_accessible
+  attr_accessible :name, :parent_id, :default_page_id, :description
 
   serialize :cache
   validates :name, presence: true

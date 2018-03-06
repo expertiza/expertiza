@@ -10,7 +10,7 @@ class Course < ActiveRecord::Base
   has_many :notifications, dependent: :destroy
   has_paper_trail
   validates :name, presence: true
-  attr_accessible
+  attr_accessible :id,:name
   # Return any predefined teams associated with this course
   # Author: ajbudlon
   # Date: 7/21/2008

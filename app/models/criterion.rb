@@ -1,7 +1,8 @@
 class Criterion < ScoredQuestion
   include ActionView::Helpers
   validates :size, presence: true
-  attr_accessible
+  attr_accessible :id, :txt, :weight, :questionnaire_id, :seq, :size,
+                  :alternatives, :break_before, :max_label, :min_label, :questionnaire, :type
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(_count)

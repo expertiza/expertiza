@@ -2,7 +2,7 @@ class FeedbackResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
   belongs_to :review, class_name: 'Response', foreign_key: 'reviewed_object_id'
   belongs_to :reviewer, class_name: 'AssignmentParticipant', dependent: :destroy
-  attr_accessible
+  attr_accessible :reviewed_object_id, :reviewer_id, :reviewee_id, :calibrate_to
 
   def assignment
     self.review.map.assignment

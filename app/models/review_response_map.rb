@@ -2,7 +2,7 @@ class ReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
-  attr_accessible
+  attr_accessible :reviewed_object_id, :reviewer_id, :reviewee_id, :calibrate_to
 
   # In if this assignment uses "varying rubrics" feature, the sls
   # "used_in_round" field should not be nil

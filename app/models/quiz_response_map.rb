@@ -5,7 +5,7 @@ class QuizResponseMap < ResponseMap
   belongs_to :assignment, class_name: 'Assignment'
   has_many :quiz_responses, foreign_key: :map_id
 
-  attr_accessible
+  attr_accessible :reviewed_object_id, :reviewer_id, :reviewee_id, :calibrate_to
 
   def questionnaire
     self.quiz_questionnaire

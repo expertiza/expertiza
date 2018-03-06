@@ -16,7 +16,7 @@ Setup
 
 The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
 If you have access, this is quickest way to get a development environment running for Expertiza.
-See the Expertiza wiki on [developing Expertiza on the VCL](http://wiki.expertiza.ncsu.edu/index.php/Developing_Expertiza_on_the_VCL).
+See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).
 
 Using the VCL is the quickest way to get started, but you may find it awkward developing on a remote machine
 with network lag and having to reinstall gems every time you connect. Installing locally can be a pain though too.

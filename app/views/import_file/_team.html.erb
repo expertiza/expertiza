@@ -1,0 +1,52 @@
+<%= form_tag( { :controller => 'import_file', :action => 'import' },
+              { :method => 'post', :name => 'column_form', :id => 'column_form'} ) do %>
+
+    <table class="table table-bordered table-striped">
+
+      <thead>
+      <tr>
+        <strong> Sequence of columns in file:
+        <ol>
+        <% if @has_teamname == 'true_first' %>
+              <li>Team Name</li>
+              <li>Team Members</li>
+                <% @contents_hash[:header] = ["teamname","teammembers"]%>
+        <% elsif @has_teamname == 'true_last' %>
+              <li>Team Members</li>
+              <li>Team Name</li>
+                <%@contents_hash[:header] = ["teammembers","teamname"]%>
+        <% else %>
+              <li>Team Members</li>
+              <%@contents_hash[:header] = ["teammembers"] %>
+        <% end %>
+        </ol>
+        </strong>
+      </tr>
+      </thead>
+
+      <tbody>
+
+      <% @contents_hash[:body].each do |row| %>
+          <tr>
+            <% row.each do |column| %>
+                <td align="center"><%= column %></td>
+            <% end %>
+          </tr>
+
+      <% end %>
+
+      </tbody>
+    </table>
+
+    <%= hidden_field_tag('contents_hash', @contents_hash) %>
+    <%= hidden_field_tag('has_header', @has_header) %>
+    <%= hidden_field_tag('has_teamname', @has_teamname) %>
+    <%= hidden_field_tag('model', @model) %>
+    <%= hidden_field_tag('id', @id) %>
+    <%= hidden_field_tag('options', @options)%>
+
+    <div style="text-align:center">
+          <button type="button" class="btn btn-primary" onclick="column_form.submit()">Import Teams</button>
+    </div>
+
+<% end %>

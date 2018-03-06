@@ -1,0 +1,50 @@
+<%= form_tag( { :controller => 'import_file', :action => 'import' },
+              { :method => 'post', :name => 'column_form', :id => 'column_form'} ) do %>
+
+
+    <table class="table table-bordered table-striped">
+
+      <thead>
+      <tr>
+        <strong> Sequence of columns in file:
+          <ol>
+            <% if params[:has_reviewee] == 'true_first' %>
+                <li>Contributor</li>
+                <li>Reviewers</li>
+                <% @contents_hash[:header] = ["reviewee","reviewers"]%>
+            <% elsif params[:has_reviewee] == 'true_last' %>
+                <li>Reviewers</li>
+                <li>Contributor</li>
+                <%@contents_hash[:header] = ["reviewers","reviewee"]%>
+           <% end %>
+          </ol>
+        </strong>
+      </tr>
+      </thead>
+
+      <tbody>
+
+      <% @contents_hash[:body].each do |row| %>
+          <tr>
+            <% row.each do |column| %>
+                <td align="center"><%= column %></td>
+            <% end %>
+          </tr>
+
+      <% end %>
+
+      </tbody>
+    </table>
+
+    <%= hidden_field_tag('contents_hash', @contents_hash) %>
+    <%= hidden_field_tag('has_header', @has_header) %>
+    <%= hidden_field_tag('has_reviewee', params[:has_reviewee]) %>
+    <%= hidden_field_tag('model', @model) %>
+    <%= hidden_field_tag('id', @id) %>
+    <%= hidden_field_tag('options', @options)%>
+
+    <div style="text-align:center">
+      <button type="button" class="btn btn-primary" onclick="column_form.submit()">Import Reviewers/button>
+    </div>
+
+<% end %>

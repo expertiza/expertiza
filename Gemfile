@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rails', '~> 4.2.7.1'
 
 ## Gems in Alphabetical Order
-
+gem 'activesupport', '~> 4.2.7.1'
 gem 'activerecord-session_store'
 gem 'airbrake'
 gem 'awesome_nested_set'
@@ -62,6 +62,7 @@ gem 'superfish-rails'
 gem 'therubyracer'
 gem 'thin'
 gem 'timecop', '0.8.1'
+gem 'tinymce-rails', '~> 4.4.0'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
@@ -85,6 +86,7 @@ group :test do
   gem 'launchy'
   gem 'rspec-rails', '~> 3.6'
   gem 'shoulda'
+  gem 'mutant-rspec', '~> 0.8.8'
 end
 
 group :assets do

@@ -20,7 +20,7 @@ describe "criterion" do
   describe "#complete" do
     it "returns the html " do
       html = criterion.complete(0, nil, 0, 5).to_s
-      expect(html).to eq("<li><div><label for=\"responses_0\">test txt</label></div>")
+      expect(html).to eq("<div><label for=\"responses_0\">test txt</label></div>")
     end
   end
   #

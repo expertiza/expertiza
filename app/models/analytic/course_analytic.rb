@@ -123,19 +123,4 @@ module CourseAnalytic
       list
     end
   end
-
-  #=============== unused ============#
-  # def students
-  #  students = Array.new
-  #  self.participants.each do |participant|
-  #    if participant.user.role_id == Role.student.id
-  #      students << participant
-  #    end
-  #  end
-  #  student
-  # end
-  #
-  # def num_students
-  #  self.students.count
-  # end
 end

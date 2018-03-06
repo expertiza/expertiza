@@ -401,8 +401,11 @@ class ReviewMappingController < ApplicationController
       # If review report for teammate is required call teammate_response_report method in teammate_review_response_map model
       @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
     when "Calibration"
-      participant = init_participant
-      @assignment = Assignment.find(params[:id])
+      participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
+      if participant.nil?
+        participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+      end
+
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
       @assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: params[:id], questionnaire_id: @review_questionnaire_ids).first
       @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
@@ -420,6 +423,8 @@ class ReviewMappingController < ApplicationController
       tag_prompt_deployments.each do |tag_dep|
         @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
       end
+    when "SelfReview"
+      @self_review_response_maps = SelfReviewResponseMap.where(reviewed_object_id: @id)
     end
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end

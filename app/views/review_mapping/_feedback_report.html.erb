@@ -5,6 +5,7 @@
     <%@l = -1 %>
 
     <% @authors.each do |r| %>
+      <% next unless r %>
       <% if @assignment.varying_rubrics_by_round? %>
         <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 
       <% else %>
@@ -57,7 +58,7 @@
             <% if @frm.blank? %>
               <!--Review response rejoined-->
               <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-                <%= link_to reviewee_id = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => reviewee_id}), :method => :post, :title => "Click here to impersonate this user" %>
+                <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                 (<%= Participant.find(rr.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
@@ -68,7 +69,7 @@
                 <% feedback_response = Response.where(map_id: @frm.id).first %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
-                  <%= link_to reviewee_id = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => reviewee_id}), :method => :post, :title => "Click here to impersonate this user" %>
+                  <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>)
                 </td>
                 <!--Last rejoined at-->
@@ -78,7 +79,7 @@
               <% else %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-                  <%= link_to reviewee_id = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => reviewee_id}), :method => :post, :title => "Click here to impersonate this user" %>
+                  <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
@@ -111,7 +112,7 @@
             <% if @frm.blank? %>
               <!--Review response rejoined-->
               <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-                <%= link_to reviewee_id = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => reviewee_id}), :method => :post, :title => "Click here to impersonate this user" %>
+                <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                 (<%= reviewee_name = Participant.find(rr.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
@@ -122,7 +123,7 @@
                 <% feedback_response = Response.where(map_id: @frm.id).first %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
-                  <%= link_to reviewee_id = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => reviewee_id}), :method => :post, :title => "Click here to impersonate this user"%>
+                  <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user"%>
                   (<%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>)
                 </td>
                 <!--Last rejoined at-->
@@ -132,7 +133,7 @@
               <% else %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
-                  <%= link_to reviewee_id = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => reviewee_id}), :method => :post, :title => "Click here to impersonate this user" %>
+                  <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->

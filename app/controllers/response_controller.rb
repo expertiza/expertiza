@@ -57,7 +57,7 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     set_all_responses
     if @prev.present?
-      @sorted = @review_scores.sort {|m1, m2| m1.version_num and m2.version_num ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
+      @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i and m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
     @modified_object = @response.response_id
@@ -85,7 +85,8 @@ class ResponseController < ApplicationController
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
       else
-        @response.update_attribute('is_submitted', false)
+        # this won't work, since the auto update click edit in the background and override the submit. Don't think this is necessary anyway
+        # @response.update_attribute('is_submitted', false)
       end
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -107,7 +108,7 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = Response.find(params[:id])
+    review = Response.find(params[:id]) if !params[:id].nil?
     if review
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
@@ -131,7 +132,9 @@ class ResponseController < ApplicationController
   end
 
   def create
-    @map = ResponseMap.find(params[:id])
+    map_id = params[:id]
+    map_id = params[:map_id] if !params[:map_id].nil?# pass map_id as a hidden field in the review form
+    @map = ResponseMap.find(map_id)
     set_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
@@ -141,21 +144,31 @@ class ResponseController < ApplicationController
     end
 
     is_submitted = (params[:isSubmit] == 'Yes')
-    @response = Response.create(response_params(
-      map_id: @map.id,
-      additional_comment: params[:review][:comments],
-      round: @round,
-      is_submitted: is_submitted)
-    )
-    
+
+    if params[:saved].nil? || params[:saved] == "0" # a flag so the autosave doesn't create different versions. The value's changed by the javascript in response.js
+      @response = Response.create(
+          map_id: @map.id,
+          additional_comment: params[:review][:comments],
+          round: @round,
+          is_submitted: is_submitted
+      )
+    else
+      @response = Response.find_by(map_id: @map.id, round: @round)
+      if !@response.nil?
+        @response.update(additional_comment: params[:review][:comments]) # ignore if autoupdate try to save when the response object is not yet created.
+      else
+        logger.error("Can't find response with '#{@map.id}' and round '#{@round}' to update, even though params[:saved] = #{params[:saved]}")
+      end
+    end
+
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-    @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-    @response.email
+    # @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+    # @response.email
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 

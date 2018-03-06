@@ -1,23 +1,33 @@
 <script>
-jQuery(document).ready(function() {
+  jQuery(document).ready(function() {
+    jQuery('#save_review').click(function(){
+      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Review saved!')
+      setTimeout(function(){
+        $('#save_confirm').html('')
+      }, 5000);
+    });
     jQuery('#Submit').click(function(e){
-    if(!confirm('Once a review has been submitted, you cannot edit it again')){
+      if(!confirm('Once a review has been submitted, you cannot edit it again')){
         e.preventDefault();
         e.stopPropagation();
         return;
-    }else{
+      }else{
         jQuery('#isSubmit').val('Yes');
-    }
+        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
+      }
     })
     $(function(){
-        $("form").sisyphus({
-            locationBased: true,
-            autoRelease: true
-        }); 
+      $("form").sisyphus({
+        locationBased: true,
+        autoRelease: true
+      });
     });
-})
+  })
 </script>
+<script type="text/javascript" src="/assets/response.js" ></script>
 
+<!--including tinymce javascript-->
+<%= tinymce_assets %>
 <% if @map.survey? %>
     <h1><%= @header %> <%= @title %> for <%= @map.survey_parent.name %></h1>
 <% else %>
@@ -58,6 +68,7 @@ jQuery(document).ready(function() {
         <hr/>
     <% end %>
 <% end %>
+
 <!-- display all versions available -->
 <% @responses_versions = Array.new %>
 <% @responses_versions = @map.get_all_versions() %>
@@ -68,8 +79,11 @@ jQuery(document).ready(function() {
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
+<input type="checkbox" id="autosave_cbx" checked><label id="autosave_cbx_lbl" for="autosave_cbx">&nbsp;Auto save your respond every 90 seconds?&nbsp;&nbsp;</label><div id="save_progress"></div>
 
-<%= form_tag :action => @next_action, :id => @modified_object do %>
+<%= form_tag({:action => @next_action}, :html => {:autocomplete => "off"}, :id => @modified_object, :class => "review_form") do %>
+    <%= hidden_field_tag "map_id", @modified_object %>
+    <%= hidden_field_tag "saved", 0 %>
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
@@ -78,8 +92,10 @@ jQuery(document).ready(function() {
        <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
        <% if question.instance_of? Criterion%>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+            <%= tinymce %>
        <% elsif question.instance_of? Scale %>
             <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
+            <%= tinymce %>
        <% elsif question.instance_of? UploadFile %>
             <!--One form had better not in another form-->
             <!--Zhewei: I move the Uploadfile question to the end of questionnaire. So multiple forms will not been overlapped.-->
@@ -91,7 +107,7 @@ jQuery(document).ready(function() {
 
     <p>
       <label for="review_comments">Additional Comments</label><BR/>
-      <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;">
+      <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
         <% if controller.action_name != 'new' and @response.additional_comment != nil %><%= @response.additional_comment.strip if !@response.nil?%>
         <% end %></textarea>
     </p>
@@ -103,7 +119,8 @@ jQuery(document).ready(function() {
 
     <br/>
     <br>
-    <%= submit_tag "Save "+@title, :name => "save" %>
+    <div id="save_confirm"></div>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>

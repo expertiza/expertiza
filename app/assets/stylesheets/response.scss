@@ -1,0 +1,72 @@
+/**
+* stylesheet for changes specific to review form page
+* includes css changes for star rating
+**/
+
+.br-theme-fontawesome-stars .br-widget {
+  height: 28px;
+  white-space: nowrap;
+}
+.br-theme-fontawesome-stars .br-widget a {
+  font: normal normal normal 20px/1 FontAwesome;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  text-decoration: none;
+  margin-right: 2px;
+}
+.br-theme-fontawesome-stars .br-widget a:after {
+  content: '\f005';
+  color: #d2d2d2;
+}
+.br-theme-fontawesome-stars .br-widget a.br-active:after {
+  color:  #986633
+;
+}
+.br-theme-fontawesome-stars .br-widget a.br-selected:after {
+  color:  #986633
+;
+}
+.br-theme-fontawesome-stars .br-widget .br-current-rating {
+  display: none;
+}
+.br-theme-fontawesome-stars .br-readonly a {
+  cursor: default;
+}
+
+@media print {
+  .br-theme-fontawesome-stars .br-widget a:after {
+    content: '\f006';
+    color: black;
+  }
+  .br-theme-fontawesome-stars .br-widget a.br-active:after,
+  .br-theme-fontawesome-stars .br-widget a.br-selected:after {
+    content: '\f005';
+    color: black;
+  }
+}
+
+
+.br-wrapper.br-theme-fontawesome-stars .br-widget{
+  float: left;
+  position: absolute;
+  width: 18%;
+}
+
+.br-theme-fontawesome-stars .br-widget .br-current-rating {
+  display: block;
+  line-height: 1.3;
+  color:  #986633;
+  font-size: 17px;
+  font-weight: 400;
+  top: 0px;
+  float: right;
+}
+
+#save_progress{
+  float: right;
+}
+
+#tick{
+  font-size: 25px;
+  color: forestgreen;
+}

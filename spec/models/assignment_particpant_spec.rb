@@ -266,20 +266,22 @@ describe AssignmentParticipant do
   describe ".import" do
     context 'when record is empty' do
       it 'raises an ArgumentError' do
-        expect { AssignmentParticipant.import([], nil, nil, nil) }.to raise_error(ArgumentError, 'No user id has been specified.')
+        expect { AssignmentParticipant.import({}, nil, nil, nil) }.to raise_error(ArgumentError, 'No user id has been specified.')
       end
     end
 
     context 'when no user is found by offered username' do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
-          row = ['no one', 'no one', 'no_one@email.com']
+          row = {name: 'no one', fullname: 'no one', email: 'no_one@email.com'}
           expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error('The record containing no one does not have enough items.')
         end
       end
 
       context 'when the record has more than 4 items' do
-        let(:row) { ['no one', 'no one', 'name@email.com', 'user_role_name', 'user_parent_name'] }
+        let(:row) do
+          {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
+        end
         let(:attributes) do
           {role_id: 1, name: 'no one', fullname: 'no one', email: '', email_on_submission: 'name@email.com',
            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}

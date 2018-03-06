@@ -192,13 +192,13 @@ describe User do
 
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
-      row = ['abc', 'abc xyz']
-      expect { User.import(row, nil, nil, nil) }.to raise_error(ArgumentError, /Not enough items: expect 3 columns/)
+      row = {"name" => 'abc', "fullname" => 'abc xyz'}
+      expect { User.import(row, nil, nil, nil) }.to raise_error(ArgumentError)
     end
 
     it 'updates an existing user with info from impor file' do
       create(:student, name: 'abc')
-      row = ['abc', 'test, test', 'test@gmail.com']
+      row = {name: 'abc', fullname: 'test, test', email: 'test@gmail.com'}
       allow(user).to receive(:id).and_return(6)
       User.import(row, nil, {user: user}, nil)
       updated_user = User.find_by(name: 'abc')

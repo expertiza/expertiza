@@ -9,11 +9,16 @@
       Author feedback report
     </option>
     <option value='TeammateReviewResponseMap' >
-      Teammate Review report
+      Teammate review report
     </option>
     <% if @assignment.calibrated? %>
       <option value='Calibration' >
         Calibration report
+      </option>
+    <% end %>
+    <% if @assignment.is_selfreview_enabled %>
+      <option value='SelfReview' >
+        Self review report
       </option>
     <% end %>
     <option value='SummaryByCriteria' >

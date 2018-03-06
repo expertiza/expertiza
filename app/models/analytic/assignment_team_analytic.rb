@@ -104,20 +104,4 @@ module AssignmentTeamAnalytic
       list
     end
   end
-
-  #======= unused ============#
-  # #return students in the participants
-  # def student_list
-  #  students = Array.new
-  #  self.participants.each do |participant|
-  #    if participant.user.role_id == Role.student.id
-  #      students << participant
-  #    end
-  #  end
-  #  students
-  # end
-  #
-  # def num_students
-  #  self.students.count
-  # end
 end

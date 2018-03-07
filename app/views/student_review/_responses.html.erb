@@ -53,7 +53,7 @@
                     <% current_round = @assignment.number_of_current_round(topic_id) %>
 
                     <td>
-                       <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
@@ -69,7 +69,8 @@
                         <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                       <% end %>
                     <% end %>
-                <%end%>
+                    <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
+          <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
                 <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                 <td>&nbsp;&nbsp;</td>
@@ -96,7 +97,7 @@
            <%@sorted_responses = @sorted_responses.reverse%>
            <% for i in 1..@sorted_responses.size-1 %>
              <tr>
-               <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].created_at}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
+               <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
              </tr>
            <% end %>
          <% else %>

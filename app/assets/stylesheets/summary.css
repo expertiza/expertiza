@@ -12,3 +12,14 @@
     cursor: pointer;
 }
 
+.fake-link-large {
+    font-size: larger;
+    color: #94672d;
+    cursor: pointer;
+}
+
+.fake-link-large:hover{
+    text-decoration: underline;
+    color: #eb0000;
+    cursor: pointer;
+}

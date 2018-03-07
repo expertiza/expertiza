@@ -14,13 +14,21 @@
               <table class="table_stretch">
         <% @summary[round].keys.each do |q| %>
                 <tr bgcolor='#BDBDBD'>
-                  <td><h5>[avg score: <%=@avg_scores_by_criterion[round][q].round(2).to_s %>%]&nbsp;<%= q %></h5></td>
+                  <t>
+                    <h5>
+                      <%= q %>
+                      </br>Average score: <%=@avg_scores_by_criterion[round][q].round(2).to_s %>
+                    </h5>
+                  </t>
                 </tr>
                 <tr>
                   <td>
                     <%
                       if !@summary[round][q].eql?("")
-                        concat @summary[round][q]
+                        @summary[round][q].each do |sentence|
+                          safe_concat "<p>"
+                          concat sentence
+                        end
                       else
                         safe_concat "&nbsp;"
                       end

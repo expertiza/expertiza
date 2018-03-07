@@ -141,7 +141,7 @@ class ResponseController < ApplicationController
       @round = nil
     end
     is_submitted = (params[:isSubmit] == 'Yes')
-
+    was_submitted = false
     if params[:saved].nil? || params[:saved] == "0" # a flag so the autosave doesn't create different versions. The value's changed by the javascript in response.js
       @response = Response.create(
           map_id: @map.id,
@@ -152,7 +152,8 @@ class ResponseController < ApplicationController
     else
       @response = Response.find_by(map_id: @map.id, round: @round)
       if !@response.nil?
-        @response.update(additional_comment: params[:review][:comments]) # ignore if autoupdate try to save when the response object is not yet created.
+        was_submitted = @response.is_submitted
+        @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
       else
         logger.error("Can't find response with '#{@map.id}' and round '#{@round}' to update, even though params[:saved] = #{params[:saved]}")
       end
@@ -164,8 +165,11 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-    # @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-    # @response.email
+    #only notify if is_submitted changes from false to true
+    if (@map.is_a? ReviewResponseMap) && (was_submitted != @response.is_submitted) && @response.significant_difference?
+      @response.notify_instructor_on_difference
+      @response.email
+    end
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 

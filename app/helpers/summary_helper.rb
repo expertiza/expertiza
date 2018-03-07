@@ -167,10 +167,11 @@ module SummaryHelper
         sum_json = RestClient.post summary_ws_url, param.to_json, content_type: :json, accept: :json
         # store each summary in a hashmap and use the question as the key
         summary = JSON.parse(sum_json)["summary"]
+        ps = PragmaticSegmenter::Segmenter.new(text: summary)
+        return ps.segment
       rescue StandardError => err
-        summary = err.message
+        summary = [err.message]
       end
-      summary
     end
 
     def break_up_comments_to_sentences(question_answers)

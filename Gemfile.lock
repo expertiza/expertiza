@@ -311,6 +311,8 @@ GEM
     parser (2.4.0.2)
       ast (~> 2.3)
     powerpack (0.1.1)
+    pragmatic_segmenter (0.3.17)
+      unicode
     procto (0.0.3)
     protected_attributes (1.1.4)
       activemodel (>= 4.0.1, < 5.0)
@@ -504,6 +506,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
+    unicode (0.4.4.4)
     unicode-display_width (1.3.0)
     unparser (0.2.6)
       abstract_type (~> 0.0.7)
@@ -569,6 +572,7 @@ DEPENDENCIES
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
   paper_trail
+  pragmatic_segmenter
   protected_attributes
   pry
   pry-nav

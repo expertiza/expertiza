@@ -1,12 +1,8 @@
 class TextField < TextResponse
   def complete(count, answer = nil)
-    html = if self.type == 'TextField' and self.break_before == true
-             '<li>'
-           else
-             ''
-           end
-    html += '<label for="responses_' + count.to_s + '">' + self.txt + '</label>'
-    html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden" value="">'
+    html = '<p>'
+    html += '<label for="responses_' + count.to_s + '">' + self.txt + '&nbsp;&nbsp;</label>'
+    html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden" value=""  style="width: 70%;">'
     html += '<input id="responses_' + count.to_s + '_comments" label=' + self.txt + ' name="responses[' + count.to_s + '][comment]" size=' + self.size.to_s + ' type="text"'
     html += 'value="' + answer.comments.to_s unless answer.nil?
     html += '">'

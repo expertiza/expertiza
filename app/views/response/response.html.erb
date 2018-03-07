@@ -22,7 +22,40 @@
         autoRelease: true
       });
     });
-  })
+
+    vis(function () {
+      // reload review when the window is sent to the foreground
+      if (vis()){
+        location.reload();
+      }
+    });
+
+    /// detect user activity, if window is idle and in the foreground, reload
+    var idleTime = 0;
+    //Increment the idle time counter every minute.
+    var idleInterval = setInterval(timerIncrement, 60000); // 1 minute
+
+    //Zero the idle timer on mouse movement.
+    $(this).mousemove(function (e) {
+      idleTime = 0;
+    });
+    $(this).keypress(function (e) {
+      idleTime = 0;
+    });
+
+
+    function timerIncrement() {
+      idleTime = idleTime + 1;
+      if (idleTime > 59 && vis()) { // 20 minutes
+        document.getElementById("autosave_cbx").checked = false;
+        var r = confirm("The window has been idle more than an hour. Auto save has been disabled. Do you want to enable it again?");
+        if (r == true) {
+          document.getElementById("autosave_cbx").checked = true;
+        }
+      }
+    }
+    /// end auto reload
+  });
 </script>
 <script type="text/javascript" src="/assets/response.js" ></script>
 
@@ -81,7 +114,7 @@
 <h2>Directions for the reviewer</h2>
 <input type="checkbox" id="autosave_cbx" checked><label id="autosave_cbx_lbl" for="autosave_cbx">&nbsp;Auto save your respond every 90 seconds?&nbsp;&nbsp;</label><div id="save_progress"></div>
 
-<%= form_tag({:action => @next_action}, :html => {:autocomplete => "off"}, :id => @modified_object, :class => "review_form") do %>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", 0 %>
     <% if @next_action.eql?'update' %>

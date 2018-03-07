@@ -2,31 +2,29 @@
 %script{:src => "/assets/summary.js", :type => "text/javascript"}
 .reviewreport
   %br/
-  %table{:border => "1", :bordercolor => "grey", :style => "table_stretch"}
+  %table{:border => "1", :bordercolor => "grey", :style => "table_stretch", :cellpadding => "15"}
     - row_round_index = 0
     - @reviewers.keys.each do |team|
-      %tr{:bgcolor => "#BDBDBD"}
-        %th.header_class{"data-target" => "#team_#{row_round_index.to_s}", "data-toggle" => "collapse"}
+      %tr{:bgcolor => "#f5f5f5"}
+        %th.fake-link-large{"data-target" => "#team_#{row_round_index.to_s}", "data-toggle" => "collapse"}
           %h5
-            %img#icon_header_team.arrow_icon{:src => "/assets/arrow_down.png"}>/
-            [avg score: #{@avg_scores_by_reviewee[team].to_s}%] #{team}
-      %tr{:bgcolor => "#E6E6E6"}
+            #{team} | Average score: #{@avg_scores_by_reviewee[team].to_s}%
+      %tr{:bgcolor => "#f2f2f2"}
         %td
           Reviewers : #{@reviewers[team].join(", ")}
       / print the team name and put the reviews in a div so it can be collapsed smoothly
       %tr
         %td
-          .collapse{:id => "team_#{row_round_index.to_s}"}
-            %table.table_stretch{:border => "1"}
+          .in.collapse{:id => "team_#{row_round_index.to_s}"}
+            %table.table_stretch{:border => "1", :cellpadding => "15"}
               - for i in 0..@assignment.rounds_of_reviews-1
               - #var to name the div
               - team_assg_index = row_round_index.to_s + i.to_s
                 / print the round header
                 %tr
-                  %td.header_class{"data-target" => "#round_#{team_assg_index}", "data-toggle" => "collapse"}
+                  %td.fake-link-large{"data-target" => "#round_#{team_assg_index}", "data-toggle" => "collapse"}
                     %h5
-                      %img.arrow_icon{:src => "/assets/arrow_down.png"}>/
-                      [score avg : #{@avg_scores_by_round[team][i].to_s}%]Round #{(i+1).to_s}
+                      Round #{(i+1).to_s} | Average score: #{@avg_scores_by_round[team][i].to_s}%
                 %tr
                   %td
                     / print the summary per round in a new div so it can be collapsed smoothly
@@ -34,15 +32,18 @@
                       %table.table_stretch
                         - @summary[team][i].keys.each do | q |
                           / print the avg scores of each question
-                          %tr{:bgcolor => "#BDBDBD"}
+                          %tr{:bgcolor => "#f5f5f5"}
                             %td
                               %i
-                                [score avg : #{@avg_scores_by_criterion[team][i][q].to_s}%]   #{q}
+                                %p #{q} 
+                                %p Average score: #{@avg_scores_by_criterion[team][i][q].to_s}%
                           %tr
                             %td
                               - #print the summary of reviews
                               - if !@summary[team][i][q].eql?("")
-                                - concat @summary[team][i][q]
+                                - @summary[team][i][q].each do |sentence|
+                                  - safe_concat "<p>"
+                                  - concat sentence
                               - else
                                 - safe_concat "&nbsp;"
               - row_round_index += 1

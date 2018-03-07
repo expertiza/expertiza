@@ -12,7 +12,7 @@ class TextArea < TextResponse
     html += '<p><textarea cols="' + cols + '" rows="' + rows + '" id="responses_' + count.to_s + '_comments" name="responses[' + count.to_s + '][comment]" class="tinymce">'
     html += answer.comments unless answer.nil?
     html += '</textarea>'
-    html += '</p></li>'
+    html += '</p>'
     html.html_safe
   end
 

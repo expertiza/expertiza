@@ -27,10 +27,13 @@ var interval = 60000
 var last_save = new Date()
 var autoSavePost = function() {
     //if it's was in the background, don't auto save to reduce bandwidth
-    if(vis() && document.getElementById("autosave_cbx").checked) {
-        executeSave();
+    var autosave_cbx = document.getElementById("autosave_cbx");
+    if(autosave_cbx){
+        if(vis() && document.getElementById("autosave_cbx").checked) {
+            executeSave();
+        }
+        setTimeout(autoSavePost, interval);
     }
-    setTimeout(autoSavePost, interval);
 };
 
 function executeSave(){

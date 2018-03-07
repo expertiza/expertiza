@@ -60,3 +60,7 @@ When editing existing files:
 
 Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
 Applying style guidelines to code you add and modify is good enough. :-)
+
+####################
+Begin adding Issues 971, 926, 718
+####################

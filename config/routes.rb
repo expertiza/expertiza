@@ -126,18 +126,12 @@ Expertiza::Application.routes.draw do
   resources :import_file, only: [] do
     collection do
       get :start
+      get :show
       get :import
+      post :show
       post :import
-
-      # MAY BE ABLE TO PUT ROUTE HERE
-
     end
   end
-
-
-  get '/import_file/import', controller: :import_file, action: :import
-  get '/import_file/show', controller: :import_file, action: :show
-  post '/import_file/show', controller: :import_file, action: :show
 
 resources :institution, except: [:destroy] do
     collection do

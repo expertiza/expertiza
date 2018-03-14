@@ -51,6 +51,7 @@ All new files/contributions should:
  * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
  * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
  * Follow the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide) style for syntax, formatting, and naming
+ * Follow the [design guidelines](http://rajanalwan.com/ui_guidelines/) for the views.
 
 When editing existing files:
 

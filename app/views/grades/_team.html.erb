@@ -8,7 +8,11 @@
     <% if @assignment.max_team_size == 1 %>
       <%= tscore[:team].users.first.name(session[:ip]) + ' (' + tscore[:team].users.first.fullname(session[:ip]) + ')' rescue '' %>
     <% else %>
-      <%= tscore[:team].name %>
+      <%= tscore[:team].name %> |
+      <% for index in 0 .. tscore[:team].users.length - 2 %> 
+        <%= tscore[:team].users[index].name(session[:ip]) %>, 
+      <% end %>
+      <%= tscore[:team].users[tscore[:team].users.length - 1].name(session[:ip]) %>
     <% end %>
   <% end %>
      <% if tscore[:scores][:avg] %>

@@ -13,7 +13,7 @@
         <% @count = 0 %>
         <% @rspan = 0 %>
         <%@l = @l+1 %>
-        <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#DDDDBB" %>
+        <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
 
         <% @teammate_review_response_maps.each do |rm| %>
         <!--count means the teammate reviews one student completed.-->
@@ -55,7 +55,7 @@
                   <%= @teammate_review_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                 </td></tr><tr>
             <% else %>
-              <!--Teammate reviewed-->
+              <!-- Teammate reviewed-->
               <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
                 <% if @team_member_count == 1 %>
                   <%= 'N/A' %>

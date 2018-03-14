@@ -455,15 +455,14 @@ table.general td {
 .notification a {
   color:#0066CC
 }
-.topictable {
-  float: left; margin-left: 0; font-size: 11px;
-}
+// .topictable {
+//   float: left; margin-left: 0; font-size: 11px;
+// }
 .taskbox {
   padding: 5px;
   margin-bottom: 39px;
   border: 1px dashed #999999;
   float: left;
-  width: 100%;
   font-size: 12px;
   background: none repeat scroll 0pt 0pt #fafaea;
 }
@@ -734,4 +733,9 @@ table.general td {
   .nav-dots {
     bottom: 18px;
   }
+}
+
+.overflow-container{
+  overflow-y: scroll;
+  max-width: 93vw;
 }

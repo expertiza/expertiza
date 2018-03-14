@@ -1,14 +1,18 @@
 .arrow_icon{
-    width: 20px;
-    height: 20px;
-}
-.table_stretch{
-    width: 100%;
+    padding-right: 20px;
 }
 
 .fake-link {
     font-size: smaller;
     color: #94672d;
     cursor: pointer;
+}
+
+.data_column {
+	padding: 0 !important;
+}
+
+.question {
+
 }
 

@@ -8,7 +8,7 @@
       <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
       <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
       <% @team_id = TeamsUser.team_id(@id.to_i, @user.id) %>
-      <% @team_member_count = TeamsUser.where(team_id: @team_id).count %>
+      <% @team_member_count = TeammateReviewResponseMap.where(reviewer_id: r.reviewer_id, reviewed_object_id: @id).count %>
       <tr>
         <% @count = 0 %>
         <% @rspan = 0 %>
@@ -22,7 +22,7 @@
           <% end %>
         <%end %>
         <!--rspan means the all teammate reviews one student should finish, here is the num of team members minus 1.-->
-        <% @team_member_count > 1 ? @rspan = @team_member_count - 1 : @rspan = 1 %>      
+        <% @team_member_count > 1 ? @rspan = @team_member_count : @rspan = 1 %>      
 
         <%if Participant.exists?(id: r.reviewer_id) %>
           <% @reviewer_name = @user.fullname(session[:ip]) %>

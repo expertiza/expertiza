@@ -110,3 +110,11 @@ Headings/ Main title of page should be given in ```<h2>Title</h2>``` tag
 	- Other titles/ text - #333; (it will be applied automatically)
 	- Text on red buttons - #fff;
 
+## Forms :
+
+All form elements must have the class ```form-control```
+
+If it is a online form (an input with a submit button), the form must be given a class ```form-inline```. And appropriate width must be added to that element to make it uniform with the page.
+
+
+## Dropdowns and Toggling dropdowns :

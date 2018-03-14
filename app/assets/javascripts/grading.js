@@ -69,7 +69,8 @@
   	  else {
   	    obj.style.display = '';
   	  	atag.innerHTML = '<img src="/assets/collapse.png">';
-            header.style.backgroundColor = 'lightcoral';
+            header.style.backgroundColor = '#a90201';
+            header.style.color = "#ffffff";
   	  }  	    
   	  sublistsize += 1;  
   	  var obj = document.getElementById(elementId+"_"+sublistsize);	    

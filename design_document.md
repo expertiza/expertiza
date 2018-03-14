@@ -76,7 +76,7 @@ The class to be used in a table tag is ```table table-striped```.
 **Element Name**
 **Image**
 **Guide**	
-|---|---|---|---|---|
+|---|---|---|---|
 |  1 |  Success | *to be added*  | For notification, add class as ```flash_note alert alert-success``` |
 |  2 |  Error | *to be added*  | For notification, add class as ```flash_note alert alert-danger``` |
 |  3 |  Info | *to be added*  | For notification, add class as ```flash_note alert alert-info``` |

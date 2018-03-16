@@ -36,6 +36,13 @@ class ResponseController < ApplicationController
     end
   end
 
+  # GET /response/json?response_id=xx
+  def json
+    response_id = params[:response_id] if params.key?(:response_id)
+    response = Response.find(response_id)
+    render :json => response
+  end
+
   def delete
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
@@ -67,12 +74,13 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
+    @questionnaire = set_questionnaire
     render action: 'response'
   end
 
   # Update the response and answers when student "edit" existing response
   def update
-    return unless action_allowed?
+    render :nothing => true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
@@ -104,6 +112,12 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
+    @response = Response.create(
+        map_id: @map.id,
+        additional_comment: '',
+        round: @current_round,
+        is_submitted: 0
+    )
     render action: 'response'
   end
 
@@ -142,22 +156,17 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     was_submitted = false
-    if params[:saved].nil? || params[:saved] == "0" # a flag so the autosave doesn't create different versions. The value's changed by the javascript in response.js
+    @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    if @response.nil?
       @response = Response.create(
           map_id: @map.id,
           additional_comment: params[:review][:comments],
-          round: @round,
+          round: @round.to_i,
           is_submitted: is_submitted
       )
-    else
-      @response = Response.find_by(map_id: @map.id, round: @round)
-      if !@response.nil?
-        was_submitted = @response.is_submitted
-        @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
-      else
-        logger.error("Can't find response with '#{@map.id}' and round '#{@round}' to update, even though params[:saved] = #{params[:saved]}")
-      end
     end
+    was_submitted = @response.is_submitted
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
 
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -166,7 +175,7 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     error_msg = ""
     #only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (was_submitted != @response.is_submitted) && @response.significant_difference?
+    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
     end

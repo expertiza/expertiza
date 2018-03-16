@@ -66,7 +66,35 @@
 (<%= time_ago_in_words(duedate) %> left) </span><br/>
 <% end %>
 <br/>
+  </div>
 
+  <div class="taskbox">
+    <strong>Past Assignments<br></strong><br>
+    <div class="topictable">
+      <table class="table" cellpadding="2">
+        <tr>
+          <th>&nbsp;</th>
+          <th>Assignment</th>
+          <th>Deadline</th>
+        </tr>
+        <% @past_student_tasks.each do |student_task| %>
+            <% participant = student_task.participant %>
+            <% if student_task.assignment %>
+                <tr class="listingRow">
+                  <td>&nbsp;</td>
+                  <!--assignment-->
+                  <td><b><%= link_to breaking_wrap_wrap(student_task.assignment.name, 15), :action => 'view', :id => participant %></b></td>
+                  <!--stage deadline-->
+                  <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref).strftime("%d/%m/%Y") %></td>
+                </tr>
+            <% end %>
+        <% end %>
+      </table>
+      <%= will_paginate @past_student_tasks, inner_window: 1, outer_window: 1, param_name: 'past_assignment_page' %>
+    </div>
+  </div>
+
+  <div class = "taskbox">
 <strong>Students who have teamed with you<br></strong><br>
 
 <% @students_teamed_with.keys.each do |course_id| %>
@@ -87,7 +115,7 @@
 </div>
 </div>
 
-<div class="topictable">
+<div class="topictable" align = "center" style="width: 1124px">
   <table class="table" cellpadding="2">
     <tr class="taskheader">
       <th>&nbsp;</th>
@@ -103,7 +131,7 @@
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
-        <tr class="listingRow">
+        <tr class="listingRow" bgcolor= <% due_date_color(student_task.stage_deadline)%> >
           <td>&nbsp;</td>
           <!--assignment-->
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
@@ -136,4 +164,5 @@
       <% end %>
     <% end %>
   </table>
+  <%= will_paginate @student_tasks, inner_window: 1, outer_window: 1, param_name: 'student_task_page' %>
 </div>

@@ -34,4 +34,27 @@ module StudentTaskHelper
     end
     info.html_safe
   end
+
+  def breaking_wrap_wrap(txt, col = 80)
+    txt.gsub(/(.{1,#{col}})( +|$\n?)|(.{1,#{col}})/,
+             "\\1\\3\n")
+  end
+
+  def due_date_color(due_date)
+    dif = (DateTime.now - due_date.to_date).to_i
+    if(dif < -14 )
+      return "white"
+    elsif (dif < -10)
+      return "green"
+    elsif (dif < -7)
+      return "yellow"
+    elsif (dif < -4)
+      return "orange"
+    elsif (dif < -2)
+      return "red"
+    else
+      return "white"
+    end
+
+  end
 end

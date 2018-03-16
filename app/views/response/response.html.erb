@@ -115,7 +115,6 @@
         for (index = 0, len = data.length; index < len; ++index) {
           switch(data[index].qtype){
             case "Criterion":
-              console.log("update Criterion");
               if(data[index].answer != null) {
                 $('#responses_' + index + '_score').val(data[index].answer);
             <% if @dropdown_or_scale == "dropdown" %>
@@ -133,30 +132,29 @@
                 tinymce.get('responses_' + index + '_comments').setContent(data[index].comments);
               break;
             case "TextArea" :
-              console.log("update TextArea " + index);
               if(data[index].comments != null)
                 tinymce.get('responses_' + index + '_comments').setContent(data[index].comments);
               break;
             case "TextField":
-              console.log("update TextField");
               if(data[index].comments != null)
                 $('#responses_' + index + '_comments').val(data[index].comments);
               break;
             case "Checkbox" :
-              console.log("update Checkbox");
               if(data[index].answer != null)
                 $('#responses_' + index + '_score').prop( "checked", data[index].score == 1).change();
               break;
             case "Dropdown" :
-              console.log("update Dropdown");
               if(data[index].comments != null) {
                 $('#responses_' + index + '_comments').val(data[index].comments);
               }
               break;
             case "Scale":
-              console.log("update Scale");
-              if(data[index].answer != null)
-                $('#' + data[index].answer).prop("checked", true).change();
+              $("input[name='Radio_" + data[index].question_id +"']").each(function(){
+                if(data[index].answer == $(this).val())
+                  $(this).prop("checked", "true");
+                else
+                  $(this).removeProp("checked");
+              });
               break;
             default:
           }
@@ -179,7 +177,7 @@
         }, 1000);
       }else if (!vis() && $("#autosave_cbx").prop("checked")){
         executeSave();
-        console.log("Saving before going to background at " + new Date().toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
+        //console.log("Saving before going to background at " + new Date().toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
       }
     });
     //overlay to block user entering new info before the form is updated with data from the server

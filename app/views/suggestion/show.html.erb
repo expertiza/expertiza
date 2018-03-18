@@ -68,22 +68,28 @@
     </tr>
 
     <% for suggestion_comment in @suggestion.suggestion_comments %>
-      <tr class="listingRow">
-        <td align="center"><%=suggestion_comment.commenter %></td>
-        <td align="center">
-          <%if suggestion_comment.vote == 'Y' %>
-            Yes
-          <%elsif suggestion_comment.vote == 'N'%>
-            No
-          <%elsif suggestion_comment.vote == 'R'%>
-            Revise
-          <%else%>
-            --
-          <%end%>
-        </td>
-        <td><%= suggestion_comment.comments %></td>
-      </tr>
-    <% end %>
+        <td class="listingRow">
+          <td align="center"><%=suggestion_comment.commenter %></td>
+          <td align="center">
+            <%if suggestion_comment.vote == 'Y' %>
+                Yes
+            <%elsif suggestion_comment.vote == 'N'%>
+                No
+            <%elsif suggestion_comment.vote == 'R'%>
+                Revise
+                <!-- Two more crieteria for displaying comments. During Approval and Denial. Issue #1781 -->
+            <%elsif suggestion_comment.vote == 'A'%>
+                Approved
+            <%elsif suggestion_comment.vote == 'D'%>
+                Denied
+            <%else%>
+                --
+            <%end%>
+          </td>
+          </td><%= suggestion_comment.comments%></td>
+        </tr>
+        </td><%= link_to "Edit",:action => 'edit', :id => @suggestion.assignment_id%></tr>
+        <%end%>
   </table>
 <%end%>
 <br>
@@ -98,9 +104,14 @@
     </p>
 
     <%= submit_tag "Submit vote", :name => 'add_comment' %>
+        <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+            <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+            <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+        <% end %>
   <% end %>
 
 <% end %>
+
 <p>
   <%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
 </p>

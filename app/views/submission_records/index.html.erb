@@ -14,19 +14,22 @@
   <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
   <tbody>
   <% @submission_records.each do |record| %>
-      <tr>
-        <td><%= record.team_id %></td>
-        <td><%= record.operation %></td>
-        <td><%= record.user %></td>
+    <tr>
+      <td><%= record.team_id %></td>
+      <td><%= record.operation %></td>
+      <td><%= record.user %></td>
 
-        <% if record.operation == "Submit Hyperlink" %>
-        <td><a href="<%= record.content %>" target="_blank"><%= record.content %></a><br/></td>
+      <% if record.operation == "Submit Hyperlink" %>
+      <td><a href="<%= record.content %>" target="_blank"><%= record.content %></a><br/></td>
 
-        <% else %>
-            <td><%= record.content %></td>
-         <% end %>
-        <td><%= record.created_at %></td>
-      </tr>
+      <% else %>
+          <td><%= record.content %></td>
+       <% end %>
+      <td><%= record.created_at %></td>
+      <% if github_pull_request?(record) %>
+        <td><%= link_to "Show Github Data", github_datum_path(record) %></td>
+      <% end %>
+    </tr>
   <% end %>
   </tbody>
 </table>

@@ -1,0 +1,27 @@
+<h1 class="center">Github Data</h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Message</th>
+    <th>Committer</th>
+    <th>Committed Time</th>
+    <th>Additions</th>
+    <th>Deletions</th>
+    <th>Files Changed</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
+  <% @commits.each do |commit| %>
+    <tr>
+      <td><%= commit.message %></td>
+      <td align="center"><%= commit.committer.name %></td>
+      <td align="center"><%= DateTime.parse(commit.committed_date) %></td>
+      <td align="center"><%= commit.additions %></td>
+      <td align="center"><%= commit.deletions %></td>
+      <td align="center"><%= commit.changed_files %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

@@ -26,6 +26,8 @@ gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
 gem "googlecharts", require: "gchart"
+gem "graphql"
+gem "graphql-client"
 gem 'haml-rails'
 gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'

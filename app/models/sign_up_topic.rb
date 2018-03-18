@@ -7,6 +7,11 @@ class SignUpTopic < ActiveRecord::Base
 
   require 'json'
 
+  attr_accessor :slots_filled_value
+  attr_accessor :slots_waitlisted
+  attr_accessor :slots_available
+  attr_accessor :participants
+
   has_paper_trail
 
   # the below relations have been added to make it consistent with the database schema

@@ -318,6 +318,7 @@ resources :institution, except: [:destroy] do
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :retrieve_topics
+      get ':id/load_add_signup_topics', action: :load_add_signup_topics
       get :delete_signup
       get :list
       get :signup_topics

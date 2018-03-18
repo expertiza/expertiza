@@ -1,0 +1,62 @@
+.jsgrid-grid-body {
+
+  overflow-x: scroll;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+}
+
+.jsgrid-table {
+  width: 150%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow-wrap: normal;
+  word-wrap: normal;
+  font-size: 10px;
+
+
+}
+
+
+.jsgrid-header-row{
+  font-size: 10px;
+  overflow-y: auto;
+
+}
+
+.jsgrid-grid-header {
+  overflow-y: auto;
+}
+
+.jsgrid-cell {
+  overflow-wrap: normal;
+  word-wrap: normal;
+
+  -ms-word-break: normal;
+  word-break: normal;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+.jsgrid-table {
+  border-collapse: separate;
+}
+
+.jsgrid-grid-body td, .jsgrid-grid-header td, .jsgrid-grid-header th {
+  border-left: 0;
+  border-top: 0;
+}
+
+.jsgrid-delete-button-custom{
+  background-image:url(/app/assets/images/delete_icon.png)  !important;
+}
+
+
+.jsgrid-edit-button-custom{
+  background-image:url(/app/assets/images/edit_icon.png) !important;
+}

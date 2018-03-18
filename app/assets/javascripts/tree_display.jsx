@@ -1171,41 +1171,16 @@ jQuery(document).ready(function() {
         })
       })
       jQuery.get("/tree_display/folder_node_ng_getter", function(data) {
-        jQuery.post("/tree_display/children_node_ng",
-          {
-            reactParams: {
-              child_nodes: data,
-              nodeType: 'FolderNode'
-            }
-          }, function(data2, status) {
-            jQuery.each(data2, function(nodeType, outerNode) {
-              jQuery.each(outerNode, function(i, node) {
-                var newParams = {
-                  key: node.name + "|" + node.directory,
-                  nodeType: nodeType,
-                  child_nodes: node.nodeinfo
-                }
-                if (nodeType === 'Assignments') {
-                  node["children"] = null;
-                  node[newParams]=newParams;
-                } else if (nodeType === 'Courses') {
-                  newParams["nodeType"] = 'CourseNode'
-                  node["newParams"]=newParams;
-                } else if (nodeType === 'Questionnaires') {
-                  newParams["nodeType"] = 'FolderNode'
-                  node["newParams"]=newParams;
-                }
-              }) 
-            })
-            if (data2) {
-              _this.setState({
-                tableContent: data2
-              })
-            }
-          },
-          'json')
+        console.log(JSON.parse(data));
+        var data1 = JSON.parse(data);
+        var order = [0, 2];
+
+        fetchAndUpdate(data1, 1, _this, function () {
+          jQuery.each(order, function (index, value) {
+            fetchAndUpdate(data1, value, _this);
+          });
+        });
       })
-      
     },
     handleTabChange: function(tabIndex) {
       jQuery.get("/tree_display/set_session_last_open_tab?tab="+tabIndex.toString())
@@ -1213,23 +1188,67 @@ jQuery(document).ready(function() {
     render: function() {
       return (
         <ReactSimpleTabs
-         className="tab-system"
-         tabActive={parseInt(this.state.activeTab)}
-         onAfterChange={this.handleTabChange}
-         >
-          <ReactSimpleTabs.Panel title="Courses">
-            <FilterableTable key="table1" dataType='course' data={this.state.tableContent.Courses}/>
-          </ReactSimpleTabs.Panel>
-          <ReactSimpleTabs.Panel title="Assignments">
-            <FilterableTable key="table2" dataType='assignment' data={this.state.tableContent.Assignments}/>
-          </ReactSimpleTabs.Panel>
-          <ReactSimpleTabs.Panel title="Questionnaires">
-            <FilterableTable key="table2" dataType='questionnaire' data={this.state.tableContent.Questionnaires}/>
-          </ReactSimpleTabs.Panel>
+          className="tab-system"
+          tabActive={parseInt(this.state.activeTab)}
+          onAfterChange={this.handleTabChange}>
+            <ReactSimpleTabs.Panel title="Courses">
+              <FilterableTable key="table1" dataType='course' data={this.state.tableContent.Courses}/>
+            </ReactSimpleTabs.Panel>
+            <ReactSimpleTabs.Panel title="Assignments">
+              <FilterableTable key="table2" dataType='assignment' data={this.state.tableContent.Assignments}/>
+            </ReactSimpleTabs.Panel>
+            <ReactSimpleTabs.Panel title="Questionnaires">
+              <FilterableTable key="table2" dataType='questionnaire' data={this.state.tableContent.Questionnaires}/>
+            </ReactSimpleTabs.Panel>
         </ReactSimpleTabs>
       )
     }
-  })
+  });
+
+  function fetchAndUpdate(data1, value, reactComp, callback) {
+        jQuery.post("/tree_display/children_node_ng",
+            {
+                reactParams: {
+                    child_nodes: JSON.stringify([data1[value]]),
+                    nodeType: 'FolderNode'
+                }
+            }, function(data2, status) {
+                var type;
+                jQuery.each(data2, function(nodeType, outerNode) {
+                    jQuery.each(outerNode, function(i, node) {
+                        var newParams = {
+                            key: node.name + "|" + node.directory,
+                            nodeType: nodeType,
+                            child_nodes: node.nodeinfo
+                        }
+                        if (nodeType === 'Assignments') {
+                            type = 'Assignments';
+                            node["children"] = null;
+                            node[newParams]=newParams;
+                        } else if (nodeType === 'Courses') {
+                            type = 'Courses';
+                            newParams["nodeType"] = 'CourseNode'
+                            node["newParams"]=newParams;
+                        } else if (nodeType === 'Questionnaires') {
+                            type = 'Questionnaires';
+                            newParams["nodeType"] = 'FolderNode'
+                            node["newParams"]=newParams;
+                        }
+                    })
+                })
+                if (data2) {
+                    dataState = reactComp.state;
+                    console.log(dataState);
+                    dataState.tableContent[type] = data2[type];
+                    reactComp.setState({
+                        tableContent : dataState.tableContent
+                    });
+                }
+                if (callback)
+                    callback();
+            },
+            'json')
+  }
 
   if (document.getElementById("tree_display")) {
     React.render(

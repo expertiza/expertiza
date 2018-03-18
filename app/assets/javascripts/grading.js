@@ -52,26 +52,36 @@
   	    sublistsize += 1;  	    
   	  }
   	}
-  } 
-  
+  }
+
   function toggleTeam(elementId){
-	var sublistsize = 1;
-	var obj = document.getElementById(elementId+"_"+sublistsize);	
-	var atag = document.getElementById(elementId+'Link');	
-        var header = document.getElementById(elementId+'_header');
-	
-  	while (obj != null){ 
-  	  var bExpand = obj.style.display.length == 0;	  	   	  
-  	  if (bExpand) {
-            collapseObj(obj, atag);   	         	  	       
-            header.style.backgroundColor = 'white';
-  	  }
-  	  else {
-  	    obj.style.display = '';
-  	  	atag.innerHTML = '<img src="/assets/collapse.png">';
-            header.style.backgroundColor = 'lightcoral';
-  	  }  	    
-  	  sublistsize += 1;  
-  	  var obj = document.getElementById(elementId+"_"+sublistsize);	    
-  	}  	  
-  }  
+      var sublistsize = 1;
+      var obj = document.getElementById(elementId+"_"+sublistsize);
+      var atag = document.getElementById(elementId+'Link');
+      var header = document.getElementById(elementId+'_header');
+
+      if (obj != null) {
+          var bExpand = obj.style.display.length == 0;
+          if (bExpand) {
+              collapseObj(obj, atag);
+              header.style.backgroundColor = 'white';
+          }
+          else {
+              obj.style.display = '';
+              atag.innerHTML = '<img src="/assets/collapse.png">';
+              header.style.backgroundColor = 'lightcoral';
+          }
+      } else {
+          var id = elementId.substring(4);
+          $.get("/grades/tabbing?i="+id, function(data, status){
+              var element = data;
+              $(element).insertAfter("#team"+id+"_header");
+              var obj = document.getElementById(elementId+"_1");
+              var atag = document.getElementById(elementId+'Link');
+              var header = document.getElementById(elementId+'_header');
+              obj.style.display = '';
+              atag.innerHTML = '<img src="/assets/collapse.png">';
+              header.style.backgroundColor = 'lightcoral';
+          });
+      }
+  }

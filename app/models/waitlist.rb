@@ -5,6 +5,7 @@ class Waitlist < ActiveRecord::Base
       for waitlisted_topic in waitlisted_topics
         entry = SignedUpTeam.find(waitlisted_topic.id)
         entry.destroy
+        ExpertizaLogger.info LogMessage.new('Waitlist', '', "Waitlisted topic deleted with id: #{waitlisted_topic.id}")
       end
     end
   end

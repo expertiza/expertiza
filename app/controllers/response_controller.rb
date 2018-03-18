@@ -91,6 +91,7 @@ class ResponseController < ApplicationController
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
+    ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "Your response was successfully #{@response.is_submitted ? 'submitted':'saved'}", request)
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
   end
 
@@ -152,6 +153,7 @@ class ResponseController < ApplicationController
     error_msg = ""
     @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     @response.email
+    ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "Your response was successfully #{@response.is_submitted ? 'submitted':'saved'}", request)
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 

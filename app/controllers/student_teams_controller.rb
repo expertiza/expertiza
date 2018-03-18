@@ -62,6 +62,7 @@ class StudentTeamsController < ApplicationController
     if existing_assignments.empty?
       if params[:team][:name].blank?
         flash[:notice] = 'The team name is empty.'
+        ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
         redirect_to view_student_teams_path student_id: student.id
         return
       end
@@ -76,6 +77,7 @@ class StudentTeamsController < ApplicationController
 
     else
       flash[:notice] = 'That team name is already in use.'
+      ExpertizaLogger.error LogMessage.new(controller_name, session[:user].name, 'Team name being created was already in use', request)
       redirect_to view_student_teams_path student_id: student.id
     end
   end
@@ -98,7 +100,7 @@ class StudentTeamsController < ApplicationController
 
     else
       flash[:notice] = 'That team name is already in use.'
-
+      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)
       redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
 
     end
@@ -120,6 +122,7 @@ class StudentTeamsController < ApplicationController
     if team_user
       team_user.destroy_all
       undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
+      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
     end
 
     # if your old team does not have any members, delete the entry for the team
@@ -164,6 +167,7 @@ class StudentTeamsController < ApplicationController
     else
       undo_link "The team \"#{team.name}\" has been successfully updated."
     end
+    ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
   end
 
   def review

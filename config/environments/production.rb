@@ -86,7 +86,21 @@ Expertiza::Application.configure do
   # config.autoflush_log = false
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
+  config.log_tags = [ :remote_ip, :uuid ]
+
+  config.log_formatter = proc do |_severity, _timestamp, _progname, msg|
+    if msg.is_a?(LogMessage)
+      "TST=[#{_timestamp}] SVT=[#{_severity}] PNM=[#{_progname}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}] UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]\n"
+    else
+      "TST=[#{_timestamp}] SVT=[#{_severity}] PNM=[#{_progname}] OIP=[] RID=[] CTR=[] UID=[] MSG=[#{filter(msg)}]\n"
+    end
+  end
+
+  def filter(msg)
+    msg.gsub("\n",'  ')
+  end
+
+  config.action_view.logger = nil
 
   config.react.variant = :production
 end

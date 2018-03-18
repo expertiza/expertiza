@@ -157,12 +157,15 @@ class UsersController < ApplicationController
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
         prepared_mail.deliver
       end
+      ExpertizaLogger.info LogMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
       flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
       redirect_to '/instructions/home'
       return
     elsif user_existed
+      ExpertizaLogger.error LogMessage.new(controller_name, requested_user.name, 'The account you are requesting has already existed in Expertiza.', request)
       flash[:error] = "The account you are requesting has already existed in Expertiza."
     else
+      ExpertizaLogger.error LogMessage.new(controller_name, "", requested_user.errors.full_messages.to_sentence, request)
       flash[:error] = requested_user.errors.full_messages.to_sentence
     end
     redirect_to controller: 'users', action: 'request_new', role: 'Student'

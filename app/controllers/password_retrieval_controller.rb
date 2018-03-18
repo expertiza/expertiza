@@ -18,9 +18,11 @@ class PasswordRetrievalController < ApplicationController
         PasswordReset.save_token(user, token)
         url = self.request.base_url + url_format + token
         MailerHelper.send_mail_to_user(user, "Expertiza password reset", "send_password", url).deliver_now
+        ExpertizaLogger.info LogMessage.new(controller_name, user.name, 'A link to reset your password has been sent to users e-mail address.', request)
         flash[:success] = "A link to reset your password has been sent to your e-mail address."
         redirect_to "/"
       else
+        ExpertizaLogger.error LogMessage.new(controller_name, params[:user][:email], 'No user is registered with provided email id!', request)
         flash[:error] = "No account is associated with the e-mail address: \"" + params[:user][:email] + "\". Please try again."
         render template: "password_retrieval/forgotten"
       end
@@ -43,10 +45,12 @@ class PasswordRetrievalController < ApplicationController
           @email = password_reset.user_email
           render template: "password_retrieval/reset_password"
         else
+          ExpertizaLogger.error LogMessage.new(controller_name, '', 'User tried to access expired link!', request)
           flash[:error] = "Link expired . Please request to reset password again"
           render template: "password_retrieval/forgotten"
         end
       else
+        ExpertizaLogger.error LogMessage.new(controller_name, '', 'User tried to access either expired link or wrong token!', request)
         flash[:error] = "Link either expired or wrong Token. Please request to reset password again"
         render template: "password_retrieval/forgotten"
       end
@@ -67,13 +71,16 @@ class PasswordRetrievalController < ApplicationController
       user.password_confirmation = params[:reset][:repassword]
       if user.save
         PasswordReset.delete_all(user_email: user.email)
+        ExpertizaLogger.info LogMessage.new(controller_name, user.name, 'Password was reset for the user', request)
         flash[:success] = "Password was successfully reset"
         redirect_to "/"
       else
+        ExpertizaLogger.error LogMessage.new(controller_name, user.name, 'Password reset operation failed for the user while saving record', request)
         flash[:error] = "Password cannot be updated. Please try again"
         redirect_to "/"
       end
     else
+      ExpertizaLogger.error LogMessage.new(controller_name, "", 'Password provided by the user did not match', request)
       flash[:error] = "Password and confirm-password do not match. Try again"
       @email = params[:reset][:email]
       render template: "password_retrieval/reset_password"

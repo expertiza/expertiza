@@ -14,6 +14,7 @@ class InvitationsController < ApplicationController
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       create_utility
     else
+      ExpertizaLogger.error LogMessage.new(controller_name, @student.name,  "Student #{@user.id} was already invited", request)
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end
 
@@ -42,8 +43,10 @@ class InvitationsController < ApplicationController
     # Accept the invite and check whether the add was successful
     unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
       flash[:error] = 'The system failed to add you to the team that invited you.'
+      ExpertizaLogger.info LogMessage.new(controller_name, @student.name,  "Invitation #{params[:inv_id]} sent by #{@inv.from_id} could not be accepted", request)
     end
 
+    ExpertizaLogger.info LogMessage.new(controller_name, @student.name,  "Accepted invitation #{params[:inv_id]} sent by #{@inv.from_id}", request)
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -53,11 +56,13 @@ class InvitationsController < ApplicationController
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])
+    ExpertizaLogger.info LogMessage.new(controller_name, student.name,  "Declined invitation #{params[:inv_id]} sent by #{@inv.from_id}", request)
     redirect_to view_student_teams_path student_id: student.id
   end
 
   def cancel
     Invitation.find(params[:inv_id]).destroy
+    ExpertizaLogger.info LogMessage.new(controller_name, params[:student_id],  "Successfully retracted invitation #{params[:inv_id]}", request)
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -68,6 +73,7 @@ class InvitationsController < ApplicationController
     @invitation.assignment_id = @student.parent_id
     @invitation.reply_status = 'W'
     @invitation.save
+    ExpertizaLogger.info LogMessage.new(controller_name, @student.name,  "Successfully invited student #{@user.id}", request)
   end
 
   def check_user_before_invitation

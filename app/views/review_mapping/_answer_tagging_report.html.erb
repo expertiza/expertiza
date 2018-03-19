@@ -12,7 +12,7 @@
   } );
 </script>
 
-<% if @questionnaire_tagging_report.nil? or @questionnaire_tagging_report.count < 1 %>
+<% if @response_report_result.questionnaire_tagging_report.nil? or @response_report_result.questionnaire_tagging_report.count < 1 %>
       <h1 align="center">No answer tags are found for this assignment</h1>
 <% else %>
     <div class="text-center">
@@ -21,11 +21,11 @@
 
     <div class= "chart-table" id="tabs">
       <ul>
-      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+      <% @response_report_result.questionnaire_tagging_report.each do |tag_dep, report_lines| %>
         <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.questionnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
       <% end %>
       </ul>
-      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+      <% @response_report_result.questionnaire_tagging_report.each do |tag_dep, report_lines| %>
         <p>
         <div id="tab-<%= tag_dep.id %>">
           <h4  align="center">Tagging Report for questionnaire "<%= tag_dep.questionnaire.name %>" and Tag "<%= tag_dep.tag_prompt.prompt %>"</h4>

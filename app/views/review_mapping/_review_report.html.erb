@@ -1,4 +1,4 @@
- <%@l = -1 %>
+ <%l = -1 %>
       <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
       <div class = 'reviewreport'>
   <!-- Added headers for tablesorter -->
@@ -30,25 +30,25 @@ $("#myTable tbody").sortable().disableSelection();
 <tbody>
 
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
-        <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
+        <% @response_maps, bgcolor, rspan, l = get_data_for_review_report(@id, r.id, @type, l) %>
         <tr>
         <%if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
-            <td bgcolor=<%= @bgcolor %>>
+            <td bgcolor=<%= bgcolor %>>
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
               (<%= user.fullname(session[:ip]) %>)
             </td>
             <!--# reviews done-->
-            <td bgcolor=<%= @bgcolor %> align = 'left'>
+            <td bgcolor=<%= bgcolor %> align = 'left'>
               <% (1..@assignment.num_review_rounds).each do |round| %>
-                <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
+                <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= rspan %>
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
               <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
             </td>
           <!--Team reviewed / Author feedback-->
-          <td bgcolor=<%= @bgcolor %> align = 'left'>
+          <td bgcolor=<%= bgcolor %> align = 'left'>
           <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
             <% team_name_color = get_team_name_color_in_review_report(ri) %>
@@ -83,20 +83,20 @@ $("#myTable tbody").sortable().disableSelection();
           <%end %>
           </td>
           <!--Score awarded / Avg. score-->
-          <td bgcolor=<%= @bgcolor %> align = 'left' >
+          <td bgcolor=<%= bgcolor %> align = 'left' >
           <% @response_maps.each_with_index do |ri, index| %>
             <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <%@team = Team.find(ri.reviewee_id) %>
-                <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+                <%= render partial: 'team_score',  locals: {bgcolor: bgcolor, team_id: @team.id, reviewer_id: r.id} %>
             <%end %>
           <%end %>
           </td>
           <!--Metrics-->
-          <td bgcolor=<%= @bgcolor %> align = 'left'>
+          <td bgcolor=<%= bgcolor %> align = 'left'>
             <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
           </td>
           <!--Assign grade and write comments-->
-          <td bgcolor=<%= @bgcolor %> align = 'left'>
+          <td bgcolor=<%= bgcolor %> align = 'left'>
             <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
               <%= hidden_field_tag :participant_id, r.id %>
               <%= hidden_field_tag :assignment_id, @id %>

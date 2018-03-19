@@ -6,21 +6,21 @@
       %tr.fake-link-large{:bgcolor => "#f5f5f5", "data-target" => "#round_#{(i+1).to_s}", "data-toggle" => "collapse"}
         %td{:style => "padding: 10px;"}
           %h5
-            Round #{(i+1).to_s} | Average score : #{@avg_scores_by_round[i].to_s}%
+            Round #{(i+1).to_s} | Average score : #{@response_report_result.avg_scores_by_round[i].to_s}%
       %tr
         %td
           .collapse.in{:id => "round_#{(i+1).to_s}"}
             %table.table_stretch
-              - @summary[i].keys.each do |question|
+              - @response_report_result.summary[i].keys.each do |question|
                 %tr{:bgcolor => "#f2f2f2" }
                   %td
                     %h5
                       - safe_concat question
-                      %div{:style => "text-decoration: underline overline;"} Average score: #{@avg_scores_by_criterion[i][question].to_s}%
+                      %div{:style => "text-decoration: underline overline;"} Average score: #{@response_report_result.avg_scores_by_criterion[i][question].to_s}%
                 %tr
                   %td
-                    - if !@summary[i][question].eql?("")
-                      - @summary[i][question].each do |sentence|
+                    - if !@response_report_result.summary[i][question].eql?("")
+                      - @response_report_result.summary[i][question].each do |sentence|
                         - safe_concat "<li>"
                         - concat sentence
                     - else

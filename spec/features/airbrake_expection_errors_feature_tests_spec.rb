@@ -102,7 +102,8 @@ describe "Airbrake expection errors" do
     questionnaire = Questionnaire.where(name: 'Review 1').first
     expect(page).to have_current_path("/questionnaires/#{questionnaire.id}/edit")
     expect(page).to have_content('Edit Review')
-    expect(page).to have_content('Import/Export (from/to CSV format)')
+    expect(page).to have_content('Import Questionnaire')
+    expect(page).to have_content('Export Questionnaire')
 
     click_button('Save review questionnaire')
     expect { page }.not_to raise_error

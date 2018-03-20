@@ -38,7 +38,9 @@ class User < ActiveRecord::Base
                   :timezonepref,
                   :public_key,
                   :copy_of_emails,
-                  :institution_id
+                  :institution_id,
+                  :introduction,
+                  :self_introduction
 
   validates :name, presence: true
   validates :name, uniqueness: true

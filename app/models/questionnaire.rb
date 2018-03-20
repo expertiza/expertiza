@@ -7,7 +7,7 @@ class Questionnaire < ActiveRecord::Base
   has_many :assignments, through: :assignment_questionnaires
   has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy
 
-  attr_accessible :id, :name, :instructor_id, :private, :min_question_score, :max_question_score, :type, :display_type, :instruction_loc
+  #attr_accessible :id, :name, :instructor_id, :private, :min_question_score, :max_question_score, :type, :display_type, :instruction_loc
 
   validate :validate_questionnaire
   validates :name, presence: true

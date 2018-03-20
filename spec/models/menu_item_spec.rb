@@ -7,37 +7,69 @@ describe MenuItem do
   # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
   ###
 
+  #let(:test1) {MenuItem.new(name: "home", parent_id: nil, seq: 1, controller_action_id: 1, content_page_id: nil, label: "blah")}
+  #let(:test2) {MenuItem.new(name: "home1", parent_id: 1, seq: 1, controller_action_id: 2, content_page_id: nil, label: "blah")}
+  #let(:test3) {MenuItem.new(name: "home2", parent_id: 1, seq: 2, controller_action_id: 3, content_page_id: nil, label: "blah")}
+  #let(:test4) {MenuItem.new(name: "home3", parent_id: 1, seq: 3, controller_action_id: 4, content_page_id: nil, label: "blah")}
+
+  before(:each) do
+    @test1 = MenuItem.new(name: "home1", parent_id: nil, seq: 1, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test1.save
+    @test2 = MenuItem.new(name: "home2", parent_id: 1, seq: 1, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test2.save
+    @test3 = MenuItem.new(name: "home3", parent_id: 1, seq: 2, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test3.save
+    @test4 = MenuItem.new(name: "home4", parent_id: 1, seq: 3, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test4.save
+    @test5 = MenuItem.new(name: "home5", parent_id: nil, seq: 2, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test5.save
+  end
+
+
   describe '.find_or_create_by_name' do
-    it 'returns a menu item with corresponding name'
+    it 'returns a menu item with corresponding name' do
     # Write your test here!
+      expect(MenuItem.find_or_create_by_name("home").name).to eq("home")
+    end
   end
 
   describe '#delete' do
-    it 'deletes current menu items and all child menu items'
+    it 'deletes current menu items and all child menu items' do
     # Write your test here!
+            expect{@test1.delete}.to change{MenuItem.count}.by(-4)
+    end
   end
 
   describe '#above' do
     context 'when current menu item has parent_id' do
-      it 'returns the first parent menu item by querying the parent_id and current sequence number minus one'
+      it 'returns the first parent menu item by querying the parent_id and current sequence number minus one' do
       # Write your test here!
+        puts MenuItem.count
+        expect(@test4.above).to eq(@test3)
+      end
     end
 
     context 'when current menu item does not have parent_id' do
-      it 'returns the first parent menu item by querying the current sequence number minus one'
+      it 'returns the first parent menu item by querying the current sequence number minus one' do
       # Write your test here!
+        expect(@test5.above).to eq(@test1) 
+      end
     end
   end
 
   describe '#below' do
     context 'when current menu item has parent_id' do
-      it 'returns the first parent menu item by querying the parent_id and current sequence number plus one'
+      it 'returns the first parent menu item by querying the parent_id and current sequence number plus one' do
       # Write your test here!
+        expect(@test3.below).to eq(@test4)
+      end
     end
 
     context 'when current menu item does not have parent_id' do
-      it 'returns the first parent menu item by querying the current sequence number plus one'
+      it 'returns the first parent menu item by querying the current sequence number plus one' do
       # Write your test here!
+        expect(@test1.below).to eq(@test5) 
+      end
     end
   end
 

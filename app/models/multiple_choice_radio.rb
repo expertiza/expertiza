@@ -1,5 +1,4 @@
 class MultipleChoiceRadio < QuizQuestion
-  attr_accessible
 
   def edit
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)

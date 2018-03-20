@@ -2,8 +2,8 @@ class ScoredQuestion < ChoiceQuestion
   validates :weight, presence: true # user must specify a weight for a question
   validates :weight, numericality: true # the weight must be numeric
 
-  attr_accessible :id, :txt, :weight, :questionnaire_id, :seq, :size,
-                  :alternatives, :break_before, :max_label, :min_label, :questionnaire, :type
+  #attr_accessible :id, :txt, :weight, :questionnaire_id, :seq, :size,
+  #                :alternatives, :break_before, :max_label, :min_label, :questionnaire, :type
 
   def edit; end
 

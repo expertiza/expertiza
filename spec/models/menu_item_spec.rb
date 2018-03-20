@@ -15,14 +15,16 @@ describe MenuItem do
   before(:each) do
     @test1 = MenuItem.new(name: "home1", parent_id: nil, seq: 1, controller_action_id: 1, content_page_id: nil, label: "blah")
     @test1.save
-    @test2 = MenuItem.new(name: "home2", parent_id: 1, seq: 1, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test2 = MenuItem.new(name: "home2", parent_id: 1, seq: 2, controller_action_id: 1, content_page_id: nil, label: "blah")
     @test2.save
-    @test3 = MenuItem.new(name: "home3", parent_id: 1, seq: 2, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test3 = MenuItem.new(name: "home3", parent_id: 1, seq: 3, controller_action_id: 1, content_page_id: nil, label: "blah")
     @test3.save
-    @test4 = MenuItem.new(name: "home4", parent_id: 1, seq: 3, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test4 = MenuItem.new(name: "home4", parent_id: 1, seq: 4, controller_action_id: 1, content_page_id: nil, label: "blah")
     @test4.save
     @test5 = MenuItem.new(name: "home5", parent_id: nil, seq: 2, controller_action_id: 1, content_page_id: nil, label: "blah")
     @test5.save
+    @test6 = MenuItem.new(name: "home6", parent_id: nil, seq: 5, controller_action_id: 1, content_page_id: nil, label: "blah")
+    @test6.save
   end
 
 
@@ -44,7 +46,6 @@ describe MenuItem do
     context 'when current menu item has parent_id' do
       it 'returns the first parent menu item by querying the parent_id and current sequence number minus one' do
       # Write your test here!
-        puts MenuItem.count
         expect(@test4.above).to eq(@test3)
       end
     end
@@ -75,25 +76,37 @@ describe MenuItem do
 
   describe '.repack' do
     context 'when current menu item has repack_id' do
-      it 'finds all menus items with parent_id equal to repack_id and repacks the sequence number'
+      it 'finds all menus items with parent_id equal to repack_id and repacks the sequence number' do
       # Write your test here!
+	@temp = MenuItem.repack(1)
+	@test2.reload
+	expect(@test2.seq).to eq(1)
+      end
     end
 
     context 'when current menu item does not have repack_id' do
-      it 'finds all menus items with parent_id null and repacks the sequence number'
+      it 'finds all menus items with parent_id null and repacks the sequence number' do
       # Write your test here!
+	@temp = MenuItem.repack(nil)
+	@test6.reload
+	expect(@test6.seq).to eq(3)
+      end
     end
   end
 
   describe '.next_seq' do
     context 'when parent_id is bigger than 0' do
-      it 'selects corresponding menu items with inputted parent_id and returns the next sequence number'
+      it 'selects corresponding menu items with inputted parent_id and returns the next sequence number' do
       # Write your test here!
+        expect(MenuItem.next_seq(1)).to eq(5)
+      end
     end
 
     context 'when parent_id is smaller than or equal to 0' do
-      it 'selects corresponding menu items with parent_id null and returns the next sequence number'
+      it 'selects corresponding menu items with parent_id null and returns the next sequence number' do
       # Write your test here!
+        expect(MenuItem.next_seq(nil)).to eq(6)
+      end
     end
   end
 

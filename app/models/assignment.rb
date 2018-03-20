@@ -303,12 +303,12 @@ class Assignment < ActiveRecord::Base
     end
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id: user.id)
     raise "The user #{user.name} is already a participant." if participant
-    new_part = AssignmentParticipant.create(AssignmentParticipant.assignment_participant_params(parent_id: self.id,
-                                                                                                user_id: user.id,
-                                                                                                permission_granted: user.master_permission_granted,
-                                                                                                can_submit: can_submit,
-                                                                                                can_review: can_review,
-                                                                                                can_take_quiz: can_take_quiz))
+    new_part = AssignmentParticipant.create(parent_id: self.id,
+                                            user_id: user.id,
+                                            permission_granted: user.master_permission_granted,
+                                            can_submit: can_submit,
+                                            can_review: can_review,
+                                            can_take_quiz: can_take_quiz)
     new_part.set_handle
   end
 
@@ -601,4 +601,7 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
+
+  private
+
 end

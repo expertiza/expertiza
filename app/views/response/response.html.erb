@@ -238,7 +238,7 @@
           json_review = JSON.stringify({ "review": ed.getContent({format : 'text'}) })
 
           $.ajax({
-            url: "http://localhost:3008/visualize_sentiment",
+            url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
             type: "POST",
             crossDomain: true,
             contentType: "application/json",

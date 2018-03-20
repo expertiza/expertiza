@@ -12,7 +12,7 @@ class QuestionnairesController < ApplicationController
       (['Super-Administrator',
        'Administrator'
        ].include? current_role_name)  ||
-          ((['Instructor'].include? current_role_name) && current_user_id?( @questionnaire.instructor_id))
+          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
 
     else
         ['Super-Administrator',

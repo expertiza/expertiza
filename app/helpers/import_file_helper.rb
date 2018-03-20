@@ -16,7 +16,7 @@ module ImportFileHelper
   end
 
   def self.create_new_user(attributes, session)
-    user = User.new(User.user_params(attributes))
+    user = User.new(attributes)
     user.parent_id = (session[:user]).id
     user.timezonepref = User.find(user.parent_id).timezonepref
     user.save!

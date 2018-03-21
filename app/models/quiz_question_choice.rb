@@ -1,4 +1,4 @@
 class QuizQuestionChoice < ActiveRecord::Base
   belongs_to :question, dependent: :destroy
-  attr_accessible :comments, :question_id, :response_id, :answer
+  attr_accessible :question_id, :txt, :iscorrect, :id
 end

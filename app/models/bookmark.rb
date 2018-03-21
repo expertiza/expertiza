@@ -5,5 +5,5 @@ class Bookmark < ActiveRecord::Base
   validates :url, presence: true
   validates :title, presence: true
   validates :description, presence: true
-  attr_accessible
+  #attr_accessible
 end

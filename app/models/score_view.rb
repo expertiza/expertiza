@@ -1,5 +1,5 @@
 class ScoreView < ActiveRecord::Base
-  attr_accessible
+  #attr_accessible
 
   def readonly?
     true

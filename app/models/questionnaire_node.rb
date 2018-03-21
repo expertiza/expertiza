@@ -1,5 +1,5 @@
 class QuestionnaireNode < Node
-  attr_accessible
+  #attr_accessible
 
   belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id"
   belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id"

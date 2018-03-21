@@ -1,5 +1,5 @@
 class Ta < User
-  attr_accessible
+  #attr_accessible
 
   has_many :ta_mappings, dependent: :destroy
 

@@ -1,5 +1,5 @@
 class TextResponse < Question
-  attr_accessible
+  #attr_accessible
 
   validates :size, presence: true
 

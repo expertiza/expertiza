@@ -1,5 +1,5 @@
 class QuestionnaireTypeNode < FolderNode
-  attr_accessible
+  #attr_accessible
 
   belongs_to :table, class_name: "TreeFolder", foreign_key: "node_object_id"
   belongs_to :node_object, class_name: "TreeFolder"

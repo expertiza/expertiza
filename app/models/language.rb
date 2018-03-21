@@ -1,3 +1,3 @@
 class Language < ActiveRecord::Base
-  attr_accessible
+  #attr_accessible
 end

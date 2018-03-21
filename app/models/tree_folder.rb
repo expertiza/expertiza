@@ -1,3 +1,3 @@
 class TreeFolder < ActiveRecord::Base
-  attr_accessible
+  #attr_accessible
 end

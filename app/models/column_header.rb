@@ -1,5 +1,5 @@
 class ColumnHeader < QuestionnaireHeader
-  attr_accessible
+  #attr_accessible
 
   def complete(_count, _answer = nil)
     html = '<tr>'

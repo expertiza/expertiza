@@ -1,3 +1,3 @@
 class SignupResubmissionQuota < ActiveRecord::Base
-  attr_accessible
+  #attr_accessible
 end

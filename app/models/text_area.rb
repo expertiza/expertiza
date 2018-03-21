@@ -1,5 +1,5 @@
 class TextArea < TextResponse
-  attr_accessible
+  #attr_accessible
 
   def complete(count, answer = nil)
     if self.size.nil?

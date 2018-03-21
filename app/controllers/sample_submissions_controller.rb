@@ -3,7 +3,11 @@ class SampleSubmissionsController < ApplicationController
 
   # GET /sample_submissions
   def index
-    assignment_id = params[:id]
+    @sample_submissions = SubmissionRecord.where(:assignment_id=> sample_submission_params[:id])
+    @sample_submissions.each do |submission|
+      puts submission.assignment_id
+    end
+
   end
 
   private
@@ -14,6 +18,6 @@ class SampleSubmissionsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def sample_submission_params
-      params[:sample_submission]
+      params.permit( :id)
     end
 end

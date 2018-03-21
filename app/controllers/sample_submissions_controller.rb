@@ -3,46 +3,7 @@ class SampleSubmissionsController < ApplicationController
 
   # GET /sample_submissions
   def index
-    @sample_submissions = SampleSubmission.all
-  end
-
-  # GET /sample_submissions/1
-  def show
-  end
-
-  # GET /sample_submissions/new
-  def new
-    @sample_submission = SampleSubmission.new
-  end
-
-  # GET /sample_submissions/1/edit
-  def edit
-  end
-
-  # POST /sample_submissions
-  def create
-    @sample_submission = SampleSubmission.new(sample_submission_params)
-
-    if @sample_submission.save
-      redirect_to @sample_submission, notice: 'Sample submission was successfully created.'
-    else
-      render :new
-    end
-  end
-
-  # PATCH/PUT /sample_submissions/1
-  def update
-    if @sample_submission.update(sample_submission_params)
-      redirect_to @sample_submission, notice: 'Sample submission was successfully updated.'
-    else
-      render :edit
-    end
-  end
-
-  # DELETE /sample_submissions/1
-  def destroy
-    @sample_submission.destroy
-    redirect_to sample_submissions_url, notice: 'Sample submission was successfully destroyed.'
+    assignment_id = params[:id]
   end
 
   private

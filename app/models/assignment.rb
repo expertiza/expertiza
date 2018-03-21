@@ -20,7 +20,27 @@ class Assignment < ActiveRecord::Base
                   :review_topic_threshold,
                   :max_reviews_per_submission,
                   :num_quiz_questions,
-                  :spec_location
+                  :spec_location,
+                  :is_calibrated,
+                  :is_selfreview_enabled,
+                  :reputation_algorithm,
+                  :simicheck,
+                  :is_anonymous,
+                  :num_reviews_required,
+                  :num_metareviews_required,
+                  :num_metareviews_allowed,
+                  :simicheck_threshold,
+                  :is_answer_tagging_allowed,
+                  :has_badge,
+                  :can_choose_topic_to_review,
+                  :can_review_same_topic,
+                  :use_bookmark,
+                  :availability_flag,
+                  :show_teammate_reviews,
+                  :max_bids,
+                  :is_intelligent,
+                  :is_coding_assignment,
+                  :require_quiz
 
 
 

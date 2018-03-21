@@ -19,15 +19,11 @@ class Assignment < ActiveRecord::Base
                   :review_assignment_strategy,
                   :review_topic_threshold,
                   :max_reviews_per_submission
-                  :num_reviews,
-                  :num_reviews_reviews,
-                  :num_reviews_reviews,
-                  :num_reviewers,
                   :num_quiz_questions,
                   :spec_location,
-                  :allow_suggestions,
-                  :microtask,
-                  
+
+
+
 
 
   # When an assignment is created, it needs to

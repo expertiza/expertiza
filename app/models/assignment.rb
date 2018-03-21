@@ -18,9 +18,9 @@ class Assignment < ActiveRecord::Base
                   :instructor_id,
                   :review_assignment_strategy,
                   :review_topic_threshold,
-                  :max_reviews_per_submission
+                  :max_reviews_per_submission,
                   :num_quiz_questions,
-                  :spec_location,
+                  :spec_location
 
 
 

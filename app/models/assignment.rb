@@ -40,7 +40,8 @@ class Assignment < ActiveRecord::Base
                   :max_bids,
                   :is_intelligent,
                   :is_coding_assignment,
-                  :require_quiz
+                  :require_quiz,
+                  :microtask
 
 
 

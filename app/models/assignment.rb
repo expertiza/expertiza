@@ -7,7 +7,28 @@ class Assignment < ActiveRecord::Base
   include QuizAssignment
   include OnTheFlyCalc
   has_paper_trail
-  attr_accessible :id, :name, :directory_path, :require_quiz, :course_id, :max_team_size, :valid_num_review, :staggered_deadline, :instructor_id, :review_assignment_strategy, :review_topic_threshold, :max_reviews_per_submission
+  attr_accessible :id,
+                  :name,
+                  :directory_path,
+                  :require_quiz,
+                  :course_id,
+                  :max_team_size,
+                  :valid_num_review,
+                  :staggered_deadline,
+                  :instructor_id,
+                  :review_assignment_strategy,
+                  :review_topic_threshold,
+                  :max_reviews_per_submission
+                  :num_reviews,
+                  :num_reviews_reviews,
+                  :num_reviews_reviews,
+                  :num_reviewers,
+                  :num_quiz_questions,
+                  :spec_location,
+                  :allow_suggestions,
+                  :microtask,
+                  
+
 
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;

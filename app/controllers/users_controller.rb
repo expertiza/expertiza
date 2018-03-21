@@ -173,8 +173,6 @@ class UsersController < ApplicationController
     requested_user.status = params[:status]
     if requested_user.status.nil?
       flash[:error] = "Please Approve or Reject before submitting"
-    elsif @user.update_attributes(user_params)
-      flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
     end
     if requested_user.status == "Approved"
       new_user = User.new

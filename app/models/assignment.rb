@@ -41,7 +41,8 @@ class Assignment < ActiveRecord::Base
                   :is_intelligent,
                   :is_coding_assignment,
                   :require_quiz,
-                  :microtask
+                  :microtask,
+                  :allow_suggestions
 
 
 

@@ -53,7 +53,7 @@
     //threshold to turn off the autosave
     var maxIdleTime = 30;
 
-    $('#autosave_cbx_lbl').html("&nbsp;Auto save your respond every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
+    $('#autosave_cbx_lbl').html("&nbsp;Auto save your responds every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
 
     //if it's was in the background, don't auto save to avoid conflict
     setInterval(function() {
@@ -205,7 +205,6 @@
       $("#overlay").remove();
     }
 
-
     //Increment the idle time counter every minute and restart the timer if there is a mouse movement or keypress.
     var idleInterval = setInterval(function(){
       idleTime = idleTime + 1;
@@ -216,7 +215,8 @@
           if (r == true) {
             updateForm();
             $("#autosave_cbx").prop("checked","true");
-          }
+          }else
+            $("#autosave_cbx").removeProp("checked");
         }, 1000);
       }
     }, interval);
@@ -227,7 +227,11 @@
     $(this).keypress(function (e) {
       idleTime = 0;
     });
-
+    //restart the counter if it's just checked
+    $("#autosave_cbx").change(function (e){
+      if($(this).prop("checked"))
+        idleTime = 0;
+    });
     /// end auto reload
 
     //attach event handler to all tinymce editors

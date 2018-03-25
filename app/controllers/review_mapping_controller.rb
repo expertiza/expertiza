@@ -272,11 +272,22 @@ class ReviewMappingController < ApplicationController
   end
 
   def automatic_review_mapping
-
+    count = 0 # this variable is used to control whether the calibrated or the uncalibrated automatic_review_map_controller_strategy will be called on yield.
     helper = AutomaticReviewMappingHelper::AutomaticReviewMappingHelper.new(params)
     # Create teams if its an individual assignment.
     helper.create_teams_if_individual_assignment
-    helper.check_artifacts_num_before_assigning_reviews(flash,params) 
+    if helper.check_if_all_artifacts_num_are_zero(flash,params)
+       helper.assign_reviews_for_artifacts_num_zero(flash,params) {automatic_review_mapping_strategy(helper.assignment_id, helper.participants, helper.teams, helper.student_review_num, helper.submission_review_num)}
+    else
+       helper.assign_reviews_for_artifacts_num_not_zero(params) do
+        automatic_review_mapping_strategy(helper.assignment_id, helper.participants, helper.teams_with_calibrated_artifacts.shuffle!, helper.calibrated_artifacts_num, 0) if count == 0
+        count = count+1
+        if count == 2 
+          automatic_review_mapping_strategy(helper.assignment_id, helper.participants, helper.teams_with_uncalibrated_artifacts.shuffle!, helper.uncalibrated_artifacts_num, 0)
+          count == 0
+        end
+      end
+    end
 
     redirect_to action: 'list_mappings', id: helper.assignment_id
   end

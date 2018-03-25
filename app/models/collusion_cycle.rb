@@ -8,9 +8,9 @@ class CollusionCycle
 
   def two_node_cycles(assignment_participant)
     collusion_cycles = []
-      puts "TESTING"
     assignment_participant.reviewers.each do |ap|
-      puts "TESTING1"
+      puts "Assignment participant has reviewers"
+      puts ap.inspect
       next unless ap.reviewers.include?(assignment_participant)
       puts "TESTING2"
       if assignment_participant.reviews_by_reviewer(ap).nil?

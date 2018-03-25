@@ -16,26 +16,34 @@ describe CollusionCycle do
 
   let(:response) { build(:response) }
   let(:team) { build(:assignment_team, id: 1) }
-  let(:team2) { build(:assignment_team, id: 2) }
-  let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response]) }
-  #let(:response_map) { build(:review_response_map, reviewer_id: 2, reviewee_id: 1, response: [response]) }
-  let(:response_map2) { build(:review_response_map, reviewer_id: 4) }
-  let(:participant) { build(:participant, id: 1, assignment: assignment) }
-  let(:participant2) { build(:participant, id: 2, grade: 100) }
-  #let(:participant3) { build(:participant, id: 3, assignment: assignment, grade: 90) }
-  #let(:participant4) { build(:participant, id: 4, assignment: assignment, grade: 80) }
+  let(:response_map) { build(:review_response_map, id: 1) }
+  let(:participant) { build(:participant, id: 1) }
+  let(:participant2) { build(:participant, id: 2) }
+  let(:participant3) { build(:participant, id: 3) }
+  let(:participant4) { build(:participant, id: 4) }
   let(:assignment) { build(:assignment, id: 1) }
+  
   before(:each) do
     allow(participant).to receive(:team).and_return(team)
-  #  allow(participant3).to receive(:team2).and_return(team2)
     @cycle = CollusionCycle.new()
   end
 
   describe '#two_node_cycles' do
     context 'when the reviewers of current reviewer (ap) does not include current assignment participant' do
       it 'skips this reviewer (ap) and returns corresponding collusion cycles' do
-        allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', 1).and_return([response_map])
-        allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+        #Sets up variables for test
+        participant.assignment = assignment
+        participant2.grade = 90
+        
+        team.assignment = assignment
+        
+        response_map.assignment = assignment
+        response_map.response = [response]
+        response_map.reviewer = participant2
+        response_map.reviewee = team
+        
+        puts response_map.inspect
+        
         expect(@cycle.two_node_cycles(participant)).to eql([])
       end
     end

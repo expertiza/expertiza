@@ -1,5 +1,4 @@
 module ResponseReportHelper
-
   # SummaryByRevieweeAndCriteria
   class SummaryRevieweeReport
     def initialize(assignment, summary_ws_url)
@@ -121,28 +120,28 @@ module ResponseReportHelper
 
   # ResponseReportFactory
   class ResponseReportFactory
-    def create_response_report (id, assignment, type, summary_ws_url, review_user)
+    def create_response_report (id, assignment, type, review_user)
+      summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
       case type
       when "SummaryByRevieweeAndCriteria"
-        return SummaryRevieweeReport.new(assignment, summary_ws_url)
+        SummaryRevieweeReport.new(assignment, summary_ws_url)
       when "SummaryByCriteria"
-        return SummaryReport.new(assignment, summary_ws_url)
+        SummaryReport.new(assignment, summary_ws_url)
       when "ReviewResponseMap"
-        return ReviewReport.new(id, assignment, type, review_user)
+        ReviewReport.new(id, assignment, type, review_user)
       when "FeedbackResponseMap"
-        return FeedbackReport.new(id, assignment, type)
+        FeedbackReport.new(id, assignment, type)
       when "TeammateReviewResponseMap"
-        return TeammateReviewReport.new(id)
+        TeammateReviewReport.new(id)
       when "Calibration"
-        return CalibrationReport.new(id)
+        CalibrationReport.new(id)
       when "PlagiarismCheckerReport"
-        return PlagiarismCheckerReport.new(id)
+        PlagiarismCheckerReport.new(id)
       when "AnswerTaggingReport"
-        return AnswerTaggingReport.new(id)
+        AnswerTaggingReport.new(id)
       when "SelfReview"
-        return SelfReviewReport.new(id)
+        SelfReviewReport.new(id)
       end
     end
   end
-
 end

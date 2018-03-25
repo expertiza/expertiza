@@ -357,9 +357,8 @@ class ReviewMappingController < ApplicationController
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
-    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-    @review_user = params[:user]
-    @response_report_result = ResponseReportHelper::ResponseReportFactory.new.create_response_report(@id, @assignment, @type, summary_ws_url, @review_user)
+    review_user = params[:user]
+    @response_report_result = ResponseReportHelper::ResponseReportFactory.new.create_response_report(@id, @assignment, @type, review_user)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 

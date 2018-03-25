@@ -35,9 +35,7 @@ class AssignmentParticipant < Participant
   # all the participants in this assignment who have reviewed the team where this participant belongs
   def reviewers
     reviewers = []
-    puts self.team.inspect
     rmaps = ReviewResponseMap.where('reviewee_id = ?', self.team.id)
-    puts rmaps.inspect
     rmaps.each do |rm|
       reviewers.push(AssignmentParticipant.find(rm.reviewer_id))
     end

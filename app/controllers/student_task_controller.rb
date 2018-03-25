@@ -9,15 +9,14 @@ class StudentTaskController < ApplicationController
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
 
-    # Get list of student tasks that are available and sort them by their due date.
-    @student_tasks = StudentTask.from_user current_user
-    @student_tasks.select! {|t| t.assignment.availability_flag }
+    # Get list of student tasks that are available and currently due then sort them by their due date.
+    all_tasks = StudentTask.from_user current_user
+    @student_tasks = all_tasks.select {|t| t.assignment.availability_flag }
     @student_tasks.select! {|t| t.stage_deadline.to_date > DateTime.now}.sort_by! {|k| k.stage_deadline}.reverse!
     @student_tasks = @student_tasks.paginate(page: params[:student_task_page], per_page: 10)
 
     # Get a list of student tasts that are past due and sort them by their due date.
-    @past_student_tasks = StudentTask.from_user current_user
-    @past_student_tasks.select! {|t| t.stage_deadline.to_date < DateTime.now}
+    @past_student_tasks= all_tasks.select {|t| t.stage_deadline.to_date < DateTime.now}
     if (!@past_student_tasks.nil?)
           @past_student_tasks.sort_by! {|k| k.stage_deadline}.reverse!
           @past_student_tasks = @past_student_tasks.paginate(page: params[:past_assignment_page], per_page: 10)

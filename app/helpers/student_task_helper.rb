@@ -35,26 +35,37 @@ module StudentTaskHelper
     info.html_safe
   end
 
+  # This function is used to break up a string to multiple lines if there is a single word that is longer than the
+  # specified column width. This allows there to be a line break in the middle of a word that is really long.
   def breaking_wrap_wrap(txt, col = 80)
     txt.gsub(/(.{1,#{col}})( +|$\n?)|(.{1,#{col}})/,
              "\\1\\3\n")
   end
 
+  # Determine a background color based on how many days out the due date is.
   def due_date_color(due_date)
-    dif = (DateTime.now - due_date.to_date).to_i
-    if(dif < -14 )
-      return "white"
-    elsif (dif < -10)
-      return "green"
-    elsif (dif < -7)
-      return "yellow"
-    elsif (dif < -4)
-      return "orange"
-    elsif (dif < -2)
-      return "red"
+    time_remaining = (DateTime.now - due_date.to_date).to_i
+    rtn = "white"
+    # More than 2 weeks away
+    if(time_remaining < -14 )
+      rtn = "white"
+      #Between 2 weeks and 10 days
+    elsif (time_remaining < -10)
+      rtn = "green"
+      #Between 10 days and a week
+    elsif (time_remaining < -7)
+      rtn = "yellow"
+      #Between a week and 4 days
+    elsif (time_remaining < -4)
+      rtn = "orange"
+      #Between 4 days and the due date
+    elsif (time_remaining < 0)
+      rtn = "red"
     else
-      return "white"
+      rtn "white"
     end
+    # Return the appropriate color
+    rtn
 
   end
 end

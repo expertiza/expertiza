@@ -126,6 +126,18 @@ class SignUpSheetController < ApplicationController
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
   end
 
+  def retrieve_topics
+    if !SignUpTopic.find_by_assignment(params[:id]).nil?
+      render json: SignUpTopic.find_by_assignment(params[:id])
+    else
+      render json: "[]"
+    end
+  end
+
+  def persist_topics
+    topics = params[:topics]
+  end
+
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]

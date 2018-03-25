@@ -5,6 +5,8 @@ class SignUpTopic < ActiveRecord::Base
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
+  require 'json'
+
   has_paper_trail
 
   # the below relations have been added to make it consistent with the database schema
@@ -156,5 +158,9 @@ class SignUpTopic < ActiveRecord::Base
       end
     end
     waitlisted_users.flatten
+  end
+
+  def self.find_by_assignment(assignment_id)
+    SignUpTopic.where(assignment_id: assignment_id)
   end
 end

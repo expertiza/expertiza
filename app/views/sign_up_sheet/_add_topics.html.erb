@@ -1,3 +1,5 @@
+<%= link_to 'Manage topics', "javascript:manageTopics(#{params[:id]})", :remote => true, "data-target": "manage-topics", "data-toggle": "modal"%>
+
 <% if @sign_up_topics.count == 0%>
 
     <%= link_to 'New topic',
@@ -57,3 +59,5 @@
                     'Topic Link <em>(optional)</em>' %> |
 
 <% end %>
+
+<div class="modal hide fade" id="manage-topics"></div>

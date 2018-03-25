@@ -240,7 +240,7 @@ class Response < ActiveRecord::Base
       questions = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id)
-      code = add_table_rows questionnaire_max, questions, answers, code
+      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -251,7 +251,7 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max, questions, answers, code
+  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
@@ -261,7 +261,10 @@ class Response < ActiveRecord::Base
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
-        code += if question.instance_of? Criterion or question.instance_of? Scale
+        code += if question.instance_of? Criterion
+                  #Answer Tags are enabled only for Criterion questions at the moment.
+                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments)
+                elsif question.instance_of? Scale
                   question.view_completed_question(count, answer, questionnaire_max)
                 else
                   question.view_completed_question(count, answer)

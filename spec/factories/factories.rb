@@ -9,6 +9,12 @@ FactoryBot.define do
     description ''
   end
 
+  factory :role_of_superadministrator, class: Role do
+    name 'Super-Administrator'
+    parent_id nil
+    description ''
+  end
+
   factory :role_of_student, class: Role do
     name "Student"
     parent_id  nil
@@ -33,6 +39,28 @@ FactoryBot.define do
     password "password"
     password_confirmation "password"
     sequence(:fullname) {|n| "#{n}, administrator" }
+    email "expertiza@mailinator.com"
+    parent_id 1
+    private_by_default  false
+    mru_directory_path  nil
+    email_on_review true
+    email_on_submission true
+    email_on_review_of_review true
+    is_new_user false
+    master_permission_granted 0
+    handle "handle"
+    digital_certificate nil
+    timezonepref nil
+    public_key nil
+    copy_of_emails  false
+  end
+
+  factory :superadmin, class: User do
+    sequence(:name) {|n| "superadmin#{n}" }
+    role { Role.where(name: 'Super-Administrator').first || association(:role_of_superadministrator) }
+    password "password"
+    password_confirmation "password"
+    sequence(:fullname) {|n| "#{n}, superadministrator" }
     email "expertiza@mailinator.com"
     parent_id 1
     private_by_default  false

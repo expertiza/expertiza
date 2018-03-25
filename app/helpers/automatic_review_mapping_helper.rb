@@ -24,5 +24,26 @@ module AutomaticReviewMappingHelper
                  end
     		end
     	end
+
+    	def check_artifacts_num_before_assigning_reviews(flash)
+    		if @calibrated_artifacts_num == 0 and @uncalibrated_artifacts_num == 0
+    			check_review_num_before_assigning_review(flash)
+    		else
+    			yield
+    		end
+
+    	end
+
+    	def check_review_num_before_assigning_review(flash)
+    		obj = ReviewMappingController.new()
+    		if @student_review_num == 0 and @submission_review_num == 0
+        		flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      		elsif (@student_review_num != 0 and @submission_review_num == 0) or (@tudent_review_num == 0 and @submission_review_num != 0)
+        		# REVIEW: mapping strategy
+             	obj.automatic_review_mapping_strategy(@assignment_id, @participants, @teams, @student_review_num, @submission_review_num)
+      		else
+        		flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+            end
+    	end
 	end
 end

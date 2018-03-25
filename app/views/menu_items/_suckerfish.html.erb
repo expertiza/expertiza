@@ -3,7 +3,10 @@
   item = session[:menu].get_item(item_id)
   selected = session[:menu].selected?(item.id)
   long_name = item.name.split(/\W/).collect{|word| word.capitalize}.join(' ')
+  # if in student view, menu items in hidden_menu_items should not be displayed
+  display_item_condition = session.key?(:student_view)?(session[:hidden_menu_items].include?item_id)?false:true:true
 %>
+    <% if display_item_condition %>
     <% if level == 1 %>
         <li class="dropdown first-level">
     <% elsif level == 2 %>
@@ -27,4 +30,5 @@
         <% end %>
     <% end -%>
     </li>
+    <% end %>
 <% end -%>

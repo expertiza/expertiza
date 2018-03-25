@@ -434,6 +434,8 @@ resources :institution, except: [:destroy] do
       post :bridge_to_is_available
       get :session_last_open_tab
       get :set_session_last_open_tab
+      post :set_student_view
+      post :revert_to_instructor_view
     end
   end
 

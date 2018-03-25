@@ -79,6 +79,20 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
 
+  # sets student_view and menu items that need to be hidden
+  def set_student_view
+    session[:student_view] = true
+    # 30 - Course Evaluation, 35 - Survey Deployments, 37 - Manage Instructor Content
+    session[:hidden_menu_items] = [30, 35, 37]
+    redirect_back
+  end
+
+  def revert_to_instructor_view
+    session.delete(:student_view)
+    session.delete(:hidden_menu_items)
+    redirect_back
+  end
+
   def confirm_notifications_access
     redirect_to controller: :notifications, action: :list if current_user.try(:student?)
   end

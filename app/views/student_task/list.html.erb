@@ -126,13 +126,13 @@
 
                 <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
                 <% if participant.assignment.current_stage_name(topic_id) == "Unknown" %>
-                    <img src="/assets/info.png" title="Please complete the peer review stage."/>
+                    <img src="/assets/action_img.png" title="Please complete the peer review stage."/>
                 <% end %>
 
             <% else %>
-                <%= participant.assignment.current_stage_name(topic_id) %> second case
+                <%= participant.assignment.current_stage_name(topic_id) %>
                 <% if participant.assignment.current_stage_name(topic_id) == "Unknown" %>
-                    <img src="/assets/info.png" title="Please complete the peer review stage."/>
+                    <img src="/assets/action_img.png" title="Please complete the peer review stage."/>
                 <% end %>
             <% end %>
           </td>

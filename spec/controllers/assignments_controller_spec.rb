@@ -180,9 +180,8 @@ describe AssignmentsController do
         due_date.due_at = DateTime.now.in_time_zone - 1.day
         allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
         params = {id: 1}
-        get :edit, params, xhr: true
+        get :edit, params, xhr: true, with: "/#tabs-2"
         expect(response).not_to respond_to(:edit)
-        #expect(flash[:error]).to eq('Deadline has passed, topic can not be edited')
       end
     end
   end

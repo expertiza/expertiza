@@ -13,20 +13,9 @@ describe VmQuestionResponseRow do
       expect(@row.average_score_for_row).to eq(4)
     end
 
-    it 'returns correct average score for all not nil (with some zero) scores' do
-      score1 = VmQuestionResponseScoreCell.new(1, '#7DCEA0', 'Case_1_score_value1 = 1')
-      score2 = VmQuestionResponseScoreCell.new(2, '#FDEDEC', 'Case_1_score_value2 = 2')
-      score3 = VmQuestionResponseScoreCell.new(0, '#E6B0AA', 'Case_1_score_value3 =0')
-      scores = [score1, score2, score3]
-      @row.instance_variable_set(:@score_row, scores)
-      expect(@row.average_score_for_row).to eq(1)
-    end
-
     it 'returns correct average score for all zero scores' do
       score1 = VmQuestionResponseScoreCell.new(0, '#A93226', 'Case_3_score_value1 = 0')
-      score2 = VmQuestionResponseScoreCell.new(0, '#7B241C', 'Case 3_score_value2 = 0')
-      score3 = VmQuestionResponseScoreCell.new(0, '#641E16', 'Case_3_score_value3 = 0')
-      scores = [score1, score2, score3]
+      scores = [score1]
       @row.instance_variable_set(:@score_row, scores)
       expect(@row.average_score_for_row).to eq(0)
     end

@@ -4,7 +4,7 @@ describe VmQuestionResponseRow do
   end
 
   describe "#average_score_for_row" do
-    it 'returns correct average score for all not nil (not zero) scores' do
+    it 'returns correct average score for all not nil scores' do
       score1 = VmQuestionResponseScoreCell.new(5, '#D98880', 'Case_2_score_value1 = 5')
       score2 = VmQuestionResponseScoreCell.new(4, '#CD6155', 'Case_2_score_value2 = 4')
       score3 = VmQuestionResponseScoreCell.new(3, '#C0392B', 'Case_2_score_value3 = 3')
@@ -22,7 +22,7 @@ describe VmQuestionResponseRow do
       expect(@row.average_score_for_row).to eq(1)
     end
 
-    it 'returns correct average score for all not nil (all zero) scores' do
+    it 'returns correct average score for all zero scores' do
       score1 = VmQuestionResponseScoreCell.new(0, '#A93226', 'Case_3_score_value1 = 0')
       score2 = VmQuestionResponseScoreCell.new(0, '#7B241C', 'Case 3_score_value2 = 0')
       score3 = VmQuestionResponseScoreCell.new(0, '#641E16', 'Case_3_score_value3 = 0')

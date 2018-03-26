@@ -1,28 +1,15 @@
 describe OnTheFlyCalc do
-  #let(:questionnaire) {build(:questionnaire)}
-  #let(:question1){ build(:question, questionnaire: questionnaire) }
-  let(:Assignment){ Assignment.new}
   describe "#compute total score" do
   end
+  let(:Assignment1){ Assignment.new}
+  let(:AssignmentQuestionaire){build(:assignment_questionnaire)}
   describe "#compute reviews hash" do
-
-    context "Has multiple review phases with different review rubrics" do
-      it "calls scores_varying_rubrics" do
-        allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-        allow(ResponseMap).to receive(:where).with(1).with(@response_type).and_return(@response_maps)
-        Assignment.compute_reviews_hash
-        expect(Assignment).to receive(:scores_varying_rubrics)
-      end
+    it "Has multiple review phases with different review rubrics" do
+      expect(Assignment1).to receive(:varying_rubrics_by_round?).and_return(true)
     end
-    context "Does not have multiple review phases with different review rubrics" do
-      it "calls scores_non_varying_rubrics" do
-        allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(false)
-        allow(ResponseMap).to receive(:where).with(1).with(@response_type).and_return(@response_maps)
-        Assignment.compute_reviews_hash
-        expect(Assignment).to receive(:scores_non_varying_rubrics)
-      end
+    it "Does not have multiple review phases with different review rubrics" do
+      expect(Assignment1).to receive(:varying_rubrics_by_round?).and_return(false)
     end
-
   end
   describe "#compute avg and ranges hash" do
 

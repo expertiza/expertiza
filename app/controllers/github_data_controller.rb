@@ -63,6 +63,15 @@ class GithubDataController < ApplicationController
 
   def show
     owner, repo, pull_number = retrieve_github_url(@submission_record)
+    assignment = Assignment.find(@submission_record.assignment_id)
+    @assignment_start_date = assignment.created_at
+    puts "Assignment start: #{@assignment_start_date}"
+    @assignment_end_date = @assignment_start_date
+    assignment.due_dates.each do |due_date|
+      @assignment_end_date = due_date.due_at if due_date.deadline_type.name == "submission" and
+          due_date.due_at > @assignment_end_date
+    end
+    puts "Deadline: #{@assignment_end_date}"
     unless pull_number.nil?
       retrieve_graphql_data(owner, repo, pull_number)
     end

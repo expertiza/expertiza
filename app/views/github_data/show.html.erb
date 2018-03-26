@@ -23,6 +23,6 @@
       <td align="center"><%= commit.deletions %></td>
       <td align="center"><%= commit.changed_files %></td>
     </tr>
-  <% end %>
+  <% end unless @commits.nil? %>
   </tbody>
 </table>

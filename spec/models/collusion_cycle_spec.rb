@@ -149,17 +149,53 @@ describe CollusionCycle do
 
   end
 
-  it "cycle_similarity_score" do
-    cycle = [[participant1, 100], [participant2, 90]]
-    expect(colcyc.cycle_similarity_score(cycle)).to eq (10)
+  context "cycle_similarity_score" do
+    it "similarity score of 2 node test" do
+      cycle = [[participant1, 100], [participant2, 90]]
+      expect(colcyc.cycle_similarity_score(cycle)).to eq (10.0)
+    end
+
+    it "similarity score of 3 node test" do
+      cycle = [[participant1, 100], [participant2, 95], [participant3, 85]]
+      expect(colcyc.cycle_similarity_score(cycle)).to eq (10.0)
+    end
+
+    it "similarity score of 4 node test" do
+      cycle = [[participant1, 100], [participant2, 95], [participant3, 95], [participant4, 90]]
+      expect(colcyc.cycle_similarity_score(cycle)).to eq (5.0)
+    end
   end
 
-  it "cycle_deviation_score" do
-    cycle = [[participant1, 100], [participant2, 90]]
-    allow(AssignmentParticipant).to receive(:find).and_return(participant1)
-    allow(participant1).to receive(:id).and_return(1)
-    allow(participant1).to receive(:review_score).and_return(100)
-    expect(colcyc.cycle_deviation_score(cycle)).to eq (5)
+  context "cycle_deviation_score" do
+    before(:each) do
+      allow(participant1).to receive(:id).and_return(1)
+      allow(participant2).to receive(:id).and_return(2)
+      allow(participant3).to receive(:id).and_return(3)
+      allow(participant4).to receive(:id).and_return(4)
+      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant1)
+      allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+      allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+      allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+      allow(participant1).to receive(:review_score).and_return(90)
+      allow(participant2).to receive(:review_score).and_return(80)
+      allow(participant3).to receive(:review_score).and_return(91)
+      allow(participant4).to receive(:review_score).and_return(95)
+    end
+
+    it "deviation score for 2 nodes test" do
+      cycle = [[participant1, 95], [participant2, 90]]
+      expect(colcyc.cycle_deviation_score(cycle)).to eq (7.5)
+    end
+
+    it "deviation score for 3 nodes test" do
+      cycle = [[participant1, 95], [participant2, 90], [participant3, 91]]
+      expect(colcyc.cycle_deviation_score(cycle)).to eq (5.0)
+    end
+
+    it "deviation score for 4 nodes test" do
+      cycle = [[participant1, 95], [participant2, 90], [participant3, 91], [participant4, 90]]
+      expect(colcyc.cycle_deviation_score(cycle)).to eq (5.0)
+    end
   end
 
 end

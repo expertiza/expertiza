@@ -70,11 +70,11 @@ class GithubDataController < ApplicationController
 
   def retrieve_graphql_data(owner, repo, pull)
     data = query IndexQuery, owner: owner, name: repo, pull: pull.to_i
-    commits = data.repository.pull_request.commits
-    puts "TotalCommits: #{commits.total_count}"
+    github_commits = data.repository.pull_request.commits
+    puts "TotalCommits: #{github_commits.total_count}"
     @commits = Array.new
-    commits.nodes.each do |node|
-      @commits.push(node.commit)
+    github_commits.nodes.each do |node|
+      @commits.push(node.commit) unless node.commit.message.start_with? "Merge"
       # puts "SHA: #{node.commit.oid}"
       # puts "Name: #{node.commit.committer.name}"
       # puts "Committed Date: #{DateTime.parse(node.commit.committed_date)}"
@@ -83,6 +83,14 @@ class GithubDataController < ApplicationController
       # puts "Message: #{node.commit.message}"
       # puts "Files changed: #{node.commit.changed_files}",""
     end
+    @commits_by_user = Hash.new(0)
+    @commits_by_date = Hash.new(0)
+    @commits.each do |commit|
+      @commits_by_user[commit.committer.name] += 1
+      @commits_by_date[DateTime.parse(commit.committed_date).strftime('%Y-%m-%d')] += 1
+    end
+    puts @commits_by_user
+    puts @commits_by_date
   end
 
   def retrieve_github_url(submission)

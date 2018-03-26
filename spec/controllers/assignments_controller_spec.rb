@@ -11,8 +11,12 @@ describe AssignmentsController do
   let(:student) { build(:student) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
+  let(:topic) { build(:topic, id: 1) }
+  #let(:team) { Team.new(id: 1, advertise_for_partner: 1) }
+  #let(:signed_up_team) { build(:signed_up_team, id: 1, topic_id: 1) }
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    #allow(Team).to receive(:find).with('1').and_return(advertise_for_partners)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
@@ -183,7 +187,34 @@ describe AssignmentsController do
         get :edit, params, xhr: true, with: "/#tabs-2"
         expect(response).not_to respond_to(:edit)
       end
+
+      it 'does not allow a topic to be deleted' do
+        due_date.due_at = DateTime.now.in_time_zone - 1.day
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+        params = {id: 1}
+        get :edit, params, xhr: true, with: "/#tabs-2"
+        expect(response).not_to respond_to(:destroy)
+      end
+
+      it 'does not allow a new topic to be added' do
+        due_date.due_at = DateTime.now.in_time_zone - 1.day
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+        params = {id: 1}
+        get :edit, params, xhr: true, with: "/#tabs-2"
+        expect(response).not_to respond_to(:new)
+      end
     end
+
+    # context 'team has ad' do
+    #   it 'displays the ad horn in the manage topics table' do
+    #     @team = Team.new(id: 1, advertise_for_partner: 1)
+    #     @signed_up_team = SignedUpTeam.new(id: 1, topic_id: 1)
+    #     allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+    #     params = {id: 1}
+    #     get :edit, params, xhr: true, with: '/#tabs-2'
+    #     expect(response).to have_css('img', text: 'ad_horn.png')
+    #   end
+    # end
   end
 
   describe '#update' do

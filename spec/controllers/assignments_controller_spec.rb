@@ -179,28 +179,50 @@ describe AssignmentsController do
       end
     end
 
+    context 'assignment due dates have not passed' do
+      before(:each) do
+        due_date.due_at = DateTime.now.in_time_zone + 1.day
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+      end
+      it 'allows a topic to be edited' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).to respond_to(:edit)
+      end
+
+      it 'allows a topic to be deleted' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).to respond_to(:destroy)
+      end
+
+      it 'allows a new topic to be added' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).to respond_to(:new)
+      end
+    end
+
     context 'all assignment due dates have passed' do
-      it 'does not allow a topic to be edited' do
+      before(:each) do
         due_date.due_at = DateTime.now.in_time_zone - 1.day
         allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
-        params = {id: 1}
-        get :edit, params, xhr: true, with: "/#tabs-2"
+      end
+      it 'does not allow a topic to be edited' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
         expect(response).not_to respond_to(:edit)
       end
 
       it 'does not allow a topic to be deleted' do
-        due_date.due_at = DateTime.now.in_time_zone - 1.day
-        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
-        params = {id: 1}
-        get :edit, params, xhr: true, with: "/#tabs-2"
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
         expect(response).not_to respond_to(:destroy)
       end
 
       it 'does not allow a new topic to be added' do
-        due_date.due_at = DateTime.now.in_time_zone - 1.day
-        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
-        params = {id: 1}
-        get :edit, params, xhr: true, with: "/#tabs-2"
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
         expect(response).not_to respond_to(:new)
       end
     end

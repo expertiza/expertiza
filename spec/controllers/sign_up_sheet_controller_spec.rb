@@ -29,6 +29,12 @@ describe SignUpSheetController do
       expect(controller.instance_variable_get(:@sign_up_topic).assignment).to eq(assignment)
       expect(response).to render_template(:new)
     end
+
+    it 'has default available slots of 1' do
+      params = {id: 1}
+      get :new, params
+      expect(response).to have_field('max_choosers', with: '1')
+    end
   end
 
   describe '#create' do

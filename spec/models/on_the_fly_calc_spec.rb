@@ -11,9 +11,11 @@ describe OnTheFlyCalc do
  # let(:on_the_fly_calc) { Assignment.new { extend OnTheFlyCalc } }
   # let(:on_the_fly_calc) { build(:assignment, id: 1, name: 'Test Assgt' ) }
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
-  let(:question1) { Question.new(id: 1, weight: 2, break_before: true) }
-  let(:question2) { Question.new(id: 2, weight: 2, break_before: true) }
-  let(:assignment_questionnaire) { AssignmentQuestionnaire.new(id: 1, assignment_id: 1) }
+  let(:questionnaire) { create(:questionnaire, id: 1) }
+  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
+  let(:question2) { Criterion.new(id: 2, weight: 2, break_before: true) }
+  let(:question3) { Criterion.new(id: 3, weight: 2, break_before: true) }
+  let(:assignment_questionnaire) { double('AssignmnetQuestionnaire',id: 1, assignment_id: 1,questionnaire_weight: 200) }
   let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:team) { build(:assignment_team) }
@@ -23,47 +25,53 @@ describe OnTheFlyCalc do
   let(:questionnaire1) {build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234)}
 
 
-   # describe '#compute_total_score' do
-   #   it 'computes total score for this assignment by summing the score given on all questionnaires' do
-   #     on_the_fly_calc = Assignment.new(id: 1, name: 'Test Assgt')
-   #     on_the_fly_calc.extend(OnTheFlyCalc)
-   #     scores = {review1: {scores: {max: 0, min: 0, avg: nil}, assessments: [response]}}
-   #     fake_result  = double('AssignmnetQuestionnaire')
-   #     allow(on_the_fly_calc).to receive(:questionnaires).and_return([questionnaire1])
-   #     #allow(ReviewQuestionnaire).to receive(:assignment_questionnaires).and_return(fake_result)
-   #     allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires, :find_by).and_return(fake_result)
-   #     #allow(fake_result).to receive(:find_by).and_return(fake_result)
-   #     allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil).and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-   #     # allow(Questionnaire).to receive(:compute_weighted_score).with()
-   #     # allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1).and_return(assignment_questionnaire)
-   #   # allow(Questionnaire).to receive(:compute_weighted_score).with(sy)
-   #     expect(on_the_fly_calc.compute_total_score(scores)).to eq (0)
-   #   end
-   # end
+  describe '#compute_total_score' do
+     it 'computes total score for this assignment by summing the score given on all questionnaires' do
+       on_the_fly_calc = Assignment.new(id: 1, name: 'Test Assgt')
+       on_the_fly_calc.extend(OnTheFlyCalc)
+       scores = {review1: {scores: {max: 80, min: 0, avg: nil}, assessments: [response]}}
+       fake_result  = double('AssignmnetQuestionnaire')
+       allow(on_the_fly_calc).to receive(:questionnaires).and_return([questionnaire1])
+       allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires,:find_by).with(no_args).with(assignment_id: 1).and_return(assignment_questionnaire)
+       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil).and_return(double('AssignmentQuestionnaire', used_in_round: 1))
+       expect(on_the_fly_calc.compute_total_score(scores)).to eq(0)
+     end
+   end
 
-  #   describe '#compute_review_hash' do
-  #     context 'when current assignment varys rubrics by round' do
-  #       it 'scores varying rubrics and returns review scores' do
-  #       # Write your test here!
-  #     end
-  #   end
-  #    context 'when current assignment does not vary rubrics by round' do
-  #      it 'scores non varying rubrics and reuturn review scores' do
-  #      # Write your test here!
-  #    end
-  #  end
-  # end
-  # describe '#compute_avg_and_ranges_hash' do
-  #   context 'when current assignment varys rubrics by round' do
-  #     it 'computes avg score and score range for each team in each round and return scores'
-  #     # Write your test here!
-  #   end
-  #
-  #   context 'when current assignment does not vary rubrics by round' do
-  #     it 'computes avg score and score range for each team and return scores'
-  #     # Write your test here!
-  #   end
-  # end
+    xdescribe '#compute_review_hash' do
+      context 'when current assignment varys rubrics by round' do
+        it 'scores varying rubrics and returns review scores' do
+        # Write your test here!
+      end
+    end
+     context 'when current assignment does not vary rubrics by round' do
+       it 'scores non varying rubrics and reuturn review scores' do
+       # Write your test here!
+     end
+   end
+  end
+
+  xdescribe '#compute_avg_and_ranges_hash' do
+    context 'when current assignment varys rubrics by round' do
+      it 'computes avg score and score range for each team in each round and return scores' do
+      # Write your test here!
+        on_the_fly_calc = Assignment.new(id: 1, name: 'Test Assgt')
+        #     on_the_fly_calc.extend(OnTheFlyCalc)
+        questions= [question2,question3]
+        allow(Assignment).to receive(:contributors).and_return(double('AssignmentTeam'))
+        allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+        allow(Assignment).to receive(:rounds_of_reviews).and_return(1)
+        allow(Assignment).to receive(:review_questionnaire_id).with(1).and_return(1)
+        allow(Question).to receive(:where).with(any_args).and_return(questions)
+        print on_the_fly_calc.compute_avg_and_ranges_hash
+    end
+  end
+    context 'when current assignment does not vary rubrics by round' do
+      it 'computes avg score and score range for each team and return scores' do
+      # Write your test here!
+    end
+    end
+  end
 
   describe '#scores' do
     context 'when current assignment varys rubrics by round' do
@@ -84,17 +92,23 @@ describe OnTheFlyCalc do
     end
 
     context 'when current assignment does not vary rubrics by round' do
+
+      let(:response1) { double("respons1") }
         it 'computes and returns scores' do
        # Write your test here!
-       questions = [question1]
+       score = {min: 20, max:50, avg:25}
+       assessments = nil
+       questions= [question1]
+       response = :response
        allow(on_the_fly_calc).to receive(:score_assignment).and_return('')
        allow(on_the_fly_calc).to receive(:teams).and_return([team, team])
        allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(false)
-       allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([])
-       allow(Answer).to receive(:compute_scores).with(any_args)
        allow(on_the_fly_calc).to receive(:index).and_return(0)
+       allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([])
+       allow(on_the_fly_calc).to receive(:score).and_return(score)
+       allow(Answer).to receive(:compute_scores).with(any_args)
        print on_the_fly_calc.scores(questions)
-     end
-   end
-   end
+        end
+    end
+  end
 end

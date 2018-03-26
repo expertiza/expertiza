@@ -131,16 +131,6 @@ describe SignUpSheetController do
        expect(response).to render_template(:edit)
       end
     end
-
-    context 'all assignment due dates have passed' do
-      it 'does not allow a topic to be edited' do
-        due_date.due_at = DateTime.now.in_time_zone - 1.day
-        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
-        params = {id: 1}
-        get :edit, params
-        expect(flash[:error]).to eq('Deadline has passed, topic can not be edited')
-      end
-    end
   end
 
   describe '#update' do

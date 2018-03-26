@@ -9,6 +9,8 @@ describe AssignmentsController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
+  let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
+  let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -170,6 +172,17 @@ describe AssignmentsController do
         expect(controller.instance_variable_get(:@signup_allowed)).to be false
         expect(controller.instance_variable_get(:@team_formation_allowed)).to be false
         expect(response).to render_template(:edit)
+      end
+    end
+
+    context 'all assignment due dates have passed' do
+      it 'does not allow a topic to be edited' do
+        due_date.due_at = DateTime.now.in_time_zone - 1.day
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+        params = {id: 1}
+        get :edit, params, xhr: true
+        expect(response).not_to respond_to(:edit)
+        #expect(flash[:error]).to eq('Deadline has passed, topic can not be edited')
       end
     end
   end

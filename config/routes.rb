@@ -397,6 +397,11 @@ resources :institution, except: [:destroy] do
       post :submit
       post :student_submit
       post :update_suggestion
+      get :edit_comment
+      post :edit_comment
+      get :form_comment
+      post :form_comment
+      get :update_comment
     end
   end
 

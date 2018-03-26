@@ -13,7 +13,7 @@
         <td align="center"><%=h suggestion.status %></td>
         <td align="center"><%= link_to 'View', :action => 'student_view', :id => suggestion %>
         <%= if suggestion.status == 'Initiated'
-          link_to 'Edit', :action => 'student_edit', :id => suggestion 
+          link_to 'Edit', :action => 'student_edit', :id => suggestion
           end %></td>
       </tr>
     <% end %>

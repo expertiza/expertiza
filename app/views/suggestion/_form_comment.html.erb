@@ -1,0 +1,16 @@
+
+<%= form_for :suggestioncomment  do |form|%>
+    <div class="field">
+      <%= form.label :comments %>
+      <%= form.text_field :comments%>
+    </div>
+
+    <div class = "field">
+      <%= form.label :vote%>
+      <%= form.text_field :vote%>
+    </div>
+    <div class="actions">
+      Click to Update
+      <%= form.submit %>
+    </div>
+<% end %>

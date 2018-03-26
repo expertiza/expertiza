@@ -67,28 +67,31 @@
       <th>Comment</th>
     </tr>
 
-    <% for suggestion_comment in @suggestion.suggestion_comments %>
-        <td class="listingRow">
-          <td align="center"><%=suggestion_comment.commenter %></td>
-          <td align="center">
-            <%if suggestion_comment.vote == 'Y' %>
+    <% for suggestioncomment in @suggestion.suggestion_comments %>
+        <tr>
+
+          <td class="listingRow" align="center"><%=suggestioncomment.commenter %></td>
+          <td class="listingRow" align="center">
+            <%if suggestioncomment.vote == 'Y' %>
                 Yes
-            <%elsif suggestion_comment.vote == 'N'%>
+            <%elsif suggestioncomment.vote == 'N'%>
                 No
-            <%elsif suggestion_comment.vote == 'R'%>
+            <%elsif suggestioncomment.vote == 'R'%>
                 Revise
-                <!-- Two more crieteria for displaying comments. During Approval and Denial. Issue #1781 -->
-            <%elsif suggestion_comment.vote == 'A'%>
+                <!-- Two more crieteria for displaying comments. During Approval and Denial. Issue #1781-718 -->
+            <%elsif suggestioncomment.vote == 'A'%>
                 Approved
-            <%elsif suggestion_comment.vote == 'D'%>
+            <%elsif suggestioncomment.vote == 'D'%>
                 Denied
             <%else%>
                 --
             <%end%>
           </td>
-          </td><%= suggestion_comment.comments%></td>
+          <td class="listingRow" align="center"><%= suggestioncomment.comments%></td>
+
+          <td><%= link_to "Edit Comment",{:controller=>"suggestion",:action=>"update_comment",:suggestion=>suggestioncomment}%></td>
         </tr>
-        </td><%= link_to "Edit",:action => 'edit', :id => @suggestion.assignment_id%></tr>
+
         <%end%>
   </table>
 <%end%>

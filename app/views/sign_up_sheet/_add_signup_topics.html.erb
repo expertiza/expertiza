@@ -11,6 +11,40 @@
 <%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id }  do %>
 <% end %>
 
+<%= content_tag :div, id: "detailsDialog" do %>
+    <form id="detailsForm">
+      <div class="details-form-field">
+        <label for="topic_identifier">Topic id</label>
+        <input type="text" id="topic_identifier" name="topic_identifier" size="4">
+      </div>
+
+      <div class="details-form-field">
+        <label for="topic_name">Topic name</label>
+        <input type="text" id="topic_name" name="topic_name" size="42">
+      </div>
+
+      <div class="details-form-field">
+        <label for="category">Topic category</label>
+        <input type="text" id="category" name="category" size="10">
+      </div>
+
+      <div class="details-form-field">
+        <label for="max_choosers">Number of slots</label>
+        <input type="text" id="max_choosers" name="max_choosers" size="1">
+      </div>
+
+      <div class="details-form-field">
+        <label for="link">Topic link</label>
+        <input type="text" id="link" name="link" size="42">
+      </div>
+
+      <div class="details-form-field">
+        <label for="description">Topic description</label>
+        <textarea id="description" name="description" cols="40", rows="5"></textarea>
+      </div>
+    </form>
+<% end %>
+
 <% session[:return_to] = request.url %>
 <br/><br/>
 

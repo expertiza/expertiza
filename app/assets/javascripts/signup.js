@@ -95,6 +95,7 @@ jQuery("input[id^='due_date_']").datetimepicker({
  JS grid information http://js-grid.com/
 */
 jQuery(document).ready(function() {
+
     /* this is used for getting the assignment ID passed from Ruby into the Java script for making those Ajax calls*/
     function getAssignmentId() {
         return jQuery("#jsGrid").data("assignmentid");
@@ -107,14 +108,15 @@ jQuery(document).ready(function() {
         width: "100%",
         height: "auto",
         filtering: false,
-        inserting: true,
+        inserting: false,
         editing: true,
         sorting: true,
         paging: true,
         autoload: true,
         updateOnResize: true,
-        deleteConfirm: "Do you really want to delete the Topic?",
-
+        rowClick: function(args) {
+            showTopicDialog("Edit",args.item);
+        },
         /* controller Object : All the CRUD functionalities of our JS GRID is taken care under this controller object*/
         controller: {
             /*This makes an Ajax call to load all the signup topics which will be rendered as a json from endpoint */
@@ -198,7 +200,7 @@ jQuery(document).ready(function() {
         fields: [{
             title: "Actions",
             type: "control",
-            editButton: true,
+            editButton: false,
             deleteButton: true,
             searching: false,
             filtering: false,
@@ -207,7 +209,13 @@ jQuery(document).ready(function() {
             editButtonClass: "jsgrid-edit-button-custom",
             deleteButtonClass: "jsgrid-delete-button-custom",
             modeSwitchButton: false,
-            width: "2%"
+            width: "2%",
+            headerTemplate: function() {
+                return $("<button>").attr("type", "button").text("Add")
+                    .on("click", function () {
+                        showTopicDialog("Add", {});
+                    });
+            }
         },
             {
                 name: "topic_identifier",
@@ -298,7 +306,6 @@ jQuery(document).ready(function() {
             {
                 name: "id",
                 title: "Book marks",
-                width: "20%",
                 editing: false,
                 width: "2%",
                 itemTemplate: function(value, topic) {
@@ -319,35 +326,102 @@ jQuery(document).ready(function() {
                 filtering: true
             },
 
-            { name: "description", type: "textarea", title: "Topic Description", width: "12%" },
-            { name: "link", type: "text", title: "Topic Link", width: "12%" }
+            { name: "description", type: "textarea", title: "Topic Description", width: "12%"}
 
         ],
         /* for freezing the first column*/
         onItemUpdated: function(args) {
-            UpdateColPos(1);
+            // UpdateColPos(1);
         },
         onItemEditing: function(args) {
-            setTimeout(function() { UpdateColPos(1); }, 1);
+            //setTimeout(function() { UpdateColPos(1); }, 1);
+            //setTimeout(function() { showTopicDialog("Edit",args.item); }, 1);
         },
         onRefreshed: function(args) {
-            UpdateColPos(1);
+            // UpdateColPos(1);
         },
         onItemUpdating: function(args) {
             previousItem = args.previousItem;
         },
-
+        submitHandler: function() {
+            formSubmitHandler();
+        }
     }); // jsgrid
     //freezing columns
 
-
+    var formSubmitHandler = $.noop();
 
     $('.jsgrid-grid-body').scroll(function() {
-        UpdateColPos(1);
+        //UpdateColPos(1);
     });
 
+    $("#detailsDialog").dialog({
+        autoOpen: false,
+        width: 400,
+        buttons: {
+            "Save": function() {
+                formSubmitHandler();
+            },
+            "Close": function () {
+                $("#detailsDialog").dialog("close");
+            }
+        }
+    });
+
+    $("#detailsForm").validate({
+        rules: {
+            topic_name: "required",
+        },
+        messages: {
+            topic_name: "Please enter name",
+        },
+        submitHandler: function() {
+            formSubmitHandler();
+        }
+    });
+
+    function showTopicDialog(dialogType,topic) {
+        initializeTopicForm(dialogType,topic);
+
+        formSubmitHandler = function() {
+            saveTopicFormValuesToObject(topic);
+            if(dialogType === "Add") {
+                jQuery("#jsGrid").jsGrid('insertItem', topic);
+            }
+            else {
+                topic.topic_name = $("#topic_name").val();
+                jQuery("#jsGrid").jsGrid('updateItem', topic);
+            }
+
+            $("#detailsDialog").dialog("close");
+        };
+
+        $("#detailsDialog").dialog("option", "title", dialogType + " Topic")
+            .dialog("open");
+        $("#detailsForm").validate();
+    }
+
+    function initializeTopicForm(dialogType,topic) {
+        $("#topic_identifier").val(topic.topic_identifier);
+        $("#topic_name").val(topic.topic_name);
+        $("#max_choosers").val(topic.max_choosers);
+        $("#category").val(topic.category);
+        $("#link").val(topic.link);
+        $("#description").val(topic.description);
+    }
+
+    function saveTopicFormValuesToObject(topic) {
+
+        topic.topic_identifier = $("#topic_identifier").val();
+        topic.topic_name = $("#topic_name").val();
+        topic.max_choosers = $("#max_choosers").val();
+        topic.category = $("#category").val();
+        topic.link = $("#link").val();
+        topic.description = $("#description").val();
+    }
+
     /* Again used for freezing the controls column in our JS GRID*/
-    function UpdateColPos(cols) {
+ /*   function UpdateColPos(cols) {
         var left = $('.jsgrid-grid-body').scrollLeft() < $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16 ?
             $('.jsgrid-grid-body').scrollLeft() : $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16;
         $('.jsgrid-header-row th:nth-child(-n+' + cols + '), .jsgrid-filter-row td:nth-child(-n+' + cols + '), .jsgrid-insert-row td:nth-child(-n+' + cols + '), .jsgrid-grid-body tr td:nth-child(-n+' + cols + ')')
@@ -356,7 +430,5 @@ jQuery(document).ready(function() {
                 "left": left
             });
     }
-
-
-
+*/
 });

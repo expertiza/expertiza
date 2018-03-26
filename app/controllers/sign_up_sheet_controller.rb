@@ -189,7 +189,7 @@ class SignUpSheetController < ApplicationController
 
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic_identifier]
+    @sign_up_topic.id = params[:topic_identifier]
     @sign_up_topic.topic_name = params[:topic_name]
     @sign_up_topic.max_choosers = params[:max_choosers]
     @sign_up_topic.category = params[:category]
@@ -488,12 +488,12 @@ class SignUpSheetController < ApplicationController
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:max_choosers].to_i
+      topic.max_choosers = params[:max_choosers].to_i
     else
-      if topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-        topic.update_waitlisted_users params[:topic][:max_choosers]
-        topic.max_choosers = params[:topic][:max_choosers]
+      if topic.max_choosers.to_i < params[:max_choosers].to_i
+        topic.update_waitlisted_users params[:max_choosers]
+        topic.max_choosers = params[:max_choosers].to_i
       else
         flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
         return false

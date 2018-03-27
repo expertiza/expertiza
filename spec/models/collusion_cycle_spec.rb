@@ -18,10 +18,12 @@ describe CollusionCycle do
   let(:response2) { build(:response, id: 2) }
   let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:team2) { build(:assignment_team, id: 2, name: "team2", assignment: assignment) }
+  let(:team3) { build(:assignment_team, id: 3, name: "team3", assignment: assignment) }
+  let(:team4) { build(:assignment_team, id: 4, name: "team4", assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, grade: 90) }
   #let(:participant3) { build(:participant, id: 3) }
-  #let(:participant4) { build(:participant, id: 4) }
+  #let(:participant4) { build(:participant, id: 4, grade: 95) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map_no_response_team_1) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, assignment: assignment) }
   let(:response_map_no_response_team_2) { build(:review_response_map, id: 2, reviewee_id: team2.id, reviewer_id: participant.id, assignment: assignment) }
@@ -31,6 +33,8 @@ describe CollusionCycle do
   before(:each) do
     allow(participant).to receive(:team).and_return(team)
     allow(participant2).to receive(:team).and_return(team2)
+    #allow(participant3).to receive(:team).and_return(team3)
+    #allow(participant4).to receive(:team).and_return(team4)
     @cycle = CollusionCycle.new()
   end
 
@@ -102,14 +106,18 @@ describe CollusionCycle do
           allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2])
           allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
           allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1])
-          allow(Response).to receive(:where).with(map_id: response_map_team_1).and_return([response])
+          allow(Response).to receive(:where).with(any_args).and_return([response])
           allow(response).to receive(:total_score).and_return(participant2.grade)
           allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant.id).and_return([response_map_team_2])
           allow(Response).to receive(:where).with(map_id: response_map_team_2).and_return([response2])
           allow(response2).to receive(:total_score).and_return(participant.grade)
           
           #Tests if reviewer was reviewed by assignment participant and inserted related information into coluusion cycle array
-          expect(@cycle.two_node_cycles(participant)).to eql([[participant, 90], [participant2, 95]])
+          #expect(@cycle.two_node_cycles(participant)).to eql([[[participant, 90], [participant2, 95]]])
+	  #puts @cycle.two_node_cycles(participant)[0][0][1]
+
+          expect((@cycle.two_node_cycles(participant))[0][0]).to eql ([participant, 90.0])
+	  expect((@cycle.two_node_cycles(participant))[0][1]).to eql ([participant, 95.0])
         end
       end
     end
@@ -219,23 +227,35 @@ describe CollusionCycle do
     context 'when collusion cycle has been calculated, verify the similarity score'do
       it 'returns similarity score based on inputted 2 node cycle' do
         c = [[participant, 90], [participant2, 70]]
-        expect(@cycle.cycle_similarity_score(c).to eql(10))
+        expect(@cycle.cycle_similarity_score(c)).to eql(20.0)
       end
       it 'returns similarity score based on inputted 3 node cycle' do
-        c = [[participant, 90], [participant2, 60], [participant, 30]]
-        expect(@cycle.cycle_similarity_score(c).to eql(40))
+        c = [[participant, 90], [participant2, 60], [participant2, 30]]
+        expect(@cycle.cycle_similarity_score(c)).to eql(40.0)
       end
       it 'returns similarity score based on inputted 4 node cycle' do
-        c = [[participant, 80], [participant2, 40], [participant3, 20], [participant4, 0]]
-        expect(@cycle.cycle_similarity_score(c).to eql(60))
+        c = [[participant, 80], [participant, 40], [participant, 40], [participant, 0]]
+        expect(@cycle.cycle_similarity_score(c)).to eql(40.0)
       end
     end
     
   end
 
   describe '#cycle_deviation_score' do
-    it 'returns cycle deviation score based on inputted cycle'
-      
+    context 'when collusion cycle has been calculated, verify the deviation score' do
+      it 'returns cycle deviation score based on inputted 2 node cycle' do
+	#c = [[participant, 90], [participant2, 70]]
+        #expect(@cycle.cycle_deviation_score(c)).to eql(20.0)
+      end
+      it 'returns cycle deviation score based on inputted 3 node cycle' do
+	#c = [[participant, 90], [participant2, 60], [participant2, 30]]
+        #expect(@cycle.cycle_deviation_score(c)).to eql(40.0)
+      end
+      it 'returns cycle deviation score based on inputted 4 node cycle' do
+	#c = [[participant, 80], [participant, 40], [participant, 40], [participant, 0]]
+        #expect(@cycle.cycle_deviation_score(c)).to eql(40.0)
+      end
+    end
     # Write your test here!
   end
 end

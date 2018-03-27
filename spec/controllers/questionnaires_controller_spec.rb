@@ -3,8 +3,8 @@ describe QuestionnairesController do
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
+  let(:instructor) { build(:instructor, id: 6) }
   before(:each) do
-    instructor = build(:instructor)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
@@ -12,7 +12,6 @@ describe QuestionnairesController do
     it 'redirects to view page of copied questionnaire' do
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
       allow(Question).to receive(:where).with(questionnaire_id: '1').and_return([question])
-      instructor = build(:instructor, id: 6)
       allow(instructor).to receive(:instructor_id).and_return(6)
       question_advice = build(:question_advice)
       allow(QuestionAdvice).to receive(:where).with(question_id: 1).and_return([question_advice])
@@ -181,7 +180,8 @@ describe QuestionnairesController do
   describe '#edit' do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire'))
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6))
+        session = {user: instructor}
         params = {id: 1}
         get :edit, params
         expect(response).to render_template(:edit)
@@ -189,11 +189,12 @@ describe QuestionnairesController do
     end
 
     context 'when @questionnaire is nil' do
-      it 'redirects to /questionnaires page' do
+      it 'redirects to root page' do
         allow(Questionnaire).to receive(:find).with('666').and_return(nil)
+        session = {user: instructor}
         params = {id: 666}
         get :edit, params
-        expect(response).to redirect_to('/questionnaires')
+        expect(response).to redirect_to('/')
       end
     end
   end

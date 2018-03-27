@@ -11,7 +11,8 @@ describe Response do
   let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
-
+  let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
+  let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
   end
@@ -31,7 +32,10 @@ describe Response do
       it 'returns corresponding html code' do
         allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
         allow(questionnaire).to receive(:max_question_score).and_return(5)
-        allow(question).to receive(:view_completed_question).with(1, answer, 5).and_return('Question HTML code')
+        allow(questionnaire).to receive(:id).and_return(1)
+        allow(assignment).to receive(:id).and_return(1)
+        allow(TagPromptDeployment).to receive(:where).and_return(tag_prompt_deployment)
+        allow(question).to receive(:view_completed_question).with(1, answer, 5, tag_prompt_deployment).and_return('Question HTML code')
         expect(response.display_as_html('Instructor end', 0)).to eq("<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;"\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
           "show review</a><BR/><table id=\"review_Instructor end_1\" style=\"display: none;\" class=\"table table-bordered\">"\

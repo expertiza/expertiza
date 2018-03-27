@@ -610,8 +610,5 @@ DEPENDENCIES
   will_paginate
   zip-zip
 
-RUBY VERSION
-   ruby 2.2.7p470
-
 BUNDLED WITH
    1.16.1

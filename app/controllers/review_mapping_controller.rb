@@ -277,7 +277,13 @@ class ReviewMappingController < ApplicationController
     # Create teams if its an individual assignment.
     helper.create_teams_if_individual_assignment
     if helper.check_if_all_artifacts_num_are_zero(flash,params)
-       helper.assign_reviews_for_artifacts_num_zero(flash,params) {automatic_review_mapping_strategy(helper.assignment_id, helper.participants, helper.teams, helper.student_review_num, helper.submission_review_num)}
+       helper.assign_reviews_for_artifacts_num_zero(flash,params) do |error|
+        if error
+          flash[:error] = error.message
+        else
+        automatic_review_mapping_strategy(helper.assignment_id, helper.participants, helper.teams, helper.student_review_num, helper.submission_review_num)
+        end
+        end
     else
        helper.assign_reviews_for_artifacts_num_not_zero(params) do
         automatic_review_mapping_strategy(helper.assignment_id, helper.participants, helper.teams_with_calibrated_artifacts.shuffle!, helper.calibrated_artifacts_num, 0) if count == 0

@@ -31,32 +31,38 @@ module AutomaticReviewMappingHelper
     		
     		if @calibrated_artifacts_num == 0 and @uncalibrated_artifacts_num == 0
     			true
-    			#check_review_num_before_assigning_review(flash,obj,params)
     		else
     			false
-    			#artifacts_num_not_zero(obj,params)
     		end
 
     	end
 
     	def assign_reviews_for_artifacts_num_zero(flash,params)
     		
-    		if @student_review_num == 0 and @submission_review_num == 0
-        		flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      		elsif (@student_review_num != 0 and @submission_review_num == 0) or (@tudent_review_num == 0 and @submission_review_num != 0)
-        		# REVIEW: mapping strategy
-             	yield
-      		else
-        		flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-            end
+    			if @student_review_num == 0 and @submission_review_num == 0
+    				begin
+        			raise "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+        			rescue Exception => e
+        			yield e
+        		    end
+        			#flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      			elsif (@student_review_num != 0 and @submission_review_num == 0) or (@tudent_review_num == 0 and @submission_review_num != 0)
+        			# REVIEW: mapping strategy
+             		yield
+      			else
+      				begin
+        			raise "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+        			rescue Exception => e
+        			yield e
+        			#flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+            		end
+           
+            	end
     	end
 
     	def assign_reviews_for_artifacts_num_not_zero(params)
     		
-    		@teams_with_calibrated_artifacts = []
-      		@teams_with_uncalibrated_artifacts = []
-
-      		ReviewResponseMap.where(reviewed_object_id: @assignment_id, calibrate_to: 1).each do |response_map|
+    		ReviewResponseMap.where(reviewed_object_id: @assignment_id, calibrate_to: 1).each do |response_map|
         	@teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
       		end
       		@teams_with_uncalibrated_artifacts = @teams - @teams_with_calibrated_artifacts

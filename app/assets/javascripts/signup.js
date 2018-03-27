@@ -220,12 +220,14 @@ jQuery(document).ready(function() {
             itemTemplate: function(value,item) {
                 var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
 
-                var $customEditButton = $("<button>").prop("type","button").attr({class: "jsgrid-edit-button-custom"})
+                var $customEditButton = $("<button>")
+                    .prop("type","button").text("Edit")
                     .on("click",function(e) {
                         showTopicDialog("Edit",item);
                     });
 
-                var $customDeleteButton = $("<button>").prop("type","button").attr({class: "jsgrid-delete-button-custom"})
+                var $customDeleteButton = $("<button>")
+                    .prop("type","button").text("Delete")
                     .on("click",function(e) {
                         if(confirm("Are you sure you want to delete \""+item.topic_name+"\"?")) {
                             jQuery("#jsGrid").jsGrid('deleteItem', item); //call deleting once more in callback

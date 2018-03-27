@@ -1,12 +1,5 @@
 describe OnTheFlyCalc do
-  ###
-  # Please do not share this file with other teams.
-  # Use factories to `build` necessary objects.
-  # Please avoid duplicated code as much as you can by moving the code to `before(:each)` block or separated methods.
-  # RSpec tutorial video (until 9:32): https://youtu.be/dzkVfaKChSU?t=35s
-  # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
-  # You do not need to test private methods directly. These private methods should be tested when testing other public methods in the same file.
-  ###
+ 
 
   # let(:on_the_fly_calc) { Assignment.new { extend OnTheFlyCalc } }
   # let(:on_the_fly_calc) { build(:assignment, id: 1, name: 'Test Assgt' ) }
@@ -122,7 +115,7 @@ describe OnTheFlyCalc do
     end
   end
 
-  xdescribe '#scores' do
+  describe '#scores' do
     context 'when current assignment varys rubrics by round' do
       it 'calculates rounds/scores/assessments and return scores' do
         questions = [question1]

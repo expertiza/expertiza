@@ -51,16 +51,16 @@ module StudentTaskHelper
       rtn = "white"
       #Between 2 weeks and 10 days
     elsif (time_remaining < -10)
-      rtn = "green"
+      rtn = "lightgreen"
       #Between 10 days and a week
     elsif (time_remaining < -7)
-      rtn = "yellow"
+      rtn = "lightyellow"
       #Between a week and 4 days
     elsif (time_remaining < -4)
-      rtn = "orange"
+      rtn = "lightsalmon"
       #Between 4 days and the due date
     elsif (time_remaining < 0)
-      rtn = "red"
+      rtn = "lightcoral"
     else
       rtn "white"
     end

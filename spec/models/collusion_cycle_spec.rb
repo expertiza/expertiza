@@ -20,8 +20,8 @@ describe CollusionCycle do
   let(:team2) { build(:assignment_team, id: 2, name: "team2", assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment) }
-  #let(:participant3) { build(:participant, id: 3, assignment: assignment) }
-  #let(:participant4) { build(:participant, id: 4, assignement: assignment) }
+  let(:participant3) { build(:participant, id: 3, assignment: assignment) }
+  let(:participant4) { build(:participant, id: 4, assignement: assignment) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map_team_1_2) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response_1_2], assignment: assignment) }
   let(:response_map_team_2_1) { build(:review_response_map, id: 2, reviewee_id: team2.id, reviewer_id: participant.id, response: [response_2_1], assignment: assignment) }

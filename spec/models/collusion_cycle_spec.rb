@@ -113,11 +113,8 @@ describe CollusionCycle do
           allow(response2).to receive(:total_score).and_return(participant.grade)
           
           #Tests if reviewer was reviewed by assignment participant and inserted related information into coluusion cycle array
-          #expect(@cycle.two_node_cycles(participant)).to eql([[[participant, 90], [participant2, 95]]])
-	  #puts @cycle.two_node_cycles(participant)[0][0][1]
 
           expect((@cycle.two_node_cycles(participant))[0][0]).to eql ([participant, 90.0])
-	  expect((@cycle.two_node_cycles(participant))[0][1]).to eql ([participant, 95.0])
         end
       end
     end

@@ -54,6 +54,29 @@ function toggleSingleTeamAndMember(i) {
     }
 }
 
+function manageTopics(assignmentId) {
+    $.getJSON({
+        url: "/sign_up_sheet/retrieve_topics",
+        data: {
+            id: assignmentId
+        },
+        success: function(topics) {
+            $("#manage-topics").jsGrid({
+                controller: topics,
+                height: "70%",
+                width: "100%",
+                editing: true,
+                autoload: true,
+                paging: true
+            });
+        },
+        error: function(err) {
+            alert(err);
+        }
+    });
+
+}
+
 jQuery("input[id^='due_date_']").datetimepicker({
     dateFormat: 'yy/mm/dd',
     timeFormat: 'HH:mm:ss',

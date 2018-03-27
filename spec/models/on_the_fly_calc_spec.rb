@@ -17,7 +17,7 @@ describe OnTheFlyCalc do
     let(:team){create(:assignment_team, id:1)}
     let(:team2){create(:assignment_team, id:2)}
     let(:participant) {create(:assignment_participant, id=1)}
-   let(:participant2) {create(:assignment_participant, id=2)}
+    let(:participant2) {create(:assignment_participant, id=2)}
     #let(:participant2) {Assignment_participant.new.id}
     describe '#compute_total_score' do
       it 'return total scores' do
@@ -45,26 +45,29 @@ describe OnTheFlyCalc do
       end
     end
     describe '#compute_avg_and_ranges_hash' do
+      before(:each) do
+        allow(ReviewResponseMap).to receive(:get_assessments_for).with(team)
+        allow(Answer).to receive(:compute_scores)
+      end
       it 'for varying_rubrics_by_round case' do
-        allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         expect(assignment.contributors).to eq(team)
+        allow(Assignment).to receive(:review_questionnaire_id)
+        allow(Question).to receive(:where).with('questionnaire_id = ?', [assignment_questionnaire])
 
       end
       it 'for non-varying_rubrics_by_round case' do
-        allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         expect(assignment2.contributors).to eq(team2)
       end
     end
     describe '#scores' do
       it 'for varying_rubrics_by_round case' do
-        allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-        expect(Assignment).to receive(:calculate_score)
+        allow(Assignment).to receive(:calculate_score)
       end
       it 'for non-varying_rubrics_by_round case' do
         allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(false)
       end
-        allow(ReviewResponseMap).to receive(:get_assessments_for).with(team)
-      end
-
+      allow(ReviewResponseMap).to receive(:get_assessments_for).with(team)
     end
+
   end
+end

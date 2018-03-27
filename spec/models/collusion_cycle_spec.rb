@@ -215,12 +215,26 @@ describe CollusionCycle do
   end
 
   describe '#cycle_similarity_score' do
-    it 'returns similarity score based on inputted cycle'
-    # Write your test here!
+    context 'when collusion cycle has been calculated, verify the similarity score'do
+      it 'returns similarity score based on inputted 2 node cycle' do
+        c = [[participant, 90], [participant2, 70]]
+        expect(@cycle.cycle_similarity_score(c).to eql(10))
+      end
+      it 'returns similarity score based on inputted 3 node cycle' do
+        c = [[participant, 90], [participant2, 60], [participant, 30]]
+        expect(@cycle.cycle_similarity_score(c).to eql(40))
+      end
+      it 'returns similarity score based on inputted 4 node cycle' do
+        c = [[participant, 80], [participant2, 40], [participant3, 20], [participant4, 0]]
+        expect(@cycle.cycle_similarity_score(c).to eql(60))
+      end
+    end
+    
   end
 
   describe '#cycle_deviation_score' do
     it 'returns cycle deviation score based on inputted cycle'
+      
     # Write your test here!
   end
 end

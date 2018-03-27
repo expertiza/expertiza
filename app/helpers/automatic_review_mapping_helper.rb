@@ -27,7 +27,7 @@ module AutomaticReviewMappingHelper
     		end
     	end
 
-    	def check_if_all_artifacts_num_are_zero(flash,params)
+    	def check_if_all_artifacts_num_are_zero(params)
     		
     		if @calibrated_artifacts_num == 0 and @uncalibrated_artifacts_num == 0
     			true
@@ -37,7 +37,7 @@ module AutomaticReviewMappingHelper
 
     	end
 
-    	def assign_reviews_for_artifacts_num_zero(flash,params)
+    	def assign_reviews_for_artifacts_num_zero(params)
     		
     			if @student_review_num == 0 and @submission_review_num == 0
     				begin

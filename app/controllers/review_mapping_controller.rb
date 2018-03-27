@@ -276,8 +276,8 @@ class ReviewMappingController < ApplicationController
     helper = AutomaticReviewMappingHelper::AutomaticReviewMappingHelper.new(params)
     # Create teams if its an individual assignment.
     helper.create_teams_if_individual_assignment
-    if helper.check_if_all_artifacts_num_are_zero(flash,params)
-       helper.assign_reviews_for_artifacts_num_zero(flash,params) do |error|
+    if helper.check_if_all_artifacts_num_are_zero(params)
+       helper.assign_reviews_for_artifacts_num_zero(params) do |error|
         if error
           flash[:error] = error.message
         else

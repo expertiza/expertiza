@@ -109,13 +109,14 @@ jQuery(document).ready(function() {
         height: "auto",
         filtering: false,
         inserting: false,
-        editing: true,
+        editing: false,
+        confirmDeleting: false,
         sorting: true,
         paging: true,
         autoload: true,
         updateOnResize: true,
         rowClick: function(args) {
-            showTopicDialog("Edit",args.item);
+            return false;
         },
         /* controller Object : All the CRUD functionalities of our JS GRID is taken care under this controller object*/
         controller: {
@@ -201,7 +202,7 @@ jQuery(document).ready(function() {
             title: "Actions",
             type: "control",
             editButton: false,
-            deleteButton: true,
+            deleteButton: false,
             searching: false,
             filtering: false,
             deleteButtonTooltip: "Delete Topic",
@@ -215,6 +216,23 @@ jQuery(document).ready(function() {
                     .on("click", function () {
                         showTopicDialog("Add", {});
                     });
+            },
+            itemTemplate: function(value,item) {
+                var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
+
+                var $customEditButton = $("<button>").prop("type","button").attr({class: "jsgrid-edit-button-custom"})
+                    .on("click",function(e) {
+                        showTopicDialog("Edit",item);
+                    });
+
+                var $customDeleteButton = $("<button>").prop("type","button").attr({class: "jsgrid-delete-button-custom"})
+                    .on("click",function(e) {
+                        if(confirm("Are you sure you want to delete \""+item.topic_name+"\"?")) {
+                            jQuery("#jsGrid").jsGrid('deleteItem', item); //call deleting once more in callback
+                        }
+                    });
+
+                return $("<div>").append($customEditButton).append($customDeleteButton);
             }
         },
             {
@@ -333,6 +351,9 @@ jQuery(document).ready(function() {
         onItemUpdated: function(args) {
             // UpdateColPos(1);
         },
+        onItemDeleting: function (args) {
+
+        },
         onItemEditing: function(args) {
             //setTimeout(function() { UpdateColPos(1); }, 1);
             //setTimeout(function() { showTopicDialog("Edit",args.item); }, 1);
@@ -343,7 +364,7 @@ jQuery(document).ready(function() {
         onItemUpdating: function(args) {
             previousItem = args.previousItem;
         },
-        submitHandler: function() {
+        submitHandler: function(e) {
             formSubmitHandler();
         }
     }); // jsgrid
@@ -374,22 +395,18 @@ jQuery(document).ready(function() {
         },
         messages: {
             topic_name: "Please enter name",
-        },
-        submitHandler: function() {
-            formSubmitHandler();
         }
     });
 
     function showTopicDialog(dialogType,topic) {
         initializeTopicForm(dialogType,topic);
 
-        formSubmitHandler = function() {
+        formSubmitHandler = function(e) {
             saveTopicFormValuesToObject(topic);
             if(dialogType === "Add") {
                 jQuery("#jsGrid").jsGrid('insertItem', topic);
             }
             else {
-                topic.topic_name = $("#topic_name").val();
                 jQuery("#jsGrid").jsGrid('updateItem', topic);
             }
 
@@ -420,15 +437,4 @@ jQuery(document).ready(function() {
         topic.description = $("#description").val();
     }
 
-    /* Again used for freezing the controls column in our JS GRID*/
- /*   function UpdateColPos(cols) {
-        var left = $('.jsgrid-grid-body').scrollLeft() < $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16 ?
-            $('.jsgrid-grid-body').scrollLeft() : $('.jsgrid-grid-body .jsgrid-table').width() - $('.jsgrid-grid-body').width() + 16;
-        $('.jsgrid-header-row th:nth-child(-n+' + cols + '), .jsgrid-filter-row td:nth-child(-n+' + cols + '), .jsgrid-insert-row td:nth-child(-n+' + cols + '), .jsgrid-grid-body tr td:nth-child(-n+' + cols + ')')
-            .css({
-                "position": "relative",
-                "left": left
-            });
-    }
-*/
 });

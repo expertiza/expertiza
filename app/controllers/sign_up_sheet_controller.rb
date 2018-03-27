@@ -189,7 +189,7 @@ class SignUpSheetController < ApplicationController
 
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.id = params[:topic_identifier]
+    @sign_up_topic.topic_identifier = params[:topic_identifier]
     @sign_up_topic.topic_name = params[:topic_name]
     @sign_up_topic.max_choosers = params[:max_choosers]
     @sign_up_topic.category = params[:category]

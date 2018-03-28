@@ -103,48 +103,50 @@
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
-    <% @current_student_tasks.each do |student_task| %>
-      <% participant = student_task.participant %>
-      <% if student_task.assignment %>
-        <tr class="listingRow" bgcolor= <%=due_date_color(student_task.stage_deadline)%> >
-          <td>&nbsp;</td>
-          <!--assignment-->
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
-          <!--course-->
-          <td><%= student_task.course.try :name %></td>
-          <!--topic-->
-          <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
-          <% if SignUpTopic.exists?(topic_id) %>
-            <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
-          <% else %>
-            <td>-</td>
-          <% end %>
-          <!--current stage-->
-          <td>
-
-            <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
-
-                <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
-                <% if participant.assignment.current_stage_name(topic_id) == "Review" %>
-                    <img src="/assets/action_img.png" title="Please complete the peer review stage."/>
-                <% end %>
-
+    <% if !@current_student_tasks.nil?%>
+      <% @current_student_tasks.each do |student_task| %>
+        <% participant = student_task.participant %>
+        <% if student_task.assignment %>
+          <tr class="listingRow" bgcolor= <%=due_date_color(student_task.stage_deadline)%> >
+            <td>&nbsp;</td>
+            <!--assignment-->
+            <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+            <!--course-->
+            <td><%= student_task.course.try :name %></td>
+            <!--topic-->
+            <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+            <% if SignUpTopic.exists?(topic_id) %>
+              <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
             <% else %>
-                <%= participant.assignment.current_stage_name(topic_id) %>
-                <% if participant.assignment.current_stage_name(topic_id) == "Review" %>
-                    <img src="/assets/action_img.png" title="Please complete the peer review stage."/>
-                <% end %>
+              <td>-</td>
             <% end %>
-          </td>
-          <!--review grade-->
-          <td><%= get_review_grade_info(participant) %></td>
-          <!--badges-->
-          <td><%= get_awarded_badges(participant) %></td>
-          <!--stage deadline-->
-          <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref)  %></td>
-          <!--publish rights-->
-          <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
-        </tr>
+            <!--current stage-->
+            <td>
+
+              <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
+
+                  <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+                  <% if participant.assignment.current_stage_name(topic_id) == "Review" %>
+                      <img src="/assets/action_img.png" title="Please complete the peer review stage."/>
+                  <% end %>
+
+              <% else %>
+                  <%= participant.assignment.current_stage_name(topic_id) %>
+                  <% if participant.assignment.current_stage_name(topic_id) == "Review" %>
+                      <img src="/assets/action_img.png" title="Please complete the peer review stage."/>
+                  <% end %>
+              <% end %>
+            </td>
+            <!--review grade-->
+            <td><%= get_review_grade_info(participant) %></td>
+            <!--badges-->
+            <td><%= get_awarded_badges(participant) %></td>
+            <!--stage deadline-->
+            <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref)  %></td>
+            <!--publish rights-->
+            <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
+          </tr>
+        <% end %>
       <% end %>
     <% end %>
   </table>
@@ -168,40 +170,42 @@
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
-    <% @past_student_tasks.each do |student_task| %>
-        <% participant = student_task.participant %>
-        <% if student_task.assignment %>
-            <tr class="listingRow">
-              <td>&nbsp;</td>
-              <!--assignment-->
-              <td><b><%= link_to breaking_wrap_wrap(student_task.assignment.name,40 ), :action => 'view', :id => participant %></b></td>
-              <!--course-->
-              <td><%= student_task.course.try :name %></td>
-              <!--topic-->
-              <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
-              <% if SignUpTopic.exists?(topic_id) %>
-                  <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
-              <% else %>
-                  <td>-</td>
-              <% end %>
-              <!--current stage-->
-              <td>
-                <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
-                    <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+    <% if !@past_student_tasks.nil?%>
+      <% @past_student_tasks.each do |student_task| %>
+          <% participant = student_task.participant %>
+          <% if student_task.assignment %>
+              <tr class="listingRow">
+                <td>&nbsp;</td>
+                <!--assignment-->
+                <td><b><%= link_to breaking_wrap_wrap(student_task.assignment.name,40 ), :action => 'view', :id => participant %></b></td>
+                <!--course-->
+                <td><%= student_task.course.try :name %></td>
+                <!--topic-->
+                <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+                <% if SignUpTopic.exists?(topic_id) %>
+                    <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
                 <% else %>
-                    <%= participant.assignment.current_stage_name(topic_id) %>
+                    <td>-</td>
                 <% end %>
-              </td>
-              <!--review grade-->
-              <td><%= get_review_grade_info(participant) %></td>
-              <!--badges-->
-              <td><%= get_awarded_badges(participant) %></td>
-              <!--stage deadline-->
-              <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
-              <!--publish rights-->
-              <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
-            </tr>
-        <% end %>
+                <!--current stage-->
+                <td>
+                  <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
+                      <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+                  <% else %>
+                      <%= participant.assignment.current_stage_name(topic_id) %>
+                  <% end %>
+                </td>
+                <!--review grade-->
+                <td><%= get_review_grade_info(participant) %></td>
+                <!--badges-->
+                <td><%= get_awarded_badges(participant) %></td>
+                <!--stage deadline-->
+                <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
+                <!--publish rights-->
+                <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
+              </tr>
+          <% end %>
+      <% end %>
     <% end %>
   </table>
   <%= will_paginate @past_student_tasks, inner_window: 1, outer_window: 1, param_name: 'past_assignment_page' %>

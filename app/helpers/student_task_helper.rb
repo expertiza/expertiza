@@ -49,16 +49,16 @@ module StudentTaskHelper
     # More than 2 weeks away
     if time_remaining < -14
       rtn = "white"
-      #Between 2 weeks and 10 days
+      # Between 2 weeks and 10 days
     elsif time_remaining < -10
       rtn = "lightgreen"
-      #Between 10 days and a week
+      # Between 10 days and a week
     elsif time_remaining < -7
       rtn = "lightyellow"
-      #Between a week and 4 days
+      # Between a week and 4 days
     elsif time_remaining < -4
       rtn = "lightsalmon"
-      #Between 4 days and the due date
+      # Between 4 days and the due date
     elsif time_remaining <= 0
       rtn = "lightcoral"
     else
@@ -66,6 +66,5 @@ module StudentTaskHelper
     end
     # Return the appropriate color
     rtn
-
   end
 end

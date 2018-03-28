@@ -11,7 +11,7 @@ $(document).ready(function(){
   });
 });
 </script>
-<p><label for="user_institutions">Institution</label><br/>
-    <%= collection_select('user',:institution_id, Institution.all.order(:name), :id, :name, {include_blank: 'Other', selected: 1}) %></p>
-    <label id="name_of_other_institution" style="display: none">Name of other instituion: </label><br/>
-    <%= text_field 'institution', 'name', style: 'display: none' %></p>
+<p class="form-inline"><label for="user_institutions">Institution: </label>
+    <%= collection_select('user',:institution_id, Institution.all.order(:name), :id, :name, {include_blank: 'Other', selected: 1}, :class => "form-control width-250") %></p>
+    <label id="name_of_other_institution" style="display: none">Name of other instituion: </label>
+    <%= text_field 'institution', 'name', style: 'display: none', class: "form-control width-250" %></p>

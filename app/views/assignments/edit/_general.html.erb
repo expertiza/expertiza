@@ -38,7 +38,7 @@ function microtaskChanged() {
 <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
 <%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
 
-<tr style="text-align: center">
+<tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
 <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
 </tr>
@@ -185,7 +185,7 @@ function microtaskChanged() {
 
   <!-- Start answer tagging code -->
   <tr>
-    <td style='padding:5px'>
+    <td style='padding:5px' class="form-inline">
       <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
       <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
       <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow feedback comments to be tagged by the author?') %>

@@ -739,3 +739,18 @@ table.general td {
   overflow-y: scroll;
   max-width: 93vw;
 }
+
+.width-250 {
+  width: 250px !important;
+}
+
+@for $i from 1 through 25 {
+  .width-#{$i * 10} {
+    width: #{$i * 10}px !important;
+  }
+}
+
+.borderless th, .borderless td {
+    border: none !important;
+    padding-left: 0px !important;
+}

@@ -150,7 +150,10 @@
       <% end %>
     <% end %>
   </table>
-  <%= will_paginate @current_student_tasks, inner_window: 1, outer_window: 1, param_name: 'student_task_page' %>
+  
+  <% if !@current_student_tasks.nil?%>
+    <%= will_paginate @current_student_tasks, inner_window: 1, outer_window: 1, param_name: 'student_task_page' %>
+  <% end %>
   <br>
   <hr style="height:2px;border:none;color:#e3e3e3;background-color:#e3e3e3;" />
   <br>
@@ -208,6 +211,8 @@
       <% end %>
     <% end %>
   </table>
-  <%= will_paginate @past_student_tasks, inner_window: 1, outer_window: 1, param_name: 'past_assignment_page' %>
 
+  <% if !@past_student_tasks.nil?%>
+    <%= will_paginate @past_student_tasks, inner_window: 1, outer_window: 1, param_name: 'past_assignment_page' %>
+  <% end %>
 </div>

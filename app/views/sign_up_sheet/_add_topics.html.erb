@@ -1,14 +1,6 @@
-<% if @sign_up_topics.count == 0%>
+<%= link_to 'Manage topics', "javascript:manageTopics(#{params[:id]})", :remote => true, "data-target": "manage-topics", "data-toggle": "modal"%>
 
-    <%= link_to 'New topic',
-                {
-                    :controller => 'sign_up_sheet',
-                    :action => 'new',
-                    :id => params[:id]
-                },
-                :confirm => "You are adding a topic to this assignment.  Students will now have to select a topic before they submit their work.",
-                :topic => @topics,
-                :method => :get%> |
+<% if @sign_up_topics.count == 0%>
 
     <%= link_to 'Import topics',
                 {
@@ -33,12 +25,6 @@
                 :method => :get %> |
 
 <% else %>
-
-    <%= link_to 'New topic',
-                :controller => 'sign_up_sheet',
-                :action => 'new',
-                :id => params[:id]%> |
-
     <%= link_to 'Import topics',
                 :controller=>'import_file',
                 :action=>'start',
@@ -57,3 +43,5 @@
                     'Topic Link <em>(optional)</em>' %> |
 
 <% end %>
+
+<div class="modal hide fade" id="manage-topics"></div>

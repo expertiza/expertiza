@@ -30,6 +30,7 @@
     "prototypejs": "latest",
     "highcharts": "latest",
     "js-grid": "latest",
+    "jquery-validation": "latest",
     "jquery-colorbox": "latest",
     "jquery-bar-rating": "latest"
   }

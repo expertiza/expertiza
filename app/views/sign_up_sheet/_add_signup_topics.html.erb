@@ -8,25 +8,41 @@
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
 
-<a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
-<% if @sign_up_topics.size != 0 %>
-    <table class="general">
-      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+<%= content_tag :div, id: "jsGrid", data: { assignmentid: @assignment.id }  do %>
+<% end %>
 
-      <% i=1 %>
-      <% for topic in @sign_up_topics %>
-          <tr>
-            <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
-          </tr>
-          <% i=i+1 %>
-      <% end %>
+<%= content_tag :div, id: "detailsDialog" do %>
+    <form id="detailsForm">
+      <div class="details-form-field">
+        <label for="topic_identifier">Topic id</label>
+        <input type="text" id="topic_identifier" name="topic_identifier" size="4">
+      </div>
 
-    </table>
+      <div class="details-form-field">
+        <label for="topic_name">Topic name</label>
+        <input type="text" id="topic_name" name="topic_name" size="42">
+      </div>
 
-<% else %>
-    <div class="flash_note">
-      <%= "Signup topics have not yet been created." %>
-    </div>
+      <div class="details-form-field">
+        <label for="category">Topic category</label>
+        <input type="text" id="category" name="category" size="10">
+      </div>
+
+      <div class="details-form-field">
+        <label for="max_choosers">Number of slots</label>
+        <input type="text" id="max_choosers" name="max_choosers" size="1">
+      </div>
+
+      <div class="details-form-field">
+        <label for="link">Topic link</label>
+        <input type="text" id="link" name="link" size="42">
+      </div>
+
+      <div class="details-form-field">
+        <label for="description">Topic description</label>
+        <textarea id="description" name="description" cols="40", rows="5"></textarea>
+      </div>
+    </form>
 <% end %>
 
 <% session[:return_to] = request.url %>

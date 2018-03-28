@@ -9,8 +9,17 @@ describe AssignmentsController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
+  let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
+  let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
+  let(:team) { build(:team, id: 1, parent_id: 1) }
+  let(:teams_user) { build(:teams_user, id: 1, team_id: 1) }
+  let(:assignment_participant) { build(:assignment_particpant, id: 1) }
+  let(:topic) { build(:topic, id: 1) }
+  #let(:team) { Team.new(id: 1, advertise_for_partner: 1) }
+  #let(:signed_up_team) { build(:signed_up_team, id: 1, topic_id: 1) }
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    #allow(Team).to receive(:find).with('1').and_return(advertise_for_partners)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
@@ -170,6 +179,68 @@ describe AssignmentsController do
         expect(controller.instance_variable_get(:@signup_allowed)).to be false
         expect(controller.instance_variable_get(:@team_formation_allowed)).to be false
         expect(response).to render_template(:edit)
+      end
+    end
+
+    context 'assignment due dates have not passed' do
+      before(:each) do
+        due_date.due_at = DateTime.now.in_time_zone + 1.day
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+      end
+      it 'allows a topic to be edited' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).to respond_to(:edit)
+      end
+
+      it 'allows a topic to be deleted' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: false
+        expect(response).to respond_to(:destroy)
+      end
+
+      it 'allows a new topic to be added' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).to respond_to(:new)
+      end
+    end
+
+    context 'all assignment due dates have passed' do
+      before(:each) do
+        due_date.due_at = DateTime.now.in_time_zone - 1.day
+        allow(assignment.due_dates).to receive(:find_by).with(deadline_type_id: 6).and_return(due_date)
+      end
+      it 'does not allow a topic to be edited' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).not_to respond_to(:edit)
+      end
+
+      it 'does not allow a topic to be deleted' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).not_to respond_to(:destroy)
+      end
+
+      it 'does not allow a new topic to be added' do
+        params = {id: 1, anchor: 'tabs-2'}
+        get :edit, params, xhr: true
+        expect(response).not_to respond_to(:new)
+      end
+    end
+
+    context 'team has ad', js: true do
+      it 'displays the ad horn in the manage topics table' do
+        login_as('instructor6')
+        visit "/assignments/1/edit#tabs-2"
+        @team = Team.new(id: 1, advertise_for_partner: 1)
+        @signed_up_team = SignedUpTeam.new(id: 1, topic_id: 1)
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        # params = {id: 1}
+        # get :edit, params, xhr: true, with: '/#tabs-2'
+        # expect(response).to have_css('img', text: 'ad_horn.png')
+        expect(response).to have_content("ad_horn.png")
       end
     end
   end

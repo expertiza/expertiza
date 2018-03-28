@@ -33,6 +33,31 @@ class SuggestionController < ApplicationController
     end
   end
 
+  def update_comment
+    @suggestioncomment = SuggestionComment.find(params[:suggestion])
+  end
+  def edit_comment
+    #718 issue
+    #instructor should be able to edit the comments
+
+    if @suggestioncomment.save
+      flash[:notice] = "Your comment has been sucessfully edited"
+      if current_role_name.eql? 'Student'
+        redirect _to action: "student_view",id: params[:id]
+      else
+        redirect_to action: 'show', id: params[:id]
+      end
+    else
+      flash[:notice] = "There was an error while editing your comment"
+      if current_role_name.eql? 'Student'
+        redirect _to action: "student_view",id: params[:id]
+      else
+        redirect_to action: 'show', id: params[:id]
+      end
+    end
+
+  end
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
@@ -165,12 +190,38 @@ class SuggestionController < ApplicationController
   end
 
   def approve_suggestion
-    approve
-    notification
+    # 1781 - 718 issue
+    # The Instructor should be able to give feed backs during the times of approval as well.
+    # Thus we are getting the comments through the request when approval is made and saving those in
+    # Database with Vote type as A - meaning approval
+    if params[:suggestion_comment][:comments] && params[:suggestion_comment][:comments] != ""
+      @suggestioncomment = SuggestionComment.new(vote: 'A', comments: params[:suggestion_comment][:comments])
+      @suggestioncomment.suggestion_id = params[:id]
+      @suggestioncomment.commenter = session[:user].name
+      @suggestioncomment.save
+    end
+    @suggestion = Suggestion.find(params[:id])
+
+    if @suggestion.update_attribute('status', 'Accepted')
+      flash[:notice] = 'The suggestion has been successfully accepted.'
+    else
+      flash[:error] = 'An error occurred when accepting the suggestion.'
+    end
+
     redirect_to action: 'show', id: @suggestion
   end
 
   def reject_suggestion
+    # 1781 - 718 issue
+    # The Instructor should be able to give feed backs during the times of rejection as well.
+    # Thus we are getting the comments through the request when denial is made and saving those in
+    # Database with Vote type as D - meaning reject
+    if params[:suggestion_comment][:comments] && params[:suggestion_comment][:comments] != ""
+      @suggestioncomment = SuggestionComment.new(vote: 'D', comments: params[:suggestion_comment][:comments])
+      @suggestioncomment.suggestion_id = params[:id]
+      @suggestioncomment.commenter = session[:user].name
+      @suggestioncomment.save
+      end
     @suggestion = Suggestion.find(params[:id])
 
     if @suggestion.update_attribute('status', 'Rejected')
@@ -181,11 +232,13 @@ class SuggestionController < ApplicationController
     redirect_to action: 'show', id: @suggestion
   end
 
+
+
   private
 
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description,
-                                       :status, :unityID, :signup_preference)
+                                       :status, :unityID, :signup_preference,:id)
   end
 
   def approve

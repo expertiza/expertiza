@@ -67,23 +67,32 @@
       <th>Comment</th>
     </tr>
 
-    <% for suggestion_comment in @suggestion.suggestion_comments %>
-      <tr class="listingRow">
-        <td align="center"><%=suggestion_comment.commenter %></td>
-        <td align="center">
-          <%if suggestion_comment.vote == 'Y' %>
-            Yes
-          <%elsif suggestion_comment.vote == 'N'%>
-            No
-          <%elsif suggestion_comment.vote == 'R'%>
-            Revise
-          <%else%>
-            --
-          <%end%>
-        </td>
-        <td><%= suggestion_comment.comments %></td>
-      </tr>
-    <% end %>
+    <% for suggestioncomment in @suggestion.suggestion_comments %>
+        <tr>
+
+          <td class="listingRow" align="center"><%=suggestioncomment.commenter %></td>
+          <td class="listingRow" align="center">
+            <%if suggestioncomment.vote == 'Y' %>
+                Yes
+            <%elsif suggestioncomment.vote == 'N'%>
+                No
+            <%elsif suggestioncomment.vote == 'R'%>
+                Revise
+                <!-- Two more crieteria for displaying comments. During Approval and Denial. Issue #1781-718 -->
+            <%elsif suggestioncomment.vote == 'A'%>
+                Approved
+            <%elsif suggestioncomment.vote == 'D'%>
+                Denied
+            <%else%>
+                --
+            <%end%>
+          </td>
+          <td class="listingRow" align="center"><%= suggestioncomment.comments%></td>
+
+          <td><%= link_to "Edit Comment",{:controller=>"suggestion",:action=>"update_comment",:suggestion=>suggestioncomment}%></td>
+        </tr>
+
+        <%end%>
   </table>
 <%end%>
 <br>
@@ -98,9 +107,14 @@
     </p>
 
     <%= submit_tag "Submit vote", :name => 'add_comment' %>
+        <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+            <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+            <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+        <% end %>
   <% end %>
 
 <% end %>
+
 <p>
   <%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
 </p>

@@ -314,6 +314,8 @@ resources :institution, except: [:destroy] do
       get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered
+      get :retrieve_topics
+      get ':id/load_add_signup_topics', action: :load_add_signup_topics
       get :delete_signup
       get :list
       get :signup_topics
@@ -326,6 +328,7 @@ resources :institution, except: [:destroy] do
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
+      post :persist_topics
     end
   end
 
@@ -391,6 +394,11 @@ resources :institution, except: [:destroy] do
       post :submit
       post :student_submit
       post :update_suggestion
+      get :edit_comment
+      post :edit_comment
+      get :form_comment
+      post :form_comment
+      get :update_comment
     end
   end
 

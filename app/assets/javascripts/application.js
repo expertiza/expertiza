@@ -33,6 +33,8 @@
 //= require jquery-tablesorter
 //= require awesome_input
 //= require jquery-bar-rating/jquery.barrating
+//= require js-grid/dist/jsgrid
+//= require jquery-validation
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

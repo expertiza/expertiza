@@ -13,7 +13,7 @@
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <% end %>
         <% if @assignment_form.assignment.has_badge? %>
-          <li><a href="#tabs-7" id="Badges">Badges</li>
+            <li><a href="#tabs-7" id="Badges">Badges</a></li>
         <% end %>
       </ul>
       <div id="tabs-1">
@@ -76,7 +76,7 @@
     </div>
     <script>
       var useBookmarkChanged = function () {
-          jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove()
+          jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove();
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {
             addQuestionnaireTableRow(

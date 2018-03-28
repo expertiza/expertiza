@@ -18,8 +18,9 @@ class StudentTaskController < ApplicationController
     # Get list of student tasks that are available and currently due then sort them by their due date.
     @all_tasks = StudentTask.from_user current_user
     @student_tasks = @all_tasks.select {|t| t.assignment.availability_flag }
-    if (!@student_tasks.nil?)
-      @student_tasks.select! {|t| t.stage_deadline.to_date > DateTime.now}.sort_by! {|k| k.stage_deadline}
+    @student_tasks = @student_tasks.select! {|t| t.stage_deadline.to_date > DateTime.now}
+    if !(@student_tasks.nil?)
+      @student_tasks= @student_tasks.sort_by! {|k| k.stage_deadline}
       @student_tasks = @student_tasks.paginate(page: params[:student_task_page], per_page: 10)
     end
     list_past_due_tasks
@@ -29,7 +30,7 @@ class StudentTaskController < ApplicationController
   def list_past_due_tasks
     # Get a list of student tasts that are past due and sort them by their due date.
     @past_student_tasks= @all_tasks.select {|t| t.stage_deadline.to_date < DateTime.now}
-    if (!@past_student_tasks.nil?)
+    if !(@past_student_tasks.nil?)
       @past_student_tasks.sort_by! {|k| k.stage_deadline}.reverse!
       @past_student_tasks = @past_student_tasks.paginate(page: params[:past_assignment_page], per_page: 10)
     end

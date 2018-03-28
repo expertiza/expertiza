@@ -103,7 +103,7 @@
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
-    <% @student_tasks.each do |student_task| %>
+    <% @current_student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
         <tr class="listingRow" bgcolor= <%=due_date_color(student_task.stage_deadline)%> >
@@ -148,7 +148,7 @@
       <% end %>
     <% end %>
   </table>
-  <%= will_paginate @student_tasks, inner_window: 1, outer_window: 1, param_name: 'student_task_page' %>
+  <%= will_paginate @current_student_tasks, inner_window: 1, outer_window: 1, param_name: 'student_task_page' %>
   <br>
   <hr style="height:2px;border:none;color:#e3e3e3;background-color:#e3e3e3;" />
   <br>

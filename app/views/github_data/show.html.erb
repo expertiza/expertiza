@@ -1,5 +1,49 @@
 <h1 class="center">Github Data</h1>
+<h3 class="center">Total Commits by User</h3>
+<table>
+  <thead>
+  <tr>
+    <th>Committer</th>
+    <th>Commits</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
 
+  <% @commits_by_user.each do |name, commits| %>
+    <tr>
+      <td align="center"><%= name %></td>
+      <td align="center"><%= commits %></td>
+    </tr>
+  <% end unless @commits_by_user.nil? %>
+  </tbody>
+</table>
+
+<h3 class="center">Commits By Day</h3>
+<table>
+  <thead>
+  <tr>
+    <th>Date</th>
+    <th>Commits</th>
+    <th>Additions</th>
+    <th>Deletions</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
+
+  <% @changes_by_date.each do |entry| %>
+    <tr>
+      <td align="center"><%= entry[0] %></td>
+      <td align="center"><%= entry[1][:commits] %></td>
+      <td align="center"><%= entry[1][:additions] %></td>
+      <td align="center"><%= entry[1][:deletions] %></td>
+    </tr>
+  <% end unless @changes_by_date.nil? %>
+  </tbody>
+</table>
+
+<h3 class="center">Full Information</h3>
 <table>
   <thead>
   <tr>

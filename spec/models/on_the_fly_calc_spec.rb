@@ -93,7 +93,7 @@ describe OnTheFlyCalc do
     end
   end
 
-  describe '#compute_avg_and_ranges_hash' do
+ xdescribe '#compute_avg_and_ranges_hash' do
     context 'when current assignment varys rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do
         # Write your test here!
@@ -115,7 +115,7 @@ describe OnTheFlyCalc do
     end
   end
 
-  describe '#scores' do
+ xdescribe '#scores' do
     context 'when current assignment varys rubrics by round' do
       it 'calculates rounds/scores/assessments and return scores' do
         questions = [question1]

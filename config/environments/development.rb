@@ -34,11 +34,11 @@ Expertiza::Application.configure do
 
   config.log_tags = [ :remote_ip, :uuid ]
 
-  config.log_formatter = proc do |_severity, _timestamp, _progname, msg|
+  config.log_formatter = proc do |s, ts, pg, msg|
     if msg.is_a?(LogMessage)
-      "TST=[#{_timestamp}] SVT=[#{_severity}] PNM=[#{_progname}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}] UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]\n"
+      "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}] UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]\n"
     else
-      "TST=[#{_timestamp}] SVT=[#{_severity}] PNM=[#{_progname}] OIP=[] RID=[] CTR=[] UID=[] MSG=[#{filter(msg)}]\n"
+      "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[] RID=[] CTR=[] UID=[] MSG=[#{filter(msg)}]\n"
     end
   end
 

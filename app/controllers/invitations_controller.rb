@@ -43,10 +43,10 @@ class InvitationsController < ApplicationController
     # Accept the invite and check whether the add was successful
     unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
       flash[:error] = 'The system failed to add you to the team that invited you.'
-      ExpertizaLogger.info LogMessage.new(controller_name, @student.name,  "Invitation #{params[:inv_id]} sent by #{@inv.from_id} could not be accepted", request)
+      ExpertizaLogger.info LogMessage.new(controller_name, @student.name, "Invitation #{params[:inv_id]} by #{@inv.from_id} could not be accepted", request)
     end
 
-    ExpertizaLogger.info LogMessage.new(controller_name, @student.name,  "Accepted invitation #{params[:inv_id]} sent by #{@inv.from_id}", request)
+    ExpertizaLogger.info LogMessage.new(controller_name, @student.name, "Accepted invitation #{params[:inv_id]} sent by #{@inv.from_id}", request)
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 

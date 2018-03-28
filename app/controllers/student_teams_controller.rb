@@ -150,14 +150,10 @@ class StudentTeamsController < ApplicationController
         end
       end
     end
-
     # remove all the sent invitations
     old_invites = Invitation.where from_id: student.user_id, assignment_id: student.parent_id
-
     old_invites.each(&:destroy)
-
     student.save
-
     redirect_to view_student_teams_path student_id: student.id
   end
 

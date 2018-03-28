@@ -49,19 +49,10 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
-    session[:scores] = @scores
     averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
-  end
-
-  def tabbing
-    index = params[:i]
-    @scores = session[:scores]
-    render "grades/_tabbing",
-           locals: {:prefix => 'team'+index.to_s, :tscore => @scores[:teams][index.to_s.to_sym]},
-           layout: false
   end
 
   # This method is used to retrieve questions for different review rounds
@@ -321,5 +312,4 @@ class GradesController < ApplicationController
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
-
 end

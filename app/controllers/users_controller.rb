@@ -162,12 +162,11 @@ class UsersController < ApplicationController
       redirect_to '/instructions/home'
       return
     elsif user_existed
-      ExpertizaLogger.error LogMessage.new(controller_name, requested_user.name, 'The account you are requesting has already existed in Expertiza.', request)
       flash[:error] = "The account you are requesting has already existed in Expertiza."
     else
-      ExpertizaLogger.error LogMessage.new(controller_name, "", requested_user.errors.full_messages.to_sentence, request)
       flash[:error] = requested_user.errors.full_messages.to_sentence
     end
+    ExpertizaLogger.error LogMessage.new(controller_name, requested_user.name, flash[:error], request)
     redirect_to controller: 'users', action: 'request_new', role: 'Student'
   end
 

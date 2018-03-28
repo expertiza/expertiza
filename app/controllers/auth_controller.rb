@@ -41,7 +41,6 @@ class AuthController < ApplicationController
   # Login functionality for google login feature using omniAuth2
   def google_login
     g_email = env['omniauth.auth'].info.email
-    ExpertizaLogger.debug("email : #{g_email}")
     user = User.find_by(email: g_email)
     if user.nil?
       ExpertizaLogger.error LogMessage.new(controller_name, g_email, 'This email is not authorized to use Expertiza!', request)
@@ -71,23 +70,15 @@ class AuthController < ApplicationController
       params[:action] == 'view'
       if session[:credentials].pages.key?(params[:page_name].to_s)
         if session[:credentials].pages[params[:page_name].to_s] == true
-          ExpertizaLogger.info "Page: authorised"
           authorised = true
-        else
-          ExpertizaLogger.info "Page: NOT authorised"
         end
-      else
-        ExpertizaLogger.warn "(Unknown page? #{params[:page_name]})"
       end
     else
       # Check if there's a specific permission for an action
       if session[:credentials].actions.key?(params[:controller])
         if session[:credentials].actions[params[:controller]].key?(params[:action])
           if session[:credentials].actions[params[:controller]][params[:action]]
-            ExpertizaLogger.info "Action: authorised"
             authorised = true
-          else
-            ExpertizaLogger.info "Action: NOT authorised"
           end
         else
           check_controller = true
@@ -100,16 +91,13 @@ class AuthController < ApplicationController
       if check_controller
         if session[:credentials].controllers.key?(params[:controller])
           if session[:credentials].controllers[params[:controller]]
-            ExpertizaLogger.info "Controller: authorised"
             authorised = true
-          else
-            ExpertizaLogger.info "Controller: NOT authorised"
           end
         end
       end
     end # Check permissions
 
-    ExpertizaLogger.info "Authorised? #{authorised}"
+    ExpertizaLogger.info "Authorised? #{authorised}, check_controller? #{check_controller}"
     authorised
   end
 

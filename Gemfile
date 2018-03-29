@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby "2.2.7"
+
 gem 'rails', '~> 4.2.7.1'
 
 ## Gems in Alphabetical Order
@@ -34,7 +34,7 @@ gem 'jquery-tablesorter'
 gem 'jquery-ui-sass-rails'
 gem 'json', '~> 1.8', '>= 1.8.3'
 gem 'lingua'
-gem 'mysql2', '~> 0.4.9'
+gem 'mysql2', '0.3.20'
 gem 'nokogiri', '~> 1.8'
 gem 'omniauth-google-oauth2', '~> 0.2.6'
 gem 'open-uri-cached'

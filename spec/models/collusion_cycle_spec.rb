@@ -55,7 +55,7 @@ describe CollusionCycle do
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
     allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
-    allow(AssignmentParticipant).to receive(:find).with(5).and_return(participant5)
+    allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
     allow(participant3).to receive(:team).and_return(team3)
     allow(participant4).to receive(:team).and_return(team4)
     allow(response_1_2).to receive(:total_score).and_return(90)
@@ -236,8 +236,19 @@ describe CollusionCycle do
   #
   describe '#four_node_cycles' do
     context 'when the reviewers of current reviewer (ap3) does not include current assignment participant' do
-      it 'skips this reviewer (ap3) and returns corresponding collusion cycles'
-      # Write your test here!
+      it 'skips this reviewer (ap3) and returns corresponding collusion cycles' do
+      	#Sets up stubs for test
+        allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+        allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+        allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+        allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+	allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_4])
+        allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant4)
+        allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team4.id).and_return([])
+
+        #Tests if current reviewer does not include current assignment participant
+        expect(@cycle.four_node_cycles(participant)).to eq([])
+      end
     end
 
     context 'when the reviewers of current reviewer (ap3) includes current assignment participant' do
@@ -312,8 +323,8 @@ describe CollusionCycle do
         expect(@cycle.cycle_deviation_score(c)).to eql(2.0)
       end
       it 'returns cycle deviation score based on inputted 4 node cycle' do
-	c = [[participant, 80], [participant2, 40], [participant3, 40], [participant55555, 0]]
-        expect(@cycle.cycle_deviation_score(c)).to eql(40.0)
+	c = [[participant, 91], [participant2, 71], [participant3, 100], [participant4, 99]]
+        expect(@cycle.cycle_deviation_score(c)).to eql(1.0)
       end
     end
     # Write your test here!

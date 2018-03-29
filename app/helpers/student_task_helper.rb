@@ -44,7 +44,7 @@ module StudentTaskHelper
 
   # Determine a background color based on how many days out the due date is.
   def due_date_color(due_date)
-    time_remaining = (DateTime.now - due_date.to_date).to_i
+    time_remaining = (Time.zone.now - due_date.to_date).to_i
     rtn = "white"
     # More than 2 weeks away
     if time_remaining < -14

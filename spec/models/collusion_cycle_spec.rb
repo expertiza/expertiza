@@ -222,8 +222,25 @@ describe CollusionCycle do
       end
 
       context 'when current reviewer (ap2) was reviewed by current assignment participant' do
-        it 'inserts related information into collusion cycles and returns results'
-        # Write your test here!
+        it 'inserts related information into collusion cycles and returns results' do
+          #Sets up stubs for test
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_1])
+          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant3.id).and_return([response_map_team_2_3])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_2_3]).and_return([response_2_3])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team3.id, reviewer_id: participant.id).and_return([response_map_team_3_1])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_3_1]).and_return([response_3_1])
+         
+          #Tests if reviewer (ap2) was reviewed by assignment participant and inserted related information into coluusion cycle arr
+          expect(@cycle.three_node_cycles(participant)).to eq([[[participant, 90], [participant2, 82],[participant3, 97]]])
+        end
       end
     end
   end

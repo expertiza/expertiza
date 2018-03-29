@@ -6,8 +6,7 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
-      ['Super-Administrator',
-       'Administrator'].include? current_role_name or
+      ['Super-Administrator', 'Administrator'].include? current_role_name or
       assignment.instructor_id == current_user.try(:id) or
       TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
       assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
@@ -33,17 +32,39 @@ class AssignmentsController < ApplicationController
   end
 
   def create
+
     @assignment_form = AssignmentForm.new(assignment_form_params)
-
-    if @assignment_form.save
-      @assignment_form.create_assignment_node
-
-      redirect_to edit_assignment_path @assignment_form.assignment.id
-      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+    if params[:button]
+        if @assignment_form.save
+          @assignment_form.create_assignment_node
+          existAssignment = Assignment.find_by_name(@assignment_form.assignment.name)
+          assignment_form_params[:assignment][:id] = existAssignment.id.to_s
+          quesparams = assignment_form_params
+          questArray = quesparams[:assignment_questionnaire]
+          dueArray = quesparams[:due_date]
+          questArray.each do |curquestionnaire|
+            curquestionnaire[:assignment_id] = existAssignment.id.to_s
+          end
+          dueArray.each do |curDue|
+            curDue[:parent_id] = existAssignment.id.to_s
+          end
+          quesparams[:assignment_questionnaire] = questArray
+          quesparams[:due_date] = dueArray
+          @assignment_form.update(quesparams,current_user)
+          aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+          redirect_to edit_assignment_path aid
+          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+          return
+        else
+          flash.now[:error] = "Failed to create assignment"
+          render 'new'
+        end
     else
       render 'new'
+      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     end
   end
+
 
   def edit
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?

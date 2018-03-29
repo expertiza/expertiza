@@ -18,19 +18,35 @@ describe CollusionCycle do
   let(:response_2_1) { build(:response, id: 2) }
   let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:team2) { build(:assignment_team, id: 2, name: "team2", assignment: assignment) }
+  let(:team3) { build(:assignment_team, id: 3, name: "team3", assignment: assignment) }
+  let(:team5) { build(:assigmnet_team, id: 4, name: "team4", assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment) }
   let(:participant3) { build(:participant, id: 3, assignment: assignment) }
-  let(:participant4) { build(:participant, id: 4, assignment: assignment) }
+  let(:participant55555) { build(:participant, id: 5, assignment: assignment) }
+  #let(:participant4) { build(:participant, id: 4, assignment: assignment) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map_team_1_2) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response_1_2], assignment: assignment) }
   let(:response_map_team_2_1) { build(:review_response_map, id: 2, reviewee_id: team2.id, reviewer_id: participant.id, response: [response_2_1], assignment: assignment) }
+  let(:questionnaire) { build(:questionnaire, id: 1) }
   
   before(:each) do
     allow(participant).to receive(:team).and_return(team)
     allow(participant2).to receive(:team).and_return(team2)
-    #allow(participant3).to receive(:team).and_return(team3)
-    #allow(participant4).to receive(:team).and_return(team4)
+    allow(participant).to receive(:id).and_return(1)
+    allow(participant2).to receive(:id).and_return(2)
+    allow(participant3).to receive(:id).and_return(3)
+    allow(participant55555).to receive(:id).and_return(4)
+    allow(participant).to receive(:review_score).and_return(90)
+    allow(participant2).to receive(:review_score).and_return(70)
+    allow(participant3).to receive(:review_score).and_return(99)
+    allow(participant55555).to receive(:review_score).and_return(100)
+    allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+    allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+    allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+    allow(AssignmentParticipant).to receive(:find).with(5).and_return(participant5)
+    allow(participant3).to receive(:team).and_return(team3)
+    allow(participant55555).to receive(:team).and_return(team4)
     @cycle = CollusionCycle.new()
   end
 
@@ -243,16 +259,16 @@ describe CollusionCycle do
   describe '#cycle_deviation_score' do
     context 'when collusion cycle has been calculated, verify the deviation score' do
       it 'returns cycle deviation score based on inputted 2 node cycle' do
-	#c = [[participant, 90], [participant2, 70]]
-        #expect(@cycle.cycle_deviation_score(c)).to eql(20.0)
+	c = [[participant, 91], [participant2, 71]]
+        expect(@cycle.cycle_deviation_score(c)).to eql(1.0)
       end
       it 'returns cycle deviation score based on inputted 3 node cycle' do
-	#c = [[participant, 90], [participant2, 60], [participant2, 30]]
-        #expect(@cycle.cycle_deviation_score(c)).to eql(40.0)
+	c = [[participant, 92], [participant2, 72], [participant3, 97]]
+        expect(@cycle.cycle_deviation_score(c)).to eql(2.0)
       end
       it 'returns cycle deviation score based on inputted 4 node cycle' do
-	#c = [[participant, 80], [participant, 40], [participant, 40], [participant, 0]]
-        #expect(@cycle.cycle_deviation_score(c)).to eql(40.0)
+	c = [[participant, 80], [participant2, 40], [participant3, 40], [participant55555, 0]]
+        expect(@cycle.cycle_deviation_score(c)).to eql(40.0)
       end
     end
     # Write your test here!

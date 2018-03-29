@@ -74,12 +74,16 @@
     <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
     <hr/>
-    <h4>Import/Export (from/to CSV format)</h4>
+        <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
+        <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
+
+
+    <!--<h4>Import/Export (from/to CSV format)</h4>
     <input type="file" name="csv" />
     <br />
     <input type="submit" name="import" value="Import questions"/>
     <br />
-    <input type="submit" name="export" value="Export questions to CSV"%>
+    <input type="submit" name="export" value="Export questions to CSV"%>-->
   <% end %>
 <% end %>
 

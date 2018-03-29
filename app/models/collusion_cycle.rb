@@ -6,7 +6,7 @@ class CollusionCycle
   # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
   # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
 
-  def two_node_cycles
+  def two_node_cycles(assignment_participant)
     collusion_cycles = []
     assignment_participant.reviewers.each do |ap|
       next unless ap.reviewers.include?(assignment_participant)
@@ -27,7 +27,7 @@ class CollusionCycle
     collusion_cycles
   end
 
-  def three_node_cycles
+  def three_node_cycles(assignment_participant)
     collusion_cycles = []
     assignment_participant.reviewers.each do |ap1|
       ap1.reviewers.each do |ap2|
@@ -56,7 +56,7 @@ class CollusionCycle
     collusion_cycles
   end
 
-  def four_node_cycles
+  def four_node_cycles(assignment_participant)
     collusion_cycles = []
     assignment_participant.reviewers.each do |ap1|
       ap1.reviewers.each do |ap2|

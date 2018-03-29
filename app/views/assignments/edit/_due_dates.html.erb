@@ -97,7 +97,9 @@
         html +=
                 '<input name="assignment_form[due_date][][id]" type="hidden" value="' + id +'">';
 
-        html += '<input class="due_date_assignment_id" name="assignment_form[due_date][][parent_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> + '">' +
+        html += '<input class="due_date_assignment_id" name="assignment_form[due_date][][parent_id]" type="hidden" value="';
+	html += '<%= @assignment_form.assignment.id %>';
+	html += '">' +
         '<input class="due_date_round" name="assignment_form[due_date][][round]" type="hidden" value="' + round_no + '">' +
         '<input class="due_date_deadline_type_id" name="assignment_form[due_date][][deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
 
@@ -178,7 +180,7 @@
         '<option value="3">Yes</option>' +
         '</select></td>';
 
-        if (<%=@assignment_form.assignment.require_quiz%>)
+        if (<%= @assignment_form.assignment.require_quiz == nil ? false : @assignment_form.assignment.require_quiz %>)
         {
             html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
             '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
@@ -266,7 +268,7 @@
         var current_round_count = 0;
         var round_no;
         for (i = 0; i < due_dates_table_element_list.length; i++) {
-            round_no = parseInt(due_dates_table_element_list[i].id.split('_').last());
+            round_no = parseInt(due_dates_table_element_list[i].id.split('_').slice(-1)[0]);
             if (!isNaN(round_no)) {
                 if (current_round_count < round_no) {
                     current_round_count = round_no;

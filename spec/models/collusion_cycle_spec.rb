@@ -324,10 +324,9 @@ describe CollusionCycle do
         # Write your test here!
 	end
       end
-
       context 'when the reviewee of current reviewee (ap1) was reviewed by current reviewee (ap2)' do
         it 'inserts related information into collusion cycles and returns results'
-        # Write your test here!
+          
       end
 
       context 'when current reviewee (ap2) was not reviewed by current reviewer (ap3)' do
@@ -346,8 +345,29 @@ describe CollusionCycle do
       end
 
       context 'when current reviewer (ap3) was reviewed by current assignment participant' do
-        it 'inserts related information into collusion cycles and returns results'
-        # Write your test here!
+        it 'inserts related information into collusion cycles and returns results' do
+          #Sets up stubs for test
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+	  allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_4])
+          allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+	  allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team4.id).and_return([response_map_team_4_1])
+          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant3.id).and_return([response_map_team_2_3])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_2_3]).and_return([response_2_3])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team3.id, reviewer_id: participant4.id).and_return([response_map_team_3_4])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_3_4]).and_return([response_3_4])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team4.id, reviewer_id: participant.id).and_return([response_map_team_4_1])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_4_1]).and_return([response_4_1])
+         
+          #Tests if reviewer was reviewed by assignment participant and inserted related information into coluusion cycle arr
+          expect(@cycle.four_node_cycles(participant)).to eq([[[participant, 90], [participant2, 82],[participant3, 80], [participant4, 0]]])
+        end
       end
     end
   end

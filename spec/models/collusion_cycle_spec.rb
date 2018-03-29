@@ -208,7 +208,7 @@ describe CollusionCycle do
 
       context 'when current reviewee (ap1) was not reviewed by current reviewer (ap2)' do
         it 'skips current reviewer (ap2) and returns corresponding collusion cycles'
-        # Write your test here!
+
       end
 
       context 'when current reviewee (ap1) was reviewed by current reviewer (ap2)' do
@@ -253,8 +253,21 @@ describe CollusionCycle do
 
     context 'when the reviewers of current reviewer (ap3) includes current assignment participant' do
       context 'when current assignment participant was not reviewed by the reviewee of current reviewee (ap1)' do
-        it 'skips current reviewer (ap3) and returns corresponding collusion cycles'
-        # Write your test here!
+        it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
+                  #Sets up stubs for test
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_4])
+          allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_4_1])
+          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+          allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([])
+          
+          #Tests if current assignment participant was not reviewed by current reviewer
+          expect(@cycle.four_node_cycles(participant)).to eq([])
+	end
       end
 
       context 'when current assignment participant was reviewed by the reviewee of current reviewee (ap1)' do

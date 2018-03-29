@@ -314,36 +314,14 @@ describe CollusionCycle do
 
       context 'when the reviewee of current reviewee (ap1) was not reviewed by current reviewee (ap2)' do
         it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
-	  #Sets up stubs for test
-          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
-          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
-          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
-          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
-          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_4])
-          allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
-          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team4.id).and_return([response_map_team_4_1])
-          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
 
-
-          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
-          allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
-          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant3.id).and_return([response_map_team_2_3])
-          allow(Response).to receive(:where).with(map_id: [response_map_team_2_3]).and_return([response_2_3])
-          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team3.id, reviewer_id: participant4.id).and_return([response_map_team_3_4])
-          allow(Response).to receive(:where).with(map_id: [response_map_team_3_4]).and_return([response_3_4])
-          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team4.id, reviewer_id: participant.id).and_return([response_map_team_4_1])
-          allow(Response).to receive(:where).with(map_id: [response_map_team_4_1]).and_return([response_4_1])
-
-          allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([])
-          
-          #Tests if reviewer was not reviewed by assignment participant
-          expect(@cycle.four_node_cycles(participant)).to eq([])
         # Write your test here!
 	end
       end
       context 'when the reviewee of current reviewee (ap1) was reviewed by current reviewee (ap2)' do
-        it 'inserts related information into collusion cycles and returns results'
+        it 'inserts related information into collusion cycles and returns results' do
           
+	end
       end
 
       context 'when current reviewee (ap2) was not reviewed by current reviewer (ap3)' do
@@ -357,8 +335,33 @@ describe CollusionCycle do
       end
 
       context 'when current reviewer (ap3) was not reviewed by current assignment participant' do
-        it 'skips current reviewer (ap3) and returns corresponding collusion cycles'
-        # Write your test here!
+        it 'skips current reviewer (ap3) and returns corresponding collusion cycles' do
+        	  #Sets up stubs for test
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_4])
+          allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team4.id).and_return([response_map_team_4_1])
+          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+
+
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant3.id).and_return([response_map_team_2_3])
+
+          allow(Response).to receive(:where).with(map_id: [response_map_team_2_3]).and_return([response_2_3])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team3.id, reviewer_id: participant4.id).and_return([response_map_team_3_4])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_3_4]).and_return([response_3_4])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team4.id, reviewer_id: participant.id).and_return([response_map_team_4_1])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_4_1]).and_return([response_4_1])
+
+          allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([])
+          
+          #Tests if reviewer was not reviewed by assignment participant
+          expect(@cycle.four_node_cycles(participant)).to eq([])
+	end
       end
 
       context 'when current reviewer (ap3) was reviewed by current assignment participant' do

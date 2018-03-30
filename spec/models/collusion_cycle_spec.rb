@@ -88,7 +88,7 @@ describe CollusionCycle do
           allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
           allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_1])
           allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-          allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([])
+          allow(participant).to receive(:reviews_by_reviewer).with(participant2).and_return(nil)
           
           #Tests if current assignment participant was not reviewed by current reviewer
           expect(@cycle.two_node_cycles(participant)).to eq([])
@@ -119,9 +119,8 @@ describe CollusionCycle do
           allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
           allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_1])
           allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
-          allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
-          allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([])
+          allow(participant).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
+          allow(participant2).to receive(:reviews_by_reviewer).with(participant).and_return(nil)
           
           #Tests if reviewer was not reviewed by assignment participant
           expect(@cycle.two_node_cycles(participant)).to eq([])

@@ -116,6 +116,16 @@ function publishConfirmation(makeSubPublic) {
     if (makeSubPublic.checked) {
         if (confirm("Please press OK to provide permission.")) {
             $(makeSubPublic).attr("checked", true);
+            $.ajax({
+                type: 'PUT',
+                url:"make_public",
+                data:{
+                    id:$(makeSubPublic).attr("teamid"),
+                    status:true
+                }
+            }).done(function (data) {
+
+            });
         } else {
             $(makeSubPublic).attr("checked", false);
         }
@@ -123,6 +133,16 @@ function publishConfirmation(makeSubPublic) {
     else {
         if (confirm("Please press OK to revoke permission.")) {
             $(makeSubPublic).attr("checked", false);
+            $.ajax({
+                type: 'PUT',
+                url:"make_public",
+                data:{
+                    id:$(makeSubPublic).attr("teamid"),
+                    status:false
+                }
+            }).done(function (data) {
+
+            });
         } else {
             $(makeSubPublic).attr("checked", true);
         }

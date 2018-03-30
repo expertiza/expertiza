@@ -69,24 +69,25 @@
   </div>
 
   <div class = "taskbox">
-<strong>Students who have teamed with you<br></strong><br>
+    <strong>Students who have teamed with you<br></strong><br>
 
-<% @students_teamed_with.keys.each do |course_id| %>
-    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
-      <%if course_id.nil?%>
-        assignments not associated with any course
-      <%else%>
-        <%=  Course.find(course_id).name %>
-      <%end%>
-      <br></strong><br>
-    <% if @students_teamed_with[course_id].size %>
+    <% @students_teamed_with.keys.each do |course_id| %>
+      <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
+        <%if course_id.nil?%>
+          assignments not associated with any course
+        <%else%>
+          <%=  Course.find(course_id).name %>
+        <%end%>
+        <br>
+      </strong><br>
+      <% if @students_teamed_with[course_id].size %>
         <% @students_teamed_with[course_id].each do |student|%>
                 <span class="notification">&nbsp; &raquo; <%= student %> </span><br/>
         <% end %>
+      <% end %>
     <% end %>
-<% end %>
 
-</div>
+  </div>
 </div>
 
 <div class="topictable" align = "center" style="width: 100%">
@@ -103,7 +104,7 @@
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
-    <% if !@current_student_tasks.nil?%>
+    <% unless @current_student_tasks.nil?%>
       <% @current_student_tasks.each do |student_task| %>
         <% participant = student_task.participant %>
         <% if student_task.assignment %>
@@ -151,7 +152,7 @@
     <% end %>
   </table>
   
-  <% if !@current_student_tasks.nil?%>
+  <% unless @current_student_tasks.nil?%>
     <%= will_paginate @current_student_tasks, inner_window: 1, outer_window: 1, param_name: 'student_task_page' %>
   <% end %>
   <br>
@@ -180,7 +181,7 @@
               <tr class="listingRow">
                 <td>&nbsp;</td>
                 <!--assignment-->
-                <td><b><%= link_to breaking_wrap_wrap(student_task.assignment.name,40 ), :action => 'view', :id => participant %></b></td>
+                <td><b><%= link_to breaking_word_wrap(student_task.assignment.name,40 ), :action => 'view', :id => participant %></b></td>
                 <!--course-->
                 <td><%= student_task.course.try :name %></td>
                 <!--topic-->
@@ -212,7 +213,7 @@
     <% end %>
   </table>
 
-  <% if !@past_student_tasks.nil?%>
+  <% unless @past_student_tasks.nil?%>
     <%= will_paginate @past_student_tasks, inner_window: 1, outer_window: 1, param_name: 'past_assignment_page' %>
   <% end %>
 </div>

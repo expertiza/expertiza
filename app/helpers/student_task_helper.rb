@@ -37,7 +37,7 @@ module StudentTaskHelper
 
   # This function is used to break up a string to multiple lines if there is a single word that is longer than the
   # specified column width. This allows there to be a line break in the middle of a word that is really long.
-  def breaking_wrap_wrap(txt, col = 80)
+  def breaking_word_wrap(txt, col = 80)
     txt.gsub(/(.{1,#{col}})( +|$\n?)|(.{1,#{col}})/,
              "\\1\\3\n")
   end

@@ -133,8 +133,8 @@
               <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
               <!--publish rights-->
               <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
-
-              <td align=center><input id="makeSubPublic" teamid="<%=participant.team.id%>" type="checkbox" onclick="publishConfirmation(this)" value="<%=participant.team.make_public%>"></td>
+              <!--make assignment public-->
+              <td align=center><input id="makeSubPublic" teamid="<%=participant.team.id%>" type="checkbox" onclick="publishConfirmation(this)" <%if participant.team.make_public%>checked<%end%>></td>
             </tr>
         <% end %>
     <% end %>

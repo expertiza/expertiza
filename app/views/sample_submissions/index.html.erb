@@ -1,12 +1,14 @@
-<h2>Reviews for "<%= @assignment.name %>"</h2>
+<h2>Sample Submissions for "<%= @assignment_name %>"</h2>
 <ul>
-  <% mappings do |map| %>
+  <% @assignment_teams.each do |assignment_team| %>
       <li>
         <ul>
-          <li>map.team_name </li>
-          <% map.links.seach do |assignment_link| %>
-              <li>assignment_link.url</li>
-          <% end%>
+          <h3>Team name : <%=assignment_team.name%></h3>
+          <% assignment_team.hyperlinks.each do |assignment_link| %>
+                  <%if assignment_link.strip! !="" and assignment_link.strip! !="--- []"  %>
+                    <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
+                  <%end%>
+          <%end%>
         </ul>
       </li>
   <% end%>

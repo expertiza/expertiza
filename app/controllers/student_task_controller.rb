@@ -9,8 +9,7 @@ class StudentTaskController < ApplicationController
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
-    @student_tasks.s
-    elect! {|t| t.assignment.availability_flag } if not @assignment.nil?
+    @student_tasks.select! {|t| t.assignment.availability_flag } if not @assignment.nil?
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)

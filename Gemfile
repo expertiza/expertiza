@@ -98,3 +98,4 @@ group :development, :test do
   gem 'capybara', '~> 2.7', '>= 2.7.1'
   gem 'simplecov', require: false
 end
+

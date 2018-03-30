@@ -274,7 +274,7 @@ GEM
     mutant-rspec (0.8.14)
       mutant (~> 0.8.14)
       rspec-core (>= 3.4.0, < 3.7.0)
-    mysql2 (0.4.10)
+    mysql2 (0.3.20)
     nenv (0.3.0)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -567,7 +567,7 @@ DEPENDENCIES
   launchy
   lingua
   mutant-rspec (~> 0.8.8)
-  mysql2 (~> 0.4.9)
+  mysql2 (= 0.3.20)
   nokogiri (~> 1.8)
   omniauth-google-oauth2 (~> 0.2.6)
   open-uri-cached
@@ -609,9 +609,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-RUBY VERSION
-   ruby 2.2.7p470
 
 BUNDLED WITH
    1.16.1

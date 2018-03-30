@@ -148,7 +148,7 @@ describe CollusionCycle do
 
   #
   # assignment participant ────┐
-  #    ∧                       │
+  #    ∧                                  │
   #    │                       v
   # current reviewee (ap1) <─ current reviewer (ap2)
   #
@@ -177,7 +177,7 @@ describe CollusionCycle do
           allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
           allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_1])
           allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-          allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([])
+          allow(participant).to receive(:reviews_by_reviewer).with(participant2).and_return(nil)
           
           #Tests if current assignment participant was not reviewed by current reviewer
           expect(@cycle.three_node_cycles(participant)).to eq([])
@@ -206,18 +206,57 @@ describe CollusionCycle do
       end
 
       context 'when current reviewee (ap1) was not reviewed by current reviewer (ap2)' do
-        it 'skips current reviewer (ap2) and returns corresponding collusion cycles'
+        it 'skips current reviewer (ap2) and returns corresponding collusion cycles' do
+          
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_1])
+          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
 
+          
+          allow(participant).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
+          allow(participant3).to receive(:reviews_by_reviewer).with(participant).and_return(response_3_1)
+          allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(nil)
+          expect(@cycle.three_node_cycles(participant)).to eq([])
+        end
       end
 
       context 'when current reviewee (ap1) was reviewed by current reviewer (ap2)' do
-        it 'inserts related information into collusion cycles and returns results'
-        # Write your test here!
+        it 'inserts related information into collusion cycles and returns results' do
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_1])
+          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant3.id).and_return([response_map_team_2_3])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_2_3]).and_return([response_2_3])
+          allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team3.id, reviewer_id: participant.id).and_return([response_map_team_3_1])
+          allow(Response).to receive(:where).with(map_id: [response_map_team_3_1]).and_return([response_3_1])
+
+          expect(@cycle.three_node_cycles(participant)).to eq([[[participant, 90], [participant2, 82],[participant3, 97]]])
+        end
       end
 
       context 'when current reviewer (ap2) was not reviewed by current assignment participant' do
-        it 'skips current reviewer (ap2) and returns corresponding collusion cycles'
-        # Write your test here!
+        it 'skips current reviewer (ap2) and returns corresponding collusion cycles' do
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map_team_1_2])
+          allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([response_map_team_2_3])
+          allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
+          allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([response_map_team_3_1])
+          allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+
+          allow(participant).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
+          allow(participant3).to receive(:reviews_by_reviewer).with(participant).and_return(nil)
+          allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
+          expect(@cycle.three_node_cycles(participant)).to eq([])
+        end
       end
 
       context 'when current reviewer (ap2) was reviewed by current assignment participant' do

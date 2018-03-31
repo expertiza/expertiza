@@ -76,7 +76,7 @@ class TreeDisplayController < ApplicationController
   # ajbudlon, July 3rd 2008
   def list
     # check to see which menu items need to be hidden
-    if session[:user].role.instructor?
+    if session[:user] and session[:user].role.instructor?
       if session.key?(:student_view)
         set_student_view_hidden_menu_items
       else

@@ -221,13 +221,13 @@ jQuery(document).ready(function() {
                 var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
 
                 var $customEditButton = $("<button>")
-                    .prop("type","button").text("Edit")
+                    .prop("type","button").append($("<img />").prop("src","/assets/edit_icon.png"))
                     .on("click",function(e) {
                         showTopicDialog("Edit",item);
                     });
 
                 var $customDeleteButton = $("<button>")
-                    .prop("type","button").text("Delete")
+                    .prop("type","button").append($("<img />").prop("src","/assets/delete_icon.png"))
                     .on("click",function(e) {
                         if(confirm("Are you sure you want to delete \""+item.topic_name+"\"?")) {
                             jQuery("#jsGrid").jsGrid('deleteItem', item); //call deleting once more in callback

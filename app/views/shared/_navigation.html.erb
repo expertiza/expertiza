@@ -32,7 +32,7 @@
                       </div>
                   <% end %>
               <% end %>
-              <% if session[:user].role.instructor? %>
+              <% if session[:user] and session[:user].role.instructor? %>
                   <% if session.key?(:student_view) %>
                       <%= link_to "Revert to Instructor View", {controller: "tree_display", action: "revert_to_instructor_view"},
                                   method: :post, :style => "color: white" %>

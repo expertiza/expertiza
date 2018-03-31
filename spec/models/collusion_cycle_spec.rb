@@ -14,6 +14,7 @@ describe CollusionCycle do
   let(:response41) { build(:response)}
   let(:colcyc) {CollusionCycle.new}
 
+  # Consider a 2 node cycle: A <-- B <-- A
   context "two_node_cycle" do
     before(:each) do
       allow(participant1).to receive(:reviewers).and_return([participant2])
@@ -48,6 +49,7 @@ describe CollusionCycle do
 
   end
 
+  # Consider a 3 node cycle: A <-- B <-- C <-- A
   context "three_node_cycles" do
     before(:each) do
       allow(participant1).to receive(:reviewers).and_return([participant2])
@@ -92,6 +94,7 @@ describe CollusionCycle do
     end
   end
 
+  # Consider a 3 node cycle: A <-- B <-- C <-- D <-- A
   context "four_node_cycles" do
     before (:each) do
       allow(participant1).to receive(:reviewers).and_return([participant2])
@@ -149,6 +152,7 @@ describe CollusionCycle do
 
   end
 
+  # similarity score
   context "cycle_similarity_score" do
     it "similarity score of 2 node test" do
       cycle = [[participant1, 100], [participant2, 90]]
@@ -166,12 +170,9 @@ describe CollusionCycle do
     end
   end
 
+  # deviation score
   context "cycle_deviation_score" do
     before(:each) do
-      allow(participant1).to receive(:id).and_return(1)
-      allow(participant2).to receive(:id).and_return(2)
-      allow(participant3).to receive(:id).and_return(3)
-      allow(participant4).to receive(:id).and_return(4)
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant1)
       allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
       allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)

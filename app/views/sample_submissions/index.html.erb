@@ -3,8 +3,8 @@
 <br>
 <!-- Displaying sample submissions by students of the current course -->
 <h3>Submissions made public by peers:</h3>
-<% if @assignment_due_date>Time.new() %>
-    <i>Will be available once the assignment submission is completed</i>
+<% if @assignment_due_date==nil or @assignment_due_date>Time.new() %>
+    <br><i>Will be available once the assignment submission is completed</i>
 <% elsif @assignment_teams==[] %>
     <br><i>None available yet</i>
 <% else %>
@@ -29,9 +29,7 @@
 
 <!-- Displaying sample submissions from a previous assignment chosen by the instructor -->
 <h3>Submissions made public by instructor:</h3>
-<% if @assignment_due_date>Time.new() %>
-    <i>Will be available once the assignment submission is completed</i>
-<% elsif @assignment_teams_professor == [] %>
+<% if @assignment_teams_professor == [] %>
     <br><i>None available yet</i>
 <% else %>
     <ul>

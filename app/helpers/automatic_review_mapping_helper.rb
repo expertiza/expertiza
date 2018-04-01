@@ -28,13 +28,13 @@ module AutomaticReviewMappingHelper
 
     attr_reader :assignment_id
 
-    def automatic_review_mapping_strategy
+    def automatic_review_mapping_strategy(params)
       if @calibrated_artifacts_num == 0 and @uncalibrated_artifacts_num == 0
         if @student_review_num == 0 and @submission_review_num == 0
           raise 'Please choose either the number of reviews per student or the number of reviewers per team (student).'
         elsif (@student_review_num != 0 and @submission_review_num == 0) or (@student_review_num == 0 and @submission_review_num != 0)
-          execute_peer_review_strategy(@teams, @student_review_num, @submission_review_num)
-          assign_reviewers_for_team(@student_review_num)
+          execute_peer_review_strategy(@teams, @student_review_num, @submission_review_num,params)
+          assign_reviewers_for_team(@student_review_num,params)
         else
           raise 'Please choose either the number of reviews per student or the number of reviewers per team (student), not both.'
         end
@@ -45,19 +45,19 @@ module AutomaticReviewMappingHelper
           @teams_with_calibrated_artifacts << AssignmentTeam.find(response_map.reviewee_id)
         end
         @teams_with_uncalibrated_artifacts = @teams - @teams_with_calibrated_artifacts
-        execute_peer_review_strategy(@teams_with_calibrated_artifacts.shuffle!, @calibrated_artifacts_num, 0)
-        assign_reviewers_for_team(@calibrated_artifacts_num)
+        execute_peer_review_strategy(@teams_with_calibrated_artifacts.shuffle!, @calibrated_artifacts_num, 0,params)
+        assign_reviewers_for_team(@calibrated_artifacts_num,params)
         @participants = AssignmentParticipant.where(parent_id: @assignment_id).to_a.reject {|p| p.can_review == false }.shuffle!
         @participants_hash = {}
         @participants.each {|participant| @participants_hash[participant.id] = 0 }
-        execute_peer_review_strategy(@teams_with_uncalibrated_artifacts.shuffle!, @uncalibrated_artifacts_num, 0)
-        assign_reviewers_for_team(@uncalibrated_artifacts_num)
+        execute_peer_review_strategy(@teams_with_uncalibrated_artifacts.shuffle!, @uncalibrated_artifacts_num, 0,params)
+        assign_reviewers_for_team(@uncalibrated_artifacts_num,params)
       end
     end
 
     private
 
-    def execute_peer_review_strategy(teams, student_review_num = 0, submission_review_num = 0)
+    def execute_peer_review_strategy(teams, student_review_num = 0, submission_review_num = 0,params)
       if student_review_num != 0 and submission_review_num == 0
         @num_reviews_per_team = (@participants.size * student_review_num * 1.0 / teams.size).round
         @exact_num_of_review_needed = @participants.size * student_review_num
@@ -72,10 +72,10 @@ module AutomaticReviewMappingHelper
       by each student to be greater than or equal to total number of teams \
       [or "participants" if it is an individual assignment].'
       end
-      peer_review_strategy(teams, student_review_num)
+      peer_review_strategy(teams, student_review_num,params)
     end
 
-    def peer_review_strategy(teams, student_review_num)
+    def peer_review_strategy(teams, student_review_num,params)
       num_participants = @participants.size
       iterator = 0
       teams.each do |team|
@@ -154,7 +154,7 @@ module AutomaticReviewMappingHelper
       end
     end
 
-    def assign_reviewers_for_team(student_review_num)
+    def assign_reviewers_for_team(student_review_num,params)
       if ReviewResponseMap.where(reviewed_object_id: @assignment_id, calibrate_to: 0)
              .where("created_at > :time",
                     time: @@time_create_last_review_mapping_record).size < @exact_num_of_review_needed

@@ -1,6 +1,7 @@
 class TreeDisplayController < ApplicationController
   helper :application
   include SecurityHelper
+  include TreeDisplayHelper
 
   def action_allowed?
     true
@@ -75,7 +76,7 @@ class TreeDisplayController < ApplicationController
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
-    # check to see which menu items need to be hidden
+    # check to see if menu items need to be hidden
     if session[:user] and session[:user].role.instructor?
       if session.key?(:student_view)
         set_student_view_hidden_menu_items
@@ -85,30 +86,6 @@ class TreeDisplayController < ApplicationController
     end
     redirect_to controller: :content_pages, action: :view if current_user.nil?
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
-  end
-
-  # sets student_view in session object
-  def set_student_view
-    session[:student_view] = true
-    redirect_back
-  end
-
-  # sets hidden_menu_items in session object when in student view
-  def set_student_view_hidden_menu_items
-    # 35 - Survey Deployments, 37 - Manage Instructor Content
-    session[:hidden_menu_items] = [35, 37]
-  end
-
-  # destroys student_view in session object
-  def revert_to_instructor_view
-    session.delete(:student_view)
-    redirect_back
-  end
-
-  # sets hidden_menu_items in session object when in instructor view
-  def set_instructor_view_hidden_menu_items
-    # 26 - Assignments, 30 - Course Evaluation
-    session[:hidden_menu_items] = [26, 30]
   end
 
   def confirm_notifications_access

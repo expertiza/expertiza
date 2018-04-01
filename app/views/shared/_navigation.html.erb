@@ -34,10 +34,10 @@
               <% end %>
               <% if session[:user] and session[:user].role.instructor? %>
                   <% if session.key?(:student_view) %>
-                      <%= link_to "Revert to Instructor View", {controller: "tree_display", action: "revert_to_instructor_view"},
+                      <%= link_to "Revert to Instructor View", {controller: "instructor", action: "revert_to_instructor_view"},
                                   method: :post, :style => "color: white" %>
                   <% else %>
-                      <%= link_to "Switch to Student View", {controller: "tree_display", action: "set_student_view"},
+                      <%= link_to "Switch to Student View", {controller: "instructor", action: "set_student_view"},
                                   method: :post, :style => "color: white" %>
                   <% end %>
               <% end %>

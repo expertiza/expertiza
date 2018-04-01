@@ -60,5 +60,14 @@ class StudentTaskController < ApplicationController
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
+  def make_public
+    @team=Team.find(params[:id])
+    @team.make_public=params[:status]
+    @team.save
+    respond_to do |format|
+      format.html{head :no_content}
+    end
+  end
+
   def your_work; end
 end

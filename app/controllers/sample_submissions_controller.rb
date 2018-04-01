@@ -6,7 +6,7 @@ class SampleSubmissionsController < ApplicationController
 
   # GET /sample_submissions
   def index
-    @assignment_teams = AssignmentTeam.where(:parent_id => sample_submission_params[:id])
+    @assignment_teams = AssignmentTeam.where(:parent_id => sample_submission_params[:id], :make_public=>true)
     @assignment_name = Assignment.where(:id => sample_submission_params[:id])
   end
 

@@ -45,7 +45,7 @@ class StudentTask
   delegate :course, to: :assignment
 
   def hyperlinks
-    @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks
+    @hyperlinks ||= participant.team.nil? ? [] : participant.team.submitted_hyperlinks
   end
 
   def incomplete?

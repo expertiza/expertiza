@@ -30,12 +30,18 @@ describe CollusionCycle do
   let(:participant3) { build(:participant, id: 3, user: student3, assignment: assignment) }
   let(:participant4) { build(:participant, id: 4, user: student4, assignment: assignment) }
   let(:assignment) { build(:assignment, id: 1) }
-  let(:response_map_team_1_2) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response_1_2], assignment: assignment) }
-  let(:response_map_team_2_1) { build(:review_response_map, id: 2, reviewee_id: team2.id, reviewer_id: participant.id, response: [response_2_1], assignment: assignment) }
-  let(:response_map_team_2_3) { build(:review_response_map, id: 3, reviewee_id: team2.id, reviewer_id: participant3.id, response: [response_2_3], assignment: assignment) }
-  let(:response_map_team_3_1) { build(:review_response_map, id: 4, reviewee_id: team3.id, reviewer_id: participant.id, response: [response_3_1], assignment: assignment) }
-  let(:response_map_team_3_4) { build(:review_response_map, id: 5, reviewee_id: team3.id, reviewer_id: participant4.id, response: [response_3_4], assignment: assignment) }
-  let(:response_map_team_4_1) { build(:review_response_map, id: 6, reviewee_id: team4.id, reviewer_id: participant.id, response: [response_4_1], assignment: assignment) }
+  let(:response_map_team_1_2) { build(:review_response_map, id: 1, reviewee_id: team.id,
+    reviewer_id: participant2.id, response: [response_1_2], assignment: assignment) }
+  let(:response_map_team_2_1) { build(:review_response_map, id: 2, reviewee_id: team2.id,
+    reviewer_id: participant.id, response: [response_2_1], assignment: assignment) }
+  let(:response_map_team_2_3) { build(:review_response_map, id: 3, reviewee_id: team2.id,
+    reviewer_id: participant3.id, response: [response_2_3], assignment: assignment) }
+  let(:response_map_team_3_1) { build(:review_response_map, id: 4, reviewee_id: team3.id,
+    reviewer_id: participant.id, response: [response_3_1], assignment: assignment) }
+  let(:response_map_team_3_4) { build(:review_response_map, id: 5, reviewee_id: team3.id,
+    reviewer_id: participant4.id, response: [response_3_4], assignment: assignment) }
+  let(:response_map_team_4_1) { build(:review_response_map, id: 6, reviewee_id: team4.id,
+    reviewer_id: participant.id, response: [response_4_1], assignment: assignment) }
   let(:student) { build(:student, id: 1, name: "Cameron") }
   let(:student2) { build(:student, id: 2, name: "Robert") }
   let(:student3) { build(:student, id: 3, name: "Peter") }
@@ -64,7 +70,7 @@ describe CollusionCycle do
     allow(response_3_1).to receive(:total_score).and_return(97)
     allow(response_3_4).to receive(:total_score).and_return(80)
     allow(response_4_1).to receive(:total_score).and_return(0)
-    @cycle = CollusionCycle.new()
+    @cycle = CollusionCycle.new
   end
 
   describe '#two_node_cycles' do
@@ -179,7 +185,7 @@ describe CollusionCycle do
       end
 
       context 'when a full, four participant relationship has been constructed' do
-        before (:each) do
+        before(:each) do
           allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
           allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
           allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant3.id).and_return([response_map_team_2_3])
@@ -268,7 +274,7 @@ describe CollusionCycle do
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       end
       context 'when a full, four participant relationship has been constructed' do
-        before (:each) do
+        before(:each) do
           allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
           allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
           allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team2.id, reviewer_id: participant3.id).and_return([response_map_team_2_3])
@@ -280,8 +286,9 @@ describe CollusionCycle do
         end
         context 'when current assignment participant was reviewed by the reviewee of current reviewee (ap1)' do
           it 'inserts related information into collusion cycles and returns results' do
-            # Tests if current assignment participant was reviewed by current reviewer and insert related information into collusion cycles array
-	    expect(@cycle.four_node_cycles(participant)[0][0]).to eq([participant, 90])
+            # Tests if current assignment participant was reviewed by current
+            # reviewer and insert related information into collusion cycles array
+            expect(@cycle.four_node_cycles(participant)[0][0]).to eq([participant, 90])
           end
         end
 
@@ -390,3 +397,4 @@ describe CollusionCycle do
     # Write your test here!
   end
 end
+

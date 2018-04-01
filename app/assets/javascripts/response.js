@@ -51,7 +51,7 @@ function executeSave(){
 
 jQuery(document).ready(function(){
     // workaround because all script are loaded in every pages now. need to clean it up
-    if (document.title.includes("response")){
+    if (document.title.indexOf("response") > -1){
         // start saving review every interval of time
         setTimeout(autoSavePost, interval);
         autosave_lbl = document.getElementById("autosave_cbx_lbl")

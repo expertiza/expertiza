@@ -32,43 +32,43 @@ describe CollusionCycle do
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map_team_1_2) {
     build(:review_response_map,
-             id: 1,
+    id: 1,
     reviewee_id: team.id,
     reviewer_id: participant2.id,
-       response: [response_1_2],
-     assignment: assignment)
+    response: [response_1_2],
+    assignment: assignment)
   }
   let(:response_map_team_2_1) {
     build(:review_response_map,
-             id: 2,
+    id: 2,
     reviewee_id: team2.id,
     reviewer_id: participant.id,
-       response: [response_2_1],
-     assignment: assignment)
+    response: [response_2_1],
+    assignment: assignment)
   }
   let(:response_map_team_2_3) {
     build(:review_response_map,
-             id: 3,
+    id: 3,
     reviewee_id: team2.id,
     reviewer_id: participant3.id,
-       response: [response_2_3],
-     assignment: assignment)
+    response: [response_2_3],
+    assignment: assignment)
   }
   let(:response_map_team_3_1) {
     build(:review_response_map,
-             id: 4,
+    id: 4,
     reviewee_id: team3.id,
     reviewer_id: participant.id,
-       response: [response_3_1],
-     assignment: assignment)
+    response: [response_3_1],
+    assignment: assignment)
   }
   let(:response_map_team_3_4) {
     build(:review_response_map,
-               id: 5,
-      reviewee_id: team3.id,
-      reviewer_id: participant4.id,
-         response: [response_3_4],
-       assignment: assignment)
+    id: 5,
+    reviewee_id: team3.id,
+    reviewer_id: participant4.id,
+    response: [response_3_4],
+    assignment: assignment)
   }
   let(:response_map_team_4_1) {
     build(:review_response_map,

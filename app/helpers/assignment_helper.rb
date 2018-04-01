@@ -64,7 +64,12 @@ module AssignmentHelper
     assignments = Assignment.all
     options = []
     assignments.each do |assignment|
-      options << [assignment.name, assignment.id]
+      course_name = ""
+      if assignment.course_id and assignment.course_id!=0 and not Course.find(assignment.course_id).nil?
+        course_name = Course.find(assignment.course_id).name
+      end
+      name = course_name + '- ' + assignment.name
+      options << [name, assignment.id]
     end
     options.uniq.sort
     options.unshift(['-----------', nil])

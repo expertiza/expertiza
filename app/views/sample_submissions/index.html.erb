@@ -1,17 +1,54 @@
-<h2>Sample Submissions for <%= @assignment_name.name %></h2>
-<ul>
-  <% @assignment_teams.each do |assignment_team| %>
-      <li>
-        <ul>
-          <h3>Team name : <%=assignment_team.name%></h3>
-          <% assignment_team.hyperlinks.each do |assignment_link| %>
-                  <%if assignment_link.strip! !="" and assignment_link.strip! !="--- []"  %>
-                    <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
+<!-- Displaying sample submissions to the student -->
+<h2>Sample Submissions:</h2>
+<br>
+<!-- Displaying sample submissions by students of the current course -->
+<h3>Submissions made public by peers:</h3>
+<% if @assignment_due_date>Time.new() %>
+    <i>Will be available once the assignment submission is completed</i>
+<% elsif @assignment_teams==[] %>
+    <br><i>None available yet</i>
+<% else %>
+    <ul>
+      <% @assignment_teams.each do |assignment_team| %>
+          <% if assignment_team.hyperlinks != [] %>
+              <li>
+                <ul>
+                  <h4>Team name : <%=assignment_team.name%></h4>
+                  <% assignment_team.hyperlinks.each do |assignment_link| %>
+                      <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
                   <%end%>
+                </ul>
+              </li>
           <%end%>
-        </ul>
-      </li>
-  <% end%>
-</ul>
+      <% end%>
+    </ul>
+<% end %>
+<br>
+<hr/>
+<br>
+
+<!-- Displaying sample submissions from a previous assignment chosen by the instructor -->
+<h3>Submissions made public by instructor:</h3>
+<% if @assignment_due_date>Time.new() %>
+    <i>Will be available once the assignment submission is completed</i>
+<% elsif @assignment_teams_professor == [] %>
+    <br><i>None available yet</i>
+<% else %>
+    <ul>
+      <% @assignment_teams_professor.each do |assignment_team| %>
+          <% if assignment_team.hyperlinks != [] %>
+              <ul>
+                <li>
+                  <h4>Team name : <%=assignment_team.name%></h4>
+                  <% assignment_team.hyperlinks.each do |assignment_link| %>
+                    <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
+                <%end%>
+                </li>
+              </ul>
+          <%end%>
+      <% end%>
+    </ul>
+<% end %>
 <br><br>
+
 <a href="javascript:window.history.back()">Back</a>

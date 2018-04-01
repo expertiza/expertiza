@@ -63,10 +63,10 @@ function microtaskChanged() {
 
   <!-- Adding sample submissions for students to refer to -->
   <tr>
-    <td style='padding:5px'><%= label_tag('assignment_form[assignment][sample_id]', 'Sample Assignment:') %>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][sample_assignment_id]', 'Sample Assignment:') %>
       <img src="/assets/info.png" title='- Select an assignment that students can refer sample submission from.'>
     </td>
-    <td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', sample_sub_options, :selected => @assignment_form.assignment.sample_assignment_id) %></td>
+    <td style='padding:5px'><%= select('assignment_form[assignment]', 'sample_assignment_id', sample_sub_options, :selected => @assignment_form.assignment.sample_assignment_id) %></td>
   </tr>
 </table>
 

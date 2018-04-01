@@ -89,7 +89,7 @@
           </td>
           <td class="listingRow" align="center"><%= suggestioncomment.comments%></td>
 
-          <td><%= link_to "Edit Comment",{:controller=>"suggestion",:action=>"update_comment",:suggestion=>suggestioncomment}%></td>
+          <td><%= link_to "Edit Comment",:controller=>"suggestion",:action=>"edit_comment",:suggestioncomment=>suggestioncomment%></td>
         </tr>
 
         <%end%>

@@ -1,3 +1,4 @@
-< Editing suggestion comments>
-<tr><%= render :partial =>"form_comment", suggestion_comment: @suggestioncomment %></tr>
-<tr><%#= link_to 'Back', :action => 'show', :id => suggestion %></tr>
+<tr> Sucessfully Edited the Comment!!!</tr>
+<tr> Click on Assignment to go back to assignment page</tr>
+
+<tr><%= link_to 'Assignment Page',:action => "show", :id => @suggestioncomment.suggestion_id %></tr>

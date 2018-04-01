@@ -33,30 +33,23 @@ class SuggestionController < ApplicationController
     end
   end
 
-  def update_comment
-    @suggestioncomment = SuggestionComment.find(params[:suggestion])
-  end
   def edit_comment
-    #718 issue
-    #instructor should be able to edit the comments
-
-    if @suggestioncomment.save
-      flash[:notice] = "Your comment has been sucessfully edited"
-      if current_role_name.eql? 'Student'
-        redirect _to action: "student_view",id: params[:id]
-      else
-        redirect_to action: 'show', id: params[:id]
-      end
-    else
-      flash[:notice] = "There was an error while editing your comment"
-      if current_role_name.eql? 'Student'
-        redirect _to action: "student_view",id: params[:id]
-      else
-        redirect_to action: 'show', id: params[:id]
-      end
-    end
-
+    @suggestioncomment = SuggestionComment.find(params[:suggestioncomment])
   end
+
+  def update_comment
+    @suggestioncomment = SuggestionComment.find(params[:id])
+    @suggestioncomment.update(suggestioncomment_params)
+    #if @suggestioncomment.update(suggestioncomment_params)
+      #redirect_to :action=>"show",:id=>@suggestioncomment.suggestion_id
+    #end
+  end
+
+
+
+  def suggestioncomment_params
+    params.require(:suggestioncomment).permit(:comments,:vote)
+    end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
@@ -112,7 +105,9 @@ class SuggestionController < ApplicationController
   end
 
   def submit
-    if !params[:add_comment].nil?
+    if !params[:update_comment].nil?
+      edit_comment
+    elsif !params[:add_comment].nil?
       add_comment
     elsif !params[:approve_suggestion].nil?
       approve_suggestion

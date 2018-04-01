@@ -1,16 +1,19 @@
 
-<%= form_for :suggestioncomment  do |form|%>
+<%= form_for :suggestioncomment,:url=>{:controller=>"suggestion",:action=>"update_comment",:id=>@suggestioncomment.id},:method=>"post"  do |form|%>
     <div class="field">
       <%= form.label :comments %>
-      <%= form.text_field :comments%>
+      <%= form.text_area :comments,value: @suggestioncomment.comments,:rows => 5, :cols => 50%>
     </div>
 
     <div class = "field">
       <%= form.label :vote%>
-      <%= form.text_field :vote%>
+      <%= form.text_field :vote,value: @suggestioncomment.vote %>
     </div>
+    <%= form.hidden_field :suggestioncomment,value: @suggestioncomment%>
+    <%= form.hidden_field :id,value: @suggestioncomment.suggestion_id%>
     <div class="actions">
       Click to Update
-      <%= form.submit %>
+      <%= form.submit%>
     </div>
 <% end %>
+<tr><%= link_to 'Back',:controller=>"suggestion", :action => "show",:id => @suggestioncomment.suggestion_id %></tr>

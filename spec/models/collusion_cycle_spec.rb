@@ -220,7 +220,7 @@ describe CollusionCycle do
         end
       end
 
-      context 'when a full, four participant relationship has been constructed' do
+      context 'when a full, three participant relationship has been constructed' do
         before(:each) do
           allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id, reviewer_id: participant2.id).and_return([response_map_team_1_2])
           allow(Response).to receive(:where).with(map_id: [response_map_team_1_2]).and_return([response_1_2])
@@ -245,7 +245,7 @@ describe CollusionCycle do
 
         context 'when current reviewer (ap2) was reviewed by current assignment participant' do
           it 'inserts related information into collusion cycles and returns results' do
-            # Tests if reviewer (ap2) was reviewed by assignment participant and inserted related information into coluusion cycle arr
+            # Tests if reviewer (ap2) was reviewed by assignment participant and inserted related information into collusion cycle arr
             expect(@cycle.three_node_cycles(participant)).to eq([[[participant, 90], [participant2, 82], [participant3, 97]]])
           end
         end
@@ -430,7 +430,6 @@ describe CollusionCycle do
         expect(@cycle.cycle_deviation_score(c)).to eql(1.0)
       end
     end
-    # Write your test here!
   end
 end
 

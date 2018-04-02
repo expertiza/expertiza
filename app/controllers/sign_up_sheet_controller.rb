@@ -131,7 +131,6 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
-
     @assignment = Assignment.find(assignment_id)
     @participants = SignedUpTeam.find_team_participants(assignment_id)
     @sign_up_topics.each { |topic|
@@ -161,6 +160,10 @@ class SignUpSheetController < ApplicationController
       topic.slots_available = topic.max_choosers - topic.slots_filled_value
       topic.participants = participants
     }
+
+    included_topic_columns = retrieve_included_topic_columns(@assignment,params)
+
+
     # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
@@ -171,8 +174,34 @@ class SignUpSheetController < ApplicationController
             :slots_filled_value,:slots_waitlisted,:slots_available,:participants
         ]),
         slots_waitlisted: @slots_waitlisted.as_json,
-        assignment: @assignment.as_json
+        assignment: @assignment.as_json,
+        included_topic_columns: included_topic_columns
     }
+  end
+
+#  if SignUpSheet.has_teammate_ads?(topic.id)
+#    included_columns << "ads"
+#  end
+#  if @assignment.current_stage_name(@topic_id) != 'Finished'
+#    included_columns << "bookmarks"
+#
+#  end
+
+  def retrieve_included_topic_columns(assignment,params)
+    included_columns = ["topic_identifier","topic_name"]
+
+    if !assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name
+      included_columns << "actions"
+      included_columns << "max_choosers"
+      included_columns << "slots_available"
+      included_columns << "slots_waitlisted"
+
+      if assignment.microtask?
+        included_columns << "micropayment"
+      end
+    end
+
+    included_columns
   end
 
   def retrieve_topics

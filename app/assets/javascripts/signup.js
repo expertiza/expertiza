@@ -96,6 +96,174 @@ jQuery("input[id^='due_date_']").datetimepicker({
 */
 jQuery(document).ready(function() {
 
+    var tabsPanelInner = $(".ui-tabs-panel").innerWidth();
+
+    var allFields = [{
+        visible: false,
+        title: "Actions",
+        name: "actions",
+        width: (tabsPanelInner*0.1),
+        type: "control",
+        editButton: false,
+        deleteButton: false,
+        searching: false,
+        filtering: false,
+        deleteButtonTooltip: "Delete Topic",
+        editButtonTooltip: "Edit Topic",
+        editButtonClass: "jsgrid-edit-button-custom",
+        deleteButtonClass: "jsgrid-delete-button-custom",
+        modeSwitchButton: false,
+        headerTemplate: function() {
+            return $("<button>").attr("type", "button").text("Add")
+                .on("click", function () {
+                    showTopicDialog("Add", {});
+                });
+        },
+        itemTemplate: function(value,item) {
+            var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
+
+            var $customEditButton = $("<button>")
+                .prop("type","button").append($("<img />").prop("src","/assets/edit_icon.png"))
+                .on("click",function(e) {
+                    showTopicDialog("Edit",item);
+                });
+
+            var $customDeleteButton = $("<button>")
+                .prop("type","button").append($("<img />").prop("src","/assets/delete_icon.png"))
+                .on("click",function(e) {
+                    if(confirm("Are you sure you want to delete \""+item.topic_name+"\"?")) {
+                        jQuery("#jsGrid").jsGrid('deleteItem', item); //call deleting once more in callback
+                    }
+                });
+
+            return $("<div>").append($customEditButton).append($customDeleteButton);
+        }
+    },
+        {
+            visible: false,
+            name: "topic_identifier",
+            width: (tabsPanelInner*0.2),
+            type: "text",
+            title: "Topic #",
+            validate: {
+                validator: "required",
+                message: "Topic Number should not be empty "
+            }
+
+        },
+        {
+            visible: false,
+            name: "topic_name",
+            width: (tabsPanelInner*0.5),
+            type: "text",
+            title: "Topic name(s)",
+            validate: {
+                validator: "required",
+                message: "Topic Name should not be empty "
+            },
+
+            /* this is used for customizing our Topic Names Field with details of signing up student and showing
+                details of all teams subscribed to a topic
+            */
+            itemTemplate: function(value, topic) {
+                /*setting a link for topic name if any link is present.*/
+                if (topic.link != null && topic.link != "") {
+                    var topicLink = $("<a>").attr("href", topic.link).attr("target", "_blank").text(value);
+                } else {
+                    var topicLink = $("<span>").text(value);
+                }
+
+                /* button for signing up to a topic */
+                var signupUrl = "/sign_up_sheet/signup_as_instructor?assignment_id=" + getAssignmentId() + "&topic_id=" + topic.id;
+                var signUpUser = $("<a>").attr("href", signupUrl);
+                var signUpUserImage = $("<img>").attr({
+                    src: "/assets/signup-806fc3d5ffb6923d8f5061db243bf1afd15ec4029f1bac250793e6ceb2ab22bf.png",
+                    title: "Sign Up Student",
+                    alt: "Signup"
+                });
+                var signUp = signUpUser.append(signUpUserImage)
+
+                /* adding all participants/teams to be shown under the topic name*/
+                var participants_temp = topic.participants;
+                if (participants_temp == null)
+                    participants_temp = []
+                var participants_div = $("<div>");
+                for (var p = 0; p < participants_temp.length; p++) {
+                    var current_participant = participants_temp[p];
+                    var text = $("<span>");
+                    text.html(current_participant.user_name_placeholder);
+                    var dropStudentUrl = "/sign_up_sheet/delete_signup_as_instructor/" + current_participant.team_id + "?topic_id=" + topic.id;
+                    var dropStudentAnchor = $("<a>").attr("href", dropStudentUrl);
+                    var dropStudentImage = $("<img>").attr({
+                        src: "/assets/delete_icon.png",
+                        title: "Drop Student",
+                        alt: "Drop Student Image"
+                    });
+                    participants_div.append(text).append(dropStudentAnchor.append(dropStudentImage));
+                }
+                return $("<div>").append(topicLink).append(signUp).append(participants_div);
+            },
+            filtering: true
+        },
+
+        { visible: false,
+            width: (tabsPanelInner*0.15),
+            name: "category", type: "text", title: "Topic category" },
+
+        /* Validate whether the number of slots entered is greter than 0*/
+        {
+            visible: false,
+            name: "max_choosers",
+            width: (tabsPanelInner*0.05),
+            type: "text",
+            title: "# Slots",
+            validate: {
+                message: "Choose Num of slots greater than or equal to 1",
+                validator: function(value, item) {
+                    return value > 0;
+                }
+            }
+        },
+
+        { visible: false,
+            width: (tabsPanelInner*0.05),
+            name: "slots_available", editing: false, title: "Available Slots" },
+
+        { visible: false,
+            width: (tabsPanelInner*0.05),
+            name: "slots_waitlisted", editing: false, title: "Num on Waitlist" },
+
+        /*adding Add bookmark and View bookmark functionalities*/
+        {
+            visible: false,
+            width: (tabsPanelInner*0.1),
+            name: "bookmarks",
+            title: "Book marks",
+            editing: false,
+            itemTemplate: function(value, topic) {
+                console.log("value ", value)
+                console.log("topic ", topic)
+                var $customBookmarkAddButton = $("<a>").attr({
+                    href: "/bookmarks/list/" + topic.id
+                });
+                var $BookmarkSelectButton = $("<i>").attr({ class: "jsgrid-bookmark-show fa fa-bookmark", title: "View Topic Bookmarks" });
+                var $customBookmarkSetButton = $("<a>").attr({
+                    href: "/bookmarks/new?id=" + topic.id
+                });
+                var $BookmarkSetButton = $("<i>").attr({ class: "jsgrid-bookmark-add fa fa-plus", title: "Add Bookmark to Topic" });
+                var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
+                var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
+                return $("<div>").attr("align", "center").append(set1).append(set2);
+            },
+            filtering: true
+        },
+
+        { visible: false,
+            width: (tabsPanelInner*0.3),
+            name: "description", type: "textarea", title: "Topic Description"}
+
+    ];
+
     /* this is used for getting the assignment ID passed from Ruby into the Java script for making those Ajax calls*/
     function getAssignmentId() {
         return jQuery("#jsGrid").data("assignmentid");
@@ -105,8 +273,7 @@ jQuery(document).ready(function() {
     jQuery("#jsGrid").jsGrid({
 
         //These are the configurations that are required for our JS Grid Table
-        width: "100%",
-        height: "auto",
+        width: tabsPanelInner,
         filtering: false,
         inserting: false,
         editing: false,
@@ -130,6 +297,12 @@ jQuery(document).ready(function() {
                     dataType: "json"
                 }).done(function(response) {
                     var sign_up_topics = response.sign_up_topics;
+                    sign_up_topics.sort(function (a, b) {
+                        return a.topic_identifier < b.topic_identifier ? -1 : 1;
+                    });
+                    for (var topic_column_idx in response.included_topic_columns) {
+                        $("#jsGrid").jsGrid("fieldOption", response.included_topic_columns[topic_column_idx], "visible", true);
+                    }
                     data.resolve(sign_up_topics);
                 }).fail(function(response) {
                     alert("Issue on Loading Topics"); // If problem occurs in loading topics
@@ -198,157 +371,7 @@ jQuery(document).ready(function() {
           All the configurations required for each column is mentioned here.
           Fields - Controls, Topic Number, Topic Category, # Slots, Available Slots, Num of Waitlist, Book mark, Topic Description, Tpic Link
             */
-        fields: [{
-            title: "Actions",
-            type: "control",
-            editButton: false,
-            deleteButton: false,
-            searching: false,
-            filtering: false,
-            deleteButtonTooltip: "Delete Topic",
-            editButtonTooltip: "Edit Topic",
-            editButtonClass: "jsgrid-edit-button-custom",
-            deleteButtonClass: "jsgrid-delete-button-custom",
-            modeSwitchButton: false,
-            width: "2%",
-            headerTemplate: function() {
-                return $("<button>").attr("type", "button").text("Add")
-                    .on("click", function () {
-                        showTopicDialog("Add", {});
-                    });
-            },
-            itemTemplate: function(value,item) {
-                var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
-
-                var $customEditButton = $("<button>")
-                    .prop("type","button").append($("<img />").prop("src","/assets/edit_icon.png"))
-                    .on("click",function(e) {
-                        showTopicDialog("Edit",item);
-                    });
-
-                var $customDeleteButton = $("<button>")
-                    .prop("type","button").append($("<img />").prop("src","/assets/delete_icon.png"))
-                    .on("click",function(e) {
-                        if(confirm("Are you sure you want to delete \""+item.topic_name+"\"?")) {
-                            jQuery("#jsGrid").jsGrid('deleteItem', item); //call deleting once more in callback
-                        }
-                    });
-
-                return $("<div>").append($customEditButton).append($customDeleteButton);
-            }
-        },
-            {
-                name: "topic_identifier",
-                type: "text",
-                title: "Topic #",
-                width: "1.5%",
-                validate: {
-                    validator: "required",
-                    message: "Topic Number should not be empty "
-                }
-
-            },
-            {
-                name: "topic_name",
-                type: "text",
-                title: "Topic name(s)",
-                width: "5%",
-                validate: {
-                    validator: "required",
-                    message: "Topic Name should not be empty "
-                },
-
-                /* this is used for customizing our Topic Names Field with details of signing up student and showing
-                    details of all teams subscribed to a topic
-                */
-                itemTemplate: function(value, topic) {
-                    /*setting a link for topic name if any link is present.*/
-                    if (topic.link != null && topic.link != "") {
-                        var topicLink = $("<a>").attr("href", topic.link).attr("target", "_blank").text(value);
-                    } else {
-                        var topicLink = $("<span>").text(value);
-                    }
-
-                    /* button for signing up to a topic */
-                    var signupUrl = "/sign_up_sheet/signup_as_instructor?assignment_id=" + getAssignmentId() + "&topic_id=" + topic.id;
-                    var signUpUser = $("<a>").attr("href", signupUrl);
-                    var signUpUserImage = $("<img>").attr({
-                        src: "/assets/signup-806fc3d5ffb6923d8f5061db243bf1afd15ec4029f1bac250793e6ceb2ab22bf.png",
-                        title: "Sign Up Student",
-                        alt: "Signup"
-                    });
-                    var signUp = signUpUser.append(signUpUserImage)
-
-                    /* adding all participants/teams to be shown under the topic name*/
-                    var participants_temp = topic.participants;
-                    if (participants_temp == null)
-                        participants_temp = []
-                    var participants_div = $("<div>");
-                    for (var p = 0; p < participants_temp.length; p++) {
-                        var current_participant = participants_temp[p];
-                        var text = $("<span>");
-                        text.html(current_participant.user_name_placeholder);
-                        var dropStudentUrl = "/sign_up_sheet/delete_signup_as_instructor/" + current_participant.team_id + "?topic_id=" + topic.id;
-                        var dropStudentAnchor = $("<a>").attr("href", dropStudentUrl);
-                        var dropStudentImage = $("<img>").attr({
-                            src: "/assets/delete_icon.png",
-                            title: "Drop Student",
-                            alt: "Drop Student Image"
-                        });
-                        participants_div.append(text).append(dropStudentAnchor.append(dropStudentImage));
-                    }
-                    return $("<div>").append(topicLink).append(signUp).append(participants_div);
-                },
-                filtering: true
-            },
-
-            { name: "category", type: "text", title: "Topic category", width: "5%" },
-
-            /* Validate whether the number of slots entered is greter than 0*/
-            {
-                name: "max_choosers",
-                type: "text",
-                title: "# Slots",
-                width: "2%",
-                validate: {
-                    message: "Choose Num of slots greater than or equal to 1",
-                    validator: function(value, item) {
-                        return value > 0;
-                    }
-                }
-            },
-
-            { name: "slots_available", editing: false, title: "Available Slots", width: "2%" },
-
-            { name: "slots_waitlisted", editing: false, title: "Num on Waitlist", width: "2%" },
-
-            /*adding Add bookmark and View bookmark functionalities*/
-            {
-                name: "id",
-                title: "Book marks",
-                editing: false,
-                width: "2%",
-                itemTemplate: function(value, topic) {
-                    console.log("value ", value)
-                    console.log("topic ", topic)
-                    var $customBookmarkAddButton = $("<a>").attr({
-                        href: "/bookmarks/list/" + topic.id
-                    });
-                    var $BookmarkSelectButton = $("<i>").attr({ class: "jsgrid-bookmark-show fa fa-bookmark", title: "View Topic Bookmarks" });
-                    var $customBookmarkSetButton = $("<a>").attr({
-                        href: "/bookmarks/new?id=" + topic.id
-                    });
-                    var $BookmarkSetButton = $("<i>").attr({ class: "jsgrid-bookmark-add fa fa-plus", title: "Add Bookmark to Topic" });
-                    var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
-                    var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
-                    return $("<div>").attr("align", "center").append(set1).append(set2);
-                },
-                filtering: true
-            },
-
-            { name: "description", type: "textarea", title: "Topic Description", width: "12%"}
-
-        ],
+        fields: allFields,
         /* for freezing the first column*/
         onItemUpdated: function(args) {
             // UpdateColPos(1);
@@ -373,10 +396,6 @@ jQuery(document).ready(function() {
     //freezing columns
 
     var formSubmitHandler = $.noop();
-
-    $('.jsgrid-grid-body').scroll(function() {
-        //UpdateColPos(1);
-    });
 
     $("#detailsDialog").dialog({
         autoOpen: false,
@@ -438,5 +457,4 @@ jQuery(document).ready(function() {
         topic.link = $("#link").val();
         topic.description = $("#description").val();
     }
-
 });

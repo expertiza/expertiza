@@ -17,7 +17,7 @@ describe OnTheFlyCalc do
   let(:assignment_questionnaire) { double('AssignmnetQuestionnaire',id: 1, assignment_id: 1,questionnaire_weight: 200) }
   let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
-  let(:team) { build(:assignment_team) }
+   let(:team) { build(:assignment_team) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
@@ -48,9 +48,6 @@ describe OnTheFlyCalc do
       allow(ReviewQuestionnaire).to receive(:assignment_questionnaires).with(assignment_id: 1).and_return(fake_result)
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil).and_return(double('AssignmentQuestionnaire', used_in_round: 1))
       expect(on_the_fly_calc.compute_total_score(scores)).to eq(0)
-      # @score={"2"=>{:scores=>{:avg=>4.5}}}
-      # allow(Questionnaire).to receive(:get_weighted_score).with(assignment,@score).and_return(4.5)
-      # expect(questionnaire.get_weighted_score(assignment, @score)).to eq(4.5)
     end
   end
 
@@ -139,7 +136,7 @@ describe OnTheFlyCalc do
          allow(on_the_fly_calc).to receive(:total_num_of_assessments).and_return(0)
          allow(on_the_fly_calc).to receive(:score).and_return(score)
          allow(on_the_fly_calc).to receive(:round).and_return({})
-         puts on_the_fly_calc.scores(questions)
+         expect(on_the_fly_calc.scores(questions)).to eq({min:0, max:0, avg:nil})
        end
      end
     xcontext 'when current assignment does not vary rubrics by round' do

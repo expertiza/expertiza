@@ -60,6 +60,7 @@ class StudentTaskController < ApplicationController
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
+  # To give permission for making a submission available to others
   def make_public
     @team=Team.find(params[:id])
     @team.make_public=params[:status]

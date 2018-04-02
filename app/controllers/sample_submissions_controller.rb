@@ -1,8 +1,18 @@
 class SampleSubmissionsController < ApplicationController
   before_action :set_sample_submission, only: [:show, :edit, :update, :destroy]
+  before_action :authorize
 
+  # Allow student enrolled in that assignment to view sample submissions
+  # Allow everyone else to view it
   def action_allowed?
-    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
+    return true if ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_role_name
+    @teams = TeamsUser.where(:user_id => current_user.try(:id))
+    @teams.each do |team|
+      if Team.where(:id => team.team_id).first.parent_id == sample_submission_params[:id].to_i
+        return true
+      end
+    end
+    false
   end
 
   # GET /sample_submissions

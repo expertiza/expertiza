@@ -1,4 +1,4 @@
-<!-- Displaying sample submissions to the student -->
+<!-- View to display sample submissions to the student -->
 <h2>Sample Submissions:</h2>
 <br>
 <!-- Displaying sample submissions by students of the current course -->
@@ -6,7 +6,7 @@
 <% if @assignment_due_date==nil or @assignment_due_date>Time.new() %>
     <br><i>Will be available once the assignment submission is completed</i>
 <% elsif @assignment_teams==[] %>
-    <br><i>None available yet</i>
+    <br><i>No sample submissions from current assignment made public yet</i>
 <% else %>
     <ul>
       <% @assignment_teams.each do |assignment_team| %>
@@ -30,7 +30,7 @@
 <!-- Displaying sample submissions from a previous assignment chosen by the instructor -->
 <h3>Submissions made public by instructor:</h3>
 <% if @assignment_teams_professor == [] %>
-    <br><i>None available yet</i>
+    <br><i>No sample submissions from previous assignments made available yet</i>
 <% else %>
     <ul>
       <% @assignment_teams_professor.each do |assignment_team| %>

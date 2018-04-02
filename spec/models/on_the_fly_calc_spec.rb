@@ -22,6 +22,7 @@ describe OnTheFlyCalc do
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:questionnaire1) {build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234)}
+  let(:contributor) { build(:assignment_team, id:1) }
 
   describe '#compute_total_score' do
     context 'when avg score is nil' do
@@ -82,28 +83,44 @@ describe OnTheFlyCalc do
     end
   end
 #
-#   xdescribe '#compute_avg_and_ranges_hash' do
-#     context 'when current assignment varys rubrics by round' do
-#       it 'computes avg score and score range for each team in each round and return scores' do
-#       # Write your test here!
-#         on_the_fly_calc = Assignment.new(id: 1, name: 'Test Assgt')
-#         #     on_the_fly_calc.extend(OnTheFlyCalc)
-#         questions= [question2,question3]
-#         allow(Assignment).to receive(:contributors).and_return(double('AssignmentTeam'))
-#         allow(Assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-#         allow(Assignment).to receive(:rounds_of_reviews).and_return(1)
-#         allow(Assignment).to receive(:review_questionnaire_id).with(1).and_return(1)
-#         allow(Question).to receive(:where).with(any_args).and_return(questions)
-#         print on_the_fly_calc.compute_avg_and_ranges_hash
-#     end
-#   end
-#     context 'when current assignment does not vary rubrics by round' do
-#       it 'computes avg score and score range for each team and return scores' do
-#       # Write your test here!
-#     end
-#     end
-#   end
-#
+  describe '#compute_avg_and_ranges_hash' do
+    #let(:response_map) { create(:review_response_map, id: 1, reviewee_id: 1) }
+    # let!(:response_record) { create(:response, id: 1, response_map: response_map) }
+    let(:response1) { double("respons1") }
+    let(:question11) {double("questn11")}
+
+    context 'when current assignment varys rubrics by round' do
+      it 'computes avg score and score range for each team in each round and return scores' do
+        score = {min: 50.0, max:50.0, avg:50.0}
+        allow(on_the_fly_calc).to receive(:contributors).and_return([contributor])
+        allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(TRUE)
+        allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
+        allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
+        allow(Answer).to receive(:compute_scores).with([],[question1]).and_return(score)
+        questions = [question11]
+        assessments = [response1]
+        allow(ReviewResponseMap).to receive(:get_assessments_for).with(contributor).and_return([])
+        # allow(Answer).to receive(:compute_scores).with([response1], [question11]).and_return(score)
+        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq({1=>{1=>{:min=>50.0, :max=>50.0, :avg=>50.0}}})
+      end
+    end
+    context 'when current assignment does not vary rubrics by round' do
+      it 'computes avg score and score range for each team and return scores' do
+        score = {min: 50.0, max:50.0, avg:50.0}
+        allow(on_the_fly_calc).to receive(:contributors).and_return([contributor])
+        allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(FALSE)
+        allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
+        allow(Answer).to receive(:compute_scores).with([],[question1]).and_return(score)
+        questions = [question11]
+        assessments = [response1]
+        allow(ReviewResponseMap).to receive(:get_assessments_for).with(contributor).and_return([])
+        # allow(Answer).to receive(:compute_scores).with([response1], [question11]).and_return(score)
+        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq({1=>{:max=>50, :min=>50, :avg=>50}})
+
+      end
+    end
+  end
+
   describe '#scores' do
     context 'when current assignment varys rubrics by round and number of assessments is non-zero' do
       it 'calculates rounds/scores/assessments and return scores' do

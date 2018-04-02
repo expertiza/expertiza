@@ -544,21 +544,12 @@ describe ReviewMappingController do
     context 'when artifacts nums are not zero' do
       it 'sets instance variables and calls methods' do
       
-      allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)
-                                                     .and_return([double('ReviewResponseMap', reviewee_id: 2)])
-          allow(AssignmentTeam).to receive(:find).with("1").and_return(team)
-
       allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:calibrated_artifacts_num, :params)
       allow(AssignmentParticipant).to receive(:where).with(parent_id: :assignment_id).and_return(participant)
       expect(flash[:error]).to be(nil)
       expect(assigns(:participants_hash)).to be(nil)
-      params = { id: 1,
-            max_team_size: 1,
-            num_reviews_per_student: 1,
-            num_reviews_per_submission: 0,
-            num_calibrated_artifacts: 1,
-            num_uncalibrated_artifacts: 1
-      }
+      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:execute_peer_review_strategy).with(any_args)
+      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:uncalibrated_artifacts_num, :params)
 
       end
     end

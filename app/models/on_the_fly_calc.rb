@@ -61,7 +61,7 @@ module OnTheFlyCalc
         calculate_assessment
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
-        score_team[:scores] = Answer.compute_scores(assessments, questions[:review])
+        score_team[:scores] = Answer.compute_scores(assessments, questions)
       end
       index += 1
     end
@@ -175,4 +175,3 @@ def scores_non_varying_rubrics
     @review_scores[response_map.reviewer_id] = @respective_scores
   end
 end
-

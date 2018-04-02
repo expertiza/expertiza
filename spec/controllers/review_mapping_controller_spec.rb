@@ -79,7 +79,7 @@ describe ReviewMappingController do
       expect(assigns(:mapping)).to eq(review_response_map)
     end
   end
-  
+
 
   describe '#add_reviewer and #get_reviewer' do
     before(:each) do
@@ -537,6 +537,28 @@ describe ReviewMappingController do
           num_uncalibrated_artifacts: 0
         }
         post :automatic_review_mapping, params
+
+      end
+    end
+
+    context 'when artifacts nums are not zero' do
+      it 'sets instance variables and calls methods' do
+      
+      allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)
+                                                     .and_return([double('ReviewResponseMap', reviewee_id: 2)])
+          allow(AssignmentTeam).to receive(:find).with("1").and_return(team)
+
+      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:calibrated_artifacts_num, :params)
+      allow(AssignmentParticipant).to receive(:where).with(parent_id: :assignment_id).and_return(participant)
+      expect(flash[:error]).to be(nil)
+      expect(assigns(:participants_hash)).to be(nil)
+      params = { id: 1,
+            max_team_size: 1,
+            num_reviews_per_student: 1,
+            num_reviews_per_submission: 0,
+            num_calibrated_artifacts: 1,
+            num_uncalibrated_artifacts: 1
+      }
 
       end
     end

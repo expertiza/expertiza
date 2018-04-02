@@ -67,7 +67,7 @@ module AutomaticReviewMappingHelper
         @exact_num_of_review_needed = teams.size * submission_review_num
         @student_review_num = student_review_num
       end
-      if @student_review_num >= teams.size
+      if student_review_num >= teams.size
         raise 'You cannot set the number of reviews done \
       by each student to be greater than or equal to total number of teams \
       [or "participants" if it is an individual assignment].'

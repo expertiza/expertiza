@@ -29,43 +29,13 @@ module AssignmentHelper
     options.uniq.sort
   end
 
-  def course_options(instructor)
-    if session[:user].role.name == 'Teaching Assistant'
-      courses = []
-      ta = Ta.find(session[:user].id)
-      ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
-      # If a TA created some courses before, s/he can still add new assignments to these courses.
-      courses << Course.where(instructor_id: instructor.id)
-      courses.flatten!
-      # Administrator and Super-Administrator can see all courses
-    elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
-      courses = Course.all
-    elsif session[:user].role.name == 'Instructor'
-      courses = Course.where(instructor_id: instructor.id)
-      # instructor can see courses his/her TAs created
-      ta_ids = []
-      ta_ids << Instructor.get_my_tas(session[:user].id)
-      ta_ids.flatten!
-      ta_ids.each do |ta_id|
-        ta = Ta.find(ta_id)
-        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
-      end
-    end
-    options = []
-    options << ['-----------', nil]
-    courses.each do |course|
-      options << [course.name, course.id]
-    end
-    options.uniq.sort
-  end
-
   # Sample submission options
-  def sample_sub_options()
+  def sample_sub_options
     assignments = Assignment.all
     options = []
     assignments.each do |assignment|
       course_name = ""
-      if assignment.course_id and assignment.course_id!=0 and not Course.find(assignment.course_id).nil?
+      if assignment.course_id and assignment.course_id != 0 and !Course.find(assignment.course_id).nil?
         course_name = Course.find(assignment.course_id).name
       end
       name = course_name + '- ' + assignment.name

@@ -9,7 +9,7 @@ class StudentTaskController < ApplicationController
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
-    @student_tasks.select! {|t| t.assignment.availability_flag } if not @assignment.nil?
+    @student_tasks.select! {|t| t.assignment.availability_flag } unless @assignment.nil?
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
@@ -62,11 +62,11 @@ class StudentTaskController < ApplicationController
 
   # To give permission for making a submission available to others
   def make_public
-    @team=Team.find(params[:id])
-    @team.make_public=params[:status]
+    @team = Team.find(params[:id])
+    @team.make_public = params[:status]
     @team.save
     respond_to do |format|
-      format.html{head :no_content}
+      format.html { head :no_content }
     end
   end
 

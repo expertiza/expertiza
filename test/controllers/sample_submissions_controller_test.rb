@@ -18,7 +18,7 @@ class SampleSubmissionsControllerTest < ActionController::TestCase
 
   test "should create sample_submission" do
     assert_difference('SampleSubmission.count') do
-      post :create, sample_submission: {  }
+      post :create, sample_submission: {}
     end
 
     assert_redirected_to sample_submission_path(assigns(:sample_submission))
@@ -35,7 +35,7 @@ class SampleSubmissionsControllerTest < ActionController::TestCase
   end
 
   test "should update sample_submission" do
-    patch :update, id: @sample_submission, sample_submission: {  }
+    patch :update, id: @sample_submission, sample_submission: {}
     assert_redirected_to sample_submission_path(assigns(:sample_submission))
   end
 

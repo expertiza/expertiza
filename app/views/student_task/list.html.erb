@@ -134,7 +134,11 @@
               <!--publish rights-->
               <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
               <!--make assignment public-->
-              <td align=center><input id="makeSubPublic" teamid="<%=participant.team.id%>" type="checkbox" onclick="publishConfirmation(this)" <%if participant.team.make_public%>checked<%end%>></td>
+              <% if !participant.team.nil? %>
+                <td align=center>
+                  <input id="makeSubPublic" teamid="<%= participant.team.id %>" type="checkbox" onclick="publishConfirmation(this)" <% if participant.team.make_public %>checked<% end %>>
+                </td>
+              <% end %>
             </tr>
         <% end %>
     <% end %>

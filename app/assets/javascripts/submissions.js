@@ -122,15 +122,9 @@ function publishConfirmation(makeSubPublic) {
                 data:{
                     id:$(makeSubPublic).attr("teamid"),
                     status:true
-                }
-            }).done(function (data) {
-
-            });
-        } else {
-            $(makeSubPublic).attr("checked", false);
-        }
-    }
-    else {
+                }}).done(function (data) {});
+        } else { $(makeSubPublic).attr("checked", false); }
+    }else {
         if (confirm("Please press OK to revoke permission.")) {
             $(makeSubPublic).attr("checked", false);
             $.ajax({
@@ -139,12 +133,7 @@ function publishConfirmation(makeSubPublic) {
                 data:{
                     id:$(makeSubPublic).attr("teamid"),
                     status:false
-                }
-            }).done(function (data) {
-
-            });
-        } else {
-            $(makeSubPublic).attr("checked", true);
-        }
+                }}).done(function (data) {});
+        } else { $(makeSubPublic).attr("checked", true); }
     }
 }

@@ -34,7 +34,7 @@ class AuthController < ApplicationController
     session[:user] = user
     AuthController.set_current_role(user.role_id, session)
     # hide menu items based on type of user
-    MenuItemsHelper.set_hidden_menu_items(user,session)
+    MenuItemsHelper.set_hidden_menu_items(user, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
   end

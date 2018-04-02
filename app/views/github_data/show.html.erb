@@ -25,8 +25,9 @@
   <tr>
     <th>Date</th>
     <th>Commits</th>
-    <th>Additions</th>
-    <th>Deletions</th>
+    <th>Line Additions</th>
+    <th>Line Deletions</th>
+    <th>Files Changed</th>
   </tr>
   </thead>
   <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
@@ -38,6 +39,7 @@
       <td align="center"><%= entry[1][:commits] %></td>
       <td align="center"><%= entry[1][:additions] %></td>
       <td align="center"><%= entry[1][:deletions] %></td>
+      <td align="center"><%= entry[1][:changed_files] %></td>
     </tr>
   <% end unless @changes_by_date.nil? %>
   </tbody>
@@ -61,8 +63,8 @@
   <% @commits.each do |commit| %>
     <tr>
       <td><%= commit.message %></td>
-      <td align="center"><%= commit.committer.name %></td>
-      <td align="center"><%= DateTime.parse(commit.committed_date) %></td>
+      <td align="center"><%= commit.committer %></td>
+      <td align="center"><%= commit.committed_date.strftime('%Y-%m-%d') %></td>
       <td align="center"><%= commit.additions %></td>
       <td align="center"><%= commit.deletions %></td>
       <td align="center"><%= commit.changed_files %></td>

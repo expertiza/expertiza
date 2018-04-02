@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180104141248) do
+ActiveRecord::Schema.define(version: 20180402023525) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -274,6 +274,22 @@ ActiveRecord::Schema.define(version: 20180104141248) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "github_data", force: :cascade do |t|
+    t.integer  "submission_record_id", limit: 4
+    t.integer  "oid",                  limit: 4
+    t.string   "committer",            limit: 255
+    t.datetime "committed_date"
+    t.integer  "commits",              limit: 4
+    t.integer  "additions",            limit: 4
+    t.integer  "deletions",            limit: 4
+    t.integer  "changed_files",        limit: 4
+    t.string   "message",              limit: 255
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "github_data", ["submission_record_id"], name: "index_github_data_on_submission_record_id", using: :btree
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -792,6 +808,7 @@ ActiveRecord::Schema.define(version: 20180104141248) do
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
+  add_foreign_key "github_data", "submission_records"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"

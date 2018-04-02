@@ -105,9 +105,9 @@ class SuggestionController < ApplicationController
   end
 
   def submit
-    if !params[:update_comment].nil?
-      edit_comment
-    elsif !params[:add_comment].nil?
+    #if !params[:update_comment].nil?
+     # edit_comment
+    if !params[:add_comment].nil?
       add_comment
     elsif !params[:approve_suggestion].nil?
       approve_suggestion

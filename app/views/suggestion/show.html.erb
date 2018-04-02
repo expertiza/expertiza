@@ -42,13 +42,13 @@
 </tr>
 </table>
 <p>
-  <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
-    <%= form_tag :action => 'submit', :id => @suggestion do %>
-      <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+  <%# if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+    <%#= form_tag :action => 'submit', :id => @suggestion do %>
+      <%#= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
       &nbsp; &nbsp;
-      <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
-    <% end %>
-  <% end %>
+      <%#= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+    <% #end %>
+  <%# end %>
 </p>
 
 <br><br>

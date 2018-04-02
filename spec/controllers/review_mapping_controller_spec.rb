@@ -436,6 +436,23 @@ describe ReviewMappingController do
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end 
+
+      context 'when all nums in calibrated params are 0 review nums are not' do
+        it 'shows an error message and redirects to review_mapping#list_mappings page' do
+          allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
+          params = {
+            id: 1,
+            max_team_size: 1,
+            num_reviews_per_student: 1,
+            num_reviews_per_submission: 1,
+            num_calibrated_artifacts: 0,
+            num_uncalibrated_artifacts: 0
+          }
+          post :automatic_review_mapping, params
+          expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student), not both.')
+          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        end
+      end 
       context 'when calibrated params are not 0' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)

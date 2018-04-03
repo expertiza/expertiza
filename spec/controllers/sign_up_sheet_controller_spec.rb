@@ -182,6 +182,7 @@ describe SignUpSheetController do
       allow(SignUpTopic).to receive(:where).with("assignment_id = ?", "1").and_return([topic])
       allow(SignUpTopic).to receive(:find_slots_filled).with("1").and_return([double('SignedUpTeam', count: 0,topic_id: 1)])
       allow(SignUpTopic).to receive(:find_slots_waitlisted).with("1").and_return([double('SignedUpTeam', count: 0,topic_id: 1)])
+      allow(SignedUpTeam).to receive(:find_team_participants).with("1").and_return([double('User', topic_id: 0)])
       params = {id: 1, topic_id: 1}
       get :load_add_signup_topics, params
       @parsed_response = JSON.parse( response.body )
@@ -191,6 +192,12 @@ describe SignUpSheetController do
     end
     it 'returns slots_filled_value as JSON' do
       expect(@parsed_response["sign_up_topics"][0]["slots_filled_value"]).to eq(0)
+    end
+    it 'returns slots_available as JSON' do
+      expect(@parsed_response["sign_up_topics"][0]["slots_available"]).to eq(1)
+    end
+    it 'returns participants as JSON' do
+      expect(@parsed_response["sign_up_topics"][0]["participants"]).to be_empty
     end
   end
 

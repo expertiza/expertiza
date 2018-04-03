@@ -23,6 +23,10 @@ class SignUpTopic < ActiveRecord::Base
   #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
   # end
 
+  def is_finished
+    (Assignment.find(self[:assignment_id]).current_stage_name(self[:id]) == 'Finished')
+  end
+
   def self.import(row_hash, session, _id = nil)
     if row_hash.length < 3
       raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."

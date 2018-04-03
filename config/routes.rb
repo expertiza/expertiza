@@ -391,7 +391,7 @@ resources :institution, except: [:destroy] do
 
   resources :submission_records, only: [:index]
 
-  resources :suggestion, only: %i[show new create] do
+  resources :suggestion, only: %i[show new create edit update] do
     collection do
       get :list
       post :submit
@@ -402,6 +402,7 @@ resources :institution, except: [:destroy] do
       get :form_comment
       post :form_comment
       get :update_comment
+      post :update_comment
     end
   end
 

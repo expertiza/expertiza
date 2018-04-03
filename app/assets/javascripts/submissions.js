@@ -115,33 +115,33 @@ function deleteSelectedFile(){
 
 
 $(document).ready(function(){
-    // Function that confirms user action via a popup message. If confirmed, it creates the backend API request.
-    function confirmAndUpdate(confirmationMessage, checkbox, status) {
+
+    // Function that confirms user action via a popup message.
+    // If confirmed, it creates the backend API request.
+    function confirmAndUpdate(confirmationMessage, event) {
+
         if (confirm(confirmationMessage)) {
-
-            console.log($(checkbox).attr("checked"));
-
-            $(checkbox).prop("checked", status);
-
             //Make changes to the DB via AJAX request
             $.ajax({
                 type: 'PUT',
                 url: "make_public",
                 data: {
-                    id: $(checkbox).attr("teamid"),
-                    status: status
+                    id: $(event.target).attr("teamid"),
+                    status: $(event.target).prop("checked")
                 }
             });
+        }
+        else{
+            //Cancel checkbox checking/unchecking
+            event.preventDefault();
         }
     }
 
     //Check the value of checkbox and take action accordingly
     $("#makeSubPublic").click(function(event){
-        event.preventDefault();
-
-        if($(this).prop("checked"))
-            confirmAndUpdate("Please press OK to revoke permission.", this, false);
+        if(!$(this).prop("checked"))
+            confirmAndUpdate("Please press OK to revoke permission.", event);
         else
-            confirmAndUpdate("Please press OK to provide permission.", this, true);
+            confirmAndUpdate("Please press OK to provide permission.", event);
     });
 });

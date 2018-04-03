@@ -1,6 +1,28 @@
 describe "sample submission test" do
   before(:each) do
     # create assignment and topic
+    assignment = build(Assignment)
+    course = Course.new
+    course.name = "newCourse"
+    course.save
+    assignment.course_id = course.id
+    assignment.save
+
+    assignment_team = AssignmentTeam.new
+    assignment_team.name = "assignment_team_1"
+    assignment_team.parent_id = assignment.id
+    assignment_team.save!
+
+    assignment_team = AssignmentTeam.new
+    assignment_team.name = "assignment_team_2"
+    assignment_team.parent_id = assignment.id
+    assignment_team.save!
+
+    assignment_team = AssignmentTeam.new
+    assignment_team.name = "assignment_team_3"
+    assignment_team.parent_id = assignment.id
+    assignment_team.save!
+
     create(:course)
     create(:assignment, name: "Assignment1684", directory_path: "Assignment1684")
     create_list(:participant, 3)

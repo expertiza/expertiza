@@ -238,7 +238,7 @@ resources :institution, except: [:destroy] do
   resources :assignment_survey_questionnaires, controller: :questionnaires
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_survey_questionnaires, controller: :questionnaires
-  resources :bookmark_rating_questionnaires, controller: :questionnaires #changed
+  resources :bookmark_rating_questionnaires, controller: :questionnaires
 
   resources :questions do
     collection do

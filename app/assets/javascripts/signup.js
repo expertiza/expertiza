@@ -114,29 +114,33 @@ jQuery(document).ready(function() {
         deleteButtonClass: "jsgrid-delete-button-custom",
         modeSwitchButton: false,
         headerTemplate: function() {
-            return $("<button>").attr("type", "button").text("Add")
+            return $("<button>").attr("type", "button").text("Add").addClass("add-topic-button")
                 .on("click", function () {
                     showTopicDialog("Add", {});
-                });
+                }).hide();
         },
         itemTemplate: function(value,item) {
-            var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
+            if (!item.is_finished) {
+                var $result = jsGrid.fields.control.prototype.itemTemplate.apply(this, arguments);
 
-            var $customEditButton = $("<button>")
-                .prop("type","button").append($("<img />").prop("src","/assets/edit_icon.png"))
-                .on("click",function(e) {
-                    showTopicDialog("Edit",item);
-                });
+                $(".add-topic-button").show();
+                var $customEditButton = $("<button>")
+                    .prop("type", "button").append($("<img />").prop("src", "/assets/edit_icon.png"))
+                    .on("click", function (e) {
+                        showTopicDialog("Edit", item);
+                    });
 
-            var $customDeleteButton = $("<button>")
-                .prop("type","button").append($("<img />").prop("src","/assets/delete_icon.png"))
-                .on("click",function(e) {
-                    if(confirm("Are you sure you want to delete \""+item.topic_name+"\"?")) {
-                        jQuery("#jsGrid").jsGrid('deleteItem', item); //call deleting once more in callback
-                    }
-                });
+                var $customDeleteButton = $("<button>")
+                    .prop("type", "button").append($("<img />").prop("src", "/assets/delete_icon.png"))
+                    .on("click", function (e) {
+                        if (confirm("Are you sure you want to delete \"" + item.topic_name + "\"?")) {
+                            jQuery("#jsGrid").jsGrid('deleteItem', item); //call deleting once more in callback
+                        }
+                    });
 
-            return $("<div>").append($customEditButton).append($customDeleteButton);
+                return $("<div>").append($customEditButton).append($customDeleteButton);
+            }
+            return false;
         }
     },
         {
@@ -243,17 +247,27 @@ jQuery(document).ready(function() {
             itemTemplate: function(value, topic) {
                 console.log("value ", value)
                 console.log("topic ", topic)
-                var $customBookmarkAddButton = $("<a>").attr({
-                    href: "/bookmarks/list/" + topic.id
-                });
-                var $BookmarkSelectButton = $("<i>").attr({ class: "jsgrid-bookmark-show fa fa-bookmark", title: "View Topic Bookmarks" });
-                var $customBookmarkSetButton = $("<a>").attr({
-                    href: "/bookmarks/new?id=" + topic.id
-                });
-                var $BookmarkSetButton = $("<i>").attr({ class: "jsgrid-bookmark-add fa fa-plus", title: "Add Bookmark to Topic" });
-                var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
-                var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
-                return $("<div>").attr("align", "center").append(set1).append(set2);
+                if(!topic.is_finished) {
+                    $(".add-topic-button").show();
+                    var $customBookmarkAddButton = $("<a>").attr({
+                        href: "/bookmarks/list/" + topic.id
+                    });
+                    var $BookmarkSelectButton = $("<i>").attr({
+                        class: "jsgrid-bookmark-show fa fa-bookmark",
+                        title: "View Topic Bookmarks"
+                    });
+                    var $customBookmarkSetButton = $("<a>").attr({
+                        href: "/bookmarks/new?id=" + topic.id
+                    });
+                    var $BookmarkSetButton = $("<i>").attr({
+                        class: "jsgrid-bookmark-add fa fa-plus",
+                        title: "Add Bookmark to Topic"
+                    });
+                    var set1 = $customBookmarkAddButton.append($BookmarkSelectButton);
+                    var set2 = $customBookmarkSetButton.append($BookmarkSetButton);
+                    return $("<div>").attr("align", "center").append(set1).append(set2);
+                }
+                return false;
             },
             filtering: true
         },
@@ -267,6 +281,23 @@ jQuery(document).ready(function() {
     /* this is used for getting the assignment ID passed from Ruby into the Java script for making those Ajax calls*/
     function getAssignmentId() {
         return jQuery("#jsGrid").data("assignmentid");
+    }
+
+    function topicFinished(assignmentId,topic) {
+       return $.ajax({
+            type: "POST",
+            url: "/sign_up_sheet/is_topic_finished",
+            dataType: "json",
+            data: {
+                topicId: topic.id,
+                assignmentId: assignmentId
+            }
+        }).done(function(response) {
+            return response.isFinished;
+        }).fail(function(response) {
+            alert("Issue determining if topic is finished");
+            return true;
+        });
     }
 
     //this is the all powerful configuration object for setting up the JS GRID Table

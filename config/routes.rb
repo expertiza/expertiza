@@ -332,6 +332,7 @@ resources :institution, except: [:destroy] do
       post :set_priority
       post :save_topic_deadlines
       post :persist_topics
+      post :is_topic_finished
     end
   end
 

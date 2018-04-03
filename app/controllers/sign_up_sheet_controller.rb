@@ -161,7 +161,7 @@ class SignUpSheetController < ApplicationController
       topic.participants = participants
     }
 
-    included_topic_columns = retrieve_included_topic_columns(@assignment,params)
+    included_topic_columns = retrieve_included_topic_columns(@assignment)
 
 
     # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
@@ -171,11 +171,19 @@ class SignUpSheetController < ApplicationController
     render json: {
         id: @id.as_json,
         sign_up_topics: @sign_up_topics.as_json(methods: [
-            :slots_filled_value,:slots_waitlisted,:slots_available,:participants
+            :slots_filled_value,:slots_waitlisted,:slots_available,:participants,:is_finished
         ]),
         slots_waitlisted: @slots_waitlisted.as_json,
         assignment: @assignment.as_json,
         included_topic_columns: included_topic_columns
+    }
+  end
+
+  def is_topic_finished
+    assignment = Assignment.find(params[:assignmentId])
+    is_finished = (assignment.current_stage_name(params[:topicId]) == 'Finished')
+    render json: {
+      isFinished: is_finished
     }
   end
 
@@ -187,11 +195,12 @@ class SignUpSheetController < ApplicationController
 #
 #  end
 
-  def retrieve_included_topic_columns(assignment,params)
+  def retrieve_included_topic_columns(assignment)
     included_columns = ["topic_identifier","topic_name"]
 
     if !assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name
       included_columns << "actions"
+      included_columns << "bookmarks"
       included_columns << "max_choosers"
       included_columns << "slots_available"
       included_columns << "slots_waitlisted"

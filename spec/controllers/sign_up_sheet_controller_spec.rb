@@ -10,7 +10,6 @@ describe SignUpSheetController do
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
   let(:bid) { Bid.new(topic_id: 1, priority: 1) }
-  let(:signed_up_team3) { build( :signed_up_team, topic_id: 1, is_waitlisted: true ) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -187,17 +186,23 @@ describe SignUpSheetController do
       get :load_add_signup_topics, params
       @parsed_response = JSON.parse( response.body )
     end
-    it 'returns slots_waitlisted as JSON' do
+
+    it 'returns slots_waitlisted correctly as JSON' do
       expect(@parsed_response["sign_up_topics"][0]["slots_waitlisted"]).to eq(0)
     end
-    it 'returns slots_filled_value as JSON' do
+
+    it 'returns slots_filled_value correctly as JSON' do
       expect(@parsed_response["sign_up_topics"][0]["slots_filled_value"]).to eq(0)
     end
-    it 'returns slots_available as JSON' do
+
+    it 'returns slots_available correctly as JSON' do
       expect(@parsed_response["sign_up_topics"][0]["slots_available"]).to eq(1)
     end
-    it 'returns participants as JSON' do
-      expect(@parsed_response["sign_up_topics"][0]["participants"]).to be_empty
+
+    context 'There are no participants' do
+      it 'returns participants as empty as JSON' do
+        expect(@parsed_response["sign_up_topics"][0]["participants"]).to be_empty
+      end
     end
   end
 

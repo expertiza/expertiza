@@ -4,46 +4,37 @@ This document provides the common design features to be followed while developin
 
 ## Icon Library
 
-Icons are available in 4 sizes : 16, 24, 32, 48. It is possibility that we might not have all sizes for all icons. Edit the number as per size chose, everything else will remain same
-
-### Icon Palette : 
-
-
-|![Add Assignment](design_images/image4.png) |![Add TA](design_images/image16.png)|![Add Private](design_images/image18.png)|![Add Public](design_images/image19.png)|![Add Signup sheet](design_images/image20.png)|![Assign Course Blue](design_images/image21.png)|![Assign Course Green](design_images/image22.png)|![Assign survey to](design_images/image11.png)|![Copy](design_images/image1.png)|![Create Team](design_images/image6.png)|![Delete](design_images/image15.png)|![Edit](design_images/image14.png) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-|![Edit Signup sheet](design_images/image23.png)|![List All](design_images/image8.png)| ![List Submissions](design_images/image24.png)| ![Make public from private](design_images/image10.png)|![Private](design_images/image25.png)| ![Remove from Course](design_images/image26.png) |![Run Lottery](design_images/image27.png)  |![Search in data](design_images/image28.png)|![View Review Report](design_images/image29.png)|![View Scores](design_images/image30.png) |![View Suggestions](design_images/image31.png) | ![View Survey](design_images/image31.png)|
-
----
+Icons are available in 4 sizes : 16, 24, 32, 48. It is possibility that we might not have all sizes for all icons. Edit the number as per size chose, everything else will remain same.
 
 **Sr. No.**
 **Element Name**
 **Image**
 **Guide**	
 |---|---|---|---|
-|  1 |  Add assignment | ![Add Assignment](design_images/image4.png)  | To add 'add assignment' icon, use path **```/assets/tree_view/add-assignment-24.png```** |
-|  2 |  Add Teaching assistant | ![Add TA](design_images/image16.png)  | To add 'add TA' icon, use path **```/assets/tree_view/add-ta-24.png```** |
-|  3 |  Add Private | ![Add Private](design_images/image18.png)  | To add 'add private' icon, use path **```/assets/tree_view/add-private-24.png```** |
-|  4 |  Add Public | ![Add Public](design_images/image19.png)  | To add 'add public' icon, use path **```/assets/tree_view/add-public-24.png```** |
-|  5 |  Add Signup Sheet | ![Add Signup sheet](design_images/image20.png)  | To add 'add signup sheet' icon, use path **```/assets/tree_view/add-signup-sheet-24.png```** |
-|  6 |  Assign Course Blue | ![Assign Course Blue](design_images/image21.png)  | To add 'Assign Course Blue' icon, use path **```/assets/tree_view/add-course-blue-24.png```** |
-|  7 |  Assign Course Green | ![Assign Course Green](design_images/image22.png)  | To add 'Assign Course Green' icon, use path **```/assets/tree_view/add-course-green-24.png```** |
-|  8 |  Assign survey to | ![Assign survey to](design_images/image11.png)  | To add 'Assign survey to' icon, use path **```/assets/tree_view/assign-survey-24.png```** |
-|  9 |  Copy | ![Copy](design_images/image1.png)  | To add "Copy" icon, use path **```/assets/tree_view/Copy-icon-24.png```** |
-|  10 |  Create Team | ![Create Team](design_images/image6.png)  | To add 'Create Team' icon, use path **```/assets/tree_view/create-teams-24.png```** |
-|  11 |  Delete | ![Delete](design_images/image15.png)  | To add "Delete" icon, use path **```/assets/tree_view/delete-icon-24.png```** |
-|  12 |  (General) Edit | ![Edit](design_images/image14.png)  | To add "Edit" icon, use path **```/assets/tree_view/edit-icon-24.png```** |
-|  13 |  Edit Signup sheet | ![Edit Signup sheet](design_images/image23.png)  | To add "Edit Signup sheet" icon, use path **```/assets/tree_view/edit-signup-sheet-24.png```** |
-|  14 |  List All | ![List All](design_images/image8.png)  | To add "List All" icon, add class as "glyphicon glyphicon-list-alt" |
-|  15 |  List Submissions | ![List Submissions](design_images/image24.png)  | To add "List Submissions" icon, use path **```/assets/tree_view/List-submisstions-24.png```** |
-|  16 |  Make public from private | ![Make public from private](design_images/image10.png)  | To add "Make public from private" icon,  use path **```/assets/tree_view/lock-off-disabled-icon-24.png```**   |
-|  17 |  Private | ![Private](design_images/image25.png)  | To add "Private" icon,  use path **```/assets/tree_view/lock-disabled-icon-24.png```**   |
-|  18 |  Remove from Course | ![Remove from Course](design_images/image26.png)  | To add "Remove from Course" icon,  use path **```/assets/tree_view/remove-from-course-24.png```**   |
-|  19 |  Run Lottery | ![Run Lottery](design_images/image27.png)  | To add "Run Lottery" icon,  use path **```/assets/tree_view/run-lottery.png```**   |
-|  20 |  Search in data | ![Search in data](design_images/image28.png)  | To add "Search in data" icon,  use path **```/assets/tree_view/view-publish-rights-24.png```**   |
-|  21 |  View Review Report | ![View Review Report](design_images/image29.png)  | To add "View Review Report " icon,  use path **```/assets/tree_view/view-review-report-24.png```**   |
-|  22 |  View Scores | ![View Scores](design_images/image30.png)  | To add "View Score" icon,  use path **```/assets/tree_view/view-scores-24.png```**   |
-|  23 |  View Suggestions | ![View Suggestions](design_images/image31.png)  | To add "View Suggestions" icon,  use path **```/assets/tree_view/view-suggestion-24.png```**   |
-|  24 |  View Survey | ![View Survey](design_images/image31.png)  | To add "View Survey" icon,  use path **```/assets/tree_view/view-survey-24.png```**   |
+|  1 |  Add assignment | ![Add Assignment](/assets/images/tree_view/image4.png)  | To add 'add assignment' icon, use path **```/assets/tree_view/add-assignment-24.png```** |
+|  2 |  Add Teaching assistant | ![Add TA](/assets/images/tree_view/add-ta-24.png)  | To add 'add TA' icon, use path **```/assets/tree_view/add-ta-24.png```** |
+|  3 |  Add Private | ![Add Private](/assets/images/tree_view/add-private-24.png)  | To add 'add private' icon, use path **```/assets/tree_view/add-private-24.png```** |
+|  4 |  Add Public | ![Add Public](/assets/images/tree_view/add-public-24.png)  | To add 'add public' icon, use path **```/assets/tree_view/add-public-24.png```** |
+|  5 |  Add Signup Sheet | ![Add Signup sheet](/assets/images/tree_view/add-signup-sheet-24.png)  | To add 'add signup sheet' icon, use path **```/assets/tree_view/add-signup-sheet-24.png```** |
+|  6 |  Assign Course Blue | ![Assign Course Blue](/assets/images/tree_view/add-course-blue-24.png)  | To add 'Assign Course Blue' icon, use path **```/assets/tree_view/add-course-blue-24.png```** |
+|  7 |  Assign Course Green | ![Assign Course Green](/assets/images/tree_view/add-course-green-24.png)  | To add 'Assign Course Green' icon, use path **```/assets/tree_view/add-course-green-24.png```** |
+|  8 |  Assign survey to | ![Assign survey to](/assets/images/tree_view/assign-survey-24.png)  | To add 'Assign survey to' icon, use path **```/assets/tree_view/assign-survey-24.png```** |
+|  9 |  Copy | ![Copy](/assets/images/tree_view/Copy-icon-24.png)  | To add "Copy" icon, use path **```/assets/tree_view/Copy-icon-24.png```** |
+|  10 |  Create Team | ![Create Team](/assets/images/tree_view/create-teams-24.png)  | To add 'Create Team' icon, use path **```/assets/tree_view/create-teams-24.png```** |
+|  11 |  Delete | ![Delete](/assets/images/tree_view/delete-icon-24.png)  | To add "Delete" icon, use path **```/assets/tree_view/delete-icon-24.png```** |
+|  12 |  (General) Edit | ![Edit](/assets/images/tree_view/edit-icon-24.png)  | To add "Edit" icon, use path **```/assets/tree_view/edit-icon-24.png```** |
+|  13 |  Edit Signup sheet | ![Edit Signup sheet](/assets/images/tree_view/edit-signup-sheet-24.png)  | To add "Edit Signup sheet" icon, use path **```/assets/tree_view/edit-signup-sheet-24.png```** |
+|  14 |  List All | ![List All](/assets/images/tree_view/image8.png)  | To add "List All" icon, add class as "glyphicon glyphicon-list-alt" |
+|  15 |  List Submissions | ![List Submissions](/assets/images/tree_view/List-submisstions-24.png)  | To add "List Submissions" icon, use path **```/assets/tree_view/List-submisstions-24.png```** |
+|  16 |  Make public from private | ![Make public from private](/assets/images/tree_view/lock-off-disabled-icon-24.png)  | To add "Make public from private" icon,  use path **```/assets/tree_view/lock-off-disabled-icon-24.png```**   |
+|  17 |  Private | ![Private](/assets/images/tree_view/lock-disabled-icon-24.png)  | To add "Private" icon,  use path **```/assets/tree_view/lock-disabled-icon-24.png```**   |
+|  18 |  Remove from Course | ![Remove from Course](/assets/images/tree_view/remove-from-course-24.png)  | To add "Remove from Course" icon,  use path **```/assets/tree_view/remove-from-course-24.png```**   |
+|  19 |  Run Lottery | ![Run Lottery](/assets/images/tree_view/image27.png)  | To add "Run Lottery" icon,  use path **```/assets/tree_view/run-lottery.png```**   |
+|  20 |  Search in data | ![Search in data](/assets/images/tree_view/view-publish-rights-24.png)  | To add "Search in data" icon,  use path **```/assets/tree_view/view-publish-rights-24.png```**   |
+|  21 |  View Review Report | ![View Review Report](/assets/images/tree_view/view-review-report-24.png)  | To add "View Review Report " icon,  use path **```/assets/tree_view/view-review-report-24.png```**   |
+|  22 |  View Scores | ![View Scores](/assets/images/tree_view/view-scores-24.png)  | To add "View Score" icon,  use path **```/assets/tree_view/view-scores-24.png```**   |
+|  23 |  View Suggestions | ![View Suggestions](/assets/images/tree_view/view-suggestion-24.png)  | To add "View Suggestions" icon,  use path **```/assets/tree_view/view-suggestion-24.png```**   |
+|  24 |  View Survey | ![View Survey](/assets/images/tree_view/view-survey-24.png)  | To add "View Survey" icon,  use path **```/assets/tree_view/view-survey-24.png```**   |
 
 ---
 
@@ -58,7 +49,7 @@ Icons are available in 4 sizes : 16, 24, 32, 48. It is possibility that we might
 |  1 |  Button - Default style | *to be added*  | Default button | ```btn btn-default btn-md``` |
 |  2 |  Button - Success style | *to be added*  | For accepting. | ```btn btn-success btn-md``` |
 |  3 |  Button - Danger style | *to be added*  | For rejecting. | ```btn btn-danger btn-md``` |
-|  4 |  Button - New style | ![button](design_images/image5.png)  | For create buttons alone. | ```btn btn-primary pull-right new-button btn-md``` |
+|  4 |  Button - New style | *to be added*  | For create buttons alone. | ```btn btn-primary pull-right new-button btn-md``` |
 
 ---
 

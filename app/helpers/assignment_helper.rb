@@ -38,8 +38,7 @@ module AssignmentHelper
       if assignment.course_id and assignment.course_id != 0 and !Course.find(assignment.course_id).nil?
         course_name = Course.find(assignment.course_id).name
       end
-      name = course_name + '- ' + assignment.name
-      options << [name, assignment.id]
+      options << [course_name + '- ' + assignment.name, assignment.id]
     end
     options.uniq.sort
     options.unshift(['-----------', nil])

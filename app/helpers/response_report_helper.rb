@@ -1,5 +1,6 @@
 module ResponseReportHelper
   # SummaryByRevieweeAndCriteria
+  # this summarizes the reviews of each reviewee by each rubric criterion
   class SummaryRevieweeReport
     def initialize(assignment, summary_ws_url)
       sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(assignment, summary_ws_url)
@@ -18,6 +19,7 @@ module ResponseReportHelper
   end
 
   # SummaryByCriteria
+  # this summarizes all reviews by each rubric criterion
   class SummaryReport
     def initialize(assignment, summary_ws_url)
       sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(assignment, summary_ws_url)
@@ -34,6 +36,7 @@ module ResponseReportHelper
   # ReviewResponseMap
   class ReviewReport
     def initialize(id, assignment, type, review_user)
+      # If review response is required call review_response_report method in review_response_map model
       @reviewers = ReviewResponseMap.review_response_report(id, assignment, type, review_user)
       @review_scores = assignment.compute_reviews_hash
       @avg_and_ranges = assignment.compute_avg_and_ranges_hash
@@ -47,6 +50,7 @@ module ResponseReportHelper
   # FeedbackResponseMap
   class FeedbackReport
     def initialize(id, assignment, type)
+      # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
       if assignment.varying_rubrics_by_round?
         @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(id, type)
       else
@@ -64,6 +68,7 @@ module ResponseReportHelper
   # TeammateReviewResponseMap
   class TeammateReviewReport
     def initialize(id)
+      # If review report for teammate is required call teammate_response_report method in teammate_review_response_map model
       @reviewers = TeammateReviewResponseMap.teammate_response_report(id)
     end
 
@@ -120,6 +125,7 @@ module ResponseReportHelper
 
   # ResponseReportFactory
   class ResponseReportFactory
+    # According to the type of report selected by the user, different report classes are created for different types of report.
     def create_response_report (id, assignment, type, review_user)
       summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
       case type

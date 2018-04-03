@@ -7,8 +7,6 @@ class ReviewMappingController < ApplicationController
   helper :submitted_content
   helper :automatic_review_mapping
 
-  @@time_create_last_review_mapping_record = nil
-
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
@@ -340,6 +338,7 @@ class ReviewMappingController < ApplicationController
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
     review_user = params[:user]
+    # ResponseReportFactory will create different types of report according to the type of report selected by the user.
     @response_report_result = ResponseReportHelper::ResponseReportFactory.new.create_response_report(@id, @assignment, @type, review_user)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end

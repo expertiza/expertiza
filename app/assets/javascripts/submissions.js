@@ -112,25 +112,36 @@ function deleteSelectedFile(){
     }
     else return false;
 }
-function publishConfirmation(makeSubPublic) {
-    if (makeSubPublic.checked && confirm("Please press OK to provide permission.")) {
-            $(makeSubPublic).attr("checked", true);
+
+
+$(document).ready(function(){
+    // Function that confirms user action via a popup message. If confirmed, it creates the backend API request.
+    function confirmAndUpdate(confirmationMessage, checkbox, status) {
+        if (confirm(confirmationMessage)) {
+
+            console.log($(checkbox).attr("checked"));
+
+            $(checkbox).prop("checked", status);
+
+            //Make changes to the DB via AJAX request
             $.ajax({
                 type: 'PUT',
-                url:"make_public",
-                data:{
-                    id:$(makeSubPublic).attr("teamid"),
-                    status:true
-                }}).done(function (data) {});
-    }else if (confirm("Please press OK to revoke permission.")) {
-            $(makeSubPublic).attr("checked", false);
-            $.ajax({
-                type: 'PUT',
-                url:"make_public",
-                data:{
-                    id:$(makeSubPublic).attr("teamid"),
-                    status:false
-                }}).done(function (data) {});
+                url: "make_public",
+                data: {
+                    id: $(checkbox).attr("teamid"),
+                    status: status
+                }
+            });
+        }
     }
-    else { location.reload(true); }
-}
+
+    //Check the value of checkbox and take action accordingly
+    $("#makeSubPublic").click(function(event){
+        event.preventDefault();
+
+        if($(this).prop("checked"))
+            confirmAndUpdate("Please press OK to revoke permission.", this, false);
+        else
+            confirmAndUpdate("Please press OK to provide permission.", this, true);
+    });
+});

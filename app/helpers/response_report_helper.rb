@@ -126,7 +126,7 @@ module ResponseReportHelper
   # ResponseReportFactory
   class ResponseReportFactory
     # According to the type of report selected by the user, different report classes are created for different types of report.
-    def create_response_report (id, assignment, type, review_user)
+    def create_response_report(id, assignment, type, review_user)
       summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
       case type
       when "SummaryByRevieweeAndCriteria"

@@ -271,7 +271,7 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping
     helper = AutomaticReviewMappingHelper::AutomaticReviewMapping.new(params)
     begin
-      helper.automatic_review_mapping_strategy(params)
+      helper.automatic_review_mapping_strategy
     rescue Exception => e
       flash[:error] = e.message
     end

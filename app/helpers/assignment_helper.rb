@@ -31,12 +31,11 @@ module AssignmentHelper
 
   # Sample submission options
   def sample_sub_options
-    assignments = Assignment.where.not(course_id: nil, course_id: 0)
+    assignments = Assignment.where.not(course_id: [nil, 0])
     options = []
     assignments.each do |assignment|
-      course_name = ""
-      course_name = Course.find(assignment.course_id).name unless Course.find(assignment.course_id).nil?
-      options << [course_name + '- ' + assignment.name, assignment.id]
+      course_name = Course.find(assignment.course_id).try(:name)
+      options << [course_name + ' - ' + assignment.name, assignment.id]
     end
     options.uniq.sort
     options.unshift(['-----------', nil])

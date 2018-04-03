@@ -64,7 +64,7 @@ class TreeDisplayController < ApplicationController
   end
 
   def goto_bookmarkrating_rubrics
-    goto_controller('Bookmark Rating') #changed spelling
+    goto_controller('Bookmark Rating') 
   end
 
   # direct access to assignments

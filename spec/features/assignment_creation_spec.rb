@@ -323,7 +323,10 @@ describe "assignment function" do
     end
     # instructor can set deadline for review and taking quiz
     it "set the deadline for an assignment review" do
-      fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
+     sleep 3 
+     fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
+      page.find("#set_rounds").click
+     
       fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
       fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
       click_button 'submit_btn'

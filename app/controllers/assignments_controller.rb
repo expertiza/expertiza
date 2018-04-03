@@ -65,7 +65,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-
   def edit
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
@@ -246,6 +245,11 @@ class AssignmentsController < ApplicationController
 
   # helper methods for edit
   def edit_params_setting
+
+    @assignment = Assignment.find(params[:id])
+    @submissions = @assignment.find_due_dates('submission')
+    @reviews = @assignment.find_due_dates('review')
+
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
@@ -337,6 +341,14 @@ class AssignmentsController < ApplicationController
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
     end
+
+    # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+
+    @due_date_info = DueDate.find_each(parent_id: params[:id])
+
+    if params[:metareviewAllowed] == "false"
+      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
+    end
   end
 
   def handle_current_user_timezonepref_nil
@@ -349,10 +361,14 @@ class AssignmentsController < ApplicationController
   end
 
   def update_feedback_assignment_form_attributes
-    if @assignment_form.update_attributes(assignment_form_params, current_user)
-      flash[:note] = 'The assignment was successfully saved....'
+    if params[:set_pressed][:bool] == 'false'
+      flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      if @assignment_form.update_attributes(assignment_form_params, current_user)
+        flash[:note] = 'The assignment was successfully saved....'
+      else
+        flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      end
     end
   end
 

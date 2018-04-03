@@ -173,7 +173,7 @@ FactoryBot.define do
     max_reviews_per_submission 2
     review_topic_threshold 0
     copy_flag false
-    rounds_of_reviews 1
+    rounds_of_reviews 2
     microtask false
     require_quiz false
     num_quiz_questions 0

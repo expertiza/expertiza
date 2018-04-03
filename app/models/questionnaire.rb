@@ -27,7 +27,7 @@ class Questionnaire < ActiveRecord::Base
                          'GlobalSurveyQuestionnaire',
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
-                         'Bookmark RatingQuestionnaire',  #changed the spelling 
+                         'Bookmark RatingQuestionnaire',  
 		         'BookmarkRatingQuestionnaire',
                          'QuizQuestionnaire'].freeze
   # zhewei: for some historical reasons, some question types have white space, others are not

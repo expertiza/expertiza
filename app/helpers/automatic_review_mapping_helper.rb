@@ -55,7 +55,7 @@ module AutomaticReviewMappingHelper
       end
     end
 
-    private
+    
 
     def execute_peer_review_strategy(teams, student_review_num = 0, submission_review_num = 0,params)
       if student_review_num != 0 and submission_review_num == 0

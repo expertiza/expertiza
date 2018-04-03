@@ -115,6 +115,7 @@ describe ReviewMappingController do
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
+    
   end
 
   describe '#assign_reviewer_dynamically' do

@@ -25,17 +25,14 @@ def visit_sample_submissions_page
 end
 
 describe "sample submission test" do
-  before(:each) do
-    init_test
-  end
+  before(:each) { init_test }
 
   it "is able to make an assignment public" do
     visit '/student_task/list'
     find(:css, "#makeSubPublic[teamid='6050']").trigger("click")
     click_button 'OK'
+    expect(page).to have_http_status(200)
   end
-
-  # it "is able to view sample submissions page" do
 
   it "should not see current assignment submissions if deadline is not met" do # Set deadline after current time.
     visit_sample_submissions_page

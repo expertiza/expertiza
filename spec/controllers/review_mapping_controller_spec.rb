@@ -64,7 +64,7 @@ describe ReviewMappingController do
     it " sets the values of the contributor" do
         post :select_reviewer, @params
         expect(assigns(:contributor)).to eq(team)
-      end
+    end
   end
 
   describe '#select_metareviewer' do
@@ -424,7 +424,7 @@ describe ReviewMappingController do
     end
   end
 
- describe '#automatic_review_mapping' do
+  describe '#automatic_review_mapping' do
     before(:each) do
       allow(AssignmentParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant1, participant2])
     end

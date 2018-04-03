@@ -1,7 +1,6 @@
 module AutomaticReviewMappingHelper
   class AutomaticReviewMapping
-
-    @@time_create_last_review_mapping_record= nil
+    @@time_create_last_review_mapping_record = nil
 
     def initialize(params)
       @assignment_id = params[:id].to_i
@@ -156,8 +155,8 @@ module AutomaticReviewMappingHelper
 
     def assign_reviewers_for_team(student_review_num)
       if ReviewResponseMap.where(reviewed_object_id: @assignment_id, calibrate_to: 0)
-             .where("created_at > :time",
-                    time: @@time_create_last_review_mapping_record).size < @exact_num_of_review_needed
+                          .where("created_at > :time",
+                                 time: @@time_create_last_review_mapping_record).size < @exact_num_of_review_needed
 
         participants_with_insufficient_review_num = []
         @participants_hash.each do |participant_id, review_num|
@@ -190,8 +189,8 @@ module AutomaticReviewMappingHelper
         end
       end
       @@time_create_last_review_mapping_record = ReviewResponseMap.
-          where(reviewed_object_id: @assignment_id).
-          last.created_at
+                                                 where(reviewed_object_id: @assignment_id).
+                                                 last.created_at
     end
   end
 end

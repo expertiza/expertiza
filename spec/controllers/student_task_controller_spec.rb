@@ -7,24 +7,9 @@ describe StudentTaskController do
   let(:student) { build(:student, id: 8) }
   let(:participant_avail) { build(:participant, id: 1, user_id: 8, assignment: assignment_avail) }
   let(:participant_not_avail) { build(:participant, id: 1, user_id: 8, assignment: assignment_not_avail) }
-
-  let(:student_task_current) { StudentTask.new(participant: participant_avail,
-                                               assignment: participant_avail.assignment,
-                                               topic: participant_avail.topic,
-                                               current_stage: participant_avail.current_stage,
-                                               stage_deadline: (Time.parse(participant_avail.stage_deadline) rescue Time.now + 1.year)) }
-
-  let(:student_task_past) { StudentTask.new(participant: participant_avail,
-                                            assignment: participant_avail.assignment,
-                                            topic: participant_avail.topic,
-                                            current_stage: participant_avail.current_stage,
-                                            stage_deadline: (Time.parse(participant_avail.stage_deadline) rescue Time.now - 1.year)) }
-
-  let(:student_task_not_avail) { StudentTask.new(participant: participant_not_avail,
-                                            assignment: participant_not_avail.assignment,
-                                            topic: participant_not_avail.topic,
-                                            current_stage: participant_not_avail.current_stage,
-                                            stage_deadline: (Time.parse(participant_not_avail.stage_deadline) rescue Time.now + 1.year)) }
+  let(:student_task_current) { StudentTask.new(participant: participant_avail, assignment: participant_avail.assignment, topic: participant_avail.topic, current_stage: participant_avail.current_stage, stage_deadline: (Time.parse(participant_avail.stage_deadline) rescue Time.now + 1.year)) }
+  let(:student_task_past) { StudentTask.new(participant: participant_avail, assignment: participant_avail.assignment, topic: participant_avail.topic, current_stage: participant_avail.current_stage, stage_deadline: (Time.parse(participant_avail.stage_deadline) rescue Time.now - 1.year)) }
+  let(:student_task_not_avail) { StudentTask.new(participant: participant_not_avail, assignment: participant_not_avail.assignment, topic: participant_not_avail.topic, current_stage: participant_not_avail.current_stage, stage_deadline: (Time.parse(participant_not_avail.stage_deadline) rescue Time.now + 1.year)) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment_avail)
@@ -34,12 +19,9 @@ describe StudentTaskController do
     allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 8).and_return(participant_avail)
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant_avail)
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant_avail)
-
-
   end
 
   describe '#list' do
-
     context 'when there are available assignments due in the future' do
       it 'should populate all_tasks, student_tasks, and current_student_tasks instance variables with tasks' do
         session = {user: student}
@@ -87,6 +69,5 @@ describe StudentTaskController do
         expect(controller.instance_variable_get(:@past_student_tasks)).not_to be_empty
       end
     end
-
   end
 end

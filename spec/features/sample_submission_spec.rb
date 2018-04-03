@@ -35,10 +35,7 @@ describe "sample submission test" do
     click_button 'OK'
   end
 
-  it "is able to view sample submissions page" do
-    visit_sample_submissions_page
-    expect(page).to have_http_status(200)
-  end
+  # it "is able to view sample submissions page" do
 
   it "should not see current assignment submissions if deadline is not met" do # Set deadline after current time.
     visit_sample_submissions_page

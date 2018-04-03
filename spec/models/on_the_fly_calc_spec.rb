@@ -2,17 +2,11 @@ describe OnTheFlyCalc do
 
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
-  let(:assignment) { create(:assignment, name: "assignment", round_of_reviews: 1)}
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
-  let(:question2) { Criterion.new(id: 2, weight: 2, break_before: true) }
-  let(:question3) { Criterion.new(id: 3, weight: 2, break_before: true) }
-  let(:assignment_questionnaire) { double('AssignmnetQuestionnaire',id: 1, assignment_id: 1,questionnaire_weight: 200) }
   let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:team) { build(:assignment_team) }
-  let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
-  let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:questionnaire1) {build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234)}
   let(:contributor) { build(:assignment_team, id:1) }
 
@@ -90,7 +84,7 @@ describe OnTheFlyCalc do
       allow(on_the_fly_calc).to receive(:index).and_return(0)
       allow(on_the_fly_calc).to receive(:score_assignment).and_return('')
     end
-    
+
       context 'when current assignment varys rubrics by round and number of assessments is non-zero' do
         it 'calculates rounds/scores/assessments and return scores' do
           questions = [question1]

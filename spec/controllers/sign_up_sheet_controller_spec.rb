@@ -3,13 +3,14 @@ describe SignUpSheetController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
-  let(:topic) { build(:topic, id: 1) }
+  let(:topic) { build(:topic, id: 1, max_choosers: 1) }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
   let(:bid) { Bid.new(topic_id: 1, priority: 1) }
+  let(:signed_up_team3) { build( :signed_up_team, topic_id: 1, is_waitlisted: true ) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -173,6 +174,23 @@ describe SignUpSheetController do
         post :update, params
         expect(response).to redirect_to('/assignments/1/edit#tabs-5')
       end
+    end
+  end
+
+  describe'#load_add_signup_topics' do
+    before(:each) do
+      allow(SignUpTopic).to receive(:where).with("assignment_id = ?", "1").and_return([topic])
+      allow(SignUpTopic).to receive(:find_slots_filled).with("1").and_return([double('SignedUpTeam', count: 0,topic_id: 1)])
+      allow(SignUpTopic).to receive(:find_slots_waitlisted).with("1").and_return([double('SignedUpTeam', count: 0,topic_id: 1)])
+      params = {id: 1, topic_id: 1}
+      get :load_add_signup_topics, params
+      @parsed_response = JSON.parse( response.body )
+    end
+    it 'returns slots_waitlisted as JSON' do
+      expect(@parsed_response["sign_up_topics"][0]["slots_waitlisted"]).to eq(0)
+    end
+    it 'returns slots_filled_value as JSON' do
+      expect(@parsed_response["sign_up_topics"][0]["slots_filled_value"]).to eq(0)
     end
   end
 

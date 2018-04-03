@@ -2,7 +2,14 @@
     jQuery(document).ready(function() {
     jQuery("#set_rounds").click(function () {
         changeReviewRounds();
+        jQuery("#set_pressed_bool").val(true)
+        console.log(jQuery("#set_pressed_bool").val())
         event.preventDefault(); // Prevent link from following its href
+    });
+
+    jQuery("#assignment_form_assignment_rounds_of_reviews").change(function(){
+        jQuery("#set_pressed_bool").val(false)
+        console.log(jQuery("#set_pressed_bool").val())
     });
 
 
@@ -258,11 +265,15 @@
 
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
+
+        var submissions_count = <%= @submissions.count %>
+        var reviews_count = <%= @reviews.count %>
         if (new_round_count <= 0) {
             alert('ERROR: number of rounds of review should be greater than 0');
             return
         }
 
+        var confirm_flag = true
         var i;
         var due_dates_table_element_list = jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)');
         var current_round_count = 0;
@@ -275,32 +286,52 @@
                 }
             }
         }
+
         var original_round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
-        if (new_round_count == current_round_count) {
-            return
+            
+        if(new_round_count < reviews_count){
+            jQuery.confirm({
+                title: 'Confirmation required.',
+                content: 'Rounds of reviews count [' + reviews_count + '] greater than rounds of reviews [' + new_round_count + ']. Are you sure you want to change rounds of reviews?',
+                buttons: {
+                    confirm: function () {
+                        $.alert('Round of reviews updated!');
+                    },
+                    cancel: function () {
+                        $.alert('Update cancelled!');
+                        
+                        jQuery('#assignment_form_assignment_rounds_of_reviews').val(original_round_count);
+                        confirm_flag = false
+                    }
+                }
+            });
         }
-        if (new_round_count >= original_round_count && current_round_count < original_round_count) {
-            //make sure all the rounds are already displayed
-            <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
-            addDueDateTableElement(false,'submission', <%=i%>, <%= due_date(@assignment_form.assignment,'submission', i-1).to_json.html_safe %>);
-            addDueDateTableElement(false,'review', <%=i%>, <%= due_date(@assignment_form.assignment,'review', i-1).to_json.html_safe %>);
-            <% end %> //use ruby because i need the i variable... @_@ unfortunate but dunno how to get around
-            //dont worry the addDueDateTableElement function check to see if it exist first before doing anything
-        }
-        if (new_round_count < current_round_count) {
-            for (i = new_round_count + 1; i <= current_round_count; i++) {
-                removeDueDateTableElement('submission', i);
-                removeDueDateTableElement('review', i);
+
+        if(confirm_flag){
+            if (new_round_count == current_round_count) {
+                return
+            }
+            if (new_round_count >= original_round_count && current_round_count < original_round_count) {
+                //make sure all the rounds are already displayed
+                <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
+                addDueDateTableElement(false,'submission', <%=i%>, <%= due_date(@assignment_form.assignment,'submission', i-1).to_json.html_safe %>);
+                addDueDateTableElement(false,'review', <%=i%>, <%= due_date(@assignment_form.assignment,'review', i-1).to_json.html_safe %>);
+                <% end %> //use ruby because i need the i variable... @_@ unfortunate but dunno how to get around
+                //dont worry the addDueDateTableElement function check to see if it exist first before doing anything
+            }
+            if (new_round_count < current_round_count) {
+                for (i = new_round_count + 1; i <= current_round_count; i++) {
+                    removeDueDateTableElement('submission', i);
+                    removeDueDateTableElement('review', i);
+                }
+            }
+            if (new_round_count > current_round_count) {
+                for (i = original_round_count + 1; i <= new_round_count; i++) {
+                    addDueDateTableElement(false,'submission', i, <%= due_date(@assignment_form.assignment,'submission', -1).to_json.html_safe%>);
+                    addDueDateTableElement(false,'review', i, <%= due_date(@assignment_form.assignment,'review', -1).to_json.html_safe%>);
+                }
             }
         }
-        if (new_round_count > current_round_count) {
-            for (i = original_round_count + 1; i <= new_round_count; i++) {
-                addDueDateTableElement(false,'submission', i, <%= due_date(@assignment_form.assignment,'submission', -1).to_json.html_safe%>);
-                addDueDateTableElement(false,'review', i, <%= due_date(@assignment_form.assignment,'review', -1).to_json.html_safe%>);
-            }
-        }
-        //jQuery.get("/assignment/update");
-        //jQuery('#assignment_form').submit();
     }
 
     function handleChangenameurl(checkvalue,due_date_name_column,due_date_url_column){
@@ -454,6 +485,8 @@ function addDaysOrMonth(mul, type) {
   <button type="button" id="set_rounds">Set</button><label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
 </div>
 
+<%= hidden_field(:set_pressed, :bool, :value => true) %>
+
 <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
     <input name="changenameurl" type="hidden" value="false" />
@@ -478,9 +511,9 @@ function addDaysOrMonth(mul, type) {
     <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
 </span>
 
-<input name="metareivewAllowed" type="hidden" value="false" />
+<input name="metareviewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareivewAllowed', 'Use metareview deadline') %><br/>
+<%= label_tag('metareviewAllowed', 'Use metareview deadline') %><br/>
 <div id="date_updater_div">
                                                     <button type="button" id="show_date_updater">Show/Hide Date Updater</button>
                                                     <div id="date_updater_inner">

@@ -9,12 +9,12 @@ describe ReviewMappingController do
     double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
                                     reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
-  let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
-  let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
+  let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1), user_id: 1) }
+  let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2), user_id: 2) }
   let(:user) { double('User', id: 3) }
-  let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
-  let(:team) { double('AssignmentTeam', name: 'no one') }
-  let(:team1) { double('AssignmentTeam', name: 'no one1') }
+  let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user, user_id: 3) }
+  let(:team) { double('AssignmentTeam', name: 'no one' ,id: 1) }
+  let(:team1) { double('AssignmentTeam', name: 'no one1', id: 2) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -54,6 +54,33 @@ describe ReviewMappingController do
     end
   end
 
+  describe '#select_reviewer' do
+    before(:each) do
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+      @params = {
+        contributor_id: 1
+      }
+    end
+    it " sets the values of the contributor" do
+        post :select_reviewer, @params
+        expect(assigns(:contributor)).to eq(team)
+      end
+  end
+
+  describe '#select_metareviewer' do
+    before(:each) do
+      allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
+      @params = {
+        id: 1
+      }
+    end
+    it 'Selects the metareviewer' do
+      post :select_metareviewer, @params
+      expect(assigns(:mapping)).to eq(review_response_map)
+    end
+  end
+
+
   describe '#add_reviewer and #get_reviewer' do
     before(:each) do
       allow(User).to receive_message_chain(:where, :first).with(name: 'expertiza').with(no_args).and_return(double('User', id: 1))
@@ -88,6 +115,7 @@ describe ReviewMappingController do
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
+    
   end
 
   describe '#assign_reviewer_dynamically' do
@@ -396,7 +424,7 @@ describe ReviewMappingController do
     end
   end
 
-  describe '#automatic_review_mapping' do
+ describe '#automatic_review_mapping' do
     before(:each) do
       allow(AssignmentParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant1, participant2])
     end
@@ -405,7 +433,6 @@ describe ReviewMappingController do
       before(:each) do
         allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team1])
       end
-
       context 'when all nums in params are 0' do
         it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
           params = {
@@ -421,7 +448,6 @@ describe ReviewMappingController do
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end
-
       context 'when all nums in params are 0 except student_review_num' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
@@ -437,14 +463,30 @@ describe ReviewMappingController do
           expect(flash[:error]).to be nil
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
-      end
+      end 
 
+      context 'when all nums in calibrated params are 0 review nums are not' do
+        it 'shows an error message and redirects to review_mapping#list_mappings page' do
+          allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
+          params = {
+            id: 1,
+            max_team_size: 1,
+            num_reviews_per_student: 1,
+            num_reviews_per_submission: 1,
+            num_calibrated_artifacts: 0,
+            num_uncalibrated_artifacts: 0
+          }
+          post :automatic_review_mapping, params
+          expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student), not both.')
+          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        end
+      end 
       context 'when calibrated params are not 0' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)
                                                      .and_return([double('ReviewResponseMap', reviewee_id: 2)])
           allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
-          allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
+          allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
           params = {
             id: 1,
             max_team_size: 1,
@@ -454,13 +496,11 @@ describe ReviewMappingController do
             num_uncalibrated_artifacts: 1
           }
           post :automatic_review_mapping, params
-          expect(flash[:error]).to be nil
+        
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
-      end
-    end
-
-    context 'when teams is empty, max team size is 1 and when review params are not 0' do
+      end 
+      context 'when teams is empty, max team size is 1 and when review params are not 0' do
       it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:team_id).with(1, 2).and_return(true)
         allow(TeamsUser).to receive(:team_id).with(1, 3).and_return(false)
@@ -478,7 +518,43 @@ describe ReviewMappingController do
         expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student), not both.')
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
+    end   
     end
+
+    context 'When Team is Empty' do
+      it 'Creates Teams ' do
+        subject {let(:team2) { double('AssignmentTeam', name: 'no one2', id: 3) }}
+      allow(subject).to receive(:empty?).and_return(true)
+      allow(TeamsUser).to receive(:team_id).with(1, 2).and_return(true)
+        allow(TeamsUser).to receive(:team_id).with(1, 3).and_return(false)
+        allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(double('AssignmentTeam', id: 1))
+        allow(ApplicationController).to receive_message_chain(:helpers, :create_team_users).with(no_args).with(user, 1).and_return(true)
+        params = {
+          id: 1,
+          max_team_size: 1,
+          num_reviews_per_student: 1,
+          num_reviews_per_submission: 4,
+          num_calibrated_artifacts: 0,
+          num_uncalibrated_artifacts: 0
+        }
+        post :automatic_review_mapping, params
+
+      end
+    end
+
+    context 'when artifacts nums are not zero' do
+      it 'sets instance variables and calls methods' do
+      
+      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:calibrated_artifacts_num, :params)
+      allow(AssignmentParticipant).to receive(:where).with(parent_id: :assignment_id).and_return(participant)
+      expect(flash[:error]).to be(nil)
+      expect(assigns(:participants_hash)).to be(nil)
+      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:execute_peer_review_strategy).with(any_args)
+      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:uncalibrated_artifacts_num, :params)
+
+      end
+    end
+
   end
 
   describe '#automatic_review_mapping_staggered' do

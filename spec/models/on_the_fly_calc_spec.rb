@@ -21,6 +21,21 @@ describe OnTheFlyCalc do
         expect(on_the_fly_calc.compute_total_score(scores)).to eq(0)
       end
     end
+     xcontext 'avg is not nil' do
+    it 'computes total score for this assignment by summing the score given on all questionnaires' do
+      on_the_fly_calc = Assignment.new(id: 1, name: 'Test Assgt')
+      on_the_fly_calc.extend(OnTheFlyCalc)
+      scores = {review1: {scores: {max: 80, min: 0, avg: 30}, assessments: [response]}}
+      symb = "review1".to_sym
+      fake_result  = double('AssignmnetQuestionnaire')
+      allow(on_the_fly_calc).to receive(:questionnaires).and_return([questionnaire1])
+      allow(ReviewQuestionnaire).to receive(:assignment_questionnaires).with(assignment_id: 1).and_return(fake_result)
+      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil).and_return(double('AssignmentQuestionnaire', used_in_round: 1))
+      allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires,:find_by).with(any_args).with(any_args)
+                                  .and_return(double('AssignmentQuestionnaire',id: 1, assignment_id: 1,questionnaire_weight: 200))
+      expect(on_the_fly_calc.compute_total_score(scores)).to eq(60)
+    end
+    end
   end
 
   describe '#compute_review_hash' do

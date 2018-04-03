@@ -18,7 +18,7 @@ describe 'AutomaticReviewMappingHelper' do
     context 'when calibrated params are not zero' do
       it 'raises an exception if the student reviews are greater or equals the number of teams' do
         teams = [team, team1]
-        expect { helper.execute_peer_review_strategy(teams, 0, 0 ,:params) }.to raise_exception(NoMethodError)
+        expect { helper.execute_peer_review_strategy(teams, 0, 0, :params) }.to raise_exception(NoMethodError)
       end
     end
   end

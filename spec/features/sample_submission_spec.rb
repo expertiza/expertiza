@@ -25,11 +25,14 @@ describe "sample submission test" do
   end
 
   it "is able to view sample submissions page" do
-
+    visit '/student_task/list'
+    click_on "Example Assignment"
+    click_on "Sample Submissions"
+    expect(page).to have_http_status(200)
   end
 
   it "should not see current assignment submissions if deadline is not met" do
-    #Set deadline after current time.
+    # Set deadline after current time.
     visit '/student_task/list'
     click_on "Example Assignment"
     click_on "Sample Submissions"
@@ -37,7 +40,7 @@ describe "sample submission test" do
   end
 
   it "should see current assignment submissions if deadline is met" do
-    #Set deadline before current time.
+    # Set deadline before current time.
     visit '/student_task/list'
     click_on "Example Assignment"
     click_on "Sample Submissions"
@@ -52,7 +55,7 @@ describe "sample submission test" do
   end
 
   it "should see instructor selected submissions if instructor has selected them" do
-    #Instructor makes submission available.
+    # Instructor makes submission available.
     visit '/student_task/list'
     click_on "Example Assignment"
     click_on "Sample Submissions"

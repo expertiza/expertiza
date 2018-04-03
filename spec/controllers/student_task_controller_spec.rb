@@ -1,15 +1,35 @@
 describe StudentTaskController do
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
-  let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
-  let(:assignment_avail) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, availability_flag: true) }
-  let(:assignment_not_avail) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, availability_flag: false) }
+  let(:assignment_avail) do
+    build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date],
+          microtask: true, staggered_deadline: true, availability_flag: true)
+  end
+  let(:assignment_not_avail) do
+    build(:assignment, id: 1, instructor_id: 6,
+          due_dates: [due_date], microtask: true,
+          staggered_deadline: true, availability_flag: false)
+  end
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
+  # Create different participates of available and not available assignments
   let(:participant_avail) { build(:participant, id: 1, user_id: 8, assignment: assignment_avail) }
   let(:participant_not_avail) { build(:participant, id: 1, user_id: 8, assignment: assignment_not_avail) }
-  let(:student_task_current) { StudentTask.new(participant: participant_avail, assignment: participant_avail.assignment, topic: participant_avail.topic, current_stage: participant_avail.current_stage, stage_deadline: (Time.parse(participant_avail.stage_deadline) rescue Time.now + 1.year)) }
-  let(:student_task_past) { StudentTask.new(participant: participant_avail, assignment: participant_avail.assignment, topic: participant_avail.topic, current_stage: participant_avail.current_stage, stage_deadline: (Time.parse(participant_avail.stage_deadline) rescue Time.now - 1.year)) }
-  let(:student_task_not_avail) { StudentTask.new(participant: participant_not_avail, assignment: participant_not_avail.assignment, topic: participant_not_avail.topic, current_stage: participant_not_avail.current_stage, stage_deadline: (Time.parse(participant_not_avail.stage_deadline) rescue Time.now + 1.year)) }
+  # Create different Student tasks
+  let(:student_task_current) do
+    StudentTask.new(participant: participant_avail, assignment: participant_avail.assignment,
+                    topic: participant_avail.topic, current_stage: participant_avail.current_stage,
+                    stage_deadline: (Time.parse.in_time_zone(participant_avail.stage_deadline) rescue Time.now.in_time_zone + 1.year))
+  end
+  let(:student_task_past) do
+    StudentTask.new(participant: participant_avail, assignment: participant_avail.assignment,
+                    topic: participant_avail.topic, current_stage: participant_avail.current_stage,
+                    stage_deadline: (Time.parse.in_time_zone(participant_avail.stage_deadline) rescue Time.now.in_time_zone - 1.year))
+  end
+  let(:student_task_not_avail) do
+    StudentTask.new(participant: participant_not_avail, assignment: participant_not_avail.assignment,
+                    topic: participant_not_avail.topic, current_stage: participant_not_avail.current_stage,
+                    stage_deadline: (Time.parse.in_time_zone(participant_not_avail.stage_deadline) rescue Time.now.in_time_zone + 1.year))
+  end
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment_avail)

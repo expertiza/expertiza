@@ -13,7 +13,7 @@ describe ReviewMappingController do
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2), user_id: 2) }
   let(:user) { double('User', id: 3) }
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user, user_id: 3) }
-  let(:team) { double('AssignmentTeam', name: 'no one' ,id: 1) }
+  let(:team) { double('AssignmentTeam', name: 'no one', id: 1) }
   let(:team1) { double('AssignmentTeam', name: 'no one1', id: 2) }
 
   before(:each) do
@@ -62,8 +62,8 @@ describe ReviewMappingController do
       }
     end
     it " sets the values of the contributor" do
-        post :select_reviewer, @params
-        expect(assigns(:contributor)).to eq(team)
+      post :select_reviewer, @params
+      expect(assigns(:contributor)).to eq(team)
     end
   end
 
@@ -79,7 +79,6 @@ describe ReviewMappingController do
       expect(assigns(:mapping)).to eq(review_response_map)
     end
   end
-
 
   describe '#add_reviewer and #get_reviewer' do
     before(:each) do
@@ -115,7 +114,6 @@ describe ReviewMappingController do
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
-    
   end
 
   describe '#assign_reviewer_dynamically' do
@@ -464,7 +462,7 @@ describe ReviewMappingController do
           expect(flash[:error]).to be nil
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
-      end 
+      end
 
       context 'when all nums in calibrated params are 0 review nums are not' do
         it 'shows an error message and redirects to review_mapping#list_mappings page' do
@@ -498,7 +496,6 @@ describe ReviewMappingController do
             num_uncalibrated_artifacts: 1
           }
           post :automatic_review_mapping, params
-        
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end
@@ -526,7 +523,7 @@ describe ReviewMappingController do
 
     context 'When Team is Empty' do
       it 'Creates Teams ' do
-        subject {let(:team2) { double('AssignmentTeam', name: 'no one2', id: 3) }}
+        subject { let(:team2) { double('AssignmentTeam', name: 'no one2', id: 3) } }
         allow(subject).to receive(:empty?).and_return(true)
         allow(TeamsUser).to receive(:team_id).with(1, 2).and_return(true)
         allow(TeamsUser).to receive(:team_id).with(1, 3).and_return(false)
@@ -546,12 +543,12 @@ describe ReviewMappingController do
 
     context 'when artifacts nums are not zero' do
       it 'sets instance variables and calls methods' do
-      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:calibrated_artifacts_num, :params)
-      allow(AssignmentParticipant).to receive(:where).with(parent_id: :assignment_id).and_return(participant)
-      expect(flash[:error]).to be(nil)
-      expect(assigns(:participants_hash)).to be(nil)
-      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:execute_peer_review_strategy).with(any_args)
-      allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:uncalibrated_artifacts_num, :params)
+        allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:calibrated_artifacts_num, :params)
+        allow(AssignmentParticipant).to receive(:where).with(parent_id: :assignment_id).and_return(participant)
+        expect(flash[:error]).to be(nil)
+        expect(assigns(:participants_hash)).to be(nil)
+        allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:execute_peer_review_strategy).with(any_args)
+        allow_any_instance_of(AutomaticReviewMappingHelper).to receive(:assign_reviewers_for_team).with(:uncalibrated_artifacts_num, :params)
       end
     end
   end

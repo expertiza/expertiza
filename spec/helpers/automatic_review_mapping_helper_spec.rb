@@ -6,7 +6,7 @@ describe 'AutomaticReviewMappingHelper' do
     @assignment = create(:assignment)
     @participant = create(:participant)
   end
-  let(:team) { double('AssignmentTeam', name: 'no one' ,id: 1) }
+  let(:team) { double('AssignmentTeam', name: 'no one', id: 1) }
   let(:team1) { double('AssignmentTeam', name: 'no one1', id: 2) }
 
   describe '#auromatic_review_mapping_strategy' do
@@ -17,15 +17,15 @@ describe 'AutomaticReviewMappingHelper' do
     end
     context 'when calibrated params are not zero' do
       it 'raises an exception if the student reviews are greater or equals the number of teams' do
-        teams = [team,team1]
-        expect { helper.execute_peer_review_strategy(teams,0,0,:params) }.to raise_exception(NoMethodError)
+        teams = [team, team1]
+        expect { helper.execute_peer_review_strategy(teams, 0, 0 ,:params) }.to raise_exception(NoMethodError)
       end
     end
   end
 
   describe '#execute_peer_review_strategy' do
     it 'Raises an exception' do
-      expect{raise 'You cannot set the number of reviews done \
+      expect { raise 'You cannot set the number of reviews done \
       by each student to be greater than or equal to total number of teams \
       [or "participants" if it is an individual assignment].' }.to raise_exception(StandardError)
     end
@@ -33,7 +33,7 @@ describe 'AutomaticReviewMappingHelper' do
 
   describe '#peer_review_strategy' do
     it 'raises an exception' do
-      expect{raise "Automatic assignment of reviewer failed."}.to raise_exception(StandardError)
+      expect { raise "Automatic assignment of reviewer failed." }.to raise_exception(StandardError)
     end
   end
 end

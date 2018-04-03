@@ -283,23 +283,6 @@ jQuery(document).ready(function() {
         return jQuery("#jsGrid").data("assignmentid");
     }
 
-    function topicFinished(assignmentId,topic) {
-       return $.ajax({
-            type: "POST",
-            url: "/sign_up_sheet/is_topic_finished",
-            dataType: "json",
-            data: {
-                topicId: topic.id,
-                assignmentId: assignmentId
-            }
-        }).done(function(response) {
-            return response.isFinished;
-        }).fail(function(response) {
-            alert("Issue determining if topic is finished");
-            return true;
-        });
-    }
-
     //this is the all powerful configuration object for setting up the JS GRID Table
     jQuery("#jsGrid").jsGrid({
 

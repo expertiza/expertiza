@@ -179,14 +179,6 @@ class SignUpSheetController < ApplicationController
     }
   end
 
-  def is_topic_finished
-    assignment = Assignment.find(params[:assignmentId])
-    is_finished = (assignment.current_stage_name(params[:topicId]) == 'Finished')
-    render json: {
-      isFinished: is_finished
-    }
-  end
-
 #  if SignUpSheet.has_teammate_ads?(topic.id)
 #    included_columns << "ads"
 #  end

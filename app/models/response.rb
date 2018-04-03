@@ -16,7 +16,7 @@ class Response < ActiveRecord::Base
     id
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -30,7 +30,7 @@ class Response < ActiveRecord::Base
       self_id = self.id.to_s
       code = construct_student_html identifier, self_id, count
     end
-    code = construct_review_response code, self_id
+    code = construct_review_response code, self_id, show_tags
     code.html_safe
   end
 
@@ -231,7 +231,7 @@ class Response < ActiveRecord::Base
 						 '</tr></table>'
   end
 
-  def construct_review_response code, self_id
+  def construct_review_response code, self_id, show_tags = nil
     code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
@@ -239,7 +239,7 @@ class Response < ActiveRecord::Base
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
-      tag_prompt_deployments = TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id)
+      tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments
     end
     comment = if !self.additional_comment.nil?

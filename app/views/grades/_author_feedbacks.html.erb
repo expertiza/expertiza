@@ -20,7 +20,7 @@
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%= prefix + "_" + feedback.map.reviewer.name(session[:ip]) %>"></a><%= feedback.display_as_html(prefix, count) %><BR/><BR/>
     <% else %>
-      <%= feedback.display_as_html(nil,count) %><BR/><BR/>
+      <%= feedback.display_as_html(nil, count) %><BR/><BR/>
     <% end %>      
   <% end %>
 <% else %>

@@ -13,8 +13,9 @@
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <% end %>
         <% if @assignment_form.assignment.has_badge? %>
-          <li><a href="#tabs-7" id="Badges">Badges</li>
+          <li><a href="#tabs-7" id="Badges">Badges</a></li>
         <% end %>
+        <li><a href="#tabs-8" id="Other">Other stuff</a></li>
       </ul>
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
@@ -72,6 +73,9 @@
           <%= render 'assignments/edit/badges' %>
         </div>
       <% end %>
+      <div id="tabs-8">
+        <%= render 'assignments/edit/other' %>
+      </div>
       <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
     </div>
     <script>

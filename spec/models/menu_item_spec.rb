@@ -1,5 +1,4 @@
 # Numbering of the test cases is in accordance with the wiki page : http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Spring_2018_E1813_Menu_item_tests
-
 describe MenuItem  do
   let!(:menuitem) {MenuItem.create id: 1, parent_id: nil, name: "navigate", label: "Navigate", seq: 1, controller_action_id: 1, content_page_id: 1}
   let!(:menuitem_home){MenuItem.create id: 2, parent_id: nil, name: "home", label: "Home", seq: 2, controller_action_id: 0, content_page_id: 1}
@@ -9,7 +8,7 @@ describe MenuItem  do
   let!(:controller_action){ControllerAction.create id: 1, site_controller_id: 1, name: "view_default", permission_id: 3, url_to_use: nil}
   let!(:content_page) {ContentPage.create id: 1, title: "Home Page", name: "home", markup_style_id: 0, content: "<h1>Welcome to Expertiza</h1>", permission_id: 3, content_cache: "<h1>Welcome to Expertiza</h1>" }
 
-  #In this test case we check for the name to be present.
+  # In this test case we check for the name to be present.
   it "is not valid without a name" do
     menuitem.name = nil
     menuitem.should_not be_valid
@@ -90,5 +89,4 @@ describe MenuItem  do
     menuitem_credits.parent_id = nil
     expect{MenuItem.repack(nil)}.to_not change{menuitem_credits.seq}
   end
-
 end

@@ -46,6 +46,7 @@ module AutomaticReviewMappingHelper
         @teams_with_uncalibrated_artifacts = @teams - @teams_with_calibrated_artifacts
         execute_peer_review_strategy(@teams_with_calibrated_artifacts.shuffle!, @calibrated_artifacts_num, 0)
         assign_reviewers_for_team(@calibrated_artifacts_num)
+        # since after first mapping, participants (delete_at) will be nil
         @participants = AssignmentParticipant.where(parent_id: @assignment_id).to_a.reject {|p| p.can_review == false }.shuffle!
         @participants_hash = {}
         @participants.each {|participant| @participants_hash[participant.id] = 0 }
@@ -57,6 +58,7 @@ module AutomaticReviewMappingHelper
     private
 
     def execute_peer_review_strategy(teams, student_review_num = 0, submission_review_num = 0)
+      # calculate reviewers for each team
       if student_review_num != 0 and submission_review_num == 0
         @num_reviews_per_team = (@participants.size * student_review_num * 1.0 / teams.size).round
         @exact_num_of_review_needed = @participants.size * student_review_num
@@ -153,6 +155,9 @@ module AutomaticReviewMappingHelper
       end
     end
 
+    # after assigning peer reviews for each team,
+    # if there are still some peer reviewers not obtain enough peer review,
+    # just assign them to valid teams
     def assign_reviewers_for_team(student_review_num)
       if ReviewResponseMap.where(reviewed_object_id: @assignment_id, calibrate_to: 0)
                           .where("created_at > :time",

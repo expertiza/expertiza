@@ -219,6 +219,9 @@ describe AssignmentsController do
         @params = {
           id: 1,
           course_id: 1,
+          set_pressed: {
+              bool: 'true'
+          },
           assignment_form: {
             assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
                                         "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],

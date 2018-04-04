@@ -178,8 +178,6 @@ describe AssignmentForm do
       allow(assignment).to receive(:set_up_defaults).and_return('OK!')
       allow(assignment).to receive(:find_due_dates).with('submission').and_return([double('DueDate')])
       allow(assignment).to receive(:find_due_dates).with('review').and_return([double('DueDate'), double('DueDate')])
-      expect { assignment_form.set_up_assignment_review }
-        .to change { assignment_form.instance_variable_get(:@assignment).rounds_of_reviews }.from(1).to(2)
       expect(assignment_form.instance_variable_get(:@assignment).directory_path).to eq('final_test')
     end
   end

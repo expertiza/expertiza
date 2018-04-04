@@ -124,7 +124,7 @@ class Criterion < ScoredQuestion
       html += '<textarea' + ' id="responses_' + count.to_s + '_comments"' \
        ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
-      html += '</textarea></td></br><br/>'
+      html += '</textarea></td>'
     elsif dropdown_or_scale == 'scale'
       html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
       html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
@@ -162,7 +162,7 @@ class Criterion < ScoredQuestion
       html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
-      html += '</textarea><br/><br/>'
+      html += '</textarea>'
 
     end
     safe_join(["".html_safe, "".html_safe], html.html_safe)

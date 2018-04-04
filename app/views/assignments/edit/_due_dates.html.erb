@@ -266,8 +266,8 @@
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
 
-        var submissions_count = <%= @submissions.count %>
-        var reviews_count = <%= @reviews.count %>
+        var submissions_count = <%= @num_submissions_round %>;
+        var reviews_count = <%= @num_reviews_round %>;
         if (new_round_count <= 0) {
             alert('ERROR: number of rounds of review should be greater than 0');
             return
@@ -292,16 +292,15 @@
         if(new_round_count < reviews_count){
             jQuery.confirm({
                 title: 'Confirmation required.',
-                content: 'Rounds of reviews count [' + reviews_count + '] greater than rounds of reviews [' + new_round_count + ']. Are you sure you want to change rounds of reviews?',
+                content: 'Are you sure you want to reduce the number of review round?',
                 buttons: {
                     confirm: function () {
                         $.alert('Round of reviews updated!');
                     },
                     cancel: function () {
-                        $.alert('Update cancelled!');
-                        
                         jQuery('#assignment_form_assignment_rounds_of_reviews').val(original_round_count);
-                        confirm_flag = false
+                        $('#set_rounds').click();
+                        confirm_flag = false;
                     }
                 }
             });

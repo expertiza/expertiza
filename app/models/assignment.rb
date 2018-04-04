@@ -388,7 +388,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+    # round == nil means that we don't know which round the questionnaire is being used for. thus, we can't always put round in the query.
+    rev_q_ids = round == nil ? AssignmentQuestionnaire.where(assignment_id: self.id) : AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
     # for program 1 like assignment, if same rubric is used in both rounds,
     # the 'used_in_round' field in 'assignment_questionnaires' will be null,
     # since one field can only store one integer

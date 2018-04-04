@@ -29,10 +29,11 @@ class AssignmentsController < ApplicationController
   def new
     @assignment_form = AssignmentForm.new
     @assignment_form.assignment.instructor ||= current_user
+    @num_submissions_round = 0
+    @num_reviews_round = 0
   end
 
   def create
-
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
         if @assignment_form.save
@@ -247,8 +248,8 @@ class AssignmentsController < ApplicationController
   def edit_params_setting
 
     @assignment = Assignment.find(params[:id])
-    @submissions = @assignment.find_due_dates('submission')
-    @reviews = @assignment.find_due_dates('review')
+    @num_submissions_round = @assignment.find_due_dates('submission') == nil ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review') == nil ? 0 : @assignment.find_due_dates('review').count
 
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])

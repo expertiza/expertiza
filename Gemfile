@@ -15,6 +15,7 @@ gem "capistrano-db-tasks", require: false
 gem 'capistrano-passenger'
 gem 'capistrano-rails'
 gem 'capistrano-rvm'
+gem 'chartkick'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'

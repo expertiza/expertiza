@@ -16,14 +16,16 @@ class GithubDataController < ApplicationController
     @commits = GithubDatum.new.retrieve_commit_data(@submission_record) if @commits.length == 0
     #New hash with default value 0
     @commits_by_user = Hash.new(0)
-    #New nested hash with nested values defaulting to 0
-    @changes_by_date = Hash.new { |h,k| h[k] = Hash.new(0) }
+    @commits_by_date = Hash.new(0)
+    @additions_by_date = Hash.new(0)
+    @deletions_by_date = Hash.new(0)
+    @changed_files_by_date = Hash.new(0)
     @commits.each do |commit|
       @commits_by_user[commit.committer] += 1
-      @changes_by_date[commit.committed_date.strftime('%Y-%m-%d')][:commits] += 1
-      @changes_by_date[commit.committed_date.strftime('%Y-%m-%d')][:additions] += commit.additions
-      @changes_by_date[commit.committed_date.strftime('%Y-%m-%d')][:deletions] += commit.deletions
-      @changes_by_date[commit.committed_date.strftime('%Y-%m-%d')][:changed_files] += commit.changed_files
+      @commits_by_date[commit.committed_date.strftime('%Y-%m-%d')]+= 1
+      @additions_by_date[commit.committed_date.strftime('%Y-%m-%d')] += commit.additions
+      @deletions_by_date[commit.committed_date.strftime('%Y-%m-%d')] += commit.deletions
+      @changed_files_by_date[commit.committed_date.strftime('%Y-%m-%d')] += commit.changed_files
     end unless @commits.nil?
   end
 

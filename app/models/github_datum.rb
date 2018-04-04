@@ -52,7 +52,6 @@ class GithubDatum < ActiveRecord::Base
   GITHUB_PULL_REGEX = %r(https?:\/\/(?:[w]{3}\.)?github\.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)\/pull\/([0-9]+)[\S]*)i
 
   def retrieve_commit_data(submission)
-    puts "RETRIEVING"
     owner, repo, pull_number = retrieve_github_url(submission)
     unless pull_number.nil?
       retrieve_graphql_data(submission, owner, repo, pull_number)

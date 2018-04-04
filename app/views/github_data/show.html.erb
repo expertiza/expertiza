@@ -33,15 +33,15 @@
   <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
   <tbody>
 
-  <% @changes_by_date.each do |entry| %>
+  <% @commits_by_date.each do |date, commit| %>
     <tr>
-      <td align="center"><%= entry[0] %></td>
-      <td align="center"><%= entry[1][:commits] %></td>
-      <td align="center"><%= entry[1][:additions] %></td>
-      <td align="center"><%= entry[1][:deletions] %></td>
-      <td align="center"><%= entry[1][:changed_files] %></td>
+      <td align="center"><%= date %></td>
+      <td align="center"><%= commit %></td>
+      <td align="center"><%= @additions_by_date[date] %></td>
+      <td align="center"><%= @deletions_by_date[date] %></td>
+      <td align="center"><%= @changed_files_by_date[date] %></td>
     </tr>
-  <% end unless @changes_by_date.nil? %>
+  <% end unless @commits_by_date.nil? %>
   </tbody>
 </table>
 

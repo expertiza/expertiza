@@ -80,8 +80,17 @@
       })
 
       $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
-        $('#save_progress').html('<span id="tick"> &#10004; </span>' + 'A draft was saved on ' + last_save.toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
-      })
+        $('#save_progress').html('<span id="tick"> &#10004; </span>' +
+            'A draft was saved on ' + last_save.toLocaleString('en-US', {
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              second: 'numeric',
+              hour12: true }));
+      });
     }
 
     $('#save_review').click(function(){
@@ -99,7 +108,7 @@
         jQuery('#isSubmit').val('Yes');
         window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
       }
-    })
+    });
     // update the values in the form using ajax
     function updateForm(){
       //update the additional comments
@@ -267,10 +276,7 @@
     });
 
   });
-
 </script>
-
-
 
 <% if @map.survey? %>
     <h1><%= @header %> <%= @title %> for <%= @map.survey_parent.name %></h1>
@@ -323,7 +329,9 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx" checked><label id="autosave_cbx_lbl" for="autosave_cbx">&nbsp;Auto save your respond every XX seconds?&nbsp;&nbsp;</label><div id="save_progress"></div>
+<input type="checkbox" id="autosave_cbx" checked>
+<label id="autosave_cbx_lbl" for="autosave_cbx"></label>
+<div id="save_progress"></div>
 <%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>

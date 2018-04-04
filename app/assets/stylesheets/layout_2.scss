@@ -740,8 +740,8 @@ table.general td {
   max-width: 93vw;
 }
 
-.width-250 {
-  width: 250px !important;
+.width-266 {
+  width: 266px !important;
 }
 
 @for $i from 1 through 25 {
@@ -753,4 +753,8 @@ table.general td {
 .borderless th, .borderless td {
     border: none !important;
     padding-left: 0px !important;
+}
+
+.table-not-full-width {
+  width: auto !important;
 }

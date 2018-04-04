@@ -135,7 +135,7 @@ describe ResponseController do
       # varying_rubrics_by_round?
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
       # review_questionnaire_id
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: nil).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
       # set_dropdown_or_scale
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)

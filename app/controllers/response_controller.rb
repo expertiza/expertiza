@@ -118,6 +118,8 @@ class ResponseController < ApplicationController
         round: @current_round,
         is_submitted: 0
     )
+    questions = sort_questions(@questionnaire.questions)
+    init_answers(questions)
     render action: 'response'
   end
 
@@ -338,6 +340,12 @@ class ResponseController < ApplicationController
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       score.update_attribute('answer', v[:score])
       score.update_attribute('comments', v[:comment])
+    end
+  end
+
+  def init_answers(questions)
+    questions.each do |q|
+      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '')
     end
   end
 

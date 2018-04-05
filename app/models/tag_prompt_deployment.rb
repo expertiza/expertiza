@@ -32,7 +32,7 @@ class TagPromptDeployment < ActiveRecord::Base
     unless teams.empty? or questions.empty?
       teams.each do |team|
         responses = Response.joins("JOIN response_maps ON response_maps.id = responses.map_id")
-                            .where(response_maps: {reviewed_object_id: self.assignment.id, reviewee_id: team.id})
+                            .where(responses: {is_submitted: 1}, response_maps: {reviewed_object_id: self.assignment.id, reviewee_id: team.id})
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
         answers = answers.where("length(comments) > ?", self.answer_length_threshold.to_s) unless self.answer_length_threshold.nil?

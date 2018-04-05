@@ -138,6 +138,7 @@ describe ResponseController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
       # set_dropdown_or_scale
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire])
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
       allow(Questionnaire).to receive(:questions).and_return(question)
       allow(Answer).to receive(:create).and_return(answer)

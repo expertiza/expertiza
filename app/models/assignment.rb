@@ -388,12 +388,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    # round == nil means that we don't know which round the questionnaire is being used for. thus, we can't always put round in the query.
-    rev_q_ids = round == nil ? AssignmentQuestionnaire.where(assignment_id: self.id) : AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+    # round == nil, first check in duedates if this assignment has rounds
+    next_due_date = DueDate.get_next_due_date(self.id)
+    round = next_due_date.round
     # for program 1 like assignment, if same rubric is used in both rounds,
     # the 'used_in_round' field in 'assignment_questionnaires' will be null,
     # since one field can only store one integer
     # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+    rev_q_ids = round == nil ? AssignmentQuestionnaire.where(assignment_id: self.id) : AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
     if rev_q_ids.empty?
       AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
         rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"

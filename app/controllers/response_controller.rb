@@ -112,8 +112,11 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
+    # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
+    # The response must be created when the review begin.
+    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
-    @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
     @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
     questions = sort_questions(@questionnaire.questions)
     init_answers(questions)
@@ -343,7 +346,7 @@ class ResponseController < ApplicationController
   def init_answers(questions)
     questions.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
-      a = Answer.where(response_id: @response.id, question_id: q.id)
+      a = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
     end
   end

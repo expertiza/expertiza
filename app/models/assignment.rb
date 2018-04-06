@@ -388,7 +388,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    # if there is some bugs in the response that causes the answers not being saved,
     # Get the round it's in from the next duedates
     if !self.staggered_deadline? && round.nil?
       next_due_date = DueDate.get_next_due_date(self.id)

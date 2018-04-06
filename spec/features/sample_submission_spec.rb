@@ -14,8 +14,8 @@ def init_test
   assignment.course_id = course.id
   assignment.save
 
-  create_assignemnt_team("ss_assignment_team_1", assignment.id)
-  create_assignemnt_team("ss_assignment_team_2", assignment.id)
+  create_assignment_team("ss_assignment_team_1", assignment.id)
+  create_assignment_team("ss_assignment_team_2", assignment.id)
 end
 
 def visit_sample_submissions_page

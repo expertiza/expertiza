@@ -29,6 +29,15 @@ th.sorter-true.tablesorter-headerUnSorted{
 </style>
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <script type = "text/javascript" language = "javascript">
+  $( document ).ready(function() {
+    $('#tag_prompt_toggler').click(function () {
+      if ($('#tag_prompt_toggler').text() == "hide tags")
+        $('#tag_prompt_toggler').text("show tags");
+      else
+        $('#tag_prompt_toggler').text("hide tags");
+      $('.tag_prompt_container').toggle();
+    });
+  });
 
 function toggleFunction(elementId) {
     var target = document.getElementById(elementId);
@@ -86,6 +95,9 @@ function toggleFunction(elementId) {
                 <%end %>
               </h4>
               <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+            <% if @assignment.is_answer_tagging_allowed %>
+            <span class="spn_qsttog" id="tag_prompt_toggler" title="">hide tags</span>
+            <% end %>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
 
@@ -169,7 +181,16 @@ function toggleFunction(elementId) {
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td><%= row.score_row[index].comment %></td>
+                              <td>
+                                <%= row.score_row[index].comment %>
+                                <% if row.score_row[index].vm_prompts.count > 0 %>
+                                    <div class="tag_prompt_container">
+                                      <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
+                                          <%= vm_tag_prompt.tag_prompt.html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer) %> &nbsp;
+                                      <% end %>
+                                    </div>
+                                <% end %>
+                              </td>
                             </tr>
                         <% end %>
                       </table>

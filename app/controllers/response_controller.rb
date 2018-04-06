@@ -36,6 +36,13 @@ class ResponseController < ApplicationController
     end
   end
 
+  # GET /response/json?response_id=xx
+  def json
+    response_id = params[:response_id] if params.key?(:response_id)
+    response = Response.find(response_id)
+    render :json => response
+  end
+
   def delete
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
@@ -67,12 +74,13 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
+    @questionnaire = set_questionnaire
     render action: 'response'
   end
 
   # Update the response and answers when student "edit" existing response
   def update
-    return unless action_allowed?
+    render :nothing => true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
@@ -104,6 +112,14 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
+    # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
+    # The response must be created when the review begin.
+    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
+    # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
+    @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
+    @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
+    questions = sort_questions(@questionnaire.questions)
+    init_answers(questions)
     render action: 'response'
   end
 
@@ -142,22 +158,17 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     was_submitted = false
-    if params[:saved].nil? || params[:saved] == "0" # a flag so the autosave doesn't create different versions. The value's changed by the javascript in response.js
+    @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    if @response.nil?
       @response = Response.create(
           map_id: @map.id,
           additional_comment: params[:review][:comments],
-          round: @round,
+          round: @round.to_i,
           is_submitted: is_submitted
       )
-    else
-      @response = Response.find_by(map_id: @map.id, round: @round)
-      if !@response.nil?
-        was_submitted = @response.is_submitted
-        @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
-      else
-        logger.error("Can't find response with '#{@map.id}' and round '#{@round}' to update, even though params[:saved] = #{params[:saved]}")
-      end
     end
+    was_submitted = @response.is_submitted
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
 
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -166,7 +177,7 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     error_msg = ""
     #only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (was_submitted != @response.is_submitted) && @response.significant_difference?
+    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
     end
@@ -329,6 +340,14 @@ class ResponseController < ApplicationController
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       score.update_attribute('answer', v[:score])
       score.update_attribute('comments', v[:comment])
+    end
+  end
+
+  def init_answers(questions)
+    questions.each do |q|
+      # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
+      a = Answer.where(response_id: @response.id, question_id: q.id).first
+      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
     end
   end
 

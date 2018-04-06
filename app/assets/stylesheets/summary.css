@@ -4,8 +4,12 @@
 }
 .table_stretch{
     width: 100%;
+    border-spacing: 5px;
+    border-collapse: collapse;
 }
-
+.table_stretch td{
+    padding: 10px;
+}
 .fake-link {
     font-size: smaller;
     color: #94672d;

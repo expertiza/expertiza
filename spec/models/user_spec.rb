@@ -167,12 +167,12 @@ describe User do
 
   describe '#super_admin?' do
     it 'returns true if role name is Super-Administrator' do
-      allow(user).to receive_message_chain(:role, :name).and_return('Super-Administrator')
+      allow(user).to receive(:role).and_return(double(:role, name: 'Super-Administrator'))
       expect(user.super_admin?).to be true
     end
 
     it 'returns false if role name is not Super-Administrator' do
-      allow(user).to receive_message_chain(:role, :name).and_return('Student')
+      allow(user).to receive(:role).and_return(double(:role, name: 'Student'))
       expect(user.super_admin?).to be false
     end
   end

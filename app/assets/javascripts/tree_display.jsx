@@ -749,8 +749,10 @@ jQuery(document).ready(function() {
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
+            var list = this.state.expandedRow;
+            list.splice(index,1);
           this.setState({
-            expandedRow: React.addons.update(this.state.expandedRow, {$splice: [[index, 1]]})
+            expandedRow: list
           })
         }
       }

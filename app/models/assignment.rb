@@ -389,11 +389,17 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+    # Get the round it's in from the next duedates
+    if !self.staggered_deadline? && round.nil?
+      next_due_date = DueDate.get_next_due_date(self.id)
+      round = next_due_date.round
+    end
     # for program 1 like assignment, if same rubric is used in both rounds,
     # the 'used_in_round' field in 'assignment_questionnaires' will be null,
     # since one field can only store one integer
     # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+
     if rev_q_ids.empty?
       AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
         rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"

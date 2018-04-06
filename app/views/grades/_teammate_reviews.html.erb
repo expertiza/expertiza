@@ -18,9 +18,9 @@
   <% for review in rscore[:assessments] %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
-      <a name="<%= prefix + "_" + review.map.reviewer.name(session[:ip]) %>"></a><%= review.display_as_html(prefix, count) %><BR/><BR/>
+      <a name="<%= prefix + "_" + review.map.reviewer.name(session[:ip]) %>"></a><%= review.display_as_html(prefix, count, show_tags=true) %><BR/><BR/>
     <% else %>
-      <%= review.display_as_html(nil,count) %><BR/><BR/>
+      <%= review.display_as_html(nil,count, show_tags=true) %><BR/><BR/>
     <% end %>    
   <% end %>
 <% else %>

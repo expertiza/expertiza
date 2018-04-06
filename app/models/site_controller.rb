@@ -20,9 +20,10 @@ class SiteController < ActiveRecord::Base
     classes = {}
 
     ObjectSpace.each_object(Class) do |klass|
-      classes[klass.controller_name] = klass if klass.respond_to?(:controller_name) && klass.superclass.to_s == ApplicationController.to_s
+      if klass < ApplicationController
+        classes[klass.controller_name] = klass if klass.respond_to?(:controller_name)
+      end
     end
-
     classes
   end
 end

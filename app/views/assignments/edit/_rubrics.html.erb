@@ -15,7 +15,7 @@
         }
         //Rubric options
         html +=     '<td align="center">' +
-        '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px">' +
+        '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
         '<option value="">--None--</option>';
         for (i = 0; i < questionnaire_options.length; i++) {
             html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
@@ -24,7 +24,7 @@
         //Use dropdown instead
         html += '<td align="center"><input type="checkbox" name="dropdown" id="dropdown" value="true"></td>';
         //Scored question display type (Dropdown or Scale)
-        html += '<td align="center"><select id="scored_question_display_type", name="assignment_form[assignment_questionnaire][][dropdown]">';
+        html += '<td align="center"><select id="scored_question_display_type", name="assignment_form[assignment_questionnaire][][dropdown]" class="form-control">';
           if (assignment_questionnaire.dropdown == true) {
             html += '<option value=true selected="selected">Dropdown</option>';
             html += '<option value=false>Scale</option>';
@@ -113,7 +113,7 @@
       html += "<input type='hidden' name='" + id_prefix + "[id][]' value='" + tag_dep_id + "'>"
       html += "Tag prompt "
       html += "<img src='/assets/info.png' title='Tag label that will be shown below the feedback' />"
-      html += ": <select name='" + id_prefix + "[tag_prompt][]' onchange='if (this.selectedIndex == 1)openAddNewTagPopup()' onfocus='if (this.selectedIndex == 1)this.selectedIndex = 0'>"
+      html += ": <select name='" + id_prefix + "[tag_prompt][]' onchange='if (this.selectedIndex == 1)openAddNewTagPopup()' onfocus='if (this.selectedIndex == 1)this.selectedIndex = 0' class='form-control'>"
       html += "<option value='none'>---</option>"
       html += "<option value='new'>add new..</option>"
       for (i=0; i<tag_prompts.length; i++) {
@@ -126,7 +126,7 @@
 
       html += "&nbsp;&nbsp; apply to question type "
       html += "<img src='/assets/info.png' title='The tag prompt will only be shown below the answers of this particular question type. It is useful to exclude types of question that the tags are not relevant to' />"
-      html += ": <select name='" + id_prefix + "[question_type][]'>"
+      html += ": <select name='" + id_prefix + "[question_type][]' class='form-control'>"
       for (i=0; i<q_types.length; i++) {
         html += "<option value=" + q_types[i]
         if (q_types[i] == question_type)

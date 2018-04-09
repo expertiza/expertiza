@@ -114,14 +114,6 @@ jQuery(document).ready(function() {
             <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
           </span>
         )
-        moreContent.push(
-          <span class="dropdown">
-            <button class="dropdown-link btn btn-sm btn-primary">···</button>
-            <span class="dropdown-content">
-              
-            </span>
-          </span>
-        )
         if (newNodeType === 'course') {
           moreContent.push(
             <br/>
@@ -284,7 +276,7 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": ""
       }
@@ -293,6 +285,8 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
+      } else if(this.props.dataType === 'course') {
+        colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.creation_date && this.props.updated_date) {
         creation_date = this.props.creation_date.replace("T", "<br/>")
@@ -305,8 +299,6 @@ jQuery(document).ready(function() {
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
                     <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
                     <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                     <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
@@ -334,8 +326,6 @@ jQuery(document).ready(function() {
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
                     <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                     <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                     <td width={colWidthArray[6]}>
@@ -365,7 +355,7 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": ""
       }
@@ -375,6 +365,8 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
+      }  else if(this.props.dataType === 'course') {
+        colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.data) {
           if (this.props.dataType == 'course') {
@@ -383,9 +375,7 @@ jQuery(document).ready(function() {
                       key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                       id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                       name={entry.name}
-                      instructor={entry.instructor}
                       institution={entry.institution}
-                      directory={entry.directory}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       private={entry.private}
@@ -407,8 +397,6 @@ jQuery(document).ready(function() {
                       key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                       id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                       name={entry.name}
-                      instructor={entry.instructor}
-                      directory={entry.directory}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       private={entry.private}
@@ -432,12 +420,6 @@ jQuery(document).ready(function() {
                       <tr>
                           <th width={colWidthArray[0]}>
                 {firstColText}
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[2]}>
-                              Instructor
                           </th>
                           <th style={colDisplayStyle} width={colWidthArray[3]}>
                               Institution
@@ -464,12 +446,6 @@ jQuery(document).ready(function() {
                       <tr>
                           <th width={colWidthArray[0]}>
                 {firstColText}
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[2]}>
-                              Instructor
                           </th>
                           <th width={colWidthArray[4]}>
                               Creation Date
@@ -511,7 +487,7 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": "",
         "word-wrap":"break-word"
@@ -521,6 +497,8 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
+      } else if(this.props.dataType === 'course') {
+        colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.creation_date && this.props.updated_date) {
         creation = this.props.creation_date
@@ -537,8 +515,6 @@ jQuery(document).ready(function() {
           return (
               <tr onClick={this.handleClick} id={this.props.id}>
                   <td width={colWidthArray[0]}>{this.props.name}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
                   <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
                   <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                   <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
@@ -567,8 +543,6 @@ jQuery(document).ready(function() {
           return (
               <tr onClick={this.handleClick} id={this.props.id}>
                   <td width={colWidthArray[0]}>{this.props.name}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
                   <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                   <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                   <td width={colWidthArray[6]}>
@@ -783,7 +757,7 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": ""
       }
@@ -795,6 +769,7 @@ jQuery(document).ready(function() {
               }
           }
           if (this.props.dataType == 'course') {
+              colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
               _rows.push(<TitleRow
                   title="My Courses"
               />)
@@ -806,9 +781,7 @@ jQuery(document).ready(function() {
           }
           jQuery.each(this.props.data, function (i, entry) {
               if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
                   (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
                   (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                   (entry.private == true || entry.type == 'FolderNode')) {
@@ -816,8 +789,6 @@ jQuery(document).ready(function() {
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
                       name={entry.name}
-                      directory={entry.directory}
-                      instructor={entry.instructor}
                       institution={entry.institution}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
@@ -853,9 +824,7 @@ jQuery(document).ready(function() {
                   />)
                   jQuery.each(this.props.data, function (i, entry) {
                       if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                           (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
                           (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
                           (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                           (entry.private == false)) {
@@ -863,8 +832,6 @@ jQuery(document).ready(function() {
                               key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                               id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                               name={entry.name}
-                              directory={entry.directory}
-                              instructor={entry.instructor}
                               institution={entry.institution}
                               creation_date={entry.creation_date}
                               updated_date={entry.updated_date}
@@ -899,17 +866,13 @@ jQuery(document).ready(function() {
                   />)
                   jQuery.each(this.props.data, function (i, entry) {
                       if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                           (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
                           (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                           (entry.private == false)) {
                           _rows.push(<ContentTableRow
                               key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                               id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                               name={entry.name}
-                              directory={entry.directory}
-                              instructor={entry.instructor}
                               creation_date={entry.creation_date}
                               updated_date={entry.updated_date}
                               actions={entry.actions}
@@ -953,20 +916,6 @@ jQuery(document).ready(function() {
                                   order="normal"
                                   handleUserClick={this.handleSortingClick} />
                           </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                              <SortToggle
-                                  colName="directory"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[2]}>
-                              Instructor
-                              <SortToggle
-                                  colName="instructor"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
                           <th style={colDisplayStyle} width={colWidthArray[3]}>
                               Institution
                               <SortToggle
@@ -1006,20 +955,6 @@ jQuery(document).ready(function() {
                               Name
                               <SortToggle
                                   colName="name"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                              <SortToggle
-                                  colName="directory"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Instructor
-                              <SortToggle
-                                  colName="instructor"
                                   order="normal"
                                   handleUserClick={this.handleSortingClick} />
                           </th>

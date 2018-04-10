@@ -10,10 +10,11 @@
     <%num_responses = @review_final_versions[key][:response_ids].length%>
     <% questions.each do |question|%>
 
-      <tr>
-        <th  align = 'left'> [Question] <%= question.txt%> </th>
-      </tr>
+
       <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
+        <tr>
+          <th  colspan="3"> [Question] <%= question.txt%> </th>
+        </tr>
         <tr>
           <td width="60%"> Reviewee </td>
           <td width="10%"> Score </td>

@@ -56,12 +56,12 @@
       <%end%>
     <%end%>
     <tr>
-      <th align = 'left'> Additional Comment</th>
+      <th align = 'left' colspan="3"> Additional Comments</th>
     </tr>
 
     <%@review_final_versions[key][:response_ids].each do |response_id|%>
       <tr>
-        <td> <%= Response.find(response_id).additional_comment%> </td>
+        <td colspan="3"> <%= Response.find(response_id).additional_comment%> </td>
       </tr>
     <%end%>
     </table>

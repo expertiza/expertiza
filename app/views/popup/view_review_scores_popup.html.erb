@@ -2,7 +2,9 @@
 
 <%keys = @review_final_versions.keys%>
 <%keys.each do |key|%>
-  <h3><%=key%></h3>
+  <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
+  <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
+  <h4><%=key%></h4>
   <table border="1">
 
     <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>

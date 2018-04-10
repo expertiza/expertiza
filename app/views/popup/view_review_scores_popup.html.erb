@@ -1,4 +1,4 @@
-<h2> Review scores </h2>
+<h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
 
 <%keys = @review_final_versions.keys%>
 <%keys.each do |key|%>

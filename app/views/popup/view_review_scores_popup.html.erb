@@ -3,7 +3,7 @@
 <%keys = @review_final_versions.keys%>
 <%keys.each do |key|%>
   <h3><%=key%></h3>
-  <table border="1">
+  <table class="general" border=1>
 
     <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>
     <%questions = Question.where(questionnaire_id: questionnaire_id)%>
@@ -11,7 +11,7 @@
     <% questions.each do |question|%>
 
       <tr>
-        <th  align = 'left' colspan="3" bgcolor="#DDDDBB"> [Question] <%= question.txt%> </th>
+        <th  align = 'left' colspan="3" style ="background-color:#DDDDBB"> [Question] <%= question.txt%> </th>
       </tr>
       <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
         <tr>
@@ -55,7 +55,7 @@
       <%end%>
     <%end%>
     <tr>
-      <th align = 'left' colspan="3"> Additional Comment</th>
+      <th align = 'left' colspan="3" style ="background-color:#DDDDBB"> Additional Comment</th>
     </tr>
 
     <%@review_final_versions[key][:response_ids].each do |response_id|%>
@@ -63,7 +63,7 @@
         <td colspan="3"> <%= Response.find(response_id).additional_comment%> </td>
       </tr>
     <%end%>
-    </table>
+  </table>
 
 <% end #loop for keys%>
 <br/>

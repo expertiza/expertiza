@@ -21,10 +21,10 @@ module ReviewMappingHelper
   #
   # for review report
   #
-  def get_data_for_review_report(reviewed_object_id, reviewer_id, type, line_num)
+  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
-    line_num += 1
-    bgcolor = line_num.even? ? "#ffffff" : "#DDDDBB"
+
+    #bgcolor = line_num.even? ? "#ffffff" : "#DDDDBB"
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
 
     response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
@@ -35,7 +35,7 @@ module ReviewMappingHelper
         instance_variable_set("@review_in_round_" + round.to_s, instance_variable_get("@review_in_round_" + round.to_s) + 1) if responses.exists?(round: round)
       end
     end
-    [response_maps, bgcolor, rspan, line_num]
+    [response_maps, rspan]
   end
 
   def get_team_name_color_in_review_report(response_map)

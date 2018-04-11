@@ -34,7 +34,7 @@ describe Response do
         allow(questionnaire).to receive(:max_question_score).and_return(5)
         allow(questionnaire).to receive(:id).and_return(1)
         allow(assignment).to receive(:id).and_return(1)
-        allow(question).to receive(:view_completed_question).with(1, answer, 5, nil).and_return('Question HTML code')
+        allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
         expect(response.display_as_html('Instructor end', 0)).to eq("<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;"\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
           "show review</a><BR/><table id=\"review_Instructor end_1\" style=\"display: none;\" class=\"table table-bordered\">"\

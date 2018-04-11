@@ -1,8 +1,8 @@
- <%@l = -1 %>
-      <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
+
+      <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
       <div class = 'reviewreport'>
   <!-- Added headers for tablesorter -->
-  
+
 <script type='text/javascript'>
 $(window).load(function(){
 $("#myTable tbody").sortable().disableSelection();
@@ -30,7 +30,7 @@ $("#myTable tbody").sortable().disableSelection();
 <tbody>
 
       <% sort_reviewer_by_review_volume_desc.each do |r| %>
-        <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
+        <% @response_maps, @rspan = get_data_for_review_report(@id, r.id, @type) %>
         <tr>
         <%if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
@@ -68,7 +68,7 @@ $("#myTable tbody").sortable().disableSelection();
                   </div>
 
                 <!--Author feedback-->
-                <!--Dr.Kidd required to add a "autor feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
+                <!--Dr.Kidd required to add a "author feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
                 <!--Dr.Kidd's course-->
                 <!--<% if @assignment.instructor_id == 2026 %>
                   <% if index == 0 %>
@@ -131,7 +131,8 @@ $(function () {
   /*Function for sorting the table */
 		 $("#myTable").tablesorter({
 		sortList: [[0,0]], //sort First Column by default when page loads
-		headers: {
+         widgets: ['zebra'], // Make sure to update the css when column is sorted
+         headers: {
      		   4: {
       			  sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
      		      }

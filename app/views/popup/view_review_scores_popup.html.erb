@@ -1,21 +1,27 @@
-<h2> Review scores </h2>
+<h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
 
 <%keys = @review_final_versions.keys%>
 <%keys.each do |key|%>
-  <h3><%=key%></h3>
-  <table class="general" border=1>
+
+  <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
+  <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
+  <h4><%=key%></h4>
+  <table border="1">
+
 
     <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>
     <%questions = Question.where(questionnaire_id: questionnaire_id)%>
     <%num_responses = @review_final_versions[key][:response_ids].length%>
     <% questions.each do |question|%>
 
-      <tr>
-        <th  align = 'left' colspan="3" style ="background-color:#DDDDBB"> [Question] <%= question.txt%> </th>
-      </tr>
       <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
         <tr>
-          <td width="20%"> Reviewee </td>
+          <th  colspan="3"> [Question] <%= question.txt%> </th>
+        </tr>
+        <tr>
+          <td width="60%"> Reviewee </td>
+
+
           <td width="10%"> Score </td>
           <td width="70%"> Comments </td>
         </tr>
@@ -38,9 +44,6 @@
               <!--Reviewee-->
               <td>
                 <p style="color: <%= col_color%>"><%=team.name%> <br>
-                <%team.author_names.each do |name|%>
-                  <%= name %> <br>
-                <%end%></p>
               </td>
               <!--Score-->
               <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
@@ -56,6 +59,7 @@
     <%end%>
     <tr>
       <th align = 'left' colspan="3" style ="background-color:#DDDDBB"> Additional Comment</th>
+
     </tr>
 
     <%@review_final_versions[key][:response_ids].each do |response_id|%>

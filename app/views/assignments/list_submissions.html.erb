@@ -1,4 +1,3 @@
-<h1>Submissions for <%= @assignment.name %></h1>
 
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
@@ -12,14 +11,16 @@
 <table class="table table-striped" style="margin-top: 50px">
     <thead>
       <% if @assignment.topics? %>
-        <td width="16%" style="font-weight: bold; font-size: 15px;">Topic name</td>
+        <td style="font-weight: bold; font-size: 15px;">Topic name</td>
       <% end %>
       <% if @assignment.max_team_size > 1 %>
-        <td width="14%" style="font-weight: bold; font-size: 15px;">Team name</td>
-        <td width="18%" style="font-weight: bold; font-size: 15px;">Team member(s)</td>
+        <td style="font-weight: bold; font-size: 15px;">Team name</td>
+        <td style="font-weight: bold; font-size: 15px;">Team member(s)</td>
       <% else %>
-        <td width="18%" style="font-weight: bold; font-size: 15px;">Participant name</td>
-      <% end %>                              
+        <td style="font-weight: bold; font-size: 15px;">Participant name</td>
+      <% end %>  
+      <td style="font-weight: bold; font-size: 15px;">Links</td> 
+      <td style="font-weight: bold; font-size: 15px;"></td>                    
     </thead>
     <% @l = -1 %>
     <% @teams.each do |team| %>
@@ -53,20 +54,23 @@
         <td>
         <!--Display submitted hyperlinks-->
           <% participant = participants.compact.first %>
-          <%= link_to "Show Submission Records", submission_records_path(team_id: team.id) %>
-          <br></br>
           <% if participant and !team.hyperlinks.empty? %>
-            Hyperlinks: <br/>
             <% team.hyperlinks.each do |link| %>
-              <a href="<%= link %>" target="_blank"><%= link %></a><br/>
+              <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
             <% end %>
           <% end %>
-
+          <br>
           <!--Display submitted files-->
+          <% p team.submitted_files %>
           <% if participant and !team.submitted_files.empty? %>
             <% files = team.submitted_files %>
-            Files: <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
+            <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
           <% end %>
+        </td>
+        <td width="10%">
+
+          <%= link_to "History", submission_records_path(team_id: team.id) %>
+
         </td>
       </tr>
     <% end %>

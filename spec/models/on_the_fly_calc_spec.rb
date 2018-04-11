@@ -1,5 +1,4 @@
 describe OnTheFlyCalc do
-  
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
@@ -74,7 +73,6 @@ describe OnTheFlyCalc do
   end
 
   describe '#scores' do
-    
     before(:each) do
       allow(on_the_fly_calc).to receive(:teams).and_return([team, team])
       allow(on_the_fly_calc).to receive(:index).and_return(0)

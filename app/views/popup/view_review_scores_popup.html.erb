@@ -11,13 +11,13 @@
     <% questions.each do |question|%>
 
       <tr>
-        <th  align = 'left'> [Question] <%= question.txt%> </th>
+        <th  align = 'left' colspan="3" bgcolor="#DDDDBB"> [Question] <%= question.txt%> </th>
       </tr>
       <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
         <tr>
-          <td width="60%"> Reviewee </td>
+          <td width="20%"> Reviewee </td>
           <td width="10%"> Score </td>
-          <td width="30%"> Comments </td>
+          <td width="70%"> Comments </td>
         </tr>
       <%else%>
         <%next%>
@@ -55,12 +55,12 @@
       <%end%>
     <%end%>
     <tr>
-      <th align = 'left'> Additional Comment</th>
+      <th align = 'left' colspan="3"> Additional Comment</th>
     </tr>
 
     <%@review_final_versions[key][:response_ids].each do |response_id|%>
       <tr>
-        <td> <%= Response.find(response_id).additional_comment%> </td>
+        <td colspan="3"> <%= Response.find(response_id).additional_comment%> </td>
       </tr>
     <%end%>
     </table>

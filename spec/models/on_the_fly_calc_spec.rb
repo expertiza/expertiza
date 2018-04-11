@@ -1,6 +1,5 @@
 describe OnTheFlyCalc do
-  
-  let(:on_the_fly_calc) { Class.new {extend OnTheFlyCalc} }
+  let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
@@ -19,7 +18,7 @@ describe OnTheFlyCalc do
         allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires, :find_by)
           .with(no_args).with(assignment_id: 1).and_return(double('AssignmentQuestionnaire', id: 1))
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil)
-          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
+                                                           .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
         expect(on_the_fly_calc.compute_total_score(scores)).to eq(0)
       end
     end
@@ -34,7 +33,7 @@ describe OnTheFlyCalc do
         allow(on_the_fly_calc).to receive(:questionnaires).and_return([questionnaire1])
         allow(ReviewQuestionnaire).to receive(:assignment_questionnaires).with(assignment_id: 1).and_return(fake_result)
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil)
-          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
+                                                           .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
         allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires, :find_by).with(any_args).with(any_args)
           .and_return(double('AssignmentQuestionnaire', id: 1, assignment_id: 1, questionnaire_weight: 200))
         expect(on_the_fly_calc.compute_total_score(scores)).to eq(60)
@@ -43,7 +42,6 @@ describe OnTheFlyCalc do
   end
 
   describe '#compute_review_hash' do
-    
     let(:response_map) { create(:review_response_map, id: 1, reviewer_id: 1) }
     let(:response_map2) { create(:review_response_map, id: 2, reviewer_id: 2) }
     let!(:response_record) { create(:response, id: 1, response_map: response_map) }
@@ -52,7 +50,6 @@ describe OnTheFlyCalc do
       allow(Answer).to receive(:get_total_score).and_return(50, 30)
       allow(ResponseMap).to receive(:where).and_return([response_map, response_map2])
     end
-    
     context 'when current assignment varys rubrics by round' do
       it 'scores varying rubrics and returns review scores' do
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(TRUE)
@@ -61,7 +58,6 @@ describe OnTheFlyCalc do
         expect(temp).to eql({})
       end
     end
-    
     context 'when current assignment does not vary rubrics by round' do
       it 'scores varying rubrics and returns review scores' do
         temp = assignment.compute_reviews_hash
@@ -78,7 +74,6 @@ describe OnTheFlyCalc do
       allow(ReviewResponseMap).to receive(:get_assessments_for).with(contributor).and_return([])
       allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
     end
-    
     context 'when current assignment varys rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do
         allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(TRUE)
@@ -86,7 +81,6 @@ describe OnTheFlyCalc do
         expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq({1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}}})
       end
     end
-    
     context 'when current assignment does not vary rubrics by round' do
       it 'computes avg score and score range for each team and return scores' do
         allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(FALSE)
@@ -101,7 +95,6 @@ describe OnTheFlyCalc do
       allow(on_the_fly_calc).to receive(:index).and_return(0)
       allow(on_the_fly_calc).to receive(:score_assignment).and_return('')
     end
-    
     context 'when current assignment varys rubrics by round and number of assessments is non-zero' do
       it 'calculates rounds/scores/assessments and return scores' do
         questions = [question1]
@@ -115,7 +108,6 @@ describe OnTheFlyCalc do
         expect(on_the_fly_calc.scores(questions)).to eq({min: 20, max: 50, avg: 50})
       end
     end
-    
     context 'when current assignmnet varys rubrics by round and number of assessments is 0' do
       it 'calculates rounds/scores/assessments and return scores' do
         questions = [question1]
@@ -134,7 +126,6 @@ describe OnTheFlyCalc do
         expect(on_the_fly_calc.scores(questions)).to eq({min: 0, max: 0, avg: nil})
       end
     end
-    
     context 'when current assignment does not vary rubrics by round' do
       it 'computes and returns scores' do
         questions = [question1]

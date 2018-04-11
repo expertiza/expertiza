@@ -22,23 +22,6 @@ describe OnTheFlyCalc do
         expect(on_the_fly_calc.compute_total_score(scores)).to eq(0)
       end
     end
-    
-    xcontext 'avg is not nil' do
-      it 'computes total score for this assignment by summing the score given on all questionnaires' do
-        on_the_fly_calc = Assignment.new(id: 1, name: 'Test Assgt')
-        on_the_fly_calc.extend(OnTheFlyCalc)
-        scores = {review1: {scores: {max: 80, min: 0, avg: 30}, assessments: [response]}}
-        symb = "review1".to_sym
-        fake_result = double('AssignmnetQuestionnaire')
-        allow(on_the_fly_calc).to receive(:questionnaires).and_return([questionnaire1])
-        allow(ReviewQuestionnaire).to receive(:assignment_questionnaires).with(assignment_id: 1).and_return(fake_result)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil)
-                                                           .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-        allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires, :find_by).with(any_args).with(any_args)
-          .and_return(double('AssignmentQuestionnaire', id: 1, assignment_id: 1, questionnaire_weight: 200))
-        expect(on_the_fly_calc.compute_total_score(scores)).to eq(60)
-      end
-    end
   end
 
   describe '#compute_review_hash' do
@@ -61,7 +44,7 @@ describe OnTheFlyCalc do
     context 'when current assignment does not vary rubrics by round' do
       it 'scores varying rubrics and returns review scores' do
         temp = assignment.compute_reviews_hash
-        expect(temp).to eql({1 => {1 => 50}, 2 => {1 => 30}})
+        expect(temp).to eql(1 => {1 => 50}, 2 => {1 => 30})
       end
     end
   end
@@ -78,13 +61,13 @@ describe OnTheFlyCalc do
       it 'computes avg score and score range for each team in each round and return scores' do
         allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(TRUE)
         allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
-        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq({1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}}})
+        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq(1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'computes avg score and score range for each team and return scores' do
         allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(FALSE)
-        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq({1 => {min: 50.0, max: 50.0, avg: 50.0}})
+        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq(1 => {min: 50.0, max: 50.0, avg: 50.0})
       end
     end
   end
@@ -105,7 +88,7 @@ describe OnTheFlyCalc do
         allow(on_the_fly_calc).to receive(:total_num_of_assessments).and_return(2)
         allow(on_the_fly_calc).to receive(:total_score).and_return(100)
         allow(on_the_fly_calc).to receive(:score).and_return(score)
-        expect(on_the_fly_calc.scores(questions)).to eq({min: 20, max: 50, avg: 50})
+        expect(on_the_fly_calc.scores(questions)).to eq(min: 20, max: 50, avg: 50)
       end
     end
     context 'when current assignmnet varys rubrics by round and number of assessments is 0' do
@@ -123,7 +106,7 @@ describe OnTheFlyCalc do
         allow(on_the_fly_calc).to receive(:total_num_of_assessments).and_return(0)
         allow(on_the_fly_calc).to receive(:score).and_return(score)
         allow(on_the_fly_calc).to receive(:round).and_return({})
-        expect(on_the_fly_calc.scores(questions)).to eq({min: 0, max: 0, avg: nil})
+        expect(on_the_fly_calc.scores(questions)).to eq(min: 0, max: 0, avg: nil)
       end
     end
     context 'when current assignment does not vary rubrics by round' do
@@ -141,7 +124,7 @@ describe OnTheFlyCalc do
         allow(on_the_fly_calc).to receive(:total_num_of_assessments).and_return(0)
         allow(on_the_fly_calc).to receive(:score).and_return(score)
         allow(on_the_fly_calc).to receive(:round).and_return({})
-        expect(on_the_fly_calc.scores(questions)).to eq({min: 20, max: 50, avg: 25})
+        expect(on_the_fly_calc.scores(questions)).to eq(min: 20, max: 50, avg: 25)
       end
     end
   end

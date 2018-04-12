@@ -438,4 +438,13 @@ FactoryBot.define do
     badge { Badge.first || association(:badge) }
     participant { AssignmentParticipant.first || association(:participant) }
   end
+
+  factory :menu_item, class: MenuItem do
+    parent_id nil
+    name 'home'
+    label 'Home'
+    seq 1
+    controller_action_id nil
+    content_page_id nil
+  end
 end

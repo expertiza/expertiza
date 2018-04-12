@@ -89,7 +89,7 @@ describe OnTheFlyCalc do
         allow(on_the_fly_calc).to receive(:total_num_of_assessments).and_return(2)
         allow(on_the_fly_calc).to receive(:total_score).and_return(100)
         allow(on_the_fly_calc).to receive(:score).and_return(score)
-        expect(on_the_fly_calc.scores(questions)).to eq({min: 20, max: 50, avg: 50})
+        expect(on_the_fly_calc.scores(questions)).to eq(min: 20, max: 50, avg: 50)
       end
     end
     context 'when current assignmnet varys rubrics by round and number of assessments is 0' do
@@ -107,7 +107,7 @@ describe OnTheFlyCalc do
         allow(on_the_fly_calc).to receive(:total_num_of_assessments).and_return(0)
         allow(on_the_fly_calc).to receive(:score).and_return(score)
         allow(on_the_fly_calc).to receive(:round).and_return({})
-        expect(on_the_fly_calc.scores(questions)).to eq({min: 0, max: 0, avg: nil})
+        expect(on_the_fly_calc.scores(questions)).to eq(min: 0, max: 0, avg: nil)
       end
     end
     context 'when current assignment does not vary rubrics by round' do
@@ -125,7 +125,7 @@ describe OnTheFlyCalc do
         allow(on_the_fly_calc).to receive(:total_num_of_assessments).and_return(0)
         allow(on_the_fly_calc).to receive(:score).and_return(score)
         allow(on_the_fly_calc).to receive(:round).and_return({})
-        expect(on_the_fly_calc.scores(questions)).to eq({min: 20, max: 50, avg: 25})
+        expect(on_the_fly_calc.scores(questions)).to eq(min: 20, max: 50, avg: 25)
       end
     end
   end

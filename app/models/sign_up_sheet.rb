@@ -14,7 +14,7 @@ class SignUpSheet < ActiveRecord::Base
     else
       confirmationStatus = SignUpSheet.confirmTopic(user_id, users_team[0].t_id, topic_id, assignment_id) if topic_id
     end
-    ExpertizaLogger.info LogMessage.new('SignUpSheet', user_id, "The signup topic save status:#{confirmationStatus} for assignment #{assignment_id}")
+    ExpertizaLogger.info "The signup topic save status:#{confirmationStatus} for assignment #{assignment_id} by #{user_id}"
     confirmationStatus
   end
 

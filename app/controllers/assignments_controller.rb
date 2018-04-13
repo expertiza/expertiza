@@ -37,7 +37,7 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "Assignment created successfully: #{@assignment_form.as_json}", request)
+      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "Assignment created successfully: #{@assignment_form.assignment.name}", request)
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else

@@ -15,6 +15,7 @@ gem "capistrano-db-tasks", require: false
 gem 'capistrano-passenger'
 gem 'capistrano-rails'
 gem 'capistrano-rvm'
+gem 'chartkick'
 gem 'coveralls', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
@@ -26,6 +27,8 @@ gem 'font-awesome-rails'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
 gem "googlecharts", require: "gchart"
+gem "graphql"
+gem "graphql-client"
 gem 'haml-rails'
 gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'

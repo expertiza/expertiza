@@ -1,6 +1,8 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
+require "graphql/client"
+require "graphql/client/http"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -60,4 +62,33 @@ module Expertiza
     end
   end
 
+  module GitHub
+    class Application < Rails::Application
+    end
+
+    HTTP = GraphQL::Client::HTTP.new("https://api.github.com/graphql") do
+      def headers(context)
+        unless token = context[:access_token] || Application.secrets.github_access_token
+          # $ GITHUB_ACCESS_TOKEN=abc123 bin/rails server
+          #   https://help.github.com/articles/creating-an-access-token-for-command-line-use
+          fail "Missing GitHub access token"
+        end
+
+        {
+            "Authorization" => "Bearer #{token}"
+        }
+      end
+    end
+
+    # Fetch latest schema on init, this will make a network request
+    #Schema = GraphQL::Client.load_schema(HTTP)
+    #GraphQL::Client.dump_schema(HTTP, "db/schema.json")
+    Schema = GraphQL::Client.load_schema("db/schema.json")
+
+    Client = GraphQL::Client.new(
+        schema: Schema,
+        execute: HTTP
+    )
+  end
 end
+

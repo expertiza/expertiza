@@ -33,6 +33,7 @@
 //= require jquery-tablesorter
 //= require awesome_input
 //= require jquery-bar-rating/jquery.barrating
+//= require chartkick
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

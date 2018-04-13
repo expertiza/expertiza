@@ -385,6 +385,8 @@ resources :institution, except: [:destroy] do
 
   resources :submission_records, only: [:index]
 
+  resources :github_data, only: [:show]
+
   resources :suggestion, only: %i[show new create] do
     collection do
       get :list

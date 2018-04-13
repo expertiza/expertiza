@@ -1,6 +1,7 @@
-class SubmissionRecordsController < ApplicationController
-  before_action :set_submission_record, only: %i[show edit update destroy]
+require 'net/http'
+require 'json'
 
+class SubmissionRecordsController < ApplicationController
   def action_allowed?
     # currently we only have a index method which shows all the submission records given a team_id
     assignment_team = AssignmentTeam.find(params[:team_id])
@@ -12,9 +13,19 @@ class SubmissionRecordsController < ApplicationController
     false
   end
 
+  GITHUB_PULL_REGEX = %r(https?:\/\/(?:[w]{3}\.)?github\.com\/([A-Z0-9_\-]+)\/([A-Z0-9_\-]+)\/pull\/([0-9]+)[\S]*)i
+
   # Show submission records.
   # expects to get team_id from params
   def index
     @submission_records = SubmissionRecord.where(team_id: params[:team_id])
   end
+
+  def github_pull_request?(submission)
+    if submission.operation != 'Submit Hyperlink'
+      return false
+    end
+    not GITHUB_PULL_REGEX.match(submission.content).nil?
+  end
+  helper_method :github_pull_request?
 end

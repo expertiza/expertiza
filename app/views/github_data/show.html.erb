@@ -1,0 +1,70 @@
+<%= javascript_include_tag "https://code.highcharts.com/highcharts.src.js" %>
+
+<h1 class="center">Github Data</h1>
+
+<h3 class="center">Commits</h3>
+<%= line_chart @commits_by_date.map { |name, series|
+  {name: name, data: series}
+} %>
+
+<h3 class="center">Line Additions</h3>
+<%= line_chart @additions_by_date.map { |name, series|
+  {name: name, data: series}
+} %>
+
+<h3 class="center">Line Deletions</h3>
+<%= line_chart @deletions_by_date.map { |name, series|
+  {name: name, data: series}
+} %>
+
+<h3 class="center">Files Changed</h3>
+<%= line_chart @changed_files_by_date.map { |name, series|
+  {name: name, data: series}
+} %>
+
+<h3 class="center">Total Commits by User</h3>
+<table>
+  <thead>
+  <tr>
+    <th>Committer</th>
+    <th>Commits</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <% @commits_by_user.each do |name, commits| %>
+    <tr>
+      <td align="center"><%= name %></td>
+      <td align="center"><%= commits %></td>
+    </tr>
+  <% end unless @commits_by_user.nil? %>
+  </tbody>
+</table>
+
+<h3 class="center">Full Information</h3>
+<table>
+  <thead>
+  <tr>
+    <th>Message</th>
+    <th>Committer</th>
+    <th>Committed Time</th>
+    <th>Additions</th>
+    <th>Deletions</th>
+    <th>Files Changed</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
+
+  <% @commits.each do |commit| %>
+    <tr>
+      <td><%= commit.message %></td>
+      <td align="center"><%= commit.committer %></td>
+      <td align="center"><%= commit.committed_date.strftime('%Y-%m-%d') %></td>
+      <td align="center"><%= commit.additions %></td>
+      <td align="center"><%= commit.deletions %></td>
+      <td align="center"><%= commit.changed_files %></td>
+    </tr>
+  <% end unless @commits.nil? %>
+  </tbody>
+</table>

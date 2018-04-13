@@ -69,17 +69,13 @@ class AuthController < ApplicationController
     if params[:controller] == 'content_pages' and
       params[:action] == 'view'
       if session[:credentials].pages.key?(params[:page_name].to_s)
-        if session[:credentials].pages[params[:page_name].to_s] == true
-          authorised = true
-        end
+        authorised = true if session[:credentials].pages[params[:page_name].to_s] == true
       end
     else
       # Check if there's a specific permission for an action
       if session[:credentials].actions.key?(params[:controller])
         if session[:credentials].actions[params[:controller]].key?(params[:action])
-          if session[:credentials].actions[params[:controller]][params[:action]]
-            authorised = true
-          end
+          authorised = true if session[:credentials].actions[params[:controller]][params[:action]]
         else
           check_controller = true
         end
@@ -90,9 +86,7 @@ class AuthController < ApplicationController
       # Check if there's a general permission for a controller
       if check_controller
         if session[:credentials].controllers.key?(params[:controller])
-          if session[:credentials].controllers[params[:controller]]
-            authorised = true
-          end
+          authorised = true if session[:credentials].controllers[params[:controller]]
         end
       end
     end # Check permissions

@@ -43,7 +43,7 @@ Expertiza::Application.configure do
   end
 
   def filter(msg)
-    msg.gsub("\n",'  ')
+    msg.tr("\n",' ')
   end
 
   config.action_view.logger = nil

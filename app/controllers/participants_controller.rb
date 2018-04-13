@@ -142,7 +142,7 @@ class ParticipantsController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     unless params[:participant].nil?
       if !AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).empty?
-        ExpertizaLogger.error LogMessage.new(controller_name, @participant.name, "The handle #{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different one.", request)
+        ExpertizaLogger.error LogMessage.new(controller_name, @participant.name, "Handle #{params[:participant][:handle]} already in use", request)
         flash[:error] = "<b>The handle #{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different one."
         redirect_to controller: 'participants', action: 'change_handle', id: @participant
       else

@@ -37,7 +37,7 @@ class AssignmentsController < ApplicationController
 
     if @assignment_form.save
       @assignment_form.create_assignment_node
-      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "Assignment created successfully: #{@assignment_form.assignment.name}", request)
+      ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
       redirect_to edit_assignment_path @assignment_form.assignment.id
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     else
@@ -297,7 +297,7 @@ class AssignmentsController < ApplicationController
   def handle_assignment_directory_path_nonexist_case_and_answer_tagging
     if @assignment_form.assignment.directory_path.blank?
       flash.now[:error] = "You did not specify your submission directory."
-      ExpertizaLogger.error LogMessage.new(controller_name, session[:user].name, "Submission directory not specified", request)
+      ExpertizaLogger.error LogMessage.new(controller_name, "", "Submission directory not specified", request)
     end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
@@ -312,7 +312,7 @@ class AssignmentsController < ApplicationController
       flash[:note] = 'The assignment was successfully saved.'
       redirect_to list_tree_display_index_path
     else
-      ExpertizaLogger.error LogMessage.new(controller_name, session[:user].name, "Failed save: #{@assignment.errors.full_messages.join(' ')}", request)
+      ExpertizaLogger.error LogMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
       flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
       redirect_to edit_assignment_path @assignment.id
     end
@@ -337,12 +337,11 @@ class AssignmentsController < ApplicationController
 
   def update_feedback_assignment_form_attributes
     if @assignment_form.update_attributes(assignment_form_params, current_user)
-      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment_form.as_json}", request)
       flash[:note] = 'The assignment was successfully saved....'
     else
-      ExpertizaLogger.error LogMessage.new(controller_name, session[:user].name, "Failed to save the assignment #{@assignment_form.assignment.id}", request)
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
+    ExpertizaLogger.info LogMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
   def assignment_form_params

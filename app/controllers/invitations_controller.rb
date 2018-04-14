@@ -14,7 +14,7 @@ class InvitationsController < ApplicationController
     if Invitation.is_invited?(@student.user_id, @user.id, @student.parent_id)
       create_utility
     else
-      ExpertizaLogger.error LogMessage.new(controller_name, @student.name, "Student #{@user.id} was already invited", request)
+      ExpertizaLogger.error LogMessage.new("", @student.name, "Student was already invited")
       flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
     end
 
@@ -41,12 +41,12 @@ class InvitationsController < ApplicationController
 
   def accept
     # Accept the invite and check whether the add was successful
-    unless Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
+    accepted = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
+    unless accepted
       flash[:error] = 'The system failed to add you to the team that invited you.'
-      ExpertizaLogger.info LogMessage.new(controller_name, @student.name, "Invitation #{params[:inv_id]} by #{@inv.from_id} could not be accepted", request)
     end
 
-    ExpertizaLogger.info LogMessage.new(controller_name, @student.name, "Accepted invitation #{params[:inv_id]} sent by #{@inv.from_id}", request)
+    ExpertizaLogger.info "Accepting Invitation #{params[:inv_id]}: #{accepted}"
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -56,13 +56,13 @@ class InvitationsController < ApplicationController
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])
-    ExpertizaLogger.info LogMessage.new(controller_name, student.name, "Declined invitation #{params[:inv_id]} sent by #{@inv.from_id}", request)
+    ExpertizaLogger.info "Declined invitation #{params[:inv_id]} sent by #{@inv.from_id}"
     redirect_to view_student_teams_path student_id: student.id
   end
 
   def cancel
     Invitation.find(params[:inv_id]).destroy
-    ExpertizaLogger.info LogMessage.new(controller_name, params[:student_id], "Successfully retracted invitation #{params[:inv_id]}", request)
+    ExpertizaLogger.info "Successfully retracted invitation #{params[:inv_id]}"
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 

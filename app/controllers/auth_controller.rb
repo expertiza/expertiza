@@ -32,7 +32,7 @@ class AuthController < ApplicationController
   # function to handle common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
-    ExpertizaLogger.info LogMessage.new(controller_name, user.name, 'Login successful', request)
+    ExpertizaLogger.info LogMessage.new("", user.name, 'Login successful')
     AuthController.set_current_role(user.role_id, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
@@ -74,8 +74,8 @@ class AuthController < ApplicationController
     else
       # Check if there's a specific permission for an action
       if session[:credentials].actions.key?(params[:controller])
-        if session[:credentials].actions[params[:controller]].key?(params[:action])
-          authorised = true if session[:credentials].actions[params[:controller]][params[:action]]
+        if session[:credentials].actions[params[:controller]].key?(params[:action]) and session[:credentials].actions[params[:controller]][params[:action]]
+          authorised = true
         else
           check_controller = true
         end
@@ -85,8 +85,8 @@ class AuthController < ApplicationController
 
       # Check if there's a general permission for a controller
       if check_controller
-        if session[:credentials].controllers.key?(params[:controller])
-          authorised = true if session[:credentials].controllers[params[:controller]]
+        if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
+          authorised = true
         end
       end
     end # Check permissions

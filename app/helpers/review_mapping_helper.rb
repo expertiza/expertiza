@@ -74,30 +74,36 @@ module ReviewMappingHelper
   def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..@assignment.num_review_rounds).each do |round|
-      if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
-        instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].inspect + '%')
+      if @response_report_result.review_scores[reviewer_id] &&
+         @response_report_result.review_scores[reviewer_id][round] &&
+         @response_report_result.review_scores[reviewer_id][round][team_id] &&
+         @response_report_result.review_scores[reviewer_id][round][team_id] != -1.0
+        instance_variable_set("@score_awarded_round_" + round.to_s, @response_report_result.review_scores[reviewer_id][round][team_id].inspect + '%')
       end
     end
   end
 
   def get_min_max_avg_value_for_review_report(round, team_id)
     %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
+    if @response_report_result.avg_and_ranges[team_id] &&
+       @response_report_result.avg_and_ranges[team_id][round] &&
+       %i[max min avg].all? {|k| @response_report_result.avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
+        metric_value = @response_report_result.avg_and_ranges[team_id][round][metric].nil? ?
+                       '-----' : @response_report_result.avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
         instance_variable_set('@' + metric.to_s, metric_value)
       end
     end
   end
 
   def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r|
+    @response_report_result.reviewers.each do |r|
       r.overall_avg_vol,
       r.avg_vol_in_round_1,
       r.avg_vol_in_round_2,
       r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
-    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+    @response_report_result.reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
@@ -167,7 +173,8 @@ module ReviewMappingHelper
       # Calculate feedback response map records
       instance_variable_set('@feedback_response_maps_round_' + round_num,
                             FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
-                                                       instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
+                                                       @response_report_result.instance_variable_get('@all_review_response_ids_round_' + round_num),
+                                                       author.id]))
     end
     # rspan means the all peer reviews one student received, including unfinished one
     @rspan_round_one = @review_responses_round_one.length
@@ -176,7 +183,8 @@ module ReviewMappingHelper
   end
 
   def get_certain_round_review_and_feedback_response_map_for_feedback_report(author)
-    @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
+    @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
+                                                        @response_report_result.all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
     @review_responses = Response.where(["map_id IN (?)", @review_response_map_ids])

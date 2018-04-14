@@ -3,17 +3,17 @@ th, td {
     padding: 5px;
 }
 </style>
-<% @calibration_response_maps.each_with_index do |response_map, index| %>
+<% @response_report_result.calibration_response_maps.each_with_index do |response_map, index| %>
 	<% team = Team.find(response_map.reviewee_id) %>
-	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>
-	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
-	<% current_responses = @responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
+	<% min_question_score = @response_report_result.assignment_questionnaire.questionnaire.min_question_score %>
+	<% max_question_score = @response_report_result.assignment_questionnaire.questionnaire.max_question_score %>
+	<% current_responses = @response_report_result.responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
 	<% response_ids = Array.new %>
 	<% current_responses.each { |curr_response|response_ids << curr_response.id } %>
 	<% participant_num = current_responses.count %>
 	
 	<h3> <%= "Calibration #{index+1} (team name:  #{team.name})" %></h3>
-	<% @questions.each_with_index do |question, index| %>
+	<% @response_report_result.questions.each_with_index do |question, index| %>
 		<% instructor_answer = Answer.select('answer').where(["question_id = ? and response_id = ?", question.id, response_map.response[0].id]).first.answer ||= 0 %>
 		<b><%= "Question #{index+1}: " %></b><%= question.txt %>
 		<table border="1">

@@ -85,9 +85,7 @@ class AuthController < ApplicationController
 
       # Check if there's a general permission for a controller
       if check_controller
-        if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
-          authorised = true
-        end
+        authorised = true if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
       end
     end # Check permissions
 

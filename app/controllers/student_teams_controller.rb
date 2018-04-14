@@ -152,11 +152,10 @@ class StudentTeamsController < ApplicationController
   end
 
   def remove_team_user(team_user)
-    if team_user
-      team_user.destroy_all
-      undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
-      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
-    end
+    return false unless team_user
+    team_user.destroy_all
+    undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
+    ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
   end
 
   def team_created_successfully(current_team = nil)

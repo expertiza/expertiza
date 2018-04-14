@@ -17,6 +17,15 @@
                   <% assignment_team.hyperlinks.each do |assignment_link| %>
                       <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
                   <%end%>
+                  <% assignment_team.submitted_files.each do |submitted_file| %>
+                      <li>
+                        <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
+                                    :action => 'download',
+                                    :download => File.basename(submitted_file)
+                        %>
+                      </li>
+                  <%end%>
+
                 </ul>
               </li>
           <%end%>
@@ -40,7 +49,16 @@
                   <h4>Team name : <%=assignment_team.name%></h4>
                   <% assignment_team.hyperlinks.each do |assignment_link| %>
                     <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
-                <%end%>
+                  <%end%>
+
+                  <% assignment_team.submitted_files.each do |submitted_file| %>
+                      <li>
+                        <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
+                                    :action => 'download',
+                                    :download => File.basename(submitted_file)
+                        %>
+                      </li>
+                  <%end%>
                 </li>
               </ul>
           <%end%>

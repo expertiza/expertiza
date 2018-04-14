@@ -22,6 +22,17 @@ class SampleSubmissionsController < ApplicationController
     @assignment_teams_professor = AssignmentTeam.where(parent_id: @assignment.sample_assignment_id, make_public: true)
     @assignment_due_date = DueDate.where(parent_id: @assignment.id).last
     @assignment_due_date = @assignment_due_date.due_at unless @assignment_due_date.nil?
+
+    #Get List of files submitted in the assignments
+
+    @assignment_teams.each do |assignment_team|
+      assignment_team.submitted_files = Dir.entries(@assignment.directory_path + "/" + assignment_team.directory_num)
+    end
+
+    professor_chosen_assignment = Assignment.where(id: @assignment.sample_assignment_id).first
+    @assignment_teams_professor.each do |assignment_team|
+      assignment_team.submitted_files = Dir.entries(professor_chosen_assignment.directory_path + "/" + assignment_team.directory_num)
+    end
   end
 
   private

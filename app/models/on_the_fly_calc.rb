@@ -50,6 +50,7 @@ module OnTheFlyCalc
   end
 
   def scores(questions)
+    index = 0
     score_assignment
     self.teams.each do |team|
       score_team = {}
@@ -60,11 +61,11 @@ module OnTheFlyCalc
         calculate_assessment
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
-        score_team[:scores] = Answer.compute_scores(assessments, questions[:review])
+        score_team[:scores] = Answer.compute_scores(assessments, questions)
       end
       index += 1
     end
-    scores
+    score
   end
 end
 
@@ -86,7 +87,7 @@ def calculate_rounds
     grades_by_rounds = {}
     assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
     round_sym = ("review" + i.to_s).to_sym
-    grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+    grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions)
     total_num_of_assessments += assessments.size
     total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
   end

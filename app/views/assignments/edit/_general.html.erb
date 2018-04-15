@@ -48,6 +48,7 @@ function microtaskChanged() {
 <td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), :selected => @assignment_form.assignment.course_id) %></td>
 </tr>
 
+
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
 <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px') %>  (Mandatory field. No space or special chars.)
@@ -59,6 +60,14 @@ function microtaskChanged() {
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
 <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px') %></td>
 </tr>
+
+  <!-- Adding sample submissions for students to refer to -->
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][sample_assignment_id]', 'Sample Assignment:') %>
+      <img src="/assets/info.png" title='- Select an assignment that students can refer sample submission from.'>
+    </td>
+    <td style='padding:5px'><%= select('assignment_form[assignment]', 'sample_assignment_id', sample_sub_options, :selected => @assignment_form.assignment.sample_assignment_id) %></td>
+  </tr>
 </table>
 
 <br/>

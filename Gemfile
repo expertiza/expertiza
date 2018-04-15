@@ -16,6 +16,7 @@ gem 'capistrano-passenger'
 gem 'capistrano-rails'
 gem 'capistrano-rvm'
 gem 'coveralls', require: false
+gem 'chartjs-ror'
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'

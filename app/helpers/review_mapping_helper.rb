@@ -97,6 +97,10 @@ module ReviewMappingHelper
       r.avg_vol_in_round_2,
       r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
+    @all_reviewers_overall_avg_vol = @reviewers.inject(0){|sum, r| sum += r.overall_avg_vol} / @reviewers.length
+    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0){|sum, r| sum += r.avg_vol_in_round_1} / @reviewers.length
+    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0){|sum, r| sum += r.avg_vol_in_round_2} / @reviewers.length
+    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0){|sum, r| sum += r.avg_vol_in_round_3} / @reviewers.length
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
@@ -107,6 +111,91 @@ module ReviewMappingHelper
     metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
     metric += ")"
     metric.html_safe
+  end
+
+  def display_volume_metric_chart(reviewer)
+    round = 0
+    labels = []
+    reviewer_data = []
+    all_reviewers_data = []
+    if @all_reviewers_avg_vol_in_round_1 > 0
+      round += 1
+      labels.push '1st'
+      reviewer_data.push reviewer.avg_vol_in_round_1
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round_1
+    end
+    if @all_reviewers_avg_vol_in_round_2 > 0
+      round += 1
+      labels.push '2nd'
+      reviewer_data.push reviewer.avg_vol_in_round_2
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round_2
+    end
+    if @all_reviewers_avg_vol_in_round_3 > 0
+      round += 1
+      labels.push '3rd'
+      reviewer_data.push reviewer.avg_vol_in_round_3
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round_3
+    end
+    labels.push 'Total'
+    reviewer_data.push reviewer.overall_avg_vol
+    all_reviewers_data.push @all_reviewers_overall_avg_vol
+
+    data = {
+        labels: labels,
+        datasets: [
+          {
+              label: 'vol.',
+              backgroundColor: "rgba(255,99,132,0.8)",
+              borderWidth: 1,
+              data: reviewer_data,
+              yAxisID: "bar-y-axis1"
+          },
+          {
+              label: 'avg. vol.',
+              backgroundColor: "rgba(255,206,86,0.8)",
+              borderWidth: 1,
+              data: all_reviewers_data,
+              yAxisID: "bar-y-axis2"
+          }
+        ]
+    }
+    options = {
+        legend: {
+            position: 'top',
+            labels: {
+                usePointStyle: true
+            }
+        },
+        width: "200",
+        height: "200",
+        scales: {
+            yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10,
+                    }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 15,
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                          offsetGridLines: true
+                         }
+                      }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {
+                          beginAtZero: true,
+                          stepSize: 50,
+                          max: 400
+                        },
+                    }]
+        }
+    }
+    horizontal_bar_chart data, options
   end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)

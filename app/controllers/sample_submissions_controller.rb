@@ -23,16 +23,17 @@ class SampleSubmissionsController < ApplicationController
     @assignment_due_date = DueDate.where(parent_id: @assignment.id).last
     @assignment_due_date = @assignment_due_date.due_at unless @assignment_due_date.nil?
 
-    #Get List of files submitted in the assignments
+    # For retrieving paths of files uploaded for the assignment submission
+    @assignment_path = get_assignment_directory(@assignment)
+    @instructor_chosen_assignment = Assignment.find(@assignment.sample_assignment_id) unless @assignment.sample_assignment_id.nil?
+    @instructor_chosen_assignment_path = get_assignment_directory(@instructor_chosen_assignment) unless @instructor_chosen_assignment.nil?
+  end
 
-    @assignment_teams.each do |assignment_team|
-      assignment_team.submitted_files = Dir.entries(@assignment.directory_path + "/" + assignment_team.directory_num)
-    end
-
-    professor_chosen_assignment = Assignment.where(id: @assignment.sample_assignment_id).first
-    @assignment_teams_professor.each do |assignment_team|
-      assignment_team.submitted_files = Dir.entries(professor_chosen_assignment.directory_path + "/" + assignment_team.directory_num)
-    end
+  def get_assignment_directory(assignment)
+    instructor_name = User.find(assignment.instructor_id).name
+    course_directory_path = Course.find(assignment.course_id).directory_path
+    assignment_directory_path = assignment.directory_path
+    "#{Rails.root}/pg_data/#{instructor_name}/#{course_directory_path}/#{assignment_directory_path}/"
   end
 
   private

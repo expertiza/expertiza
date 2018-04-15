@@ -136,7 +136,7 @@
               <!--make assignment public-->
               <% if !participant.team.nil? %>
                 <td align=center>
-                  <input class='make-public-check' teamid="<%= participant.team.id %>" type="checkbox" <% if participant.team.make_public %>checked<% end %>>
+                  <input id="makeSubPublic" teamid="<%= participant.team.id %>" type="checkbox" <% if participant.team.make_public %>checked<% end %>>
                 </td>
               <% end %>
             </tr>

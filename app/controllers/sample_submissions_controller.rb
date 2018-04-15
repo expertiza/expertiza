@@ -22,26 +22,17 @@ class SampleSubmissionsController < ApplicationController
     @assignment_teams_professor = AssignmentTeam.where(parent_id: @assignment.sample_assignment_id, make_public: true)
     @assignment_due_date = DueDate.where(parent_id: @assignment.id).last
     @assignment_due_date = @assignment_due_date.due_at unless @assignment_due_date.nil?
-    @assignment_path = "#{Rails.root}/pg_data/#{User.find(@assignment.instructor_id).name}/#{Course.find(@assignment.course_id).directory_path}/#{@assignment.directory_path}/"
-    @instructor_chosen_assignment = Assignment.find(@assignment.sample_assignment_id) unless @assignment.sample_assignment_id.nil?
-    @instructor_chosen_assignment_path = "#{Rails.root}/pg_data/#{User.find(@instructor_chosen_assignment.instructor_id).name}/#{Course.find(@instructor_chosen_assignment.course_id).directory_path}/#{@instructor_chosen_assignment.directory_path}/" unless @instructor_chosen_assignment.nil?
+
     #Get List of files submitted in the assignments
 
-    # @assignment_teams.each do |assignment_team|
-    #   path = "#{Rails.root}/pg_data/#{User.find(@assignment.instructor_id).name}/#{Course.find(@assignment.course_id).directory_path}/#{@assignment.directory_path}/#{assignment_team.directory_num.to_s}"
-    #   puts path
-    #   @assignment_team.submitted_files = Dir.entries(path)
-    # end
-    #
-    # professor_chosen_assignment = Assignment.where(id: @assignment.sample_assignment_id).first
-    # @assignment_teams_professor.each do |assignment_team|
-    #   path = "#{Rails.root}/pg_data/#{User.find(@assignment.instructor_id).name}/#{Course.find(professor_chosen_assignment.course_id).directory_path}/#{professor_chosen_assignment.directory_path}/#{assignment_team.directory_num.to_s}"
-    #
-    #   #path = "#{Rails.root}/pg_data/#{@assignment.instructor_id}/#{professor_chosen_assignment.directory_path}/#{assignment_team.directory_num.to_s}"
-    #   puts path
-    #   @assignment_team.submitted_files = Dir.entries(path)
-    #   #assignment_team.submitted_files = Dir.entries(Rails.root + "/pg_data/"+ professor_chosen_assignment.directory_path + "/" + (assignment_team.directory_num).to_s)
-    # end
+    @assignment_teams.each do |assignment_team|
+      assignment_team.submitted_files = Dir.entries(@assignment.directory_path + "/" + assignment_team.directory_num)
+    end
+
+    professor_chosen_assignment = Assignment.where(id: @assignment.sample_assignment_id).first
+    @assignment_teams_professor.each do |assignment_team|
+      assignment_team.submitted_files = Dir.entries(professor_chosen_assignment.directory_path + "/" + assignment_team.directory_num)
+    end
   end
 
   private

@@ -114,7 +114,7 @@ function deleteSelectedFile(){
 }
 
 
-$(document).ready(function() {
+$(document).ready(function(){
 
     // Function that confirms user action via a popup message.
     // If confirmed, it creates the backend API request.
@@ -131,15 +131,15 @@ $(document).ready(function() {
                 }
             });
         }
-        else {
+        else{
             //Cancel checkbox checking/unchecking
             event.preventDefault();
         }
     }
 
     //Check the value of checkbox and take action accordingly
-    $(".make-public-check").click(function (event) {
-        if (!$(this).prop("checked"))
+    $("#makeSubPublic").click(function(event){
+        if(!$(this).prop("checked"))
             confirmAndUpdate("Please press OK to revoke permission.", event);
         else
             confirmAndUpdate("Please press OK to provide permission.", event);

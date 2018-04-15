@@ -17,7 +17,7 @@
                   <% assignment_team.hyperlinks.each do |assignment_link| %>
                       <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
                   <%end%>
-                  <% assignment_team.submitted_files.each do |submitted_file| %>
+                  <% Dir.entries(@assignment_path + assignment_team.directory_num.to_s).each do |submitted_file| %>
                       <li>
                         <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
                                     :action => 'download',
@@ -51,7 +51,7 @@
                     <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
                   <%end%>
 
-                  <% assignment_team.submitted_files.each do |submitted_file| %>
+                  <% Dir.entries(@instructor_chosen_assignment_path + assignment_team.directory_num.to_s).each do |submitted_file| %>
                       <li>
                         <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
                                     :action => 'download',

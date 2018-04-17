@@ -47,8 +47,8 @@
     <ul>
       <% @assignment_teams_professor.each do |assignment_team| %>
           <% if assignment_team.hyperlinks != [] %>
-              <ul>
-                <li>
+              <li>
+                <ul>
                   <h4>Team name : <%=assignment_team.name%></h4>
                   <% assignment_team.hyperlinks.each do |assignment_link| %>
                     <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
@@ -67,8 +67,8 @@
                       </li>
                     <%end%>
                   <%end%>
-                </li>
-              </ul>
+                </ul>
+              </li>
           <%end%>
       <% end%>
     </ul>

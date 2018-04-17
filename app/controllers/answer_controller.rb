@@ -14,12 +14,14 @@ class AnswerController < ApplicationController
 
   # GET /answer?response_id=xx&questionnaire_id=xx
   def index
-    response_id = params[:response_id] if params.key?(:response_id)
-    questionnaire_id = params[:questionnaire_id] if params.key?(:questionnaire_id)
+    if params.key?(:response_id)
+        join_query = sanitize_sql_array(["LEFT JOIN answers ON answers.question_id = questions.id AND answers.response_id = '?'", params[:response_id])
+    end
+    where_query = sanitize_sql_array(["questions.questionnaire_id = '?'", params[:questionnaire_id]) if params.key?(:questionnaire_id)
     # get all answers given the questionaire and response id
-    question_answers = Question.joins(sanitize_sql_array(["LEFT JOIN answers ON answers.question_id = questions.id AND answers.response_id = '?'", response_id]))
+    question_answers = Question.joins(join_query)
                            .select('answers.*, questions.txt as qtxt, questions.type as qtype, questions.seq as qseq')
-                           .where(sanitize_sql_array(["questions.questionnaire_id = '?'", questionnaire_id]))
+                           .where(where_query)
                            .order("seq asc")
     render :json => question_answers
   end

@@ -42,7 +42,7 @@ class SampleSubmissionsController < ApplicationController
     instructor_name = User.find(assignment.instructor_id).name
     course_directory_path = Course.find(assignment.course_id).directory_path
     assignment_directory_path = assignment.directory_path
-    Rails.root.join('pg_data',instructor_name, course_directory_path, assignment_directory_path)
+    Rails.root.join('pg_data', instructor_name, course_directory_path, assignment_directory_path)
   end
 
   private

@@ -15,25 +15,34 @@ class SampleSubmissionsController < ApplicationController
 
   def show; end
 
-  # GET /sample_submissions
-  def index
+  def init_sample_submissions
+    # Retrieve links submitted by students in sample submission assignments
     @assignment_teams = AssignmentTeam.where(parent_id: sample_submission_params[:id], make_public: true)
     @assignment = Assignment.where(id: sample_submission_params[:id]).first
     @assignment_teams_professor = AssignmentTeam.where(parent_id: @assignment.sample_assignment_id, make_public: true)
     @assignment_due_date = DueDate.where(parent_id: @assignment.id).last
     @assignment_due_date = @assignment_due_date.due_at unless @assignment_due_date.nil?
+  end
 
+  def init_assignment_paths
     # For retrieving paths of files uploaded for the assignment submission
     @assignment_path = get_assignment_directory(@assignment)
     @instructor_chosen_assignment = Assignment.find(@assignment.sample_assignment_id) unless @assignment.sample_assignment_id.nil?
     @instructor_chosen_assignment_path = get_assignment_directory(@instructor_chosen_assignment) unless @instructor_chosen_assignment.nil?
   end
 
+  # GET /sample_submissions
+  def index
+    # Initialize variables required in view.
+    init_sample_submissions
+    init_assignment_paths
+  end
+
   def get_assignment_directory(assignment)
     instructor_name = User.find(assignment.instructor_id).name
     course_directory_path = Course.find(assignment.course_id).directory_path
     assignment_directory_path = assignment.directory_path
-    "#{Rails.root}/pg_data/#{instructor_name}/#{course_directory_path}/#{assignment_directory_path}/"
+    Rails.root.join('pg_data',instructor_name, course_directory_path, assignment_directory_path)
   end
 
   private

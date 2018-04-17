@@ -27,19 +27,22 @@
           %th{:align => "left", :width => "50%"} Question
           %th{:width => "5%"} Score
           %th{:width => "45%"} Comments
-        - instance_variable_get('@scores_round_' + round.to_s).each do |s|
+        - instance_variable_get('@scores_round_' + round.to_s).each do |answer|
           %tr
             %td{:align => "left"}
-              = Question.find(s.question_id).txt
-            - if Question.find(s.question_id).is_a?(ScoredQuestion)
+              = answer.question.txt
+            - if answer.question.is_a?(ScoredQuestion)
               %td{:align => "center"}
-                = s.answer
+                = answer.answer
                 \/#{instance_variable_get('@max_score_round_' + round.to_s)}
-            - else
+            - elsif answer.question.is_a?(Checkbox)
               %td{:align => "center"}
-                = s.answer
+                =answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png")
+            -else
+              %td{:align => "center"}
+                =answer.answer
             %td{:align => "left"}
-              = s.comments
+              = answer.comments
         %tr
           %th Reviewer Score (Σ weighted score/Σ weighted available score)
           %td{:align => "center"}

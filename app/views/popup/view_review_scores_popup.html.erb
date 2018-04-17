@@ -6,7 +6,7 @@
   <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
   <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
   <h4><%=key%></h4>
-  <table border="1">
+  <table class="general" border="1">
 
 
     <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>
@@ -20,8 +20,6 @@
         </tr>
         <tr>
           <td width="60%"> Reviewee </td>
-
-
           <td width="10%"> Score </td>
           <td width="70%"> Comments </td>
         </tr>
@@ -46,7 +44,12 @@
                 <p style="color: <%= col_color%>"><%=team.name%> <br>
               </td>
               <!--Score-->
-              <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
+              <% if question.instance_of? Checkbox %>
+                <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer==0 ? image_tag("delete_icon.png"): image_tag("check-icon.png") %></p></td>
+              <% else %>
+                <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
+              <% end %>
+
               <!--Comments-->
               <td align = 'left'><p style="color: <%= col_color%>"><%= answer.comments %></p></td>
             </tr>

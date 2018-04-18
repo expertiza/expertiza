@@ -296,7 +296,7 @@ jQuery(document).ready(function() {
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
       var institution_name = "-"
-      if(this.props.institution.length != 0){
+      if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
         institution_name = this.props.institution[0].name
       }
         if (this.props.dataType == 'course') {
@@ -516,7 +516,7 @@ jQuery(document).ready(function() {
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
       var institution_name = "-"
-      if(this.props.institution.length != 0){
+      if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
         institution_name = this.props.institution[0].name
       }
       if (this.props.dataType == 'course') {

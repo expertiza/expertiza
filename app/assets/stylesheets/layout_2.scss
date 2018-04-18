@@ -754,13 +754,14 @@ table.general td {
 .overflow-container{
   overflow-y: scroll;
   max-width: 93vw;
+  padding-top: 10px;
 }
 
 .width-266 {
   width: 266px !important;
 }
 
-@for $i from 1 through 25 {
+@for $i from 1 through 50 {
   .width-#{$i * 10} {
     width: #{$i * 10}px !important;
   }

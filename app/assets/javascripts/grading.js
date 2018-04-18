@@ -61,10 +61,12 @@
         var header = document.getElementById(elementId+'_header');
 	
   	while (obj != null){ 
+
+      header.style.backgroundColor = 'white';
+      header.style.color = "#000000";
   	  var bExpand = obj.style.display.length == 0;	  	   	  
   	  if (bExpand) {
-            collapseObj(obj, atag);   	         	  	       
-            header.style.backgroundColor = 'white';
+            collapseObj(obj, atag);
   	  }
   	  else {
   	    obj.style.display = '';

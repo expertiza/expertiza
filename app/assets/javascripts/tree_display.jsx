@@ -295,11 +295,15 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
+      var institution_name = "-"
+      if(this.props.institution.length != 0){
+        institution_name = this.props.institution[0].name
+      }
         if (this.props.dataType == 'course') {
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[3]}>{institution_name}</td>
                     <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                     <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                     <td width={colWidthArray[6]}>
@@ -511,11 +515,15 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
+      var institution_name = "-"
+      if(this.props.institution.length != 0){
+        institution_name = this.props.institution[0].name
+      }
       if (this.props.dataType == 'course') {
           return (
               <tr onClick={this.handleClick} id={this.props.id}>
                   <td width={colWidthArray[0]}>{this.props.name}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[3]}>{institution_name}</td>
                   <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                   <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                   <td width={colWidthArray[6]}>

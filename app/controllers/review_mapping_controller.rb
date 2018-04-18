@@ -115,8 +115,12 @@ class ReviewMappingController < ApplicationController
     # rescue Exception => e
     #   flash[:error] = (e.nil?) ? $! : e
     # end
+    if current_user_role ==2 or current_user_role ==6
+      redirect_to controller: 'response', action: 'new', id: reviewer.id
+    else
+      redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+    end
 
-    redirect_to controller: 'student_review', action: 'list', id: reviewer.id
   end
 
   # assigns the quiz dynamically to the participant

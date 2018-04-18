@@ -51,7 +51,7 @@ function toggleFunction(elementId) {
 </script>
 <h1>Review Report for assignment: <%= @assignment.name %></h1>
 <h4>Team: <%= @team.name %></h4>
-<button onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
+<button class="btn btn-default" onclick="toggleFunction('<%= @type + @participant.id.to_s%>')">Show Submission</button>
 <div id="<%= @type + @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
@@ -70,7 +70,7 @@ function toggleFunction(elementId) {
 
           <!-- display the list of questions for this questionnaire -->
           <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
-            <table class="tbl_questlist" >
+            <table class="table tbl_questlist" >
               <thead>
               <th>#</th>
               <th>Question</th>
@@ -103,7 +103,7 @@ function toggleFunction(elementId) {
 
           </span>
 
-          <table id='<%="scoresTable"+@type + @participant.id.to_s%>' class="tbl_heat tablesorter">
+          <table id='<%="scoresTable"+@type + @participant.id.to_s%>' class="table tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr>
@@ -169,9 +169,9 @@ function toggleFunction(elementId) {
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
                   <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= @type + @participant.id.to_s + row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
-                    <div style="background-color:lightblue;padding:4px;"><%= row.question_text %></div>
+                    <div style="padding-top: 10px; padding-bottom: 10px"><%= row.question_text %></div>
                     <div>
-                      <table class="tbl_questlist">
+                      <table class="table tbl_questlist">
                         <thead>
                         <th>Review </th>
                         <th>Score</th>
@@ -206,7 +206,7 @@ function toggleFunction(elementId) {
               <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
                 <div id="hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
                   <div style="background-color:#A9A9F5;padding:4px;">
-                    <table class="tbl_addlcmt">
+                    <table class="table tbl_addlcmt">
                       <thead>
                       <th>Review</th>
                       <th >Additional Comments</th>

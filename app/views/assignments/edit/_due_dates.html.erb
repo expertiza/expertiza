@@ -136,7 +136,7 @@
         html += '<td align="center" class="due_date_due_at">' +
         '<input id="datetimepicker_' + element_id +
         '" name="assignment_form[due_date][][due_at]"  type="text" style="width: 140px;text-align:center;" value="' +
-        due_at.substr(0, 16) + '">' + '</td>';
+        due_at.substr(0, 16) + '" class="form-control">' + '</td>';
     html += '<td align="center" class="due_date_due_at" width="5%">' + '<input id="use_updator_' + element_id +
         '" type="checkbox" name="updatorCheck" style="width: 20px">' + '</td>';
         
@@ -145,7 +145,7 @@
         //     html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" disabled>'
         // }
         // else{
-        html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]">'
+        html += '<select id="due_date_submission_allowed_id" name="assignment_form[due_date][][submission_allowed_id]" class="form-control" style="width: 75px">'
         // }
         html +=
         '<option value="1">No</option>' +
@@ -158,7 +158,7 @@
         //     html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" disabled>'
         // }
         // else{
-            html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]">'
+            html += '<select id="due_date_review_allowed_id" name="assignment_form[due_date][][review_allowed_id]" class="form-control" style="width: 75px">'
         // }
          html +=
         '<option value="1">No</option>' +
@@ -167,7 +167,7 @@
         '</select></td>';
 
         html += '<td align="center" class="due_date_teammate_review_allowed_id" width="10%">';
-        html += '<select id="due_date_teammate_review_allowed_id" name="assignment_form[due_date][][teammate_review_allowed_id]">'
+        html += '<select id="due_date_teammate_review_allowed_id" name="assignment_form[due_date][][teammate_review_allowed_id]" class="form-control" style="width: 75px">'
          html +=
         '<option value="1">No</option>' +
         '<option value="2">Late</option>' +
@@ -179,7 +179,7 @@
         //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
         // }
         // else{
-            html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]">'
+            html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" class="form-control" style="width: 75px">'
         // }
         html +=
         '<option value="1">No</option>' +
@@ -190,7 +190,7 @@
         if (<%= @assignment_form.assignment.require_quiz == nil ? false : @assignment_form.assignment.require_quiz %>)
         {
             html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +
-            '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]">' +
+            '<select id="due_date_quiz_allowed_id" name="assignment_form[due_date][][quiz_allowed_id]" class="form-control" style="width: 75px">' +
             '<option value="1">No</option>' +
             '<option value="2">Late</option>' +
             '<option value="3">Yes</option>' +
@@ -201,7 +201,7 @@
         }
 
         html += '<td align="center" class="due_date_threshold" width="10%">' +
-        '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]">' +
+        '<select id="due_date_threshold" name="assignment_form[due_date][][threshold]" class="form-control" style="width: 75px">' +
         '<option value="">No</option>' +
         '<option value="1">1</option>' +
         '<option value="8">8</option>' +
@@ -220,9 +220,9 @@
         var html2 = html;
 
         html += '<td  align="center" id="specialname" class="due_date_name" width="10%">';
-        html += '<input id="due_date_name" type="text" name="assignment_form[due_date][][deadline_name]" value="'+due_date.deadline_name+'">'+'</td>';
+        html += '<input id="due_date_name" type="text" name="assignment_form[due_date][][deadline_name]" value="'+due_date.deadline_name+'" class="form-control">'+'</td>';
         html += '<td align="center" id="due_date_url_col" class="due_date_description_url" width="10%">';
-        html += '<input id="due_date_description_url" type="text" name="assignment_form[due_date][][description_url]" value="'+due_date.description_url+'">'+'</td>';
+        html += '<input id="due_date_description_url" type="text" name="assignment_form[due_date][][description_url]" value="'+due_date.description_url+'" class="form-control">'+'</td>';
         if (addnameurl==false){
             previous_element.after(html2);
         }
@@ -478,10 +478,10 @@ function addDaysOrMonth(mul, type) {
 
 </script>
 
-<div style='padding: 5px' id='review_round'>
+<div style='padding: 5px' id='review_round' class="form-inline">
 <%= label_tag('assignment_form[assignment][rounds_of_reviews]', 'Number of review rounds:') %>
-<%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:50px') %>
-  <button type="button" id="set_rounds">Set</button><label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
+<%= text_field_tag('assignment_form[assignment][rounds_of_reviews]', @assignment_form.assignment.rounds_of_reviews, :style => 'width:150px', class: "form-control") %>
+  <button type="button" id="set_rounds" class="btn btn-default">Set</button><label style='padding-left: 300px; text-align:right;'>Timezone : <%= current_user.timezonepref %></label>
 </div>
 
 <%= hidden_field(:set_pressed, :bool, :value => true) %>
@@ -514,17 +514,17 @@ function addDaysOrMonth(mul, type) {
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
 <%= label_tag('metareviewAllowed', 'Use metareview deadline') %><br/>
 <div id="date_updater_div">
-                                                    <button type="button" id="show_date_updater">Show/Hide Date Updater</button>
+                                                    <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px;">Show/Hide Date Updater</button>
                                                     <div id="date_updater_inner">
 
                                                         <%= label_tag('Days') %>
-                                                            <button type="button" id="addDays_btn">+</button>
+                                                            <button type="button" id="addDays_btn" class="btn btn-default">+</button>
 								<input id="days" type="number" name="quantity" min="0" value="0" style="width:50px">
-                                                                <button type="button" id="subDays_btn">-</button>
+                                                                <button type="button" id="subDays_btn" class="btn btn-default">-</button>
 
                                                 </div>
 												</div>
-<table class='exp' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden;'>
+<table class='exp table table-striped' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden; font-size: 15px'>
 
 <tr id='due_date_heading'>
 <th width=10% style="text-align:left;">Deadline type</th>

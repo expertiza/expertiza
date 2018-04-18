@@ -1,7 +1,7 @@
 <h1>Assignments</h1>
 <%= render 'publishing_rights' %>
 
-<div style="width: 1024px">
+<div style="">
   <div class="taskbox">
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
 
@@ -88,9 +88,8 @@
 </div>
 
 <div class="topictable">
-  <table class="table" cellpadding="2">
+  <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
-      <th>&nbsp;</th>
       <th>Assignment</th>
       <th>Course</th>
       <th>Topic</th>
@@ -104,7 +103,6 @@
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
         <tr class="listingRow">
-          <td>&nbsp;</td>
           <!--assignment-->
           <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
           <!--course-->

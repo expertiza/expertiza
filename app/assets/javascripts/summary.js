@@ -2,8 +2,8 @@
  * Created by ferry on 3/8/16.
  */
 
-var mImg = "/assets/arrow_down.png";
-var pImg = "/assets/arrow_right.png";
+var mImg = "/assets/expand.png";
+var pImg = "/assets/collapse.png";
 $(document).ready(function(){
 
     // toggle icon collapse

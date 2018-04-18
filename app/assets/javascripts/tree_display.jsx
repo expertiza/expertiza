@@ -10,6 +10,31 @@ jQuery(document).ready(function() {
     }
   }
 
+  function formatDate(date) {
+    var month = new Array();
+    month[0] = "Jan";
+    month[1] = "Feb";
+    month[2] = "Mar";
+    month[3] = "Apr";
+    month[4] = "May";
+    month[5] = "Jun";
+    month[6] = "Jul";
+    month[7] = "Aug";
+    month[8] = "Sep";
+    month[9] = "Oct";
+    month[10] = "Nov";
+    month[11] = "Dec";
+
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+    return month[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() + " - " + strTime;
+  }
+
   function showIntelligentAssignmentDialog() {
     jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
   }
@@ -32,6 +57,7 @@ jQuery(document).ready(function() {
     },
     render: function() {
       var moreContent = []
+      var buttonContent = ""
       var moreButtonStyle = {
         "display": "",
         "padding": "0 2px"
@@ -80,7 +106,6 @@ jQuery(document).ready(function() {
             <span>
               <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
-              <a title={this.props.private? "Make public" : "Make private"} href={"/"+newNodeType+"/toggle_access?id="+(parseInt(this.props.id)/2).toString()}><img src={"/assets/tree_view/lock-"+(this.props.private? "off-" : "")+"disabled-icon-24.png"} /></a>
             </span>
           )
         }
@@ -219,28 +244,13 @@ jQuery(document).ready(function() {
               )
             }
             // if ends
-            moreContent.push(
-              <span>
-                <a title="View delayed jobs" href={"/assignments/delayed_mailer?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-delayed-mailer.png" />
-                </a>
-              </span>
-            )
+            
             if (this.props.has_topic) {
                 // Moved content out of this to the block outside this containing "if" statement
             }
           }
           // if ends
 
-          // Moved it out of if (this.props.has_topic) and if(this.props.is_available),
-          // Since view_publishing_rights should be visible for all the assignments
-           moreContent.push(
-            <span>
-              <a title="View publishing rights" href={"/participants/view_publishing_rights?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-publish-rights-24.png" />
-              </a>
-            </span>
-          )
         } else if (newNodeType === 'questionnaires'){
           moreContent.push(
             <span>
@@ -266,7 +276,7 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": ""
       }
@@ -275,6 +285,8 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
+      } else if(this.props.dataType === 'course') {
+        colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.creation_date && this.props.updated_date) {
         creation_date = this.props.creation_date.replace("T", "<br/>")
@@ -283,13 +295,15 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
+      var institution_name = "-"
+      if(this.props.institution.length != 0){
+        institution_name = this.props.institution[0].name
+      }
         if (this.props.dataType == 'course') {
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+                    <td style={colDisplayStyle} width={colWidthArray[3]}>{institution_name}</td>
                     <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                     <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                     <td width={colWidthArray[6]}>
@@ -316,8 +330,6 @@ jQuery(document).ready(function() {
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                    <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
                     <td width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                     <td width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                     <td width={colWidthArray[6]}>
@@ -347,7 +359,7 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": ""
       }
@@ -357,6 +369,8 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
+      }  else if(this.props.dataType === 'course') {
+        colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.data) {
           if (this.props.dataType == 'course') {
@@ -365,9 +379,7 @@ jQuery(document).ready(function() {
                       key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                       id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                       name={entry.name}
-                      instructor={entry.instructor}
                       institution={entry.institution}
-                      directory={entry.directory}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       private={entry.private}
@@ -389,8 +401,6 @@ jQuery(document).ready(function() {
                       key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                       id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                       name={entry.name}
-                      instructor={entry.instructor}
-                      directory={entry.directory}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
                       private={entry.private}
@@ -414,12 +424,6 @@ jQuery(document).ready(function() {
                       <tr>
                           <th width={colWidthArray[0]}>
                 {firstColText}
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[2]}>
-                              Instructor
                           </th>
                           <th style={colDisplayStyle} width={colWidthArray[3]}>
                               Institution
@@ -446,12 +450,6 @@ jQuery(document).ready(function() {
                       <tr>
                           <th width={colWidthArray[0]}>
                 {firstColText}
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[2]}>
-                              Instructor
                           </th>
                           <th width={colWidthArray[4]}>
                               Creation Date
@@ -493,7 +491,7 @@ jQuery(document).ready(function() {
     render: function () {
       var creation_date;
       var updated_date;
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": "",
         "word-wrap":"break-word"
@@ -503,21 +501,29 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
+      } else if(this.props.dataType === 'course') {
+        colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.creation_date && this.props.updated_date) {
-        creation_date = this.props.creation_date.replace("T", "<br/>")
-        updated_date = this.props.updated_date.replace("T", "<br/>")
+        creation = this.props.creation_date
+        updated = this.props.updated_date
+
+        creation_date = formatDate(new Date(creation))
+        updated_date = formatDate(new Date(updated))
+
       }
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
+      var institution_name = "-"
+      if(this.props.institution.length != 0){
+        institution_name = this.props.institution[0].name
+      }
       if (this.props.dataType == 'course') {
           return (
               <tr onClick={this.handleClick} id={this.props.id}>
                   <td width={colWidthArray[0]}>{this.props.name}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[2]}>{this.props.instructor}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[3]}>{this.props.institution}</td>
+                  <td style={colDisplayStyle} width={colWidthArray[3]}>{institution_name}</td>
                   <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                   <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                   <td width={colWidthArray[6]}>
@@ -545,8 +551,6 @@ jQuery(document).ready(function() {
           return (
               <tr onClick={this.handleClick} id={this.props.id}>
                   <td width={colWidthArray[0]}>{this.props.name}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.directory}</td>
-                  <td style={colDisplayStyle} width={colWidthArray[1]}>{this.props.instructor}</td>
                   <td style={colDisplayStyle} width={colWidthArray[4]} dangerouslySetInnerHTML={{__html: creation_date}}></td>
                   <td style={colDisplayStyle} width={colWidthArray[5]} dangerouslySetInnerHTML={{__html: updated_date}}></td>
                   <td width={colWidthArray[6]}>
@@ -763,7 +767,7 @@ jQuery(document).ready(function() {
     render: function() {
       var _rows = []
       var _this = this
-      var colWidthArray = ["19%", "16%", "8%", "8%", "17%", "17%", "15%"]
+      var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
       var colDisplayStyle = {
         "display": ""
       }
@@ -775,6 +779,7 @@ jQuery(document).ready(function() {
               }
           }
           if (this.props.dataType == 'course') {
+              colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
               _rows.push(<TitleRow
                   title="My Courses"
               />)
@@ -786,9 +791,7 @@ jQuery(document).ready(function() {
           }
           jQuery.each(this.props.data, function (i, entry) {
               if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
                   (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
                   (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                   (entry.private == true || entry.type == 'FolderNode')) {
@@ -796,8 +799,6 @@ jQuery(document).ready(function() {
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
                       name={entry.name}
-                      directory={entry.directory}
-                      instructor={entry.instructor}
                       institution={entry.institution}
                       creation_date={entry.creation_date}
                       updated_date={entry.updated_date}
@@ -833,9 +834,7 @@ jQuery(document).ready(function() {
                   />)
                   jQuery.each(this.props.data, function (i, entry) {
                       if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                           (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
                           (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
                           (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                           (entry.private == false)) {
@@ -843,8 +842,6 @@ jQuery(document).ready(function() {
                               key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                               id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                               name={entry.name}
-                              directory={entry.directory}
-                              instructor={entry.instructor}
                               institution={entry.institution}
                               creation_date={entry.creation_date}
                               updated_date={entry.updated_date}
@@ -879,17 +876,13 @@ jQuery(document).ready(function() {
                   />)
                   jQuery.each(this.props.data, function (i, entry) {
                       if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.directory && entry.directory.indexOf(_this.props.filterText) !== -1) ||
                           (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                          (entry.instructor && entry.instructor.indexOf(_this.props.filterText) !== -1) ||
                           (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
                           (entry.private == false)) {
                           _rows.push(<ContentTableRow
                               key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
                               id={entry.type + '_' + (parseInt(entry.nodeinfo.node_object_id) * 2).toString() + '_' + i}
                               name={entry.name}
-                              directory={entry.directory}
-                              instructor={entry.instructor}
                               creation_date={entry.creation_date}
                               updated_date={entry.updated_date}
                               actions={entry.actions}
@@ -933,20 +926,6 @@ jQuery(document).ready(function() {
                                   order="normal"
                                   handleUserClick={this.handleSortingClick} />
                           </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                              <SortToggle
-                                  colName="directory"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[2]}>
-                              Instructor
-                              <SortToggle
-                                  colName="instructor"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
                           <th style={colDisplayStyle} width={colWidthArray[3]}>
                               Institution
                               <SortToggle
@@ -986,20 +965,6 @@ jQuery(document).ready(function() {
                               Name
                               <SortToggle
                                   colName="name"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Directory
-                              <SortToggle
-                                  colName="directory"
-                                  order="normal"
-                                  handleUserClick={this.handleSortingClick} />
-                          </th>
-                          <th style={colDisplayStyle} width={colWidthArray[1]}>
-                              Instructor
-                              <SortToggle
-                                  colName="instructor"
                                   order="normal"
                                   handleUserClick={this.handleSortingClick} />
                           </th>

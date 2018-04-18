@@ -10,7 +10,7 @@
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>
-    <table class="general">
+    <table class="table table-striped">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
       <% i=1 %>
@@ -24,7 +24,7 @@
     </table>
 
 <% else %>
-    <div class="flash_note">
+    <div class="flash_note alert alert-danger">
       <%= "Signup topics have not yet been created." %>
     </div>
 <% end %>

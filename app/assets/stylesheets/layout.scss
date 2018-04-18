@@ -470,3 +470,7 @@ table.general td {
 .ui-dialog-titlebar-close {
   visibility: hidden !important; 
 }
+
+.table-striped > tbody > tr:nth-of-type(odd){
+  background-color: #eeeeee !important;
+}

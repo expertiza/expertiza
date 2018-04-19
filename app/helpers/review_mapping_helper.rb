@@ -47,13 +47,15 @@ module ReviewMappingHelper
       if review_graded_at.nil? ||
           (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
         'blue' # REVIEW: grade is not assigned or updated yet.
-      elsif SubmissionRecord.exists? && (response_last_updated_at>submission_updated_at)
-        'green'
+      # elsif SubmissionRecord.exists? && (response_last_updated_at>submission_updated_at)
+      #   'green'
       else
         'brown' # REVIEW: grades has been assigned.
       end
-    else
+    elsif SubmissionRecord.exists?
         'red' # REVIEW: is not finished yet.
+    else
+      'green' # There are no submission record to review
        end
     end
 

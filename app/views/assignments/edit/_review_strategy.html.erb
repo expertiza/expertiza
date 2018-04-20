@@ -94,7 +94,7 @@
   </tr>
 
   <!--#E1600-->
-  <!-- self review flag should be the last checkbox in review strategy tab while editing/creating assignment-->
+  <!-- self review flag should be the last checkbox in review strategy tab while editing/creating     assignment-->
   <tr>
     <td style='padding:5px' id='assignment_is_selfreview_enabled'>
       <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
@@ -102,7 +102,25 @@
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow self reviews?') %>
     </td>
   </tr>
+  <!-- #E1818-->
+  <!-- Adding a checkbox to allow role based reviewing -->
+  <tr>
+    <td style='padding:5px' id='assignment_role_based_review'>
+      <input name="assignment_form[assignment][role_based_review]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'false',false , {:onChange => 'dutiesAssign()'}) %>
+      <%= label_tag('assignment_form[assignment][role_based_review]', 'Is Role Based review allowed?') %>&emsp;&emsp;
+    
+ 
+      <%flag_rolebased=@assignment_form.assignment.role_based_review==false%>
+     <span id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
+     <%= label_tag('assignment_form[duty_id]', ' Add Duties ') %>
+     <%= text_field_tag('assignment_form[duty_id]')%>
+   </span>
 
+    </td>
+
+  </tr>
+  <!-- END OF E1818 -->
 </table>
 <script>
     function hasReviewChanged() {
@@ -132,6 +150,22 @@
                 meta_reviews_allowed_field.attr('hidden', true);
                 jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
 
+        }
+    }
+
+
+    function dutiesAssign() {
+        
+        var checkbox = jQuery('#assignment_form_assignment_role_based_review');
+        var duties_assigned = jQuery('#duties_assigned')
+        if (checkbox.is(':checked')) {
+             duties_assigned.removeAttr('hidden');
+            jQuery('#assignment_form.assignment.role_based_review').val(true);
+ 
+         } else {
+             duties_assigned.attr('hidden', true);
+            jQuery('#assignment_form.assignment.role_based_review').val(false);
+ 
         }
     }
 

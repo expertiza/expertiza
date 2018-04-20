@@ -107,7 +107,7 @@
   <tr>
     <td style='padding:5px' id='assignment_role_based_review'>
       <input name="assignment_form[assignment][role_based_review]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'false',false , {:onChange => 'dutiesAssign()'}) %>
+      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'true', @assignment_form.assignment.role_based_review, {:onChange => 'dutiesAssign()'}) %>
       <%= label_tag('assignment_form[assignment][role_based_review]', 'Is Role Based review allowed?') %>&emsp;&emsp;
     
  

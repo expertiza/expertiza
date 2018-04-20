@@ -105,17 +105,40 @@
   <!-- #E1818-->
   <!-- Adding a checkbox to allow role based reviewing -->
   <tr>
+    <%@duties = Duty.new %>
     <td style='padding:5px' id='assignment_role_based_review'>
       <input name="assignment_form[assignment][role_based_review]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'true', @assignment_form.assignment.role_based_review, {:onChange => 'dutiesAssign()'}) %>
-      <%= label_tag('assignment_form[assignment][role_based_review]', 'Is Role Based review allowed?') %>&emsp;&emsp;
+      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'true' , @assignment_form.assignment.role_based_review, {:onChange => 'dutiesAssign()'}) %>
+      <%= label_tag('assignment_form[assignment][role_based_review]', 'Is Role Based review allowed?') %>
     
- 
+    </tr>
+    
+    <tr>
+    
       <%flag_rolebased=@assignment_form.assignment.role_based_review==false%>
-     <span id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
-     <%= label_tag('assignment_form[duty_id]', ' Add Duties ') %>
-     <%= text_field_tag('assignment_form[duty_id]')%>
-   </span>
+      <td style='padding:5px' id="multiple_reviews_allowed" <%='hidden' if (flag_rolebased) %> >
+     <%= check_box_tag('assignment_form[assignment][allow_multiple_duties]', 'true', @assignment_form.assignment.allow_multiple_duties)%>
+     <%= label_tag('assignment_form[assignment][allow_multiple_duties]', ' Allow multiple duties.? ') %>
+     
+     
+    
+    </tr>
+
+    <tr>
+      <%= form_tag :controller => 'duties', :action => 'create' ,:id => @assignment_form.duty.id do %>
+      
+     <td style='padding:5px' id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
+     <%= label_tag('assignment_form[duty][name]', ' Add Duties ') %>
+     <%= text_field_tag('assignment_form[duty][name]', "none")%>
+
+     <%= submit_tag 'Add', :id => 'duties tag' %>
+
+     <% end %>
+
+     
+
+      
+   
 
     </td>
 
@@ -158,12 +181,15 @@
         
         var checkbox = jQuery('#assignment_form_assignment_role_based_review');
         var duties_assigned = jQuery('#duties_assigned')
+        var multiple_duties = jQuery('#multiple_reviews_allowed')
         if (checkbox.is(':checked')) {
              duties_assigned.removeAttr('hidden');
+             multiple_duties.removeAttr('hidden');
             jQuery('#assignment_form.assignment.role_based_review').val(true);
  
          } else {
              duties_assigned.attr('hidden', true);
+             multiple_duties.attr('hidden', true);
             jQuery('#assignment_form.assignment.role_based_review').val(false);
  
         }

@@ -50,6 +50,9 @@
               <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
               &nbsp;&nbsp;
               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+              &nbsp;&nbsp;
+              <select id="select_role_for_assignment", name="assignment_form[assignment_questionnaire][][dropdown]">
+              </select>
             </td>
           <% end %>
         <% end %>

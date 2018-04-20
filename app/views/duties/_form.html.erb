@@ -1,0 +1,23 @@
+<%= form_with(model: duty, local: true) do |form| %>
+  <% if duty.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(duty.errors.count, "error") %> prohibited this duty from being saved:</h2>
+
+      <ul>
+      <% duty.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name%>
+    <%= form.text_field :name ,id: :name %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+

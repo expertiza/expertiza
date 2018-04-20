@@ -118,31 +118,12 @@
       <%flag_rolebased=@assignment_form.assignment.role_based_review==false%>
       <td style='padding:5px' id="multiple_reviews_allowed" <%='hidden' if (flag_rolebased) %> >
      <%= check_box_tag('assignment_form[assignment][allow_multiple_duties]', 'true', @assignment_form.assignment.allow_multiple_duties)%>
-     <%= label_tag('assignment_form[assignment][allow_multiple_duties]', ' Allow multiple duties.? ') %>
+     <%= label_tag('assignment_form[assignment][allow_multiple_duties]', ' Allow multiple duties.? ') %>&emsp;&emsp;&emsp;&emsp;
+     <%=link_to "Add duties", new_duty_path %> 
      
-     
+    </td> 
     
-    </tr>
-
-    <tr>
-      <%= form_tag :controller => 'duties', :action => 'create' ,:id => @assignment_form.duty.id do %>
-      
-     <td style='padding:5px' id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
-     <%= label_tag('assignment_form[duty][name]', ' Add Duties ') %>
-     <%= text_field_tag('assignment_form[duty][name]', "none")%>
-
-     <%= submit_tag 'Add', :id => 'duties tag' %>
-
-     <% end %>
-
-     
-
-      
-   
-
-    </td>
-
-  </tr>
+    
   <!-- END OF E1818 -->
 </table>
 <script>

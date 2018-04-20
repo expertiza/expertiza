@@ -30,7 +30,7 @@ class DutiesController < ApplicationController
     @duty = Duty.new(duty_params)
 
     if @duty.save
-      redirect_to @duty, notice: 'Duty was successfully created.'
+      redirect_to @duty
     else
       render :new
     end
@@ -59,6 +59,6 @@ class DutiesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def duty_params
-      params[:duty]
+      params.require(:duty).permit(:name)
     end
 end

@@ -31,6 +31,7 @@ class Assignment < ActiveRecord::Base
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
   has_many :assignment_badges, dependent: :destroy
   has_many :badges, through: :assignment_badges
+  has_many :duties, class_name: 'Duty'
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review

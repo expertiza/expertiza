@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180420001705) do
+ActiveRecord::Schema.define(version: 20180420222939) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -278,10 +278,11 @@ ActiveRecord::Schema.define(version: 20180420001705) do
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
 
   create_table "duties", force: :cascade do |t|
-    t.string   "name",          limit: 255, null: false
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.integer  "instructor_id", limit: 4
+    t.string   "name",           limit: 255, null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "instructor_id",  limit: 4 , null: false
+    t.integer  "assignments_id", limit: 4
   end
 
   create_table "institutions", force: :cascade do |t|

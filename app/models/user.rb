@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   has_many :track_notifications, dependent: :destroy
+  has_many :duties, class_name: 'Duty'
   belongs_to :parent, class_name: 'User'
   belongs_to :role
   validates :name, presence: true

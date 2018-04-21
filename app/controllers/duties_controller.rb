@@ -59,6 +59,6 @@ class DutiesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def duty_params
-      params.require(:duty).permit(:name)
+      params.require(:duty).permit(:name, :instructor_id, :assignment_id)
     end
 end

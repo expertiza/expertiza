@@ -104,27 +104,22 @@
   </tr>
   <!-- #E1818-->
   <!-- Adding a checkbox to allow role based reviewing -->
-  <%= form_tag @assignment_form.assignment do %>
   <tr>
     <td style='padding:5px' id='assignment_role_based_review'>
       <input name="assignment_form[assignment][role_based_review]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][role_based_review]', false , @assignment_form.assignment.role_based_review, {:onChange => 'dutiesAssign()'}) %>
-      <%= label_tag('assignment_form[assignment][role_based_review]', 'Is Duty Based review allowed?') %>&emsp;&emsp;
+      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'true' , @assignment_form.assignment.role_based_review, {:onClick => 'dutiesAssign()'}) %>
+      <%= label_tag('assignment_form[assignment][role_based_review]', 'Allow Role based Reviews?') %>&emsp;&emsp;
     
      
       <%flag_rolebased=@assignment_form.assignment.role_based_review==false%>
 
      <span id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
-     <%= link_to('Add Duties',new_duty_path) %>
-     <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
-    <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
-    <%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
+     <%= link_to('Add Duties',new_duty_path(:instructor_id => @assignment_form.assignment.instructor_id, :assignment_id => @assignment_form.assignment.id)) %>
    </span>
 
     </td>
 
   </tr>
-  <% end %>
   <!-- END OF E1818 -->
 </table>
 <script>

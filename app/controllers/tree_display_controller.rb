@@ -178,12 +178,7 @@ class TreeDisplayController < ApplicationController
           "type" => node.type
         }
         courses_assignments_obj(node_type, tmp_object, node) if %w[Courses Assignments].include? node_type
-        # below logic makes sure that only courses/assignments for the instructor/ta
-        # which were marked private = true
-        # based on the filtering criteria of ta seeing courses he/she is ta of &
-        # instructor seeing all courses he/she is instructor of,
-        # is added to the list which is returned
-        res[node_type] << tmp_object if tmp_object['private']
+        res[node_type] << tmp_object
       end
     end
     res

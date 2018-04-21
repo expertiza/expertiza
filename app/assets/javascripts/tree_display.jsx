@@ -295,11 +295,11 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-      var institution_name = "-"
-      if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
-        institution_name = this.props.institution[0].name
-      }
         if (this.props.dataType == 'course') {
+            var institution_name = "-"
+            if(this.props.institution.length != 0){
+              institution_name = this.props.institution[0].name
+            }
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
@@ -515,11 +515,11 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-      var institution_name = "-"
-      if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
-        institution_name = this.props.institution[0].name
-      }
       if (this.props.dataType == 'course') {
+          var institution_name = "-"
+            if(this.props.institution.length != 0){
+              institution_name = this.props.institution[0].name
+            }
           return (
               <tr onClick={this.handleClick} id={this.props.id}>
                   <td width={colWidthArray[0]}>{this.props.name}</td>

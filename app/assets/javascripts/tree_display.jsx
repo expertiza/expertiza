@@ -297,7 +297,7 @@ jQuery(document).ready(function() {
       var id = this.props.id.split("_")[1]
         if (this.props.dataType == 'course') {
             var institution_name = "-"
-            if(this.props.institution.length != 0){
+            if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
               institution_name = this.props.institution[0].name
             }
             return (
@@ -517,7 +517,7 @@ jQuery(document).ready(function() {
       var id = this.props.id.split("_")[1]
       if (this.props.dataType == 'course') {
           var institution_name = "-"
-            if(this.props.institution.length != 0){
+            if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
               institution_name = this.props.institution[0].name
             }
           return (

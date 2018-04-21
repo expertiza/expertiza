@@ -42,12 +42,12 @@
         html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
         '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>';
         //Notification Limit 
-        // if (round_no ==null) {
-        //     html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
-        // }
-        // else{
-        //     html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
-        // }
+        if (round_no ==null) {
+             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
+        }
+        else{
+             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+        }
         //insert menu for adding & selecting tag prompts
         <%if @assignment_form.assignment.is_answer_tagging_allowed %>
         tag_dropdown_index = 0

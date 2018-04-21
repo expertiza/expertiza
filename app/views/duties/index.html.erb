@@ -1,0 +1,19 @@
+
+<h1>Listing Duties</h1>
+<table>
+
+  <tbody>
+    <% @duties.each do |duty| %>
+      <tr>
+        <td><%= duty.name%></td>
+        <td><%= link_to 'Edit', edit_duty_path(duty)%></td>
+        <td><%= link_to 'Destroy', duty, method: :delete, data: { confirm: 'Are you sure?' }%></td>
+</tr>
+<% end %>
+</tbody>
+</table>
+
+
+
+<%= link_to 'New Duty', new_duty_path %>
+<%= link_to 'Return to review strategy tab' %>

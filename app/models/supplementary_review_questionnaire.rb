@@ -1,0 +1,3 @@
+class SupplementaryReviewQuestionnaire < ReviewQuestionnaire
+
+end

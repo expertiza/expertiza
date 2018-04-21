@@ -37,3 +37,7 @@
     <% end %>
   <% end %>
 <% end %>
+
+<% if stage != "Finished" %>
+ <%= link_to "SRQ", {:controller => "questionnaires", :action => "create_srq", :id => participant.id } %>
+<% end  %>

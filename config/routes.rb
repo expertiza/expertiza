@@ -231,6 +231,8 @@ resources :institution, except: [:destroy] do
       post :update_quiz
       post :add_new_questions
       post :save_all_questions
+      #route added for create_srq
+      post :create_srq
     end
   end
 
@@ -243,7 +245,8 @@ resources :institution, except: [:destroy] do
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_survey_questionnaires, controller: :questionnaires
   resources :bookmarkrating_questionnaires, controller: :questionnaires
-
+  #added for SRQ
+  resources :supplementary_review_questionnaire, controller: :questionnaires
   resources :questions do
     collection do
       get :types

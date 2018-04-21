@@ -363,6 +363,31 @@ class QuestionnairesController < ApplicationController
     valid
   end
 
+  # Methods for Supplementary Review Questionnaire
+
+  def create_srq
+    @participant = AssignmentParticipant.find(params[:id])
+    @team = Team.find(@participant.team.id)
+    if @team.srq_id.nil? then
+      @questionnaire = Questionnaire.new
+      @questionnaire.private = false
+      @questionnaire.name = "SRQ_" + @team.id.to_s
+      @questionnaire.instructor_id = @team.id
+      @questionnaire.min_question_score = 0
+      @questionnaire.max_question_score = 5
+      @questionnaire.type = "SupplementaryReviewQuestionnaire"
+      @questionnaire.display_type = "SupplementaryReviewQuestionnaire"
+      @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+      @questionnaire.save
+      @team.srq_id = @questionnaire.id
+      @team.save
+      flash[:success] = 'You have successfully created a questionnaire!'
+    else
+      @questionnaire = Questionnaire.find(@team.srq_id)
+    end
+    redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
+  end
+
   private
 
   # save questionnaire object after create or edit
@@ -561,4 +586,6 @@ class QuestionnairesController < ApplicationController
       Ta.get_my_instructor(session[:user].id)
     end
   end
+
+
 end

@@ -40,6 +40,8 @@ class LotteryController < ApplicationController
 
   def create_new_teams_for_bidding_response(teams, assignment)
     original_team_ids = assignment.teams.map(&:id)
+    # JSON.parse(response)["teams"] is assigned to this team variable,
+    # the example output is [[user_id1,user_id2],[user_id3,user_id4]]
     teams.each do |user_ids|
       current_team = nil
       parent = nil
@@ -57,7 +59,11 @@ class LotteryController < ApplicationController
           end
           team_user.team_user_node.destroy
           team_user.destroy
-          # transfer biddings from old team to new team
+          # transfer bids from old team to new team
+          # if we use this way to do transformation, it is possible (already proved by db records) that
+          # some team has multiple 1st priority, multiply 2nd priority, ....
+          # these multiple identical priorities come from different previous teams
+          # ideally, we need to find a way to merge bids that came from different previous teams
           Bid.where(team_id: original_team_id).update_all(team_id: current_team.id)
         end
         team_user = TeamsUser.find_by(user_id: user_id, team_id: current_team.id)
@@ -88,7 +94,11 @@ class LotteryController < ApplicationController
     # Getting signuptopics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? and max_choosers > 0', params[:id])
     unassigned_teams = AssignmentTeam.where(parent_id: params[:id]).reject {|t| SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).any? }
-    # sorting unassigned_teams by team size desc, bid size asc
+    # sorting unassigned_teams by team size desc, number of bids in current team asc
+    # again, we need to find a way to to merge bids that came from different previous teams
+    # then sorting unassigned_teams by number of bids in current team (less is better)
+    # and we also need to think about, how to sort teams when they have the same team size and number of bids
+    # maybe we can use timestamps in this case
     unassigned_teams.sort! do |t1, t2|
       [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
       [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]

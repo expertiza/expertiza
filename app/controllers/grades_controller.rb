@@ -106,11 +106,20 @@ class GradesController < ApplicationController
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
+    counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
-      @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-                 AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
-               end
-      vm = VmQuestionResponse.new(questionnaire, @assignment)
+      @round = nil
+      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          @round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          @round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      end
+      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
       vmquestions = questionnaire.questions
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)

@@ -50,15 +50,15 @@
         }
         //insert menu for adding & selecting tag prompts
         <%if @assignment_form.assignment.is_answer_tagging_allowed %>
-        tag_dropdown_index = 0
-        placeholder_id = 'tag_prompt_placeholder_' + questionnaire.id
-        deleted_input_id = getIdPrefix(questionnaire.id) + '[deleted][]'
-        html += "<tr>"
-        html += "<td>Add tag prompts</td>"
-        html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
-        html += "<button type='button' class='btn btn-default' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + questionnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
-        html += "<button type='button' class='btn btn-default' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\",\"" + deleted_input_id + "\")'>-Tag prompt-</button>"
-        html += "</td></tr>"
+          tag_dropdown_index = 0
+          placeholder_id = 'tag_prompt_placeholder_' + questionnaire.id
+          deleted_input_id = getIdPrefix(questionnaire.id) + '[deleted][]'
+          html += "<tr id='" + row_id + "_add_tag_prompt'>"
+          html += "<td>Add tag prompts</td>"
+          html += "<td colspan='6'><div id='" + placeholder_id + "'></div>"
+          html += "<button type='button' class='btn btn-default' onClick='addTagPromptDropdown(\"" + placeholder_id + "\", undefined, " + questionnaire.id + ", " + null + ", " + 0 + ", " + 0 +")'>+Tag prompt+</button>"
+          html += "<button type='button' class='btn btn-default' onClick='removeLastTagPromptDropdown(\"" + placeholder_id + "\",\"" + deleted_input_id + "\")'>-Tag prompt-</button>"
+          html += "</td></tr>"
         <% end %>
         questionnaire_table.last().after(html);
         jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
@@ -105,11 +105,11 @@
       }
       $('#loading_image').remove()
       var id_prefix = getIdPrefix(questionnaire_id)
-      var html = "<div id='container_" + id_prefix + "'>"
+      var html = "<table><tr><td><div id='container_" + id_prefix + "'>"
       html += "<input type='hidden' name='" + id_prefix + "[id][]' value='" + tag_dep_id + "'>"
-      html += "Tag prompt "
-      html += "<img src='/assets/info.png' title='Tag label that will be shown below the feedback' />"
-      html += ": <select name='" + id_prefix + "[tag_prompt][]' onchange='if (this.selectedIndex == 1)openAddNewTagPopup()' onfocus='if (this.selectedIndex == 1)this.selectedIndex = 0' class='form-control'>"
+      html += "<div style='float: left;'>Tag prompt</div>"
+      html += "<img src='/assets/info.png' title='Tag label that will be shown below the feedback' style='float: left;'/>"
+      html += "&nbsp;<select name='" + id_prefix + "[tag_prompt][]' onchange='if (this.selectedIndex == 1)openAddNewTagPopup()' onfocus='if (this.selectedIndex == 1)this.selectedIndex = 0' class='form-control' style='float: left; max-width: 150px;'>"
       html += "<option value='none'>---</option>"
       html += "<option value='new'>add new..</option>"
       for (i=0; i<tag_prompts.length; i++) {
@@ -119,9 +119,9 @@
         html += ">" + tag_prompts[i].prompt + "</option>"
       }
       html += "</select>"
-      html += "&nbsp;&nbsp; apply to question type "
-      html += "<img src='/assets/info.png' title='The tag prompt will only be shown below the answers of this particular question type. It is useful to exclude types of question that the tags are not relevant to' />"
-      html += ": <select name='" + id_prefix + "[question_type][]' class='form-control'>"
+      html += "<div style='float: left;'>&nbsp;&nbsp; apply to question type </div>"
+      html += "<img src='/assets/info.png' title='The tag prompt will only be shown below the answers of this particular question type. It is useful to exclude types of question that the tags are not relevant to' style='float: left;'/>"
+      html += "&nbsp;<select name='" + id_prefix + "[question_type][]' class='form-control' style='float: left;max-width: 150px;'>"
       for (i=0; i<q_types.length; i++) {
         html += "<option value=" + q_types[i]
         if (q_types[i] == question_type)
@@ -129,10 +129,10 @@
         html += ">" + q_types[i] + "</option>"
       }
       html += "</select>"
-      html += "&nbsp;&nbsp; comment length threshold "
-      html += "<img src='/assets/info.png' title='This is only applicable to textual comments. The tag prompt will only be shown below textual comments whose length exceed the threshold. it is useful to exclude short comments that are not relevant' />"
-      html += ": <input type='text' name='" + id_prefix + "[answer_length_threshold][]' size='4' value='" + text_len + "'/>"
-      html += "</div>"
+      html += "<div style='float: left;'>&nbsp;&nbsp; comment length threshold </div>"
+      html += "<img src='/assets/info.png' title='This is only applicable to textual comments. The tag prompt will only be shown below textual comments whose length exceed the threshold. it is useful to exclude short comments that are not relevant' style='float: left;' />"
+      html += "&nbsp;<input type='text' name='" + id_prefix + "[answer_length_threshold][]' size='4' value='" + text_len + "' style='float: left;'/>"
+      html += "</div></td></tr></table>"
       $( "#" + placeholder_id ).append(html)
     }
     function sleep(ms) {
@@ -189,14 +189,20 @@
       });
     }
     <% unless @assignment_form.tag_prompt_deployments == nil %>
+    function initTagPrompts(){
     	<% @assignment_form.tag_prompt_deployments.each do |tag_dep| %>
     		addTagPromptDropdown('tag_prompt_placeholder_' + <%= tag_dep.questionnaire_id %>, <%= tag_dep.id %>, <%= tag_dep.questionnaire_id %>, <%= tag_dep.tag_prompt_id %>, '<%= tag_dep.question_type.to_s %>', <%= tag_dep.answer_length_threshold %>)
     	<% end %>
+    }
+    initTagPrompts();
     <%end%>
     // end tag prompt code
     function removeQuestionnaireTableRow(questionnaire_type) {
       var row_id = 'questionnaire_table_' + questionnaire_type;
       jQuery('#' + row_id).remove();
+      <%if @assignment_form.assignment.is_answer_tagging_allowed %>
+      jQuery('#' + row_id + '_add_tag_prompt').remove();
+      <%end%>
     }
     function metareview_due_date() {
       var metareview = document.getElementById("metareview_due_date_label");
@@ -214,15 +220,13 @@
         var round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
         if (state == true && round_count >1){
             //Make it display by rounds
-            var element_id;
-            element_id = 'questionnaire_table_' + 'ReviewQuestionnaire';
-            jQuery('#' + element_id).remove();
-            element_id = 'questionnaire_table_' + 'MetareviewQuestionnaire';
-            jQuery('#' + element_id).remove();
-            element_id = 'questionnaire_table_' + 'AuthorFeedbackQuestionnaire';
-            jQuery('#' + element_id).remove();
-            element_id = 'questionnaire_table_' + 'TeammateReviewQuestionnaire';
-            jQuery('#' + element_id).remove();
+          //Make it display by rounds
+          ['ReviewQuestionnaire',
+            'MetareviewQuestionnaire',
+            'AuthorFeedbackQuestionnaire',
+            'TeammateReviewQuestionnaire'].forEach(function(item){
+            removeQuestionnaireTableRow(item);
+          });
             for (i = 1; i <= round_count; i++) {
                 addQuestionnaireTableRow(
                         'ReviewQuestionnaire',
@@ -257,18 +261,16 @@
         }
         if (state == false && round_count>1){
             //Make it display as usual
-            var element_id;
-            for (i=1;i<=round_count+1;i++) {
-                element_id = 'questionnaire_table_' + 'ReviewQuestionnaire';
-                jQuery('#' + element_id).remove();
-            }
-            element_id = 'questionnaire_table_' + 'MetareviewQuestionnaire';
-            jQuery('#' + element_id).remove();
-            element_id = 'questionnaire_table_' + 'AuthorFeedbackQuestionnaire';
-            jQuery('#' + element_id).remove();
-            element_id = 'questionnaire_table_' + 'TeammateReviewQuestionnaire';
-            jQuery('#' + element_id).remove();
-            //And display original ones
+          ['ReviewQuestionnaire',
+            'MetareviewQuestionnaire',
+            'AuthorFeedbackQuestionnaire',
+            'TeammateReviewQuestionnaire'].forEach(function(item){
+            if(item==='ReviewQuestionnaire')
+              for (i=1;i<=round_count+1;i++) {
+                removeQuestionnaireTableRow(item);
+              }else
+                removeQuestionnaireTableRow(item);
+          });
             addQuestionnaireTableRow(
                     'ReviewQuestionnaire',
                     null,
@@ -298,6 +300,7 @@
                     <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
             );
         }
+      initTagPrompts();
     }
   </script>
 

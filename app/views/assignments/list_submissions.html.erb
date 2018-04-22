@@ -27,7 +27,7 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td bgcolor= <%= bgcolor %>><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
-            <%= link_to 'Perform review', { controller: 'review_mapping', action: 'assign_reviewer_dynamically', topic_id: SignedUpTeam.topic_id_by_team_id(team.id), assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>
+            <%= link_to 'Perform review', { controller: 'review_mapping', action: 'assign_reviewer_instructor', team_id: team.id, assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>
                 <%= link_to 'Update review', { controller: 'review', action: 'edit_review', id: participants.first.id } %></br>
                 <%= link_to 'Assign grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
           <% end %>

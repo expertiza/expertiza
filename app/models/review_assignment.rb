@@ -74,6 +74,7 @@ module ReviewAssignment
     contributor.assign_reviewer(reviewer)
   end
 
+
   # This method is only for the assignments without topics
   def candidate_assignment_teams_to_review(reviewer)
     # the contributors are AssignmentTeam objects
@@ -157,15 +158,15 @@ module ReviewAssignment
 
   # Returns a contributor to review if available, otherwise will raise an error
   def contributor_to_review(reviewer, topic)
-    @user_role=User.find(reviewer.user_id).role_id
-    if @user_role != 2 && @user_role != 6
-      raise 'Please select a topic' if topics? && topic.nil?
-      raise 'This assignment does not have topics' if !topics? && topic
-      # This condition might happen if the reviewer waited too much time in the
-      # select topic page and other students have already selected this topic.
-      # Another scenario is someone that deliberately modifies the view.
-      raise 'This topic has too many reviews; please select another one.' if topic && !candidate_topics_to_review(reviewer).include?(topic)
-    end
+    #@user_role=User.find(reviewer.user_id).role_id
+
+    raise 'Please select a topic' if topics? && topic.nil?
+    raise 'This assignment does not have topics' if !topics? && topic
+    # This condition might happen if the reviewer waited too much time in the
+    # select topic page and other students have already selected this topic.
+    # Another scenario is someone that deliberately modifies the view.
+    raise 'This topic has too many reviews; please select another one.' if topic && !candidate_topics_to_review(reviewer).include?(topic)
+    #end
     contributor_set = Array.new(contributors)
     work = topic.nil? ? 'assignment' : 'topic'
 
@@ -176,6 +177,7 @@ module ReviewAssignment
           contributor.includes?(reviewer) ||
           !contributor.has_submissions?
     end
+
 
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
@@ -198,4 +200,5 @@ module ReviewAssignment
     # they were picked.
     contributor_set.sample
   end
+
 end

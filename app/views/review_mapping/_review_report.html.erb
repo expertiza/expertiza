@@ -104,7 +104,18 @@ $(window).load(function(){
           </td>
           <!--Metrics-->
           <td align = 'left'>
-            <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+            <%= image_tag(Gchart.bar(
+                                    :data => [r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3],
+                                    :orientation => 'horizontal',
+                                    :max_value => 300,
+                                    :size => '233x190',
+                                    :title => 'Volume',
+                                    :axis_with_labels => [['y'], ['x']],
+                                    :encoding => 'text',
+                                    :axis_labels => [["Round 3|Round 2|Round 1|Average"], ["0|50|100|150|200|250|300"]]
+            ))%>
+            <!--<%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3)
+          %>-->
           </td>
           <!--Assign grade and write comments-->
           <td align = 'left' style="" id=<%= "assign_grade" + r.id.to_s %>>

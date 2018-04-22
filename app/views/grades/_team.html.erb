@@ -1,5 +1,5 @@
 <TR id="<%= prefix %>_header" style="background-color: white"><TD>       
-     <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%=image_tag("expand.png")%></a>
+     <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;" style="padding-right: 20px"><%=image_tag("expand.png")%></a>
 
   <% topic_id = tscore[:team].topic%>
   <% if topic_id%>
@@ -8,7 +8,11 @@
     <% if @assignment.max_team_size == 1 %>
       <%= tscore[:team].users.first.name(session[:ip]) + ' (' + tscore[:team].users.first.fullname(session[:ip]) + ')' rescue '' %>
     <% else %>
-      <%= tscore[:team].name %>
+      <%= tscore[:team].name %> |
+      <% for index in 0 .. tscore[:team].users.length - 2 %> 
+        <%= tscore[:team].users[index].name(session[:ip]) %>, 
+      <% end %>
+      <%= tscore[:team].users[tscore[:team].users.length - 1].name(session[:ip]) %>
     <% end %>
   <% end %>
      <% if tscore[:scores][:avg] %>

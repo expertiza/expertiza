@@ -1,14 +1,5 @@
 .arrow_icon{
-    width: 20px;
-    height: 20px;
-}
-.table_stretch{
-    width: 100%;
-    border-spacing: 5px;
-    border-collapse: collapse;
-}
-.table_stretch td{
-    padding: 10px;
+    padding-right: 20px;
 }
 .fake-link {
     font-size: smaller;
@@ -26,4 +17,11 @@
     text-decoration: underline;
     color: #eb0000;
     cursor: pointer;
+}
+.data_column {
+	padding: 0 !important;
+}
+
+.question {
+
 }

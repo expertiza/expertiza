@@ -30,7 +30,7 @@ class DutiesController < ApplicationController
     @duty = Duty.new(duty_params)
 
     if @duty.save
-      redirect_to edit_assignment_path(@duty.assignment_id)
+      redirect_to new_duty_path, notice: 'Duty was successfully created.'
     else
       render :new
     end

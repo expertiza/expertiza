@@ -20,7 +20,7 @@ module ApplicationHelper
   end
 
   def flash_message(type)
-    "<div class='flash_#{type}'>#{flash[type]}</div>".html_safe if flash[type]
+    "<div class='flash_#{type} alert alert-#{type}'>#{flash[type]}</div>".html_safe if flash[type]
   end
 
   def text_field_with_auto_complete model, field, options

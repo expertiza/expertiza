@@ -1,0 +1,63 @@
+.tab-system > .tab-panel {
+  padding: 10px 0;
+}
+
+tr > .toggleDiv {
+  display: inline-block;
+}
+
+.new-button {
+  margin: 0 5px;
+}
+
+.filterable_table {
+  span.show-checkbox {
+    margin: 0 5px;
+  }
+}
+
+.tabs-menu-item > a {
+  font-size: 1.2em;
+}
+
+.questionnaire-button {
+  margin: 0 5px;
+}
+
+.round-border-table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid #dddddd !important;
+  border-radius: 5px !important;
+  -moz-border-radius: 5px !important;
+  padding: 0px !important;
+}
+
+.round-border-table td {
+  border: 1px solid #dddddd;
+}
+
+table.text-center th, table.text-center td {
+  text-align: center;
+  vertical-align: middle !important;
+}
+
+// table td {
+//   min-width: 108px !important;
+// }
+
+.graph-btn {
+  cursor: pointer;
+}
+
+.td-top-arrow {
+  position: relative; padding: 5px;
+}
+
+.top-arrow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-top: 10px solid #428bca;
+  border-left: 10px solid transparent;
+}

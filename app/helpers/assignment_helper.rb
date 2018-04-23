@@ -148,9 +148,9 @@ module AssignmentHelper
 
   def get_team_name_color_in_list_submission(team)
     if team.try(:grade_for_submission) && team.try(:comment_for_submission)
-      '#986633' # brown. submission grade has been assigned.
+      '#cd6133' # brown. submission grade has been assigned.
     else
-      'blue' # submission grade is not assigned yet.
+      '#0984e3' # submission grade is not assigned yet.
     end
   end
 end

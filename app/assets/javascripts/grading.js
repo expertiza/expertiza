@@ -61,15 +61,18 @@
         var header = document.getElementById(elementId+'_header');
 	
   	while (obj != null){ 
+
+      header.style.backgroundColor = 'white';
+      header.style.color = "#000000";
   	  var bExpand = obj.style.display.length == 0;	  	   	  
   	  if (bExpand) {
-            collapseObj(obj, atag);   	         	  	       
-            header.style.backgroundColor = 'white';
+            collapseObj(obj, atag);
   	  }
   	  else {
   	    obj.style.display = '';
   	  	atag.innerHTML = '<img src="/assets/collapse.png">';
-            header.style.backgroundColor = 'lightcoral';
+            header.style.backgroundColor = '#a90201';
+            header.style.color = "#ffffff";
   	  }  	    
   	  sublistsize += 1;  
   	  var obj = document.getElementById(elementId+"_"+sublistsize);	    

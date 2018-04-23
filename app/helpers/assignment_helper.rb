@@ -153,4 +153,8 @@ module AssignmentHelper
       'blue' # submission grade is not assigned yet.
     end
   end
+
+    def duty_index
+        duties = Duty.all;
+  end
 end

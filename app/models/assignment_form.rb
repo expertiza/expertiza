@@ -1,7 +1,7 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :duty
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :assignment_duties
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -15,6 +15,7 @@ class AssignmentForm
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
+    @assignments_duties = Array(args[:assignment_duties])
     @due_dates = Array(args[:due_dates])
   end
 
@@ -26,6 +27,7 @@ class AssignmentForm
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
+    assignment_form.assignment_duties =AssignmentsDutyMapping.where(assignment_id: assignment_id ).pluck(:duty_id)
     assignment_form
   end
 
@@ -40,6 +42,7 @@ class AssignmentForm
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
+    update_assignments_duties(attributes[:assignment_duties])
     set_badge_threshold_for_assignment(attributes[:assignment][:id], attributes[:badge]) if @assignment.has_badge?
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
@@ -62,6 +65,25 @@ class AssignmentForm
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment.num_reviews = @assignment.num_reviews_allowed
   end
+
+def update_assignments_duties(attributes)
+    if attributes
+    attributes.each do |duties|
+         duties.each do |duty_list|
+         if(duty_list!="duty_id")
+           duty_list.each do |duty|
+           unless duty.nil? then
+            @assignment_duty = AssignmentsDutyMapping.new( assignment_id: @assignment.id, duty_id: duty.to_i)
+            @assignment_duty.save
+           end
+           end
+         end
+       end
+     end
+   end
+   return false
+ end
+
 
   # code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)

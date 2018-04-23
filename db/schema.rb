@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180421003942) do
+ActiveRecord::Schema.define(version: 20180422230039) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -118,6 +118,13 @@ ActiveRecord::Schema.define(version: 20180421003942) do
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
+
+  create_table "assignments_duty_mappings", force: :cascade do |t|
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "duty_id",       limit: 4, null: false
+    t.integer  "assignment_id", limit: 4
+  end
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24

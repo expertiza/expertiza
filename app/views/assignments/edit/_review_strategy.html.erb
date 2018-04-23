@@ -107,19 +107,33 @@
   <tr>
     <td style='padding:5px' id='assignment_role_based_review'>
       <input name="assignment_form[assignment][role_based_review]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'true' , @assignment_form.assignment.role_based_review, {:onClick => 'dutiesAssign()'}) %>
+      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'false' , @assignment_form.assignment.role_based_review, {:onClick => 'dutiesAssign()'}) %>
       <%= label_tag('assignment_form[assignment][role_based_review]', 'Allow Role based Reviews?') %>&emsp;&emsp;
-    
-     
+
+      <%duties_list=[]%>
+      <% duties_list=@assignment_form.assignment_duties if(@assignment_form.assignment_duties.any?) %>
       <%flag_rolebased=@assignment_form.assignment.role_based_review==false%>
 
+      <span id="duties_dropdown" <%='hidden' if (flag_rolebased) %> >
+      <%= label_tag('assignment_form[assignment][duty_id]', ' Select Duties ') %>
+      <%= select('assignment_form[assignment_duties]', 'duty_id', duty_index.select {|p| !duties_list.include? p.id }.collect{|p| [p.name, p.id]},{}, {:multiple => true}) %>
+      </span>
+      
+     
      <span id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
-     <%= link_to('Add Duties',new_duty_path(:instructor_id => @assignment_form.assignment.instructor_id, :assignment_id => @assignment_form.assignment.id)) %>
-   </span>
+     <%= link_to('Add Duty',new_duty_path(:instructor_id => @assignment_form.assignment.instructor_id)) %>
+     </span>
 
-    </td>
+   
+     </td>
+   </tr>
 
-  </tr>
+     <tr>
+      <td id="assignment_allow_multiple_duties" <%='hidden' if (flag_rolebased) %>>
+      <%= check_box_tag('assignment_form[assignment][allow_multiple_duties]', 'false' , @assignment_form.assignment.allow_multiple_duties ) %>
+      <%= label_tag('assignment_form[assignment][allow_multiple_duties]', 'Allow multiple duties to be selected?') %>&emsp;&emsp;
+     </td>
+    </tr>
   <!-- END OF E1818 -->
 </table>
 <script>
@@ -157,16 +171,27 @@
     function dutiesAssign() {
         
         var checkbox = jQuery('#assignment_form_assignment_role_based_review');
-        var duties_assigned = jQuery('#duties_assigned')
+        var duties_assigned = jQuery('#duties_assigned');
+        var allow_multiple_duties =jQuery('#assignment_allow_multiple_duties');
+        var duties_dropdown= jQuery('#duties_dropdown');
+
         if (checkbox.is(':checked')) {
              duties_assigned.removeAttr('hidden');
+             allow_multiple_duties.removeAttr('hidden')
+             duties_dropdown.removeAttr('hidden')
             jQuery('#assignment_form.assignment.role_based_review').val(true);
- 
+            jQuery('#assignment_form.assignment.allow_multiple_duties').val(true);
+            jQuery('#duties_dropdown').val(true);
+            
          } else {
              duties_assigned.attr('hidden', true);
-            jQuery('#assignment_form.assignment.role_based_review').val(false);
- 
+             allow_multiple_duties.removeAttr('hidden',true)
+             duties_dropdown.removeAttr('hidden',true)
+             jQuery('#assignment_form.assignment.role_based_review').val(false);
+             jQuery('#assignment_form.assignment.allow_multiple_duties').val(false);
+             jQuery('#duties_dropdown').val(false);
         }
+        
     }
 
 </script>

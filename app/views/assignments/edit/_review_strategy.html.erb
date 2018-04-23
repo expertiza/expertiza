@@ -107,7 +107,7 @@
   <tr>
     <td style='padding:5px' id='assignment_role_based_review'>
       <input name="assignment_form[assignment][role_based_review]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'false' , @assignment_form.assignment.role_based_review, {:onClick => 'dutiesAssign()'}) %>
+      <%= check_box_tag('assignment_form[assignment][role_based_review]', 'true' , @assignment_form.assignment.role_based_review, {:onClick => 'dutiesAssign()'}) %>
       <%= label_tag('assignment_form[assignment][role_based_review]', 'Allow Role based Reviews?') %>&emsp;&emsp;
 
       <%duties_list=[]%>
@@ -117,7 +117,7 @@
 
       <span id="duties_dropdown" <%='hidden' if (flag_rolebased) %> >
       <%= label_tag('assignment_form[assignment][duty_id]', ' Select Duties ') %>
-      <%= select('assignment_form[assignment_duties]', 'duty_id', duty_index.select {|p| !duties_list.include? p.id }.collect{|p| [p.name, p.id]}, {:multiple => true, :include_blank => 'None'}) %>
+      <%= select('assignment_form[assignment_duties]', 'duty_id', duty_index.select {|p| !duties_list.include? p.id }.collect{|p| [p.name, p.id]},{}, {:multiple => true, :include_blank => 'None'}) %>
       </span>
       
      
@@ -131,7 +131,7 @@
 
      <tr>
       <td id="assignment_allow_multiple_duties" <%='hidden' if (flag_rolebased) %>>
-      <%= check_box_tag('assignment_form[assignment][allow_multiple_duties]', 'false' , @assignment_form.assignment.allow_multiple_duties ) %>
+      <%= check_box_tag('assignment_form[assignment][allow_multiple_duties]', 'true' , @assignment_form.assignment.allow_multiple_duties ) %>
       <%= label_tag('assignment_form[assignment][allow_multiple_duties]', 'Allow multiple team-members to have same duty?') %>&emsp;&emsp;
      </td>
     </tr>

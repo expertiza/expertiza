@@ -122,7 +122,7 @@
       
      
      <span id="duties_assigned" <%='hidden' if (flag_rolebased) %> >
-     <%= link_to('Add Duty',new_duty_path(:instructor_id => @assignment_form.assignment.instructor_id)) %>
+     <%= link_to('Add Duty',new_duty_path(:instructor_id => @assignment_form.assignment.instructor_id,:assignment_id => @assignment_form.assignment)) %>
      </span>
 
    

@@ -15,7 +15,7 @@ class AssignmentForm
     end
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
-    @assignments_duties = Array(args[:assignment_duties])
+    @assignment_duties = Array(args[:assignment_duties])
     @due_dates = Array(args[:due_dates])
   end
 
@@ -72,7 +72,7 @@ def update_assignments_duties(attributes)
          duties.each do |duty_list|
          if(duty_list!="duty_id")
            duty_list.each do |duty|
-           unless duty.nil? then
+           if(duty!="") then
             @assignment_duty = AssignmentsDutyMapping.new( assignment_id: @assignment.id, duty_id: duty.to_i)
             @assignment_duty.save
            end

@@ -117,7 +117,7 @@
 
       <span id="duties_dropdown" <%='hidden' if (flag_rolebased) %> >
       <%= label_tag('assignment_form[assignment][duty_id]', ' Select Duties ') %>
-      <%= select('assignment_form[assignment_duties]', 'duty_id', duty_index.select {|p| !duties_list.include? p.id }.collect{|p| [p.name, p.id]},{}, {:multiple => true, :include_blank => 'None'}) %>
+      <%= select('assignment_form[assignment_duties]', 'duty_id', duty_index(@assignment_form.assignment.instructor_id).select {|p| !duties_list.include? p.id }.collect{|p| [p.name, p.id]},{}, {:multiple => true, :include_blank => 'None'}) %>
       </span>&emsp;&emsp;
       
      

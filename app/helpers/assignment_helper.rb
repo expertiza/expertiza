@@ -154,8 +154,15 @@ module AssignmentHelper
     end
   end
 
-    def duty_index
+    def duty_index(instructor_id)
         duties = Duty.all
+        duty_temp_list = []
+        duties.each do |duty| 
+          if duty.instructor_id == instructor_id
+            duty_temp_list << duty
+          end
+        end
+        duty_temp_list
   end
 
     def duty_names(id_list)

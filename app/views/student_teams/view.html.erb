@@ -24,10 +24,10 @@
       <th class="head">Email address</th>
      
       <% if @teammate_review_allowed %>
-       <!-- if @duty_based_review_allowed-->
-      <th class="head">Duty</th>
-      <!-- end -->
-        <th class="head">Review action</th>
+       <% if @duty_based_review_allowed %>
+          <th class="head">Duty</th>
+       <% end %>
+       <th class="head">Review action</th>
       <% end %>
 
 
@@ -43,10 +43,12 @@
         <% if @teammate_review_allowed %>
           <td>
             <%if member.user.id == session[:user].id %>
-              <select id="select_role_for_assignment", name="assignment_form[assignment_questionnaire][][dropdown]">
-                <option value=true selected="selected">Dropdown</option>
-                <option value=false>Scale</option>
-                <option disabled="disabled">No</option> 
+            
+              <!--Displayed the names of duties added by the instructor for an assignment in a dropdown-->
+              <select>
+                <% for duty in @duties %>
+                  <option value = true><%=duty%></option>
+                <%end%>
               </select>
             <%end%>
           </td>

@@ -124,19 +124,14 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_reviewer_instructor
-    assignment = AssignmentTeam.find(params[:team_id])
-    reviewers = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.parent_id)
-    if(reviewers != nil)
-      reviewer = reviewers.first
-    else
-      reviewer = AssignmentParticipant.create(user_id: params[:reviewer_id], parent_id: assignment.parent_id)
-    end
+    assignmentTeam = AssignmentTeam.find(params[:team_id])
+    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignmentTeam.parent_id).first
+    reviewer = AssignmentParticipant.create(user_id: params[:reviewer_id], parent_id: assignmentTeam.parent_id) if reviewer.nil?
 
-    @reviewMapId=assignment.assign_reviewer(reviewer)
-    # @reviewMapId=ReviewResponseMap.where(reviewee_id: assignment.id, reviewer_id: reviewer.id,
-    #                          reviewed_object_id: params[:assignment_id]).first
+    @reviewMapId=ReviewResponseMap.where(reviewee_id: assignmentTeam.id, reviewer_id: reviewer.id,
+                             reviewed_object_id: params[:assignment_id]).first
+    @reviewMapId=assignmentTeam.assign_reviewer(reviewer) if @reviewMapId.nil?
     redirect_to controller: 'response', action: 'new', id: @reviewMapId
-    #end
   end
 
 

@@ -1,0 +1,16 @@
+<%= form_for @duty do |form| %>
+
+
+  <div class="field">
+    <%= form.label :name%>
+    <%= form.text_field :name ,id: :name %>
+    <%= form.hidden_field :instructor_id, id: :instructor_id, :value => params[:instructor_id].to_i %>
+  </div>
+
+<br>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
+

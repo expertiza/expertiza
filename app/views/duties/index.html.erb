@@ -1,0 +1,32 @@
+
+<h1>Listing Duties</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Duty Name</th>
+      <th>Instructor Id</th>
+      <th>Assignment Id</th>
+      
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+   
+    <% @duties.each do |duty| %>
+      <tr>
+        <td><%= duty.name%></td>
+        <td><%= duty.instructor_id %></td>
+        <td><%= duty.assignment_id %></td> 
+        <td><%= link_to 'Edit', edit_duty_path(duty)%></td>
+        
+</tr> 
+<% end %>
+</tbody>
+</table>
+
+
+<br>
+<br>
+<%= link_to 'New Duty', new_duty_path %> &emsp;&emsp;&emsp;&emsp;
+<%= link_to 'Return to Assignment Homepage' %>

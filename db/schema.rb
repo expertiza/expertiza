@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180104141248) do
+ActiveRecord::Schema.define(version: 20180422230039) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -111,11 +111,20 @@ ActiveRecord::Schema.define(version: 20180104141248) do
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
+    t.boolean  "role_based_review"
+    t.boolean  "allow_multiple_duties"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
+
+  create_table "assignments_duty_mappings", force: :cascade do |t|
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "duty_id",       limit: 4, null: false
+    t.integer  "assignment_id", limit: 4
+  end
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24
@@ -274,6 +283,14 @@ ActiveRecord::Schema.define(version: 20180104141248) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "duties", force: :cascade do |t|
+    t.string   "name",          limit: 255, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "instructor_id", limit: 4
+    t.integer  "assignment_id", limit: 4
+  end
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -705,10 +722,12 @@ ActiveRecord::Schema.define(version: 20180104141248) do
   end
 
   create_table "teams_users", force: :cascade do |t|
-    t.integer "team_id", limit: 4
-    t.integer "user_id", limit: 4
+    t.integer "team_id",   limit: 4
+    t.integer "user_id",   limit: 4
+    t.integer "duties_id", limit: 4
   end
 
+  add_index "teams_users", ["duties_id"], name: "index_teams_users_on_duties_id", using: :btree
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 

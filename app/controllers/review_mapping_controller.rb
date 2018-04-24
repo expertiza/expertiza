@@ -124,36 +124,19 @@ class ReviewMappingController < ApplicationController
   end
 
   def assign_reviewer_instructor
-    assignment = Assignment.find(params[:assignment_id])
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
-      flash[:error] = "No topic is selected.  Please go back and select a topic."
+    assignment = AssignmentTeam.find(params[:team_id])
+    reviewers = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.parent_id)
+    if(reviewers != nil)
+      reviewer = reviewers.first
     else
-      # begin
-      if assignment.topics? # assignment with topics
-        topic = SignUpTopic.find(params[:-topic_id])
-
-        if topic.nil?
-          flash[:error] = "No topics are available to review at this time. Please try later."
-        else
-          assignment.assign_reviewer(reviewer)
-        end
-      end
+      reviewer = AssignmentParticipant.create(user_id: params[:reviewer_id], parent_id: assignment.parent_id)
     end
-    # rescue Exception => e
-    #   flash[:error] = (e.nil?) ? $! : e
-    # end
-    #if current_user_role ==2 or current_user_role ==6
-    #  redirect_to controller: 'response', action: 'new', id: reviewer.id
-    #else
 
-    @reviewMapId=ReviewResponseMap.find(reviewee_id: params[:team_id], reviewer_id: reviewer.id,
-                             reviewed_object_id: assignment.id)
-
+    @reviewMapId=assignment.assign_reviewer(reviewer)
+    # @reviewMapId=ReviewResponseMap.where(reviewee_id: assignment.id, reviewer_id: reviewer.id,
+    #                          reviewed_object_id: params[:assignment_id]).first
     redirect_to controller: 'response', action: 'new', id: @reviewMapId
     #end
-
   end
 
 

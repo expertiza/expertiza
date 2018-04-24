@@ -155,6 +155,10 @@ module AssignmentHelper
   end
 
     def duty_index
-        duties = Duty.all;
+        duties = Duty.all
   end
+
+    def duty_names(id_list)
+      duty_names_list = Duty.find_by_id(id_list)
+    end
 end

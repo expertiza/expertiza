@@ -4,6 +4,8 @@
         var row_id = 'questionnaire_table_' + questionnaire_type;
         var i = 0;
         var html;
+        <% duty_id_list = @assignment_form.assignment_duties %>
+        <% duty_names_list = duty_names(duty_id_list) %>
         html += '<tr id="' + row_id + '">' +
         '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="' + <%= @assignment_form.assignment.id %> +'">';
         //Rubric name

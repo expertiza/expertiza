@@ -2,8 +2,4 @@
 
 <%= render 'form' %>
 <br>
-<% temp = 0 %>
-<%if (!params[:assignment_id].nil?) %>
-    <% temp = params[:assignment_id] %>
-<% end %>
-<%= link_to 'Back', edit_assignment_path(temp) %>
+<%= link_to 'Back', edit_assignment_path(params[:assignment_id]) %>

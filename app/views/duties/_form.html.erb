@@ -5,6 +5,7 @@
     <%= form.label :name%>
     <%= form.text_field :name ,id: :name %>
     <%= form.hidden_field :instructor_id, id: :instructor_id, :value => params[:instructor_id].to_i %>
+    <%= form.hidden_field :assignment_id, id: :assignment_id, :value => params[:assignment_id].to_i %>
   </div>
 
 <br>

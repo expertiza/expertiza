@@ -106,9 +106,53 @@ class PopupController < ApplicationController
   end
 
   def view_review_scores_popup
+    puts "enters calling function"
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    build_tone_analysis_report
+  end
+
+  def build_tone_analysis_report
+    ##uri = URI.parse("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk")
+    ##header = {'Content-Type': 'application/json; charset=UTF-8'}
+
+    count = 0;
+    reviews = []
+
+    @ToneAnalizedComment = ""
+    @review_final_versions.each do |key, round|
+      round[:response_ids].each do |responseid|
+
+        Answer.where(response_id: responseid).each do |review|
+          comment = review.comments
+          param = {
+              id:count,
+              text:comment
+          }
+          reviews[count] = param
+          @ToneAnalizedComment = @ToneAnalizedComment + param.to_json
+          count += 1
+        end
+      end
+    end
+    revs = {
+        reviews:reviews
+    }
+    @ToneAnalizedComment = revs.to_json
+    puts @ToneAnalizedComment
+
+    summary = ""
+
+    # call web service
+      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", @ToneAnalizedComment, content_type: :json, accept: :json
+      # store each summary in a hashmap and use the question as the key
+      puts "THE RESPONSE"
+      puts JSON.parse(sum_json)
+      summary = JSON.parse(sum_json)["summary"]
+      rescue StandardError => err
+        puts "failed"
+
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

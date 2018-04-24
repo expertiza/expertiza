@@ -6,12 +6,191 @@ describe UsersController do
   # let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student1) { build(:student, id: 1, name: :lily) }
   let(:student2) { build(:student) }
+  let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
+  let(:student4) { build(:student, id: 20, role_id: 4) }
+  let(:student5) { build(:student, role_id: 4, parent_id: 3) }
+  let(:student6) { build(:student, role_id: nil, name: :lilith)}
+
   let(:institution1) {build(:institution, id: 1)}
   let(:requested_user1) {RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1', institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
   let(:superadmin) {build(:superadmin)}
 
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
+  end
+
+  context "#show_selection" do
+    before(:each) do
+      allow(User).to receive(:find).with(2).and_return(instructor)
+    end
+    it 'user is nil' do
+      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
+      session = {user: admin}
+      params ={
+          user: { name: 'instructor6',
+                  crypted_password: 'password',
+                  role_id: 2,
+                  password_salt: 1,
+                  fullname: '6, instructor',
+                  email: 'chenzy@gmail.com',
+                  parent_id: 1,
+                  private_by_default: false,
+                  mru_directory_path: nil,
+                  email_on_review: true,
+                  email_on_submission: true,
+                  email_on_review_of_review: true,
+                  is_new_user: false,
+                  master_permission_granted: 0,
+                  handle: 'handle',
+                  digital_certificate: nil,
+                  timezonepref: 'Eastern Time (US & Canada)',
+                  public_key: nil,
+                  copy_of_emails: nil,
+                  institution_id: 1}
+      }
+      post :show_selection, params, session
+      expect(response).to redirect_to('http://test.host/users/list')
+    end
+
+    it 'user is not nil and user is available for editing' do
+      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(student3)
+      session = {user: student4}
+      params ={
+          user: { name: 'instructor6',
+                  crypted_password: 'password',
+                  role_id: 2,
+                  password_salt: 1,
+                  fullname: '6, instructor',
+                  email: 'chenzy@gmail.com',
+                  parent_id: 1,
+                  private_by_default: false,
+                  mru_directory_path: nil,
+                  email_on_review: true,
+                  email_on_submission: true,
+                  email_on_review_of_review: true,
+                  is_new_user: false,
+                  master_permission_granted: 0,
+                  handle: 'handle',
+                  digital_certificate: nil,
+                  timezonepref: 'Eastern Time (US & Canada)',
+                  public_key: nil,
+                  copy_of_emails: nil,
+                  institution_id: 1}
+      }
+      get :show_selection, params
+      expect(response).to render_template(:show)
+    end
+
+    it 'user is not nil but is not available for editing' do
+      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(student4)
+      allow(Role).to receive(:find).with(4).and_return(student5)
+      session = {user: student3}
+      params ={
+          user: { name: 'instructor6',
+                  crypted_password: 'password',
+                  role_id: 2,
+                  password_salt: 1,
+                  fullname: '6, instructor',
+                  email: 'chenzy@gmail.com',
+                  parent_id: 1,
+                  private_by_default: false,
+                  mru_directory_path: nil,
+                  email_on_review: true,
+                  email_on_submission: true,
+                  email_on_review_of_review: true,
+                  is_new_user: false,
+                  master_permission_granted: 0,
+                  handle: 'handle',
+                  digital_certificate: nil,
+                  timezonepref: 'Eastern Time (US & Canada)',
+                  public_key: nil,
+                  copy_of_emails: nil,
+                  institution_id: 1}
+      }
+      post :show_selection, params, session
+      expect(response).to redirect_to('http://test.host/users/list')
+    end
+
+  end
+
+  context '#show' do
+    it 'when params[:id] is not nil' do
+      allow(controller).to receive(:current_user).and_return(student1)
+      allow(User).to receive(:find).with('1').and_return(student1)
+
+      @params = {id: 1,
+          user: { name: 'instructor6',
+                  crypted_password: 'password',
+                  role_id: 2,
+                  password_salt: 1,
+                  fullname: '6, instructor',
+                  email: 'chenzy@gmail.com',
+                  parent_id: 1,
+                  private_by_default: false,
+                  mru_directory_path: nil,
+                  email_on_review: true,
+                  email_on_submission: true,
+                  email_on_review_of_review: true,
+                  is_new_user: false,
+                  master_permission_granted: 0,
+                  handle: 'handle',
+                  digital_certificate: nil,
+                  timezonepref: 'Eastern Time (US & Canada)',
+                  public_key: nil,
+                  copy_of_emails: nil,
+                  institution_id: 1}
+      }
+      session = {user: student1}
+      get :show, @params, session
+      expect(response).to render_template(:show)
+    end
+
+    it 'when params[:id] is not nil but role_id is nil' do
+      allow(controller).to receive(:current_user).and_return(student6)
+      allow(User).to receive(:find).with('6').and_return(student6)
+
+      @params = {id: 6,
+                 user: { name: 'instructor6',
+                         crypted_password: 'password',
+                         role_id: 2,
+                         password_salt: 1,
+                         fullname: '6, instructor',
+                         email: 'chenzy@gmail.com',
+                         parent_id: 1,
+                         private_by_default: false,
+                         mru_directory_path: nil,
+                         email_on_review: true,
+                         email_on_submission: true,
+                         email_on_review_of_review: true,
+                         is_new_user: false,
+                         master_permission_granted: 0,
+                         handle: 'handle',
+                         digital_certificate: nil,
+                         timezonepref: 'Eastern Time (US & Canada)',
+                         public_key: nil,
+                         copy_of_emails: nil,
+                         institution_id: 1}
+      }
+      session = {user: student6}
+      get :show, @params, session
+      expect(response).to render_template(:show)
+    end
+
+    it 'when params[:id] is nil' do
+      @params = {id: nil}
+      get :show, @params
+      expect(response).to redirect_to('/tree_display/drill')
+    end
+  end
+
+  context "#new" do
+    it '1' do
+      allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
+      params = {role: 'instructor'}
+      session = {user: instructor}
+      get :new, params, session
+      expect(response).to render_template(:new)
+    end
   end
 
   context "#request new" do

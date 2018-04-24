@@ -113,7 +113,7 @@ module ReviewMappingHelper
     metric.html_safe
   end
 
-  def display_volume_metric_chart(reviewer)
+  def initialize_chart_elements(reviewer)
     round = 0
     labels = []
     reviewer_data = []
@@ -139,7 +139,11 @@ module ReviewMappingHelper
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol
     all_reviewers_data.push @all_reviewers_overall_avg_vol
+    return labels, reviewer_data, all_reviewers_data
+  end
 
+  def display_volume_metric_chart(reviewer)
+    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
     data = {
         labels: labels,
         datasets: [
@@ -167,7 +171,7 @@ module ReviewMappingHelper
             }
         },
         width: "200",
-        height: "200",
+        height: "125",
         scales: {
             yAxes: [{
                         stacked: true,

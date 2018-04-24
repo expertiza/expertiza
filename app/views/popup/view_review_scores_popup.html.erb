@@ -17,7 +17,7 @@
 
       <% if !question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
         <tr>
-          <th colspan="3" style="background-color:#DDDDBB"> [Question] <%= question.txt %> </th>
+          <th colspan="3" style="background-color:#DDDDBB" > [Question] <%= question.txt %> </th>
         </tr>
         <% if question.instance_of? Checkbox %>
           <tr>

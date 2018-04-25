@@ -166,6 +166,13 @@ module AssignmentHelper
   end
 
     def duty_names(id_list)
-      duty_names_list = Duty.find_by_id(id_list)
+      duty_names_list = []
+      id_list.each do |id|
+        unless id == 0 
+        temp = Duty.find(id)
+        duty_names_list << [temp.name , temp.id]
+       end
+      end
+      duty_names_list
     end
 end

@@ -120,36 +120,37 @@ class PopupController < ApplicationController
     count = 0;
     reviews = []
 
-    @ToneAnalizedComment = ""
-    @review_final_versions.each do |key, round|
-      round[:response_ids].each do |responseid|
-
-        Answer.where(response_id: responseid).each do |review|
-          comment = review.comments
-          param = {
-              id:count,
-              text:comment
-          }
-          reviews[count] = param
-          @ToneAnalizedComment = @ToneAnalizedComment + param.to_json
-          count += 1
+    @toneAnalizedComment = ""
+    keys = @review_final_versions.keys
+    
+    keys.each do |key|
+      questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
+      questions = Question.where(questionnaire_id: questionnaire_id)
+      
+      questions.each do |question|
+        @review_final_versions[key][:response_ids].each do |responseid|
+          Answer.where(response_id: responseid, question_id: question.id).each do |review|
+            comment = review.comments
+            param = {
+                id:count,
+                text:comment
+            }
+            reviews[count] = param
+            @toneAnalizedComment = @toneAnalizedComment + param.to_json
+            count += 1
+          end
         end
       end
     end
     revs = {
         reviews:reviews
     }
-    @ToneAnalizedComment = revs.to_json
-    puts @ToneAnalizedComment
-
-    summary = ""
+    @toneAnalizedComment = revs.to_json
 
     # call web service
-      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", @ToneAnalizedComment, content_type: :json, accept: :json
+      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", @toneAnalizedComment, :content_type => 'application/json; charset=UTF-8', accept: :json
       # store each summary in a hashmap and use the question as the key
-      puts "THE RESPONSE"
-      puts JSON.parse(sum_json)
-      summary = JSON.parse(sum_json)["summary"]
+      @sentiment_summary = JSON.parse(sum_json)
       rescue StandardError => err
         puts "failed"
 

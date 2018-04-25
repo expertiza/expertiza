@@ -24,7 +24,7 @@
       <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
         <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.questionnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
       <% end %>
-        <li><a href="#tab-summary" id="tabmenu_summary">Summary per user</a></li>
+        <li><a href="#tab-summary" id="tabmenu_summary">Report tags done by each user</a></li>
       </ul>
       <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
         <p>
@@ -63,10 +63,10 @@
           <tr>
             <th class="sorter-true">Username</th>
             <th class="sorter-true">Name</th>
-            <th class="sorter-true">Percentage of answers tagged</th>
-            <th class="sorter-true"># answers tagged</th>
-            <th class="sorter-true"># answers not tagged</th>
-            <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain question types and has a length of greater than the threshold).'/></th>
+            <th class="sorter-true">Percentage of tags done</th>
+            <th class="sorter-true"># tags done</th>
+            <th class="sorter-true"># tags not done</th>
+            <th class="sorter-true"># possible tags to do<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain question types and has a length of greater than the threshold).'/></th>
           </tr>
           </thead>
           <% @user_tagging_report.each do |key, val| %>

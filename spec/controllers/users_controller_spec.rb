@@ -1,5 +1,6 @@
 describe UsersController do
   let(:admin) { build(:admin, id: 3) }
+  let(:super_admin) {build (:superadmin)}
   let(:instructor) { build(:instructor, id: 2) }
   let(:student1) { build(:student, id: 1, name: :lily) }
   let(:student2) { build(:student) }
@@ -42,6 +43,14 @@ describe UsersController do
       session = {user: instructor}
       get :set_anonymized_view, params: @params,session: session
       expect(response).to redirect_to("http://www.example.com")
+    end
+  end
+
+  context "#list_pending_requested" do
+    it 'test list_pednign_requested view' do
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+      get :list_pending_requested
+      expect(response).to render_template(:list_pending_requested)
     end
   end
 

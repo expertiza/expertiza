@@ -374,6 +374,26 @@
           <div id="review_comments_analysis"></div>
         </td>
       </tr>
+      <% if @questionnaire.type == "TeammateReviewQuestionnaire" || @questionnaire.type == "Teammate ReviewQuestionnaire" %>
+        <tr>
+          <td>
+            <img width = "100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
+            Good Teammate?
+            <input type="checkbox">
+          </td>
+        </tr>
+      <% end%>
+
+      <% if @questionnaire.type == "AuthorFeedbackQuestionnaire" || @questionnaire.type == "Author FeedbackQuestionnaire" %>
+        <tr>
+          <td>
+            <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
+            Good Reviewer?
+            <input type="checkbox">
+          </td>
+        </tr>
+      <% end %>
+
     </table>
     <%if @current_round%>
       <%= hidden_field_tag "review[round]", @current_round %>

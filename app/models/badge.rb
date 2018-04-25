@@ -6,4 +6,9 @@ class Badge < ActiveRecord::Base
   def self.get_id_from_name(badge_name)
     Badge.find_by(name: badge_name).try(:id)
   end
+
+  def self.get_image_name_from_name(badge_name)
+    Badge.find_by(name: badge_name).try(:image_name)
+  end
+
 end

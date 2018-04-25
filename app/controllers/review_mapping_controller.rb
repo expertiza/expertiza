@@ -417,8 +417,20 @@ class ReviewMappingController < ApplicationController
     when "AnswerTaggingReport"
       tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
       @questionnaire_tagging_report = {}
+      @user_tagging_report = {}
       tag_prompt_deployments.each do |tag_dep|
         @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
+        #generate a summary report per user
+        @questionnaire_tagging_report[tag_dep].each do |line|
+          if @user_tagging_report[line.user.name].nil?
+            @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
+          else
+            @user_tagging_report[line.user.name].no_tagged += line.no_tagged
+            @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
+            @user_tagging_report[line.user.name].no_tagable += line.no_tagable
+            @user_tagging_report[line.user.name].percentage = @user_tagging_report[line.user.name].no_tagable == 0 ? "-" : format("%.1f", @user_tagging_report[line.user.name].no_tagged.to_f / @user_tagging_report[line.user.name].no_tagable * 100)
+          end
+        end
       end
     when "SelfReview"
       @self_review_response_maps = SelfReviewResponseMap.where(reviewed_object_id: @id)

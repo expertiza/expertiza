@@ -7,13 +7,13 @@ class VmUserAnswerTagging
     @no_tagable = no_tagable
   end
 
-  attr_reader :user
+  attr_accessor :user
 
-  attr_reader :percentage
+  attr_accessor :percentage
 
-  attr_reader :no_tagged
+  attr_accessor :no_tagged
 
-  attr_reader :no_not_tagged
+  attr_accessor :no_not_tagged
 
-  attr_reader :no_tagable
+  attr_accessor :no_tagable
 end

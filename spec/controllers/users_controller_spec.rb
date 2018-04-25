@@ -1,9 +1,6 @@
 describe UsersController do
-  # RSpec::Mocks.configuration.allow_message_expectations_on_nil=true
   let(:admin) { build(:admin, id: 3) }
   let(:instructor) { build(:instructor, id: 2) }
-  # let(:instructor2) { build(:instructor, id: 66) }
-  # let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student1) { build(:student, id: 1, name: :lily) }
   let(:student2) { build(:student) }
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
@@ -20,35 +17,25 @@ describe UsersController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  describe '#index' do
+  context '#index' do
     it 'redirects if user is student' do
       stub_current_user(student3, student3.role.name, student3.role)
       allow(controller).to receive(:current_user_role?).and_return("Student")
-      #allow(student1).to receive(:get_user_list).and_return(nil)
-      #allow_any_instance_of(:student).to receive(:get_user_list).and_return(nil)
-      #@params = {}
-      #puts student1.role_id
-      #session = {user: student1}
       get :index
-      #expect(response).to redirect_to(:home)
       expect(response).to redirect_to('/tree_display/drill')
     end
 
     it 'renders list if user is instructor' do
-      #stub_current_user(instructor, instructor.role.name, instructor.role)
       allow(instructor).to receive(:get_user_list).and_return(student1)
-      #allow_any_instance_of(:student).to receive(:get_user_list).and_return(nil)
       @params = {}
-      #puts student1.role_id
       session = {user: instructor}
       get :index, @params,session
-      #expect(response).to redirect_to(:home)
       expect(controller.instance_variable_get(:@users)).to equal(student1)
       expect(response).to render_template(:list)
     end
   end
 
-  describe '#set_anonymized_view' do
+  context '#set_anonymized_view' do
     it 'redirects to back' do
       request.env["HTTP_REFERER"] = "http://www.example.com"
       @params = {}
@@ -99,7 +86,6 @@ describe UsersController do
     it 'when params[:id] is not nil' do
       allow(controller).to receive(:current_user).and_return(student1)
       allow(User).to receive(:find).with('1').and_return(student1)
-
       @params = {id: 1}
       session = {user: student1}
       get :show, @params, session
@@ -109,7 +95,6 @@ describe UsersController do
     it 'when params[:id] is not nil but role_id is nil' do
       allow(controller).to receive(:current_user).and_return(student6)
       allow(User).to receive(:find).with('6').and_return(student6)
-
       @params = {id: 6}
       session = {user: student6}
       get :show, @params, session
@@ -146,7 +131,6 @@ describe UsersController do
     before(:each) do
       allow(User).to receive(:find).with(3).and_return(admin)
     end
-
     it 'save successfully with email as name' do
       allow(User).to receive(:find_by).with(name: 'lily').and_return(student1)
       session = {user: admin}
@@ -167,7 +151,7 @@ describe UsersController do
                   master_permission_granted: 0,
                   handle: 'handle',
                   digital_certificate: nil,
-                  timezonepref: 'Eastern Time (US & Canada)', 
+                  timezonepref: 'Eastern Time (US & Canada)',
                   public_key: nil,
                   copy_of_emails: nil,
                   institution_id: 1}
@@ -240,10 +224,6 @@ describe UsersController do
 
   context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
-#			allow(User).to receive_message_chain(:joins, :where).and_return([superadmin])
-#			session = { user: admin,
-#				    ip: "5646:asdh"					
-#					}			
       params ={
           user: { name: 'instructor6',
                   role_id: 2,
@@ -326,7 +306,6 @@ describe UsersController do
       post :create_approved_user, params, session
       allow_any_instance_of(RequestedUser).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address." or 'The user "requester1" has been successfully updated.'
-#			expect(flash[:success]).to eq 'The user requester1 has been successfully updated'
       expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
 
@@ -348,7 +327,6 @@ describe UsersController do
           status: 'Rejected'
       }
       post :create_approved_user, params
-#			expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
       expect(flash[:success]).to eq 'The user "requester1" has been Rejected.' or 'The user "requester1" has been successfully updated.'
       expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
@@ -366,7 +344,7 @@ describe UsersController do
     end
   end
 
-  describe '#edit' do
+  context '#edit' do
     it 'renders users#edit page' do
       allow(User).to receive(:find).with('1').and_return(student1)
       @params = {id: 1}
@@ -376,81 +354,49 @@ describe UsersController do
     end
   end
 
-  describe '#update' do
-    context 'when user is updated successfully' do
-      it 'shows correct flash and redirects to users#show page' do
-        allow(User).to receive(:find).with('1').and_return(student1)
-        @params = {id: 1}
-        allow(student1).to receive(:update_attributes).with(any_args).and_return(true)
-        post :update, @params
-        expect(flash[:success]).to eq 'The user "lily" has been successfully updated.'
-        expect(response).to redirect_to('/users')
-      end
+  context '#update' do
+    it 'when user is updated successfully' do
+      allow(User).to receive(:find).with('1').and_return(student1)
+      @params = {id: 1}
+      allow(student1).to receive(:update_attributes).with(any_args).and_return(true)
+      post :update, @params
+      expect(flash[:success]).to eq 'The user "lily" has been successfully updated.'
+      expect(response).to redirect_to('/users')
     end
-    context 'when user is not updated successfully' do
-      it 'redirects to users#edit page' do
-        allow(User).to receive(:find).with('2').and_return(student2)
-        @params = {id: 2}
-        allow(student2).to receive(:update_attributes).with(any_args).and_return(false)
-        post :update, @params
-        expect(response).to render_template(:edit)
-      end
+    it 'when user is not updated successfully' do
+      allow(User).to receive(:find).with('2').and_return(student2)
+      @params = {id: 2}
+      allow(student2).to receive(:update_attributes).with(any_args).and_return(false)
+      post :update, @params
+      expect(response).to render_template(:edit)
     end
   end
 
-  describe '#destroy' do
-    # context 'when user is deleted successfully' do
-    #   it 'shows correct flash and redirects to users/list page' do
-    #     assignment_participant = [double('AssignmentParticipant', user_id: 1)]
-    #     teams_user = [double('TeamsUser', user_id: 1)]
-    #     assignment_questionnaire = [double('AssignmentQuestionnaire', user_id: 1)]
-    #
-    #     allow(assignment_participant).to receive(:delete).and_return(true)
-    #     allow(teams_user).to receive(:delete).and_return(true)
-    #     allow(assignment_questionnaire).to receive(:destroy).and_return(true)
-    #
-    #     allow(assignment_participant).to receive(:each).and_return(true)
-    #     allow(teams_user).to receive(:each).and_return(true)
-    #     allow(assignment_questionnaire).to receive(:each).and_return(true)
-    #
-    #     allow(student1).to receive(:destroy).and_return(true)
-    #     allow(User).to receive(:find).with('1').and_return(student1)
-    #     @params = {id: 1}
-    #     get :destroy, @params
-    #     expect(flash[:note]).to match(/'The user "lily" has been successfully updated.*/)
-    #     expect(response).to redirect_to('/users/list')
-    #   end
-    # end
-    context 'when user is not deleted successfully' do
-      it 'shows an error and redirects to users/list page' do
-        allow(User).to receive(:find).with('2').and_return(student2)
-        @params = {id: 2}
-        get :destroy, @params
-        expect(flash[:error]).not_to be_nil
-        expect(response).to redirect_to('/users/list')
-      end
+  context '#destroy' do
+    it 'when user is not deleted successfully' do
+      allow(User).to receive(:find).with('2').and_return(student2)
+      @params = {id: 2}
+      get :destroy, @params
+      expect(flash[:error]).not_to be_nil
+      expect(response).to redirect_to('/users/list')
     end
   end
 
-  describe '#keys' do
+  context '#keys' do
     before(:each) do
       stub_current_user(student1, student1.role.name, student1.role)
     end
-    context 'when params[:id] is not nil' do
-      it '@private_key gets correct value' do
-        the_key="the key"
-        allow(User).to receive(:find).with('1').and_return(student1)
-        allow(student1).to receive(:generate_keys).and_return(the_key)
-        @params = {id: 1}
-        get :keys, @params
-        expect(controller.instance_variable_get(:@private_key)).to be(the_key)
-      end
+    it 'when params[:id] is not nil' do
+      the_key="the key"
+      allow(User).to receive(:find).with('1').and_return(student1)
+      allow(student1).to receive(:generate_keys).and_return(the_key)
+      @params = {id: 1}
+      get :keys, @params
+      expect(controller.instance_variable_get(:@private_key)).to be(the_key)
     end
-    context 'when params[:id] is nil' do
-      it 'redirects to ' do
-        get :keys
-        expect(response).to redirect_to('/tree_display/drill')
-      end
+    it 'when params[:id] is nil' do
+      get :keys
+      expect(response).to redirect_to('/tree_display/drill')
     end
   end
 end

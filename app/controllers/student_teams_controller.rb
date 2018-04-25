@@ -13,8 +13,8 @@ class StudentTeamsController < ApplicationController
 
   attr_writer :student
 
-  before_action :team, only: %i[edit update]
-  before_action :student, only: %i[view update edit create remove_participant]
+  before_action :team, only: %i[edit update edit_duty update_duty]
+  before_action :student, only: %i[view update edit edit_duty update_duty create remove_participant]
 
   def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
@@ -54,7 +54,7 @@ class StudentTeamsController < ApplicationController
     @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
 
     @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
-    @duties = Duty.where(assignment_id: student.assignment.id).map(&:name)
+    @duties = Duty.select(:name,:id).where(assignment_id: student.assignment.id)
     @duty_based_review_allowed =  @student.assignment.role_based_review
   end
 
@@ -84,24 +84,44 @@ class StudentTeamsController < ApplicationController
 
   def edit; end
 
+  def edit_duty
+    @duties = Duty.select(:name,:id).where(assignment_id: student.assignment.id)
+  end
+
+  def update_duty
+    team_user = TeamsUser.find_by(team_id: params[:team_id],user_id: @student.user_id)
+    
+    if team_user.update_attribute('duties_id' , params[:duty][:duty_id])
+      team_user = TeamsUser.find_by(team_id: params[:team_id],user_id: @student.user_id)
+       redirect_to view_student_teams_path student_id: params[:student_id]
+      
+    else
+      
+       flash[:notice] = 'Duty ID not stored.'
+    end
+    
+  end
+
+
   def update
     matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
+    render :plain => params.inspect  
     if matching_teams.length.zero?
       if team.update_attribute('name', params[:team][:name])
         team_created_successfully
 
-        redirect_to view_student_teams_path student_id: params[:student_id]
+        #redirect_to view_student_teams_path student_id: params[:student_id]
 
       end
     elsif matching_teams.length == 1 && (matching_teams[0].name <=> team.name).zero?
 
       team_created_successfully
-      redirect_to view_student_teams_path student_id: params[:student_id]
+      #redirect_to view_student_teams_path student_id: params[:student_id]
 
     else
       flash[:notice] = 'That team name is already in use.'
 
-      redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
+      #redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
 
     end
   end

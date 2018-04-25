@@ -233,6 +233,7 @@ describe UsersController do
                   institution_id: 1}
       }
       post :create, params, session
+      allow_any_instance_of(User).to receive(:undo_link).with('The user "chenzy@gmail.com" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
       expect(response).to redirect_to('http://test.host/users/list')
     end
@@ -262,6 +263,7 @@ describe UsersController do
                   institution_id: 1}
       }
       post :create, params, session
+      allow_any_instance_of(User).to receive(:undo_link).with('The user "instructor6" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
       expect(response).to redirect_to('http://test.host/users/list')
     end
@@ -382,6 +384,7 @@ describe UsersController do
           status: 'Approved'
       }
       post :create_approved_user, params, session
+      allow_any_instance_of(RequestedUser).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address." or 'The user "requester1" has been successfully updated.'
 #			expect(flash[:success]).to eq 'The user requester1 has been successfully updated'
       expect(response).to redirect_to('http://test.host/users/list_pending_requested')

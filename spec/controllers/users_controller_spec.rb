@@ -14,9 +14,48 @@ describe UsersController do
   let(:institution1) {build(:institution, id: 1)}
   let(:requested_user1) {RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1', institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
   let(:superadmin) {build(:superadmin)}
+  let(:assignment) {build(:assignment, id: 1, name: "test_assignment", instructor_id: 2, participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
 
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
+  end
+
+  describe '#index' do
+    it 'redirects if user is student' do
+      stub_current_user(student3, student3.role.name, student3.role)
+      allow(controller).to receive(:current_user_role?).and_return("Student")
+      #allow(student1).to receive(:get_user_list).and_return(nil)
+      #allow_any_instance_of(:student).to receive(:get_user_list).and_return(nil)
+      #@params = {}
+      #puts student1.role_id
+      #session = {user: student1}
+      get :index
+      #expect(response).to redirect_to(:home)
+      expect(response).to redirect_to('/tree_display/drill')
+    end
+
+    it 'renders list if user is instructor' do
+      #stub_current_user(instructor, instructor.role.name, instructor.role)
+      allow(instructor).to receive(:get_user_list).and_return(student1)
+      #allow_any_instance_of(:student).to receive(:get_user_list).and_return(nil)
+      @params = {}
+      #puts student1.role_id
+      session = {user: instructor}
+      get :index, @params,session
+      #expect(response).to redirect_to(:home)
+      expect(controller.instance_variable_get(:@users)).to equal(student1)
+      expect(response).to render_template(:list)
+    end
+  end
+
+  describe '#set_anonymized_view' do
+    it 'redirects to back' do
+      request.env["HTTP_REFERER"] = "http://www.example.com"
+      @params = {}
+      session = {user: instructor}
+      get :set_anonymized_view, params: @params,session: session
+      expect(response).to redirect_to("http://www.example.com")
+    end
   end
 
   context "#show_selection" do

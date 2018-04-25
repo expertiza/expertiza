@@ -9,10 +9,10 @@
       <%questions = Question.where(questionnaire_id: questionnaire_id)%>
       <%num_responses = @review_final_versions[key][:response_ids].length%>
       <% questions.each do |question|%>
-          <% if question.type!= 'Checkbox' %>
           <tr>
             <th  align = 'left' colspan="3"> [Question] <%= question.txt%> </th>
           </tr>
+          <% if question.type!= 'Checkbox' %>
           <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
               <tr>
                 <td width="30%"> Reviewee </td>
@@ -54,9 +54,6 @@
               <%end%>
           <%end%>
           <%else %>
-              <tr>
-                <th  align = 'left' colspan="3"> [Question] <%= question.txt%> </th>
-              </tr>
 
               <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
                   <tr>

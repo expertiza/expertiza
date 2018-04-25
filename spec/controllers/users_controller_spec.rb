@@ -27,26 +27,7 @@ describe UsersController do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
       session = {user: admin}
       params ={
-          user: { name: 'instructor6',
-                  crypted_password: 'password',
-                  role_id: 2,
-                  password_salt: 1,
-                  fullname: '6, instructor',
-                  email: 'chenzy@gmail.com',
-                  parent_id: 1,
-                  private_by_default: false,
-                  mru_directory_path: nil,
-                  email_on_review: true,
-                  email_on_submission: true,
-                  email_on_review_of_review: true,
-                  is_new_user: false,
-                  master_permission_granted: 0,
-                  handle: 'handle',
-                  digital_certificate: nil,
-                  timezonepref: 'Eastern Time (US & Canada)',
-                  public_key: nil,
-                  copy_of_emails: nil,
-                  institution_id: 1}
+          user: { name: 'instructor6'}
       }
       post :show_selection, params, session
       expect(response).to redirect_to('http://test.host/users/list')
@@ -56,26 +37,7 @@ describe UsersController do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(student3)
       session = {user: student4}
       params ={
-          user: { name: 'instructor6',
-                  crypted_password: 'password',
-                  role_id: 2,
-                  password_salt: 1,
-                  fullname: '6, instructor',
-                  email: 'chenzy@gmail.com',
-                  parent_id: 1,
-                  private_by_default: false,
-                  mru_directory_path: nil,
-                  email_on_review: true,
-                  email_on_submission: true,
-                  email_on_review_of_review: true,
-                  is_new_user: false,
-                  master_permission_granted: 0,
-                  handle: 'handle',
-                  digital_certificate: nil,
-                  timezonepref: 'Eastern Time (US & Canada)',
-                  public_key: nil,
-                  copy_of_emails: nil,
-                  institution_id: 1}
+          user: { name: 'instructor6'}
       }
       get :show_selection, params
       expect(response).to render_template(:show)
@@ -86,26 +48,7 @@ describe UsersController do
       allow(Role).to receive(:find).with(4).and_return(student5)
       session = {user: student3}
       params ={
-          user: { name: 'instructor6',
-                  crypted_password: 'password',
-                  role_id: 2,
-                  password_salt: 1,
-                  fullname: '6, instructor',
-                  email: 'chenzy@gmail.com',
-                  parent_id: 1,
-                  private_by_default: false,
-                  mru_directory_path: nil,
-                  email_on_review: true,
-                  email_on_submission: true,
-                  email_on_review_of_review: true,
-                  is_new_user: false,
-                  master_permission_granted: 0,
-                  handle: 'handle',
-                  digital_certificate: nil,
-                  timezonepref: 'Eastern Time (US & Canada)',
-                  public_key: nil,
-                  copy_of_emails: nil,
-                  institution_id: 1}
+          user: { name: 'instructor6'}
       }
       post :show_selection, params, session
       expect(response).to redirect_to('http://test.host/users/list')
@@ -118,28 +61,7 @@ describe UsersController do
       allow(controller).to receive(:current_user).and_return(student1)
       allow(User).to receive(:find).with('1').and_return(student1)
 
-      @params = {id: 1,
-          user: { name: 'instructor6',
-                  crypted_password: 'password',
-                  role_id: 2,
-                  password_salt: 1,
-                  fullname: '6, instructor',
-                  email: 'chenzy@gmail.com',
-                  parent_id: 1,
-                  private_by_default: false,
-                  mru_directory_path: nil,
-                  email_on_review: true,
-                  email_on_submission: true,
-                  email_on_review_of_review: true,
-                  is_new_user: false,
-                  master_permission_granted: 0,
-                  handle: 'handle',
-                  digital_certificate: nil,
-                  timezonepref: 'Eastern Time (US & Canada)',
-                  public_key: nil,
-                  copy_of_emails: nil,
-                  institution_id: 1}
-      }
+      @params = {id: 1}
       session = {user: student1}
       get :show, @params, session
       expect(response).to render_template(:show)
@@ -149,28 +71,7 @@ describe UsersController do
       allow(controller).to receive(:current_user).and_return(student6)
       allow(User).to receive(:find).with('6').and_return(student6)
 
-      @params = {id: 6,
-                 user: { name: 'instructor6',
-                         crypted_password: 'password',
-                         role_id: 2,
-                         password_salt: 1,
-                         fullname: '6, instructor',
-                         email: 'chenzy@gmail.com',
-                         parent_id: 1,
-                         private_by_default: false,
-                         mru_directory_path: nil,
-                         email_on_review: true,
-                         email_on_submission: true,
-                         email_on_review_of_review: true,
-                         is_new_user: false,
-                         master_permission_granted: 0,
-                         handle: 'handle',
-                         digital_certificate: nil,
-                         timezonepref: 'Eastern Time (US & Canada)',
-                         public_key: nil,
-                         copy_of_emails: nil,
-                         institution_id: 1}
-      }
+      @params = {id: 6}
       session = {user: student6}
       get :show, @params, session
       expect(response).to render_template(:show)

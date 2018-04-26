@@ -9,10 +9,10 @@
       <%questions = Question.where(questionnaire_id: questionnaire_id)%>
       <%num_responses = @review_final_versions[key][:response_ids].length%>
       <% questions.each do |question|%>
+          <% if question.type!= 'Checkbox' %>
           <tr>
             <th  align = 'left' colspan="3"> [Question] <%= question.txt%> </th>
           </tr>
-          <% if question.type!= 'Checkbox' %>
           <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
               <tr>
                 <td width="30%"> Reviewee </td>
@@ -59,24 +59,27 @@
                   <tr>
                   <td colspan="3" border="1">
                   <table width = "100%" border="1" >
+                    <col width="60%">
                   <tr>
+                    <th align = 'left' rowspan="2"> [Question] <%= question.txt%> </th>
                     <%@review_final_versions[key][:response_ids].each do |response_id|%>
                         <%team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)%>
-                    <td align="center"> <%=team.name%></td>
+                    <td align="center" width="10%"> <%=team.name%></td>
                        <%end%>
                   </tr>
                     <tr>
                       <%@review_final_versions[key][:response_ids].each do |response_id|%>
                       <%answer = Answer.where(response_id: response_id, question_id: question.id).first%>
                           <%if answer.answer == 1 %>
-                          <td align="center"><%=image_tag("Check-icon.png") %></td>
+                          <td align="center" width="10%"><%=image_tag("Check-icon.png") %></td>
                           <%else%>
-                              <td align="center"><%=image_tag("delete_icon.png") %> </td>
+                              <td align="center" width="10%"><%=image_tag("delete_icon.png") %> </td>
                           <%end%>
                      <%end%>
                     </tr>
                     </table>
                     </td>
+                  </tr>
                   </tr>
               <%else%>
                   <%next%>

@@ -81,6 +81,11 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
+      # added for srq
+
+      @sr_questionnaire = set_questionnaire
+      sr_questions = sort_questions(@sr_questionnaire.questions)
+      questions += sr_questions
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
@@ -133,10 +138,20 @@ class ResponseController < ApplicationController
     map_id = params[:id]
     map_id = params[:map_id] if !params[:map_id].nil?# pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
+    # added for srq
+
+    @team_id = @map.reviewee_id
+
     set_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
+      # added for srq
+
+      @sr_questionnaire_id =  Team.get_srq_id_of_team(@team_id)
+      unless @sr_questionnaire_id.nil?
+        @sr_questionnaire = Questionnaire.find(@sr_questionnaire_id)
+      end
     else
       @round = nil
     end
@@ -161,6 +176,13 @@ class ResponseController < ApplicationController
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
+    # added for srq
+
+    unless @sr_questionnaire.nil?
+      sr_questions = sort_questions(@sr_questionnaire.questions)
+      questions += sr_questions
+    end
+
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
@@ -269,6 +291,12 @@ class ResponseController < ApplicationController
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
+    # added for srq
+
+    unless @sr_questionnaire.nil?
+      @sr_questions = sort_questions(@sr_questionnaire.questions)
+    end
+    @questions += @sr_questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
@@ -279,6 +307,11 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
+      # added for srq
+      @sr_questionnaire_id = Team.get_srq_id_of_team(@contributor.id)
+      unless @sr_questionnaire_id.nil?
+        @sr_questionnaire = Questionnaire.find(@sr_questionnaire_id)
+      end
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
@@ -305,6 +338,9 @@ class ResponseController < ApplicationController
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
     @questionnaire = @response.questionnaire_by_answer(answer)
+    # added for srq
+    sr_answer = @response.scores.last
+    @sr_questionnaire = @response.questionnaire_by_answer(sr_answer)
   end
 
   def set_dropdown_or_scale

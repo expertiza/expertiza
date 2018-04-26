@@ -1,8 +1,8 @@
 class CreateAssignmentsDutyMappings < ActiveRecord::Migration
   def change
-    create_table :assignments_duty_mappings do |t|
-
-      t.timestamps null: false
+    
+        add_column :assignments_duty_mappings ,:duty_id,:integer
+  		add_column :assignments_duty_mappings ,:assignment_id,:integer
     end
   end
 end

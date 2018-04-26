@@ -1,7 +1,7 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :assignment_duties
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :assignment_duties, :assignment_duty_questionnaire
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -16,6 +16,7 @@ class AssignmentForm
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @assignment_duties = Array(args[:assignment_duties])
+    @assignment_duty_questionnaire = Array(args[:assignment_duty_questionnaire])
     @due_dates = Array(args[:due_dates])
   end
 
@@ -28,6 +29,7 @@ class AssignmentForm
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     assignment_form.assignment_duties =AssignmentsDutyMapping.where(assignment_id: assignment_id ).pluck(:duty_id)
+    assignment_form.assignment_duty_questionnaire
     assignment_form
   end
 
@@ -43,6 +45,7 @@ class AssignmentForm
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assignments_duties(attributes[:assignment_duties])
+    update_assignment_duty_questionnaires(attributes[:assignment_duty_questionnaire])
     set_badge_threshold_for_assignment(attributes[:assignment][:id], attributes[:badge]) if @assignment.has_badge?
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
@@ -73,7 +76,7 @@ def update_assignments_duties(attributes)
          if(duty_list!="duty_id")
            duty_list.each do |duty|
            if(duty!="") then
-            @assignment_duty = AssignmentsDutyMapping.new( assignment_id: @assignment.id, duty_id: duty.to_i)
+            @assignment_duty = AssignmentsDutyMapping.new(assignment_id: @assignment.id, duty_id: duty.to_i)
             @assignment_duty.save
            end
            end
@@ -83,6 +86,16 @@ def update_assignments_duties(attributes)
    end
    return false
  end
+
+ def update_assignment_duty_questionnaires(attributes)
+  return false unless attributes
+  attributes.each do |key,val|
+    if val != "" then
+     @assignment_duty_map = AssignmentDutyQuestionnaireMapping.new(assignment_id: @assignment.id, duty_id: val.to_i)
+     @assignment_duty_map.save
+   end
+ end
+end
 
 
   # code to save assignment questionnaires

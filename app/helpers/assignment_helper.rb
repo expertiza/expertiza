@@ -176,11 +176,4 @@ module AssignmentHelper
       duty_names_list
     end
 
-    def saveQuestionnaireIdtoAssignmentDutyMappings(duty_id,questionnaire_id,assignment_id)
-      if duty_id!=0 and assignment_id!=0
-        @quest_id = AssignmentsDutyMapping.questionnaire_id.where(assignment_id: assignment_id, duty_id: duty_id)
-        @quest_id = questionnaire_id
-        @quest_id.save
-      end
-    end
 end

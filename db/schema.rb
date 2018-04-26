@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180422230039) do
+ActiveRecord::Schema.define(version: 20180426041700) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -46,6 +46,14 @@ ActiveRecord::Schema.define(version: 20180422230039) do
 
   add_index "assignment_badges", ["assignment_id"], name: "index_assignment_badges_on_assignment_id", using: :btree
   add_index "assignment_badges", ["badge_id"], name: "index_assignment_badges_on_badge_id", using: :btree
+
+  create_table "assignment_duty_questionnaire_mappings", force: :cascade do |t|
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "questionnaire_id", limit: 4
+    t.integer  "assignment_id",    limit: 4
+    t.integer  "duty_id",          limit: 4
+  end
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -120,10 +128,11 @@ ActiveRecord::Schema.define(version: 20180422230039) do
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
 
   create_table "assignments_duty_mappings", force: :cascade do |t|
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.integer  "duty_id",       limit: 4, null: false
-    t.integer  "assignment_id", limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "duty_id",          limit: 4
+    t.integer  "assignment_id",    limit: 4
+    t.integer  "questionnaire_id", limit: 4
   end
 
   create_table "automated_metareviews", force: :cascade do |t|
@@ -430,6 +439,20 @@ ActiveRecord::Schema.define(version: 20180422230039) do
   end
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
+
+  create_table "questionnaire_duty_mappings", force: :cascade do |t|
+    t.integer  "assignment_id",    limit: 4
+    t.integer  "questionnaire_id", limit: 4
+    t.integer  "duty_id",          limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  create_table "questionnaire_to_duty_mapping_tables", force: :cascade do |t|
+    t.integer "questionnaire_id", limit: 4
+    t.integer "assignment_id",    limit: 4
+    t.integer "duty_id",          limit: 4
+  end
 
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64

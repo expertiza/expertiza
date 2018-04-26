@@ -22,9 +22,15 @@
       <th class="head">Full name</th>
       <!--<th class="head">Team-member role (duty)</th>-->
       <th class="head">Email address</th>
+     
       <% if @teammate_review_allowed %>
-        <th class="head">Review action</th>
+       <% if @duty_based_review_allowed %>
+          <th class="head">Duty</th>
+       <% end %>
+       <th class="head">Review action</th>
       <% end %>
+
+
     </tr>
 
     <% for member in @student.team.participants %> <!--start team member content-->
@@ -35,6 +41,23 @@
 
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
+          <td>
+            <%if TeamsUser.where(user_id: member.user.id,team_id:member.team.id).map(&:duties_id).first == nil %>
+              <b style="text-align: center">Not Selected &nbsp;</b>
+            <%else%>
+              <% dutyId = TeamsUser.where(user_id: member.user.id,team_id:member.team.id).map(&:duties_id).first %>
+                 <%=Duty.where(id: dutyId).map(&:name).first%>
+
+            <%end%>
+
+            <%if member.user.id == session[:user].id %>
+
+              <!--Displayed the names of duties added by the instructor for an assignment in a dropdown-->
+               
+
+                | <%= link_to "Select", controller: 'StudentTeams', action: 'edit_duty', team_id: member.team.id, student_id: member.id %>
+            <%end%>
+          </td>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?
@@ -50,6 +73,8 @@
               <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
               &nbsp;&nbsp;
               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+              &nbsp;&nbsp;
+              
             </td>
           <% end %>
         <% end %>

@@ -357,11 +357,13 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :student_teams, only: %i[create edit update] do
+  resources :student_teams, only: %i[create edit update edit_duty update_duty] do
     collection do
       get :view
       get :remove_participant
       get :auto_complete_for_user_name
+      get :edit_duty
+      post :update_duty
     end
   end
 

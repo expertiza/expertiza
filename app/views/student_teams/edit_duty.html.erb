@@ -1,0 +1,14 @@
+<H1>Select Duty</H1>
+<%= form_for'duty', url: {action: "update_duty"} do |f|%>
+  <%= hidden_field_tag 'team_id', @team.id %>
+  <%= hidden_field_tag 'student_id', @student.id %>
+  <label for="select_duty">Select Duty:</label>&nbsp;
+  <br>
+  <br>
+  	<% @duties.each do |d| %>
+  		<%= f.radio_button :duty_id,d.id%><%=d.name%> <br>
+  	<% end %>
+  <%= submit_tag "Select Duty" %>
+<% end %>
+<br/>
+<a href="javascript:window.history.back()">Back</a>

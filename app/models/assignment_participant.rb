@@ -76,6 +76,10 @@ class AssignmentParticipant < Participant
     calculate_scores(scores)
   end
 
+  def role_based_review
+    Assignment.find_by(id: self.assignment.id).role_based_review
+  end
+
   def compute_assignment_score(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round

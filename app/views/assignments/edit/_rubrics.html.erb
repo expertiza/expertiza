@@ -22,14 +22,14 @@
         //Rubric options
         if (questionnaire_type ==  'TeammateReviewQuestionnaire' && role_based_review == true) {
         html +=     '<td align="center">' + 
-        '<select id="duty_id" name="Select Duty" style="width:300px">' +
+        '<select id="duty_id" name="Select Duty" , {},:onChange => saveQuestionnaireId(@assignment_form.assignment_duties.to_json.html_safe)style="width:300px">' +
         '<option value="">Please Select a duty</option>';
         for (j = 0; j<duty_names.length ; j++) {
           html += '<option value="' + duty_names[j][1] + '">' + duty_names[j][0] + '</option>';
         }
         html += '</select>';
         html +=    
-        '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px">' +
+        '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" , {},:onChange => saveQuestionnaireId(@assignment_form.assignment_duties.to_json.html_safe)style="width:300px">' +
         '<option value="">--None--</option>';
         for (i = 0; i < questionnaire_options.length; i++) {
             html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
@@ -94,6 +94,12 @@
         return prefix + qs_id + ']'
       else
         return prefix + ']'
+    }
+
+    function saveQuestionnaireId(assignment_id){
+      var dropdown1 = jQuery('#duty_id');
+      var dropdown2 = jQuery('#questionnaire_id');
+      saveQuestionnaireIdtoAssignmentDutyMappings(dropdown1,dropdown2,assignment_id);
     }
 
     async function addTagPromptDropdown(placeholder_id, tag_dep_id, questionnaire_id, tag_prompt_id, question_type, text_len){

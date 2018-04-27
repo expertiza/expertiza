@@ -244,6 +244,8 @@ class AssignmentsController < ApplicationController
     @team_formation_allowed_checkbox = false
     @participants_count = @assignment_form.assignment.participants.size
     @teams_count = @assignment_form.assignment.teams.size
+    #@assignment_form.assignment.role_based_review = params[:role_based_review]
+    #@assignment_form.assignment.allow_multiple_duties = params[:allow_multiple_duties]
   end
 
   def assignment_form_assignment_staggered_deadline?
@@ -313,9 +315,11 @@ class AssignmentsController < ApplicationController
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
+    unless params[:assignment_form][:assignment_questionnaire].nil?
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
     end
+  end
   end
 
   def handle_current_user_timezonepref_nil

@@ -29,7 +29,7 @@ class AssignmentForm
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     assignment_form.assignment_duties =AssignmentsDutyMapping.where(assignment_id: assignment_id ).pluck(:duty_id)
-    assignment_form.assignment_duty_questionnaire
+    assignment_form.assignment_duty_questionnaire = AssignmentQuestionnaire.where(assignment_id: assignment_id).pluck(:questionnaire_id)
     assignment_form
   end
 

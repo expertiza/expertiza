@@ -165,7 +165,7 @@ module AssignmentHelper
         duty_temp_list
   end
 
-    def duty_names(id_list)
+    def duty_names(id_list,assignment_id = 0)
       duty_names_list = []
       id_list.each do |id|
         unless id == 0 

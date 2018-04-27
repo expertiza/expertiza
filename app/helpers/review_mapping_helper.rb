@@ -6,11 +6,11 @@ module ReviewMappingHelper
     headers.each do |header, percentage|
       table_header += if percentage
                         "<th width = #{percentage}>\
-                        #{header.humanize}\
+                                        #{header.humanize}\
                                         </th>"
                       else
                         "<th>\
-                        #{header.humanize}\
+                                        #{header.humanize}\
                                         </th>"
                       end
     end
@@ -24,8 +24,7 @@ module ReviewMappingHelper
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
 
-    #bgcolor = line_num.even? ? "#ffffff" : "#DDDDBB"
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0)}
+    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
 
     response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
     response_maps.each do |ri|
@@ -42,23 +41,16 @@ module ReviewMappingHelper
     if Response.exists?(map_id: response_map.id)
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
-      submission_created_at = SubmissionRecord.try(:created_at)
-      submission_updated_at = SubmissionRecord.try(:last).try(:updated_at)
       if review_graded_at.nil? ||
-          (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
+        (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
         'blue' # REVIEW: grade is not assigned or updated yet.
-      # elsif SubmissionRecord.exists? && (response_last_updated_at>submission_updated_at)
-      #   'green'
       else
         'brown' # REVIEW: grades has been assigned.
       end
-    elsif SubmissionRecord.exists?
-        'red' # REVIEW: is not finished yet.
     else
-      'green' # There are no submission record to review
-       end
+      'red' # REVIEW: is not finished yet.
     end
-
+  end
 
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
     team_reviewed_link_name = if max_team_size == 1
@@ -79,7 +71,7 @@ module ReviewMappingHelper
 
   # varying rubric by round
   def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----')}
+    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..@assignment.num_review_rounds).each do |round|
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
         instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].inspect + '%')
@@ -88,8 +80,8 @@ module ReviewMappingHelper
   end
 
   def get_min_max_avg_value_for_review_report(round, team_id)
-    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----')}
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k}
+    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
+    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|
         metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
         instance_variable_set('@' + metric.to_s, metric_value)
@@ -100,11 +92,15 @@ module ReviewMappingHelper
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       r.overall_avg_vol,
-          r.avg_vol_in_round_1,
-          r.avg_vol_in_round_2,
-          r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      r.avg_vol_in_round_1,
+      r.avg_vol_in_round_2,
+      r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
-    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol}
+    @all_reviewers_overall_avg_vol = @reviewers.inject(0){|sum, r| sum += r.overall_avg_vol} / @reviewers.length
+    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0){|sum, r| sum += r.avg_vol_in_round_1} / @reviewers.length
+    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0){|sum, r| sum += r.avg_vol_in_round_2} / @reviewers.length
+    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0){|sum, r| sum += r.avg_vol_in_round_3} / @reviewers.length
+    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
@@ -114,6 +110,95 @@ module ReviewMappingHelper
     metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
     metric += ")"
     metric.html_safe
+  end
+
+  def initialize_chart_elements(reviewer)
+    round = 0
+    labels = []
+    reviewer_data = []
+    all_reviewers_data = []
+    if @all_reviewers_avg_vol_in_round_1 > 0
+      round += 1
+      labels.push '1st'
+      reviewer_data.push reviewer.avg_vol_in_round_1
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round_1
+    end
+    if @all_reviewers_avg_vol_in_round_2 > 0
+      round += 1
+      labels.push '2nd'
+      reviewer_data.push reviewer.avg_vol_in_round_2
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round_2
+    end
+    if @all_reviewers_avg_vol_in_round_3 > 0
+      round += 1
+      labels.push '3rd'
+      reviewer_data.push reviewer.avg_vol_in_round_3
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round_3
+    end
+    labels.push 'Total'
+    reviewer_data.push reviewer.overall_avg_vol
+    all_reviewers_data.push @all_reviewers_overall_avg_vol
+    return labels, reviewer_data, all_reviewers_data
+  end
+
+  def display_volume_metric_chart(reviewer)
+    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+    data = {
+        labels: labels,
+        datasets: [
+          {
+              label: 'vol.',
+              backgroundColor: "rgba(255,99,132,0.8)",
+              borderWidth: 1,
+              data: reviewer_data,
+              yAxisID: "bar-y-axis1"
+          },
+          {
+              label: 'avg. vol.',
+              backgroundColor: "rgba(255,206,86,0.8)",
+              borderWidth: 1,
+              data: all_reviewers_data,
+              yAxisID: "bar-y-axis2"
+          }
+        ]
+    }
+    options = {
+        legend: {
+            position: 'top',
+            labels: {
+                usePointStyle: true
+            }
+        },
+        width: "200",
+        height: "125",
+        scales: {
+            yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10,
+                    }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 15,
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                          offsetGridLines: true
+                         }
+                      }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {
+                          beginAtZero: true,
+                          stepSize: 50,
+                          max: 400
+                        },
+                    }]
+        }
+    }
+    horizontal_bar_chart data, options
   end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
@@ -196,16 +281,16 @@ module ReviewMappingHelper
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     css_class = case diff.abs
-                  when 0
-                    'c5'
-                  when 1
-                    'c4'
-                  when 2
-                    'c3'
-                  when 3
-                    'c2'
-                  else
-                    'c1'
+                when 0
+                  'c5'
+                when 1
+                  'c4'
+                when 2
+                  'c3'
+                when 3
+                  'c2'
+                else
+                  'c1'
                 end
     css_class
   end

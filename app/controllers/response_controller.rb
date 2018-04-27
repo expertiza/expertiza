@@ -100,7 +100,7 @@ class ResponseController < ApplicationController
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
   def new
@@ -181,7 +181,7 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
       @response.email
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
   def saving
@@ -189,12 +189,21 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @map.save
     # Award Good Teammate Badge
-    if @map.assignment.has_badge? and @map.is_a? TeammateReviewResponseMap
+    if @map.assignment.has_badge? and @map.is_a? TeammateReviewResponseMap and
+         params[:review][:good_teammate_checkbox] == 'on'
       participant = Participant.find_by(id: @map.reviewee_id)
-      teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
+      #teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
       badge_id = Badge.get_id_from_name('Good Teammate')
       assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
-      AwardedBadge.award(participant.id, teammate_review_score, assignment_badge.try(:threshold), badge_id)
+      AwardedBadge.award(participant.id, 100, assignment_badge.try(:threshold), badge_id)
+    end
+    #Award Good Reviewer Badge
+    if @map.assignment.has_badge? and @map.is_a? FeedbackResponseMap and
+        params[:review][:good_reviewer_checkbox] == 'on'
+      participant = Participant.find_by(id: @map.reviewee_id)
+      badge_id = Badge.get_id_from_name('Good Reviewer')
+      assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
+      AwardedBadge.award(participant.id, 100, assignment_badge.try(:threshold), badge_id)
     end
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

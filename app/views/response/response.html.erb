@@ -379,7 +379,7 @@
           <td>
             <img width = "100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
             Good Teammate?
-            <input type="checkbox">
+            <input type="checkbox" id="good_teammate_checkbox" name="review[good_teammate_checkbox]">
           </td>
         </tr>
       <% end%>
@@ -389,7 +389,7 @@
           <td>
             <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
             Good Reviewer?
-            <input type="checkbox">
+            <input type="checkbox" id="good_reviewer_checkbox" name="review[good_reviewer_checkbox]">
           </td>
         </tr>
       <% end %>
@@ -410,7 +410,8 @@
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
     <%= hidden_field_tag('return', @return) %>
-    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+    <%= hidden_field_tag  "isSub
+    mit", :id=>"isSubmit" %>
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

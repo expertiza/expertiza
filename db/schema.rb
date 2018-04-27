@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180104141248) do
+ActiveRecord::Schema.define(version: 20180426231637) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -136,10 +136,11 @@ ActiveRecord::Schema.define(version: 20180104141248) do
   add_index "automated_metareviews", ["response_id"], name: "fk_automated_metareviews_responses_id", using: :btree
 
   create_table "awarded_badges", force: :cascade do |t|
-    t.integer  "badge_id",       limit: 4
-    t.integer  "participant_id", limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.integer  "badge_id",        limit: 4
+    t.integer  "participant_id",  limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "approval_status", limit: 4
   end
 
   add_index "awarded_badges", ["badge_id"], name: "index_awarded_badges_on_badge_id", using: :btree

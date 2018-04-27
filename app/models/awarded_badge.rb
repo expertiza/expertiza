@@ -10,10 +10,15 @@ class AwardedBadge < ActiveRecord::Base
   end
 
   #Called when badge is assigned manually
-  def self.award_manually(participant_id,badge_id)
-    AwardedBadge.create()
+  # Populate only if no previous record found
+  def self.suggest_badge(participant_id,badge_id)
+    AwardedBadge.create(participant_id: participant_id, badge_id: badge_id, approval_status: 0) if AwardedBadge.where(participant_id: participant_id, badge_id: badge_id).empty?
   end
 
+  # called to check if a badge is approved
+  def is_approved?
+    self.approval_status == 1
+  end
   # When threshold is created/updated in Assignment edit page
   # Populate/Repopulate AwardedBadges
   def self.award_good_reviewer_badge(assignment_id)

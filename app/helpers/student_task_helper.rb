@@ -30,7 +30,10 @@ module StudentTaskHelper
     info = ''
     participant.awarded_badges.each do |awarded_badge|
       badge = awarded_badge.badge
-      info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
+      #list only those badges that are approved
+      if awarded_badge.is_approved?
+        info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
+      end
     end
     info.html_safe
   end

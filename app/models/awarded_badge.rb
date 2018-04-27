@@ -9,6 +9,11 @@ class AwardedBadge < ActiveRecord::Base
     AwardedBadge.create(participant_id: participant_id, badge_id: badge_id) if score and score >= assignment_badge_threshold
   end
 
+  #Called when badge is assigned manually
+  def self.award_manually(participant_id,badge_id)
+    AwardedBadge.create()
+  end
+
   # When threshold is created/updated in Assignment edit page
   # Populate/Repopulate AwardedBadges
   def self.award_good_reviewer_badge(assignment_id)

@@ -374,7 +374,9 @@
           <div id="review_comments_analysis"></div>
         </td>
       </tr>
-      <% if @questionnaire.type == "TeammateReviewQuestionnaire" || @questionnaire.type == "Teammate ReviewQuestionnaire" %>
+
+      <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
+      <% if @questionnaire.type == "TeammateReviewQuestionnaire" || @questionnaire.type == "Teammate ReviewQuestionnaire"  and @assignment.has_badge?%>
         <tr>
           <td>
             <img width = "100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
@@ -384,7 +386,8 @@
         </tr>
       <% end%>
 
-      <% if @questionnaire.type == "AuthorFeedbackQuestionnaire" || @questionnaire.type == "Author FeedbackQuestionnaire" %>
+      <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
+      <% if @questionnaire.type == "AuthorFeedbackQuestionnaire" || @questionnaire.type == "Author FeedbackQuestionnaire" and @assignment.has_badge?%>
         <tr>
           <td>
             <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">

@@ -49,8 +49,26 @@ module ReviewMappingHelper
         'brown' # REVIEW: grades has been assigned.
       end
     else
-      'red' # REVIEW: is not finished yet.
+      if is_response_updated_for_current_round(response_map)
+        'red' # REVIEW: is not finished yet.
+      else
+        'green' # REVIEW: is not finished yet because there has been no resubmission.
+      end
     end
+  end
+
+  def is_response_updated_for_current_round(response_map)
+    team = Team.find(response_map.reviewee_id)
+    if !team.hyperlinks.empty?
+      team.hyperlinks.each do |link|
+        if link.include? "wiki.expertiza.ncsu.edu"
+          last_modified = open(link) do |f|
+            f.last_modified
+          end
+        end
+      end
+    end
+    return false
   end
 
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
@@ -100,6 +118,53 @@ module ReviewMappingHelper
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
+  def find_overall_average_and_max_metric
+    total = 0
+    count = 0
+    max = 0
+    @reviewers.each do |r|
+      r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      count = count + 1
+      total = total + r.overall_avg_vol
+      r_max = [r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3].max
+      if(r_max > max)
+        max = r_max
+      end
+    end
+
+    total_avg = total / count
+    max_ = (max/50.0).ceil * 50
+    return total_avg, max
+  end
+
+  def get_xaxis_labels(max_metric)
+    i = 0
+    xaxis = ""
+    while i <= max_metric do
+      xaxis += i.to_s
+      if(i != max_metric)
+        xaxis += "|"
+      end
+      i = i + 50
+    end
+    return xaxis
+  end
+
+  def construct_bar_chart(total_overall_avg, overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3, max_metric, name, xaxis)
+    Gchart.bar(
+        :data => [total_overall_avg, overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3],
+        :orientation => 'horizontal',
+        :bar_width_and_spacing => '15,6',
+        :max_value => max_metric,
+        :size => '280x190',
+        :title => 'Volume',
+        :axis_with_labels => [['y'], ['x']],
+        :encoding => 'text',
+        :axis_labels => [["Round 3|Round 2|Round 1|#{name} Avg|All Students Avg"], ["#{xaxis}"]],
+    )
+  end
+
+=begin
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
     metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
@@ -108,6 +173,7 @@ module ReviewMappingHelper
     metric += ")"
     metric.html_safe
   end
+=end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)

@@ -20,6 +20,12 @@ $(window).load(function(){
 });
 </script>
 
+<%
+  # Getting data needed for constructing bar charts
+  total_overall_avg, max_metric = find_overall_average_and_max_metric
+  xaxis = get_xaxis_labels(max_metric)
+%>
+
   <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0' style="font-size: 15px">
     <thead>
     <tr>
@@ -31,10 +37,10 @@ $(window).load(function(){
         <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
         <th width = "14%" class="sorter-false">Author feedback <span></span></th>
       <% else %>-->
-        <th width = "24%" class="sorter-false">Team reviewed <span></span></th>
+        <th width = "19%" class="sorter-false">Team reviewed <span></span></th>
       <!--<% end %>-->
       <th width = "13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width = "13%" class="sorter-true">Metrics <span></span></th>
+      <th width = "18%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
@@ -61,8 +67,9 @@ $(window).load(function(){
           <!--Team reviewed / Author feedback-->
           <td align = 'left'>
           <% @response_maps.each_with_index do |ri, index| %>
+
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_name_color_in_review_report(ri) %>
+                <% team_name_color = get_team_name_color_in_review_report(ri) %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
@@ -104,18 +111,7 @@ $(window).load(function(){
           </td>
           <!--Metrics-->
           <td align = 'left'>
-            <%= image_tag(Gchart.bar(
-                                    :data => [r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3],
-                                    :orientation => 'horizontal',
-                                    :max_value => 300,
-                                    :size => '233x190',
-                                    :title => 'Volume',
-                                    :axis_with_labels => [['y'], ['x']],
-                                    :encoding => 'text',
-                                    :axis_labels => [["Round 3|Round 2|Round 1|Average"], ["0|50|100|150|200|250|300"]]
-            ))%>
-            <!--<%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3)
-          %>-->
+            <%= image_tag(construct_bar_chart(total_overall_avg, r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3, max_metric, r.name, xaxis))%>
           </td>
           <!--Assign grade and write comments-->
           <td align = 'left' style="" id=<%= "assign_grade" + r.id.to_s %>>

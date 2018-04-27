@@ -22,7 +22,7 @@
         //Rubric options
         if (questionnaire_type ==  'TeammateReviewQuestionnaire' && role_based_review == true) {
         html +=     '<td align="center">' + 
-        '<select id="duty_id" name="assignment_form[assignment_duty_questionnaire][][duty_id]" style="width:300px">' +
+        '<select id="duty_id" name="assignment_form[assignment_duty_questionnaire][duty_id]" style="width:300px">' +
         '<option value="">Please Select a duty</option>';
         for (j = 0; j<duty_names.length ; j++) {
           html += '<option value="' + duty_names[j][1] + '">' + duty_names[j][0] + '</option>';

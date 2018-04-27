@@ -56,9 +56,9 @@
             <% if Team.where(id: ri.reviewee_id).length > 0 %>
               <!--Team reviewed-->
               <% if index == 0 %>
-                <div id = <%= team_name_color %>>
+                  <div id = <%= team_name_color %>>
               <% else %>
-                <div id = <%= team_name_color %> style="border-top": solid; border-width: 1px;">
+                  <div id = <%= team_name_color %> style="border-top": solid; border-width: 1px;">
               <% end %>
               <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
               <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>

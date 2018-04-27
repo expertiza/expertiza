@@ -39,18 +39,83 @@ module ReviewMappingHelper
 
   def get_team_name_color_in_review_report(response_map)
     if Response.exists?(map_id: response_map.id)
-      review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
-      response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
-      if review_graded_at.nil? ||
-        (review_graded_at && response_last_updated_at && response_last_updated_at > review_graded_at)
-        'blue' # REVIEW: grade is not assigned or updated yet.
+      if !response_map.try(:reviewer).try(:review_grade).nil?
+        'brown'
       else
-        'brown' # REVIEW: grades has been assigned.
+        if response_for_each_round?(response_map)
+          'blue'
+        else
+          assignment_created = @assignment.created_at
+          assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+          (1..@assignment.num_review_rounds).each do |round|
+            if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+              'purple'
+            else
+              link = submitted_hyperlink(round, response_map, assignment_created, due_dates)
+              if link.nil? || (link !~ /https*:\/\/wiki(.*)/) #can be extended for github links in future
+                'green'
+              else
+                link_updated_at = get_link_updated_at(link)
+                if link_updated_since_last?(round, assignment_due_dates, link_updated_at)
+                  'purple'
+                else
+                  'green'
+                end
+              end
+            end
+          end
+        end
       end
     else
-      'red' # REVIEW: is not finished yet.
+      'red'
     end
   end
+
+  def response_for_each_round?(response_map)
+    num_responses = 0
+    total_num_rounds = @assignment.num_review_rounds
+    (1..total_num_rounds).each do |round|
+      if Response.exists?(map_id: response_map.id, round: round)
+        num_responses += 1
+      end
+      num_responses == total_num_rounds
+    end
+  end
+
+  def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+    submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
+    subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
+    if round > 1
+      submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+      subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+    end
+    !subm_created_at.try(:first).try(:created_at).nil?
+  end
+
+  def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    subm_hyperlink = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: 'Submit Hyperlink')
+    submitted_h = subm_hyperlink.where(created_at: assignment_created..submission_due_date)
+    if round > 1
+      submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+      submitted_h = subm_hyperlink.where(created_at: submission_due_last_round..submission_due_date)
+    end
+    link = submitted_h.try(:last).try(:content)
+  end
+
+  def get_link_updated_at(link)
+    uri = URI(link)
+    res = Net::HTTP.get_response(uri)['last-modified']
+    res.to_time
+  end
+
+  def link_updated_since_last?(round, due_dates, link_updated_at)
+    submission_due_date = due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    submission_due_last_round = due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+    updated = (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
+  end
+
 
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
     team_reviewed_link_name = if max_team_size == 1

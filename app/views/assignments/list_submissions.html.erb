@@ -38,8 +38,29 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
-            <%= link_to 'Perform review', { controller: 'review_mapping', action: 'assign_reviewer_instructor', team_id: team.id, assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>
-                <%= link_to 'Update review', { controller: 'review', action: 'edit_review', id: participants.first.id } %></br>
+
+                <% @assignment_team = AssignmentTeam.find(team.id) %>
+                <% @reviewer = AssignmentParticipant.where(user_id: session[:user].id , parent_id: @assignment_team.parent_id).first %>
+                <% @map =ReviewResponseMap.where(reviewee_id: @assignment_team.id, reviewer_id: @reviewer.id).last%>
+                <% if @map !=nil%>
+                    <% @latest_response = Response.where(map_id: @map.id).last %>
+                    <%= link_to "View Review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %> </br>
+                    <% if @latest_response.round.nil? %>
+                        <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+                    <% else %>
+                        <% last_response_round = @latest_response.round %>
+                    <% end %>
+                    <% current_round = @assignment.number_of_current_round(SignedUpTeam.topic_id(participants.first.parent_id, participants.first.user_id)) %>
+                    <% if last_response_round != current_round %>
+                        <%= link_to 'Update review', { controller: 'response', :action => 'new',  id: @map.id } rescue nil %></br>
+                    <% elsif !@latest_response.is_submitted? %>
+                        <%= link_to "Edit review", {:controller => 'response', :action => 'edit', :id => @latest_response.id} rescue nil %></br>
+                    <% end %>
+                <% else %>
+                    <%= link_to 'Perform review', { controller: 'review_mapping', action: 'assign_reviewer_instructor', team_id: team.id, assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>
+                <% end %>
+
+
                 <%= link_to 'Assign grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
         <% end %>

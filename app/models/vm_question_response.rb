@@ -88,7 +88,7 @@ class VmQuestionResponse
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-        add_answer(answer)
+        add_answer(answer, review.response_id)
       end
     end
   end
@@ -138,7 +138,7 @@ class VmQuestionResponse
 
   attr_reader :list_of_reviewers
 
-  def add_answer(answer)
+  def add_answer(answer, response_id)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
     @list_of_rows.each do |row|
@@ -173,7 +173,11 @@ class VmQuestionResponse
 
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts))
+      is_instructor_review = 0
+      if User.find(Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewer_id).user_id).role_id.in?([2,6])
+        is_instructor_review = 1
+      end
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, is_instructor_review, vm_tag_prompts))
     end
   end
 

@@ -39,27 +39,28 @@ module ReviewMappingHelper
 
   def get_team_name_color_in_review_report(response_map)
     if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
+      review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
+      if !review_graded_at.nil?
+        '#008080' #'#986633'
       else
         if response_for_each_round?(response_map)
-          'blue'
+          '#69BE28' #'blue'
         else
           assignment_created = @assignment.created_at
           assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
           (1..@assignment.num_review_rounds).each do |round|
             if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-              'purple'
+              '#800080' #'purple'
             else
               link = submitted_hyperlink(round, response_map, assignment_created, due_dates)
               if link.nil? || (link !~ /https*:\/\/wiki(.*)/) #can be extended for github links in future
-                'green'
+                '#008000' #'green'
               else
                 link_updated_at = get_link_updated_at(link)
                 if link_updated_since_last?(round, assignment_due_dates, link_updated_at)
-                  'purple'
+                 '#800080' #'purple'
                 else
-                  'green'
+                  '#008000' #'green'
                 end
               end
             end

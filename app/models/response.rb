@@ -236,8 +236,15 @@ class Response < ActiveRecord::Base
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
+      # added for srq
+      sr_questionnaire = self.questionnaire_by_answer(answers.last)
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
+      # added for srq
+      sr_questions = sr_questionnaire.questions.sort_by(&:seq)
+      unless sr_questionnaire.nil?
+        questions += sr_questions
+      end
       # get the tag settings this questionnaire
       tag_prompt_deployments = TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id)
       code = add_table_rows questionnaire_max, questions, answers, code

@@ -94,7 +94,7 @@ class Response < ActiveRecord::Base
     response_map.email(defn, participant, parent)
   end
 
-  def questionnaire_by_answer(answer)
+  def questionnaire_by_answer(answer, duty_status=false)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
     else
@@ -102,10 +102,16 @@ class Response < ActiveRecord::Base
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
       assignment = Participant.find(map.reviewer_id).assignment
-      questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
+      if !duty_status
+        questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
+      else
+
+        
+      end
     end
     questionnaire
   end
+
 
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''

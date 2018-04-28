@@ -87,10 +87,7 @@ class StudentTeamsController < ApplicationController
   def edit_duty
     
     @assignment_duty = AssignmentsDutyMapping.where(assignment_id: student.assignment.id).map(&:duty_id)
-      @duties = Duty.select(:name,:id).where(id: @assignment_duty)
-    
-    
-    
+    @duties = Duty.select(:name,:id).where(id: @assignment_duty)
   end
 
 

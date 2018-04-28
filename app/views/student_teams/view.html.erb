@@ -65,7 +65,7 @@
             review = map.response.last
             if review.nil? %>
             <td>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :team_id => member.team.id, :return => "teammate"} %>
             </td>
           <% else %>
             <td>

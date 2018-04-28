@@ -96,6 +96,23 @@ class ResponseController < ApplicationController
   end
 
   def new
+    #@duty_based_review_allowed =  @student.assignment.role_based_review
+    #user_id_re = .map.reviewee.user_id
+    review = TeammateReviewResponseMap.find(params[:id]) if !params[:id].nil?
+    student = AssignmentParticipant.find(review.reviewee_id)
+
+    #Got team_id(through params), student_id and assignment_id(parent_id for student)
+    #Get duty_id from teams_users using team_id and assignment_id.
+    #Use this duty and assignment to find appropriate questionnare
+    #render :plain => params.inspect
+    
+
+    #CHECK WHETHER DUTY BASED REVIEWS ALLOWED OR NOT.
+    duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
+    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).first
+
+    render :plain => @questionnaire_id_rubric.inspect
+
     @header = "New"
     @next_action = "create"
     @feedback = params[:feedback]
@@ -104,7 +121,7 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
-    render action: 'response'
+    
   end
 
   def new_feedback
@@ -134,6 +151,9 @@ class ResponseController < ApplicationController
     map_id = params[:map_id] if !params[:map_id].nil?# pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
     set_all_responses
+
+    render :plain => params.inspect
+    
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
@@ -170,7 +190,7 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
       @response.email
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+    #redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
   def saving
@@ -270,6 +290,8 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
+    
+
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
@@ -278,6 +300,7 @@ class ResponseController < ApplicationController
   end
 
   def set_questionnaire_for_new_response
+  
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)

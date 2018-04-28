@@ -121,7 +121,7 @@ describe ResponseController do
           isSubmit: 'No'
         }
         post :update, params
-        expect(response).to redirect_to('/response/saving?id=1&msg=')
+        expect(response).to redirect_to('/response/saving?id=1&msg=&review%5Bcomments%5D=some+comments')
       end
     end
   end

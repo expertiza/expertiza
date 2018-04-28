@@ -111,6 +111,7 @@ class PopupController < ApplicationController
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
     build_tone_analysis_report
+    build_tone_analysis_heatmap
   end
 
   def build_tone_analysis_report
@@ -155,6 +156,39 @@ class PopupController < ApplicationController
         puts "failed"
 
   end
+
+  def build_tone_analysis_heatmap
+
+    content = []
+    count = 0
+
+    sentiment_array = @sentiment_summary['sentiments']
+    sentiment_array.each do |index|
+      sentiment_value = index['sentiment'].to_f
+      sentiment_text = index['text']
+      param = {
+
+          value:sentiment_value,
+          text:sentiment_text
+      }
+      content[count] = param
+      count += 1
+    end
+
+    contents = {
+
+        content:content
+    }
+
+    @tone_analyzed_for_heatmap = contents.to_json
+
+
+    heatmap_json = RestClient.post "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure", @tone_analyzed_for_heatmap, :content_type => 'application/json; charset=UTF-8', accept: :json
+    @heatmap_url = heatmap_json['url']
+
+  end
+
+
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup

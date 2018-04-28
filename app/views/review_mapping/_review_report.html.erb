@@ -25,15 +25,15 @@ $(window).load(function(){
     <tr>
   <!-- class value decides whether the column should be sortable or not  -->
       <th width = "16%" class="sorter-true">Reviewer <span></span></th>
-      <th width = "10%" class="sorter-false">Reviews done<span></span></th>
+      <th width = "10%" class="sorter-true">Reviews done<span></span></th>
       <!--Dr.Kidd's course
       <% if @assignment.instructor_id == 2026 %>
         <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
         <th width = "14%" class="sorter-false">Author feedback <span></span></th>
       <% else %>-->
-        <th width = "24%" class="sorter-false">Team reviewed <span></span></th>
+        <th width = "24%" class="sorter-true">Team reviewed <span></span></th>
       <!--<% end %>-->
-      <th width = "13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
+      <th width = "13%" class="sorter-true">Score awarded / Avg. score <span></span></th>
       <th width = "13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>

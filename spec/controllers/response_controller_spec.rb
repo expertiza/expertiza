@@ -97,7 +97,7 @@ describe ResponseController do
           }
         }
         post :update, params
-        expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21')
+        expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
       end
     end
 

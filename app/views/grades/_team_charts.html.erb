@@ -31,6 +31,58 @@
 
 </script>
 
+<div id="placeholder" style="width:600px;height:300px;"> </div>
+
+<script type="text/javascript">
+  $(function () {
+    $.plot($("#placeholder"), <%= @flot_series_data.to_json.html_safe %>, {
+      xaxis: {
+        ticks: <%= @flot_categories.to_json.html_safe %>
+      },
+      grid: {
+        hoverable: true,
+        clickable: true
+      },
+      series: {
+        stack: true,
+        lines: {
+          show: false,
+          fill: true,
+          steps: 0
+        },
+        bars: {
+          show: true,
+          align: 'center',
+          barWidth: 1
+        }
+      }
+    });
+
+    $("<div id='tooltip'></div>").css({
+      position: "absolute",
+      display: "none",
+      border: "1px solid #fdd",
+      padding: "2px",
+      "background-color": "#fee",
+      opacity: 0.80
+    }).appendTo("body");
+
+    $("#placeholder").bind("plothover", function (event, pos, item) {
+
+      if (item) {
+        var x = item.datapoint[0],
+        y = item.datapoint[1];
+
+        $("#tooltip").html(item.series.xaxis.ticks[x].label + ": " + item.series.data[x][1] + "% of the class scored " + item.seriesIndex)
+        .css({top: item.pageY+5, left: item.pageX+5})
+        .fadeIn(200);
+      } else {
+        $("#tooltip").hide();
+      }
+    });
+  });
+</script>
+
 <style> 
  .circles-final{
     font-size: 16px !important;    

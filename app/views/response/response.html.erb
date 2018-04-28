@@ -376,7 +376,8 @@
       </tr>
 
       <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
-      <% if @questionnaire.type == "TeammateReviewQuestionnaire" || @questionnaire.type == "Teammate ReviewQuestionnaire"  and @assignment.has_badge?%>
+      <% if @questionnaire.type == "TeammateReviewQuestionnaire" || @questionnaire.type == "Teammate ReviewQuestionnaire"  and @assignment.has_badge? and
+          !AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name("Good Teammate")).empty?%>
         <tr>
           <td>
             <img width = "100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
@@ -387,8 +388,9 @@
       <% end%>
 
       <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
-      <% if @questionnaire.type == "AuthorFeedbackQuestionnaire" || @questionnaire.type == "Author FeedbackQuestionnaire" and @assignment.has_badge?%>
-        <tr>
+      <% if @questionnaire.type == "AuthorFeedbackQuestionnaire" || @questionnaire.type == "Author FeedbackQuestionnaire" and @assignment.has_badge? and
+          !AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name("Good Reviewer")).empty?%>
+    <tr>
           <td>
             <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
             Good Reviewer?

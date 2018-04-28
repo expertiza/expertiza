@@ -147,12 +147,14 @@ class AssignmentForm
 
   # Adds badges to assignment badges table
   def update_assigned_badges(badge, assignment)
-    assigned_badges = AssignmentBadge.where(assignment_id: assignment[:id]).select(:id).to_a
-    assigned_badges.each do |assigned_badge|
-      AssignmentBadge.delete(assigned_badge.id) unless badge[:id].include?(assigned_badge.id)
-    end
-    badge[:id].each do |badge_id|
-      AssignmentBadge.create_badge_without_threshold(badge_id[0], assignment[:id])
+    if !assignment.nil? and !badge.nil?
+      assigned_badges = AssignmentBadge.where(assignment_id: assignment[:id]).select(:id).to_a
+      assigned_badges.each do |assigned_badge|
+        AssignmentBadge.delete(assigned_badge.id) unless badge[:id].include?(assigned_badge.id)
+      end
+      badge[:id].each do |badge_id|
+        AssignmentBadge.create_badge_without_threshold(badge_id[0], assignment[:id])
+      end
     end
   end
 

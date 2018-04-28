@@ -65,7 +65,8 @@ class GradesController < ApplicationController
     min, max, number_of_review_questions = calculate_review_questions(@assignment, questionnaires)
     team_data = get_team_data(@assignment, questionnaires, @scores)
     highchart_data = get_highchart_data(team_data, @assignment, min, max, number_of_review_questions)
-    @highchart_series_data, @highchart_categories, @highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
+    highchart_series_data, highchart_categories, highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
+    @flot_series_data, @flot_categories = highchart_to_flot_adapter(min, max, highchart_series_data)
   end
 
   # This method is used to retrieve questions for different review rounds
@@ -377,7 +378,7 @@ class GradesController < ApplicationController
       scores.to_a.reverse.to_h.each do |score, rubric_distribution|
         highchart_series_data.push(name: "Score #{score} - Submission #{round}", data: rubric_distribution, stack: "S#{round}")
       end
-     end
+    end
 
     # Here we dynamically creates the categories which will be used later in the highchart Object
     highchart_categories = []
@@ -393,6 +394,43 @@ class GradesController < ApplicationController
       highchart_colors.push("\##{sprintf('%06x', (rand * 0xffffff))}")
     end
     [highchart_series_data, highchart_categories, highchart_colors]
+  end
+
+  def highchart_to_flot_adapter(min, max, highchart_series_data)
+    flot_series_data = []
+    flot_categories = []
+    flot_data = []
+    j, k = 0
+    review_round = ""
+    flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"]
+    highchart_series_data.to_a.reverse.to_h.each do |name, data, stack|
+      for i in 0..data.size-1
+        flot_data.push([i, data[i]])
+      end
+      flot_series_data.push(data: flot_data, color: flot_colors[j])
+      j += 1
+
+      round = stack.scan(/[0-9]/)
+      unless stack.eql?(review_round)
+        k = 0
+      end
+      flot_categories.push([k, "Rubric \##{k} Round \##{round[0]}"])
+      k += 1
+      review_round = stack
+      if j > max
+        j = 0
+      end
+    end
+    num_reviewees = 0
+    for i in 0..flot_series_data.data[0].size-1
+      for j in 0..flot_series_data.size-1
+        num_reviewees += flot_series_data[j].data[i][1]
+      end
+      for j in 0..flot_series_data.size-1
+        flot_series_data[j].data[i][1] /= num_reviewees
+      end
+    end
+    [flot_series_data, flot_categories]
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)

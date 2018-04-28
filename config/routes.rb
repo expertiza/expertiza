@@ -56,6 +56,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :badges
+
   resources :bookmarks, except: %i[index show] do
     collection do
       get :list

@@ -81,7 +81,8 @@ class AssignmentsController < ApplicationController
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
-    @badges = @assignment_form.assignment.badges
+    @assigned_badges = @assignment_form.assignment.badges
+    @badges = Badge.all
   end
 
   def update

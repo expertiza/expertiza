@@ -31,4 +31,9 @@ class AssignmentBadge < ActiveRecord::Base
       assignment_badge.update_attributes(threshold: badge_threshold_hash[badge.try(:name)])
     end
   end
+
+  def self.create_badge_without_threshold(badge_id, assignment_id)
+    AssignmentBadge.create(badge_id: badge_id, assignment_id: assignment_id) if
+        AssignmentBadge.where(badge_id: badge_id, assignment_id: assignment_id).empty?
+  end
 end

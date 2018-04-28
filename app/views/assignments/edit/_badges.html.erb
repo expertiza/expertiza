@@ -12,17 +12,21 @@
       <td style="text-align:center"><img width = "30px" src=<%= "/assets/badges/#{badge.image_name}" %> title="<%= badge.name %>"></td>
       <td><%= badge.name %></td>
       <td><%= badge.description %></td>
-      <td><input type="checkbox" name="select-badge" id="select-badge"></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <%= form_tag({:controller => "badges",
-        :action => "new"}, {:method => "get"}) do %>
-      <td><%= submit_tag "+" %></td>
+      <% if !@assigned_badges.where(id: badge.id).empty? %>
+        <td><input type="checkbox" name=<%="assignment_form[badge][id][#{badge.id}]"%> checked></td>
+      <% else %>
+        <td><input type="checkbox" name=<%="assignment_form[badge][id][#{badge.id}]"%>></td>
       <% end %>
     </tr>
   <% end %>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <%= form_tag({:controller => "badges",
+                  :action => "new"}, {:method => "get"}) do %>
+      <td><%= submit_tag "+" %></td>
+    <% end %>
+  </tr>
   </tbody>
 </table>

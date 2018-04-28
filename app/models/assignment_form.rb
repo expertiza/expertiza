@@ -40,7 +40,8 @@ class AssignmentForm
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
-    set_badge_threshold_for_assignment(attributes[:assignment][:id], attributes[:badge]) if @assignment.has_badge?
+    update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
+    #set_badge_threshold_for_assignment(attributes[:assignment][:id], attributes[:badge]) if @assignment.has_badge?
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
@@ -141,6 +142,17 @@ class AssignmentForm
         @has_errors = true unless dd.update_attributes(due_date)
       end
       @errors += @assignment.errors.to_s if @has_errors
+    end
+  end
+
+  # Adds badges to assignment badges table
+  def update_assigned_badges(badge, assignment)
+    assigned_badges = AssignmentBadge.where(assignment_id: assignment[:id]).select(:id).to_a
+    assigned_badges.each do |assigned_badge|
+      AssignmentBadge.delete(assigned_badge.id) unless badge[:id].include?(assigned_badge.id)
+    end
+    badge[:id].each do |badge_id|
+      AssignmentBadge.create_badge_without_threshold(badge_id[0], assignment[:id])
     end
   end
 

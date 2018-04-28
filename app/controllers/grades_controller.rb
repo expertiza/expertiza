@@ -109,6 +109,15 @@ class GradesController < ApplicationController
                  AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
                end
       vm = VmQuestionResponse.new(questionnaire, @assignment)
+      # added for srq
+      sr_questionnaire_id = Team.get_srq_id_of_team(@team_id)
+      unless sr_questionnaire_id.nil?
+        sr_questionnaire = Questionnaire.find(sr_questionnaire_id)
+        unless sr_questionnaire.nil?
+          sr_questions = sr_questionnaire.questions
+          questionnaire.questions += sr_questions
+        end
+      end
       vmquestions = questionnaire.questions
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)

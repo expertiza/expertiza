@@ -39,6 +39,7 @@ module ReviewMappingHelper
   end
 
   def get_team_name_color_in_review_report(response_map)
+    if is_submission_updated_for_last_round(response_map)
     if Response.exists?(map_id: response_map.id)
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
@@ -49,26 +50,56 @@ module ReviewMappingHelper
         'brown' # REVIEW: grades has been assigned.
       end
     else
-      if is_response_updated_for_current_round(response_map)
         'red' # REVIEW: is not finished yet.
-      else
-        'green' # REVIEW: is not finished yet because there has been no resubmission.
-      end
     end
+    else
+       'green'
+      end
   end
 
-  def is_response_updated_for_current_round(response_map)
-    team = Team.find(response_map.reviewee_id)
-    if !team.hyperlinks.empty?
-      team.hyperlinks.each do |link|
-        if link.include? "wiki.expertiza.ncsu.edu"
-          last_modified = open(link) do |f|
-            f.last_modified
+  def is_submission_updated_for_last_round(response_map)
+    last_round = 0
+    assignment_deadlines = DueDate.where(parent_id: response_map.reviewed_object_id)
+    number_of_assignemnt_rounds = @assignment.num_review_rounds
+    current_time = Time.new
+    r = number_of_assignemnt_rounds..1
+    due_time = DueDate.new
+    (r.first).downto(r.last).each do |round|
+      due_time = assignment_deadlines.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+      if(current_time > due_time)
+        last_round = round
+        break
+      end
+    end
+    if(last_round > 1)
+      previous_round = last_round-1
+      prev_due_time=assignment_deadlines.where(round: previous_round, deadline_type_id: 1).try(:first).try(:due_at)
+      team = Team.find(response_map.reviewee_id)
+      hyperlinks_count = team.hyperlinks.size
+      testable_links_count = 0
+      if !team.hyperlinks.empty?
+        #flag is false when none of the wiki links are updated
+        flag = false
+        team.hyperlinks.each do |link|
+          if ((link.include? "wiki") && !flag)
+            testable_links_count = testable_links_count + 1
+            last_modified = open(link) do |f|
+              if(!(f.last_modified < prev_due_time))
+                flag= true
+                break
+            end
           end
         end
       end
+      end
+      if(flag == false && hyperlinks_count == testable_links_count)
+        return false
+      else
+        return true
+      end
+    else
+      return true
     end
-    return false
   end
 
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)

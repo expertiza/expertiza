@@ -2,7 +2,7 @@ default: &default
   adapter: mysql2
   host: localhost
   username: root
-  password: Ssl@labde@2903
+  password:
 
 development:
   <<: *default

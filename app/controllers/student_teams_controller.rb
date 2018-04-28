@@ -85,8 +85,14 @@ class StudentTeamsController < ApplicationController
   def edit; end
 
   def edit_duty
-    @duties = Duty.select(:name,:id).where(assignment_id: student.assignment.id)
+    
+    @assignment_duty = AssignmentsDutyMapping.where(assignment_id: student.assignment.id).map(&:duty_id)
+      @duties = Duty.select(:name,:id).where(id: @assignment_duty)
+    
+    
+    
   end
+
 
   def update_duty
     team_user = TeamsUser.find_by(team_id: params[:team_id],user_id: @student.user_id)

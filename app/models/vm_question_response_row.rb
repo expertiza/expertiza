@@ -35,7 +35,7 @@ class VmQuestionResponseRow
     row_average_score = 0.0
     no_of_columns = 0.0 # Counting reviews that are not null
     @score_row.each do |score|
-      if score.score_value.is_a? Numeric and score.is_instructor_review == 0
+      if score.score_value.is_a? Numeric and score.is_instructor_review.zero?
         no_of_columns += 1
         row_average_score += score.score_value.to_f
       end

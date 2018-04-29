@@ -51,13 +51,14 @@
                         <% last_response_round = @latest_response.round %>
                     <% end %>
                     <% current_round = @assignment.number_of_current_round(SignedUpTeam.topic_id(participants.first.parent_id, participants.first.user_id)) %>
+
                     <% if last_response_round != current_round %>
                         <%= link_to 'Update review', { controller: 'response', :action => 'new',  id: @map.id } rescue nil %></br>
                     <% elsif !@latest_response.is_submitted? %>
                         <%= link_to "Edit review", {:controller => 'response', :action => 'edit', :id => @latest_response.id} rescue nil %></br>
                     <% end %>
                 <% else %>
-                    <%= link_to 'Perform review', { controller: 'review_mapping', action: 'assign_reviewer_instructor', team_id: team.id, assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>
+                    <%= link_to 'Perform review', { controller: 'review_mapping', action: 'add_instructor_as_reviewer', team_id: team.id, assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>
                 <% end %>
 
 

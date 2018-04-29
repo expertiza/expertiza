@@ -123,11 +123,15 @@ class ReviewMappingController < ApplicationController
 
   end
 
-  def assign_reviewer_instructor
+  # Adds an instructor as a participant in a team so that he/she can add a review.
+  def add_instructor_as_reviewer
     assignment_team = AssignmentTeam.find(params[:team_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment_team.parent_id).first
-    reviewer = AssignmentParticipant.create(parent_id: assignment_team.parent_id, user_id: session[:user].id, can_submit: 0,
-                                            can_review: 1, can_take_quiz: 0, handle: 'handle') if reviewer.nil?
+    if reviewer.nil?
+      reviewer = AssignmentParticipant.create(parent_id: assignment_team.parent_id, user_id: session[:user].id, can_submit: false, can_review: true,
+                                              can_take_quiz: false, handle: 'handle')
+
+    end
     @review_map_id=ReviewResponseMap.where(reviewee_id: assignment_team.id, reviewer_id: reviewer.id,
                              reviewed_object_id: params[:assignment_id]).first
     @review_map_id=assignment_team.assign_reviewer(reviewer) if @review_map_id.nil?

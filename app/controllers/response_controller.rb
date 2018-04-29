@@ -292,7 +292,12 @@ class ResponseController < ApplicationController
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-      @current_round = @assignment.number_of_current_round(reviewees_topic)
+      if current_user.role.id.in?([2,6])
+        @current_round = @assignment.number_of_current_round_for_instructor(reviewees_topic)
+      else
+        @current_round = @assignment.number_of_current_round(reviewees_topic)
+      end
+
       @questionnaire = @map.questionnaire(@current_round)
     when
       "MetareviewResponseMap",

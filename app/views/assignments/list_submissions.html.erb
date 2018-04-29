@@ -44,7 +44,7 @@
                 <% @map =ReviewResponseMap.where(reviewee_id: @assignment_team.id, reviewer_id: @reviewer.id).last%>
                 <% if @map !=nil%>
                     <% @latest_response = Response.where(map_id: @map.id).last %>
-                    <%= link_to "View Review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %> </br>
+                    <%= link_to "View review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %> </br>
                     <% if @latest_response.round.nil? %>
                         <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
                     <% else %>

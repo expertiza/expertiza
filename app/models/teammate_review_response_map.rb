@@ -2,8 +2,12 @@ class TeammateReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
-  def questionnaire
-    self.assignment.questionnaires.find_by(type: 'TeammateReviewQuestionnaire',)
+  def questionnaire(dutyEnabled = false,questionnaire_id_rubric = 0)
+    if (!dutyEnabled)
+      self.assignment.questionnaires.find_by(type: 'TeammateReviewQuestionnaire')
+    else
+      Questionnaire.find_by(id: questionnaire_id_rubric)
+    end
   end
 
   def contributor

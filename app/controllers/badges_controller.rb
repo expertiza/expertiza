@@ -14,6 +14,11 @@ class BadgesController < ApplicationController
 
   def create
     @badge = Badge.new(badge_params)
+    image_file = params[:badge][:image_file]
+    File.open(Rails.root.join('app', 'assets', 'images', 'badges', image_file.original_filename), 'wb') do |file|
+      file.write(image_file.read)
+    end
+    @badge.image_name = image_file.original_filename
     respond_to do |format|
       if @badge.save
         format.html { redirect_to session.delete(:return_to), notice: 'Badge was successfully created' }

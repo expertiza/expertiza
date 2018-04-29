@@ -118,10 +118,10 @@ class PopupController < ApplicationController
     ##uri = URI.parse("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk")
     ##header = {'Content-Type': 'application/json; charset=UTF-8'}
 
-    count = 0;
+    index = 0;
     reviews = []
 
-    @toneAnalizedComment = ""
+    tone_analized_comment = ""
     keys = @review_final_versions.keys
     
     keys.each do |key|
@@ -133,12 +133,11 @@ class PopupController < ApplicationController
           Answer.where(response_id: responseid, question_id: question.id).each do |review|
             comment = review.comments
             param = {
-                id:count,
-                text:comment
+              id:index,
+              text:comment
             }
-            reviews[count] = param
-            @toneAnalizedComment = @toneAnalizedComment + param.to_json
-            count += 1
+            reviews[index] = param
+            index = index + 1
           end
         end
       end
@@ -146,49 +145,105 @@ class PopupController < ApplicationController
     revs = {
         reviews:reviews
     }
-    @toneAnalizedComment = revs.to_json
+    tone_analized_comment = revs.to_json
 
     # call web service
-      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", @toneAnalizedComment, :content_type => 'application/json; charset=UTF-8', accept: :json
-      # store each summary in a hashmap and use the question as the key
-      @sentiment_summary = JSON.parse(sum_json)
-      rescue StandardError => err
-        puts "failed"
-
+    sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", tone_analized_comment, :content_type => 'application/json; charset=UTF-8', accept: :json
+    # store each summary in a hashmap and use the question as the key
+    @sentiment_summary = JSON.parse(sum_json)
+    rescue StandardError => err
+      puts err
   end
 
   def build_tone_analysis_heatmap
+    ##uri = URI.parse("http://peerlogic.csc.ncsu.edu/reviewsentiment/configure")
+    ##header = {'Content-Type': 'application/json; charset=UTF-8'}
 
     content = []
-    count = 0
-
-    sentiment_array = @sentiment_summary['sentiments']
-    sentiment_array.each do |index|
-      sentiment_value = index['sentiment'].to_f
-      sentiment_text = index['text']
-      param = {
-
+    v_label = []
+    h_label = []
+    @heatmap_urls = []
+    sentiment_index = 0
+    label_index = 0
+    url_count = 0
+    
+    keys = @review_final_versions.keys
+    
+    keys.each do |key|
+      questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
+      questions = Question.where(questionnaire_id: questionnaire_id)
+      
+      questions.each do |question|
+        h_label[label_index] = "Q" + (label_index + 1).to_s
+        label_index = label_index + 1
+      end
+      
+      label_index = 0
+      @review_final_versions[key][:response_ids].each do |responseid|
+        v_label[label_index] = "Reviewee " + (label_index + 1).to_s
+        label_index = label_index + 1
+      end
+      
+      @sentiment_summary['sentiments'].each do |index|
+        sentiment_value = index['sentiment'].to_f
+        sentiment_text = index['text']
+        param = {
           value:sentiment_value,
           text:sentiment_text
+        }
+        content[sentiment_index] = param
+        sentiment_index = sentiment_index + 1
+      end
+
+      contents = {
+          v_label:v_label,
+          h_label:h_label,
+          "font-face": "Arial",
+          "showTextInsideBoxes": true,
+          "showCustomColorScheme": false,
+          "tooltipColorScheme": "black",
+          "custom_color_scheme": {
+            "minimum_value": -1,
+            "maximum_value": 1,
+            "minimum_color": "#FFFF00",
+            "maximum_color": "#FF0000",
+            "total_intervals": 5
+          },
+          "color_scheme": {
+            "ranges": [{
+              "minimum": -1,
+              "maximum": -0.5,
+              "color": "red"
+            }, {
+              "minimum": -0.5,
+              "maximum": 0,
+              "color": "#DC7633"
+            }, {
+              "minimum": 0,
+              "maximum": 0,
+              "color": "yellow"
+            }, {
+              "minimum": 0,
+              "maximum": 0.5,
+              "color": "#ABEBC6"
+            }, {
+              "minimum": 0.5,
+              "maximum": 1,
+              "color": "green"
+            }]
+          },
+          content:content
       }
-      content[count] = param
-      count += 1
+
+      tone_analyzed_for_heatmap = contents.to_json
+      heatmap_json = RestClient.post "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure", tone_analyzed_for_heatmap, :content_type => 'application/json; charset=UTF-8', accept: :json
+      @heatmap_urls[url_count] = JSON.parse(heatmap_json)
+      url_count = url_count + 1
     end
-
-    contents = {
-
-        content:content
-    }
-
-    @tone_analyzed_for_heatmap = contents.to_json
-
-
-    heatmap_json = RestClient.post "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure", @tone_analyzed_for_heatmap, :content_type => 'application/json; charset=UTF-8', accept: :json
-    @heatmap_url = heatmap_json['url']
-
+    puts @heatmap_urls
+    rescue StandardError => err
+      puts err
   end
-
-
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup

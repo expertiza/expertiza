@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-  <script>
+<script>
 
   $(function () {
     /*Function for sorting the table */
@@ -12,8 +12,33 @@
   $( function() {
     $( "#tabs" ).tabs();
   } );
-  </script>
+</script>
+
+<div id="main div">
+  <% if @review_final_versions.keys.nil? or @review_final_versions.keys.length < 1 %>
+    <h2>No scores</h2>
+  <% else %>
+    <div class="text-center">
+      <h4>Tone Analysis Charts</h4>
+    </div>
+
+    <div class="chart-table" id="tabs">
+      <ul>
+        <% @review_final_versions.keys.each_index do | idx | %>
+          <li>
+            <a href="#tab-<%= idx + 1 %>" id="tabmenu_<%= idx + 1 %>"><%= "Round " + (idx + 1).to_s %></a>
+          </li>
+        <% end %>
+      </ul>
+      <% @review_final_versions.keys.each_index do | idx | %>
+        <p>
+          <div id="tab-<%= idx + 1 %>">
+            <iframe width="560" height="315" src="<%= @heatmap_urls[ idx ] %>" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
   
-  <div id="details">
-  </div>
+</div>
 

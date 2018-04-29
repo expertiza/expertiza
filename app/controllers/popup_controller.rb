@@ -105,6 +105,15 @@ class PopupController < ApplicationController
     end
   end
 
+  def tone_analysis_chart_popup
+    puts "enters calling function"
+    @reviewer_id = params[:reviewer_id]
+    @assignment_id = params[:assignment_id]
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    build_tone_analysis_report
+    build_tone_analysis_heatmap
+  end
+
   def view_review_scores_popup
     puts "enters calling function"
     @reviewer_id = params[:reviewer_id]

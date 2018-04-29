@@ -38,6 +38,11 @@
   <% end %>
 <% end %>
 
-<% if stage != "Finished" %>
- <%= link_to "SRQ", {:controller => "questionnaires", :action => "create_srq", :id => participant.id } %>
-<% end  %>
+<% if stage != "Finished" and controller.controller_name == 'submitted_content' and @can_submit %>
+  <h2>Add Supplementary Review Questions:</h2>
+    <% if @assignment.srq? %>
+      <%= link_to "Create Supplementary Review Questionnaire", {:controller => "questionnaires", :action => "create_srq", :id => participant.id } %>
+    <% else %>
+      The instructor has not enabled this feature for this assignment
+    <% end %>
+<% end %>

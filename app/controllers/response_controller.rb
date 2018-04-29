@@ -216,7 +216,11 @@ class ResponseController < ApplicationController
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
     else
-      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+      if current_user.role.id.in?([2,6])
+        redirect_to controller: 'assignments', action: 'list_submissions', id:@map.response_map.assignment.id
+      else
+        redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+      end
     end
   end
 

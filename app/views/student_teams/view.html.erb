@@ -69,9 +69,9 @@
             </td>
           <% else %>
             <td>
-              <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+              <%= link_to "View", {:controller => 'response', :action => 'view', :team_id => member.team.id, :id => review.id} %>
               &nbsp;&nbsp;
-              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :team_id => member.team.id, :id => review.id, :return => "teammate"} %>
               &nbsp;&nbsp;
               
             </td>

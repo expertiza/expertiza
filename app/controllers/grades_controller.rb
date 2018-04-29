@@ -405,6 +405,7 @@ class GradesController < ApplicationController
     j = 0
     k = 0
     rounds = 0
+    highchart_series_index = 0
     review_round = highchart_series_data.to_a.reverse[0][:stack]
     flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"]
     highchart_series_data.to_a.reverse.each do |element|
@@ -416,8 +417,12 @@ class GradesController < ApplicationController
         review_round = stack
         k = 0
       end
-      flot_categories.push([k + (rounds*data.size), "Rubric \##{k} Round \##{round[0]}"])
-      k += 1
+      if highchart_series_index % 6 == 1
+        for i in 0..data.size-1
+          flot_categories.push([k + (rounds*data.size), "Rubric \##{k} Round \##{round[0]}"])
+          k += 1
+        end
+      end
       for i in 0..data.size-1
         if rounds > 0
           flot_series_data[j][:data].push([i + (rounds*data.size), data[i]])
@@ -434,6 +439,7 @@ class GradesController < ApplicationController
       end
       flot_data = []
       data = []
+      highchart_series_index += 1
     end
 
     num_reviewees = 0

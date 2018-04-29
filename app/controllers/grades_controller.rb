@@ -408,7 +408,7 @@ class GradesController < ApplicationController
     review_round = highchart_series_data.to_a.reverse[0][:stack]
     flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"]
     highchart_series_data.to_a.reverse.each do |element|
-      data << element[:data]
+      data = element[:data]
       puts element
       puts data
       stack = element[:stack]

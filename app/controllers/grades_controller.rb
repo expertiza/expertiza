@@ -37,6 +37,7 @@ class GradesController < ApplicationController
   # in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
+    @id = params[:id]
     @questions = {}
     questionnaires = @assignment.questionnaires
 
@@ -329,7 +330,7 @@ class GradesController < ApplicationController
                   nil
                 end
 
-        vm = VmQuestionResponse.new(questionnaire, round, assignment.rounds_of_reviews)
+        vm = VmQuestionResponse.new(questionnaire, assignment)
         questions = questionnaire.questions
         vm.add_questions(questions)
         vm.add_team_members(team)
@@ -399,37 +400,57 @@ class GradesController < ApplicationController
   def highchart_to_flot_adapter(min, max, highchart_series_data)
     flot_series_data = []
     flot_categories = []
+    data = []
     flot_data = []
-    j, k = 0
-    review_round = ""
+    j = 0
+    k = 0
+    rounds = 0
+    review_round = highchart_series_data.to_a.reverse[0][:stack]
     flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"]
-    highchart_series_data.to_a.reverse.to_h.each do |name, data, stack|
-      for i in 0..data.size-1
-        flot_data.push([i, data[i]])
-      end
-      flot_series_data.push(data: flot_data, color: flot_colors[j])
-      j += 1
-
+    highchart_series_data.to_a.reverse.each do |element|
+      data << element[:data]
+      puts element
+      puts data
+      stack = element[:stack]
       round = stack.scan(/[0-9]/)
       unless stack.eql?(review_round)
+        rounds += 1
+        review_round = stack
         k = 0
       end
-      flot_categories.push([k, "Rubric \##{k} Round \##{round[0]}"])
+      flot_categories.push([k + (rounds*data.size), "Rubric \##{k} Round \##{round[0]}"])
       k += 1
-      review_round = stack
+      #puts element
+      for i in 0..data.size-1
+        if rounds > 0
+          flot_series_data[j][:data].push([i + (rounds*data.size), data[i]])
+          puts flot_series_data[j]
+        end
+        if rounds.zero?
+          flot_data.push([i, data[i]])
+        end
+      end
+      flot_series_data.push(data: flot_data, color: flot_colors[j]) if rounds.zero?
+
+      j += 1
       if j > max
         j = 0
       end
+      flot_data = []
+      data = []
     end
-    num_reviewees = 0
-    for i in 0..flot_series_data.data[0].size-1
-      for j in 0..flot_series_data.size-1
-        num_reviewees += flot_series_data[j].data[i][1]
-      end
-      for j in 0..flot_series_data.size-1
-        flot_series_data[j].data[i][1] /= num_reviewees
-      end
-    end
+
+    # num_reviewees = 0
+    # for i in 0..flot_series_data[0][:data].size-1
+    #   for j in 0..(flot_series_data.size / 2) - 1
+    #     num_reviewees += flot_series_data[2*j][:data][i][1]
+    #   end
+    #   for j in 0..(flot_series_data.size / 2) - 1
+    #     unless num_reviewees.zero?
+    #       flot_series_data[2*j][:data][i][1] /= num_reviewees
+    #     end
+    #   end
+    # end
     [flot_series_data, flot_categories]
   end
 

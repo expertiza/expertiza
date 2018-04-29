@@ -397,38 +397,51 @@ class GradesController < ApplicationController
     [highchart_series_data, highchart_categories, highchart_colors]
   end
 
+  # This adapter is used to convert the data from the form highchart required to the form flot requires.
+  # It takes in the data formed by the generate_highchart method and molds it into a form to make a flot stacked bar graph
   def highchart_to_flot_adapter(min, max, highchart_series_data)
     flot_series_data = []
     flot_categories = []
-    data = []
+    highchart_data = []
     flot_data = []
     j = 0
     k = 0
     rounds = 0
     highchart_series_index = 0
     review_round = highchart_series_data.to_a.reverse[0][:stack]
-    flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"]
+    flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"] # These are the six colors from red to green
+
+    # This loop will look at every element of the highchart_series_data and use them to form the flot_series_data
+    # and flot_categories. Flot_series_data is of the form [{data: [[0,x], [1,x], [2,x], [3,x], [4,x], ...], color: "#......"},...].
+    # It is an array of hashes of the size of the number of different scores, which for us is 6: 0, 1, 2, 3, 4, 5. The first
+    # value in each of those arrays within the hash indicates the specific question, while the x indicates the percentage
+    # of people which scored a certain score on that question. Flot_categories is a hash of the form [[0,""], [1,""], [2,""]],
+    # where the first value in each of the inner arrays indicates the question number and the quotes indicate the name
+    # of that question.
     highchart_series_data.to_a.reverse.each do |element|
-      data = element[:data]
+      highchart_data = element[:data]
       stack = element[:stack]
       round = stack.scan(/[0-9]/)
+      # This tells flot_categories and flot_series_data that it is a new round
       unless stack.eql?(review_round)
         rounds += 1
         review_round = stack
         k = 0
       end
+      # Every sixth element tells flot_categories to create as many ticks as there were questions in that round
       if highchart_series_index % 6 == 1
-        for i in 0..data.size-1
-          flot_categories.push([k + (rounds*data.size), "Rubric \##{k} Round \##{round[0]}"])
+        for i in 0..highchart_data.size-1
+          flot_categories.push([k + (rounds*highchart_data.size), "Rubric \##{k} Round \##{round[0]}"])
           k += 1
         end
       end
-      for i in 0..data.size-1
+      # Pushes the data into flot_series_data in the correct form specified above
+      for i in 0..highchart_data.size-1
         if rounds > 0
-          flot_series_data[j][:data].push([i + (rounds*data.size), data[i]])
+          flot_series_data[j][:data].push([i + (rounds*highchart_data.size), highchart_data[i]])
         end
         if rounds.zero?
-          flot_data.push([i, data[i]])
+          flot_data.push([i, highchart_data[i]])
         end
       end
       flot_series_data.push(data: flot_data, color: flot_colors[j]) if rounds.zero?
@@ -438,10 +451,11 @@ class GradesController < ApplicationController
         j = 0
       end
       flot_data = []
-      data = []
+      highchart_data = []
       highchart_series_index += 1
     end
 
+    # This loop calculates the percentages and stores them in the correct data series
     num_reviewees = 0
     for i in 0..flot_series_data[0][:data].size-1
       for j in 0..flot_series_data.size - 1

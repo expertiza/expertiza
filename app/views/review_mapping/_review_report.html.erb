@@ -94,6 +94,7 @@ $("#myTable tbody").sortable().disableSelection();
           <!--Metrics-->
           <td bgcolor=<%= @bgcolor %> align = 'left'>
             <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+            <%= link_to "tone analysis chart", {:controller => 'popup', :action => 'tone_analysis_chart_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
           </td>
           <!--Assign grade and write comments-->
           <td bgcolor=<%= @bgcolor %> align = 'left'>

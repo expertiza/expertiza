@@ -1,5 +1,19 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+  <script>
+
+  $(function () {
+    /*Function for sorting the table */
+    $(".sortable").tablesorter({
+      sortList: [[0,0]] //sort First Column by default when page loads
+    });
+  });
+
+  /*Function to create tabs of the rubric-tag_prompt pairs */
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
+  </script>
+  
   <div id="details">
-    <h2>Test</h2>
   </div>
 

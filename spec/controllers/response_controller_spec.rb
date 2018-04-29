@@ -219,7 +219,7 @@ describe ResponseController do
         isSubmit: 'No'
       }
       post :create, params
-      expect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
+      expect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
     end
   end
 

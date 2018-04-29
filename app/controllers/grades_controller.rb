@@ -69,7 +69,54 @@ class GradesController < ApplicationController
     highchart_series_data, highchart_categories, highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
     @flot_series_data, @flot_categories = highchart_to_flot_adapter(min, max, highchart_series_data)
 
+    add_scores_by_round
+
     @show_reputation = false
+  end
+
+  def add_scores_by_round
+    scores_by_team_round = get_raw_scores_by_team_round(@questions)
+    @scores[:teams].each_value do |value|
+      team_id = value[:team][:id]
+      value[:scores][:scores_by_round] = scores_by_team_round[:teams][team_id]
+    end
+  end
+
+  def get_raw_scores_by_team_round(questions)
+    scores = {}
+
+    scores[:teams] = {}
+    if !questions.nil? && !questions.empty?
+      @assignment.teams.collect {|team| team.id}.each do |team_id|
+        first_round_sym = (@assignment.num_review_rounds == 1) ? :review : :review1
+        scores[:teams][team_id] = get_team_raw_scores_by_round(team_id,questions[first_round_sym][0].questionnaire.id) if !questions[first_round_sym].nil? && !questions[first_round_sym].empty?
+      end
+    end
+    scores
+  end
+
+  def get_team_raw_scores_by_round(team_id, questionnaire_id)
+    scores = {}
+    maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
+    assessments_by_team_id = {}
+    res_round = {}
+    maps.each do |m|
+      responses = m.response.each{|r| r.response_id} # response_id is the actual response here
+      assessments_by_team_id[team_id] = [] if assessments_by_team_id[team_id].nil?
+      responses.each{|res| assessments_by_team_id[team_id] << res.id if res.is_submitted} if !responses.nil? && !responses.empty?
+      responses.each{|res| res_round[res.id] = res.round if res.is_submitted} if !responses.nil? && !responses.empty?
+    end
+
+    qData = ScoreView.find_by_sql ["SELECT q1_id,s_response_id, question_weight,s_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id in (?)", questionnaire_id, assessments_by_team_id[team_id]]
+    scores[team_id] = {}
+    (1..@assignment.num_review_rounds).each{|idx| scores[team_id].merge!("#{idx}": [0, 0, 0, 0, 0, 0])} # [num0s,num1s,num2s,num3s,num4s,num5s]
+    qData.each do |qd|
+      if !qd.s_score.nil? && !res_round[qd.s_response_id].nil? # if res_round[qd.s_response_id].nil?, then not submitted
+        scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] = scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] + 1
+      end
+    end
+
+    scores[team_id]
   end
 
   # This method is used to retrieve questions for different review rounds

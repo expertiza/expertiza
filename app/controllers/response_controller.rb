@@ -217,7 +217,7 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
       @response.email
     end
-    #redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
   end
 
   def saving

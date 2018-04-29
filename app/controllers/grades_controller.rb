@@ -409,8 +409,6 @@ class GradesController < ApplicationController
     flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"]
     highchart_series_data.to_a.reverse.each do |element|
       data = element[:data]
-      puts element
-      puts data
       stack = element[:stack]
       round = stack.scan(/[0-9]/)
       unless stack.eql?(review_round)
@@ -420,11 +418,9 @@ class GradesController < ApplicationController
       end
       flot_categories.push([k + (rounds*data.size), "Rubric \##{k} Round \##{round[0]}"])
       k += 1
-      #puts element
       for i in 0..data.size-1
         if rounds > 0
           flot_series_data[j][:data].push([i + (rounds*data.size), data[i]])
-          puts flot_series_data[j]
         end
         if rounds.zero?
           flot_data.push([i, data[i]])
@@ -440,17 +436,19 @@ class GradesController < ApplicationController
       data = []
     end
 
-    # num_reviewees = 0
-    # for i in 0..flot_series_data[0][:data].size-1
-    #   for j in 0..(flot_series_data.size / 2) - 1
-    #     num_reviewees += flot_series_data[2*j][:data][i][1]
-    #   end
-    #   for j in 0..(flot_series_data.size / 2) - 1
-    #     unless num_reviewees.zero?
-    #       flot_series_data[2*j][:data][i][1] /= num_reviewees
-    #     end
-    #   end
-    # end
+    num_reviewees = 0
+    for i in 0..flot_series_data[0][:data].size-1
+      for j in 0..flot_series_data.size - 1
+        num_reviewees += flot_series_data[j][:data][i][1]
+      end
+      for j in 0..flot_series_data.size - 1
+        unless num_reviewees.zero?
+          flot_series_data[j][:data][i][1] /= num_reviewees.to_f
+          flot_series_data[j][:data][i][1] *= 100.0
+        end
+      end
+      num_reviewees = 0
+    end
     [flot_series_data, flot_categories]
   end
 

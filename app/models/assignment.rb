@@ -166,8 +166,8 @@ class Assignment < ActiveRecord::Base
       team_ids = teams.collect {|team| team.id}
       assignment_scores_by_team_round = {}
       team_ids.each do |team_id|
-
-          assignment_scores_by_team_round[team_id] = get_assignment_scores_by_round(team_id, questions[("review1").to_sym][0].questionnaire.id) if !questions[("review1").to_sym].nil? && !questions[("review1").to_sym].empty?
+          first_round_sym = (self.num_review_rounds == 1) ? :review : :review1
+          assignment_scores_by_team_round[team_id] = get_assignment_scores_by_round(team_id, questions[first_round_sym][0].questionnaire.id) if !questions[first_round_sym].nil? && !questions[first_round_sym].empty?
         end
 
       self.teams.each do |team|
@@ -209,6 +209,7 @@ class Assignment < ActiveRecord::Base
         else
           assessments = ReviewResponseMap.get_assessments_for(team)
           scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
+          scores[:teams][index.to_s.to_sym][:scores][:scores_by_round] = assignment_scores_by_team_round[team.id]
         end
         index += 1
       end
@@ -222,7 +223,7 @@ class Assignment < ActiveRecord::Base
       assessments_by_team_id = {}
       res_round = {}
       maps.each do |m|
-        responses = m.response.each{|r| r.response_id}
+        responses = m.response.each{|r| r.response_id} # response_id is the actual response here
         assessments_by_team_id[team_id] = [] if assessments_by_team_id[team_id].nil?
         responses.each{|res| assessments_by_team_id[team_id] << res.id if res.is_submitted} if !responses.nil? && !responses.empty?
         responses.each{|res| res_round[res.id] = res.round if res.is_submitted} if !responses.nil? && !responses.empty?
@@ -233,7 +234,7 @@ class Assignment < ActiveRecord::Base
         (1..self.num_review_rounds).each{|idx| scores[team_id].merge!("#{idx}": [0, 0, 0, 0, 0, 0])} # [num0s,num1s,num2s,num3s,num4s,num5s]
       #(0..self.num_review_rounds-1).each do |idx|
           qData.each do |qd|
-            if !qd.s_score.nil? && !res_round[qd.s_response_id].nil? # if nil, hasn't been submitted
+            if !qd.s_score.nil? && !res_round[qd.s_response_id].nil? # if res_round[qd.s_response_id].nil?, then not submitted
               scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] = scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] + 1
             end
           end

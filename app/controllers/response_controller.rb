@@ -60,8 +60,12 @@ class ResponseController < ApplicationController
     student = AssignmentParticipant.find(review.reviewee_id)
     duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
     @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
-    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review)
-    
+    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review).first
+    if @duty_based_review_allowed_rubric.nil?|| !@duty_based_review_allowed_rubric
+      @duty_based_review_allowed_rubric=0
+    else
+      @duty_based_review_allowed_rubric=1
+    end
 
     set_all_responses
     if @prev.present?
@@ -118,8 +122,12 @@ class ResponseController < ApplicationController
     #CHECK WHETHER DUTY BASED REVIEWS ALLOWED OR NOT.
     duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
     
-    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review)
-    @duty_based_review_allowed_rubric=0 if @duty_based_review_allowed_rubric.first.nil?|| !@duty_based_review_allowed_rubric.first
+    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review).first
+    if @duty_based_review_allowed_rubric.nil?|| !@duty_based_review_allowed_rubric
+      @duty_based_review_allowed_rubric=0
+    else
+      @duty_based_review_allowed_rubric=1
+    end
     @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
     
   
@@ -163,9 +171,13 @@ class ResponseController < ApplicationController
     student = AssignmentParticipant.find(review.reviewee_id)
     duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
     @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
-    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review)
-    
-    #render :plain => [duty_id_for_rubric, @duty_based_review_allowed_rubric, @questionnaire_id_rubric, review, student].inspect
+    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review).first
+    if @duty_based_review_allowed_rubric.nil?|| !@duty_based_review_allowed_rubric
+      @duty_based_review_allowed_rubric=0
+    else
+      @duty_based_review_allowed_rubric=1
+    end
+    #render :plain => [duty_id_for_rubric, @duty_based_review_allowed_rubric, review, student, @questionnaire_id_rubric].inspect
 
     
     #arr = [params, @response, @map]
@@ -345,12 +357,12 @@ class ResponseController < ApplicationController
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap"
-      if @duty_based_review_allowed_rubric ==1
+      if @duty_based_review_allowed_rubric==1 
         @questionnaire = @map.questionnaire(@duty_based_review_allowed_rubric,@questionnaire_id_rubric)
-             
+             #render :plain => [@duty_based_review_allowed_rubric].inspect
       else
         @questionnaire = @map.questionnaire
-        #render :plain => [@questionnaire].inspect
+        
       end
       
     end

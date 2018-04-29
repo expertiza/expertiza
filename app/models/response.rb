@@ -108,7 +108,7 @@ class Response < ActiveRecord::Base
       map = ResponseMap.find(self.map_id)
       assignment = Participant.find(map.reviewer_id).assignment
 
-      if (duty_status==1)
+      if (duty_status == 1)
         questionnaire = Questionnaire.find(questionnaire_id_rubric)
       else
         questionnaire = Questionnaire.find(assignment.review_questionnaire_id)

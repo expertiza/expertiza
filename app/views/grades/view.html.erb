@@ -1,9 +1,7 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <br/>
-
-<%= @scores.to_json %>
 <br/>
-<div id="placeholder" style="width:600px;height:300px;">
+<div id="placeholder">
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
@@ -11,36 +9,71 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/excanvas.js"></script>
 <script type="application/javascript">
     $(function () {
+        var allData = <%= @scores.to_json.html_safe %>;
+        var frequencyData = [];
+        for(var teamIdx in allData.teams) {
+            var team = allData.teams[teamIdx].team;
+            var scoresByRound = allData.teams[teamIdx].scores.scores_by_round;
+            frequencyData.push({
+                team: {
+                    id: team.id,
+                    name: team.name
+                },
+                scoresByRound: scoresByRound
+            });
+        }
 
-        // [question number - 1,percent of teams score]
-        var score0 = [[0,2],[1,7],[2,null],[3,5],[4,null],[5,5]];
-        var score1 = [[0,30],[1,20],[2,null],[3,10],[4,null],[5,10]];
-        var score2 = [[0,11],[1,18],[2,null],[3,21],[4,null],[5,21]];
-        var score3 = [[0,14],[1,24],[2,null],[3,30],[4,null],[5,20]];
-        var score4 = [[0,18],[1,11],[2,null],[3,12],[4,null],[5,22]];
-        var score5 = [[0,25],[1,20],[2,null],[3,22],[4,null],[5,22]];
+        var aggregate = {};
+
+        for(var teamDataKey in frequencyData) {
+            var teamData = frequencyData[teamDataKey];
+              for(var scoresByRoundKey in teamData.scoresByRound) {
+                  var scores = teamData.scoresByRound[scoresByRoundKey];
+                  for(var score in scores) {
+                      if(aggregate[scoresByRoundKey] == null) {
+                          aggregate[scoresByRoundKey] = scores;
+                      }
+                      else {
+                          if(aggregate[scoresByRoundKey].length != scores.length) {
+                              console.error("Team "+  +"("+teamData.team.id+") does not contain the same number of scores as other teams.");
+                          }
+                          else {
+                              for(var idx = 0;idx < scores[score].length;idx++) {
+                                  aggregate[scoresByRoundKey][idx] += scores[idx];
+                              }
+                          }
+                      }
+                  }
+              }
+        }
+
+        var all = [];
+        for(var aggregateKey in aggregate) {
+            for(var idx = 0;idx < aggregate[aggregateKey].length;idx++) {
+                all[idx] = (idx == all.length) ? aggregate[aggregateKey][idx] : all[idx] + aggregate[aggregateKey][idx];
+            }
+        }
+        aggregate.all = all;
+
+        var data = {};
+        for(var round in aggregate) {
+            data[round] = [];
+            for(var idx = 0;idx < aggregate[round].length;idx++) {
+                data[round].push([idx, aggregate[round][idx]]);
+            }
+        }
+
+        $("#placeholder").width($(placeholder).parent().innerWidth());
+        $("#placeholder").height($(placeholder).parent().innerHeight());
 
         $.plot($("#placeholder"),[
-            {data: score0,
-                color: '#FF0000' },
-            {data: score1,
-                color: '#ff6600' },
-            {data: score2,
-                color: '#FFCC00' },
-            {data: score3,
-                color: '#ccff00' },
-            {data: score4,
-                color: '#66ff00' },
-            {data: score5,
-                color: '#00FF00' }], {
-            xaxis: {
-                ticks: [[0,'Question 1a'],[1,'Question 1b'],[2,''],[3,'Question 2'],[4,''],[5,'Question 3']]
-            },
-            grid: {
+            {data: data.all}
+            ],
+            {
+              grid: {
                 hoverable: true,
-                clickable: true
-            },series: {
-                stack: true,
+                clickable: false
+              },series: {
                 lines: {
                     show: false,
                     fill: true,
@@ -70,7 +103,7 @@
                 var x = item.datapoint[0],
                     y = item.datapoint[1];
 
-                $("#tooltip").html(item.series.xaxis.ticks[x].label + ": " + item.series.data[x][1] + "% of the class scored " + item.seriesIndex)
+                $("#tooltip").html("Score: " + x + "; Frequency: " + y)
                     .css({top: item.pageY+5, left: item.pageX+5})
                     .fadeIn(200);
             } else {

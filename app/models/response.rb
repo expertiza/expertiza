@@ -94,21 +94,27 @@ class Response < ActiveRecord::Base
     response_map.email(defn, participant, parent)
   end
 
-  def questionnaire_by_answer(answer, duty_status=false)
+  def questionnaire_by_answer(answer, duty_status=0, questionnaire_id_rubric = 0)
+
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
-      questionnaire = Question.find(answer.question_id).questionnaire
+      #if !duty_status
+        questionnaire = Question.find(answer.question_id).questionnaire
+      #else 
+        #questionnaire = Questionnaire.find(questionnaire_id_rubric)
+      #end
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
       assignment = Participant.find(map.reviewer_id).assignment
+
       if !duty_status
         questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
       else
-
-        
+        questionnaire = Questionnaire.find(questionnaire_id_rubric)
       end
     end
+
     questionnaire
   end
 

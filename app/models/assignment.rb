@@ -50,6 +50,7 @@ class Assignment < ActiveRecord::Base
   def team_assignment?
     true
   end
+
   alias team_assignment team_assignment?
 
   def topics?
@@ -97,7 +98,7 @@ class Assignment < ActiveRecord::Base
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
     # Reject response maps without responses
-    response_map_set.reject! {|response_map| response_map.response.empty? }
+    response_map_set.reject! {|response_map| response_map.response.empty?}
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
@@ -107,13 +108,13 @@ class Assignment < ActiveRecord::Base
     raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
 
     # Metareviewer can only metareview each review once
-    response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer) }
+    response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer)}
     raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
     # Reduce to the response maps with the least number of metareviews received
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count}
     min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
+    response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews}
 
     # Reduce the response maps to the reviewers with the least number of metareviews received
     reviewers = {} # <reviewer, number of metareviews>
@@ -121,15 +122,15 @@ class Assignment < ActiveRecord::Base
       reviewer = response_map.reviewer
       reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
     end
-    reviewers = reviewers.sort_by {|a| a[1] }
+    reviewers = reviewers.sort_by {|a| a[1]}
     min_metareviews = reviewers.first[1]
-    reviewers.reject! {|reviewer| reviewer[1] == min_metareviews }
-    response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
+    reviewers.reject! {|reviewer| reviewer[1] == min_metareviews}
+    response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer)}
 
     # Pick the response map whose most recent meta_reviewer was assigned longest ago
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count}
     min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
+    response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id} if min_metareviews > 0
     # The first review_map is the best to metareview
     response_map_set.first
   end
@@ -142,12 +143,104 @@ class Assignment < ActiveRecord::Base
     end
     mappings
   end
+
   #--------------------metareview assignment end
 
   def dynamic_reviewer_assignment?
     self.review_assignment_strategy == RS_AUTO_SELECTED
   end
+
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
+
+  def optimized_scores(questions)
+    scores = {}
+#    scores[:participants] = {}
+#    self.participants.each do |participant|
+#      scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
+#    end
+
+    scores[:teams] = {}
+    index = 0
+
+    if !questions.nil? && !questions.empty?
+      team_ids = teams.collect {|team| team.id}
+      assignment_scores_by_team_round = {}
+      team_ids.each do |team_id|
+
+          assignment_scores_by_team_round[team_id] = get_assignment_scores_by_round(team_id, questions[("review1").to_sym][0].questionnaire.id) if !questions[("review1").to_sym].nil? && !questions[("review1").to_sym].empty?
+        end
+
+      self.teams.each do |team|
+        scores[:teams][index.to_s.to_sym] = {}
+        scores[:teams][index.to_s.to_sym][:team] = team
+        if self.varying_rubrics_by_round?
+          grades_by_rounds = {}
+          total_score = 0
+          total_num_of_assessments = 0 # calculate grades for each rounds
+          (1..self.num_review_rounds).each do |i|
+            assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
+            round_sym = ("review" + i.to_s).to_sym
+            grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+            total_num_of_assessments += assessments.size
+            total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
+          end
+          # merge the grades from multiple rounds
+          scores[:teams][index.to_s.to_sym][:scores] = {}
+          scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
+          scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
+          scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
+          scores[:teams][index.to_s.to_sym][:scores][:scores_by_round] = assignment_scores_by_team_round[team.id]
+          (1..self.num_review_rounds).each do |i|
+            round_sym = ("review" + i.to_s).to_sym
+            if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
+              scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
+            end
+            if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
+              scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
+            end
+          end
+          if total_num_of_assessments != 0
+            scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
+          else
+            scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
+            scores[:teams][index.to_s.to_sym][:scores][:max] = 0
+            scores[:teams][index.to_s.to_sym][:scores][:min] = 0
+          end
+        else
+          assessments = ReviewResponseMap.get_assessments_for(team)
+          scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
+        end
+        index += 1
+      end
+    end
+    scores
+  end
+
+  def get_assignment_scores_by_round(team_id, questionnaire_id)
+    scores = {}
+      maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
+      assessments_by_team_id = {}
+      res_round = {}
+      maps.each do |m|
+        responses = m.response.each{|r| r.response_id}
+        assessments_by_team_id[team_id] = [] if assessments_by_team_id[team_id].nil?
+        responses.each{|res| assessments_by_team_id[team_id] << res.id if res.is_submitted} if !responses.nil? && !responses.empty?
+        responses.each{|res| res_round[res.id] = res.round if res.is_submitted} if !responses.nil? && !responses.empty?
+      end
+
+      qData = ScoreView.find_by_sql ["SELECT q1_id,s_response_id, question_weight,s_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id in (?)", questionnaire_id, assessments_by_team_id[team_id]]
+        scores[team_id] = {}
+        (1..self.num_review_rounds).each{|idx| scores[team_id].merge!("#{idx}": [0, 0, 0, 0, 0, 0])} # [num0s,num1s,num2s,num3s,num4s,num5s]
+      #(0..self.num_review_rounds-1).each do |idx|
+          qData.each do |qd|
+            if !qd.s_score.nil? && !res_round[qd.s_response_id].nil? # if nil, hasn't been submitted
+              scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] = scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] + 1
+            end
+          end
+        #end
+
+      scores[team_id]
+  end
 
   def scores(questions)
     scores = {}
@@ -208,7 +301,7 @@ class Assignment < ActiveRecord::Base
     path_text = ""
     path_text = if !self.course_id.nil? && self.course_id > 0
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
-                    FileHelper.clean_path(self.course.directory_path) + '/'
+                      FileHelper.clean_path(self.course.directory_path) + '/'
                 else
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
                 end
@@ -250,14 +343,14 @@ class Assignment < ActiveRecord::Base
   def delete(force = nil)
     begin
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each {|map| map.delete(force) }
+      maps.each {|map| map.delete(force)}
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each {|map| map.delete(force) }
+      maps.each {|map| map.delete(force)}
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -298,7 +391,7 @@ class Assignment < ActiveRecord::Base
     user = User.find_by(name: user_name)
     if user.nil?
       raise "The user account with the name #{user_name} does not exist. Please <a href='" +
-        url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
+                url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id: user.id)
     raise "The user #{user.name} is already a participant." if participant
@@ -507,11 +600,11 @@ class Assignment < ActiveRecord::Base
   def self.check_empty_rounds(answers, round_num, res_type)
     unless answers[round_num][res_type].empty?
       round_type =
-        if round_num.nil?
-          "Round Nill - " + res_type
-        else
-          "Round " + round_num.to_s + " - " + res_type.to_s
-        end
+          if round_num.nil?
+            "Round Nill - " + res_type
+          else
+            "Round " + round_num.to_s + " - " + res_type.to_s
+          end
       return round_type
     end
     nil
@@ -571,8 +664,8 @@ class Assignment < ActiveRecord::Base
   def self.export_data_fields(options)
     if options['team_score'] == 'true'
       team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
-        tcsv.push('---', '---', '---')
+          tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+          tcsv.push('---', '---', '---')
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',
@@ -607,6 +700,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id}
   end
 end

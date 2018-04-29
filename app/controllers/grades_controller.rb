@@ -74,8 +74,9 @@ class GradesController < ApplicationController
 
   # This method is used to retrieve questions for different review rounds
   def retrieve_questions(questionnaires)
+    all_questionnaires_for_assignment = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
     questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
+      round = all_questionnaires_for_assignment.select{|q| q.questionnaire_id == questionnaire.id }.first.used_in_round
       questionnaire_symbol = if !round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              else

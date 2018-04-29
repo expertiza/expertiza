@@ -55,6 +55,14 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @map = @response.map
     @contributor = @map.contributor
+
+    review = TeammateReviewResponseMap.find(@map.id)
+    student = AssignmentParticipant.find(review.reviewee_id)
+    duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
+    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
+    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review)
+    
+
     set_all_responses
     if @prev.present?
       @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i and m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
@@ -97,7 +105,7 @@ class ResponseController < ApplicationController
 
   def new
     #@duty_based_review_allowed =  @student.assignment.role_based_review
-    #user_id_re = .map.reviewee.user_id
+    
     review = TeammateReviewResponseMap.find(params[:id]) if !params[:id].nil?
     student = AssignmentParticipant.find(review.reviewee_id)
 
@@ -109,19 +117,23 @@ class ResponseController < ApplicationController
 
     #CHECK WHETHER DUTY BASED REVIEWS ALLOWED OR NOT.
     duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
-    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).first
-
-    render :plain => @questionnaire_id_rubric.inspect
+    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
+    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review)
+  
+    #render :plain => [duty_id_for_rubric, @duty_based_review_allowed_rubric, @questionnaire_id_rubric].inspect
+    #These values here are correct.
 
     @header = "New"
     @next_action = "create"
     @feedback = params[:feedback]
     @map = ResponseMap.find(params[:id])
+
     @return = params[:return]
     @modified_object = @map.id
     set_content(true)
+
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
-    
+    render action: 'response'
   end
 
   def new_feedback
@@ -142,7 +154,18 @@ class ResponseController < ApplicationController
   # view response
   def view
     @response = Response.find(params[:id])
-    @map = @response.map
+    @map = @response.map   
+    review = TeammateReviewResponseMap.find(@map.id)
+    student = AssignmentParticipant.find(review.reviewee_id)
+    duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
+    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
+    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review)
+    
+    #render :plain => [duty_id_for_rubric, @duty_based_review_allowed_rubric, @questionnaire_id_rubric, review, student].inspect
+
+    
+    #arr = [params, @response, @map]
+    #render :plain => arr.inspect
     set_content
   end
 
@@ -152,7 +175,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(map_id)
     set_all_responses
 
-    render :plain => params.inspect
+    #render :plain => params.inspect
     
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
@@ -293,6 +316,8 @@ class ResponseController < ApplicationController
     
 
     new_response ? set_questionnaire_for_new_response : set_questionnaire
+    # render :plain => [@questionnare, @map, @questionnaire_id_rubric].inspect
+    #render :plain => test111.inspect
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
@@ -313,8 +338,9 @@ class ResponseController < ApplicationController
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap"
-      @questionnaire = @map.questionnaire
+      @questionnaire = @map.questionnaire(@duty_based_review_allowed_rubric,@questionnaire_id_rubric)
     end
+    
   end
 
   def scores
@@ -331,7 +357,9 @@ class ResponseController < ApplicationController
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
-    @questionnaire = @response.questionnaire_by_answer(answer)
+    #render :plain => [@response, @map].inspect
+    @questionnaire = @response.questionnaire_by_answer(answer, @duty_based_review_allowed_rubric, @questionnaire_id_rubric)
+    
   end
 
   def set_dropdown_or_scale

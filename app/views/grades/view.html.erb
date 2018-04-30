@@ -1,118 +1,24 @@
 <h1>Summary report for <%= @assignment.name %></h1>
 <br/>
 <br/>
-<div id="placeholder">
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.stack.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/excanvas.js"></script>
-<script type="application/javascript">
-    $(function () {
-        var allData = <%= @scores.to_json.html_safe %>;
-        var frequencyData = [];
-        for(var teamIdx in allData.teams) {
-            var team = allData.teams[teamIdx].team;
-            var scoresByRound = allData.teams[teamIdx].scores.scores_by_round;
-            frequencyData.push({
-                team: {
-                    id: team.id,
-                    name: team.name
-                },
-                scoresByRound: scoresByRound
-            });
-        }
-
-        var aggregate = {};
-
-        for(var teamDataKey in frequencyData) {
-            var teamData = frequencyData[teamDataKey];
-              for(var scoresByRoundKey in teamData.scoresByRound) {
-                  var scores = teamData.scoresByRound[scoresByRoundKey];
-                  for(var score in scores) {
-                      if(aggregate[scoresByRoundKey] == null) {
-                          aggregate[scoresByRoundKey] = scores;
-                      }
-                      else {
-                          if(aggregate[scoresByRoundKey].length != scores.length) {
-                              console.error("Team "+  +"("+teamData.team.id+") does not contain the same number of scores as other teams.");
-                          }
-                          else {
-                              for(var idx = 0;idx < scores[score].length;idx++) {
-                                  aggregate[scoresByRoundKey][idx] += scores[idx];
-                              }
-                          }
-                      }
-                  }
-              }
-        }
-
-        var all = [];
-        for(var aggregateKey in aggregate) {
-            for(var idx = 0;idx < aggregate[aggregateKey].length;idx++) {
-                all[idx] = (idx == all.length) ? aggregate[aggregateKey][idx] : all[idx] + aggregate[aggregateKey][idx];
-            }
-        }
-        aggregate.all = all;
-
-        var data = {};
-        for(var round in aggregate) {
-            data[round] = [];
-            for(var idx = 0;idx < aggregate[round].length;idx++) {
-                data[round].push([idx, aggregate[round][idx]]);
-            }
-        }
-
-        $("#placeholder").width($(placeholder).parent().innerWidth());
-        $("#placeholder").height($(placeholder).parent().innerHeight());
-
-        $.plot($("#placeholder"),[
-            {data: data.all}
-            ],
-            {
-              grid: {
-                hoverable: true,
-                clickable: false
-              },series: {
-                lines: {
-                    show: false,
-                    fill: true,
-                    steps: 0
-                },
-                bars: {
-                    show: true,
-                    align: 'center',
-                    barWidth: 1
-                }
-            }
-        });
-
-
-        $("<div id='tooltip'></div>").css({
-            position: "absolute",
-            display: "none",
-            border: "1px solid #fdd",
-            padding: "2px",
-            "background-color": "#fee",
-            opacity: 0.80
-        }).appendTo("body");
-
-        $("#placeholder").bind("plothover", function (event, pos, item) {
-
-            if (item) {
-                var x = item.datapoint[0],
-                    y = item.datapoint[1];
-
-                $("#tooltip").html("Score: " + x + "; Frequency: " + y)
-                    .css({top: item.pageY+5, left: item.pageX+5})
-                    .fadeIn(200);
-            } else {
-                $("#tooltip").hide();
-            }
-
-        });
-    });
-</script>
+<% if @scores[:teams] %>
+    <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <BR/><BR/>
+<% end %>
+<!-- If there are 1-member teams, the Teammate Review column should not appear in the score report.
+If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
+<table class="table table-striped grades" width="100%">
+  <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
+  <% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
+      <div>Aggregate Class Scores<br/><span id="placeholder" style="display: inline-block"></span>
+        <span id="radioBtns" style="display: inline-block;vertical-align: top"></span></div>
+      <%= render :partial => 'teams' %>
+  <% else %>
+      <tr><td>No teams are defined for this assignment</td></tr>
+  <% end %>
+</table>
+<BR/><BR/>
 
 <%= link_to 'Export '+'Grades',
             :controller=>'export_file',

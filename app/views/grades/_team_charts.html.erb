@@ -12,12 +12,12 @@
   	</div>
   	Class Average
 	</th>
-	<TH COLSPAN="8">
+  <TH COLSPAN="8">
 		<img src="<%= @average_chart  %>" ><br>
 		Class Distribution
 		<br>
 	</th>
-	<TH WIDTH="9">&nbsp;</th>
+	<TH WIDTH="2">&nbsp;</th>
 </TR>
 
 <script type="text/javascript">
@@ -87,7 +87,149 @@
         $("#tooltip").hide();
       }
     });
-  });
+
+        function compileData() {
+            var allData = <%= @scores.to_json.html_safe %>;
+            frequencyDataByTeam = collectFrequencyDataByTeam(allData);
+            aggregate = calculateAggregateFrequencies(frequencyDataByTeam);
+            cddata = convertAggregateFrequencyArraysToFlotData(aggregate);
+
+            return cddata;
+        }
+
+        function collectFrequencyDataByTeam(allData) {
+            var frequencyData = [];
+            for(var teamIdx in allData.teams) {
+                var team = allData.teams[teamIdx].team;
+                var scoresByRound = allData.teams[teamIdx].scores.scores_by_round;
+                frequencyData.push({
+                    team: {
+                        id: team.id,
+                        name: team.name
+                    },
+                    scoresByRound: scoresByRound
+                });
+            }
+            return frequencyData;
+        }
+
+        function calculateAggregateFrequencies(frequencyData) {
+            var aggregate = aggregateByRound(frequencyData);
+
+            aggregate.all = aggregateAllRounds(aggregate);
+
+            return aggregate;
+        }
+
+        function aggregateAllRounds(aggregate) {
+            var all = [0,0,0,0,0,0];
+            for(var round in aggregate) {
+                for(var idx = 0;idx < aggregate[round].length;idx++) {
+                    all[idx] += aggregate[round][idx];
+                }
+            }
+            return all;
+        }
+
+        function aggregateByRound(frequencyData) {
+            var aggregate = {};
+
+            for(var teamDataKey in frequencyData) {
+                var teamData = frequencyData[teamDataKey];
+                for(var round in teamData.scoresByRound) {
+                    var scores = teamData.scoresByRound[round];
+                    if(aggregate[round] == null) {
+                        aggregate[round] = [0, 0, 0, 0, 0, 0];
+                    }
+                    for(var idx = 0;idx < scores.length;idx++) {
+                        aggregate[round][idx] += scores[idx];
+                    }
+                }
+            }
+
+            return aggregate;
+        }
+
+        function convertAggregateFrequencyArraysToFlotData(aggregate) {
+            var data = {};
+            for(var round in aggregate) {
+                data[round] = [];
+                for(var idx = 0;idx < aggregate[round].length;idx++) {
+                    data[round].push([idx, aggregate[round][idx]]);
+                }
+            }
+
+            return data;
+        }
+
+        $("#placeholder").width($("#placeholder").parent().innerWidth()*0.8);
+        $("#placeholder").height($("#team-chart").innerHeight());
+
+        $("#radioBtns").width($("#radioBtns").parent().innerWidth()*0.2);
+        $("#radioBtns").height($("#team-chart").innerHeight());
+
+        var cpdata = compileData();
+
+        var classPerformance = $.plot($("#placeholder"),[cpdata.all],
+            {
+                grid: {
+                    hoverable: true,
+                    clickable: false
+                },series: {
+                lines: {
+                    show: false,
+                    fill: true,
+                    steps: 0
+                },
+                bars: {
+                    show: true,
+                    align: 'center',
+                    barWidth: 1
+                }
+            }
+            });
+
+
+        $("<div id='tooltip'></div>").css({
+            position: "absolute",
+            display: "none",
+            border: "1px solid #fdd",
+            padding: "2px",
+            "background-color": "#fee",
+            opacity: 0.80
+        }).appendTo("body");
+
+        $("#placeholder").bind("plothover", function (event, pos, item) {
+
+            if (item) {
+                var x = item.datapoint[0],
+                    y = item.datapoint[1];
+
+                $("#tooltip").html("Score: " + x + "; Frequency: " + y)
+                    .css({top: item.pageY+5, left: item.pageX+5})
+                    .fadeIn(200);
+            } else {
+                $("#tooltip").hide();
+            }
+
+        });
+
+        var radioBtn = $('<label><input type="radio" name="assignmentRound" value="all" checked onclick="showAggregation(\'all\')"/>All Rounds</label>')
+        radioBtn.appendTo('#radioBtns');
+
+        for (var round = 1; round <= <%= @assignment.num_review_rounds %>; round++) {
+            var radioBtn = $('<label><input type="radio" name="assignmentRound" onclick="showAggregation(\''+round+'\')"/>Round '+round+'</label>');
+            radioBtn.attr("value",round);
+            radioBtn.appendTo('#radioBtns');
+
+        }
+
+        window.showAggregation = function(round) {
+            classPerformance.setData([cpdata[round]]);
+            classPerformance.setupGrid();
+            classPerformance.draw();
+        }
+    });
 </script>
 
 <style> 

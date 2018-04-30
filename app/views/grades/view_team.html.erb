@@ -82,7 +82,8 @@
 
           </span>
 
-          <% if @assignment.display_peer_review_before_self_review_complete %>
+          <% if (@assignment.is_selfreview_enabled and @assignment.display_peer_review_before_self_review_complete) or %>
+                <% !@assignment.is_selfreview_enabled or (!unsubmitted_self_review?(@participant.id)) %>
             <table id="scoresTable" class="tbl_heat tablesorter">
               <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
               <thead>

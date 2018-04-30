@@ -40,22 +40,25 @@
           <% unless participants.empty? %>
 
                 <% @assignment_team = AssignmentTeam.find(team.id) %>
-                <% @reviewer = AssignmentParticipant.where(user_id: session[:user].id , parent_id: @assignment_team.parent_id).first %>
-                <% @map =ReviewResponseMap.where(reviewee_id: @assignment_team.id, reviewer_id: @reviewer.id).last%>
-                <% if @map !=nil%>
+                <% @reviewer = AssignmentParticipant.where(user_id: session[:user].id , parent_id: @assignment_team.parent_id).first unless @assignment_team.nil? %>
+                <% @map =ReviewResponseMap.where(reviewee_id: @assignment_team.id, reviewer_id: @reviewer.id).last unless @reviewer.nil? %>
+                <% unless @map.nil? %>
                     <% @latest_response = Response.where(map_id: @map.id).last %>
-                    <%= link_to "View review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %> </br>
-                    <% if @latest_response.round.nil? %>
-                        <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
-                    <% else %>
-                        <% last_response_round = @latest_response.round %>
-                    <% end %>
-                    <% current_round = @assignment.number_of_current_round(SignedUpTeam.topic_id(participants.first.parent_id, participants.first.user_id)) %>
+                    <% unless @latest_response.nil? %>
+                      <%= link_to "View review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %> </br>
+                      <% if @latest_response.round.nil? %>
+                          <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+                      <% else %>
+                          <% last_response_round = @latest_response.round %>
+                      <% end %>
+                      <% current_round = @assignment.number_of_current_round(SignedUpTeam.topic_id(participants.first.parent_id, participants.first.user_id)) %>
 
-                    <% if last_response_round != current_round %>
-                        <%= link_to 'Update review', { controller: 'response', :action => 'new',  id: @map.id } rescue nil %></br>
-                    <% elsif !@latest_response.is_submitted? %>
-                        <%= link_to "Edit review", {:controller => 'response', :action => 'edit', :id => @latest_response.id} rescue nil %></br>
+                      <% if last_response_round != current_round %>
+                          <%= link_to 'Update review', { controller: 'response', :action => 'new',  id: @map.id } rescue nil %></br>
+                      <% elsif !@latest_response.is_submitted? %>
+                          <%= link_to "Edit review", {:controller => 'response', :action => 'edit', :id => @latest_response.id} rescue nil %></br>
+                      <% end %>
+
                     <% end %>
                 <% else %>
                     <%= link_to 'Perform review', { controller: 'review_mapping', action: 'add_instructor_as_reviewer', team_id: team.id, assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>

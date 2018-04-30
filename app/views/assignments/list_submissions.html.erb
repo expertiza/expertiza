@@ -58,6 +58,7 @@
                       <% elsif !@latest_response.is_submitted? %>
                           <%= link_to "Edit review", {:controller => 'response', :action => 'edit', :id => @latest_response.id} rescue nil %></br>
                       <% end %>
+
                     <% end %>
                 <% else %>
                     <%= link_to 'Perform review', { controller: 'review_mapping', action: 'add_instructor_as_reviewer', team_id: team.id, assignment_id: @assignment.id, reviewer_id: session[:user].id }, target: '_blank' %></br>

@@ -1,12 +1,12 @@
-<%= form_tag form_action, :id => "part_add", :method => 'post', :remote => remote do %>
-  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 20} %>
+<%= form_tag form_action, :id => "part_add", :method => 'post', :class => "form-inline", :remote => remote do %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 20, :class => "form-control", :style => "width: 250px"} %>
 	<%= hidden_field_tag(obj_type, obj_id) %>
 	<%= hidden_field_tag('model', model) %>
         <!-- E726 Fall2012 Changes Begin -->
     <%= hidden_field_tag('authorization', authorization) %>
         <!-- E726 Fall2012 Changes End -->
     <% if form_action == "add" %>
-		<input id='add_a' type='submit' value='Add'/>
+		<input id='add_a' type='submit' value='Add' class="btn btn-md btn-default" />
 		<%= radio_button "user","role", "participant",:checked=>(params[:authorization]=='participant' or params[:authorization].nil?)%>
 		<%= label_tag :role_participant, "participant" ,{:style=>"font-size:16px;"}%>
 		<img src="/assets/info.png" title='A participant can submit artifacts, review artifacts and take a quiz.'>

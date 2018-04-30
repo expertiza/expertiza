@@ -48,87 +48,9 @@ module OnTheFlyCalc
     end
     scores
   end
-
-  def scores(questions)
-    score_assignment
-    self.teams.each do |team|
-      score_team = {}
-      score_team[:team] = team
-      if self.varying_rubrics_by_round?
-        calculate_rounds
-        calculate_score
-        calculate_assessment
-      else
-        assessments = ReviewResponseMap.get_assessments_for(team)
-        score_team[:scores] = Answer.compute_scores(assessments, questions[:review])
-      end
-      index += 1
-    end
-    scores
-  end
 end
 
 private
-
-def score_assignment
-  scores = {}
-  score_team = scores[:teams][index.to_s.to_sym]
-  scores[:participants] = {}
-  participant_score
-  scores[:teams] = {}
-  index = 0
-end
-
-def calculate_rounds
-  self.num_review_rounds.each do |i|
-    total_score = 0
-    total_num_of_assessments = 0 # calculate grades for each rounds
-    grades_by_rounds = {}
-    assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
-    round_sym = ("review" + i.to_s).to_sym
-    grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
-    total_num_of_assessments += assessments.size
-    total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
-  end
-end
-
-def calculate_score
-  score = {}
-  score[:max] = -999_999_999
-  score[:min] = 999_999_999
-  score[:avg] = 0
-  grades_by_rounds = {}
-  self.num_review_rounds.each do |i|
-    round_sym = ("review" + i.to_s).to_sym
-    grades_by_rounds = {}
-    score[:max] = grades_by_rounds[round_sym][:max] if max_condition
-    score[:min] = grades_by_rounds[round_sym][:min] if min_condition
-  end
-end
-
-def max_condition
-  !round[:max].nil? && score[:max] < round[:max]
-end
-
-def min_condition
-  !round[:min].nil? && score[:min] > round[:min]
-end
-
-def participant_score
-  self.participants.each do |participant|
-    scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
-  end
-end
-
-def calculate_assessment
-  if total_num_of_assessments.nonzero?
-    score[:avg] = total_score / total_num_of_assessments
-  else
-    score[:avg] = nil
-    score[:max] = 0
-    score[:min] = 0
-  end
-end
 
 def calc_review_score
   if !@corresponding_response.empty?

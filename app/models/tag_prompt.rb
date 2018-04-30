@@ -3,10 +3,10 @@ class TagPrompt < ActiveRecord::Base
   validates :desc, presence: true
   validates :control_type, presence: true
 
-  def html_control(tag_prompt_deployment, answer)
+  def html_control(tag_prompt_deployment, answer, user_id)
     html = ""
     unless answer.nil?
-      stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id)
+      stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id, user_id: user_id)
 
       length_valid = false
       if !tag_prompt_deployment.answer_length_threshold.nil?

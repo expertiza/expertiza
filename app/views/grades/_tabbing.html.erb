@@ -7,7 +7,7 @@
   } );
   </script>
 
-<div id="<%= prefix %>_tabs">
+<div id="<%= prefix %>_tabs" class="overflow-container">
   <ul>
     <li><a href="#<%= prefix %>_tabs-1">Reviews</a></li>
     <li><a href="#<%= prefix %>_tabs-2">Author Feedback</a></li>
@@ -15,19 +15,19 @@
     <li><a href="#<%= prefix %>_tabs-4">Metareviews</a></li>
     <li><a href="#<%= prefix %>_tabs-5">Statistics</a></li>
   </ul>
-  <div id="<%= prefix %>_tabs-1">
+  <div id="<%= prefix %>_tabs-1" class="overflow-container">
     <%= render :partial => 'reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %>  
   </div>
-  <div id="<%= prefix %>_tabs-2">
+  <div id="<%= prefix %>_tabs-2" class="overflow-container">
    <%= render :partial => 'author_feedback_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
-  <div id="<%= prefix %>_tabs-3">
+  <div id="<%= prefix %>_tabs-3" class="overflow-container">
     <%= render :partial => 'teammate_reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %> 
   </div>
-  <div id="<%= prefix %>_tabs-4">
+  <div id="<%= prefix %>_tabs-4" class="overflow-container">
     <%= render :partial => 'metareviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
-  <div id="<%= prefix %>_tabs-5">
+  <div id="<%= prefix %>_tabs-5" class="overflow-container">
     <%= render :partial => 'statistics_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
 </div>

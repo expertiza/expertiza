@@ -1,7 +1,7 @@
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
     table_header = "<div class = 'reviewreport'>\
-                    <table width='100% cellspacing='0' cellpadding='2' border='0'>\
+                    <table width='100% cellspacing='0' cellpadding='2' border='0' class='table table-striped'>\
                     <tr bgcolor='#CCCCCC'>"
     headers.each do |header, percentage|
       table_header += if percentage
@@ -24,7 +24,7 @@ module ReviewMappingHelper
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type, line_num)
     rspan = 0
     line_num += 1
-    bgcolor = line_num.even? ? "#ffffff" : "#DDDDBB"
+    bgcolor = line_num.even? ? "#ffffff" : "#DDDDDD"
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
 
     response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
@@ -118,36 +118,6 @@ module ReviewMappingHelper
       files = team.submitted_files(review_submissions_path)
       html += display_review_files_directory_tree(participant, files) if files.present?
     end
-    html.html_safe
-  end
-
-  # Zhewei - 2017-02-27
-  # This is for all Dr.Kidd's courses
-  def calcutate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
-    review_response = ResponseMap.where(id: response_map_id).try(:first).try(:response).try(:last)
-    author_feedback_avg_score = "-- / --"
-    unless review_response.nil?
-      user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
-      author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
-      feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
-    end
-    author_feedback_avg_score
-  end
-
-  # Zhewei - 2016-10-20
-  # This is for Dr.Kidd's assignment (806)
-  # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
-  # Since we do not have hyperlink question type, we hacked this requirement
-  # Maybe later we can create a hyperlink question type to deal with this situation.
-  def list_hyperlink_submission(response_map_id, question_id)
-    assignment = Assignment.find(@id)
-    curr_round = assignment.try(:num_review_rounds)
-    curr_response = Response.where(map_id: response_map_id, round: curr_round).first
-    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
-    comments = answer_with_link.try(:comments)
-    html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? and comments.start_with?('http')
     html.html_safe
   end
 

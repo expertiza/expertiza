@@ -1,18 +1,18 @@
 %link{:href => "/assets/summary.css", :rel => "stylesheet", :type => "text/css"}/
-%script{:src => "/assets/summary.js", :type => "text/javascript"}
+%script{:src => "/assets/javascripts/summary.js", :type => "text/javascript"}
 .reviewreport
-  %table{:border => "1", :bordercolor => "#848484"}
+  %table{:class => "table table-striped"}
     - for i in 0..@assignment.rounds_of_reviews-1
-      %tr.fake-link-large{:bgcolor => "#f5f5f5", "data-target" => "#round_#{(i+1).to_s}", "data-toggle" => "collapse"}
+      %tr.header_class{:bgcolor => "", "data-target" => "#round_#{(i+1).to_s}", "data-toggle" => "collapse"}
         %td{:style => "padding: 10px;"}
-          %h5
-            Round #{(i+1).to_s} | Average score : #{@avg_scores_by_round[i].to_s}%
+          %img#icon_header_team.arrow_icon{:src => "/assets/expand.png"}>/
+          [avg score : #{@avg_scores_by_round[i].to_s}%] Round #{(i+1).to_s}
       %tr
-        %td
-          .collapse.in{:id => "round_#{(i+1).to_s}"}
-            %table.table_stretch
+        %td.data_column
+          .collapse{:id => "round_#{(i+1).to_s}"}
+            %table.table.table-striped
               - @summary[i].keys.each do |question|
-                %tr{:bgcolor => "#f2f2f2" }
+                %tr{:bgcolor => "#f9f9f9"}
                   %td
                     %h5
                       - safe_concat question

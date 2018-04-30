@@ -173,11 +173,11 @@ class VmQuestionResponse
 
       # Now construct the color code and we're good to go!
       color_code = "c#{color_code_number}"
-      is_instructor_review = 0
-      if User.find(Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewer_id).user_id).role_id.in?([2,6])
-        is_instructor_review = 1
-      end
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, is_instructor_review, vm_tag_prompts))
+      participant= Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewer_id)
+      user_id = participant.user_id
+      course =  Course.find(@assignment.course_id)
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments,
+                                                         course.is_ta_or_instructor?(user_id), vm_tag_prompts))
     end
   end
 

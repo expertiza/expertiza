@@ -216,7 +216,7 @@ class ResponseController < ApplicationController
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
     else
-      if current_user.role.id.in?([2,6])
+      if @map.response_map.assignment.course.is_ta_or_instructor?(current_user.id)
         redirect_to controller: 'assignments', action: 'list_submissions', id:@map.response_map.assignment.id
       else
         redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
@@ -296,7 +296,7 @@ class ResponseController < ApplicationController
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-      if current_user.role.id.in?([2,6])
+      if @assignment.course.is_ta_or_instructor?(current_user.id)
         @current_round = @assignment.number_of_current_round_for_instructor(reviewees_topic)
       else
         @current_round = @assignment.number_of_current_round(reviewees_topic)

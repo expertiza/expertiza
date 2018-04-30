@@ -103,7 +103,7 @@
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <% if User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role_id.in?([2,6]) %>
+                      <% if @assignment.course.is_ta_or_instructor?(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id) %>
                           <th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Instructor review" %></a>  </th>
                       <% else %>
                           <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
@@ -139,7 +139,7 @@
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <!-- Highlight cell if instructor's review-->
-                      <% if score.is_instructor_review==1 %>
+                      <% if score.is_instructor_review%>
 
                         <!-- Check if this is the last row-->
                         <% if index == vm.list_of_rows.size - 1 %>

@@ -90,11 +90,11 @@
 
         function compileData() {
             var allData = <%= @scores.to_json.html_safe %>;
-            frequencyDataByTeam = collectFrequencyDataByTeam(allData);
-            aggregate = calculateAggregateFrequencies(frequencyDataByTeam);
-            cddata = convertAggregateFrequencyArraysToFlotData(aggregate);
+            var frequencyDataByTeam = collectFrequencyDataByTeam(allData);
+            var aggregate = calculateAggregateFrequencies(frequencyDataByTeam);
+            var data = convertAggregateFrequencyArraysToFlotData(aggregate);
 
-            return cddata;
+            return data;
         }
 
         function collectFrequencyDataByTeam(allData) {

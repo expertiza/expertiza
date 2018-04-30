@@ -66,5 +66,19 @@ describe "instructor review testing" do
     click_button "Save Review"
     expect(page.current_path).to eq "/assignments/list_submissions"
   end
+
+  it "allows instructor perform a review and saves after deadline for reviewing has passed" do
+    assignment = Assignment.first
+    due_date = AssignmentDueDate.first
+    due_date.due_at = Time.now.in_time_zone - 1.day
+    login_as("instructor6")
+    visit "/assignments/list_submissions?id=#{assignment.id}"
+    expect(page).to have_content 'Perform review'
+    all(:link, 'Perform review')[1].click
+    fill_in "responses[0][comment]", with: "DRY"
+    select 5, from: "responses[0][score]"
+    click_button "Save Review"
+    expect(page).to have_content "Your response was successfully saved."
+  end
 end
 

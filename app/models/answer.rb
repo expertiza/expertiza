@@ -38,11 +38,13 @@ class Answer < ActiveRecord::Base
         end
         total_score += curr_score
       end
-      scores[:avg] = if length_of_assessments != 0
-                       total_score.to_f / (length_of_assessments - number_of_instructor_reviews)
+      student_review_count = length_of_assessments - number_of_instructor_reviews.to_f
+      scores[:avg] = if student_review_count != 0
+                       total_score.to_f / (student_review_count)
                      else
                        0
                      end
+      scores[:student_review_count] = student_review_count
     else
       scores[:max] = nil
       scores[:min] = nil

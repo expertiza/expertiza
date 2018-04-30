@@ -100,19 +100,21 @@
               <th class="sorter-true">Criterion<span></span></th>
             
               <% i = 1 %>
+              <% j = 1 %>
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                       <% if @assignment.course.is_ta_or_instructor?(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id) %>
-                          <th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Instructor review" %></a>  </th>
+                          <th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Instructor review " + j.to_s %></a>  </th>
+                          <% j += 1 %>
                       <% else %>
                           <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
+                          <% i += 1 %>
                       <% end %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                   <% end %>
-                  <% i += 1 %>
               <% end %>
 
               <th class="sorter-true" align="right" >

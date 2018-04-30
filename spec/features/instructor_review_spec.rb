@@ -29,20 +29,11 @@ describe "instructor review testing" do
   it "lets instructor perform a review and saves" do
     assignment = Assignment.first
     login_as("instructor6")
-
-    allow(AssignmentTeam).to receive(:find).and_return(AssignmentTeam.second)
-    allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(any_args).with(no_args).and_return(User.find_by(name: "instructor6"))
-    allow(ReviewResponseMap).to receive_message_chain(:where, :last).with(any_args).with(no_args).and_return(nil)
-
     visit "/assignments/list_submissions?id=#{assignment.id}"
     expect(page).to have_content 'Perform review'
-    allow(ReviewResponseMap).to receive_message_chain(:where, :first).with(any_args).with(no_args).and_return(ReviewResponseMap.first)
-    allow(AssignmentParticipant).to receive(:find_by).with(any_args).and_return(TeamsUser.third))
     all(:link, 'Perform review')[1].click
-    
     fill_in "responses[0][comment]", with: "DRY"
     select 5, from: "responses[0][score]"
-
     click_button "Save Review"
     expect(page).to have_content "Your response was successfully saved."
   end
@@ -51,12 +42,11 @@ describe "instructor review testing" do
     assignment = Assignment.first
     login_as("instructor6")
     visit "/assignments/list_submissions?id=#{assignment.id}"
+    all(:link, 'Perform review')[1].click
     fill_in "responses[0][comment]", with: "Hello world"
     click_button "Save Review"
-
     visit "/assignments/list_submissions?id=#{assignment.id}"
     expect(page).to have_content 'View review'
-
     click_link "View review"
     expect(page).to have_content "Hello world"
   end
@@ -65,15 +55,13 @@ describe "instructor review testing" do
     assignment = Assignment.first
     login_as("instructor6")
     visit "/assignments/list_submissions?id=#{assignment.id}"
+    all(:link, 'Perform review')[1].click
     fill_in "responses[0][comment]", with: "Good job"
     click_button "Save Review"
-
     visit "/assignments/list_submissions?id=#{assignment.id}"
     expect(page).to have_content 'Edit review'
-
     click_link "Edit review"
     expect(page).to have_content "Good job"
-
     fill_in "review[comments]", with: "Excellent work"
     click_link "Save Review"
     expect(page).to have_content "Your response was successfully saved."

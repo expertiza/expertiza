@@ -25,4 +25,19 @@ class SelfReviewResponseMap < ResponseMap
 
   # do not send any reminder for self review received.
   def email(defn, participant, assignment); end
+
+  # return  the responses for specified round, for varying rubric feature -Yang
+  def self.get_responses_for_team_round(team, round)
+    responses = []
+    if team.id
+      maps = ResponseMap.where(reviewee_id: team.id, type: "SelfReviewResponseMap")
+      maps.each do |map|
+        if !map.response.empty? && !map.response.reject {|r| (r.round != round || !r.is_submitted) }.empty?
+          responses << map.response.reject {|r| (r.round != round || !r.is_submitted) }.last
+        end
+      end
+      responses.sort! {|a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+    end
+    responses
+  end
 end

@@ -56,6 +56,20 @@ class VmQuestionResponse
           @list_of_reviewers << participant
         end
       end
+      #find and add any self reviews
+      self_reviews = if vary
+                  SelfReviewResponseMap.get_responses_for_team_round(team, @round)
+                else
+                  SelfReviewResponseMap.get_assessments_for(team)
+                end
+      self_reviews.each do |review|
+        mapping = SelfReviewResponseMap.find(review.map_id)
+        if mapping.present?
+          participant = Participant.find(mapping.reviewer_id)
+          @list_of_reviewers << participant
+          reviews << review
+        end
+      end unless self_reviews.nil?
       @list_of_reviews = reviews
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews

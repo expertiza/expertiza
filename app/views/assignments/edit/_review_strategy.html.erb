@@ -105,6 +105,16 @@
     </td>
   </tr>
 
+  <!-- #E1819-->
+  <!-- When self reviews are required ask if students can see peer reviews before completing their self review-->
+  <tr>
+    <td style='padding:5px' id='assignment_display_peer_review_before_self_review_complete'>
+      <input name="assignment_form[assignment][display_peer_review_before_self_review_complete]" type="hidden" value=""false"/>
+      <%= check_box_tag('assignment_form[assignment][display_peer_review_before_self_review_complete]', 'true', @assignment_form.assignment.display_peer_review_before_self_review_complete) %>
+      <%= label_tag('assignment_form[assignment][display_peer_review_before_self_review_complete]', 'Display peer reviews before self review completion?') %>
+    </td>
+  </tr>
+
 </table>
 <script>
     function hasReviewChanged() {

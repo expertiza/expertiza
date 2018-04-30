@@ -48,7 +48,7 @@ describe "instructor review testing" do
     visit "/assignments/list_submissions?id=#{assignment.id}"
     expect(page).to have_content 'View review'
     click_link "View review"
-    expect(page).to have_content "Hello world"
+    expect(page).to have_content "show review"
   end
 
   it "lets instructor edit a saved review and saves" do
@@ -61,10 +61,10 @@ describe "instructor review testing" do
     visit "/assignments/list_submissions?id=#{assignment.id}"
     expect(page).to have_content 'Edit review'
     click_link "Edit review"
-    expect(page).to have_content "Good job"
+    expect(page).to have_text "Good job"
     fill_in "review[comments]", with: "Excellent work"
-    click_link "Save Review"
-    expect(page).to have_content "Your response was successfully saved."
+    click_button "Save Review"
+    expect(page.current_path).to eq "/student_review/list"
   end
 end
 

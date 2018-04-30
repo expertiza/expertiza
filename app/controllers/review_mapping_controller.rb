@@ -135,7 +135,7 @@ class ReviewMappingController < ApplicationController
     @review_map_id=ReviewResponseMap.where(reviewee_id: assignment_team.id, reviewer_id: reviewer.id,
                              reviewed_object_id: params[:assignment_id]).first
     @review_map_id=assignment_team.assign_reviewer(reviewer) if @review_map_id.nil?
-    redirect_to controller: 'response', action: 'new', id: @review_map_id
+    redirect_to controller: 'response', action: 'new', id: @review_map_id.map_id
   end
 
 

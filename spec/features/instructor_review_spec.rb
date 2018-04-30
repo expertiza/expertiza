@@ -64,7 +64,7 @@ describe "instructor review testing" do
     expect(page).to have_text "Good job"
     fill_in "review[comments]", with: "Excellent work"
     click_button "Save Review"
-    expect(page.current_path).to eq "/student_review/list"
+    expect(page.current_path).to eq "/assignments/list_submissions"
   end
 end
 

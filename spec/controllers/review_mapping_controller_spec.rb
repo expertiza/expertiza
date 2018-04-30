@@ -696,7 +696,7 @@ describe ReviewMappingController do
           .with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: '1').with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create)
           .with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: '1').and_return(review_response_map)
-        params = {id: 1, team_id: 1}
+        params = {id: 1, team_id: 1, assignment_id: 1}
         session = {user: build(:instructor, id: 1)}
         expect(response).to redirect_to '/response/new?id=1'
       end
@@ -706,14 +706,10 @@ describe ReviewMappingController do
       it 'does not need to add instructor as a participant for the assignment or create review_repsonse_map and redirects to response#new' do
         allow(AssignmentTeam).to receive(:find).with(1).and_return(team2)
         allow(AssignmentParticipant).to receive_message_chain(:where, :first)
-          .with(user_id: 1, parent_id: '1').with(no_args).and_return(nil)
-        allow(AssignmentParticipant).to receive(:create)
-          .with(parent_id: '1', user_id: 1, can_submit: false, can_review: true, can_take_quiz: false, handle: 'handle').and_return(participant)
+          .with(user_id: 1, parent_id: '1').with(no_args).and_return(participant)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
-          .with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: '1').with(no_args).and_return(nil)
-        allow(ReviewResponseMap).to receive(:create)
-          .with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: '1').and_return(review_response_map)
-        params = {id: 1, team_id: 1}
+          .with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: '1').with(no_args).and_return(review_response_map)
+        params = {id: 1, team_id: 1, assignment_id: 1}
         session = {user: build(:instructor, id: 1)}
         expect(response).to redirect_to '/response/new?id=1'
       end

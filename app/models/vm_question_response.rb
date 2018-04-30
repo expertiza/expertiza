@@ -107,6 +107,10 @@ class VmQuestionResponse
     end
   end
 
+  def is_self_review? (user_name)
+    @list_of_team_participants.any? { |participant| participant.fullname.eql? user_name}
+  end
+
   def display_team_members
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"

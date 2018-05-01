@@ -162,15 +162,15 @@
             return data;
         }
 
-        $("#placeholder").width($("#placeholder").parent().innerWidth()*0.8);
-        $("#placeholder").height($("#team-chart").innerHeight());
+        $("#class-performance-plot").width($("#class-performance-plot").parent().innerWidth()*0.8);
+        $("#class-performance-plot").height($("#team-chart").innerHeight());
 
         $("#radioBtns").width($("#radioBtns").parent().innerWidth()*0.2);
         $("#radioBtns").height($("#team-chart").innerHeight());
 
         var cpdata = compileData();
 
-        var classPerformance = $.plot($("#placeholder"),[cpdata.all],
+        var classPerformance = $.plot($("#class-performance-plot"),[cpdata.all],
             {
                 grid: {
                     hoverable: true,
@@ -190,7 +190,7 @@
             });
 
 
-        $("<div id='tooltip'></div>").css({
+        $("<div id='class-performance-plot-tooltip'></div>").css({
             position: "absolute",
             display: "none",
             border: "1px solid #fdd",
@@ -199,17 +199,17 @@
             opacity: 0.80
         }).appendTo("body");
 
-        $("#placeholder").bind("plothover", function (event, pos, item) {
+        $("#class-performance-plot").bind("plothover", function (event, pos, item) {
 
             if (item) {
                 var x = item.datapoint[0],
                     y = item.datapoint[1];
 
-                $("#tooltip").html("Score: " + x + "; Frequency: " + y)
+                $("#class-performance-plot-tooltip").html("Score: " + x + "; Frequency: " + y)
                     .css({top: item.pageY+5, left: item.pageX+5})
                     .fadeIn(200);
             } else {
-                $("#tooltip").hide();
+                $("#class-performance-plot-tooltip").hide();
             }
 
         });

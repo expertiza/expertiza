@@ -11,7 +11,7 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
 <table class="table table-striped grades" width="100%">
   <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
   <% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
-      <div>Aggregate Class Scores<br/><span id="placeholder" style="display: inline-block"></span>
+      <div>Aggregate Class Scores<br/><span id="class-performance-plot" style="display: inline-block"></span>
         <span id="radioBtns" style="display: inline-block;vertical-align: top"></span></div>
       <%= render :partial => 'teams' %>
   <% else %>

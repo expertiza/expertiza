@@ -389,7 +389,7 @@ class GradesController < ApplicationController
                   nil
                 end
 
-        vm = VmQuestionResponse.new(questionnaire, assignment)
+        vm = VmQuestionResponse.new(questionnaire, assignment,round)
         questions = questionnaire.questions
         vm.add_questions(questions)
         vm.add_team_members(team)

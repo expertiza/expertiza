@@ -172,7 +172,8 @@ class PopupController < ApplicationController
     v_label = []
     h_label = []
     @heatmap_urls = []
-    sentiment_index = 0
+    question_index = 0
+    reviewer_index = 0
     label_index = 0
     url_count = 0
     
@@ -194,19 +195,28 @@ class PopupController < ApplicationController
       end
       
       @sentiment_summary['sentiments'].each do |index|
+        temp = []
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
         param = {
-          value:sentiment_value,
-          text:sentiment_text
+          "value":sentiment_value,
+          "text":sentiment_text
         }
-        content[sentiment_index] = param
-        sentiment_index = sentiment_index + 1
+        temp[question_index] = param
+        question_index = question_index + 1
+        if ( question_index >= h_label.size )
+          content[reviewer_index] = temp
+          temp = []
+          question_index = 0
+          reviewer_index = reviewer_index + 1
+        end
       end
 
+      puts "content: #{content}"
+
       contents = {
-          v_label:v_label,
-          h_label:h_label,
+          "v_labels":v_label,
+          "h_labels":h_label,
           "font-face": "Arial",
           "showTextInsideBoxes": true,
           "showCustomColorScheme": false,
@@ -241,7 +251,7 @@ class PopupController < ApplicationController
               "color": "green"
             }]
           },
-          content:content
+          "content":content
       }
 
       tone_analyzed_for_heatmap = contents.to_json

@@ -120,7 +120,7 @@ function toggleFunction(elementId) {
                   <% end %>
                   <th class="sorter-false">
                       <% if vm.is_self_review? user_name %>
-                        <%= image_tag "selfie.png", size:"24", alt:"Self" %>
+                        <%= image_tag "selfie.png", size:"24", alt:"Self-Review", title: "Self-Review" %>
                       <% end %>
                       <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= review_display_name %></a>
                   </th>

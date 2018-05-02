@@ -32,6 +32,7 @@ class AssignmentBadge < ActiveRecord::Base
     end
   end
 
+  # added to insert badges to Assignment badge table if it has not already been assigned
   def self.create_badge_without_threshold(badge_id, assignment_id)
     AssignmentBadge.create(badge_id: badge_id, assignment_id: assignment_id) if
         AssignmentBadge.where(badge_id: badge_id, assignment_id: assignment_id).empty?

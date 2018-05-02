@@ -56,6 +56,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  # Added as part of E1822
   resources :badges do
     collection do
       get :redirect_to_assignment

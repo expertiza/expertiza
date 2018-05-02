@@ -12,6 +12,7 @@
       <td style="text-align:center"><img width = "30px" src=<%= "/assets/badges/#{badge.image_name}" %> title="<%= badge.name %>"></td>
       <td><%= badge.name %></td>
       <td><%= badge.description %></td>
+      <!-- If a badge is already assigned to an assignment, the checkbox for the badge will be checked -->
       <% if !@assigned_badges.where(id: badge.id).empty? %>
         <td><input type="checkbox" name=<%="assignment_form[badge][id][#{badge.id}]"%> checked></td>
       <% else %>

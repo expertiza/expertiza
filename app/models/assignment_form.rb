@@ -146,7 +146,7 @@ class AssignmentForm
     end
   end
 
-  # Adds badges to assignment badges table
+  # Adds badges to assignment badges table as part of E1822
   def update_assigned_badges(badge, assignment)
     if !assignment.nil? and !badge.nil?
       assigned_badges = AssignmentBadge.where(assignment_id: assignment[:id]).select(:id).to_a

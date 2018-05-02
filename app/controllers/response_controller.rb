@@ -176,7 +176,7 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-    #only notify if is_submitted changes from false to true
+    # only notify if is_submitted changes from false to true
     if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
@@ -192,12 +192,12 @@ class ResponseController < ApplicationController
     if @map.assignment.has_badge? and @map.is_a? TeammateReviewResponseMap and
          params[:review][:good_teammate_checkbox] == 'on'
       participant = Participant.find_by(id: @map.reviewee_id)
-      #teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
+      # teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
       badge_id = Badge.get_id_from_name('Good Teammate')
       assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
       AwardedBadge.suggest_badge(participant.id, badge_id)
     end
-    #Award Good Reviewer Badge
+    # Added logic to award Good Reviewer Badge manually as part of E1822
     if @map.assignment.has_badge? and @map.is_a? FeedbackResponseMap and
         params[:review][:good_reviewer_checkbox] == 'on'
       participant = Participant.find_by(id: @map.reviewee_id)

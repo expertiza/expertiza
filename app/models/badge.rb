@@ -2,9 +2,7 @@ class Badge < ActiveRecord::Base
   has_many :assignment_badges, dependent: :destroy
   has_many :assignments, through: :assignment_badges
   has_many :awarded_badges
-  validates :name, presence: true
-  validates :description, presence: true
-
+  # adding validations for Badge table entries as part of project E1822
   validates :name, presence: true
   validates :name, uniqueness: true
   validates :description, presence: true
@@ -14,8 +12,9 @@ class Badge < ActiveRecord::Base
     Badge.find_by(name: badge_name).try(:id)
   end
 
-  def self.get_image_name_frrom_name(badge_name)
+  # adding a method to get the image name from the Badge table to specify as part of src path of the
+  # image to be displayed as part of the Teammate and Review Questionnaires
+  def self.get_image_name_from_name(badge_name)
     Badge.find_by(name: badge_name).try(:image_name)
   end
-
 end

@@ -1,3 +1,5 @@
+# added the badges controller as part of E1822
+# added a create method for badge creation functionality
 class BadgesController < ApplicationController
   def action_allowed?
     true
@@ -15,10 +17,10 @@ class BadgesController < ApplicationController
   def create
     @badge = Badge.new(badge_params)
     image_file = params[:badge][:image_file]
-    if !image_file.nil? then
+    if !image_file.nil?
       File.open(Rails.root.join('app', 'assets', 'images', 'badges', image_file.original_filename), 'wb') do |file|
-        file.write(image_file.read)
-      end
+      file.write(image_file.read)
+    end
     @badge.image_name = image_file.original_filename
     else
       @badge.image_name = ''
@@ -27,7 +29,6 @@ class BadgesController < ApplicationController
     respond_to do |format|
       if @badge.save
         format.html { redirect_to session.delete(:return_to), notice: 'Badge was successfully created' }
-        #format.json { render :show, status: :created, location: @badge }
       else
         format.html { render :new }
         format.json { render json: @badge.errors, status: :unprocessable_entity }

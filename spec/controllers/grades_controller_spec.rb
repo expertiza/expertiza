@@ -1,5 +1,4 @@
 require 'rails_helper'
-include LogInHelper # TEMP USED TO AUTHORIZE SESSION
 
 describe GradesController do
   let(:review_response) { build(:response) }

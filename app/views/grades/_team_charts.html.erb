@@ -35,11 +35,11 @@
 
 </script>
 
-<div id="placeholder" style="width:1000px;height:300px;"> </div>
+<div id="flot_scores_on_rubric_questions" style="width:1000px;height:300px;"> </div>
 
 <script type="text/javascript">
   $(function () {
-    $.plot($("#placeholder"), <%= @flot_series_data.to_json.html_safe %>, {
+    $.plot($("#flot_scores_on_rubric_questions"), <%= @flot_series_data.to_json.html_safe %>, {
       xaxis: {
         ticks: <%= @flot_categories.to_json.html_safe %>
       },
@@ -65,7 +65,7 @@
       }
     });
 
-    $("<div id='tooltip'></div>").css({
+    $("<div id='flot_team_scores_tooltip'></div>").css({
       position: "absolute",
       display: "none",
       border: "1px solid #fdd",
@@ -74,17 +74,17 @@
       opacity: 0.80
     }).appendTo("body");
 
-    $("#placeholder").bind("plothover", function (event, pos, item) {
+    $("#flot_scores_on_rubric_questions").bind("plothover", function (event, pos, item) {
 
       if (item) {
         var x = item.datapoint[0],
         y = item.datapoint[1];
 
-        $("#tooltip").html(item.series.xaxis.ticks[x].label + ": " + item.series.data[x][1].toFixed(2) + "% of the class scored " + item.seriesIndex)
+        $("#flot_team_scores_tooltip").html(item.series.xaxis.ticks[x].label + ": " + item.series.data[x][1].toFixed(2) + "% of the class scored " + item.seriesIndex)
         .css({top: item.pageY+5, left: item.pageX+5})
         .fadeIn(200);
       } else {
-        $("#tooltip").hide();
+        $("#flot_team_scores_tooltip").hide();
       }
     });
 

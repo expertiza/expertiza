@@ -5,6 +5,11 @@ class Badge < ActiveRecord::Base
   validates :name, presence: true
   validates :description, presence: true
 
+  validates :name, presence: true
+  validates :name, uniqueness: true
+  validates :description, presence: true
+  validates :image_name, presence: true
+
   def self.get_id_from_name(badge_name)
     Badge.find_by(name: badge_name).try(:id)
   end

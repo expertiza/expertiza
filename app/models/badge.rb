@@ -3,6 +3,11 @@ class Badge < ActiveRecord::Base
   has_many :assignments, through: :assignment_badges
   has_many :awarded_badges
 
+  validates :name, presence: true
+  validates :name, uniqueness: true
+  validates :description, presence: true
+  validates :image_name, presence: true
+
   def self.get_id_from_name(badge_name)
     Badge.find_by(name: badge_name).try(:id)
   end

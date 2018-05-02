@@ -16,6 +16,10 @@ class Response < ActiveRecord::Base
     id
   end
 
+  def self_review?
+    self.map.type == "SelfReviewResponseMap"
+  end
+
   def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying

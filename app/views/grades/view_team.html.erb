@@ -92,14 +92,20 @@
 
                 <% i = 1 %>g
                 <% vm.list_of_reviews.each do |review| %>
-                    <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
-                    <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
-                    <% else %>
-                        <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                  <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
+                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
+                  <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
+                    <% review_display_name = "Review " + i.to_s %>
+                  <% else %>
+                    <% review_display_name = user_name.to_s %>
+                  <% end %>
+                  <th class="sorter-false">
+                    <% if review.self_review? %>
+                      <%= image_tag "selfie.png", size:"24", alt:"Self-Review", title: "Self-Review" %>
                     <% end %>
-                    <% i += 1 %>
+                    <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= review_display_name %></a>
+                  </th>
+                  <% i += 1 %>
                 <% end %>
 
                 <th class="sorter-true" align="right" >

@@ -33,7 +33,7 @@
       <% @review_final_versions.keys.each_index do | idx | %>
         <p>
           <div id="tab-<%= idx + 1 %>">
-            <iframe width="560" height="315" src="<%= @heatmap_urls[ idx ][ 'url' ] %>" frameborder="0" allowfullscreen></iframe>
+            <iframe width="1800" height="auto" src="<%= @heatmap_urls[ idx ][ 'url' ] %>" frameborder="0" allowfullscreen></iframe>
           </div>
         </p>
       <% end %>

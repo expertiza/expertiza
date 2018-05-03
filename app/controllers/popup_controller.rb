@@ -119,6 +119,8 @@ class PopupController < ApplicationController
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    @reviews = []
+
     build_tone_analysis_report
     build_tone_analysis_heatmap
   end
@@ -128,10 +130,11 @@ class PopupController < ApplicationController
     ##header = {'Content-Type': 'application/json; charset=UTF-8'}
 
     index = 0;
-    reviews = []
-
+    @sentiment_summary = []
     tone_analized_comment = ""
     keys = @review_final_versions.keys
+    reviews = []
+    round = 0
     
     keys.each do |key|
       questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
@@ -150,24 +153,29 @@ class PopupController < ApplicationController
           end
         end
       end
-    end
-    revs = {
+      index = 0
+      revs = {
         reviews:reviews
-    }
-    tone_analized_comment = revs.to_json
+      }
+      tone_analized_comment = revs.to_json
+      # call web service
+      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", tone_analized_comment, :content_type => 'application/json; charset=UTF-8', accept: :json
 
-    # call web service
-    sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", tone_analized_comment, :content_type => 'application/json; charset=UTF-8', accept: :json
-    # store each summary in a hashmap and use the question as the key
-    @sentiment_summary = JSON.parse(sum_json)
+      # store each summary in a hashmap and use the question as the key
+      @sentiment_summary[round] = JSON.parse(sum_json)
+      round = round + 1
+
+
+    end
     rescue StandardError => err
-      puts err
+        puts err
   end
 
   def build_tone_analysis_heatmap
     ##uri = URI.parse("http://peerlogic.csc.ncsu.edu/reviewsentiment/configure")
     ##header = {'Content-Type': 'application/json; charset=UTF-8'}
 
+     
     content = []
     v_label = []
     h_label = []
@@ -176,6 +184,8 @@ class PopupController < ApplicationController
     reviewer_index = 0
     label_index = 0
     url_count = 0
+    temp = []
+    round = 0
     
     keys = @review_final_versions.keys
     
@@ -194,19 +204,19 @@ class PopupController < ApplicationController
         label_index = label_index + 1
       end
       
-      @sentiment_summary['sentiments'].each do |index|
-        temp = []
+      @sentiment_summary[round]['sentiments'].each do |index|
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
         param = {
           "value":sentiment_value,
           "text":sentiment_text
         }
+        
         temp[question_index] = param
         question_index = question_index + 1
-        if ( question_index >= h_label.size )
+        if (question_index >= h_label.size)
           content[reviewer_index] = temp
-          temp = []
+          temp =[]
           question_index = 0
           reviewer_index = reviewer_index + 1
         end
@@ -235,14 +245,14 @@ class PopupController < ApplicationController
               "color": "red"
             }, {
               "minimum": -0.5,
-              "maximum": 0,
+              "maximum": -0.25,
               "color": "#DC7633"
             }, {
-              "minimum": 0,
-              "maximum": 0,
+              "minimum": -0.25,
+              "maximum": 0.25,
               "color": "yellow"
             }, {
-              "minimum": 0,
+              "minimum": 0.25,
               "maximum": 0.5,
               "color": "#ABEBC6"
             }, {
@@ -258,6 +268,7 @@ class PopupController < ApplicationController
       heatmap_json = RestClient.post "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure", tone_analyzed_for_heatmap, :content_type => 'application/json; charset=UTF-8', accept: :json
       @heatmap_urls[url_count] = JSON.parse(heatmap_json)
       url_count = url_count + 1
+      round = round + 1
     end
     puts @heatmap_urls
     rescue StandardError => err

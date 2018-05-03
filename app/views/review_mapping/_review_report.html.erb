@@ -8,6 +8,15 @@
       });
   </script>
 
+  <p> **In "Team reviewed" column text in:</p>
+    <ul style="list-style-type:square">
+  <li><i style="color:red">red</i> indicates that the review is not  completed in any rounds;</li>
+  <li><i style="color:blue">blue</i> indicates that a review is completed in every round and the review grade is not assigned;</li>
+  <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
+  <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
+  <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
+</ul>
+  
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
@@ -123,12 +132,7 @@
       </tr>
     <% end %>
     </table>
-  <p> **In "Team reviewed" column, text in <i style="color:red">red</i> indicates that the review is not yet completed;
-    text in <i style="color:blue">blue</i> indicates that the review grade is not assigned or updated, and there is a review for each round;
-    text in <i style="color: #986633">brown</i> indicates that the review grade has been assigned;
-    text in <i style="color:green">green</i> indicates that there is no work to review;
-    text in <i style="color:purple">purple</i> indicates that there is no review for a team's work</p>
-</div>
+ </div>
 <!--Partial for text macro form-->
 <%= render :partial => '/user_pastebins/save_text_macros' %>
 

@@ -21,24 +21,6 @@ describe GradesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
-
-    # Simulate Authorized Session
-    instructor.save
-    @user = User.find_by(name: "instructor")
-    allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return('Instructor')
-    allow_any_instance_of(ApplicationController).to receive(:undo_link).and_return(TRUE)
-
-    # Allow Access to Private Methods
-    @controller = GradesController.new
-
-    # Create Assignment and Questionnaires
-    @assignment = create(:assignment)
-    @questionnaire = create(:questionnaire)
-    @assignment_questionnaire = create(:assignment_questionnaire, used_in_round: 2)
-    @question1 = create(:question, txt: "Who?")
-    @question2 = create(:question, txt: "What?")
-    @questions = {question1: @question1, question2: @question2}
-    @questionnaires = [@questionnaire]
   end
 
   describe '#view' do
@@ -53,7 +35,7 @@ describe GradesController do
     context 'when current assignment varys rubric by round' do
       it 'retrieves questions, calculates scores and renders grades#view page' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
         params = {id: 1}
         get :view, params
         expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
@@ -211,54 +193,6 @@ describe GradesController do
       post :save_grade_and_comment_for_submission, params
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/assignments/list_submissions?id=8')
-    end
-  end
-
-  describe "Calculate review questions" do
-    it "returns the correct minimum, maximum, and number of questions" do
-      min, max, questions = @controller.send(:calculate_review_questions, @assignment, @questionnaires)
-      expect(min).to eq(0)
-      expect(max).to eq(5)
-      expect(questions).to eq(2)
-    end
-  end
-
-  describe "Get team data" do
-    it "returns a blank array when there are no teams" do
-      scores = @assignment.scores(@questions)
-      data = @controller.send(:get_team_data, @assignment, @questionnaires, scores)
-      expect(data).to eq([])
-    end
-    it "returns a valid data structure with the correct participants" do
-      create_list(:participant, 1)
-      student = User.where(role_id: 2).second # Since Instructor is First
-      team = create(:assignment_team)
-      create(:team_user, user: student, team: team)
-
-      scores = @assignment.scores(@questions)
-      scores[:teams]["0".to_sym][:team] = team
-
-      data = @controller.send(:get_team_data, @assignment, @questionnaires, scores)
-      participants = data.first.first.listofteamparticipants # Team Data -> VMList -> VmQuestionResponse
-      expect(participants.first.user_id).to eq(student.id)
-    end
-  end
-
-  describe "Get highchart data" do
-    it "properly initializes the chart hash" do
-      data = @controller.send(:get_highchart_data, [], @assignment, 1, 3, 1)
-      expect(data).to eq(1 => {1 => [0], 2 => [0], 3 => [0]})
-    end
-  end
-
-  describe "Generate highchart" do
-    it "returns the correct series" do
-      series, _categories = @controller.send(:generate_highchart, {1 => {1 => [5]}}, 1, 1, 1)
-      expect(series).to eq([{name: "Score 1 - Submission 1", data: [5], stack: "S1"}])
-    end
-    it "returns the correct categories" do
-     _series, categories = @controller.send(:generate_highchart, {1 => {1 => [5, 10]}}, 1, 1, 2)
-      expect(categories).to eq(["Rubric 1", "Rubric 2"])
     end
   end
 end

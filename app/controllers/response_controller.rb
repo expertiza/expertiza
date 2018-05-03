@@ -188,7 +188,8 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    # Award Good Teammate Badge
+    # E1822: Added logic to insert a student suggested 'Good Teammate' badge in the
+    # awarded_badges table.
     if @map.assignment.has_badge? and @map.is_a? TeammateReviewResponseMap and
          params[:review][:good_teammate_checkbox] == 'on'
       participant = Participant.find_by(id: @map.reviewee_id)
@@ -197,7 +198,8 @@ class ResponseController < ApplicationController
       assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
       AwardedBadge.suggest_badge(participant.id, badge_id)
     end
-    # Added logic to award Good Reviewer Badge manually as part of E1822
+    # E1822: Added logic to inser a student suggested 'Good Reviewer' badge in the
+    # awarded_badges table.
     if @map.assignment.has_badge? and @map.is_a? FeedbackResponseMap and
         params[:review][:good_reviewer_checkbox] == 'on'
       participant = Participant.find_by(id: @map.reviewee_id)

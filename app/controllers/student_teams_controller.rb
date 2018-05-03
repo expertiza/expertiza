@@ -56,6 +56,13 @@ class StudentTeamsController < ApplicationController
     @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
     @duties = Duty.select(:name,:id).where(assignment_id: student.assignment.id)
     @duty_based_review_allowed =  @student.assignment.role_based_review
+
+    #Get teamId and studentId to search in team_users if the duty_id is nil or not
+    #Use this condition to display hyperlink or some message.
+
+    #render :plain => @student.team.participants.inspect
+    #current_team.id will give team_id and 
+
   end
 
   def create

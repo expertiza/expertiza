@@ -56,26 +56,32 @@
                 	| <%= link_to "Select", controller: 'StudentTeams', action: 'edit_duty', team_id: member.team.id, student_id: member.id %>
             	<%end%>
           	</td>
-          	<%end%>
+          <%end%>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?
               map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
             end
             review = map.response.last
-            if review.nil? %>
-            <td>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :team_id => member.team.id, :return => "teammate"} %>
+
+            if TeamsUser.where(team_id: @student.team.id, user_id: member.user.id).map(&:duties_id).first.nil? == false
+              if review.nil? %>
+              <td>
+                <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :team_id => member.team.id, :return => "teammate"} %>
+              </td>
+              <% else %>
+              <td>
+                <%= link_to "View", {:controller => 'response', :action => 'view', :team_id => member.team.id, :id => review.id} %>
+                &nbsp;&nbsp;
+                <%= link_to "Edit", {:controller => 'response', :action => 'edit', :team_id => member.team.id, :id => review.id, :return => "teammate"} %>
+                &nbsp;&nbsp;
+              </td>
+              <%end%>
+            <%else%>
+              <td>
+              Teammate has not selected a duty.
             </td>
-          <% else %>
-            <td>
-              <%= link_to "View", {:controller => 'response', :action => 'view', :team_id => member.team.id, :id => review.id} %>
-              &nbsp;&nbsp;
-              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :team_id => member.team.id, :id => review.id, :return => "teammate"} %>
-              &nbsp;&nbsp;
-              
-            </td>
-          <% end %>
+            <%end%>
         <% end %>
       <% end %>
     </tr>

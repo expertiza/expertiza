@@ -114,7 +114,7 @@ class ResponseController < ApplicationController
     student = AssignmentParticipant.find(review.reviewee_id)
 
     #Got team_id(through params), student_id and assignment_id(parent_id for student)
-    #Get duty_id from teams_users using team_id and assignment_id.
+    #Get duty_id from teams_users using team_id and user_id.
     #Use this duty and assignment to find appropriate questionnare
     #render :plain => params.inspect
     

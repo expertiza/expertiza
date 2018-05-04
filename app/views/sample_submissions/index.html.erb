@@ -18,10 +18,10 @@
                         <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
                     <%end%>
                   <%end%>
-
+                  <%unless assignment_team.directory_num.nil?%>
                   <% directory_path = @assignment_path + assignment_team.directory_num.to_s
                    if File.directory?(directory_path)
-                     file_list = Dir.entries(directory_path).select {|entry| entry unless (entry =='.' || entry == '..') }
+                     file_list = Dir.entries(directory_path).select {|entry| entry unless ( entry =='.' || entry == '..') }
                      file_list.each do |submitted_file| %>
                       <li>
                         <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
@@ -29,10 +29,11 @@
                                     :download => File.basename(submitted_file),
                                     "current_folder[name]" => directory_path
                         %>
+                        <% puts directory_path %>
                       </li>
                      <%end%>
                   <%end%>
-
+                  <%end%>
                 </ul>
               </li>
       <% end%>
@@ -58,7 +59,8 @@
               <%end%>
             <%end%>
 
-            <% unless @instructor_chosen_assignment_path.nil?
+            <% unless @instructor_chosen_assignment_path.nil? or assignment_team.directory_num.nil?
+
               directory_path = @instructor_chosen_assignment_path + assignment_team.directory_num.to_s
               if File.directory?(directory_path)
                 file_list = Dir.entries(directory_path).select {|entry| entry unless (entry =='.' || entry == '..') }

@@ -21,6 +21,7 @@ class ReviewQuestionnaire < Questionnaire
     responses = []
     if participant
       maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
+      maps.concat ResponseMap.where(reviewee_id: team_id, type: "SelfReviewResponseMap")
       maps.each do |map|
         next if map.response.empty?
         map.response.each do |response|

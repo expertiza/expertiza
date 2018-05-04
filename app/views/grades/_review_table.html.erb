@@ -5,8 +5,15 @@
       <% reviews = reviews.sort_by{|response| response.map_id} %>
   <%end%>
 	<tr><th style="text-align:center;">&nbsp;</th>
-		<% for i in 0...reviews.size%>
-			<th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%>&nbsp;</th>
+    <% i = 1 %>
+    <% for review in reviews %>
+			<th style="text-align:center;">
+        <% if review.self_review? %>
+          <%= image_tag "selfie.png", size:"14", alt:"Self-Review", title: "Self-Review" %>
+        <% end %>
+        <%= collabel %>&nbsp;<%=i%>&nbsp;
+      </th>
+      <% i += 1 %>
 		<% end %>
 	</tr>
 	<% if controller.action_name != "view_my_scores" || !@assignment.is_anonymous?%>

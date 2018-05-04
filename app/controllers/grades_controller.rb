@@ -309,6 +309,24 @@ class GradesController < ApplicationController
     end
   end
 
+  #E1819
+  def derive_self_peer_review_score
+    grade = 0
+    self_score = 0
+    peer_score = 0
+    @vmlist.each do |vm|
+      vm.list_of_reviews.each do |review|
+        if review.self_review?
+          self_score = review.score
+        else
+          peer_score = peer_score + review.score
+        end
+      end
+      peer_score = peer_score/vm.list_of_reviews.length - 1 # -1 for self-review
+      grade = 100 - (peer_score - self_score)
+    end
+  end
+
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end

@@ -90,7 +90,7 @@
               <tr>
                 <th class="sorter-true">Criterion<span></span></th>
 
-                <% i = 1 %>
+                <% i = 1 %>g
                 <% vm.list_of_reviews.each do |review| %>
                   <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
@@ -236,6 +236,9 @@
 <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
 <% if ['Student'].include? current_user.role.name %>
   Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+  <%# if @assignment.is_selfreview_enabled %>
+    Self and peer-review derived grade: <%= label_tag 'self_peer_review_derived_grade', "56"%><br/>
+  <%# end %>
   Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
 <% else %>
   <%= form_tag 'save_grade_and_comment_for_submission', remote: true do %>

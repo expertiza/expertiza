@@ -10,32 +10,36 @@
 <% else %>
     <ul>
       <% @assignment_teams.each do |assignment_team| %>
+          <% directory_path = @assignment_path + assignment_team.directory_num.to_s %>
+
+            <% unless assignment_team.hyperlinks.empty? or assignment_team.directory_num.nil? %>
               <li>
                 <ul>
                   <h4>Team name : <%=assignment_team.name%></h4>
-                  <% if assignment_team.hyperlinks != [] %>
+
+                  <% unless assignment_team.hyperlinks.empty? %>
                     <% assignment_team.hyperlinks.each do |assignment_link| %>
                         <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
                     <%end%>
                   <%end%>
                   <%unless assignment_team.directory_num.nil?%>
-                  <% directory_path = @assignment_path + assignment_team.directory_num.to_s
-                   if File.directory?(directory_path)
-                     file_list = Dir.entries(directory_path).select {|entry| entry unless ( entry =='.' || entry == '..') }
-                     file_list.each do |submitted_file| %>
-                      <li>
-                        <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
-                                    :action => 'download',
-                                    :download => File.basename(submitted_file),
-                                    "current_folder[name]" => directory_path
-                        %>
-                        <% puts directory_path %>
-                      </li>
-                     <%end%>
-                  <%end%>
+                    <% if File.directory?(directory_path)
+                       file_list = Dir.entries(directory_path).select {|entry| entry unless ( entry =='.' || entry == '..') }
+                       file_list.each do |submitted_file| %>
+                        <li>
+                          <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
+                                      :action => 'download',
+                                      :download => File.basename(submitted_file),
+                                      "current_folder[name]" => directory_path
+                          %>
+                          <% puts directory_path %>
+                        </li>
+                       <%end%>
+                    <%end%>
                   <%end%>
                 </ul>
               </li>
+            <% end %>
       <% end%>
     </ul>
 <% end %>
@@ -50,34 +54,37 @@
 <% else %>
     <ul>
       <% @assignment_teams_professor.each do |assignment_team| %>
-        <li>
-          <ul>
-            <h4>Team name : <%=assignment_team.name%></h4>
-            <% if assignment_team.hyperlinks != [] %>
-              <% assignment_team.hyperlinks.each do |assignment_link| %>
-                <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
-              <%end%>
-            <%end%>
+        <% directory_path = @instructor_chosen_assignment_path + assignment_team.directory_num.to_s %>
+        <% unless assignment_team.hyperlinks.empty? or @instructor_chosen_assignment_path.nil? or assignment_team.directory_num.nil? %>
 
-            <% unless @instructor_chosen_assignment_path.nil? or assignment_team.directory_num.nil?
-
-              directory_path = @instructor_chosen_assignment_path + assignment_team.directory_num.to_s
-              if File.directory?(directory_path)
-                file_list = Dir.entries(directory_path).select {|entry| entry unless (entry =='.' || entry == '..') }
-                file_list.each do |submitted_file| %>
-                  <li>
-                    <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
-                                :action => 'download',
-                                :download => File.basename(submitted_file),
-                                "current_folder[name]" => directory_path
-                    %>
-                  </li>
+          <li>
+            <ul>
+              <h4>Team name : <%=assignment_team.name%></h4>
+              <% unless assignment_team.hyperlinks.empty? %>
+                <% assignment_team.hyperlinks.each do |assignment_link| %>
+                  <li><a href="<%=assignment_link%>"><%=assignment_link%></a></li>
                 <%end%>
               <%end%>
-            <%end%>
-          </ul>
-        </li>
-      <% end%>
+
+              <% unless @instructor_chosen_assignment_path.nil? or assignment_team.directory_num.nil?
+                if File.directory?(directory_path)
+                  file_list = Dir.entries(directory_path).select {|entry| entry unless (entry =='.' || entry == '..') }
+                  file_list.each do |submitted_file| %>
+                    <li>
+                      <%= link_to File.basename(submitted_file), :controller => 'submitted_content',
+                                  :action => 'download',
+                                  :download => File.basename(submitted_file),
+                                  "current_folder[name]" => directory_path
+                      %>
+                    </li>
+                  <%end%>
+                <%end%>
+              <%end%>
+            </ul>
+          </li>
+        <% end %>
+
+    <% end%>
     </ul>
 <% end %>
 <br><br>

@@ -74,6 +74,8 @@ class GradesController < ApplicationController
     @show_reputation = false
   end
 
+  # Adds a scores_by_round object to each @scores[:teams][team_idx.to_s.to_sym][:scores][scores_by_round]
+  # object where team_idx=0..num_teams_on_assignment
   def add_scores_by_round
     scores_by_team_round = get_raw_scores_by_team_round(@questions)
     @scores[:teams].each_value do |value|
@@ -82,19 +84,22 @@ class GradesController < ApplicationController
     end
   end
 
+  # Retrieves sum of raw score occurrences as 6-element array for each team by round
   def get_raw_scores_by_team_round(questions)
     scores = {}
 
     scores[:teams] = {}
     if !questions.nil? && !questions.empty?
       @assignment.teams.collect {|team| team.id}.each do |team_id|
-        first_round_sym = (@assignment.num_review_rounds == 1) ? :review : :review1
+        first_round_sym = (@assignment.num_review_rounds == 1) ? :review : :review1 # if there is only one round, the first round is called "review", otherwise, it is "review1"
         scores[:teams][team_id] = get_team_raw_scores_by_round(team_id,questions[first_round_sym][0].questionnaire.id) if !questions[first_round_sym].nil? && !questions[first_round_sym].empty?
       end
     end
     scores
   end
 
+  # for a particular team and questionnaire, sum up the occurrences of 0s to 5s
+  # and return as six element numerical arrays(one for each round)
   def get_team_raw_scores_by_round(team_id, questionnaire_id)
     scores = {}
     maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")

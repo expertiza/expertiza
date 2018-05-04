@@ -88,7 +88,10 @@
       }
     });
 
-        function compileData() {
+      /**
+       * Convert data from backend to format that can be used by flot
+       */
+      function compileData() {
             var allData = <%= @scores.to_json.html_safe %>;
             var frequencyDataByTeam = collectFrequencyDataByTeam(allData);
             var aggregate = calculateAggregateFrequencies(frequencyDataByTeam);
@@ -97,6 +100,12 @@
             return data;
         }
 
+      /**
+       * Collects pertinent data from backend data object
+       * @param allData data from backend
+       * @returns {Array} array of objects specifying team info and score occurrences/frequency
+       *              for each round
+       */
         function collectFrequencyDataByTeam(allData) {
             var frequencyData = [];
             for(var teamIdx in allData.teams) {
@@ -113,6 +122,11 @@
             return frequencyData;
         }
 
+      /**
+       * Compiles object with six-element frequency arrays for each round and the sum of those arrays to the
+       * "all" key
+       * @param frequencyData
+       */
         function calculateAggregateFrequencies(frequencyData) {
             var aggregate = aggregateByRound(frequencyData);
 
@@ -121,6 +135,11 @@
             return aggregate;
         }
 
+      /**
+       * Combines/sums data in all rounds to a single six-element array
+       * @param aggregate
+       * @returns {[number,number,number,number,number,number]}
+       */
         function aggregateAllRounds(aggregate) {
             var all = [0,0,0,0,0,0];
             for(var round in aggregate) {
@@ -131,6 +150,11 @@
             return all;
         }
 
+      /**
+       * Takes frequency data for each team by round and aggregates data for each round
+       * @param frequencyData
+       * @returns {{}}
+       */
         function aggregateByRound(frequencyData) {
             var aggregate = {};
 
@@ -150,6 +174,11 @@
             return aggregate;
         }
 
+      /**
+       * Converts aggregate data for rounds to Flot points
+       * @param aggregate
+       * @returns {{}}
+       */
         function convertAggregateFrequencyArraysToFlotData(aggregate) {
             var data = {};
             for(var round in aggregate) {
@@ -162,6 +191,7 @@
             return data;
         }
 
+        // assign dimensions to plot span and radio button span
         $("#class-performance-plot").width($("#class-performance-plot").parent().innerWidth()*0.8);
         $("#class-performance-plot").height($("#team-chart").innerHeight());
 
@@ -170,6 +200,7 @@
 
         var cpdata = compileData();
 
+        // plot frequency data for all round initially
         var classPerformance = $.plot($("#class-performance-plot"),[cpdata.all],
             {
                 grid: {
@@ -190,6 +221,7 @@
             });
 
 
+        // create and hide tooltip div
         $("<div id='class-performance-plot-tooltip'></div>").css({
             position: "absolute",
             display: "none",
@@ -199,6 +231,7 @@
             opacity: 0.80
         }).appendTo("body");
 
+        // specify tooltip display behavior and text when hovering over plot
         $("#class-performance-plot").bind("plothover", function (event, pos, item) {
 
             if (item) {
@@ -214,6 +247,7 @@
 
         });
 
+        // Add ration button options to UI
         var radioBtn = $('<label><input type="radio" name="assignmentRound" value="all" checked onclick="showAggregation(\'all\')"/>All Rounds</label>')
         radioBtn.appendTo('#radioBtns');
 
@@ -224,10 +258,11 @@
 
         }
 
+        // method executed on radio button selection
         window.showAggregation = function(round) {
-            classPerformance.setData([cpdata[round]]);
-            classPerformance.setupGrid();
-            classPerformance.draw();
+            classPerformance.setData([cpdata[round]]); // set data for plot to selected round
+            classPerformance.setupGrid(); // needed in case axes and ticks need to be redrawn
+            classPerformance.draw(); // draws plot with new data and grid
         }
     });
 </script>

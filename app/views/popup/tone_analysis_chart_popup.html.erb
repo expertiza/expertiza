@@ -33,7 +33,9 @@
       <% @review_final_versions.keys.each_index do | idx | %>
         <p>
           <div id="tab-<%= idx + 1 %>">
-            <iframe width="1800" height="auto" src="<%= @heatmap_urls[ idx ][ 'url' ] %>" frameborder="0" allowfullscreen></iframe>
+            <div class="intrinsic-container intrinsic-container-16x9">
+              <iframe src="<%= @heatmap_urls[ idx ][ 'url' ] %>" allowfullscreen></iframe>
+            </div>
           </div>
         </p>
       <% end %>
@@ -42,3 +44,28 @@
   
 </div>
 
+<style>
+.intrinsic-container {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+}
+ 
+/* 16x9 Aspect Ratio */
+.intrinsic-container-16x9 {
+  padding-bottom: 56.25%;
+}
+ 
+/* 4x3 Aspect Ratio */
+.intrinsic-container-4x3 {
+  padding-bottom: 75%;
+}
+ 
+.intrinsic-container iframe {
+  position: absolute;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+</style>

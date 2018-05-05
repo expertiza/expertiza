@@ -142,14 +142,26 @@ class PopupController < ApplicationController
       
       questions.each do |question|
         @review_final_versions[key][:response_ids].each do |responseid|
-          Answer.where(response_id: responseid, question_id: question.id).each do |review|
-            comment = review.comments
+          if (Answer.where(response_id: responseid, question_id: question.id) == [])
+            comment = "N/A"
             param = {
               id:index,
               text:comment
             }
             reviews[index] = param
             index = index + 1
+          else
+            Answer.where(response_id: responseid, question_id: question.id).each do |review|
+    
+              comment = review.comments
+              puts "Comment for #{responseid}/#{question.id}: #{comment}"
+              param = {
+                id:index,
+                text:comment
+              }
+              reviews[index] = param
+              index = index + 1
+            end
           end
         end
       end
@@ -207,6 +219,9 @@ class PopupController < ApplicationController
       @sentiment_summary[round]['sentiments'].each do |index|
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
+        if (sentiment_text == "N/A")
+          sentiment_value = 0
+        end
         param = {
           "value":sentiment_value,
           "text":sentiment_text
@@ -222,7 +237,6 @@ class PopupController < ApplicationController
         end
       end
 
-      puts "content: #{content}"
 
       contents = {
           "v_labels":v_label,
@@ -234,9 +248,9 @@ class PopupController < ApplicationController
           "custom_color_scheme": {
             "minimum_value": -1,
             "maximum_value": 1,
-            "minimum_color": "#FFFF00",
+            "minimum_color": "#FFFFFF",
             "maximum_color": "#FF0000",
-            "total_intervals": 5
+            "total_intervals": 7
           },
           "color_scheme": {
             "ranges": [{
@@ -249,6 +263,14 @@ class PopupController < ApplicationController
               "color": "#DC7633"
             }, {
               "minimum": -0.25,
+              "maximum": -0.01,
+              "color": "yellow"
+            }, {
+              "minimum": -0.01,
+              "maximum": 0.01,
+              "color": "#808080"
+            }, {
+              "minimum": 0.01,
               "maximum": 0.25,
               "color": "yellow"
             }, {
@@ -265,10 +287,19 @@ class PopupController < ApplicationController
       }
 
       tone_analyzed_for_heatmap = contents.to_json
+
       heatmap_json = RestClient.post "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure", tone_analyzed_for_heatmap, :content_type => 'application/json; charset=UTF-8', accept: :json
       @heatmap_urls[url_count] = JSON.parse(heatmap_json)
       url_count = url_count + 1
       round = round + 1
+
+      content = []
+      v_label = []
+      h_label = []
+      question_index = 0
+      reviewer_index = 0
+      label_index = 0
+      temp = []
     end
     puts @heatmap_urls
     rescue StandardError => err

@@ -128,10 +128,8 @@ class PopupController < ApplicationController
 
   def build_tone_analysis_report
     uri = "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk"
-
     index = 0
     @sentiment_summary = []
-    tone_analized_comment = ""
     keys = @review_final_versions.keys
     reviews = []
     round = 0
@@ -145,8 +143,8 @@ class PopupController < ApplicationController
       questions.each do |question|
         # Loops an array of reviewee ids by review round
         @review_final_versions[key][:response_ids].each do |responseid|
-          # If an answer to a question is not provided by a reviewer, add a default comment so that the tone analysis chart can color the comment grey in the heatmap.
-          # Otherwise, add their comment to the list of reviews
+          # If an answer to a question is not provided by a reviewer, add a default comment so that the tone analysis chart can
+          # color the comment grey in the heatmap.  Otherwise, add their comment to the list of reviews.
           if Answer.where(response_id: responseid, question_id: question.id) == []
             comment = "N/A"
             param = {
@@ -174,8 +172,6 @@ class PopupController < ApplicationController
         reviews: reviews
       }
 
-      # Converts array of comments to JSON format
-      tone_analized_comment = revs.to_json
       # calls web service
       sum_json = RestClient.post uri, revs.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
       # store each summary in a hashmap and use the question as the key
@@ -188,7 +184,6 @@ class PopupController < ApplicationController
 
   def build_tone_analysis_heatmap
     uri = "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure"
-
     content = []
     v_label = []
     h_label = []
@@ -296,12 +291,9 @@ class PopupController < ApplicationController
         content: content
       }
 
-      # Converts cotent to JSON format
-      tone_analyzed_for_heatmap = contents.to_json
-
       # calls web service
-      heatmap_json = RestClient.post uri, tone_analyzed_for_heatmap, content_type: 'application/json; charset=UTF-8', accept: :json
-      
+      heatmap_json = RestClient.post uri, contents.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
+
       # store each URL into an array of URLS where the index is by review round
       @heatmap_urls[url_count] = JSON.parse(heatmap_json)
       url_count += 1

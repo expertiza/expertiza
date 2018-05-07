@@ -8,12 +8,12 @@ describe PopupController do
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response], assignment: assignment) }
   final_versions = {
-      review_round_1: {questionnaire_id: 1, response_ids: [77024]},
-      review_round_2: {questionnaire_id: 2, response_ids: []},
-      review_round_3: {questionnaire_id: 3, response_ids: []}
+    review_round_one: {questionnaire_id: 1, response_ids: [77024]},
+    review_round_two: {questionnaire_id: 2, response_ids: []},
+    review_round_three: {questionnaire_id: 3, response_ids: []}
   }
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
-  mocked_comments_1 = OpenStruct.new(comments: "test comment")
+  mocked_comments_one = OpenStruct.new(comments: "test comment")
 
   describe '#action_allowed?' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
@@ -37,7 +37,7 @@ describe PopupController do
       allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map])
       allow(Assignment).to receive(:find).with('reviewee_id = ?', team.id).and_return(assignment)
       allow(ReviewResponseMap).to receive(:final_versions_from_reviewer).with(1).and_return(final_versions)
-      allow(Answer).to receive(:where).with(any_args).and_return(mocked_comments_1)
+      allow(Answer).to receive(:where).with(any_args).and_return(mocked_comments_one)
       @request.host = test_url
     end
     describe '#tone_analysis_chart_popup' do

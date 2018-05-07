@@ -184,39 +184,26 @@ class PopupController < ApplicationController
 
   def build_tone_analysis_heatmap
     uri = "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure"
-    content = []
-    v_label = []
-    h_label = []
     @heatmap_urls = []
-    question_index = 0
-    reviewer_index = 0
-    label_index = 0
-    url_count = 0
-    temp = []
-    round = 0
     keys = @review_final_versions.keys
 
     # Loops by each review round
-    keys.each do |key|
+    keys.each_with_index do |key, round|
+      content = []
+      v_label = []
+      h_label = []
       questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire_id)
 
       # Loops by each question to obtain dynamic number of questions for a review round
-      questions.each do
-        h_label[label_index] = "Q" + (label_index + 1).to_s
-        label_index += 1
-      end
-
-      label_index = 0
+      questions.each_index { |index| h_label.push("Q" + (index + 1).to_s) }
 
       # Loops by each reviewee to obtain dynamic number of reviewees for a review round
-      @review_final_versions[key][:response_ids].each do
-        v_label[label_index] = "Reviewee " + (label_index + 1).to_s
-        label_index += 1
-      end
+      @review_final_versions[key][:response_ids].each_index { |index| v_label.push("Reviewee " + (index + 1).to_s) }
 
       # Loops through each sentiment generated from the previous method above and stores the sentiment value and comment per review round.
       # If the sentiment_text contains "N/A", the the sentiment_value defaults to a score of 100.
+      temp = []
       @sentiment_summary[round]['sentiments'].each do |index|
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
@@ -238,13 +225,10 @@ class PopupController < ApplicationController
           text: sentiment_text
         }
 
-        temp[question_index] = param
-        question_index += 1
-        next unless question_index >= h_label.size
-        content[reviewer_index] = temp
+        temp.push(param)
+        next unless temp.size >= h_label.size
+        content.push(temp)
         temp = []
-        question_index = 0
-        reviewer_index += 1
       end
 
       contents = {
@@ -295,17 +279,7 @@ class PopupController < ApplicationController
       heatmap_json = RestClient.post uri, contents.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
 
       # store each URL into an array of URLS where the index is by review round
-      @heatmap_urls[url_count] = JSON.parse(heatmap_json)
-      url_count += 1
-      round += 1
-
-      content = []
-      v_label = []
-      h_label = []
-      question_index = 0
-      reviewer_index = 0
-      label_index = 0
-      temp = []
+      @heatmap_urls[round] = JSON.parse(heatmap_json)
     end
   rescue StandardError => err
     logger.error err.message

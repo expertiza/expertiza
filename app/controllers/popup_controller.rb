@@ -106,21 +106,20 @@ class PopupController < ApplicationController
   end
 
   def tone_analysis_chart_popup
-    puts "enters calling function"
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    #Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "Tone analysis chart button" link for an assignment.
     build_tone_analysis_report
     build_tone_analysis_heatmap
   end
 
   def view_review_scores_popup
-    puts "enters calling function"
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
     @reviews = []
-
+    #Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "View Review Report" Icon for an assignment.
     build_tone_analysis_report
     build_tone_analysis_heatmap
   end
@@ -136,12 +135,17 @@ class PopupController < ApplicationController
     reviews = []
     round = 0
     
+    # Loops by each review round
     keys.each do |key|
       questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire_id)
       
+      #Loops by each question per review round
       questions.each do |question|
+        #Loops an array of reviewee ids by review round
         @review_final_versions[key][:response_ids].each do |responseid|
+          # If an answer to a question is not provided by a reviewer, add a default comment so that the tone analysis chart can color the comment grey in the heatmap.
+          # Otherwise, add their comment to the list of reviews
           if (Answer.where(response_id: responseid, question_id: question.id) == [])
             comment = "N/A"
             param = {
@@ -154,7 +158,6 @@ class PopupController < ApplicationController
             Answer.where(response_id: responseid, question_id: question.id).each do |review|
     
               comment = review.comments
-              puts "Comment for #{responseid}/#{question.id}: #{comment}"
               param = {
                 id:index,
                 text:comment
@@ -165,19 +168,20 @@ class PopupController < ApplicationController
           end
         end
       end
+      
       index = 0
       revs = {
         reviews:reviews
       }
+      
+      # Converts array of comments to JSON format
       tone_analized_comment = revs.to_json
-      # call web service
+      # calls web service
       sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", tone_analized_comment, :content_type => 'application/json; charset=UTF-8', accept: :json
 
       # store each summary in a hashmap and use the question as the key
       @sentiment_summary[round] = JSON.parse(sum_json)
       round = round + 1
-
-
     end
     rescue StandardError => err
         puts err
@@ -201,21 +205,26 @@ class PopupController < ApplicationController
     
     keys = @review_final_versions.keys
     
+    # Loops by each review round
     keys.each do |key|
       questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire_id)
       
+      # Loops by each question to obtain dynamic number of questions for a review round
       questions.each do |question|
         h_label[label_index] = "Q" + (label_index + 1).to_s
         label_index = label_index + 1
       end
       
       label_index = 0
+      
+      # Loops by each reviewee to obtain dynamic number of reviewees for a review round
       @review_final_versions[key][:response_ids].each do |responseid|
         v_label[label_index] = "Reviewee " + (label_index + 1).to_s
         label_index = label_index + 1
       end
       
+      # Loops through each sentiment generated from the previous method above and stores the sentiment value and comment per review round.
       @sentiment_summary[round]['sentiments'].each do |index|
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
@@ -286,9 +295,13 @@ class PopupController < ApplicationController
           "content":content
       }
 
+      # Converts cotent to JSON format
       tone_analyzed_for_heatmap = contents.to_json
 
+      # calls web service
       heatmap_json = RestClient.post "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure", tone_analyzed_for_heatmap, :content_type => 'application/json; charset=UTF-8', accept: :json
+      
+      # store each URL into an array of URLS where the index is by review round
       @heatmap_urls[url_count] = JSON.parse(heatmap_json)
       url_count = url_count + 1
       round = round + 1
@@ -301,7 +314,7 @@ class PopupController < ApplicationController
       label_index = 0
       temp = []
     end
-    puts @heatmap_urls
+    
     rescue StandardError => err
       puts err
   end

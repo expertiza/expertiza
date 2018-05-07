@@ -143,10 +143,8 @@ class PopupController < ApplicationController
 
       # Loops by each question per review round
       questions.each do |question|
-
         # Loops an array of reviewee ids by review round
         @review_final_versions[key][:response_ids].each do |responseid|
-
           # If an answer to a question is not provided by a reviewer, add a default comment so that the tone analysis chart can color the comment grey in the heatmap.
           # Otherwise, add their comment to the list of reviews
           if Answer.where(response_id: responseid, question_id: question.id) == []
@@ -173,7 +171,7 @@ class PopupController < ApplicationController
 
       index = 0
       revs = {
-        reviews:reviews
+        reviews: reviews
       }
 
       # Converts array of comments to JSON format
@@ -184,7 +182,6 @@ class PopupController < ApplicationController
       @sentiment_summary[round] = JSON.parse(sum_json)
       round += 1
     end
-
   rescue StandardError => err
     logger.error err.message
   end
@@ -224,6 +221,7 @@ class PopupController < ApplicationController
       end
 
       # Loops through each sentiment generated from the previous method above and stores the sentiment value and comment per review round.
+      # If the sentiment_text contains "N/A", the the sentiment_value defaults to a score of 100.
       @sentiment_summary[round]['sentiments'].each do |index|
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
@@ -239,22 +237,19 @@ class PopupController < ApplicationController
         when 0.5..1.0
           sentiment_value = 0.75
         end
-        if sentiment_text == "N/A"
-          sentiment_value = 100
-        end
+        sentiment_value = 100 if sentiment_text == "N/A"
         param = {
           value: sentiment_value,
           text: sentiment_text
         }
 
         temp[question_index] = param
-        question_index = question_index + 1
-        if question_index >= h_label.size
-          content[reviewer_index] = temp
-          temp = []
-          question_index = 0
-          reviewer_index += 1
-        end
+        question_index += 1
+        next unless question_index >= h_label.size
+        content[reviewer_index] = temp
+        temp = []
+        question_index = 0
+        reviewer_index += 1
       end
 
       contents = {
@@ -320,7 +315,6 @@ class PopupController < ApplicationController
       label_index = 0
       temp = []
     end
-
   rescue StandardError => err
     logger.error err.message
   end

@@ -1,16 +1,16 @@
 describe PopupController do
   let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:student) { build(:student, id: 1, name: "student") }
-  let(:student2) { build(:student, id: 2, name: "student2")}
+  let(:student2) { build(:student, id: 2, name: "student2") }
   let(:participant) { build(:participant, id: 1, user: student, assignment: assignment) }
-  let(:participant2){ build(:participant, id: 2, user: student2, assignment: assignment) }
+  let(:participant2) { build(:participant, id: 2, user: student2, assignment: assignment) }
   let(:response) { build(:response, id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response], assignment: assignment) }
   final_versions = {
-      review_round_1: { questionnaire_id: 1, response_ids: [77024] },
-      review_round_2: { questionnaire_id: 2, response_ids: [] },
-      review_round_3: { questionnaire_id: 3, response_ids: [] }
+      review_round_1: {questionnaire_id: 1, response_ids: [77024]},
+      review_round_2: {questionnaire_id: 2, response_ids: []},
+      review_round_3: {questionnaire_id: 3, response_ids: []}
   }
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments_1 = OpenStruct.new(comments: "test comment")

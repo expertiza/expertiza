@@ -244,8 +244,8 @@ class PopupController < ApplicationController
           sentiment_value = 100
         end
         param = {
-          "value":sentiment_value,
-          "text":sentiment_text
+          value: sentiment_value,
+          text: sentiment_text
         }
         
         temp[question_index] = param

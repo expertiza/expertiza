@@ -1,11 +1,11 @@
 describe PopupController do
-  let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
-  let(:student) { build(:student, id: 1, name: "student") }
-  let(:student2) { build(:student, id: 2, name: "student2") }
-  let(:participant){ build(:participant, id: 1, user: student, assignment: assignment) }
-  let(:participant2){ build(:participant, id: 2, user: student2, assignment: assignment) }
-  let(:response) { build(:response, id: 1) }
-  let(:assignment) { build(:assignment, id: 1) }
+  let(:team) {build(:assignment_team, id: 1, name: "team1", assignment: assignment)}
+  let(:student) {build(:student, id: 1, name: "student")}
+  let(:student2) {build(:student, id: 2, name: "student2")}
+  let(:participant) {build(:participant, id: 1, user: student, assignment: assignment)}
+  let(:participant2){build(:participant, id: 2, user: student2, assignment: assignment)}
+  let(:response) {build(:response, id: 1)}
+  let(:assignment) {build(:assignment, id: 1)}
   let(:response_map) {
     build(:review_response_map,
           id: 1,
@@ -15,9 +15,9 @@ describe PopupController do
           assignment: assignment)
   }
   final_versions = {
-      :"review round1" => { questionnaire_id: 1, response_ids: [77024] },
-      :"review round2" => { questionnaire_id: 2, response_ids: [] },
-      :"review round3" => { questionnaire_id: 3, response_ids: [] }
+      review_round1: { questionnaire_id: 1, response_ids: [77024] },
+      review_round2: { questionnaire_id: 2, response_ids: [] },
+      review_round3: { questionnaire_id: 3, response_ids: [] }
   }
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments1 = OpenStruct.new(:comments => "test comment")
@@ -39,7 +39,7 @@ describe PopupController do
   end
 
   ######### Tone Analysis Tests ##########
-  describe "tone analysis tests"do
+  describe "tone analysis tests" do
     before(:each) do
       allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map])
       allow(Assignment).to receive(:find).with('reviewee_id = ?', team.id).and_return(assignment)

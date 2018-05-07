@@ -1,39 +1,42 @@
 describe PopupController do
-  let(:team) { build(:assignment_team, id:1, name: "team1", assignment: assignment)}
-  let(:student) { build(:student, id: 1, name: "student")}
-  let(:student2) { build(:student, id: 2, name: "student2")}
-  let(:participant){build(:participant, id:1, user: student, assignment: assignment)}
-  let(:participant2){build(:participant, id:2, user: student2, assignment: assignment)}
-  let(:response) {build(:response, id: 1)}
-  let(:assignment) {build(:assignment, id: 1)}
+  let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
+  let(:student) { build(:student, id: 1, name: "student") }
+  let(:student2) { build(:student, id: 2, name: "student2") }
+  let(:participant){ build(:participant, id: 1, user: student, assignment: assignment) }
+  let(:participant2){ build(:participant, id: 2, user: student2, assignment: assignment) }
+  let(:response) { build(:response, id: 1) }
+  let(:assignment) { build(:assignment, id: 1) }
   let(:response_map){
     build(:review_response_map,
           id: 1,
           reviewee_id: team.id,
           reviewer_id: participant2.id,
-          response:[response],
+          response: [response],
           assignment: assignment)
   }
-  final_versions = {:"review round1"=>{:questionnaire_id=>1, :response_ids=>[77024]}, :"review round2"=>{:questionnaire_id=>2, :response_ids=>[]}, :"review round3"=>{:questionnaire_id=>3, :response_ids=>[]}}
+  final_versions = {
+      :"review round1" => {:questionnaire_id => 1, :response_ids => [77024]},
+      :"review round2" => {:questionnaire_id => 2, :response_ids => []},
+      :"review round3" => {:questionnaire_id => 3, :response_ids => []}
+  }
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments1 = OpenStruct.new(:comments => "test comment")
-  mocked_comments2 = OpenStruct.new( :comments => "test comment2")
-
+  mocked_comments2 = OpenStruct.new(:comments => "test comment2")
 
   describe '#action_allowed?' do
-    ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
 
   describe '#author_feedback_popup' do
-    ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
 
   describe '#team_users_popup' do
-    ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
 
   describe '#participants_popup' do
-    ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
 
   ######### Tone Analysis Tests ##########
@@ -49,36 +52,35 @@ describe PopupController do
       context 'when tone analysis page is loaded, review tone analysis is calculated' do
         it 'builds a tone analysis report for both the summery and tone analysis pages and returns an array of heat map URLs' do
           result = get :tone_analysis_chart_popup
-          expect(result["Location"]).to eq(test_url + "/") ##Placeholder URL should be returned since GET returns a 302 status redirection error
+          expect(result["Location"]).to eq(test_url + "/") ## Placeholder URL should be returned since GET returns a 302 status redirection error
         end
       end
     end
 
     describe '#view_review_scores_popup' do
-      ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+      ## INSERT CONTEXT/DESCRIPTION/CODE HERE
     end
 
     describe '#build_tone_analysis_report' do
       context 'upon selecting summery, the tone analysis for review comments is calculated and applied to the page' do
         it 'builds a tone analysis report and returns the heat map URLs' do
           result = get :build_tone_analysis_report
-          expect(result["Location"]).to eq(test_url + "/")  ##Placeholder URL should be returned since GET returns a 302 status redirection error
+          expect(result["Location"]).to eq(test_url + "/")  ## Placeholder URL should be returned since GET returns a 302 status redirection error
         end
       end
     end
 
     describe '#build_tone_analysis_heatmap' do
-      ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+      ## INSERT CONTEXT/DESCRIPTION/CODE HERE
     end
   end
   ##########################################
 
   describe '#reviewer_details_popup' do
-    ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
 
   describe '#self_review_popup' do
-    ##INSERT CONTEXT/DESCRIPTION/CODE HERE
+    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
-
 end

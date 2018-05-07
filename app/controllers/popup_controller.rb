@@ -109,7 +109,7 @@ class PopupController < ApplicationController
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
-    #Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "Tone analysis chart button" link for an assignment.
+    # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "Tone analysis chart button" link for an assignment.
     build_tone_analysis_report
     build_tone_analysis_heatmap
   end
@@ -125,24 +125,24 @@ class PopupController < ApplicationController
   end
 
   def build_tone_analysis_report
-    ##uri = URI.parse("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk")
-    ##header = {'Content-Type': 'application/json; charset=UTF-8'}
+    ## uri = URI.parse("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk")
+    ## header = {'Content-Type': 'application/json; charset=UTF-8'}
 
     index = 0;
     @sentiment_summary = []
-    tone_analized_comment = ""
-    keys = @review_final_versions.keys
+    # tone_analized_comment = ""
+    # keys = @review_final_versions.keys
     reviews = []
     round = 0
     
     # Loops by each review round
-    keys.each do |key|
+    @review_final_versions.keys.each do |key|
       questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire_id)
       
-      #Loops by each question per review round
+      # Loops by each question per review round
       questions.each do |question|
-        #Loops an array of reviewee ids by review round
+        # Loops an array of reviewee ids by review round
         @review_final_versions[key][:response_ids].each do |responseid|
           # If an answer to a question is not provided by a reviewer, add a default comment so that the tone analysis chart can color the comment grey in the heatmap.
           # Otherwise, add their comment to the list of reviews
@@ -175,9 +175,9 @@ class PopupController < ApplicationController
       }
       
       # Converts array of comments to JSON format
-      tone_analized_comment = revs.to_json
+      #tone_analized_comment = revs.to_json
       # calls web service
-      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", tone_analized_comment, :content_type => 'application/json; charset=UTF-8', accept: :json
+      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", revs.to_json, :content_type => 'application/json; charset=UTF-8', accept: :json
 
       # store each summary in a hashmap and use the question as the key
       @sentiment_summary[round] = JSON.parse(sum_json)

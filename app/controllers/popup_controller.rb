@@ -196,10 +196,10 @@ class PopupController < ApplicationController
       questions = Question.where(questionnaire_id: questionnaire_id)
 
       # Loops by each question to obtain dynamic number of questions for a review round
-      questions.each_index { |index| h_label.push("Q" + (index + 1).to_s) }
+      questions.each_index {|index| h_label.push("Q" + (index + 1).to_s) }
 
       # Loops by each reviewee to obtain dynamic number of reviewees for a review round
-      @review_final_versions[key][:response_ids].each_index { |index| v_label.push("Reviewee " + (index + 1).to_s) }
+      @review_final_versions[key][:response_ids].each_index {|index| v_label.push("Reviewee " + (index + 1).to_s) }
 
       # Loops through each sentiment generated from the previous method above and stores the sentiment value and comment per review round.
       # If the sentiment_text contains "N/A", the the sentiment_value defaults to a score of 100.

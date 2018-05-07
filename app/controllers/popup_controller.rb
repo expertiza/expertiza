@@ -219,8 +219,20 @@ class PopupController < ApplicationController
       @sentiment_summary[round]['sentiments'].each do |index|
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
+        case sentiment_value
+          when -1.0..-0.5
+            sentiment_value = -0.75
+          when -0.5..-0.25
+            sentiment_value = -0.375
+          when -0.25..0.25
+            sentiment_value = 0
+          when 0.25..0.5
+            sentiment_value = 0.375
+          when 0.5..1.0
+            sentiment_value = 0.75
+        end
         if (sentiment_text == "N/A")
-          sentiment_value = 0
+          sentiment_value = 100
         end
         param = {
           "value":sentiment_value,
@@ -263,14 +275,6 @@ class PopupController < ApplicationController
               "color": "#DC7633"
             }, {
               "minimum": -0.25,
-              "maximum": -0.01,
-              "color": "yellow"
-            }, {
-              "minimum": -0.01,
-              "maximum": 0.01,
-              "color": "#808080"
-            }, {
-              "minimum": 0.01,
               "maximum": 0.25,
               "color": "yellow"
             }, {
@@ -281,6 +285,10 @@ class PopupController < ApplicationController
               "minimum": 0.5,
               "maximum": 1,
               "color": "green"
+            }, {
+              "minimum": 100,
+              "maximum": 100,
+              "color": "#808080"
             }]
           },
           "content":content

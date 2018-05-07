@@ -260,47 +260,47 @@ class PopupController < ApplicationController
 
 
       contents = {
-          "v_labels":v_label,
-          "h_labels":h_label,
-          "font-face": "Arial",
-          "showTextInsideBoxes": true,
-          "showCustomColorScheme": false,
-          "tooltipColorScheme": "black",
-          "custom_color_scheme": {
-            "minimum_value": -1,
-            "maximum_value": 1,
-            "minimum_color": "#FFFFFF",
-            "maximum_color": "#FF0000",
-            "total_intervals": 7
+          v_labels: v_label,
+          h_labels: h_label,
+          font_face: "Arial",
+          showTextInsideBoxes: true,
+          showCustomColorScheme: false,
+          tooltipColorScheme: "black",
+          custom_color_scheme: {
+            minimum_value: -1,
+            maximum_value: 1,
+            minimum_color: "#FFFFFF",
+            maximum_color: "#FF0000",
+            total_intervals: 7
           },
-          "color_scheme": {
-            "ranges": [{
-              "minimum": -1,
-              "maximum": -0.5,
-              "color": "red"
+          color_scheme: {
+            ranges: [{
+              minimum: -1,
+              maximum: -0.5,
+              color: "red"
             }, {
-              "minimum": -0.5,
-              "maximum": -0.25,
-              "color": "#DC7633"
+              minimum: -0.5,
+              maximum: -0.25,
+              color: "#DC7633"
             }, {
-              "minimum": -0.25,
-              "maximum": 0.25,
-              "color": "yellow"
+              minimum: -0.25,
+              maximum: 0.25,
+              color: "yellow"
             }, {
-              "minimum": 0.25,
-              "maximum": 0.5,
-              "color": "#ABEBC6"
+              minimum: 0.25,
+              maximum: 0.5,
+              color: "#ABEBC6"
             }, {
-              "minimum": 0.5,
-              "maximum": 1,
-              "color": "green"
+              minimum: 0.5,
+              maximum: 1,
+              color: "green"
             }, {
-              "minimum": 100,
-              "maximum": 100,
-              "color": "#808080"
+              minimum: 100,
+              maximum: 100,
+              color: "#808080"
             }]
           },
-          "content":content
+          content: content
       }
 
       # Converts cotent to JSON format

@@ -109,6 +109,7 @@ class PopupController < ApplicationController
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+
     # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "Tone analysis chart button" link for an assignment.
     build_tone_analysis_report
     build_tone_analysis_heatmap
@@ -119,79 +120,78 @@ class PopupController < ApplicationController
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
     @reviews = []
-    #Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "View Review Report" Icon for an assignment.
+
+    # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "View Review Report" Icon for an assignment.
     build_tone_analysis_report
     build_tone_analysis_heatmap
   end
 
   def build_tone_analysis_report
-    ## uri = URI.parse("http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk")
-    ## header = {'Content-Type': 'application/json; charset=UTF-8'}
+    uri = "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk"
 
-    index = 0;
+    index = 0
     @sentiment_summary = []
-    # tone_analized_comment = ""
-    # keys = @review_final_versions.keys
+    tone_analized_comment = ""
+    keys = @review_final_versions.keys
     reviews = []
     round = 0
-    
+
     # Loops by each review round
-    @review_final_versions.keys.each do |key|
+    keys.each do |key|
       questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire_id)
-      
+
       # Loops by each question per review round
       questions.each do |question|
+
         # Loops an array of reviewee ids by review round
         @review_final_versions[key][:response_ids].each do |responseid|
+
           # If an answer to a question is not provided by a reviewer, add a default comment so that the tone analysis chart can color the comment grey in the heatmap.
           # Otherwise, add their comment to the list of reviews
-          if (Answer.where(response_id: responseid, question_id: question.id) == [])
+          if Answer.where(response_id: responseid, question_id: question.id) == []
             comment = "N/A"
             param = {
-              id:index,
-              text:comment
+              id: index,
+              text: comment
             }
             reviews[index] = param
-            index = index + 1
+            index += 1
           else
             Answer.where(response_id: responseid, question_id: question.id).each do |review|
-    
               comment = review.comments
               param = {
-                id:index,
-                text:comment
+                id: index,
+                text: comment
               }
               reviews[index] = param
-              index = index + 1
+              index += 1
             end
           end
         end
       end
-      
+
       index = 0
       revs = {
         reviews:reviews
       }
-      
-      # Converts array of comments to JSON format
-      #tone_analized_comment = revs.to_json
-      # calls web service
-      sum_json = RestClient.post "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk", revs.to_json, :content_type => 'application/json; charset=UTF-8', accept: :json
 
+      # Converts array of comments to JSON format
+      tone_analized_comment = revs.to_json
+      # calls web service
+      sum_json = RestClient.post uri, revs.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
       # store each summary in a hashmap and use the question as the key
       @sentiment_summary[round] = JSON.parse(sum_json)
-      round = round + 1
+      round += 1
     end
-    rescue StandardError => err
-        puts err
+
+  rescue StandardError => err
+    logger.error err.message
   end
 
   def build_tone_analysis_heatmap
-    ##uri = URI.parse("http://peerlogic.csc.ncsu.edu/reviewsentiment/configure")
-    ##header = {'Content-Type': 'application/json; charset=UTF-8'}
+    uri = "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure"
 
-     
     content = []
     v_label = []
     h_label = []
@@ -202,117 +202,115 @@ class PopupController < ApplicationController
     url_count = 0
     temp = []
     round = 0
-    
     keys = @review_final_versions.keys
-    
+
     # Loops by each review round
     keys.each do |key|
       questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire_id)
-      
+
       # Loops by each question to obtain dynamic number of questions for a review round
-      questions.each do |question|
+      questions.each do
         h_label[label_index] = "Q" + (label_index + 1).to_s
-        label_index = label_index + 1
+        label_index += 1
       end
-      
+
       label_index = 0
-      
+
       # Loops by each reviewee to obtain dynamic number of reviewees for a review round
-      @review_final_versions[key][:response_ids].each do |responseid|
+      @review_final_versions[key][:response_ids].each do
         v_label[label_index] = "Reviewee " + (label_index + 1).to_s
-        label_index = label_index + 1
+        label_index += 1
       end
-      
+
       # Loops through each sentiment generated from the previous method above and stores the sentiment value and comment per review round.
       @sentiment_summary[round]['sentiments'].each do |index|
         sentiment_value = index['sentiment'].to_f
         sentiment_text = index['text']
         case sentiment_value
-          when -1.0..-0.5
-            sentiment_value = -0.75
-          when -0.5..-0.25
-            sentiment_value = -0.375
-          when -0.25..0.25
-            sentiment_value = 0
-          when 0.25..0.5
-            sentiment_value = 0.375
-          when 0.5..1.0
-            sentiment_value = 0.75
+        when -1.0..-0.5
+          sentiment_value = -0.75
+        when -0.5..-0.25
+          sentiment_value = -0.375
+        when -0.25..0.25
+          sentiment_value = 0
+        when 0.25..0.5
+          sentiment_value = 0.375
+        when 0.5..1.0
+          sentiment_value = 0.75
         end
-        if (sentiment_text == "N/A")
+        if sentiment_text == "N/A"
           sentiment_value = 100
         end
         param = {
           value: sentiment_value,
           text: sentiment_text
         }
-        
+
         temp[question_index] = param
         question_index = question_index + 1
-        if (question_index >= h_label.size)
+        if question_index >= h_label.size
           content[reviewer_index] = temp
-          temp =[]
+          temp = []
           question_index = 0
-          reviewer_index = reviewer_index + 1
+          reviewer_index += 1
         end
       end
 
-
       contents = {
-          v_labels: v_label,
-          h_labels: h_label,
-          font_face: "Arial",
-          showTextInsideBoxes: true,
-          showCustomColorScheme: false,
-          tooltipColorScheme: "black",
-          custom_color_scheme: {
-            minimum_value: -1,
-            maximum_value: 1,
-            minimum_color: "#FFFFFF",
-            maximum_color: "#FF0000",
-            total_intervals: 7
-          },
-          color_scheme: {
-            ranges: [{
-              minimum: -1,
-              maximum: -0.5,
-              color: "red"
-            }, {
-              minimum: -0.5,
-              maximum: -0.25,
-              color: "#DC7633"
-            }, {
-              minimum: -0.25,
-              maximum: 0.25,
-              color: "yellow"
-            }, {
-              minimum: 0.25,
-              maximum: 0.5,
-              color: "#ABEBC6"
-            }, {
-              minimum: 0.5,
-              maximum: 1,
-              color: "green"
-            }, {
-              minimum: 100,
-              maximum: 100,
-              color: "#808080"
-            }]
-          },
-          content: content
+        v_labels: v_label,
+        h_labels: h_label,
+        font_face: "Arial",
+        showTextInsideBoxes: true,
+        showCustomColorScheme: false,
+        tooltipColorScheme: "black",
+        custom_color_scheme: {
+          minimum_value: -1,
+          maximum_value: 1,
+          minimum_color: "#FFFFFF",
+          maximum_color: "#FF0000",
+          total_intervals: 7
+        },
+        color_scheme: {
+          ranges: [{
+            minimum: -1,
+            maximum: -0.5,
+            color: "red"
+          }, {
+            minimum: -0.5,
+            maximum: -0.25,
+            color: "#DC7633"
+          }, {
+            minimum: -0.25,
+            maximum: 0.25,
+            color: "yellow"
+          }, {
+            minimum: 0.25,
+            maximum: 0.5,
+            color: "#ABEBC6"
+          }, {
+            minimum: 0.5,
+            maximum: 1,
+            color: "green"
+          }, {
+            minimum: 100,
+            maximum: 100,
+            color: "#808080"
+          }]
+        },
+        content: content
       }
 
       # Converts cotent to JSON format
       tone_analyzed_for_heatmap = contents.to_json
 
       # calls web service
-      heatmap_json = RestClient.post "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure", tone_analyzed_for_heatmap, :content_type => 'application/json; charset=UTF-8', accept: :json
+      heatmap_json = RestClient.post uri, tone_analyzed_for_heatmap, content_type: 'application/json; charset=UTF-8', accept: :json
       
       # store each URL into an array of URLS where the index is by review round
       @heatmap_urls[url_count] = JSON.parse(heatmap_json)
-      url_count = url_count + 1
-      round = round + 1
+      url_count += 1
+      round += 1
 
       content = []
       v_label = []
@@ -322,9 +320,9 @@ class PopupController < ApplicationController
       label_index = 0
       temp = []
     end
-    
-    rescue StandardError => err
-      puts err
+
+  rescue StandardError => err
+    logger.error err.message
   end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.

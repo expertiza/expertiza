@@ -6,7 +6,7 @@ describe PopupController do
   let(:participant2){ build(:participant, id: 2, user: student2, assignment: assignment) }
   let(:response) { build(:response, id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
-  let(:response_map){
+  let(:response_map) {
     build(:review_response_map,
           id: 1,
           reviewee_id: team.id,
@@ -15,13 +15,12 @@ describe PopupController do
           assignment: assignment)
   }
   final_versions = {
-      :"review round1" => {:questionnaire_id => 1, :response_ids => [77024]},
-      :"review round2" => {:questionnaire_id => 2, :response_ids => []},
-      :"review round3" => {:questionnaire_id => 3, :response_ids => []}
+      :"review round1" => { questionnaire_id: 1, response_ids: [77024] },
+      :"review round2" => { questionnaire_id: 2, response_ids: [] },
+      :"review round3" => { questionnaire_id: 3, response_ids: [] }
   }
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments1 = OpenStruct.new(:comments => "test comment")
-  mocked_comments2 = OpenStruct.new(:comments => "test comment2")
 
   describe '#action_allowed?' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
@@ -65,7 +64,7 @@ describe PopupController do
       context 'upon selecting summery, the tone analysis for review comments is calculated and applied to the page' do
         it 'builds a tone analysis report and returns the heat map URLs' do
           result = get :build_tone_analysis_report
-          expect(result["Location"]).to eq(test_url + "/")  ## Placeholder URL should be returned since GET returns a 302 status redirection error
+          expect(result["Location"]).to eq(test_url + "/") ## Placeholder URL should be returned since GET returns a 302 status redirection error
         end
       end
     end

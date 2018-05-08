@@ -234,14 +234,18 @@ class Response < ActiveRecord::Base
   def construct_review_response code, self_id
     code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
+    # added for srq
+    team_id  = response_map.reviewee_id
+    sr_questionnaire_id = Team.get_srq_id_of_team(team_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
       # added for srq
-      sr_questionnaire = self.questionnaire_by_answer(answers.last)
+      unless sr_questionnaire_id.nil?
+        sr_questionnaire = Questionnaire.find(sr_questionnaire_id)
+        sr_questions = sr_questionnaire.questions.sort_by(&:seq)
+      end
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
-      # added for srq
-      sr_questions = sr_questionnaire.questions.sort_by(&:seq)
       unless sr_questionnaire.nil?
         questions += sr_questions
       end

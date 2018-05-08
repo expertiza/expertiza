@@ -16,10 +16,4 @@ module TopicHelper
     expect(page).to have_content "https://www.ncsu.edu"
 
   end
-
-  def tick_box
-    user = User.find_by(name: "instructor6")
-    stub_current_user(user,user.role.name,user.role)
-    visit '/assignments'
-  end
 end

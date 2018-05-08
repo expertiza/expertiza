@@ -2,7 +2,7 @@ include TopicHelper
 describe "supplementary rubric testing" do
   before(:each) do
     # create assignment and topic
-    create(:assignment, name: "TestAssignment", directory_path: "TestAssignment")
+    create(:assignment, name: "TestAssignment", directory_path: "TestAssignment", srq: true)
     create_list(:participant, 3)
     create(:assignment_team)
     create(:team_user, user: User.where(role_id: 2).first, team: AssignmentTeam.first)
@@ -32,7 +32,7 @@ describe "supplementary rubric testing" do
     click_link "Create Supplementary Review Questionnaire"
     click_button "Add"
     click_button "Save supplementaryreview questionnaire"
-    # assert !Team.supplementary_rubric_by_team_id(2).nil?
+
   end
 
   it "should display Supplementary Questionnaire to assigned student" do
@@ -48,6 +48,6 @@ describe "supplementary rubric testing" do
     find(:css, "#i_dont_care").set(true)
     click_button "Request a new submission to review"
     click_link "Begin"
-    #expect(page).to have_content "Supplementary Reviewee Generated Questions"
+    expect(page).to have_content "Supplementary Review Questions"
   end
 end

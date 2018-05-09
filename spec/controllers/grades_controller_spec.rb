@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe GradesController do
   let(:review_response) { build(:response) }
   let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
@@ -93,7 +91,7 @@ describe GradesController do
     end
   end
 
-  xdescribe '#view_team' do
+  describe '#view_team' do
     it 'renders grades#view_team page' do
       allow(participant).to receive(:team).and_return(team)
       params = {id: 1}

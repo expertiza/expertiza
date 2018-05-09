@@ -62,11 +62,14 @@ class GradesController < ApplicationController
         @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
       end
 
+    # These functon calls were added by Team E1742 in the spring semester of 2017
+    # ==================================================================================================================
     # private functions for generating a valid highchart
     min, max, number_of_review_questions = calculate_review_questions(@assignment, questionnaires)
     team_data = get_team_data(@assignment, questionnaires, @scores)
     highchart_data = get_highchart_data(team_data, @assignment, min, max, number_of_review_questions)
     highchart_series_data, highchart_categories, highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
+    # ==================================================================================================================
     @flot_series_data, @flot_categories = highchart_to_flot_adapter(min, max, highchart_series_data)
 
     add_scores_by_round
@@ -380,11 +383,16 @@ class GradesController < ApplicationController
     scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
   end
 
+  # This block of code was completed by Team E1742 in the spring semester of 2017.
+  # The functions get_team_data, get_highchart_data, and generate_highchart
+  # ====================================================================================================================
   def get_team_data(assignment, questionnaires, scores)
     team_data = []
     for index in 0..scores[:teams].length - 1
-      participant = AssignmentParticipant.find(scores[:teams][index.to_s.to_sym][:team].participants.first.id)
-      team = participant.team
+      unless scores[:teams][index.to_s.to_sym][:team].participants.first.nil?
+        participant = AssignmentParticipant.find(scores[:teams][index.to_s.to_sym][:team].participants.first.id)
+        team = participant.team
+      end
       vmlist = []
 
       questionnaires.each do |questionnaire|
@@ -460,19 +468,28 @@ class GradesController < ApplicationController
     end
     [highchart_series_data, highchart_categories, highchart_colors]
   end
+  # ====================================================================================================================
 
   # This adapter is used to convert the data from the form highchart required to the form flot requires.
   # It takes in the data formed by the generate_highchart method and molds it into a form to make a flot stacked bar graph
+  # Variable explanations:
+  # flot_series_data contains the data hash elements required to send to the view and create the stacked bar graph
+  # flot_categories contains the category names in the format required for the stacked bar graph
+  # highchart_data contains the specific data array that is being processed and converted into flot data
+  # flot_data contains the direct converted hash of arrays that will be pushed into the flot_series_data hash
+  # score_index contains which score data is being looked at, for each review round, 0, 1, 2, 3, 4, or 5 currently
+  # rubric_question_number is used to create the flot_categories
+  # num_rounds holds the number of review rounds currently processed
   def highchart_to_flot_adapter(min, max, highchart_series_data)
     flot_series_data = []
     flot_categories = []
     highchart_data = []
     flot_data = []
-    j = 0
-    k = 0
-    rounds = 0
+    score_index = 0
+    rubric_question_number = 1
+    num_rounds = 0
     highchart_series_index = 0
-    review_round = highchart_series_data.to_a.reverse[0][:stack]
+    previous_review_round = highchart_series_data.to_a.reverse[0][:stack]
     flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"] # These are the six colors from red to green
 
     # This loop will look at every element of the highchart_series_data and use them to form the flot_series_data
@@ -484,35 +501,37 @@ class GradesController < ApplicationController
     # of that question.
     highchart_series_data.to_a.reverse.each do |element|
       highchart_data = element[:data]
-      stack = element[:stack]
-      round = stack.scan(/[0-9]/)
+      current_review_round = element[:stack]
+      round_number = current_review_round.scan(/[0-9]/)
       # This tells flot_categories and flot_series_data that it is a new round
-      unless stack.eql?(review_round)
-        rounds += 1
-        review_round = stack
-        k = 0
+      unless current_review_round.eql?(previous_review_round)
+        num_rounds += 1
+        previous_review_round = current_review_round
+        rubric_question_number = 1
       end
       # Every sixth element tells flot_categories to create as many ticks as there were questions in that round
+      # This needs to change in the case that you want to support a different min and max, a different number of score data
       if highchart_series_index % 6 == 1
         for i in 0..highchart_data.size-1
-          flot_categories.push([k + (rounds*highchart_data.size), "Rubric \##{k} Round \##{round[0]}"])
-          k += 1
+          flot_categories.push([rubric_question_number-1 + (num_rounds*highchart_data.size), "Rubric \##{rubric_question_number} Round \##{round_number[0]}"])
+          rubric_question_number += 1
         end
       end
       # Pushes the data into flot_series_data in the correct form specified above
       for i in 0..highchart_data.size-1
-        if rounds > 0
-          flot_series_data[j][:data].push([i + (rounds*highchart_data.size), highchart_data[i]])
+        if num_rounds > 0
+          flot_series_data[score_index][:data].push([i + (num_rounds*highchart_data.size), highchart_data[i]])
         end
-        if rounds.zero?
+        if num_rounds.zero?
           flot_data.push([i, highchart_data[i]])
         end
       end
-      flot_series_data.push(data: flot_data, color: flot_colors[j]) if rounds.zero?
+      flot_series_data.push(data: flot_data, color: flot_colors[score_index]) if num_rounds.zero?
 
-      j += 1
-      if j > max
-        j = 0
+      # This process would need to be modified in the case of a different score set. currently it processed 0 - 5, 6 score value data series
+      score_index += 1
+      if score_index > max
+        score_index = 0
       end
       flot_data = []
       highchart_data = []

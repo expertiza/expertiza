@@ -36,6 +36,22 @@ class ResponseController < ApplicationController
     end
   end
 
+  def init_duty_based_review
+
+    review = TeammateReviewResponseMap.find(@map.id)
+    student = AssignmentParticipant.find(review.reviewee_id)
+  duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
+    
+    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review).first
+    if @duty_based_review_allowed_rubric.nil?|| !@duty_based_review_allowed_rubric
+      @duty_based_review_allowed_rubric=0
+    else
+      @duty_based_review_allowed_rubric=1
+    end
+    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
+
+  end
+
   def delete
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
@@ -55,17 +71,6 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @map = @response.map
     @contributor = @map.contributor
-
-    review = TeammateReviewResponseMap.find(@map.id)
-    student = AssignmentParticipant.find(review.reviewee_id)
-    duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
-    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
-    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review).first
-    if @duty_based_review_allowed_rubric.nil?|| !@duty_based_review_allowed_rubric
-      @duty_based_review_allowed_rubric=0
-    else
-      @duty_based_review_allowed_rubric=1
-    end
 
     set_all_responses
     if @prev.present?
@@ -108,38 +113,20 @@ class ResponseController < ApplicationController
   end
 
   def new
-    #@duty_based_review_allowed =  @student.assignment.role_based_review
     
     review = TeammateReviewResponseMap.find(params[:id]) if !params[:id].nil?
     student = AssignmentParticipant.find(review.reviewee_id)
 
     #Got team_id(through params), student_id and assignment_id(parent_id for student)
     #Get duty_id from teams_users using team_id and user_id.
-    #Use this duty and assignment to find appropriate questionnare
-    #render :plain => params.inspect
-    
+    #Use this duty and assignment to find appropriate questionnare  
 
     #CHECK WHETHER DUTY BASED REVIEWS ALLOWED OR NOT.
-    duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
     
-    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review).first
-    if @duty_based_review_allowed_rubric.nil?|| !@duty_based_review_allowed_rubric
-      @duty_based_review_allowed_rubric=0
-    else
-      @duty_based_review_allowed_rubric=1
-    end
-    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
-    
-  
-    #render :plain => [duty_id_for_rubric, @duty_based_review_allowed_rubric, @questionnaire_id_rubric].inspect
-    #These values here are correct.
-
     @header = "New"
     @next_action = "create"
     @feedback = params[:feedback]
     @map = ResponseMap.find(params[:id])
-
-    #render :plain => @map.inspect
     @return = params[:return]
     @modified_object = @map.id
     set_content(true)
@@ -167,21 +154,7 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     @map = @response.map   
-    review = TeammateReviewResponseMap.find(@map.id)
-    student = AssignmentParticipant.find(review.reviewee_id)
-    duty_id_for_rubric = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id).map(&:duties_id)
-    @questionnaire_id_rubric = AssignmentDutyQuestionnaireMapping.where(assignment_id: student.parent_id, duty_id: duty_id_for_rubric.first).map(&:questionnaire_id).last
-    @duty_based_review_allowed_rubric = Assignment.where(id: student.parent_id).map(&:role_based_review).first
-    if @duty_based_review_allowed_rubric.nil?|| !@duty_based_review_allowed_rubric
-      @duty_based_review_allowed_rubric=0
-    else
-      @duty_based_review_allowed_rubric=1
-    end
-    #render :plain => [duty_id_for_rubric, @duty_based_review_allowed_rubric, review, student, @questionnaire_id_rubric].inspect
-
-    
-    #arr = [params, @response, @map]
-    #render :plain => arr.inspect
+    init_duty_based_review
     set_content
   end
 
@@ -191,8 +164,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(map_id)
     set_all_responses
 
-    #render :plain => params.inspect
-    
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
@@ -330,12 +301,8 @@ class ResponseController < ApplicationController
     @participant = @map.reviewer
     @contributor = @map.contributor
     
-       # render :plain => [@questionnaire_id_rubric].inspect
-
     new_response ? set_questionnaire_for_new_response : set_questionnaire
-    # render :plain => [@questionnare, @map, @questionnaire_id_rubric].inspect
     set_dropdown_or_scale
-    #render :plain => test111.inspect
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
@@ -383,7 +350,6 @@ class ResponseController < ApplicationController
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
-    #render :plain => [@response, @map].inspect
     if @duty_based_review_allowed_rubric ==1
       @questionnaire = @response.questionnaire_by_answer(answer, @duty_based_review_allowed_rubric, @questionnaire_id_rubric)
     

@@ -326,6 +326,12 @@ class Assignment < ActiveRecord::Base
     next_due_date.round ||= 0
   end
 
+  def number_of_current_round_for_instructor(topic_id)
+    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    return num_review_rounds if next_due_date.nil?
+    next_due_date.round ||= num_review_rounds
+  end
+
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
     if self.staggered_deadline?

@@ -91,7 +91,7 @@ class ResponseController < ApplicationController
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
   end
 
@@ -168,7 +168,7 @@ class ResponseController < ApplicationController
       assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
       AwardedBadge.award(participant.id, teammate_review_score, assignment_badge.try(:threshold), badge_id)
     end
-    ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "Response was successfully saved")
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 

@@ -21,10 +21,10 @@ class ImportFileController < ApplicationController
     end
     err_msg += "</ul>"
     if errors.empty?
-      ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, "The file has been successfully imported.", request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The file has been successfully imported.", request)
       undo_link("The file has been successfully imported.")
     else
-      ExpertizaLogger.error LogMessage.new(controller_name, session[:user].name, err_msg, request)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, err_msg, request)
       flash[:error] = err_msg
     end
     redirect_to session[:return_to]

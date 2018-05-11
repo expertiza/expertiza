@@ -62,7 +62,7 @@ class Team < ActiveRecord::Base
       parent = TeamNode.find_by(node_object_id: self.id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(self.parent_id, user)
-      ExpertizaLogger.info LogMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
     end
     can_add_member
   end
@@ -248,7 +248,7 @@ class Team < ActiveRecord::Base
     team = self.create(name: team_name, parent_id: id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
     TeamNode.create(parent_id: id, node_object_id: team.id)
-    ExpertizaLogger.info LogMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
+    ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
   end
 

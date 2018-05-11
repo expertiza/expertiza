@@ -2,7 +2,7 @@
 class ExpertizaLogFormatter < Logger::Formatter
   # This method is invoked when a log event occurs
   def call(s, ts, pg, msg)
-    if msg.is_a?(LogMessage)
+    if msg.is_a?(LoggerMessage)
       "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}] UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]\n"
     else
       "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[] RID=[] CTR=[] UID=[] MSG=[#{filter(msg)}]\n"

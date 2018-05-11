@@ -1,4 +1,4 @@
-class LogMessage
+class LoggerMessage
   attr_reader :generator, :unity_id, :message, :oip, :req_id
   def initialize(generator, unity_id, message, req = nil)
     @generator = generator

@@ -35,7 +35,7 @@ Expertiza::Application.configure do
   config.log_tags = [ :remote_ip, :uuid ]
 
   config.log_formatter = proc do |s, ts, pg, msg|
-    if msg.is_a?(LogMessage)
+    if msg.is_a?(LoggerMessage)
       "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}] UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]\n"
     else
       "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[] RID=[] CTR=[] UID=[] MSG=[#{filter(msg)}]\n"

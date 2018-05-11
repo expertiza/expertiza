@@ -22,7 +22,7 @@ class AuthController < ApplicationController
       if user and user.valid_password?(params[:login][:password])
         after_login(user)
       else
-        ExpertizaLogger.error LogMessage.new(controller_name, "", 'Failed login attempt. Invalid username/password', request)
+        ExpertizaLogger.error LoggerMessage.new(controller_name, "", 'Failed login attempt. Invalid username/password', request)
         flash[:error] = "Your username or password is incorrect."
         redirect_to controller: 'password_retrieval', action: 'forgotten'
       end
@@ -32,7 +32,7 @@ class AuthController < ApplicationController
   # function to handle common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
-    ExpertizaLogger.info LogMessage.new("", user.name, 'Login successful')
+    ExpertizaLogger.info LoggerMessage.new("", user.name, 'Login successful')
     AuthController.set_current_role(user.role_id, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
@@ -43,7 +43,7 @@ class AuthController < ApplicationController
     g_email = env['omniauth.auth'].info.email
     user = User.find_by(email: g_email)
     if user.nil?
-      ExpertizaLogger.error LogMessage.new(controller_name, g_email, 'This email is not authorized to use Expertiza!', request)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, g_email, 'This email is not authorized to use Expertiza!', request)
       flash[:error] = "This email is not authorized to use Expertiza!"
       redirect_to root_path
     else
@@ -57,7 +57,7 @@ class AuthController < ApplicationController
   end
 
   def logout
-    ExpertizaLogger.info LogMessage.new(controller_name, session[:user].name, 'Logging out!', request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
     AuthController.logout(session)
     redirect_to '/'
   end

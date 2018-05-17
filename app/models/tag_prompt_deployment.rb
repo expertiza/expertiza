@@ -31,8 +31,14 @@ class TagPromptDeployment < ActiveRecord::Base
     user_answer_tagging = []
     unless teams.empty? or questions.empty?
       teams.each do |team|
-        responses = Response.joins("JOIN response_maps ON response_maps.id = responses.map_id")
-                            .where(responses: {is_submitted: 1}, response_maps: {reviewed_object_id: self.assignment.id, reviewee_id: team.id})
+        if self.assignment.varying_rubrics_by_round?
+          responses = []
+          for round in 1..self.assignment.rounds_of_reviews
+            responses << ReviewResponseMap.get_responses_for_team_round(team, round)
+          end
+        else
+          responses = ResponseMap.get_assessments_for(team)
+        end
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
         answers = answers.where("length(comments) > ?", self.answer_length_threshold.to_s) unless self.answer_length_threshold.nil?

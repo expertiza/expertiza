@@ -34,7 +34,7 @@ class TagPromptDeployment < ActiveRecord::Base
         if self.assignment.varying_rubrics_by_round?
           responses = []
           for round in 1..self.assignment.rounds_of_reviews
-            responses << ReviewResponseMap.get_responses_for_team_round(team, round)
+            responses += ReviewResponseMap.get_responses_for_team_round(team, round)
           end
         else
           responses = ResponseMap.get_assessments_for(team)

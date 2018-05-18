@@ -42,9 +42,10 @@ class TagPromptDeployment < ActiveRecord::Base
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
         answers = answers.where("length(comments) > ?", self.answer_length_threshold.to_s) unless self.answer_length_threshold.nil?
+        answers_ids = answers.map(&:id)
         users = TeamsUser.where(team_id: team.id).map(&:user)
         users.each do |user|
-          tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id)
+          tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id, answer_id: answers_ids)
           tagged_answers_ids = tags.map(&:answer_id)
           percentage = answers.count == 0 ? "-" : format("%.1f", tags.count.to_f / answers.count * 100)
           not_tagged_answers = answers.where.not(id: tagged_answers_ids)

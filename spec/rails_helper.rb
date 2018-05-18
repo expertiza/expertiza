@@ -62,7 +62,7 @@ RSpec.configure do |config|
     visit root_path
     fill_in 'login_name', with: user_name
     fill_in 'login_password', with: 'password'
-    click_button 'SIGN IN'
+    click_button 'Sign in'
     stub_current_user(user, user.role.name, user.role)
   end
 

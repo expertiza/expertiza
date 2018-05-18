@@ -93,7 +93,7 @@ describe 'new user request' do
           visit '/'
           fill_in 'login_name', with: 'approved_requster1'
           fill_in 'login_password', with: 'password'
-          click_button 'SIGN IN'
+          click_button 'Sign in'
           expect(page).to have_current_path("/student_task/list")
         end
       end

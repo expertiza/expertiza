@@ -17,7 +17,7 @@ describe "Questionnaire tests for instructor interface" do
       visit root_path
       fill_in 'login_name', with: 'instructor6'
       fill_in 'login_password', with: 'something'
-      click_button 'SIGN IN'
+      click_button 'Sign in'
       expect(page).to have_text('Your username or password is incorrect.')
     end
   end

@@ -52,7 +52,7 @@ class Mailer < ActionMailer::Base
                body: defn[:body],
                content_type: "text/html",
                bcc: defn[:bcc])
-    CUSTOM_LOGGER.info(ret.encoded.to_s)
+    ExpertizaLogger.info(ret.encoded.to_s)
   end
 
   def suggested_topic_approved_message(defn)

@@ -53,6 +53,7 @@ class AssignmentsController < ApplicationController
           quesparams[:due_date] = dueArray
           @assignment_form.update(quesparams,current_user)
           aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
           redirect_to edit_assignment_path aid
           undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
           return
@@ -67,6 +68,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
     assignment_form_assignment_staggered_deadline?
@@ -134,9 +136,11 @@ class AssignmentsController < ApplicationController
       @user = session[:user]
       id = @user.get_instructor
       if id != @assignment_form.assignment.instructor_id
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "You are not authorized to delete this assignment.", request)
         raise "You are not authorized to delete this assignment."
       else
         @assignment_form.delete(params[:force])
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{@assignment_form.assignment.id} was deleted.", request)
         flash[:success] = "The assignment was successfully deleted."
       end
     rescue StandardError => e
@@ -311,14 +315,17 @@ class AssignmentsController < ApplicationController
   def handle_rubrics_not_assigned_case
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
       flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
           " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
   end
 
   def handle_assignment_directory_path_nonexist_case_and_answer_tagging
-    flash.now[:error] = "You did not specify your submission directory." if @assignment_form.assignment.directory_path.blank?
-
+    if @assignment_form.assignment.directory_path.blank?
+      flash.now[:error] = "You did not specify your submission directory."
+      ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
+    end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
 
@@ -328,9 +335,11 @@ class AssignmentsController < ApplicationController
     @assignment.course_id = params[:course_id]
 
     if @assignment.save
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
       flash[:note] = 'The assignment was successfully saved.'
       redirect_to list_tree_display_index_path
     else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
       flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
       redirect_to edit_assignment_path @assignment.id
     end
@@ -371,6 +380,7 @@ class AssignmentsController < ApplicationController
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
       end
     end
+    ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
   def assignment_form_params

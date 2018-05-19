@@ -22,7 +22,7 @@ class AuthController < ApplicationController
       if user and user.valid_password?(params[:login][:password])
         after_login(user)
       else
-        logger.warn "Failed login attempt."
+        ExpertizaLogger.error LoggerMessage.new(controller_name, "", 'Failed login attempt. Invalid username/password', request)
         flash[:error] = "Your username or password is incorrect."
         redirect_to controller: 'password_retrieval', action: 'forgotten'
       end
@@ -32,6 +32,7 @@ class AuthController < ApplicationController
   # function to handle common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
+    ExpertizaLogger.info LoggerMessage.new("", user.name, 'Login successful')
     AuthController.set_current_role(user.role_id, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
@@ -40,9 +41,9 @@ class AuthController < ApplicationController
   # Login functionality for google login feature using omniAuth2
   def google_login
     g_email = env['omniauth.auth'].info.email
-    Rails.logger.debug("email : #{g_email}")
     user = User.find_by(email: g_email)
     if user.nil?
+      ExpertizaLogger.error LoggerMessage.new(controller_name, g_email, 'This email is not authorized to use Expertiza!', request)
       flash[:error] = "This email is not authorized to use Expertiza!"
       redirect_to root_path
     else
@@ -56,6 +57,7 @@ class AuthController < ApplicationController
   end
 
   def logout
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
     AuthController.logout(session)
     redirect_to '/'
   end
@@ -67,25 +69,13 @@ class AuthController < ApplicationController
     if params[:controller] == 'content_pages' and
       params[:action] == 'view'
       if session[:credentials].pages.key?(params[:page_name].to_s)
-        if session[:credentials].pages[params[:page_name].to_s] == true
-          logger.info "Page: authorised"
-          authorised = true
-        else
-          logger.info "Page: NOT authorised"
-        end
-      else
-        logger.warn "(Unknown page? #{params[:page_name]})"
+        authorised = true if session[:credentials].pages[params[:page_name].to_s] == true
       end
     else
       # Check if there's a specific permission for an action
       if session[:credentials].actions.key?(params[:controller])
-        if session[:credentials].actions[params[:controller]].key?(params[:action])
-          if session[:credentials].actions[params[:controller]][params[:action]]
-            logger.info "Action: authorised"
-            authorised = true
-          else
-            logger.info "Action: NOT authorised"
-          end
+        if session[:credentials].actions[params[:controller]].key?(params[:action]) and session[:credentials].actions[params[:controller]][params[:action]]
+          authorised = true
         else
           check_controller = true
         end
@@ -95,18 +85,11 @@ class AuthController < ApplicationController
 
       # Check if there's a general permission for a controller
       if check_controller
-        if session[:credentials].controllers.key?(params[:controller])
-          if session[:credentials].controllers[params[:controller]]
-            logger.info "Controller: authorised"
-            authorised = true
-          else
-            logger.info "Controller: NOT authorised"
-          end
-        end
+        authorised = true if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
       end
     end # Check permissions
 
-    logger.info "Authorised? #{authorised}"
+    ExpertizaLogger.info "Authorised? #{authorised}, check_controller? #{check_controller}"
     authorised
   end
 
@@ -123,9 +106,9 @@ class AuthController < ApplicationController
         Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
         session[:credentials] = role.cache[:credentials]
         session[:menu] = role.cache[:menu]
-        logger.info "Logging in user as role #{session[:credentials].class}"
+        ExpertizaLogger.info "Logging in user as role #{session[:credentials].class}"
       else
-        logger.error "Something went seriously wrong with the role."
+        ExpertizaLogger.error "Something went seriously wrong with the role."
       end
     end
   end

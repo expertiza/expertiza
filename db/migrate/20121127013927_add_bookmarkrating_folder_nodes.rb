@@ -9,10 +9,10 @@ class AddBookmarkratingFolderNodes < ActiveRecord::Migration
     parent = TreeFolder.find_by_name("Questionnaires")
     pNode = FolderNode.find_by_node_object_id(parent.id)
 
-    fnode = TreeFolder.create(:name => 'Bookmarkrating', :child_type => 'QuestionnaireNode')
+    fnode = TreeFolder.create(:name => 'Bookmark Rating', :child_type => 'QuestionnaireNode')
     pfNode = FolderNode.create(:parent_id => pNode.id, :node_object_id => fnode.id)
 
-    BookmarkratingQuestionnaire.find_each{
+    BookmarkRatingQuestionnaire.find_each{
         | questionnaire |
       QuestionnaireNode.create(:parent_id => pfNode.id, :node_object_id => questionnaire.id)
     }

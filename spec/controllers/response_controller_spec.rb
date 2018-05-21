@@ -96,7 +96,8 @@ describe ResponseController do
             comments: 'some comments'
           }
         }
-        post :update, params
+        session = {user: instructor}
+        post :update, params, session
         expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21')
       end
     end
@@ -120,7 +121,8 @@ describe ResponseController do
           },
           isSubmit: 'No'
         }
-        post :update, params
+        session = {user: instructor}
+        post :update, params, session
         expect(response).to redirect_to('/response/saving?id=1&msg=')
       end
     end
@@ -231,7 +233,8 @@ describe ResponseController do
         id: 1,
         return: ''
       }
-      post :saving, params
+      session = {user: instructor}
+      post :saving, params, session
       expect(response).to redirect_to('/response/redirection?id=1&return=')
     end
   end

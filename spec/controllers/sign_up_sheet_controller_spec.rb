@@ -49,7 +49,6 @@ describe SignUpSheetController do
               micropayment: 1
             }
           }
-
           post :create, params
           expect(response).to redirect_to('/assignments/1/edit#tabs-5')
         end
@@ -297,7 +296,8 @@ describe SignUpSheetController do
       it 'shows a flash error message and redirects to sign_up_sheet#list page' do
         allow(assignment).to receive(:instructor).and_return(instructor)
         params = {id: 1}
-        get :delete_signup, params
+        session = {user: instructor}
+        get :delete_signup, params, session
         expect(flash[:error]).to eq('You have already submitted your work, so you are not allowed to drop your topic.')
         expect(response).to redirect_to('/sign_up_sheet/list?id=1')
       end
@@ -344,7 +344,8 @@ describe SignUpSheetController do
       it 'shows a flash error message and redirects to assignment#edit page' do
         allow(assignment).to receive(:instructor).and_return(instructor)
         params = {id: 1}
-        get :delete_signup_as_instructor, params
+        session = {user: instructor}
+        get :delete_signup_as_instructor, params, session
         expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -357,7 +358,8 @@ describe SignUpSheetController do
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
         params = {id: 1}
-        get :delete_signup_as_instructor, params
+        session = {user: instructor}
+        get :delete_signup_as_instructor, params, session
         expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
         expect(response).to redirect_to('/assignments/1/edit')
       end

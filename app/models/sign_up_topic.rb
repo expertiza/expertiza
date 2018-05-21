@@ -119,7 +119,7 @@ class SignUpTopic < ActiveRecord::Base
       end
       signup_record.destroy unless signup_record.nil?
       ExpertizaLogger.info LoggerMessage.new('SignUpTopic', session_user_id, "Topic dropped: #{topic_id}")
-      end # end condition for 'drop deadline' check
+    end # end condition for 'drop deadline' check
   end
 
   def self.assign_to_first_waiting_team(next_wait_listed_team)

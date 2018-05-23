@@ -1,68 +1,102 @@
-<h2> Review scores </h2>
-
+<h2> Review scores for <%= Assignment.find(@assignment_id).name %></h2>
+<h2> by <%= Participant.find(@reviewer_id).name %> </h2>
 <%keys = @review_final_versions.keys%>
 <%keys.each do |key|%>
-  <h3><%=key%></h3>
-  <table border="1">
+    <h3><%=key%></h3>
+    <table border="1" cellpadding="10">
 
-    <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>
-    <%questions = Question.where(questionnaire_id: questionnaire_id)%>
-    <%num_responses = @review_final_versions[key][:response_ids].length%>
-    <% questions.each do |question|%>
-
-      <tr>
-        <th  align = 'left'> [Question] <%= question.txt%> </th>
-      </tr>
-      <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
-        <tr>
-          <td width="60%"> Reviewee </td>
-          <td width="10%"> Score </td>
-          <td width="30%"> Comments </td>
-        </tr>
-      <%else%>
-        <%next%>
-      <%end%>
-
-      <%@review_final_versions[key][:response_ids].each do |response_id|%>
-        <%answer = Answer.where(response_id: response_id, question_id: question.id).first%>
-          <%if !answer.nil?%>
-            <tr>
-              <%team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)%>
-              <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id, 
-                                                        reviewer_id: @reviewer_id,
-                                                        reviewee_id: team.id ).last %>
-              <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
-              <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
-              <% col_color = 'black' %>
-              <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
-              <!--Reviewee-->
-              <td>
-                <p style="color: <%= col_color%>"><%=team.name%> <br>
-                <%team.author_names.each do |name|%>
-                  <%= name %> <br>
-                <%end%></p>
-              </td>
-              <!--Score-->
-              <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
-              <!--Comments-->
-              <td align = 'left'><p style="color: <%= col_color%>"><%= answer.comments %></p></td>
-            </tr>
+      <%questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])%>
+      <%questions = Question.where(questionnaire_id: questionnaire_id)%>
+      <%num_responses = @review_final_versions[key][:response_ids].length%>
+      <% questions.each do |question|%>
+          <% if question.type!= 'Checkbox' %>
+          <tr>
+            <th  align = 'left' colspan="3"> [Question] <%= question.txt%> </th>
+          </tr>
+          <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
+              <tr>
+                <td width="30%"> Reviewee </td>
+                <td width="10%"> Score </td>
+                <td width="60%"> Comments </td>
+              </tr>
           <%else%>
-                <td>N/A</td>
-            <td>N/A</td>
-            <td>N/A</td>
+              <%next%>
+          <%end%>
+
+          <%@review_final_versions[key][:response_ids].each do |response_id|%>
+              <%answer = Answer.where(response_id: response_id, question_id: question.id).first%>
+              <%if !answer.nil?%>
+                  <tr>
+                    <%team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)%>
+                    <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
+                                                              reviewer_id: @reviewer_id,
+                                                              reviewee_id: team.id ).last %>
+                    <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
+                    <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
+                    <% col_color = 'black' %>
+                    <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
+                    <!--Reviewee-->
+                    <td>
+                      <p style="color: <%= col_color%>"><%=team.name%> <br>
+                        <%team.author_names.each do |name|%>
+                            <%= name %> <br>
+                        <%end%></p>
+                    </td>
+                    <!--Score-->
+                    <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
+                    <!--Comments-->
+                    <td align = 'left'><p style="color: <%= col_color%>"><%= answer.comments %></p></td>
+                  </tr>
+              <%else%>
+                  <td>N/A</td>
+                  <td>N/A</td>
+                  <td>N/A</td>
+              <%end%>
+          <%end%>
+          <%else %>
+
+              <%if !question.is_a?(QuestionnaireHeader) && num_responses>0%>
+                  <tr>
+                  <td colspan="3" border="1">
+                  <table width = "100%" border="1" >
+                    <col width="60%">
+                  <tr>
+                    <th align = 'left' rowspan="2"> [Question] <%= question.txt%> </th>
+                    <%@review_final_versions[key][:response_ids].each do |response_id|%>
+                        <%team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)%>
+                    <td align="center" width="10%"> <%=team.name%></td>
+                       <%end%>
+                  </tr>
+                    <tr>
+                      <%@review_final_versions[key][:response_ids].each do |response_id|%>
+                      <%answer = Answer.where(response_id: response_id, question_id: question.id).first%>
+                          <%if answer.answer == 1 %>
+                          <td align="center" width="10%"><%=image_tag("Check-icon.png") %></td>
+                          <%else%>
+                              <td align="center" width="10%"><%=image_tag("delete_icon.png") %> </td>
+                          <%end%>
+                     <%end%>
+                    </tr>
+                    </table>
+                    </td>
+                  </tr>
+                  </tr>
+              <%else%>
+                  <%next%>
+              <%end%>
+
+
           <%end%>
       <%end%>
-    <%end%>
-    <tr>
-      <th align = 'left'> Additional Comment</th>
-    </tr>
-
-    <%@review_final_versions[key][:response_ids].each do |response_id|%>
       <tr>
-        <td> <%= Response.find(response_id).additional_comment%> </td>
+        <th align = 'left'> Additional Comment</th>
       </tr>
-    <%end%>
+
+      <%@review_final_versions[key][:response_ids].each do |response_id|%>
+          <tr>
+            <td> <%= Response.find(response_id).additional_comment%> </td>
+          </tr>
+      <%end%>
     </table>
 
 <% end #loop for keys%>

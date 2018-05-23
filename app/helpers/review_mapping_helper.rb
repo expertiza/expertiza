@@ -39,6 +39,7 @@ module ReviewMappingHelper
   end
 
   def get_team_name_color_in_review_report(response_map)
+    if is_submission_updated_for_last_round(response_map)
     if Response.exists?(map_id: response_map.id)
       review_graded_at = response_map.try(:reviewer).try(:review_grade).try(:review_graded_at)
       response_last_updated_at = response_map.try(:response).try(:last).try(:updated_at)
@@ -49,7 +50,55 @@ module ReviewMappingHelper
         'brown' # REVIEW: grades has been assigned.
       end
     else
-      'red' # REVIEW: is not finished yet.
+        'red' # REVIEW: is not finished yet.
+    end
+    else
+       'green'
+      end
+  end
+
+  def is_submission_updated_for_last_round(response_map)
+    last_round = 0
+    assignment_deadlines = DueDate.where(parent_id: response_map.reviewed_object_id)
+    number_of_assignemnt_rounds = @assignment.num_review_rounds
+    current_time = Time.new
+    r = number_of_assignemnt_rounds..1
+    due_time = DueDate.new
+    (r.first).downto(r.last).each do |round|
+      due_time = assignment_deadlines.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+      if(current_time > due_time)
+        last_round = round
+        break
+      end
+    end
+    if(last_round > 1)
+      previous_round = last_round-1
+      prev_due_time=assignment_deadlines.where(round: previous_round, deadline_type_id: 1).try(:first).try(:due_at)
+      team = Team.find(response_map.reviewee_id)
+      hyperlinks_count = team.hyperlinks.size
+      testable_links_count = 0
+      if !team.hyperlinks.empty?
+        #flag is false when none of the wiki links are updated
+        flag = false
+        team.hyperlinks.each do |link|
+          if ((link.include? "wiki") && !flag)
+            testable_links_count = testable_links_count + 1
+            last_modified = open(link) do |f|
+              if(!(f.last_modified < prev_due_time))
+                flag= true
+                break
+            end
+          end
+        end
+      end
+      end
+      if(flag == false && hyperlinks_count == testable_links_count)
+        return false
+      else
+        return true
+      end
+    else
+      return true
     end
   end
 
@@ -100,6 +149,53 @@ module ReviewMappingHelper
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
+  def find_overall_average_and_max_metric
+    total = 0
+    count = 0
+    max = 0
+    @reviewers.each do |r|
+      r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      count = count + 1
+      total = total + r.overall_avg_vol
+      r_max = [r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3].max
+      if(r_max > max)
+        max = r_max
+      end
+    end
+
+    total_avg = total / count
+    max_ = (max/50.0).ceil * 50
+    return total_avg, max
+  end
+
+  def get_xaxis_labels(max_metric)
+    i = 0
+    xaxis = ""
+    while i <= max_metric do
+      xaxis += i.to_s
+      if(i != max_metric)
+        xaxis += "|"
+      end
+      i = i + 50
+    end
+    return xaxis
+  end
+
+  def construct_bar_chart(total_overall_avg, overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3, max_metric, name, xaxis)
+    Gchart.bar(
+        :data => [total_overall_avg, overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3],
+        :orientation => 'horizontal',
+        :bar_width_and_spacing => '15,6',
+        :max_value => max_metric,
+        :size => '280x190',
+        :title => 'Volume',
+        :axis_with_labels => [['y'], ['x']],
+        :encoding => 'text',
+        :axis_labels => [["Round 3|Round 2|Round 1|#{name} Avg|All Students Avg"], ["#{xaxis}"]],
+    )
+  end
+
+=begin
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
     metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
@@ -108,6 +204,7 @@ module ReviewMappingHelper
     metric += ")"
     metric.html_safe
   end
+=end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)

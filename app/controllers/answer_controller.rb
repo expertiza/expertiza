@@ -13,6 +13,7 @@ class AnswerController < ApplicationController
   end
 
   # GET /answer?response_id=xx&questionnaire_id=xx
+  # reference: https://stackoverflow.com/questions/35639507/parametrized-join-in-rails-4
   def index
     if params.key?(:response_id)
         join_query = sanitize_sql_array(["LEFT JOIN answers ON answers.question_id = questions.id AND answers.response_id = '?'", params[:response_id])

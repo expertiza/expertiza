@@ -446,14 +446,7 @@ class ReviewMappingController < ApplicationController
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
     begin
-      review_grade.save
-      # Award Good Reviewer Badge
-      assignment = Assignment.find_by(id: params[:assignment_id])
-      if assignment.has_badge?
-        badge_id = Badge.get_id_from_name('Good Reviewer')
-        assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: params[:assignment_id])
-        AwardedBadge.award(params[:participant_id], params[:grade_for_reviewer], assignment_badge.try(:threshold), badge_id)
-      end
+      review_grade.save!
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

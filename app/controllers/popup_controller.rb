@@ -127,7 +127,7 @@ class PopupController < ApplicationController
   end
 
   def build_tone_analysis_report
-    uri = "http://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk"
+    uri =  WEBSERVICE_CONFIG['sentiment_webservice_url'] + "analyze_reviews_bulk"
     index = 0
     @sentiment_summary = []
     keys = @review_final_versions.keys
@@ -136,8 +136,8 @@ class PopupController < ApplicationController
 
     # Loops by each review round
     keys.each do |key|
-      questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
-      questions = Question.where(questionnaire_id: questionnaire_id)
+      questionnaire = Questionnaire.find(@review_final_versions[key][:questionnaire_id])
+      questions = Question.where(questionnaire_id: questionnaire.id)
 
       # Loops by each question per review round
       questions.each do |question|
@@ -167,15 +167,17 @@ class PopupController < ApplicationController
         end
       end
 
-      index = 0
-      revs = {
-        reviews: reviews
-      }
+      if !reviews.empty?
+        index = 0
+        revs = {
+          reviews: reviews
+        }
 
-      # calls web service
-      sum_json = RestClient.post uri, revs.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
-      # store each summary in a hashmap and use the question as the key
-      @sentiment_summary[round] = JSON.parse(sum_json)
+        # calls web service
+        sum_json = RestClient.post uri, revs.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
+        # store each summary in a hashmap and use the question as the key
+        @sentiment_summary[round] = JSON.parse(sum_json)
+      end
       round += 1
     end
   rescue StandardError => err
@@ -183,12 +185,13 @@ class PopupController < ApplicationController
   end
 
   def build_tone_analysis_heatmap
-    uri = "http://peerlogic.csc.ncsu.edu/reviewsentiment/configure"
+
     @heatmap_urls = []
     keys = @review_final_versions.keys
 
     # Loops by each review round
     keys.each_with_index do |key, round|
+      next if @sentiment_summary[round].nil?
       content = []
       v_label = []
       h_label = []
@@ -276,7 +279,7 @@ class PopupController < ApplicationController
       }
 
       # calls web service
-      heatmap_json = RestClient.post uri, contents.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
+      heatmap_json = RestClient.post WEBSERVICE_CONFIG['heatmap_webservice_url'], contents.to_json, content_type: 'application/json; charset=UTF-8', accept: :json
 
       # store each URL into an array of URLS where the index is by review round
       @heatmap_urls[round] = JSON.parse(heatmap_json)

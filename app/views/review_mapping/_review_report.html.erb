@@ -105,7 +105,9 @@ $(window).load(function(){
           <!--Metrics-->
           <td align = 'left'>
             <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
+            <p>
             <%= link_to "tone analysis chart", {:controller => 'popup', :action => 'tone_analysis_chart_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
+            </p>
           </td>
           <!--Assign grade and write comments-->
           <td align = 'left' style="" id=<%= "assign_grade" + r.id.to_s %>>

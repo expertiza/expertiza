@@ -34,7 +34,11 @@
         <p>
           <div id="tab-<%= idx + 1 %>">
             <div class="intrinsic-container intrinsic-container-16x9">
-              <iframe src="<%= @heatmap_urls[ idx ][ 'url' ] %>" allowfullscreen></iframe>
+              <% if !@heatmap_urls[ idx ].nil?%>
+                  <iframe src="<%= @heatmap_urls[ idx ][ 'url' ] %>"></iframe>
+              <% else %>
+                  <h3>No reviews found in this round</h3>
+              <% end %>
             </div>
           </div>
         </p>
@@ -54,11 +58,15 @@
 /* 16x9 Aspect Ratio */
 .intrinsic-container-16x9 {
   padding-bottom: 56.25%;
+  border:none;
+  min-width: 600px;
+  min-height: 600px;
 }
  
 /* 4x3 Aspect Ratio */
 .intrinsic-container-4x3 {
   padding-bottom: 75%;
+  border:none;
 }
  
 .intrinsic-container iframe {

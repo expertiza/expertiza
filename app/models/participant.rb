@@ -7,7 +7,8 @@ class Participant < ActiveRecord::Base
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
-  has_many :awarded_badges
+  has_many :awarded_badges, dependent: :destroy
+  has_many :badges, through: :awarded_badges
   has_one :review_grade
 
   PARTICIPANT_TYPES = %w[Course Assignment].freeze

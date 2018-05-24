@@ -40,7 +40,7 @@ class AssignmentForm
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
-    set_badge_threshold_for_assignment(attributes[:assignment][:id], attributes[:badge]) if @assignment.has_badge?
+    update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
@@ -141,6 +141,18 @@ class AssignmentForm
         @has_errors = true unless dd.update_attributes(due_date)
       end
       @errors += @assignment.errors.to_s if @has_errors
+    end
+  end
+
+  # Adds badges to assignment badges table as part of E1822
+  def update_assigned_badges(badge, assignment)
+    if assignment and badge
+      AssignmentBadge.where(assignment_id: assignment[:id]).map(&:id).each do |assigned_badge_id|
+        AssignmentBadge.delete(assigned_badge_id) unless badge[:id].include?(assigned_badge_id)
+      end
+      badge[:id].each do |badge_id|
+        AssignmentBadge.where(badge_id: badge_id[0], assignment_id: assignment[:id]).first_or_create
+      end
     end
   end
 
@@ -320,14 +332,5 @@ class AssignmentForm
         questionnaire_weight: aq.questionnaire_weight
       )
     end
-  end
-
-  def set_badge_threshold_for_assignment(assignment_id, badges)
-    badge_threshold_hash = {}
-    ['Good Teammate', 'Good Reviewer'].each do |badge_name|
-      badge_threshold_hash[badge_name] = badges["badge_#{badge_name}_threshold"].to_i if badges and badges.key?("badge_#{badge_name}_threshold")
-      badge_threshold_hash[badge_name] = 95 if badge_threshold_hash[badge_name].nil? or badge_threshold_hash[badge_name].zero?
-    end
-    AssignmentBadge.save_badge_populate_awarded_badges(badge_threshold_hash, assignment_id)
   end
 end

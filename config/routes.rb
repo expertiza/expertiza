@@ -56,6 +56,12 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :badges, only: %i[new create] do
+    collection do
+      get :redirect_to_assignment
+    end
+  end
+
   resources :bookmarks, except: %i[index show] do
     collection do
       get :list
@@ -441,6 +447,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
+      get :list_pending_requested
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name

@@ -156,6 +156,7 @@ class PopupController < ApplicationController
           else
             Answer.where(response_id: responseid, question_id: question.id).each do |review|
               comment = review.comments
+              comment = "N/A" if review.comments.nil?
               param = {
                 id: index,
                 text: comment

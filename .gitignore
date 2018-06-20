@@ -24,7 +24,6 @@ expertiza_scrubbed_db.sql.tar.gz
 ## npm & bower ##
 #################
 node_modules
-package.json
 
 #################
 ## Eclipse

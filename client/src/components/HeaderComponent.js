@@ -39,7 +39,7 @@ class Header extends Component {
                                 </NavItem>
                                 <NavItem>
                                     <NavLink className="nav-link" to="/home">
-                                        Pending Surveys 
+                                        Profile 
                                     </NavLink> 
                                 </NavItem>
                                 <NavItem>

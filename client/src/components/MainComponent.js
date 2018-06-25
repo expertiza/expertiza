@@ -21,6 +21,7 @@ constructor(props){
           <Header />
           <Switch>
             <Route path ='/home' component={(HomePage)} />
+            <Route path ='/profile' component={() => <Profile />} />
             <Redirect to="/home" />
           </Switch>
           <Footer />

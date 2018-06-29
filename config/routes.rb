@@ -2,6 +2,10 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+  namespace :api do 
+    resources :sessions, only: [:create, :destroy]
+  end
+
   resources :admin, only: [] do
     collection do
       get :list_super_administrators

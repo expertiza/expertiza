@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Assignment badge:
+  = @nomination.assignment_badge_id
+%p
+  %b Recipient:
+  = @nomination.recipient_id
+%p
+  %b Nominator:
+  = @nomination.nominator_id
+
+= link_to 'Edit', edit_nomination_path(@nomination)
+\|
+= link_to 'Back', nominations_path

@@ -1,0 +1,25 @@
+%h1 Listing nominations
+
+%table
+  %thead
+    %tr
+      %th Assignment badge
+      %th Recipient
+      %th Nominator
+      %th
+      %th
+      %th
+
+  %tbody
+    - @nominations.each do |nomination|
+      %tr
+        %td= nomination.assignment_badge_id
+        %td= nomination.recipient_id
+        %td= nomination.nominator_id
+        %td= link_to 'Show', nomination
+        %td= link_to 'Edit', edit_nomination_path(nomination)
+        %td= link_to 'Destroy', nomination, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Nomination', new_nomination_path

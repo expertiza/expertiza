@@ -1,0 +1,19 @@
+= form_for @nomination do |f|
+  - if @nomination.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@nomination.errors.count, "error")} prohibited this nomination from being saved:"
+      %ul
+        - @nomination.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :assignment_badge_id
+    = f.text_field :assignment_badge_id
+  .field
+    = f.label :recipient_id
+    = f.text_field :recipient_id
+  .field
+    = f.label :nominator_id
+    = f.text_field :nominator_id
+  .actions
+    = f.submit 'Save'

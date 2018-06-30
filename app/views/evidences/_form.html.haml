@@ -1,0 +1,16 @@
+= form_for @evidence do |f|
+  - if @evidence.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@evidence.errors.count, "error")} prohibited this evidence from being saved:"
+      %ul
+        - @evidence.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :awarded_badge_id
+    = f.text_field :awarded_badge_id
+  .field
+    = f.label :file_name
+    = f.text_field :file_name
+  .actions
+    = f.submit 'Save'

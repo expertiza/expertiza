@@ -1,4 +1,8 @@
 Expertiza::Application.routes.draw do
+  resources :file_instructions
+  resources :instructions
+  resources :evidences
+  resources :nominations
   ###
   # Please insert new routes alphabetically!
   ###

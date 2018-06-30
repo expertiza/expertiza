@@ -1,0 +1,25 @@
+%h1 Listing file_instructions
+
+%table
+  %thead
+    %tr
+      %th Host url
+      %th File type
+      %th Instructions
+      %th
+      %th
+      %th
+
+  %tbody
+    - @file_instructions.each do |file_instruction|
+      %tr
+        %td= file_instruction.host_url
+        %td= file_instruction.file_type
+        %td= file_instruction.instructions
+        %td= link_to 'Show', file_instruction
+        %td= link_to 'Edit', edit_file_instruction_path(file_instruction)
+        %td= link_to 'Destroy', file_instruction, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New File instruction', new_file_instruction_path

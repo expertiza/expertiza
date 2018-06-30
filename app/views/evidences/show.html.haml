@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Awarded badge:
+  = @evidence.awarded_badge_id
+%p
+  %b File name:
+  = @evidence.file_name
+
+= link_to 'Edit', edit_evidence_path(@evidence)
+\|
+= link_to 'Back', evidences_path

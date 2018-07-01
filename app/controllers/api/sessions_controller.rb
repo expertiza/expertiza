@@ -1,19 +1,42 @@
+require 'jwt'
 class Api::SessionsController <  ApplicationController 
-
+    skip_before_action :authenticate, only: [:create]
+   
     def create
-        # puts "--------------------------------------------------------"
-        # puts params.inspect
-        user  = User.where(email: params[:email], name: params[:name]).first
-        if(user && user.valid_password?(params[:password]))
-            render json: {status: :created, user: user.as_json(only: [:email])}.to_json
+        user = User.find_by(email: auth_params[:email], name: auth_params[:name])
+        if user.valid_password?(auth_params[:password])
+          jwt = JWT.encode( {user: user.id},
+                            Rails.application.secrets.secret_key_base,
+                            'HS256')
+          render json: {jwt: jwt}
         else
-            head[:unauthorised_access]
+            head(:unauthorized)
         end
+      end
+    
+
+    def index
+        render json: {status: :ok, user: User.find(6)}
     end
+    # def create
+    #     # puts "--------------------------------------------------------"
+    #     # puts params.inspect
+    #     user  = User.where(email: params[:email], name: params[:name]).first
+    #     if(user && user.valid_password?(params[:password]))
+    #         render json: {status: :created, user: user.as_json(only: [:email])}.to_json
+    #     else
+    #         head[:unauthorised_access]
+    #     end
+    # end
 
     def destroy
 
     end
+
+    private
+        def auth_params
+          params.require(:auth).permit(:email, :password, :name)
+        end
 
 end
 

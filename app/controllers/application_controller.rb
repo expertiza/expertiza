@@ -11,10 +11,10 @@ class ApplicationController < ActionController::Base
   # forcing SSL only in the production mode
   force_ssl if Rails.env.production?
 
-  # helper_method :current_user, :current_user_role?
-  # protect_from_forgery with: :exception
-  # before_action :set_time_zone
-  # #  before_action :authorize
+  helper_method :current_user, :current_user_role?
+  protect_from_forgery with: :exception
+  before_action :set_time_zone
+  before_action :authorize
 
   def self.verify(_args); end
 

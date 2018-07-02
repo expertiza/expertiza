@@ -13,13 +13,19 @@ handleSubmit(values) {
     console.log('Current State is: ' + JSON.stringify(values));
     alert('Current State is: ' + JSON.stringify(values));
 }
-// componentDidMount() {
-//     axios.get('http://localhost:3001/api/v1/profile/1.json')
-//     .then(response => {
-//         console.log(JSON.stringify(response))
-//     })
-//     .catch(error => console.log(error))
-// }
+componentDidMount() {
+    axios({
+        method: 'get',
+        url: 'http://localhost:3001/api/v1/profile',
+        headers: { AUTHORIZATION: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0" }
+    })
+    .then(response => {
+        console.log('-----------------------------------data recieved is ')
+        console.log(JSON.stringify(response.data['user']))
+        console.log("-----------------------------------")
+    })
+    .catch(error => console.log(error))
+}
 
 render(){
     return(

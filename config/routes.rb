@@ -5,10 +5,12 @@ Expertiza::Application.routes.draw do
   namespace :api do 
     namespace :v1 do
     resources :sessions, only: [:create, :index, :destroy]
+    resources :profile
   end
 end
 
-  resources :admin, only: [] do
+
+resources :admin, only: [] do
     collection do
       get :list_super_administrators
       get :list_administrators
@@ -472,11 +474,7 @@ resources :institution, except: [:destroy] do
       delete '', action: :destroy_all
     end
   end
-  namespace :api do
-     namespace :v1 do
-      resources :profile
-    end
- end
+  
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'

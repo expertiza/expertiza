@@ -1,5 +1,6 @@
 require 'jwt'
-class Api::SessionsController <  ApplicationController 
+class Api::SessionsController <  ::Api::BasicApiController 
+    skip_before_action :verify_authenticity_token 
     skip_before_action :authenticate, only: [:create]
    
     def create

@@ -36,6 +36,12 @@ module Expertiza
       config.sass.load_paths << bower_path
       config.assets.paths << bower_path
     end
+    config.middleware.insert_before 0, "Rack::Cors" do
+      allow do
+        origins '*'
+        resource '*', :headers => :any, :methods => [:get, :post, :patch, :options]
+      end
+    end
     # Precompile Bootstrap fonts
     config.assets.precompile << %r(bootstrap-sass/assets/fonts/bootstrap/[\w-]+\.(?:eot|svg|ttf|woff2?)$)
     # Minimum Sass number precision required by bootstrap-sass
@@ -60,5 +66,4 @@ module Expertiza
       config.active_record.raise_in_transactional_callbacks = true
     end
   end
-
 end

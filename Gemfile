@@ -68,6 +68,7 @@ gem 'tinymce-rails', '~> 4.4.0'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'rack-cors', :require => 'rack/cors'
 
 group :development do
   gem 'daemons'

@@ -470,7 +470,11 @@ resources :institution, except: [:destroy] do
       delete '', action: :destroy_all
     end
   end
-
+  namespace :api do
+    # namespace :v1 do
+      resources :profile
+    end
+# end
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'

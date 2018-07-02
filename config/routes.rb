@@ -471,10 +471,10 @@ resources :institution, except: [:destroy] do
     end
   end
   namespace :api do
-    namespace :v1 do
+    # namespace :v1 do
       resources :profile
     end
-end
+# end
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'

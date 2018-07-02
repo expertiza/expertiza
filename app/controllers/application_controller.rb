@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
- 
+  include AccessHelper
   # You want to get exceptions in development, but not in production.
   unless Rails.application.config.consider_all_requests_local
     rescue_from ActionView::MissingTemplate do |_exception|

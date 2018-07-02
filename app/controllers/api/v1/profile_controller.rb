@@ -1,13 +1,13 @@
 module Api::V1
-class ProfileController < ApplicationController
+class ProfileController < BasicApiController
   
   def action_allowed?
     current_user
   end
 
   def index
-    @user = session[:user]
-    render json: @user
+    @user = current_user
+    render json: { status: :ok, user: @user}
     # @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first
     #render json: @assignment_questionnaire
   end   
@@ -17,25 +17,25 @@ class ProfileController < ApplicationController
   #   @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first
   # end
 
-  def update
-    params.permit!
-    @user = session[:user]
-    unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?
-      aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
-      aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
-    end
-    if @user.update_attributes(params[:user])
-      ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, "Your profile was successfully updated.", request)
-      render json: @user
-      flash[:success] = 'Your profile was successfully updated.'
-    else
-      ExpertizaLogger.error LoggerMessage.new(controller_name, @user.name, "An error occurred and your profile could not updated.", request)
-      render json: @user.errors, status: :unprocessable_entity
-      flash[:error] = 'An error occurred and your profile could not updated.'
-    end
+  # def update
+  #   params.permit!
+  #   @user = session[:user]
+  #   unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?
+  #     aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
+  #     aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
+  #   end
+  #   if @user.update_attributes(params[:user])
+  #     ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, "Your profile was successfully updated.", request)
+  #     render json: @user
+  #     flash[:success] = 'Your profile was successfully updated.'
+  #   else
+  #     ExpertizaLogger.error LoggerMessage.new(controller_name, @user.name, "An error occurred and your profile could not updated.", request)
+  #     render json: @user.errors, status: :unprocessable_entity
+  #     flash[:error] = 'An error occurred and your profile could not updated.'
+  #   end
 
-    redirect_to controller: :profile, action: :show
-  end
+  #   redirect_to controller: :profile, action: :show
+  # end
 
   private
 

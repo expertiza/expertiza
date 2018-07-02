@@ -1,5 +1,6 @@
 require 'jwt'
-class Api::SessionsController <  ::Api::BasicApiController 
+module Api::V1
+class SessionsController <  BasicApiController 
     skip_before_action :verify_authenticity_token 
     skip_before_action :authenticate, only: [:create]
    
@@ -19,16 +20,7 @@ class Api::SessionsController <  ::Api::BasicApiController
     def index
         render json: {status: :ok, user: User.find(6)}
     end
-    # def create
-    #     # puts "--------------------------------------------------------"
-    #     # puts params.inspect
-    #     user  = User.where(email: params[:email], name: params[:name]).first
-    #     if(user && user.valid_password?(params[:password]))
-    #         render json: {status: :created, user: user.as_json(only: [:email])}.to_json
-    #     else
-    #         head[:unauthorised_access]
-    #     end
-    # end
+    
 
     def destroy
 
@@ -38,7 +30,7 @@ class Api::SessionsController <  ::Api::BasicApiController
         def auth_params
           params.require(:auth).permit(:email, :password, :name)
         end
-
+    end
 end
 
  #<User id: 2, name: "super_administrator2", crypted_password: "f3488c791e5b153ddea3fa64a9e4134fcb48d2ef", role_id: 4, password_salt: "tUltQGRzGp8tih1t9jfu", fullname: "2, super_administrator", email: "expertiza@mailinator.com", parent_id: 2, private_by_default: false, mru_directory_path: nil, email_on_review: true, email_on_submission: true, email_on_review_of_review: true, is_new_user: false, master_permission_granted: 0, handle: "handle", digital_certificate: nil, persistence_token: "65096ca6c66fac1b1e9b71fcc4ba6d5d92103976619211ab7f...", timezonepref: "Eastern Time (US & Canada)", public_key: nil, copy_of_emails: false, institution_id: 1>,

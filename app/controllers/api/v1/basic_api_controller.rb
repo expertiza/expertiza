@@ -3,6 +3,9 @@ module Api::V1
        protect_from_forgery with: :null_session
         before_action :authenticate
 
+        def action_allowed?
+            true
+        end
         def current_user
             @current_user
         end

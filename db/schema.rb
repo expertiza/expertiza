@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180630173250) do
+ActiveRecord::Schema.define(version: 20180703203334) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -154,6 +154,7 @@ ActiveRecord::Schema.define(version: 20180630173250) do
     t.datetime "updated_at",                    null: false
     t.integer  "external_badge_id", limit: 4
     t.integer  "instructor_id",     limit: 4
+    t.integer  "private",           limit: 1
   end
 
   create_table "bids", force: :cascade do |t|

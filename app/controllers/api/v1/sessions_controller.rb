@@ -5,7 +5,7 @@ class SessionsController <  BasicApiController
     skip_before_action :authenticate, only: [:create]
    
     def create
-        user = User.find_by(email: auth_params[:email], name: auth_params[:name])
+        user = User.find_by(email: auth_params[:email], name: "instructor6")
         if user.valid_password?(auth_params[:password])
           jwt = JWT.encode( {user: user.id},
                             Rails.application.secrets.secret_key_base,

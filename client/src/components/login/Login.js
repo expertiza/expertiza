@@ -1,4 +1,6 @@
 import React, { Component} from 'react';
+// import { connect} from 'react-redux';
+import axios from 'axios';
 
 class Login extends Component {
     state = {
@@ -9,6 +11,20 @@ class Login extends Component {
     onSubmitHandler = (event) => {
         event.preventDefault();
         console.log(event);
+        axios({
+            method: 'post',
+            url: 'http://localhost:3000/api/v1/sessions',
+            headers: { "Content-Type": "application/json"},
+            data: {auth: {
+                email: this.state.email,
+                password: this.state.password
+            }}
+        })
+        .then(response => {
+            console.log(response)
+            localStorage.setItem('jwt', response.data.jwt)
+        })
+        .catch(error => console.log(error))
     }
     emailChangeHandler = (event) => {
         console.log(event.target.value)
@@ -52,4 +68,5 @@ class Login extends Component {
         )
     }
 }
+// const mapStatetoProps
 export default Login;

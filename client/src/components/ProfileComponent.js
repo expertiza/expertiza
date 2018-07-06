@@ -14,10 +14,11 @@ handleSubmit(values) {
     alert('Current State is: ' + JSON.stringify(values));
 }
 componentDidMount() {
+    console.log(localStorage.getItem('jwt'))
     axios({
         method: 'get',
-        url: 'http://localhost:3001/api/v1/profile',
-        headers: { AUTHORIZATION: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0" }
+        url: 'http://localhost:3000/api/v1/profile',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
     .then(response => {
         console.log('-----------------------------------data recieved is ')

@@ -9,10 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-<<<<<<< HEAD
-=======
     "bootstrap": "^4.1.1",
->>>>>>> dc6b6d4922549ecd092843ba53dbe897dc2bfc8e
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-popper": "^1.0.0",
@@ -22,7 +19,9 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "reactstrap": "^6.1.0",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts start",

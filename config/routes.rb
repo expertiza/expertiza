@@ -6,6 +6,7 @@ Expertiza::Application.routes.draw do
     namespace :v1 do
     resources :sessions, only: [:create, :index, :destroy]
     resources :profile
+    resources :institution
   end
 end
 

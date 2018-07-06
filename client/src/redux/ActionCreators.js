@@ -9,8 +9,10 @@ export const fetchProfile = () =>(dispatch) => {
         headers: { AUTHORIZATION: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0" }
     })
     .then(response => response.data)
-    .then(profile => dispatch(addProfile(profile.user)))
+    .then(profile => dispatch(addProfile(profile['user'])))
     .catch(error => console.log(error));
+
+
 }
 
 export const fetchInstitutions = () =>(dispatch) => {
@@ -28,7 +30,6 @@ export const addProfile = (profile) => ({
     type: ActionTypes.ADD_PROFILE,
     payload: profile
 });
-
 
 export const addInstitutions = (institutions) => ({
     type: ActionTypes.ADD_INSTITUTIONS,

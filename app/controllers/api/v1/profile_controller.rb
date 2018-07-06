@@ -7,9 +7,8 @@ class ProfileController < BasicApiController
 
   def index
     @user = current_user
-    @institution_names = Institution.all;
     @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first
-    render json: { status: :ok, user: @user, institution_name: @institution_names}
+    render json: { status: :ok, user: @user}
   end   
   # def edit
   #   @user = session[:user]

@@ -16,11 +16,12 @@ class InstitutionController < BasicApiController
 
   def list
     @institutions = Institution.all
-    render json: {institutions: @institutions}
+    render json:  { status: :ok, institutions: @institutions}
   end
 
   def show
     @institution = Institution.find(params[:id])
+    render json: {status: :ok, institution: @institution}
   end
 
   def new

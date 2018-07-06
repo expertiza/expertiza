@@ -1,23 +1,37 @@
 import React, { Component } from 'react';
 import {  Label,  Col, Row, Button } from 'reactstrap';
 import {Control, Form, Errors} from 'react-redux-form';
+import { Loading } from './LoadingComponent';
 import axios from 'axios';
 
 class Profile extends Component {
     constructor(props){
     super(props);
+    this.state = {
+        institutions: this.props.institutions.institutions.institutions
+    };
     this.handleSubmit = this.handleSubmit.bind(this);
 }
 handleSubmit(values) {
     console.log('Current State is: ' + JSON.stringify(values));
     alert('Current State is: ' + JSON.stringify(values));
 }
-componentWillMount(){
-    //let a = this.props.institutions.institutions.institutions;
-   // console.log("a is ======> " + a[0]);
-}   
 render(){
-    return(
+    if(this.state.institutions === undefined || this.state.institutions === null)
+    {
+            return(
+                <div className ="profileform container-fluid">
+                <div className="row row-content">
+                       <div className=" col-12">
+                           <h1>User Profile Information</h1>
+                       </div>           
+                        <Loading />
+                    </div>
+                </div>
+            );
+    }
+    else{
+        return(
          <div className ="profileform container-fluid">
              <div className="row row-content">
                     <div className=" col-12">
@@ -64,11 +78,10 @@ render(){
                               <Label htmlFor="institution" md={3}>Institution: </Label>
                               <Col md={3}>
                                 <Control.select model=".institution" name="institution"
-                                        className="form-control">
-                                    {
-                                        //console.log(this.state)
-                                       //this.state.institutions.map(el => <option value={el.name} key={el.name}> {el.name} </option>)
-                                    }
+                                        className="form-control" defaultValue = {this.state.institutions.filter((insti) => insti.id === this.props.profile.profile.institution_id)} >
+                                        {
+                                             this.state.institutions.map( opt => <option id={opt.name} key= {opt.name} >{opt.name} </option>) 
+                                        }
                                     </Control.select>
                               </Col>
                           </Row>
@@ -91,8 +104,9 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".agree_on_review" name="agree_on_review"
-                                             className="form-check-input" />  
+                                    <Control.checkbox model=".email_on_review" name="email_on_review"
+                                             className="form-check-input"
+                                             defaultChecked={this.props.profile.profile.email_on_review} />  
                                 </div>    
                              </Col>
                          </Row>
@@ -108,8 +122,9 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".agree_on_submit" name="agree_on_submit"
-                                             className="form-check-input" />  
+                                    <Control.checkbox model=".email_on_submission" name="email_on_submission"
+                                             className="form-check-input"
+                                             defaultChecked={this.props.profile.profile.email_on_submission} />  
                                 </div>    
                              </Col>
                          </Row>
@@ -125,8 +140,9 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".agree_on_metareviews" name="agree_on_metareviews"
-                                             className="form-check-input" />  
+                                    <Control.checkbox model=".email_on_review_of_review" name="email_on_review_of_review"
+                                             className="form-check-input" 
+                                             defaultChecked={this.props.profile.profile.email_on_review_of_review} />  
                                 </div>    
                              </Col>
                          </Row> 
@@ -142,8 +158,9 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".agree_on_metareviews" name="agree_on_metareviews"
-                                             className="form-check-input" />  
+                                    <Control.checkbox model=".copy_of_emails" name="copy_of_emails"
+                                             className="form-check-input" 
+                                             defaultChecked={this.props.profile.profile.copy_of_emails}/>  
                                 </div>    
                              </Col>
                          </Row>                        
@@ -203,8 +220,9 @@ render(){
                     </Form>
                  </div>     
             </div>      
-        </div>    
+        </div>
     );
+    }
 }
 }
 

@@ -1,5 +1,5 @@
 module Api::V1
-    class BasicApiController <  ApplicationController
+    class BasicApiController <  ActionController::Base
        protect_from_forgery with: :null_session
         before_action :authenticate
 

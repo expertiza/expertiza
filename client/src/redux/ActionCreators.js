@@ -6,19 +6,18 @@ export const fetchProfile = () =>(dispatch) => {
     return axios({
         method: 'get',
         url: baseUrl + 'profile',
-        headers: { AUTHORIZATION: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0" }
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
     .then(response => response.data)
     .then(profile => dispatch(addProfile(profile)))
     .catch(error => console.log(error));
 }
 
-
 export const fetchInstitutions = () =>(dispatch) => {
     return axios({
         method: 'get',
         url: baseUrl + 'institution',
-        headers: { AUTHORIZATION: "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0" }
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
     .then(response => response.data)
     .then(institutions => dispatch(addInstitutions(institutions)))
@@ -41,7 +40,7 @@ export const editProfile = (profile)  => (dispatch) => {
         url: baseUrl + 'profile/update', 
         body: JSON.stringify(newprofile), 
         headers: {
-             "AUTHORIZATION": "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0",
+             "AUTHORIZATION": "Bearer " + localStorage.getItem('jwt'),
               "Content-Type": 'application/json'  
             }
     })

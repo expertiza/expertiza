@@ -1,11 +1,13 @@
 module Api::V1
 class ProfileController < BasicApiController
-  
+  # skip_before_action :authenticate, only: [:index]
+   
   def action_allowed?
     current_user
   end
 
   def index
+    puts '---------------------------------------------------'
     @user = current_user
     render json: { status: :ok, user: @user}
     # @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first

@@ -17,7 +17,7 @@ componentDidMount() {
     console.log(localStorage.getItem('jwt'))
     axios({
         method: 'get',
-        url: 'http://localhost:3000/api/v1/profile',
+        url: 'http://localhost:3001/api/v1/sessions',
         headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
     .then(response => {

@@ -2,6 +2,7 @@ import React, { Component} from 'react';
 // import { connect} from 'react-redux';
 import axios from 'axios';
 
+
 class Login extends Component {
     state = {
         email: '',
@@ -13,7 +14,7 @@ class Login extends Component {
         console.log(event);
         axios({
             method: 'post',
-            url: 'http://localhost:3000/api/v1/sessions',
+            url: 'http://localhost:3001/api/v1/sessions',
             headers: { "Content-Type": "application/json"},
             data: {auth: {
                 email: this.state.email,

@@ -1,20 +1,48 @@
 import React, { Component } from 'react';
-import {  Label,  Col, Row, Button } from 'reactstrap';
-import {Control, Form, Errors} from 'react-redux-form';
+import {  Label,  Col, Row, Button, Form,FormGroup, Input } from 'reactstrap';
+import {Control, Errors} from 'react-redux-form';
 import { Loading } from './LoadingComponent';
 import axios from 'axios';
 
 class Profile extends Component {
     constructor(props){
     super(props);
+   // console.log(this.props.profile.profile.fullname)
     this.state = {
-        institutions: this.props.institutions.institutions.institutions
+        institutions: this.props.institutions.institutions.institutions,
+        profileform : {
+            fullname: this.props.profile.profile.fullname,
+            crypted_password: this.props.profile.profile.crypted_password,
+            email: this.props.profile.profile.email,
+            institution_id: this.props.profile.profile.institution_id,
+            email_on_review: this.props.profile.profile.email_on_review,
+            email_on_submission: this.props.profile.profile.email_on_submission,
+            email_on_review_of_review: this.props.profile.profile.email_on_review_of_review,
+            copy_of_emails: this.props.profile.profile.copy_of_emails,
+            handle: this.props.profile.profile.handle,
+            timezonepref: this.props.profile.profile.timezonepref
+        }
     };
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 }
-handleSubmit(values) {
-    console.log('Current State is: ' + JSON.stringify(values));
-    alert('Current State is: ' + JSON.stringify(values));
+
+handleSubmit(event) {
+    this.props.editProfile(this.state.profileform);
+    console.log('Current State is: ' + JSON.stringify(this.state.profileform));
+    alert('Current State is: ' + JSON.stringify(this.state.profileform));
+    event.preventDefault();
+}
+
+handleInputChange(event) {
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+    this.setState({
+        profileform: {
+            [name]: value
+        }
+      });
 }
 render(){
     if(this.state.institutions === undefined || this.state.institutions === null)
@@ -38,61 +66,64 @@ render(){
                         <h1>User Profile Information</h1>
                     </div>   
                     <div className=" col-12 col-md-9">
-                     <Form model="profileForm" onSubmit={(values) => this.handleSubmit(values)}>
-                       <Row className="form-group">
+                     <Form onSubmit={this.handleSubmit}>
+                       <FormGroup row >
                               <Label htmlFor="fullname" md={3}>Full name (last, first[ middle]):</Label>
                               <Col md={3}>
-                                  <Control.text model=".fullname" id="fullname" name="fullname"
-                                      placeholder= {this.props.profile.profile.fullname}  
-                                      className="form-control"
+                                  <Input type="text" id="fullname" name="fullname"
+                                      value = {this.state.profileform.fullname}
+                                      onChange={this.handleInputChange} 
                                        />
                               </Col>
-                          </Row><br />
-                          <Row className="form-group">
+                          </FormGroup><br />     
+                          <FormGroup row>
                               <Label htmlFor="password" md={3}>Password</Label>
                               <Col md={3}>
-                                  <Control.text model=".password" id="password" name="password"
+                              <Input type="password" id="password" name="password"
                                       className="form-control"
+                                       value = {this.state.profileform.crypted_password}
+                                       onChange={this.handleInputChange}
                                        />
                               </Col>
-                          </Row><br />
-                          <Row className="form-group">
+                              </FormGroup><br /> 
+                          <FormGroup row>
                               <Label htmlFor="confirmpassword" md={3}>Confirm password:</Label>
                               <Col md={3}>
-                                  <Control.text model=".confirmpassword" id="confirmpassword" name="confirmpassword"
+                              <Input type="text" id="confirmpassword" name="confirmpassword"
                                       className="form-control"
                                        />
                               </Col>
-                          </Row><br />
+                            </FormGroup><br /> 
                           <font >If password field is blank, the password will not be updated.</font>
-                          <Row className="form-group">
+                          <FormGroup row>
                               <Label htmlFor="email" md={3}>E-mail address: </Label>
                               <Col md={3}>
-                                  <Control.text model=".email" id="email" name="email"
-                                      placeholder={this.props.profile.profile.email}
+                              <Input type="text" id="email" name="email"
                                       className="form-control"
+                                      value = {this.state.profileform.email}
+                                       onChange={this.handleInputChange}
                                        />
                               </Col>
-                          </Row><br />
-                          <Row className="form-group">
+                            </FormGroup><br /> 
+                         <FormGroup row>
                               <Label htmlFor="institution" md={3}>Institution: </Label>
                               <Col md={3}>
-                                <Control.select model=".institution" name="institution"
-                                        className="form-control" defaultValue = {this.state.institutions.filter((insti) => insti.id === this.props.profile.profile.institution_id)} >
+                                <select name="institution"  onChange={this.handleInputChange}
+                                        className="form-control" selected = {this.state.institutions.filter((insti) => insti.id === this.props.profile.profile.institution_id)} >
                                         {
                                              this.state.institutions.map( opt => <option id={opt.name} key= {opt.name} >{opt.name} </option>) 
                                         }
-                                    </Control.select>
+                                    </select>
                               </Col>
-                          </Row>
+                        </FormGroup><br /> 
                           <br /><br />
-                          <Row>
+                          <FormGroup row>
                               <Col>
                                     <h5>E-mail options</h5>
                                     <p>Check the boxes representing the times when you want to receive e-mail.</p>
                               </Col>      
-                          </Row>
-                         <Row className="form-group">
+                              </FormGroup><br /> 
+                          <FormGroup row>
                              <Col md={{size:5}}>
                                  <div className="form-check">
                                     <Label check>
@@ -104,13 +135,14 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".email_on_review" name="email_on_review"
+                                    <input type="checkbox" name="email_on_review"
                                              className="form-check-input"
-                                             defaultChecked={this.props.profile.profile.email_on_review} />  
+                                             defaultChecked={this.state.profileform.email_on_review}
+                                            onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
-                         </Row>
-                         <Row className="form-group">
+                             </FormGroup>
+                         <FormGroup row>
                              <Col md={{size: 5}}>
                                  <div className="form-check">
                                     <Label check>
@@ -122,13 +154,14 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".email_on_submission" name="email_on_submission"
+                                    <input type="checkbox"  name="email_on_submission"
                                              className="form-check-input"
-                                             defaultChecked={this.props.profile.profile.email_on_submission} />  
+                                             defaultChecked={this.state.profileform.email_on_submission}
+                                             onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
-                         </Row>
-                         <Row className="form-group">
+                             </FormGroup>
+                         <FormGroup row>
                              <Col md={{size: 5}}>
                                  <div className="form-check">
                                     <Label check>
@@ -140,13 +173,14 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".email_on_review_of_review" name="email_on_review_of_review"
+                                    <input type="checkbox" name="email_on_review_of_review"
                                              className="form-check-input" 
-                                             defaultChecked={this.props.profile.profile.email_on_review_of_review} />  
+                                             defaultChecked={this.state.profileform.email_on_review_of_review}
+                                             onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
-                         </Row> 
-                         <Row className="form-group">
+                             </FormGroup> 
+                         <FormGroup row>
                              <Col md={{size: 5}}>
                                  <div className="form-check">
                                     <Label check>
@@ -158,13 +192,14 @@ render(){
                              </Col>
                              <Col md={{size: 1}}>
                                 <div  className="form-check">
-                                    <Control.checkbox model=".copy_of_emails" name="copy_of_emails"
+                                    <input type="checkbox" name="copy_of_emails"
                                              className="form-check-input" 
-                                             defaultChecked={this.props.profile.profile.copy_of_emails}/>  
+                                             defaultChecked={this.state.profileform.copy_of_emails}
+                                             onChange={this.handleInputChange}/>  
                                 </div>    
                              </Col>
-                         </Row>                        
-                        <Row>
+                             </FormGroup>                        
+                         <FormGroup row>
                             <Col>
                                 <p><strong>Handle</strong></p>
                                     <p>A "handle" can be used to conceal your username from people who view your wiki pages. If you have a handle,
@@ -174,42 +209,49 @@ render(){
                                     <em>future</em> assignments.  To change your handle for a specific assignment, select that assignment and choose the <i>Change Handle</i>
                                     action.</p> 
                             </Col>
-                        </Row>    
-                        <Row className="form-group">
+                            </FormGroup>   
+                        <FormGroup row>
                             <Label htmlFor="handle" md={3}>Default Handle:</Label>
                             <Col md={3}>
-                                <Control.text model=".handle" id="handle" name="handle"
-                                    placeholder="Handle"
+                                <input type="text" id="handle" name="handle"
+                                    placeholder={this.props.profile.profile.handle}
+                                    value = {this.state.profileform.handle}
+                                    onChange={this.handleInputChange}
                                     className="form-control"
                                     />
                             </Col>
-                        </Row><br />
-                        <Row>
+                        </FormGroup><br /> 
+                        <FormGroup row>
                             <Col>
                                 <p>Specify a percent value greater than 0 in this field to receive notifications when a new review is 
                                         created which is outside the current range by the given amount.
                                         The value can be set on a per assignment, per questionnaire basis through the Manage Assignments page.
                                 </p> 
                             </Col>
-                        </Row>
-                        <Row className="form-group">
+                            </FormGroup><br /> 
+                        <FormGroup row>
                             <Label htmlFor="notification_percentage" md={3}>Notification Percentage: </Label>
                             <Col md={3}>
-                                <Control.text model=".notification_percentage" id="notification_percentage" name="notification_percentage"
+                                <input type="text" id="notification_percentage" name="notification_percentage"
                                     className="form-control"
+                                    placeholder={this.props.profile.aq.notification_limit}
+                                        value = {this.state.profileform.notification_limit}
+                                       onChange={this.handleInputChange}
                                     />
                             </Col>
                             <Label htmlFor="notification_percentage" > %</Label>
-                        </Row><br /> 
-                        <Row className="form-group">
+                            </FormGroup><br /> 
+                        <FormGroup row>
                             <Label htmlFor="timezone" md={3}>Preferred Time Zone:</Label>
                             <Col md={3}>
-                                <Control.text model=".timezone" id="timezone" name="timezone"
+                                <input type="text" id="timezone" name="timezone"
                                     placeholder={this.props.profile.profile.timezonepref}
+                                    value = {this.state.profileform.timezone}
+                                    onChange={this.handleInputChange}
                                     className="form-control"
                                     />
                             </Col>
-                        </Row><br /> 
+                            </FormGroup><br /> 
                         <Row className="form-group">
                             <Col md={{size:10}}>
                                 <Button type="submit">

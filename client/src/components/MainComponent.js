@@ -4,7 +4,7 @@ import Footer from './FooterComponent';
 import Profile from './ProfileComponent';
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import { connect } from 'react-redux';
-import { fetchProfile, fetchInstitutions } from '../redux/ActionCreators'; 
+import { fetchProfile, fetchInstitutions, editProfile } from '../redux/ActionCreators'; 
 
 const mapStateToProps = state => {
   return {
@@ -15,7 +15,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch =>({
   fetchProfile : () => {dispatch(fetchProfile())},
-  fetchInstitutions: () => {dispatch(fetchInstitutions())}
+  fetchInstitutions: () => {dispatch(fetchInstitutions())},
+  editProfile: (profile) =>{dispatch(editProfile(profile))}
 });
 class Main extends Component {
 
@@ -40,7 +41,7 @@ constructor(props){
           <Header />
           <Switch>
             <Route path ='/home' component={(HomePage)} />
-            <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} /> } />
+            <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } />
             <Redirect to="/home" />
           </Switch>
           <Footer />

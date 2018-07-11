@@ -33,6 +33,20 @@ handleSubmit(event) {
     alert('Current State is: ' + JSON.stringify(this.state.profileform));
     event.preventDefault();
 }
+componentDidMount() {
+    console.log(localStorage.getItem('jwt'))
+    axios({
+        method: 'get',
+        url: 'http://localhost:3001/api/v1/sessions',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => {
+        console.log('-----------------------------------data recieved is ')
+        console.log(JSON.stringify(response.data['user']))
+        console.log("-----------------------------------")
+    })
+    .catch(error => console.log(error))
+}
 
 handleInputChange(event) {
     const target = event.target;

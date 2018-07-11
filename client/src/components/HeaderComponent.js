@@ -49,9 +49,10 @@ class Header extends Component {
                                 </NavItem>
                             </Nav>
                             <Nav className="ml-auto" navbar>
-                                <NavItem>
+                                {/* <NavItem>
                                     <Button outline> Login</Button>
-                                </NavItem>
+                                </NavItem> */}
+                                <NavLink className="nav-link" to="/login">Login </NavLink>
                             </Nav>
                         </Collapse>
                 </Navbar>

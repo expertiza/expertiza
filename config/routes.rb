@@ -7,6 +7,12 @@ Expertiza::Application.routes.draw do
     resources :sessions, only: [:create, :index, :destroy]
     resources :profile
     resources :institution
+    resources :password_retrieval, only: [] do
+      collection do
+        post :forgottenPasswordSendLink
+        post :forgottenPasswordUpdatePassword
+      end
+    end
   end
 end
 

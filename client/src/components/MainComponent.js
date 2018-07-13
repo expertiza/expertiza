@@ -6,6 +6,7 @@ import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import { connect } from 'react-redux';
 import { fetchProfile, fetchInstitutions, editProfile } from '../redux/ActionCreators'; 
 import Login from './login/Login';
+import PasswordForgotten from './passwordForgotten/PasswordForgotten'
 
 const mapStateToProps = state => {
   return {
@@ -38,12 +39,13 @@ constructor(props){
         );
       }
     return (
-      <div >
+      <div  className="container-fluid">
           <Header />
           <Switch>
             <Route path ='/home' component={(HomePage)} />
             <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } />
             <Route path ='/login' component={(Login)} />
+            <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
             <Redirect to="/home" />
           </Switch>
           <Footer />

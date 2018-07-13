@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {  Label,  Col, Row, Button, Form,FormGroup, Input } from 'reactstrap';
-import {Control, Errors} from 'react-redux-form';
+// import {Control, Errors} from 'react-redux-form';
 import { Loading } from './LoadingComponent';
-import axios from 'axios';
+// import axios from 'axios';
 
 class Profile extends Component {
     constructor(props){

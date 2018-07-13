@@ -5,6 +5,7 @@ import { createForms } from 'react-redux-form';
 import { Profileform } from './profileform';
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
+import authReducer from './reducers/Auth';
 
 export const ConfigureStore = () => {
     const store = createStore(
@@ -13,7 +14,8 @@ export const ConfigureStore = () => {
             institutions: Institutions,
             ...createForms({
                 profileForm: Profileform
-            })
+            }),
+            auth: authReducer
         }),
         applyMiddleware(thunk, logger)
     );

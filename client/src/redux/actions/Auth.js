@@ -1,17 +1,12 @@
-import  * as actions from '..ActionTypes'
+import  * as actions from '../index'
 import axios from 'axios'
 
 
-export const authStart = () => {
-    return {
-        type: actions.AUTH_START
-    }
-}
-export const authSuccess = (idToken, localId) => {
+export const authSuccess = (jwt) => {
+    console.log('in auth success action')
     return {
         type: actions.AUTH_SUCCESS,
-        idToken : idToken,
-        localId: localId,
+        jwt : jwt,
     }
 }
 export const authFailure = (error) => {
@@ -21,68 +16,37 @@ export const authFailure = (error) => {
     }
 }
 
-// export const logOut = () => {
-//     localStorage.removeItem('token')
-//     localStorage.removeItem('userId')
-//     localStorage.removeItem('expirationDate')
-//     return {
-//         type: actions.AUTH_LOGOUT
-//     }
-// }
-
-
-
-export const auth = (email, password,isSignUp) => {
-    return dispatch => {
-        dispatch(authStart());
-        console.log(email, password, isSignUp)
-        const payload = { email: email, password: password, returnSecureToken : true}
-        let url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyDDSbfGxvn7zMJ4JScdzJXbxaXpq2cbrp4'
-        if(!isSignUp)
-            url = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyDDSbfGxvn7zMJ4JScdzJXbxaXpq2cbrp4'
-        axios.post(url, payload)
-        .then(response => { 
-            // console.log(response)
-            localStorage.setItem('token', response.data.idToken)
-            localStorage.setItem('expirationDate', new Date(new Date().getTime()+ response.data.expiresIn *1000))
-            localStorage.setItem('userId', response.data.localId)
-            dispatch(authSuccess(response.data.idToken, response.data.localId))
-            console.log('fa1'+response.data.expiresIn)
-            dispatch(checkAuthTimeout(response.data.expiresIn))
-        })
-        .catch(error => {
-            // console.log(error)
-            dispatch(authFailure(error.response.data.error))
-        })
-    }
-    
-}
-
-
-
-export const checkAuthTimeout = (expirationTime) => {
-    return dispatch => {
-        setTimeout( () => dispatch(logOut()) ,expirationTime * 1000 )
+export const logOut = () => {
+    localStorage.removeItem('jwt')
+    return {
+        type: actions.AUTH_LOGOUT
     }
 }
 
 
-export const authStateCheck = () => {
+
+export const auth = (name, password) => {
     return dispatch => {
-        const token = localStorage.getItem('token')
-        // console.log(token)
-        if(!token){
-            dispatch(logOut())
-        }else{
-            const expirationDate = new Date(localStorage.getItem('expirationDate'))
-            if(expirationDate <= new Date()){
-                dispatch(logOut())
-            }else{
-                const userId = localStorage.getItem('userId')
-                dispatch(authSuccess(token, userId))
-                dispatch(checkAuthTimeout( ( expirationDate.getTime() - new Date().getTime() )  /1000))
-            }
+        if(!localStorage.getItem('jwt')) {
+            axios({
+                method: 'post',
+                url: 'http://localhost:3001/api/v1/sessions',
+                headers: { "Content-Type": "application/json"},
+                data: {auth: { name: name, password: password }}
+            })
+            .then(response => {
+                console.log(response)
+                localStorage.setItem('jwt', response.data.jwt)
+                dispatch(authSuccess(response.data.jwt))
+            })
+            .catch(error => {
+                            console.log(error)
+                            alert('Invalid username or password')
+                            dispatch(actions.authFailure(error))
+                            } )
+        }else {
+            console.log('jwt exists allready')
+            dispatch(authSuccess(localStorage.getItem('jwt')))
         }
-
     }
 }

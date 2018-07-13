@@ -1,44 +1,51 @@
 module Api::V1
-class PasswordRetrievalController < BasicApiController
-  skip_before_action :authenticate
-  
-  def forgottenPasswordSendLink 
-    if  params[:user][:email].nil? || params[:user][:email].strip.empty?
-      render json: {status: ok , error: "Please enter an e-mail address." }
-    else
-      password_reset = true                              # need to ask ferry about token here
-      user = User.find_by(email: params[:user][:email])
-      if user 
-        token = SecureRandom.urlsafe_base64
-        console.log(token);
-        PasswordReset.save_token(user, token)
-        # url = self.request.base_url + url_format + token
-        MailerHelper.send_mail_to_user(user, "Expertiza password reset", "send_password", url).deliver_now
-        ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'A link to reset your password has been sent to users e-mail address.', request)
-        render json: { status: :ok}
-      else
-        render json: { stauts: 406}
-      end
-  end
+  class PasswordRetrievalController < BasicApiController
+    skip_before_action :verify_authenticity_token 
+    skip_before_action :authenticate
+    include MailerHelper
 
-  def forgottenPasswordUpdatePassword
-    if params[:reset][:password] == params[:reset][:repassword]
-      user = User.find_by(email: params[:reset][:email])
-      user.password = params[:reset][:password]
-      user.password_confirmation = params[:reset][:repassword]
-      if user.save
-        PasswordReset.delete_all(user_email: user.email)
-        ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
-        render json: {status: :ok}
+    def forgottenPasswordSendLink 
+      if  params[:user][:email].nil? || params[:user][:email].strip.empty?
+        render json: {status: ok , error: "Please enter an e-mail address." }
       else
-        ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, 'Password reset operation failed for the user while saving record', request)
-        render json: {status: 500, error: "Password cannot be updated. Please try again"}
+        password_reset = true                              # need to ask ferry about token here
+        user = User.find_by(email: params[:user][:email])
+        if user 
+          token = SecureRandom.urlsafe_base64
+          puts token
+          PasswordReset.save_token(user, token)
+          # url = self.request.base_url + url_format + token
+          # MailerHelper.send_mail_to_user(user, "Expertiza password reset", "send_password", url).deliver_now,  #, url).deliver_now
+          # ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'A link to reset your password has been sent to users e-mail address.', request)
+          render json: { status: :ok , token: token}
+        else
+          render json: { stauts: 406}
+        end
       end
-    else
-      ExpertizaLogger.error LoggerMessage.new(controller_name, "", 'Password provided by the user did not match', request)
-      render json: {status: 406, error: "Password and confirm-password do not match. Try again" }
+    end
+
+    def forgottenPasswordUpdatePassword
+      if params[:reset][:password] == params[:reset][:repassword]
+        user = User.find_by(email: params[:reset][:email])
+        user.password = params[:reset][:password]
+        user.password_confirmation = params[:reset][:repassword]
+        if user.save
+          PasswordReset.delete_all(user_email: user.email)
+          ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
+          render json: {status: :ok}
+        else
+          ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, 'Password reset operation failed for the user while saving record', request)
+          render json: {status: 500, error: "Password cannot be updated. Please try again"}
+        end
+      else
+        ExpertizaLogger.error LoggerMessage.new(controller_name, "", 'Password provided by the user did not match', request)
+        render json: {status: 406, error: "Password and confirm-password do not match. Try again" }
+      end
     end
   end
+end
+
+
 
   
   # def send_password
@@ -120,5 +127,3 @@ class PasswordRetrievalController < BasicApiController
   #     render template: "password_retrieval/reset_password"
   #   end
   # end
-  end
-end

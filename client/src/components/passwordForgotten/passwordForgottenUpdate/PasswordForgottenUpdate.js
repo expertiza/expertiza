@@ -1,10 +1,22 @@
 import React, { Component } from 'react'
+import querystring from 'query-string'
+import {connect} from 'react-redux'
+import {Redirect} from 'react-router-dom'
+import * as actions from '../../../redux/index'
 
 class PasswordForgottenUpdate extends Component {
     state = {
         email: '',
         Password: '',
-        rePassword: ''
+        rePassword: '',
+        token: ''
+    }
+
+    componentDidMount () {
+        console.log(this.props.location.search)
+        const queryStringObj = querystring.parse(this.props.location.search)
+        const token = queryStringObj.token
+        this.setState({token: token})
     }
 
     onEmailChangeHandler = (e) => {
@@ -20,41 +32,53 @@ class PasswordForgottenUpdate extends Component {
     }
 
     onSubmitPasswordUpdateHandler = () => {
-        
+        this.props.onForgetPasswordSubmit(this.state.email, this.state.password, this.state.rePassword, this.state.token)
     }
 
     render () {
-
-        return (
+        let output = (
             <div className="container" style={{marginTop: '10px'}}>
             <div className="row">
-                <div className="col-md-6">
-                <h4>Forgotten Your Password?</h4>
-                <div className="row">
-                    <div className="form-group">
-                        <label >Email</label>
-                        <input onChange={onEmailChangeHandler} className="form-control" id="usr" />
+                <div className="col-md-4">
+                    <div className="row">
+                        <div className="form-group">
+                            <label >Email </label>
+                            <input onChange={this.onEmailChangeHandler} className="form-control" id="usr" />
+                        </div>
+                        <br />
+                        <div className="form-group">
+                            <label >Password </label>
+                            <input onChange={this.onPasswordChangeHandler} className="form-control" id="usr" />
+                        </div>
+                        <br />
+                        <div className="form-group">
+                            <label >Confirm Password</label>
+                            <input onChange={this.onRePasswordChangeHandler} className="form-control" id="usr" />
+                        </div>
                     </div>
-                    <div className="form-group">
-                        <label >Enter new Password </label>
-                        <input onChange={onPasswordChangeHandler} className="form-control" id="usr" />
+                    <div className="row">
+                        <button type="submit" className="btn btn-danger" onClick={ this.onSubmitPasswordUpdateHandler }>Submit</button>
                     </div>
-                    <div className="form-group">
-                        <label >Enter the new Password Again </label>
-                        <input onChange={onRePasswordChangeHandler} className="form-control" id="usr" />
-                    </div>
-    
-                </div>
-                
-                <div className="row">
-                    <button type="submit" className="btn btn-danger" onSubmit={ this.onSubmitPasswordUpdateHandler }>Submit</button>
-                </div>
                 </div>
             </div>
         </div>
         )
+        output = this.props.isPasswordresetSuccess ?  <Redirect to="/login" /> : output ;
+        return output;
     }
     
 }
 
-export default PasswordForgottenUpdate;
+
+const mapStateToProps = state  => {
+    return {
+        isPasswordresetSuccess: state.auth.isPasswordresetSuccess
+    }
+}
+const mapDispatchToProps = dispatch => {
+    return {
+        onForgetPasswordSubmit: (name, password, repassword, token) => 
+                            dispatch(actions.forgetPasswordUpdate(name, password, repassword, token))
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(PasswordForgottenUpdate);

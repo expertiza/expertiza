@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import {connect } from 'react-redux';
+import * as actions from '../../redux/index'
 
 class PasswordForgotten extends Component {
     state = {
@@ -13,26 +14,30 @@ class PasswordForgotten extends Component {
 
     onEmailSubmit = () => {
         console.log('in email submit fhandler')
-        axios({
-            method: 'post',
-            url: 'http://localhost:3001/api/v1/password_retrieval/forgottenPasswordSendLink',
-            headers: { "Content-Type": "application/json"},
-            data: { "user": { "email" : this.state.email} }
-        })
-        .then(response => {
-            console.log(response)
-            // localStorage.setItem('jwt', response.data.jwt)
-            // this.props.history.push('/')
-        })
-        .catch(error => {
-                        console.log(error)
-                        alert('Something went wrong. adding the log: ', error)
-                        this.props.history.push('/login')
-                        } )
+       this.props.onEmailSubmitForPasswordReset(this.state.email)
     }
     
     render () {
-
+        let output = (
+            <div className="container" style={{marginTop: '10px'}}>
+                <div className="row">
+                    <div className="col-md-6">
+                    <h4>Forgotten Your Password?</h4>
+                    <div className="row">
+                        <div className="form-group">
+                            <label >Enter the e-mail address associated with your account:</label>
+                            <input onChange={this.onEmailChangeHandler} className="form-control" id="usr" />
+                        </div>
+                    </div>
+                    
+                    <div className="row">
+                        <button type="submit" className="btn btn-danger" onClick={this.onEmailSubmit}>Submit</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        )
+        output = this.props.passwordResetEmailSent ? <p>A link to reset your password has been sent to your e-mail address.</p> : output;
         return (
             <div className="container" style={{marginTop: '10px'}}>
                 <div className="row">
@@ -56,4 +61,15 @@ class PasswordForgotten extends Component {
     }
 }
 
-export default PasswordForgotten;
+const mapStateToProps = state => {
+    return {
+        passwordResetEmailSent: state.auth.passwordResetEmailSent
+    }
+}
+const mapDispatchToProps = dispatch => {
+    return {
+        onEmailSubmitForPasswordReset: (email) => dispatch(actions.passwordResetEmailSend(email))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PasswordForgotten);

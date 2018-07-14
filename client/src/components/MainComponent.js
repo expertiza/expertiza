@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { fetchProfile, fetchInstitutions, editProfile } from '../redux/ActionCreators'; 
 import Login from './login/Login';
 import PasswordForgotten from './passwordForgotten/PasswordForgotten'
+import PasswordForgottenUpdate from './passwordForgotten/passwordForgottenUpdate/PasswordForgottenUpdate'
 import Logout from './logout/Logout'
 
 const mapStateToProps = state => {
@@ -48,6 +49,7 @@ class Main extends Component {
             <Route path ='/login' component={(Login)} />
             <Route path ='/logout' component={(Logout)} />
             <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
+            <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />
             <Redirect to="/home" />
           </Switch>
           <Footer />

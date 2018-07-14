@@ -1,5 +1,6 @@
 module MailerHelper
   def self.send_mail_to_user(user, subject, partial_name, password)
+    puts user, subject , partial_name, password
     Mailer.generic_message ({
       to: user.email,
       subject: subject,

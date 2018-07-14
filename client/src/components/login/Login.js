@@ -1,6 +1,5 @@
 import React, { Component} from 'react';
 import { connect} from 'react-redux';
-import axios from 'axios';
 import {NavLink} from 'react-router-dom'
 import * as actions from '../../redux/index.js'
 import {Redirect} from 'react-router-dom'
@@ -47,7 +46,6 @@ class Login extends Component {
         let output =  ( <div className="container center" style= {{marginTop:'35px', marginLeft: '560px'}}>
                             <div className="row">
                                 <div className="col-md-6 col-md-offset-6">
-                                    <h4>{output} </h4>
                                     <h4> Welcome! </h4><br />
                                     <form onSubmit={this.onSubmitHandler}>
                                         <div className="form-group">

@@ -48,12 +48,12 @@ class PasswordForgottenUpdate extends Component {
                         <br />
                         <div className="form-group">
                             <label >Password </label>
-                            <input onChange={this.onPasswordChangeHandler} className="form-control" id="usr" />
+                            <input type="password" onChange={this.onPasswordChangeHandler} className="form-control" id="usr" />
                         </div>
                         <br />
                         <div className="form-group">
                             <label >Confirm Password</label>
-                            <input onChange={this.onRePasswordChangeHandler} className="form-control" id="usr" />
+                            <input type="password" onChange={this.onRePasswordChangeHandler} className="form-control" id="usr" />
                         </div>
                     </div>
                     <div className="row">

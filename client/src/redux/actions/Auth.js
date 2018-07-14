@@ -12,24 +12,24 @@ export const forgetPasswordUpdate = (email, password, repassword, token) => {
         })
         .then(response => {
             console.log(response)
+            alert('password reset successful')
             dispatch(actions.passwordResetSuccess())
         })
         .catch(error => {
                 console.log(error)
+                alert('password reset failed')
                 dispatch(actions.passwordResetFailure())
                } )
     }
 }
 
 export const passwordResetSuccess = () => {
-    console.log('in passrest success action')
     return {
         type: actions.PASSWORD_RESET_SUCCESS
     }
 }
 
 export const passwordResetFailure = () => {
-    console.log('in passrest failure action')
     return {
         type: actions.PASSWORD_RESET_FAILURE
     }
@@ -45,6 +45,7 @@ export const passwordResetEmailSend = (email) => {
         })
         .then(response => {
             console.log(response)
+            alert('password reset successful')
             dispatch(actions.forgetPasswordSendSuccess())
         })
         .catch(error => {
@@ -97,7 +98,6 @@ export const auth = (name, password) => {
                 data: {auth: { name: name, password: password }}
             })
             .then(response => {
-                console.log(response)
                 localStorage.setItem('jwt', response.data.jwt)
                 dispatch(authSuccess(response.data.jwt))
             })

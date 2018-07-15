@@ -1,7 +1,7 @@
 module Api::V1
     class BasicApiController <  ActionController::Base
-       protect_from_forgery with: :null_session
-        before_action :authenticate
+        # protect_from_forgery with: :null_session
+         before_action :authenticate
 
         def action_allowed?
             true

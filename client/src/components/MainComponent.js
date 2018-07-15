@@ -42,7 +42,10 @@ constructor(props){
           <Header />
           <Switch>
             <Route path ='/home' component={(HomePage)} />
-            <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } />
+            <Route path ='/profile' component={() => <Profile profile={this.props.profile} 
+                   institutions = {this.props.institutions}
+                   editProfile = {this.props.editProfile}/> } 
+                   profileErr = { this.props.profile.errMess } />
             <Route path ='/login' component={(Login)} />
             <Redirect to="/home" />
           </Switch>

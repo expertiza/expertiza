@@ -29,6 +29,11 @@ export const addProfile = (profile) => ({
     payload: profile
 });
 
+export const profileFailed = (errormess) => ({
+    type: ActionTypes.PROFILE_FAILED,
+    payload: errormess
+});
+
 export const editProfile = (profile)  => (dispatch) => {
 
     const newprofile = 
@@ -40,13 +45,27 @@ export const editProfile = (profile)  => (dispatch) => {
         url: baseUrl + 'profile/update', 
         body: JSON.stringify(newprofile), 
         headers: {
-             "AUTHORIZATION": "Bearer " + localStorage.getItem('jwt'),
-              "Content-Type": 'application/json'  
+             "AUTHORIZATION": "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0",
+             "Content-Type": 'application/json'  
             }
+    })
+    .then(response => {
+            if(response.ok){
+                return response;
+            }
+            else{
+                var error = new Error('Error ' + response.status + ": " + response.statusText);
+                error.reponse = response;
+                throw error;
+            }
+    }, 
+    error => {
+        var errmess = new Error(error.message);
+        throw errmess;
     })
     .then(response => console.log(response.data))
     .then(profile => dispatch(addProfile(profile)))
-    .catch(error => console.log(error));
+    .catch(error => dispatch(profileFailed(error.message)));
 }
 
 export const addInstitutions = (institutions) => ({

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {  Label,  Col, Row, Button, Form,FormGroup, Input } from 'reactstrap';
 import {Control, Errors} from 'react-redux-form';
 import { Loading } from './LoadingComponent';
+import  ServerMessage  from './ServerMessComponent';
 import axios from 'axios';
 
 class Profile extends Component {
@@ -45,7 +46,7 @@ handleInputChange(event) {
       });
 }
 render(){
-    if(this.state.institutions === undefined || this.state.institutions === null)
+    if(this.state.institutions === undefined || this.state.institutions === null || this.props.profile.profile === undefined || this.props.profile.profile === null)
     {
             return(
                 <div className ="profileform container-fluid">
@@ -62,6 +63,9 @@ render(){
         return(
          <div className ="profileform container-fluid">
              <div className="row row-content">
+                    <div className ="col-12">
+                        <ServerMessage  err = {this.props.profileErr} />
+                    </div>
                     <div className=" col-12">
                         <h1>User Profile Information</h1>
                     </div>   

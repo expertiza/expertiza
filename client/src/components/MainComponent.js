@@ -17,7 +17,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch =>({
   fetchProfile : () => {dispatch(fetchProfile())},
   fetchInstitutions: () => {dispatch(fetchInstitutions())},
-  editProfile: (profile) =>{dispatch(editProfile(profile))}
+  editProfile: (profile,aq) =>{dispatch(editProfile(profile,aq))}
 });
 class Main extends Component {
 

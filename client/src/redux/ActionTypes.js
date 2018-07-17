@@ -1,5 +1,7 @@
-export const PROFILE_FAILED = 'PROFILE_LOADING';
+export const PROFILE_FAILED = 'PROFILE_FAILED';
 export const ADD_PROFILE = 'ADD_PROFILE';
+export const EDIT_PROFILE= 'EDIT_PROFILE';
+
 export const ADD_INSTITUTIONS = 'ADD_INSTITUTIONS';
 
 export const AUTH_START = 'AUTH_START'

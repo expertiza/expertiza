@@ -1,14 +1,37 @@
 import React, { Component } from 'react';
 import {  Label,  Col, Row, Button, Form,FormGroup, Input } from 'reactstrap';
-// import {Control, Errors} from 'react-redux-form';
 import { Loading } from './LoadingComponent';
-// import axios from 'axios';
+import  ServerMessage  from './ServerMessComponent';
+import axios from 'axios';
 
 class Profile extends Component {
     constructor(props){
     super(props);
-   // console.log(this.props.profile.profile.fullname)
     this.state = {
+        institutions: [],
+        profileform : {
+            fullname: "" ,
+            crypted_password: "",
+            email: "",
+            institution_id: "",
+            email_on_review: "",
+            email_on_submission: "",
+            email_on_review_of_review: "",
+            copy_of_emails: "",
+            handle: "",
+            timezonepref: "",
+        },
+        aq : {
+            notification_limit: 0
+        },
+        isHidden: false
+    };
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+}
+
+componentDidMount(){
+    this.setState({
         institutions: this.props.institutions.institutions.institutions,
         profileform : {
             fullname: this.props.profile.profile.fullname,
@@ -20,17 +43,19 @@ class Profile extends Component {
             email_on_review_of_review: this.props.profile.profile.email_on_review_of_review,
             copy_of_emails: this.props.profile.profile.copy_of_emails,
             handle: this.props.profile.profile.handle,
-            timezonepref: this.props.profile.profile.timezonepref
+            timezonepref: this.props.profile.profile.timezonepref,
+        },
+        aq : {
+             notification_limit:  this.props.profile.aq.notification_limit
         }
-    };
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    });
 }
-
 handleSubmit(event) {
-    this.props.editProfile(this.state.profileform);
+
+    this.props.editProfile(this.state.profileform, this.state.aq);
     console.log('Current State is: ' + JSON.stringify(this.state.profileform));
     alert('Current State is: ' + JSON.stringify(this.state.profileform));
+    // this.setState({isHidden : true});
     event.preventDefault();
 }
 
@@ -45,7 +70,7 @@ handleInputChange(event) {
       });
 }
 render(){
-    if(this.state.institutions === undefined || this.state.institutions === null)
+    if(this.state.institutions === undefined || this.state.institutions === null || this.props.profile.profile === undefined || this.props.profile.profile === null)
     {
             return(
                 <div className ="profileform container-fluid">
@@ -62,6 +87,9 @@ render(){
         return(
          <div className ="profileform container-fluid">
              <div className="row row-content">
+                    <div className ="col-12">
+                        <ServerMessage  err = {this.props.profile.errMess} />
+                    </div>
                     <div className=" col-12">
                         <h1>User Profile Information</h1>
                     </div>   
@@ -137,7 +165,7 @@ render(){
                                 <div  className="form-check">
                                     <input type="checkbox" name="email_on_review"
                                              className="form-check-input"
-                                             defaultChecked={this.state.profileform.email_on_review}
+                                             checked={this.state.profileform.email_on_review}
                                             onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
@@ -156,7 +184,7 @@ render(){
                                 <div  className="form-check">
                                     <input type="checkbox"  name="email_on_submission"
                                              className="form-check-input"
-                                             defaultChecked={this.state.profileform.email_on_submission}
+                                             checked={this.state.profileform.email_on_submission}
                                              onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
@@ -175,7 +203,7 @@ render(){
                                 <div  className="form-check">
                                     <input type="checkbox" name="email_on_review_of_review"
                                              className="form-check-input" 
-                                             defaultChecked={this.state.profileform.email_on_review_of_review}
+                                             checked={this.state.profileform.email_on_review_of_review}
                                              onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
@@ -194,7 +222,7 @@ render(){
                                 <div  className="form-check">
                                     <input type="checkbox" name="copy_of_emails"
                                              className="form-check-input" 
-                                             defaultChecked={this.state.profileform.copy_of_emails}
+                                             checked={this.state.profileform.copy_of_emails}
                                              onChange={this.handleInputChange}/>  
                                 </div>    
                              </Col>
@@ -234,8 +262,7 @@ render(){
                             <Col md={3}>
                                 <input type="text" id="notification_percentage" name="notification_percentage"
                                     className="form-control"
-                                    placeholder={this.props.profile.aq.notification_limit}
-                                        value = {this.state.profileform.notification_limit}
+                                        value = {this.state.aq.notification_limit}
                                        onChange={this.handleInputChange}
                                     />
                             </Col>
@@ -245,8 +272,7 @@ render(){
                             <Label htmlFor="timezone" md={3}>Preferred Time Zone:</Label>
                             <Col md={3}>
                                 <input type="text" id="timezone" name="timezone"
-                                    placeholder={this.props.profile.profile.timezonepref}
-                                    value = {this.state.profileform.timezone}
+                                    value = {this.state.profileform.timezonepref}
                                     onChange={this.handleInputChange}
                                     className="form-control"
                                     />

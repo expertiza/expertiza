@@ -20,7 +20,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch =>({
   fetchProfile : () => {dispatch(fetchProfile())},
   fetchInstitutions: () => {dispatch(fetchInstitutions())},
-  editProfile: (profile) =>{dispatch(editProfile(profile))}
+  editProfile: (profile,aq) =>{dispatch(editProfile(profile,aq))}
 });
 class Main extends Component {
 
@@ -45,7 +45,10 @@ class Main extends Component {
           <Header />
           <Switch>
             <Route path ='/home' component={(HomePage)} />
-            <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } />
+            <Route path ='/profile' component={() => <Profile profile={this.props.profile} 
+                   institutions = {this.props.institutions}
+                   editProfile = {this.props.editProfile}/> } 
+                   profileErr = { this.props.profile.errMess } />
             <Route path ='/login' component={(Login)} />
             <Route path ='/logout' component={(Logout)} />
             <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />

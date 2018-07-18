@@ -8,7 +8,7 @@ import axios from 'axios';
 class Profile extends Component {
     constructor(props){
     super(props);
-   // console.log(this.props.profile.profile.fullname)
+    console.log(this.props.institutions.institutions.institutions)
     this.state = {
         institutions: this.props.institutions.institutions.institutions,
         profileform : {
@@ -23,7 +23,10 @@ class Profile extends Component {
             handle: this.props.profile.profile.handle,
             timezonepref: this.props.profile.profile.timezonepref
         }
+
+        
     };
+    console.log(this.state.institutions);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 }

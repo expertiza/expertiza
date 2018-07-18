@@ -24,6 +24,29 @@ export const fetchInstitutions = () =>(dispatch) => {
     .catch(error => console.log(error));
 }
 
+export const fetchStudentsTeamedWith = () =>(dispatch) => {
+    return axios ({
+        method : 'get',
+        url : baseUrl + 'student_tasks_list',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => dispatch(addStudentsTeamedWith(response.data.studentsTeamedWith[""])))
+    .catch(error => console.log(error));
+
+}
+
+export const fetchStudentTasks = () =>(dispatch) => {
+    return axios({
+        method: 'get',
+        url: baseUrl + 'student_tasks_list',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => response.data)
+    .then(studentTasks => dispatch(addStudentTasks(studentTasks)))
+    .catch(error => console.log(error));
+}
+
+
 export const addProfile = (profile) => ({
     type: ActionTypes.ADD_PROFILE,
     payload: profile
@@ -32,6 +55,16 @@ export const addProfile = (profile) => ({
 export const profileFailed = (errormess) => ({
     type: ActionTypes.PROFILE_FAILED,
     payload: errormess
+});
+
+export const addStudentsTeamedWith = (studentsTeamedWith) => ({
+    type: ActionTypes.ADD_STUDENTSTEAMEDWITH,
+    payload: studentsTeamedWith
+});
+
+export const addStudentTasks = (studentTasks) => ({
+    type: ActionTypes.ADD_STUDENTTASKS,
+    payload: studentTasks
 });
 
 export const editProfile = (profile)  => (dispatch) => {

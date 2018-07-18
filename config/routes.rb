@@ -7,6 +7,7 @@ Expertiza::Application.routes.draw do
     resources :sessions, only: [:create, :index, :destroy]
     resources :profile
     resources :institution
+    resources :student_tasks_list
   end
 end
 

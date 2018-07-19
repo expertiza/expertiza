@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import './assets/stylesheets/flash_messages.css'
 import Main from './components/MainComponent';
 import {BrowserRouter } from 'react-router-dom';
 

@@ -31,9 +31,9 @@ class Profile extends Component {
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-     this.handleBlur = this.handleBlur.bind(this);
-     this.handleConfirmpassword= this.handleConfirmpassword.bind(this);
-     this.handleNotificationChange = this.handleNotificationChange.bind(this);
+        this.handleBlur = this.handleBlur.bind(this);
+        this.handleConfirmpassword= this.handleConfirmpassword.bind(this);
+        this.handleNotificationChange = this.handleNotificationChange.bind(this);
 }
 
 validate(password, confirmpassword){
@@ -41,15 +41,13 @@ validate(password, confirmpassword){
         password: '',
         confirmpassword: ''
     }
-    if(this.state.touched.confirmpassword && this.state.profileform.password !== this.state.confirmpassword){
+    if(this.state.profileform.password !== this.state.confirmpassword){
         errors.confirmpassword = 'passwords do not match';
     }
     return errors;
 }
 handleSubmit(event) {
     this.props.editProfile(this.state.profileform, this.state.aq);
-    // console.log('Current State is: ' + JSON.stringify(this.state.profileform));
-    // alert('Current State is: ' + JSON.stringify(this.state.profileform));
     event.preventDefault();
 }
 handleConfirmpassword(event){
@@ -78,7 +76,6 @@ handleBlur = (field) => (evt) => {
     });
 }
 render(){
-    // console.log(this.state);
     const errors = this.validate(this.state.profileform.password, this.state.confirmpassword);
     if(this.state.institutions === undefined || this.state.institutions === null || this.state.profileform === undefined || this.state.profileform === null)
     {

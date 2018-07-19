@@ -56,7 +56,7 @@ export const editProfile = (profile,aq)  => (dispatch) => {
         headers
     })
     .then(response => {
-            if(response.status == 200){
+            if(response.status === 200){
                 return {response: response.data, servermsg: response.status};
             }
             else{

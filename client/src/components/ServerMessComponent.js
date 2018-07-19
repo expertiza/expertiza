@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import { Card, CardTitle} from 'reactstrap';
 
 class ServerMessage extends Component {
-    constructor(props){
-        super(props);
-    }
+
 render(){
     if(this.props.err === null && !this.props.saved)
     {

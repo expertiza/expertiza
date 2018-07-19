@@ -1,34 +1,34 @@
 require 'jwt'
 module Api::V1
-class SessionsController <  BasicApiController 
-    skip_before_action :verify_authenticity_token 
-    skip_before_action :authenticate, only: [:create]
-   
-    def create
-        user = User.find_by(email: auth_params[:email], name: "instructor6")
-        if user.valid_password?(auth_params[:password])
-          jwt = JWT.encode( {user: user.id},
-                            Rails.application.secrets.secret_key_base,
-                            'HS256')
-          render json: {jwt: jwt}
-        else
-            head(:unauthorized)
+    class SessionsController <  BasicApiController 
+        skip_before_action :verify_authenticity_token 
+        skip_before_action :authenticate, only: [:create]
+    
+        def create
+            user = User.find_by(name: auth_params[:name])
+            if user && user.valid_password?(auth_params[:password])
+            jwt = JWT.encode( {user: user.id},
+                                Rails.application.secrets.secret_key_base,
+                                'HS256')
+            render json: {jwt: jwt}
+            else
+                head(:unauthorized)
+            end
         end
-      end
-    
+        
 
-    def index
-        render json: {status: :ok, user: User.find(6)}
-    end
-    
+        def index
+            render json: {status: :ok, user: User.find(6)}
+        end
+        
 
-    def destroy
+        def destroy
 
-    end
+        end
 
-    private
+        private
         def auth_params
-          params.require(:auth).permit(:email, :password, :name)
+        params.require(:auth).permit( :password, :name)
         end
     end
 end

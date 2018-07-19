@@ -1,7 +1,7 @@
-import { Navbar, NavbarBrand, Nav, NavbarToggler, Collapse, NavItem,
-    Button } from 'reactstrap';
+import { Navbar, NavbarBrand, Nav, NavbarToggler, Collapse, NavItem } from 'reactstrap';
 import { NavLink } from 'react-router-dom';
 import React, { Component } from 'react';
+import {connect} from 'react-redux'
 
 class Header extends Component {
     constructor(props) {
@@ -52,7 +52,8 @@ class Header extends Component {
                                 {/* <NavItem>
                                     <Button outline> Login</Button>
                                 </NavItem> */}
-                                <NavLink className="nav-link" to="/login">Login </NavLink>
+                                { this.props.loggedIn ? <NavLink className="nav-link" to="/logout">LogOut </NavLink> :
+                                                        <NavLink className="nav-link" to="/login">Login </NavLink>}
                             </Nav>
                         </Collapse>
                 </Navbar>
@@ -60,4 +61,10 @@ class Header extends Component {
         );
     }
 }
-export default Header;
+
+const mapStateToProps = state => {
+    return {
+        loggedIn: state.auth.loggedIn
+    }
+}
+export default connect( mapStateToProps)(Header);

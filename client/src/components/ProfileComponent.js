@@ -1,55 +1,86 @@
 import React, { Component } from 'react';
-import {  Label,  Col, Row, Button, Form,FormGroup, Input } from 'reactstrap';
-import {Control, Errors} from 'react-redux-form';
+import {  Label,  Col, Button, Form,FormGroup, Input, FormFeedback } from 'reactstrap';
 import { Loading } from './LoadingComponent';
 import  ServerMessage  from './ServerMessComponent';
-import axios from 'axios';
 
 class Profile extends Component {
     constructor(props){
-    super(props);
-    console.log(this.props.institutions.institutions.institutions)
-    this.state = {
-        institutions: this.props.institutions.institutions.institutions,
-        profileform : {
-            fullname: this.props.profile.profile.fullname,
-            crypted_password: this.props.profile.profile.crypted_password,
-            email: this.props.profile.profile.email,
-            institution_id: this.props.profile.profile.institution_id,
-            email_on_review: this.props.profile.profile.email_on_review,
-            email_on_submission: this.props.profile.profile.email_on_submission,
-            email_on_review_of_review: this.props.profile.profile.email_on_review_of_review,
-            copy_of_emails: this.props.profile.profile.copy_of_emails,
-            handle: this.props.profile.profile.handle,
-            timezonepref: this.props.profile.profile.timezonepref
-        }
-
-        
-    };
-    console.log(this.state.institutions);
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+        super(props);
+        this.state = {
+            institutions: this.props.institutions.institutions.institutions,
+             profileform : {
+                fullname: this.props.profile.profile.fullname,
+                password: '',
+                email: this.props.profile.profile.email,
+                institution_id: this.props.profile.profile.institution_id,
+                email_on_review: this.props.profile.profile.email_on_review,
+                email_on_submission: this.props.profile.profile.email_on_submission,
+                email_on_review_of_review: this.props.profile.profile.email_on_review_of_review,
+                copy_of_emails: this.props.profile.profile.copy_of_emails,
+                handle: this.props.profile.profile.handle,
+                timezonepref: this.props.profile.profile.timezonepref,
+             },
+            aq : {
+                 notification_limit: this.props.profile.aq.notification_limit
+            },
+            touched: {
+                password: false,
+                confirmpassword: false
+            },
+            confirmpassword: ''
+        };
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+     this.handleBlur = this.handleBlur.bind(this);
+     this.handleConfirmpassword= this.handleConfirmpassword.bind(this);
+     this.handleNotificationChange = this.handleNotificationChange.bind(this);
 }
 
+validate(password, confirmpassword){
+    const errors = {
+        password: '',
+        confirmpassword: ''
+    }
+    if(this.state.touched.confirmpassword && this.state.profileform.password !== this.state.confirmpassword){
+        errors.confirmpassword = 'passwords do not match';
+    }
+    return errors;
+}
 handleSubmit(event) {
-    this.props.editProfile(this.state.profileform);
-    console.log('Current State is: ' + JSON.stringify(this.state.profileform));
-    alert('Current State is: ' + JSON.stringify(this.state.profileform));
+    this.props.editProfile(this.state.profileform, this.state.aq);
+    // console.log('Current State is: ' + JSON.stringify(this.state.profileform));
+    // alert('Current State is: ' + JSON.stringify(this.state.profileform));
     event.preventDefault();
 }
-
+handleConfirmpassword(event){
+    const value = event.target.value;
+    this.setState({
+        confirmpassword: value
+    });
+}
 handleInputChange(event) {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
+    var profileform = {...this.state.profileform};
+    profileform[name] = value;
+    this.setState({profileform})
+}
+handleNotificationChange(event){
+    const value = event.target.value;
+    var aq = {...this.state.aq};
+    aq['notification_limit'] =  value;
+    this.setState({aq});
+}
+handleBlur = (field) => (evt) => {
     this.setState({
-        profileform: {
-            [name]: value
-        }
-      });
+      touched: { ...this.state.touched, [field]: true },
+    });
 }
 render(){
-    if(this.state.institutions === undefined || this.state.institutions === null || this.props.profile.profile === undefined || this.props.profile.profile === null)
+    // console.log(this.state);
+    const errors = this.validate(this.state.profileform.password, this.state.confirmpassword);
+    if(this.state.institutions === undefined || this.state.institutions === null || this.state.profileform === undefined || this.state.profileform === null)
     {
             return(
                 <div className ="profileform container-fluid">
@@ -64,10 +95,10 @@ render(){
     }
     else{
         return(
-         <div className ="profileform container-fluid">
+          <div className ="profileform container-fluid">
              <div className="row row-content">
                     <div className ="col-12">
-                        <ServerMessage  err = {this.props.profileErr} />
+                        <ServerMessage  err = {this.props.profile.errMess} />
                     </div>
                     <div className=" col-12">
                         <h1>User Profile Information</h1>
@@ -78,7 +109,7 @@ render(){
                               <Label htmlFor="fullname" md={3}>Full name (last, first[ middle]):</Label>
                               <Col md={3}>
                                   <Input type="text" id="fullname" name="fullname"
-                                      value = {this.state.profileform.fullname}
+                                      value = { this.state.profileform.fullname }
                                       onChange={this.handleInputChange} 
                                        />
                               </Col>
@@ -87,18 +118,23 @@ render(){
                               <Label htmlFor="password" md={3}>Password</Label>
                               <Col md={3}>
                               <Input type="password" id="password" name="password"
-                                      className="form-control"
-                                       value = {this.state.profileform.crypted_password}
+                                       className="form-control"
                                        onChange={this.handleInputChange}
+                                       onBlur = {this.handleBlur('password')}
                                        />
                               </Col>
                               </FormGroup><br /> 
-                          <FormGroup row>
+                           <FormGroup row>
                               <Label htmlFor="confirmpassword" md={3}>Confirm password:</Label>
                               <Col md={3}>
                               <Input type="text" id="confirmpassword" name="confirmpassword"
                                       className="form-control"
+                                      onChange = {this.handleConfirmpassword}
+                                      valid = {errors.confirmpassword === ''}
+                                      invalid = {errors.confirmpassword !== ''}
+                                      onBlur = {this.handleBlur('confirmpassword')}
                                        />
+                              <FormFeedback>{errors.confirmpassword}</FormFeedback>       
                               </Col>
                             </FormGroup><br /> 
                           <font >If password field is blank, the password will not be updated.</font>
@@ -107,7 +143,7 @@ render(){
                               <Col md={3}>
                               <Input type="text" id="email" name="email"
                                       className="form-control"
-                                      value = {this.state.profileform.email}
+                                       value = {this.state.profileform.email}
                                        onChange={this.handleInputChange}
                                        />
                               </Col>
@@ -118,7 +154,7 @@ render(){
                                 <select name="institution"  onChange={this.handleInputChange}
                                         className="form-control" selected = {this.state.institutions.filter((insti) => insti.id === this.props.profile.profile.institution_id)} >
                                         {
-                                             this.state.institutions.map( opt => <option id={opt.name} key= {opt.name} >{opt.name} </option>) 
+                                             this.state.institutions.map(opt => <option id={opt.name} key= {opt.name} >{opt.name} </option>) 
                                         }
                                     </select>
                               </Col>
@@ -145,7 +181,7 @@ render(){
                                     <input type="checkbox" name="email_on_review"
                                              className="form-check-input"
                                              defaultChecked={this.state.profileform.email_on_review}
-                                            onChange={this.handleInputChange} />  
+                                             onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
                              </FormGroup>
@@ -163,8 +199,9 @@ render(){
                                 <div  className="form-check">
                                     <input type="checkbox"  name="email_on_submission"
                                              className="form-check-input"
-                                             defaultChecked={this.state.profileform.email_on_submission}
-                                             onChange={this.handleInputChange} />  
+                                             checked={this.state.profileform.email_on_submission}
+                                             onChange={this.handleInputChange}
+                                              />  
                                 </div>    
                              </Col>
                              </FormGroup>
@@ -182,7 +219,7 @@ render(){
                                 <div  className="form-check">
                                     <input type="checkbox" name="email_on_review_of_review"
                                              className="form-check-input" 
-                                             defaultChecked={this.state.profileform.email_on_review_of_review}
+                                             checked={this.state.profileform.email_on_review_of_review}
                                              onChange={this.handleInputChange} />  
                                 </div>    
                              </Col>
@@ -201,7 +238,7 @@ render(){
                                 <div  className="form-check">
                                     <input type="checkbox" name="copy_of_emails"
                                              className="form-check-input" 
-                                             defaultChecked={this.state.profileform.copy_of_emails}
+                                             checked={this.state.profileform.copy_of_emails}
                                              onChange={this.handleInputChange}/>  
                                 </div>    
                              </Col>
@@ -237,13 +274,12 @@ render(){
                             </Col>
                             </FormGroup><br /> 
                         <FormGroup row>
-                            <Label htmlFor="notification_percentage" md={3}>Notification Percentage: </Label>
+                            <Label htmlFor="notification_limit" md={3}>Notification Percentage: </Label>
                             <Col md={3}>
-                                <input type="text" id="notification_percentage" name="notification_percentage"
-                                    className="form-control"
-                                    placeholder={this.props.profile.aq.notification_limit}
-                                        value = {this.state.profileform.notification_limit}
-                                       onChange={this.handleInputChange}
+                                <input type="text" id="notification_limit" name="notification_limit"
+                                        className="form-control"
+                                        value = {this.state.aq.notification_limit }
+                                        onChange={this.handleNotificationChange}
                                     />
                             </Col>
                             <Label htmlFor="notification_percentage" > %</Label>
@@ -252,24 +288,23 @@ render(){
                             <Label htmlFor="timezone" md={3}>Preferred Time Zone:</Label>
                             <Col md={3}>
                                 <input type="text" id="timezone" name="timezone"
-                                    placeholder={this.props.profile.profile.timezonepref}
-                                    value = {this.state.profileform.timezone}
+                                    value = {this.state.profileform.timezonepref }
                                     onChange={this.handleInputChange}
                                     className="form-control"
                                     />
                             </Col>
-                            </FormGroup><br /> 
-                        <Row className="form-group">
-                            <Col md={{size:10}}>
-                                <Button type="submit">
-                                    Save
-                                </Button>
-                            </Col>
-                        </Row>         
+                            </FormGroup><br />
+                            <FormGroup row> 
+                                <Col md={{size:10}}>
+                                    <Button type="submit" disabled={errors.confirmpassword!==''}>
+                                        Save
+                                    </Button>
+                                </Col>
+                            </FormGroup>                
                     </Form>
                  </div>     
             </div>      
-        </div>
+         </div>
     );
     }
 }

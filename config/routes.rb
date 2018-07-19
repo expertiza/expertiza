@@ -8,6 +8,12 @@ Expertiza::Application.routes.draw do
     resources :profile
     resources :institution
     resources :student_tasks_list
+    resources :password_retrieval, only: [] do
+      collection do
+        post :forgottenPasswordSendLink
+        post :forgottenPasswordUpdatePassword
+      end
+    end
   end
 end
 

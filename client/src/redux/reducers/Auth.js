@@ -1,24 +1,30 @@
-import * as actionType from '../actions/index'
-import {updateObject}  from './utility'
+import * as actionType from '../index'
+import {updateObject}  from '../../shared/utility/utility'
 
 const initialize = {
-    idToken: null,
-    userId: null,
+    jwt: null,
     error: false,
-    loading: false,
+    loggedIn: false,
+    isPasswordresetSuccess: false,
+    passwordResetEmailSent: false
 }
 
 const authReducer = (state = initialize, action) => {
     switch (action.type) {
-        case actionType.AUTH_START:
-            return updateObject(state, {loading: true })
         case actionType.AUTH_SUCCESS:
-            return updateObject(state, {loading: false, error: false, userId: action.localId, idToken: action.idToken })
+            return updateObject(state, { error: false, jwt: action.jwt, loggedIn: true })
         case actionType.AUTH_FAILURE:
-            return updateObject(state, {loading: false, error: action.error })
+            return updateObject(state, { error: action.error, loggedIn: false })
         case actionType.AUTH_LOGOUT:
-            return updateObject(state, {idToken: null, userId: null})
-        
+            return updateObject(state, {jwt: null, loggedIn: false})
+        case actionType.PASSWORD_RESET_FAILURE:
+            return updateObject(state, {isPasswordresetSuccess: false})
+        case actionType.PASSWORD_RESET_SUCCESS:
+            return updateObject(state, {isPasswordresetSuccess: true })
+        case actionType.PASSWORD_RESET_EMAIL_SEND_SUCCESS:
+            return updateObject(state, { passwordResetEmailSent: true })
+        case actionType.PASSWORD_RESET_EMAIL_SEND_FAILURE:
+            return updateObject(state, {passwordResetEmailSent: false })
         default:
             return state;
     }

@@ -1,28 +1,10 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Card, CardTitle} from 'reactstrap';
 
+class ServerMessage extends Component {
 
-const SuccessCard = () => {
-    return (
-                <Card>
-                    <CardTitle>Update Successfull</CardTitle>
-                </Card>    
-    );
-}
-
-
-
-const ErrorCard = () => {
-    return (
-                <Card>
-                    <CardTitle>There was an error, Please try again!!</CardTitle>
-                </Card>    
-    );
-}
-
-const ServerMessage = (props) => {
-
-    if(props.err === null)
+render(){
+    if(this.props.err === null && !this.props.saved)
     {
             return (
                 <div className = "container">
@@ -31,14 +13,28 @@ const ServerMessage = (props) => {
                 </div>
             );
     }
-    else {
-        return(
+    else if(this.props.err === 200){
+        return (
             <div className = "container">
-                <div className = "row">     
-                    <SuccessCard />
+                <div className = "row"> 
+                    <Card>
+                        <CardTitle>Your profile was successfully updated.</CardTitle>
+                    </Card>        
                 </div>
             </div>
         );
     }
+    else{
+        return(
+            <div className = "container">
+                <div className = "row">     
+                <Card>
+                    <CardTitle>An error occurred and your profile could not updated.</CardTitle>
+                </Card>    
+                </div>
+            </div>
+        );
+        }
+}
 }
 export default ServerMessage;

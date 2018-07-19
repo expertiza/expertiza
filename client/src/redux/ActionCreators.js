@@ -8,7 +8,7 @@ export const fetchProfile = () =>(dispatch) => {
         url: baseUrl + 'profile',
         headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
-    .then(response => response.data)
+    .then(response => { return {response: response.data, servermsg : response.status} } )
     .then(profile => dispatch(addProfile(profile)))
     .catch(error => console.log(error));
 }
@@ -52,6 +52,11 @@ export const addProfile = (profile) => ({
     payload: profile
 });
 
+export const edit_profile = (profile) => ({
+    type: ActionTypes.EDIT_PROFILE,
+    payload: profile
+});
+
 export const profileFailed = (errormess) => ({
     type: ActionTypes.PROFILE_FAILED,
     payload: errormess
@@ -67,24 +72,26 @@ export const addStudentTasks = (studentTasks) => ({
     payload: studentTasks
 });
 
-export const editProfile = (profile)  => (dispatch) => {
 
+export const editProfile = (profile,aq)  => (dispatch) => {
     const newprofile = 
     {
-        user: profile
-    };  
+        user: profile,
+        assignment_questionnaire: aq
+    };
+    var headers = {
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + localStorage.getItem('jwt') 
+    }
     return axios({
         method: 'put',
         url: baseUrl + 'profile/update', 
-        body: JSON.stringify(newprofile), 
-        headers: {
-             "AUTHORIZATION": "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo2fQ.edz6wZkJeHqaZjBOtOLwO-9WSQIQo0RnQYBNl7AoTS0",
-             "Content-Type": 'application/json'  
-            }
+        data: JSON.stringify(newprofile), 
+        headers
     })
     .then(response => {
-            if(response.ok){
-                return response;
+            if(response.status === 200){
+                return {response: response.data, servermsg: response.status};
             }
             else{
                 var error = new Error('Error ' + response.status + ": " + response.statusText);
@@ -96,8 +103,7 @@ export const editProfile = (profile)  => (dispatch) => {
         var errmess = new Error(error.message);
         throw errmess;
     })
-    .then(response => console.log(response.data))
-    .then(profile => dispatch(addProfile(profile)))
+    .then(profile => dispatch(edit_profile(profile)))
     .catch(error => dispatch(profileFailed(error.message)));
 }
 

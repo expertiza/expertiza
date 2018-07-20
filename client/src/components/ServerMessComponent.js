@@ -4,12 +4,11 @@ import { Card, CardTitle} from 'reactstrap';
 class ServerMessage extends Component {
 
 render(){
-    if(this.props.err === null && !this.props.saved)
+    if(this.props.clicked === true)
     {
-            return (
-                <div>
-                </div>
-            );
+        return(
+            <div className="flash_error alert alert-error">An error occurred and your profile could not updated.</div>
+        );
     }
     else if(this.props.err === 200){
         return (
@@ -18,7 +17,7 @@ render(){
     }
     else{
             return(
-                <div className="flash_error alert alert-error">An error occurred and your profile could not updated.</div>
+                <div></div>
             );
         }
 }

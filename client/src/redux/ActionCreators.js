@@ -70,7 +70,7 @@ export const editProfile = (profile,aq)  => (dispatch) => {
         throw errmess;
     })
     .then(profile => dispatch(edit_profile(profile)))
-    .catch(error => dispatch(profileFailed(error.message)));
+    .catch(error => console.log(error));
 }
 
 export const addInstitutions = (institutions) => ({

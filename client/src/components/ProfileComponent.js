@@ -27,13 +27,15 @@ class Profile extends Component {
                 password: false,
                 confirmpassword: false
             },
-            confirmpassword: ''
+            confirmpassword: '',
+            save: false,
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
         this.handleConfirmpassword= this.handleConfirmpassword.bind(this);
         this.handleNotificationChange = this.handleNotificationChange.bind(this);
+        this.test = this.test.bind(this);
 }
 
 validate(password, confirmpassword){
@@ -47,8 +49,12 @@ validate(password, confirmpassword){
     return errors;
 }
 handleSubmit(event) {
-    this.props.editProfile(this.state.profileform, this.state.aq);
+    this.setState({ save: true}, ()=>{console.log(this.state.save); this.test()});
+    // this.props.editProfile(this.state.profileform, this.state.aq);
     event.preventDefault();
+}
+test(){
+    this.props.editProfile(this.state.profileform, this.state.aq);
 }
 handleConfirmpassword(event){
     const value = event.target.value;
@@ -95,7 +101,7 @@ render(){
           <div className ="profileform container-fluid">
              <div className="row row-content">
                     <div className ="col-12">
-                        <ServerMessage  err = {this.props.profile.errMess} />
+                        <ServerMessage  err = {this.props.profile.errMess} clicked={this.state.save}/>
                     </div>
                     <div className=" col-12">
                         <h1>User Profile Information</h1>

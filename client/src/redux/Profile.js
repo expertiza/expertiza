@@ -21,13 +21,9 @@ export const Profile = (state={ profile:{
         case ActionTypes.ADD_PROFILE:
             return {...state, profile: action.payload.response['user'], aq: action.payload.response['aq'], errMess: null};
         case ActionTypes.PROFILE_FAILED:
-            return {...state, errMess: action.payload };
+            return {...state };
         case ActionTypes.EDIT_PROFILE:
-            console.log(action.payload.servermsg);
-            if(action.payload.servermsg === 200)
-                return {...state, profile: action.payload.response['user'], aq: action.payload.response['aq'], errMess: action.payload.servermsg};
-            else
-                return {...state, errMess: action.payload.servermsg};   
+            return {...state, profile: action.payload.response['user'], aq: action.payload.response['aq'], errMess: action.payload.servermsg}; 
         default: 
             return state;
     }

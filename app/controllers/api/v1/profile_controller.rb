@@ -1,47 +1,38 @@
 module Api::V1
 class ProfileController < BasicApiController
-  # skip_before_action :authenticate, only: [:index]
+  #  skip_before_action :authenticate, only: [:index]
    
   def action_allowed?
     current_user
   end
 
   def index
-    puts '---------------------------------------------------'
     @user = current_user
     @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first
-    render json: { status: :ok, user: @user, aq: @assignment_questionnaire}
+     render json: { status: :ok, user: @user.as_json(except: [:crypted_password, :password_salt]), aq: @assignment_questionnaire}
+    # render json: @user.as_json(except: [:id])
   end   
-  # def edit
-  #   @user = session[:user]
-  #   render json: @user
-  #   @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first
-  # end
 
    def update
     params.permit!
     @user = current_user
-    puts @user
-    # puts params[:user]
-    unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?
-      aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
-      aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
+    @aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
+    unless (params[:user][:password].nil? or params[:user][:password].blank?)
+      puts Digest::SHA1.hexdigest(@user.password_salt+params[:user][:password])
+      @user.update_attribute('crypted_password', Digest::SHA1.hexdigest(@user.password_salt+params[:user][:password]))
     end
-    if @user.update_attributes(params[:user])
+    if( @user.update_attributes(params[:user].except!(:password)))
         ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, "Your profile was successfully updated.", request)
-        render json: { status: :ok, user: @user}
-       flash[:success] = 'Your profile was successfully updated.'
+        render json: { status: :ok, user: @user.as_json(except: [:crypted_password, :password_salt]), aq: @aq}
+        flash[:success] = 'Your profile was successfully updated.'
     else
        ExpertizaLogger.error LoggerMessage.new(controller_name, @user.name, "An error occurred and your profile could not updated.", request)
         render json: @user.errors, status: :unprocessable_entity
        flash[:error] = 'An error occurred and your profile could not updated.'
     end
-    #  render json: @user
-    # redirect_to controller: :profile, action: :show
    end
 
   private
-
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,

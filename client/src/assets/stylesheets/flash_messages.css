@@ -1,0 +1,44 @@
+.flash_success, .flash_note {
+  color: green;
+  border: 2px solid #0a0;
+  background-color: #8f8;
+  padding: 5px 20px 5px;
+  margin-bottom: 15px; }
+
+.flash_info {
+  color: #004;
+  border: 2px solid #00a;
+  background-color: #99f;
+  padding: 5px 20px 5px;
+  margin-bottom: 15px; }
+
+.flash_warn {
+  color: #330;
+  border: 2px solid #990;
+  background-color: #ff8;
+  padding: 5px 20px 5px;
+  margin-bottom: 15px; }
+
+.flash_error {
+  background-color: #fdd;
+  border: 2px solid #b30;
+  color: #510;
+  padding: 5px 20px 5px;
+  margin-bottom: 15px; }
+
+.errorExplanation {
+  background-color: #ffddd1;
+  border: 2px solid #b73204;
+  color: #571802;
+  padding: 5px 20px 5px;
+  margin-bottom: 15px; }
+
+.fieldWithErrors input {
+  background-color: #ffddd1; }
+
+.flash_notification {
+  color: #2a4810;
+  border: 2px solid #87aa96;
+  background-color: #bdfa8d;
+  padding: 5px 20px 5px;
+  margin-bottom: 15px; }

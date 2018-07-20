@@ -5,11 +5,26 @@ module Api::V1
     include MailerHelper
 
     def forgottenPasswordSendLink 
-      if  params[:user][:email].nil? || params[:user][:email].strip.empty?
-        render json: {status: ok , error: "Please enter an e-mail address." }
+      flag = false
+      if (!params[:user][:email].nil? )
+        if(params[:user][:email].strip.empty?)
+          flag = true
+        end
+      elsif(!params[:user][:username].nil?) 
+        if(params[:user][:username].strip.empty?)
+          flag = true
+        end
+      end
+
+      if flag
+        render json: {status: :ok , error: "Please enter an e-mail address." }
       else
-        password_reset = true                              # need to ask ferry about token here
-        user = User.find_by(email: params[:user][:email])
+        password_reset = true     
+        if(params[:user][:email].nil?)
+          user = User.find_by(name: params[:user][:username])
+        else 
+          user = User.find_by(email: params[:user][:email])
+        end
         if user 
           url_format = "/password_edit/check_reset_url?token="
           token = SecureRandom.urlsafe_base64

@@ -9,7 +9,8 @@ export {
     PASSWORD_RESET_SUCCESS,
     PASSWORD_RESET_FAILURE,
     PASSWORD_RESET_EMAIL_SEND_SUCCESS,
-    PASSWORD_RESET_EMAIL_SEND_FAILURE
+    PASSWORD_RESET_EMAIL_SEND_FAILURE,
+    FORGET_USERNAME
 } from './ActionTypes';
 
 export {
@@ -22,5 +23,6 @@ export {
     passwordResetFailure,
     passwordResetEmailSend,
     forgetPasswordSendSuccess,
-    forgetPasswordSendFailure
+    forgetPasswordSendFailure,
+    forgetUsername
 } from './actions/Auth'

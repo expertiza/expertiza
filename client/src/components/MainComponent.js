@@ -45,9 +45,9 @@ class Main extends Component {
           <Header />
           <Switch>
             <Route path ='/home' component={(HomePage)} />
-            <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } />
             <Route path ='/login' component={(Login)} />
             <Route path ='/logout' component={(Logout)} />
+            <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } />
             <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
             <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />
             <Redirect to="/home" />

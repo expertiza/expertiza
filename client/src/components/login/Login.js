@@ -41,6 +41,9 @@ class Login extends Component {
         this.setState({password: event.target.value})
     }
 
+    forgetUsernameHandler = () => {
+        this.props.onUsernameForget();
+    }
   
     render (){
         let output =  ( <div className="container center" style= {{marginTop:'35px', marginLeft: '560px'}}>
@@ -57,6 +60,9 @@ class Login extends Component {
                                                     onChange={this.usernameChangeHandler}
                                                     autoComplete={"on"}
                                                     />
+                                            <span>
+                                                <NavLink to="/password_retrieval/forgotten" onClick={this.forgetUsernameHandler} className="pull-right"> Forgot username?</NavLink>
+                                            </span>
                                         </div>
                                         <div className="form-group">
                                             <label >Password</label>
@@ -95,7 +101,8 @@ const mapStatetoProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onSubmit: (name, password) => {dispatch(actions.auth(name, password))}
+        onSubmit: (name, password) => {dispatch(actions.auth(name, password))},
+        onUsernameForget : () => {dispatch(actions.forgetUsername())}
     }
 }
 export default connect(mapStatetoProps, mapDispatchToProps)(Login);

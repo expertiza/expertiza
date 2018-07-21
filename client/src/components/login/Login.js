@@ -52,7 +52,7 @@ class Login extends Component {
                                     <h4> Welcome! </h4><br />
                                     <form onSubmit={this.onSubmitHandler}>
                                         <div className="form-group">
-                                            <label >username </label>
+                                            <label >Username </label>
                                             <input type="username" 
                                                     className="form-control" 
                                                     placeholder="Enter username" 

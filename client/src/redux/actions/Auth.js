@@ -20,7 +20,7 @@ export const forgetPasswordUpdate = (email, password, repassword, token) => {
         })
         .then(response => {
             console.log(response)
-            alert('password reset successful')
+            // alert('A password reset link has been sent to the address on file for this account.')
             dispatch(actions.passwordResetSuccess())
         })
         .catch(error => {

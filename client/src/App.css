@@ -31,3 +31,44 @@ a{
   margin-right: 0px;
   padding-right: 0px;
 }
+
+.taskbox {
+  padding: 5px;
+  margin-bottom: 39px;
+  border: 1px dashed #999999;
+  float: left;
+  font-size: 12px;
+  background: none repeat scroll 0pt 0pt #fafaea;
+}
+
+.tasknum {
+  color: #FFFFFF;
+  background-color: #B73204;
+}
+
+table.general {
+  border: 1px solid #999999;
+  border-collapse: collapse;
+}
+
+table.general th {
+  background-color: #cccccc;
+  border: 1px solid #999999;
+  padding: 3px;
+}
+
+table.general td {
+  border: 1px solid #999999;
+  padding: 3px;
+}
+.topictable {
+  float: left; margin-left: 0; font-size: 11px;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd){
+  background-color: #eeeeee !important;
+}
+
+.taskheader {
+  font-family: verdana; font-size: 13px; text-align:left;
+}

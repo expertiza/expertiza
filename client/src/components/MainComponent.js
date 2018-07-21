@@ -11,6 +11,7 @@ import Login from './login/Login';
 import PasswordForgotten from './passwordForgotten/PasswordForgotten'
 import PasswordForgottenUpdate from './passwordForgotten/passwordForgottenUpdate/PasswordForgottenUpdate'
 import Logout from './logout/Logout'
+import {StudentTaskView} from './studentTaskView/StudentTaskView'
 
 const mapStateToProps = state => {
   return {
@@ -62,6 +63,7 @@ class Main extends Component {
             <Route path = '/sign_up_sheet' component={SignupSheet}/>
             <Route path ='/login' component={(Login)} />
             <Route path ='/logout' component={(Logout)} />
+            <Route path ='/studentTaskView' component={(StudentTaskView)} />
             {/* <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } /> */}
             <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
             <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />

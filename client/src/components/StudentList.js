@@ -14,7 +14,7 @@ class StudentList extends Component {
         console.log(this.state.studentTasks.studentTasks);
     }
     render(){
-        const students = this.state.studentsTeamedWith;
+        // const students = this.state.studentsTeamedWith;
         // const student = this.state.studentsTeamedWith.map((d) => <li>{d}</li>);
         return(
             
@@ -53,7 +53,7 @@ class StudentList extends Component {
                     </tr>
                 </thead>
                 {
-                    this.state.studentTasks.studentTasks == undefined
+                    this.state.studentTasks.studentTasks === undefined
                     ? 'Loading.....'
                     :this.state.studentTasks.studentTasks.map(studentTask =>(
                         <tr>

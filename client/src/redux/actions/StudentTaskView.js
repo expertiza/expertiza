@@ -5,7 +5,7 @@ export const onLoad = (id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_tasks_view',
+            url: 'http://localhost:3001/api/v1/student_task/view',
             headers: { "Content-Type": "application/json",
                        AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "id": 17 }

@@ -26,5 +26,8 @@ module Api::V1
             !!request.env.fetch("HTTP_AUTHORIZATION", "").scan(/Bearer/).flatten.first
         end
 
+        def current_user_id?(user_id)
+            current_user.try(:id) == user_id
+        end
     end
 end

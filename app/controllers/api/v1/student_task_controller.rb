@@ -6,7 +6,7 @@ module Api::V1
         ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
       end
     
-      def index
+      def list
         @student_tasks = StudentTask.from_user current_user
         @student_tasks.select! {|t| t.assignment.availability_flag }
         # @student_task_array = []

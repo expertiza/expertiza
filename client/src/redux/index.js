@@ -28,8 +28,10 @@ export {
     passwordResetEmailSend,
     forgetPasswordSendSuccess,
     forgetPasswordSendFailure,
-    forgetUsername,
+    forgetUsername
+} from './actions/Auth'
+export {
     onLoad,
     loadSuccess,
     loadFailure
-} from './actions/Auth'
+} from './actions/StudentTaskView'

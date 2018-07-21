@@ -27,7 +27,7 @@ export const fetchInstitutions = () =>(dispatch) => {
 export const fetchStudentsTeamedWith = () =>(dispatch) => {
     return axios ({
         method : 'get',
-        url : baseUrl + 'student_tasks_list',
+        url : baseUrl + 'student_task/list',
         headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
     .then(response => dispatch(addStudentsTeamedWith(response.data.studentsTeamedWith[""])))
@@ -38,7 +38,7 @@ export const fetchStudentsTeamedWith = () =>(dispatch) => {
 export const fetchStudentTasks = () =>(dispatch) => {
     return axios({
         method: 'get',
-        url: baseUrl + 'student_tasks_list',
+        url: baseUrl + 'student_task/list',
         headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
     .then(response => response.data)

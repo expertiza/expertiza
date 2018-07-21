@@ -2,9 +2,9 @@ import { Alert } from 'reactstrap';
 import React, { Component } from 'react';
 
 class PublishingRights extends Component {
-    constructor(props) {
-        super(props);
-    }
+    // constructor(props) {
+    //     super(props);
+    // }
     render(){
         return(
             <div>

@@ -60,7 +60,7 @@ class StudentTaskView extends Component {
             panel = <div class="list-group col-md-5">
                        {
                         (this.props.topics.length === 0) ? 
-                             (this.props.authorization === 'participant' || this.props.authorization == 'submitter') ? 
+                             (this.props.authorization === 'participant' || this.props.authorization === 'submitter') ? 
                                     <li><NavLink to="#" 
                                         onClick = {this.signUpSheetHandler}
                                         class="list-group-item list-group-item-action">
@@ -69,7 +69,7 @@ class StudentTaskView extends Component {
                        } 
                        {/* ACS Here we need to know the size of the team to decide whether or not to display the label "Your team" in the student assignment tasks */}
                        {
-                        (this.props.assignment.max_team_size < 1) ? this.props.authorization == 'participant' ?
+                        (this.props.assignment.max_team_size < 1) ? this.props.authorization === 'participant' ?
                                     <li><NavLink to='#' 
                                                  onClick={this.view_student_teams_path_handler} 
                                                  class="list-group-item list-group-item-action" >
@@ -77,7 +77,7 @@ class StudentTaskView extends Component {
                        }
                        {/* Your Work */}
                        {
-                        (this.props.authorization == 'participant' || this.props.can_submit === true) ?
+                        (this.props.authorization === 'participant' || this.props.can_submit === true) ?
                              (this.props.topics.size > 0) ? 
                                     (this.props.topic_id && this.submission_allowed_handler) ?
                                         <NavLink to="#" onClick={this.your_work_handler} class="list-group-item list-group-item-action" > 'Your work' (Submit and view your work) </NavLink    > :

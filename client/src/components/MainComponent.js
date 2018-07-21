@@ -11,7 +11,7 @@ import Login from './login/Login';
 import PasswordForgotten from './passwordForgotten/PasswordForgotten'
 import PasswordForgottenUpdate from './passwordForgotten/passwordForgottenUpdate/PasswordForgottenUpdate'
 import Logout from './logout/Logout'
-import {StudentTaskView} from './studentTaskView/StudentTaskView'
+import StudentTaskView from './studentTaskView/StudentTaskView'
 
 const mapStateToProps = state => {
   return {

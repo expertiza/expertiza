@@ -16,25 +16,25 @@ module Api::V1
     def list
       @student_tasks = StudentTask.from_user current_user
       @student_tasks.select! {|t| t.assignment.availability_flag }
-      # @student_task_array = []
+      @student_task_array = []
       
-      # @student_tasks.each do |student_task|
-      #   hash = {}
-      #   student_task.instance_variables.each {|var| hash[var.to_s] = student_task.instance_variable_get(var) }
-      #   if(student_task.course_name) 
-      #     hash['course_name'] = student_task.course_name
-      #     puts hash
-      #   end
-      #   @student_task_array.push(hash)
-      # end
-      # student_task_to_json = @student_task_array.map{|s| {
-      #                             assignment: s["@assignment"] , 
-      #                             current_stage: s["@current_stage"],
-      #                             participant: s["@participant"] , 
-      #                             stage_deadline:s["@stage_deadline"], 
-      #                             topic:s["@topic"],
-      #                             course_name: s["course_name"]} 
-      #                         }
+      @student_tasks.each do |student_task|
+        hash = {}
+        student_task.instance_variables.each {|var| hash[var.to_s] = student_task.instance_variable_get(var) }
+        if(student_task.course_name) 
+          hash['course_name'] = student_task.course_name
+          puts hash
+        end
+        @student_task_array.push(hash)
+      end
+      student_task_to_json = @student_task_array.map{|s| {
+                                  assignment: s["@assignment"] , 
+                                  current_stage: s["@current_stage"],
+                                  participant: s["@participant"] , 
+                                  stage_deadline:s["@stage_deadline"], 
+                                  topic:s["@topic"],
+                                  course_name: s["course_name"]} 
+                              }
       
                               # #######Tasks and Notifications##################
       @tasknotstarted = @student_tasks.select(&:not_started?)
@@ -43,8 +43,8 @@ module Api::V1
       ######## Students Teamed With###################
       @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip])
 
-      # render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: student_task_to_json}
-      render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: @student_tasks}
+      render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: student_task_to_json}
+      # render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: @student_tasks}
     end
 
 

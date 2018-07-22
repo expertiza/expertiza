@@ -34,4 +34,11 @@ export {
     onLoad,
     loadSuccess,
     loadFailure
-} from './actions/StudentTaskView'
+} from './actions/StudentTaskView';
+export {
+    fetchProfile,
+    fetchInstitutions,
+    fetchStudentsTeamedWith,
+    fetchStudentTasks
+}
+from './ActionCreators'

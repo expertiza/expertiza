@@ -80,9 +80,7 @@ class StudentTaskView extends Component {
         // {:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id}
     }
 
-    participantChangeHandler = () => {
-        // {:controller => 'participants', :action => 'change_handle', :id => @participant.id}
-    }
+  
     render () {
 
         let assign_name;
@@ -113,7 +111,7 @@ class StudentTaskView extends Component {
                        
                        {
                         (this.props.assignment.max_team_size < 1) ? this.props.authorization === 'participant' ?
-                                <li><NavLink to='#' onClick={this.view_student_teams_path_handler} >
+                                <li><NavLink to={`/view_student_teams/${this.props.participant.id}`} >
                                         Your team (View and manage your team) </NavLink> </li> : null :null
                        }
                       
@@ -174,7 +172,7 @@ class StudentTaskView extends Component {
                         }
                         
    
-                        <li><NavLink to="#" onClick={this.participantChangeHandler}> Change your handle (Provide a different handle for this assignment)</NavLink></li>             
+                        <li><NavLink to="/changeHandle" > Change your handle (Provide a different handle for this assignment)</NavLink></li>             
                 
             </div>
 

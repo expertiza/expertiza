@@ -109,6 +109,10 @@ export const auth = (name, password) => {
             .then(response => {
                 localStorage.setItem('jwt', response.data.jwt)
                 dispatch(authSuccess(response.data.jwt))
+                dispatch(actions.fetchProfile())
+                dispatch(actions.fetchInstitutions())
+                dispatch(actions.fetchStudentsTeamedWith())
+                dispatch(actions.fetchStudentTasks())
             })
             .catch(error => {
                             console.log(error)

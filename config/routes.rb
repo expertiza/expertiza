@@ -21,8 +21,25 @@ Expertiza::Application.routes.draw do
         # get '/*other', to: redirect('/student_task/list')
       end
     end
-    # get 'student_tasks_list', to: 'student_task#index'
-    # post 'student_tasks_view', to: 'student_task#view'
+
+    resources :student_teams, only: %i[create edit update] do
+      collection do
+        post :view
+        get :remove_participant
+        get :auto_complete_for_user_name
+      end
+    end
+    resources :grades, only: %i[edit update] do
+      collection do
+        get :view
+        post :view_team
+        get :view_reviewer
+        get :view_my_scores
+        get :instructor_review
+        post :remove_hyperlink
+        post :save_grade_and_comment_for_submission
+      end
+    end
   end
 end
 

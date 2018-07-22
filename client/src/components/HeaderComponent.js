@@ -56,7 +56,8 @@ class Header extends Component {
                                     <Button outline> Login</Button>
                                 </NavItem> */}
                                 { this.props.loggedIn ? <NavLink className="nav-link" to="/logout">Log out </NavLink> :
-                                                        <NavLink className="nav-link" to="/login">Log in </NavLink>}
+                                                        null }
+                                                        {/* <NavLink className="nav-link" to="/login">Log in </NavLink>} */}
                             </Nav>
                         </Collapse>
                 </Navbar>

@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
+import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
+import { connect } from 'react-redux';
+
 import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import Profile from './ProfileComponent';
 import StudentList from './StudentList';
 import SignupSheet from './SignupSheet';
-import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
-import { connect } from 'react-redux';
-import { fetchProfile, fetchInstitutions, editProfile, fetchStudentsTeamedWith, fetchStudentTasks } from '../redux/ActionCreators'; 
+
+import {  editProfile } from '../redux/ActionCreators'; 
 import Login from './login/Login';
 import PasswordForgotten from './passwordForgotten/PasswordForgotten'
 import PasswordForgottenUpdate from './passwordForgotten/passwordForgottenUpdate/PasswordForgottenUpdate'
 import Logout from './logout/Logout'
 import StudentTaskView from './studentTaskView/StudentTaskView'
 // import ProfileComponent from './ProfileComponent';
+import StudentTeamComponent from './studentTeamComponent/StudentTeamComponent'
+import ChangeHandleComponent from './changeHandle/ChangeHandleComponent';
 
 const mapStateToProps = state => {
   return {
@@ -25,27 +29,20 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch =>({
-  fetchProfile : () => {dispatch(fetchProfile())},
-  fetchInstitutions: () => {dispatch(fetchInstitutions())},
-  fetchStudentsTeamedWith : () => {dispatch(fetchStudentsTeamedWith())},
-  fetchStudentTasks : () => {dispatch(fetchStudentTasks())},
+  //  *******************  fetchProfile, fetchInstitutions, fetchStudentsTeamedWith, fetchStudentTasks all these methods are added
+  //  in async call to logIn ******
   editProfile: (profile,aq) =>{dispatch(editProfile(profile,aq))}
 });
+
 class Main extends Component {
 
-// constructor(props){
-//     super(props);
-//   } 
-
   componentDidMount(){
-   if( this.props.loggedIn) {
-    this.props.fetchProfile();
-    this.props.fetchInstitutions();
-    this.props.fetchStudentsTeamedWith();
-    this.props.fetchStudentTasks();
-   } 
-  }
-  render() {
+    //  *******************  fetchProfile, fetchInstitutions, fetchStudentsTeamedWith, fetchStudentTasks all these methods are added 
+    // in async call to logIn ******
+    
+  } 
+
+   render() {
     const HomePage = () => {
         return(
                 <div className="main_content" align="center">
@@ -73,6 +70,8 @@ class Main extends Component {
                       studentTasks = {this.props.studentTasks}/>}/>
                 <Route path = '/sign_up_sheet' component={SignupSheet}/>
                 <Route path ='/logout' component={(Logout)} />
+                <Route path ='/view_student_teams/:id' component={(StudentTeamComponent)} />
+                <Route path ='/changeHandle' component={(ChangeHandleComponent)} />
                 <Route path ='/studentTaskView' component={(StudentTaskView)} />
                 <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
                 <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />

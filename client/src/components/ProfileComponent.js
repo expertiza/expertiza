@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import {  Label,  Col, Button, Form,FormGroup, Input, FormFeedback } from 'reactstrap';
 import { Loading } from './LoadingComponent';
 import  ServerMessage  from './ServerMessComponent';
+import TimezonePicker from 'react-bootstrap-timezone-picker';
+// import 'react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css';
 
 class Profile extends Component {
     constructor(props){
@@ -35,7 +37,8 @@ class Profile extends Component {
         this.handleBlur = this.handleBlur.bind(this);
         this.handleConfirmpassword= this.handleConfirmpassword.bind(this);
         this.handleNotificationChange = this.handleNotificationChange.bind(this);
-        this.test = this.test.bind(this);
+        this.performedit = this.performedit.bind(this);
+        this.handleChange = this.handleChange.bind(this);
 }
 
 validate(password, confirmpassword){
@@ -49,12 +52,19 @@ validate(password, confirmpassword){
     return errors;
 }
 handleSubmit(event) {
-    this.setState({ save: true}, ()=>{console.log(this.state.save); this.test()});
+    this.setState({ save: true}, ()=>{console.log(this.state.save); this.performedit()});
     // this.props.editProfile(this.state.profileform, this.state.aq);
     event.preventDefault();
 }
-test(){
+
+performedit(){
     this.props.editProfile(this.state.profileform, this.state.aq);
+}
+handleChange = (newValue) => {
+    var profileform = {...this.state.profileform};
+    profileform['timezonepref'] = newValue
+    this.setState({ profileform });
+
 }
 handleConfirmpassword(event){
     const value = event.target.value;
@@ -290,13 +300,19 @@ render(){
                         <FormGroup row>
                             <Label htmlFor="timezone" md={3}>Preferred Time Zone:</Label>
                             <Col md={3}>
-                                <input type="text" id="timezone" name="timezone"
+                                {/* <input type="text" id="timezone" name="timezone"
                                     value = {this.state.profileform.timezonepref }
                                     onChange={this.handleInputChange}
                                     className="form-control"
-                                    />
+                                    /> */}
+                                <TimezonePicker
+                                        absolute      = {false}
+                                        defaultValue  = { this.state.profileform.timezonepref }
+                                        placeholder   = "Select timezone..."
+                                        onChange      = {this.handleChange}
+                                />    
                             </Col>
-                            </FormGroup><br />
+                            </FormGroup><br />     
                             <FormGroup row> 
                                 <Col md={{size:10}}>
                                     <Button type="submit" disabled={errors.confirmpassword!==''}>

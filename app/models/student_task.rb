@@ -20,8 +20,8 @@ class StudentTask
     )
   end
 
-  def course_name
-    self.course.try :name
+  def self.from_participant_id(id)
+    from_participant AssignmentParticipant.find(id)
   end
   
   def self.from_participant_id(id)

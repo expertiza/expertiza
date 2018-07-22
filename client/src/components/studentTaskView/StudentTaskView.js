@@ -32,7 +32,10 @@ class StudentTaskView extends Component {
 // (@assignment.quiz_allowed(@topic_id)
     }
 
-    
+    unsubmitted_self_review = () => {
+        // unsubmitted_self_review?(@participant.id)
+    }
+
     grades_controller_view_team_helper = () => {
         // controller: 'grades', action: 'view_team', id: @participant.id
     }

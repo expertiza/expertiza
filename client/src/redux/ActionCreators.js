@@ -47,6 +47,12 @@ export const fetchStudentTasks = () =>(dispatch) => {
     .catch(error => console.log(error));
 }
 
+export const changeHandle = (handle_name) => {
+    return {
+        type: ActionTypes.CHANGE_HANDLE,
+        handle: handle_name
+    }
+}
 
 export const addProfile = (profile) => ({
     type: ActionTypes.ADD_PROFILE,

@@ -1,16 +1,21 @@
 import React, {Component} from 'react';
-import Aux from '../hoc/Aux/Aux'
+// import Aux from '../hoc/Aux/Aux'
 import {NavLink} from 'react-router-dom';
+import {connect} from 'react-redux';
+// import * as actions from '../../redux/index';
 
 class ChangeHandleComponent extends Component {
-
-    state = {
-        handle_name : ''
-    }
+    state = { profile : this.props.profile,
+                aq: this.props}
+  
 
     handleNameChangeHandler = (e) => {
+        this.setState({handle: e.target.value})
+    }
+
+    onSubmitHandler = (e) => {
         e.preventDefault();
-        this.setState({handle_name: e.target.value});
+        this.props.onSubmit(this.state.handle)
     }
     render () {
 
@@ -20,7 +25,6 @@ class ChangeHandleComponent extends Component {
                     <div style={{padding: '20px'}}>
                         <h1>Create or Change Handle for Current Assignment</h1>
                     </div>
-                    {/* <%= form_tag({:action => 'change_handle', :id =>  @participant}) do %> */}
                     <p>Your <strong>handle</strong> is the way you will be known to your reviewers.</p>
                     <p>For example, if you are writing on a wiki, you might not want to use your Expertiza user-ID to show up on the
                     wiki, because then your reviewers would know who they are reviewing. So, you are allowed to set up a handle instead.
@@ -37,11 +41,16 @@ class ChangeHandleComponent extends Component {
                     </p>
                     <p>Change handle <em>for current assignment</em>:</p>
                     <div className="form-group">
-                        <input className="form-control" value={this.state.handle_name} onChange={this.handleNameChangeHandler}/>
+                        <input  className="form-control" 
+                                value={this.props.handle_name}
+                                onChange={this.handleNameChangeHandler}/>
                     </div>
                     <p><em>Warning:</em> You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff.</p>
                     <div style={{ marginTop: '20px'}}>
-                        <button type="submit" className="btn btn-success">Save</button>
+                        <button type="submit"
+                                className="btn btn-success"
+                                onSubmit={this.onSubmitHandler}
+                                >Save</button>
                     </div>
                 </form>
             </div>
@@ -49,5 +58,16 @@ class ChangeHandleComponent extends Component {
     }
 }
 
+const mapStatetoProps = state => {
+    return {
+        profile: state.profile.profile,
+        aq: state.profile.aq
+    }
+}
 
-export default ChangeHandleComponent;
+const mapDispatchToProps = dispatch => {
+    return {
+        onSubmit: (handle_name) => {dispatch()},
+    }
+}
+export default connect(mapStatetoProps,mapDispatchToProps)(ChangeHandleComponent);

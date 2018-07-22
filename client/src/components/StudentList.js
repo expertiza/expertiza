@@ -47,7 +47,7 @@ class StudentList extends Component {
                     <th>Review Grade</th>
                     <th>Badges</th>
                     <th>Stage Deadline<img src='assets/images/info.png' 
-                     title="You can change 'Prefered time Zone' in 'Profile' in the banner. ">
+                     title="You can change 'Prefered time Zone' in 'Profile' in the banner. " alt="img">
                     </img></th>  
                     <th>Publishing Rights</th>                  
                     </tr>

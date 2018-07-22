@@ -17,6 +17,10 @@ import StudentTaskView from './studentTaskView/StudentTaskView'
 // import ProfileComponent from './ProfileComponent';
 import StudentTeamComponent from './studentTeamComponent/StudentTeamComponent'
 import ChangeHandleComponent from './changeHandle/ChangeHandleComponent';
+import SignUpSheetComponent from './signUpSheet/SignUpSheetComponent'
+import SubmittedContentEditComponent from './submittedContentEdit/SubmittedContentEditComponent';
+import StudentQuizzesComponent from './studentQuizzes/StudentQuizzesComponent';
+
 
 const mapStateToProps = state => {
   return {
@@ -54,13 +58,7 @@ class Main extends Component {
       <div  className="container-fluid">
           <Header />
           <Switch>
-            { !this.props.loggedIn ? 
-                    <div>
-                      <Route exact path ='/' component={Login} />
-                      <Route path ='/login' component={(Login)} />
-                    </div> : null }
-            
-                {/* <Route path ='/' exact component={(HomePage)} /> */}
+                { !this.props.loggedIn ? <Route path ='/' component={Login} /> : null }
                 <Route path ='/home'  component={(HomePage)} /> 
                 <Route path ='/profile' component={() => <Profile profile={this.props.profile} 
                       institutions = {this.props.institutions}
@@ -71,6 +69,9 @@ class Main extends Component {
                 <Route path = '/sign_up_sheet' component={SignupSheet}/>
                 <Route path ='/logout' component={(Logout)} />
                 <Route path ='/view_student_teams/:id' component={(StudentTeamComponent)} />
+                <Route path ='/sign_up_sheet_list/:id' component={(SignUpSheetComponent)} />
+                <Route path ='/submitted_content/:id/edit' component={(SubmittedContentEditComponent)} />
+                <Route path ='/student_quizzes/:id' component={(StudentQuizzesComponent)} />
                 <Route path ='/changeHandle' component={(ChangeHandleComponent)} />
                 <Route path ='/studentTaskView' component={(StudentTaskView)} />
                 <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />

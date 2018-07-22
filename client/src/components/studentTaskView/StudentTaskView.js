@@ -9,22 +9,6 @@ class StudentTaskView extends Component {
         this.props.onLoad();
     }
 
-    signUpSheetHandler = () =>  {
-
-    }
-
-    view_student_teams_path_handler = () => {
-        // view_student_teams_path(student_id: @participant.id)
-    }
-
-    submission_allowed_handler = () => {
-        // assignment.submission_allowed(this.topic_id)
-        return true
-    }
-
-    your_work_handler = () => {
-        // :controller => 'submitted_content', :action => 'edit', :id => @participant.id
-    }
 
     student_review_handler = () => {
 // ,{:controller => 'student_review', :action => 'list', :id => @participant.id} 
@@ -38,19 +22,6 @@ class StudentTaskView extends Component {
             alias_name = "Your readings"
         }
         return alias_name
-    }
-
-    check_reviewable_topics = () => {
-// check_reviewable_topics(@assignment)
-    }
-
-    metareview_allowed = () => {
-        //  @assignment.metareview_allowed(nil)  
-    }
-
-    get_current_stage = () => {
-    // @assignment.get_current_stage(@topic_id) 
-    return true
     }
 
     student_quizzes_handler = () => {
@@ -98,12 +69,11 @@ class StudentTaskView extends Component {
             link = ( this.props.assignment.spec_location && this.props.assignment.spec_location.length > 0 ) ?
                   <NavLink className="nav-link" to="#assignment.spec_location">Assignment Description</NavLink> : null;
                    
-            panel = <div class="list-group col-md-5" style={{ marginLeft: '15px'}}>
-                       
+            panel = <div class="list-group col-md-7 offset-md-1">
                        {
                         (this.props.topics.length === 0) ? 
                              (this.props.authorization === 'participant' || this.props.authorization === 'submitter') ? 
-                                <li><NavLink to="#" onClick = {this.signUpSheetHandler} > Signup sheet (Sign up for a topic)
+                             <li><NavLink to={`/sign_up_sheet_list/${this.props.participant.id}`} > Signup sheet (Sign up for a topic)
                                     </NavLink></li> :null :null
                        } 
                        
@@ -120,11 +90,11 @@ class StudentTaskView extends Component {
                        {
                         (this.props.authorization === 'participant' || this.props.can_submit === true) ?
                              (this.props.topics.size > 0) ? 
-                                    (this.props.topic_id && this.submission_allowed_handler) ?
-                                        <li><NavLink to="#" onClick={this.your_work_handler} > 'Your work' (Submit and view your work) </NavLink></li> :
+                                    (this.props.topic_id && this.props.submission_allowed) ?
+                                        <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > 'Your work' (Submit and view your work) </NavLink></li> :
                                         <li><font color="gray">Your work</font> <span>(You have to choose a topic first)</span></li>
                            :
-                            (this.submission_allowed_handler) ?  <li><NavLink to="#" onClick={this.your_work_handler}  > Your work (Submit and view your work) </NavLink></li>
+                            (this.props.submission_allowed || true) ? <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > Your work (Submit and view your work) </NavLink></li>
                                 :<li><font color="gray">Your work</font> <span>(You are not allowed to submit your work right now)</span></li>
                         : null 
                        }
@@ -132,7 +102,7 @@ class StudentTaskView extends Component {
                             screen.--> */}
 
                         {(this.props.authorization === 'participant' || this.props.can_review) ? 
-                                 (this.check_reviewable_topics() || this.metareview_allowed() || this.get_current_stage() === "Finished") ?             
+                                 (this.props.check_reviewable_topics || this.props.metareview_allowed || this.props.get_current_stage === "Finished") ?             
                                   <li><NavLink to="#" onClick={this.student_review_handler} > { this.getAliasName()} </NavLink></li>:
                                   <li><font color="gray">{this.getAliasName()}</font> <span>  (Give feedback to others on their work)</span></li>
                                 : null
@@ -140,10 +110,10 @@ class StudentTaskView extends Component {
                        
                         {/* <!--Quiz--> */}
                         
-                        {(this.props.assignment.require_quiz)? 
+                        {(this.props.assignment.require_quiz )? 
                             (this.props.authorization === 'participant' || this.props.can_take_quiz ) ?
-                                (this.props.assignment.require_quiz && (this.quiz_allowed() || this.get_current_stage() === "Finished")) ?
-                                    <li><NavLink to="#" onClick={this.student_quizzes_handler} > Take quizzes (Take quizzes over the work you have read) </NavLink></li> :
+                                (this.props.assignment.require_quiz && (this.quiz_allowed() || this.props.get_current_stage === "Finished")) ?
+                                    <li><NavLink to={`/student_quizzes/${this.props.participant.id}`} > Take quizzes (Take quizzes over the work you have read) </NavLink></li> :
                                     <li><font color="gray">Take quizzes</font><span> (Take quizzes over the work you have read)</span></li> 
                                 :null
                             : null
@@ -167,7 +137,7 @@ class StudentTaskView extends Component {
                          }
                         
                         {/*  removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id) */}
-                        { (this.get_current_stage() === "Complete") ? 
+                        { (this.props.get_current_stage === "Complete") ? 
                             <li><NavLink to="#" onClick={this.takeASurvey} >Take a survey </NavLink> </li>:null
                         }
                         
@@ -184,9 +154,12 @@ class StudentTaskView extends Component {
 
         return (
             <div className="container-fluid left">
+                
                 {assign_name}
                 {link}
+                <div className="row">
                 {panel}
+                </div>
             </div>
         )
     }
@@ -207,7 +180,11 @@ const mapStateToProps = state => {
         topic_id: state.studentTaskView.topic_id,
         topics: state.studentTaskView.topics,
         timeline_list: state.studentTaskView.timeline_list,
-        loaded: state.studentTaskView.loaded
+        loaded: state.studentTaskView.loaded,
+        submission_allowed: state.studentTaskView.submission_allowed,
+        check_reviewable_topics: state.studentTaskView.check_reviewable_topics,
+        metareview_allowed: state.studentTaskView.metareview_allowed,
+        get_current_stage: state.studentTaskView.get_current_stage
     }
 }
 

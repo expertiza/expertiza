@@ -15,6 +15,11 @@ export {
     STUDENT_TASK_VIEW_FAILURE,
     ADD_STUDENTSTEAMEDWITH,
     ADD_STUDENTTASKS,
+    CHANGE_HANDLE,
+    STUDENT_TASK_VIEW_SUBMISSION_ALLOWED,
+    STUDENT_TASK_VIEW_CHECK_REVIEWABLE_TOPICS,
+    STUDENT_TASK_VIEW_METAREVIEW_ALLOWED,
+    STUDENT_TASK_VIEW_GET_CURRENT_STAGE
 } from './ActionTypes';
 
 export {
@@ -33,12 +38,21 @@ export {
 export {
     onLoad,
     loadSuccess,
-    loadFailure
+    loadFailure,
+    submission_allowed,
+    submission_allowed_success,
+    metareview_allowed,
+    metareview_allowed_success,
+    check_reviewable_topics,
+    check_reviewable_topics_success,
+    get_current_stage,
+    get_current_stage_success
 } from './actions/StudentTaskView';
 export {
     fetchProfile,
     fetchInstitutions,
     fetchStudentsTeamedWith,
-    fetchStudentTasks
+    fetchStudentTasks,
+    changeHandle
 }
 from './ActionCreators'

@@ -18,7 +18,6 @@ module Api::V1
       
           ######## Students Teamed With###################
           @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip])
-
          render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: @student_tasks}
              
       end

@@ -15,6 +15,7 @@ export const onLoad = (id) => {
             if(response.data.denied) {
                 dispatch(actions.loadFailure())
             }else {
+                console.log(response.data)
                 dispatch(actions.loadSuccess(response.data));
             }
         })

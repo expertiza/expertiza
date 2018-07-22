@@ -12,13 +12,15 @@ import PasswordForgotten from './passwordForgotten/PasswordForgotten'
 import PasswordForgottenUpdate from './passwordForgotten/passwordForgottenUpdate/PasswordForgottenUpdate'
 import Logout from './logout/Logout'
 import StudentTaskView from './studentTaskView/StudentTaskView'
+// import ProfileComponent from './ProfileComponent';
 
 const mapStateToProps = state => {
   return {
     profile: state.profile,
     institutions : state.institutions,
     studentsTeamedWith : state.studentsTeamedWith,
-    studentTasks : state.studentTasks
+    studentTasks : state.studentTasks,
+    loggedIn : state.auth.loggedIn
   }
 }
 
@@ -36,10 +38,12 @@ class Main extends Component {
 //   } 
 
   componentDidMount(){
+   if( this.props.loggedIn) {
     this.props.fetchProfile();
     this.props.fetchInstitutions();
     this.props.fetchStudentsTeamedWith();
     this.props.fetchStudentTasks();
+   } 
   }
   render() {
     const HomePage = () => {
@@ -53,21 +57,26 @@ class Main extends Component {
       <div  className="container-fluid">
           <Header />
           <Switch>
-            <Route path ='/home' component={(HomePage)} />
-            <Route path ='/profile' component={() => <Profile profile={this.props.profile} 
-                   institutions = {this.props.institutions}
-                   editProfile = {this.props.editProfile}/> } 
-                   profileErr = { this.props.profile.errMess } />
-            <Route path = '/studentlist' component={() => <StudentList studentsTeamedWith={this.props.studentsTeamedWith}
-                  studentTasks = {this.props.studentTasks}/>}/>
-            <Route path = '/sign_up_sheet' component={SignupSheet}/>
-            <Route path ='/login' component={(Login)} />
-            <Route path ='/logout' component={(Logout)} />
-            <Route path ='/studentTaskView' component={(StudentTaskView)} />
-            {/* <Route path ='/profile' component={() => <Profile profile={this.props.profile} institutions = {this.props.institutions} editProfile = {this.props.editProfile}/> } /> */}
-            <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
-            <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />
-            <Redirect to="/home" />
+            { !this.props.loggedIn ? 
+                    <div>
+                      <Route exact path ='/' component={Login} />
+                      <Route path ='/login' component={(Login)} />
+                    </div> : null }
+            
+                {/* <Route path ='/' exact component={(HomePage)} /> */}
+                <Route path ='/home'  component={(HomePage)} /> 
+                <Route path ='/profile' component={() => <Profile profile={this.props.profile} 
+                      institutions = {this.props.institutions}
+                      editProfile = {this.props.editProfile}/> } 
+                      profileErr = { this.props.profile.errMess } />
+                <Route path =  '/studentlist' component={() => <StudentList studentsTeamedWith={this.props.studentsTeamedWith}
+                      studentTasks = {this.props.studentTasks}/>}/>
+                <Route path = '/sign_up_sheet' component={SignupSheet}/>
+                <Route path ='/logout' component={(Logout)} />
+                <Route path ='/studentTaskView' component={(StudentTaskView)} />
+                <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
+                <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />
+              <Redirect to="/home" />
           </Switch>
           <Footer />
       </div>

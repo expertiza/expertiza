@@ -23,7 +23,10 @@ class Header extends Component {
                         <NavbarToggler onClick={this.toggleNav} />
                         <NavbarBrand className="ml-0" href="/"><img src='assets/images/logo.png' height="65" width="143" alt='Expertiza' /></NavbarBrand>
                         <Collapse isOpen={this.state.isNavOpen} navbar>
-                            <Nav navbar>
+                            {this.props.loggedIn ?  <Nav navbar>
+                                <NavItem>
+                                    <NavLink className="nav-link" to="/studentTaskView">studentTaskView </NavLink>
+                                </NavItem>
                                 <NavItem>
                                     <NavLink className="nav-link" to="/home">Home </NavLink>
                                 </NavItem>
@@ -47,7 +50,7 @@ class Header extends Component {
                                         Contact Us
                                     </NavLink>
                                 </NavItem>
-                            </Nav>
+                            </Nav> : null}
                             <Nav className="ml-auto" navbar>
                                 {/* <NavItem>
                                     <Button outline> Login</Button>

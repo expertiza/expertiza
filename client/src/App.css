@@ -31,6 +31,15 @@ a{
   margin-right: 0px;
   padding-right: 0px;
 }
+.timezone-picker{
+  width:  100%;
+  font-size:  1rem;
+  color: #495057;
+  background-color:  #fff;
+  background-clip:  padding-box;
+  border:  0.5px solid #ced4da;;
+  border-radius:  .25rem;
+}
 
 .taskbox {
   padding: 5px;

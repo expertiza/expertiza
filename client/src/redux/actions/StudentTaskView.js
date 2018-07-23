@@ -1,11 +1,11 @@
-import axios from 'axios'
+import axios from '../../axios-instance'
 import * as actions from '../index'
 
 export const onLoad = (id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_task/view',
+            url: 'student_task/view',
             headers: { "Content-Type": "application/json",
                        AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "id": id }
@@ -35,7 +35,7 @@ export const unsubmitted_self_review = (participant_id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_task/unsubmitted_self_review',
+            url: 'student_task/unsubmitted_self_review',
             headers: { "Content-Type": "application/json", AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "participant_id": participant_id }
         })
@@ -55,7 +55,7 @@ export const quiz_allowed = (assignment_id, topic_id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_task/quiz_allowed',
+            url: 'student_task/quiz_allowed',
             headers: { "Content-Type": "application/json", AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "assignment_id": assignment_id, topic_id: topic_id  }
         })
@@ -74,7 +74,7 @@ export const get_current_stage = (assignment_id, topic_id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_task/get_current_stage',
+            url: 'student_task/get_current_stage',
             headers: { "Content-Type": "application/json", AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "assignment_id": assignment_id, topic_id: topic_id  }
         })
@@ -93,7 +93,7 @@ export const check_reviewable_topics = (assignment_id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_task/check_reviewable_topic',
+            url: 'student_task/check_reviewable_topic',
             headers: { "Content-Type": "application/json", AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "assignment_id": assignment_id  }
         })
@@ -108,7 +108,7 @@ export const metareview_allowed = (assignment_id, topic_id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_task/metareview_allowed',
+            url: 'student_task/metareview_allowed',
             headers: { "Content-Type": "application/json", AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "assignment_id": assignment_id , "topic_id": topic_id }
         })
@@ -135,7 +135,7 @@ export const submission_allowed = (assignment_id, topic_id) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/student_task/submission_allowed',
+            url: 'student_task/submission_allowed',
             headers: { "Content-Type": "application/json",
                        AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data: { "assignment_id": assignment_id ,

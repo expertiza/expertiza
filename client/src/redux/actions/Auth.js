@@ -1,5 +1,5 @@
 import  * as actions from '../index'
-import axios from 'axios'
+import axios from '../../axios-instance';
 
 export const forgetUsername = () => {
     return {
@@ -14,7 +14,7 @@ export const forgetPasswordUpdate = (email, password, repassword, token) => {
     return dispatch => {
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/password_retrieval/forgottenPasswordUpdatePassword',
+            url: 'password_retrieval/forgottenPasswordUpdatePassword',
             headers: { "Content-Type": "application/json"},
             data:{ "token": token, "reset": { "email": email, "password": password, "repassword": repassword }}
         })
@@ -48,7 +48,7 @@ export const passwordResetEmailSend = (email, username) => {
         console.log('props recieved are:', email, username)
         axios({
             method: 'post',
-            url: 'http://localhost:3001/api/v1/password_retrieval/forgottenPasswordSendLink',
+            url: 'password_retrieval/forgottenPasswordSendLink',
             headers: { "Content-Type": "application/json"},
             data: { "user": { "email" : email, "username": username} }
         })
@@ -102,7 +102,7 @@ export const auth = (name, password) => {
         if(!localStorage.getItem('jwt')) {
             axios({
                 method: 'post',
-                url: 'http://localhost:3001/api/v1/sessions',
+                url: 'sessions',
                 headers: { "Content-Type": "application/json"},
                 data: {auth: { name: name, password: password }}
             })

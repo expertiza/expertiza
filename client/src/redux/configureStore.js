@@ -1,7 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Profile } from './Profile';
-import { StudentsTeamedWith } from './StudentsTeamedWith'
-import { studentTasks } from './StudentTasks'
+import studentTaskList from './reducers/StudentTaskList';
 import { Institutions } from './Institution';
 import { createForms } from 'react-redux-form';
 import { Profileform } from './profileform';
@@ -14,8 +13,7 @@ export const ConfigureStore = () => {
     const store = createStore(
         combineReducers({
             profile: Profile,
-            studentsTeamedWith: StudentsTeamedWith,
-            studentTasks: studentTasks,
+            studentTaskList: studentTaskList,
             institutions: Institutions,
             studentTaskView:  studentTaskView,
             ...createForms({

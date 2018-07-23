@@ -57,8 +57,13 @@ export {
 export {
     fetchProfile,
     fetchInstitutions,
-    fetchStudentsTeamedWith,
-    fetchStudentTasks,
     changeHandle
 }
 from './ActionCreators'
+export {
+    fetchStudentsTeamedWith,
+    fetchStudentTasks,
+    addStudentsTeamedWith,
+    addStudentTasks
+} 
+from './actions/StudentTaskList'

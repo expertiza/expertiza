@@ -89,7 +89,7 @@ class Main extends Component {
                 <Route path ='/home'  component={(HomePage)} /> 
               {/* <Redirect to="/home" /> */}
           </Switch>
-          <Footer />
+            <Footer />
       </div>
     );
   }

@@ -4,6 +4,7 @@ import * as actions from '../../redux/index'
 import { NavLink } from 'react-router-dom';
 import TimelineComponent from './timeline/TimelineComponent'
 import Aux from '../../hoc/Aux/Aux'
+import { Loading } from '../LoadingComponent';
 
 class StudentTaskView extends Component {
 
@@ -118,7 +119,7 @@ class StudentTaskView extends Component {
           
                  
         }else {
-            assign_name = 'loading...'
+            assign_name = <Loading/>
         }
 
         return (

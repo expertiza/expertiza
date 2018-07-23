@@ -1,4 +1,4 @@
-import * as actionType from '../index'
+import * as actions from '../index'
 import {updateObject}  from '../../shared/utility/utility'
 
 const initialize = {
@@ -25,7 +25,7 @@ const initialize = {
 
 const studentTaskViewReducer = (state = initialize, action) => {
     switch (action.type) {
-        case actionType.STUDENT_TASK_VIEW_SUCCESS:
+        case actions.STUDENT_TASK_VIEW_SUCCESS:
             return updateObject(state, { participant: action.participant,
                                         can_submit : action.can_submit,
                                         can_review: action.can_review,
@@ -38,19 +38,19 @@ const studentTaskViewReducer = (state = initialize, action) => {
                                         topics: action.topics,
                                         timeline_list: action.timeline_list,
                                         loaded: true })
-        case actionType.STUDENT_TASK_VIEW_FAILURE:
+        case actions.STUDENT_TASK_VIEW_FAILURE:
             return updateObject(state, {denied: true})
-        case actionType.STUDENT_TASK_VIEW_SUBMISSION_ALLOWED:
+        case actions.STUDENT_TASK_VIEW_SUBMISSION_ALLOWED:
             return updateObject(state, { submission_allowed: action.submission_allowed })
-        case actionType.STUDENT_TASK_VIEW_CHECK_REVIEWABLE_TOPICS:
+        case actions.STUDENT_TASK_VIEW_CHECK_REVIEWABLE_TOPICS:
             return updateObject(state, {check_reviewable_topics: action.check_reviewable_topics})
-        case actionType.STUDENT_TASK_VIEW_METAREVIEW_ALLOWED:
+        case actions.STUDENT_TASK_VIEW_METAREVIEW_ALLOWED:
             return updateObject(state, { metareview_allowed: action.metareview_allowed })
-        case actionType.STUDENT_TASK_VIEW_GET_CURRENT_STAGE:
+        case actions.STUDENT_TASK_VIEW_GET_CURRENT_STAGE:
             return updateObject(state, {get_current_stage: action.get_current_stage})
-        case actionType.STUDENT_TASK_VIEW_QUIZ_ALLOWED:
+        case actions.STUDENT_TASK_VIEW_QUIZ_ALLOWED:
             return updateObject(state, {quiz_allowed: action.quiz_allowed})
-        case actionType.STUDENT_TASK_VIEW_UNSUBMITTED_SELF_REVIEW:
+        case actions.STUDENT_TASK_VIEW_UNSUBMITTED_SELF_REVIEW:
             return updateObject(state, {unsubmitted_self_review: action.unsubmitted_self_review})
         default:
             return state;

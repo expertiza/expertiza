@@ -1,6 +1,7 @@
 export {
     PROFILE_FAILED,
     ADD_PROFILE,
+    EDIT_PROFILE,
     ADD_INSTITUTIONS,
     AUTH_START,
     AUTH_SUCCESS,
@@ -59,7 +60,7 @@ export {
     fetchInstitutions,
     changeHandle
 }
-from './ActionCreators'
+from './actions/Profile'
 export {
     fetchStudentsTeamedWith,
     fetchStudentTasks,

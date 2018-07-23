@@ -1,6 +1,5 @@
-import * as ActionTypes from './ActionTypes';
-import { baseUrl } from '../shared/baseURL';
-import axios from '../axios-instance';
+import * as actions from '../index';
+import axios from '../../axios-instance';
 
 export const fetchProfile = () =>(dispatch) => {
     return axios({
@@ -27,23 +26,23 @@ export const fetchInstitutions = () =>(dispatch) => {
 
 export const changeHandle = (handle_name) => {
     return {
-        type: ActionTypes.CHANGE_HANDLE,
+        type: actions.CHANGE_HANDLE,
         handle: handle_name
     }
 }
 
 export const addProfile = (profile) => ({
-    type: ActionTypes.ADD_PROFILE,
+    type: actions.ADD_PROFILE,
     payload: profile
 });
 
 export const edit_profile = (profile) => ({
-    type: ActionTypes.EDIT_PROFILE,
+    type: actions.EDIT_PROFILE,
     payload: profile
 });
 
 export const profileFailed = (errormess) => ({
-    type: ActionTypes.PROFILE_FAILED,
+    type: actions.PROFILE_FAILED,
     payload: errormess
 });
 
@@ -82,7 +81,7 @@ export const editProfile = (profile,aq)  => (dispatch) => {
 }
 
 export const addInstitutions = (institutions) => ({
-    type: ActionTypes.ADD_INSTITUTIONS,
+    type: actions.ADD_INSTITUTIONS,
     payload: institutions
 });
 

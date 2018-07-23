@@ -1,13 +1,12 @@
 import { Table } from 'reactstrap';
-import React, { Component } from 'react';
-import PublishingRights from './PublishingRights'
+import React, { Component } from 'react'
 import {NavLink} from 'react-router-dom'
 import { Loading } from './LoadingComponent';
 
 class StudentList extends Component {
     state = {
-            studentsTeamedWith: this.props.studentsTeamedWith.studentsTeamedWith,
-            studentTasks: this.props.studentTasks.studentTasks
+            studentsTeamedWith: this.props.studentsTeamedWith,
+            studentTasks: this.props.studentTasks
         };
     
     render(){
@@ -44,9 +43,8 @@ class StudentList extends Component {
                                 </tr>
                             </thead>
                             {
-                                this.state.studentTasks.studentTasks === undefined
-                                ? <Loading />
-                                :this.state.studentTasks.studentTasks.map(studentTask =>(
+                                this.state.studentTasks === undefined ? <Loading /> :
+                                this.state.studentTasks.map(studentTask =>(
                                     <tr>
                                         <td key={studentTask.assignment.id}><NavLink to={`/studentTaskView/${studentTask.assignment.id}`}>{studentTask.assignment.name}</NavLink> <br /> {studentTask.assignment.course_id== null ? "" : studentTask.course_name}</td>
                                         <td key={studentTask.assignment.id}> {studentTask.topic == null ? "-" : studentTask.topic}</td>

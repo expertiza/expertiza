@@ -20,8 +20,8 @@ export const fetchStudentTasks = () =>(dispatch) => {
         url: 'student_task/list',
         headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
-    .then(response => response.data)
-    .then(studentTasks => dispatch(actions.addStudentTasks(studentTasks)))
+    // .then(response => console.log(response.data))
+    .then(response => dispatch(actions.addStudentTasks(response.data.studentTasks)))
     .catch(error => console.log(error));
 }
 

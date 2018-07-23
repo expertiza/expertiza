@@ -2,7 +2,7 @@ import * as actions from '../index'
 
 const initialize={
          studentsTeamedWith:{ },
-         studentTasks:{ }
+         studentTasks: []
     }
 
 const studentTaskList = (state = initialize, action) => {

@@ -8,7 +8,7 @@ import Profile from './ProfileComponent';
 import StudentList from './StudentList';
 import SignupSheet from './SignupSheet';
 
-import {  editProfile } from '../redux/ActionCreators'; 
+import {  editProfile } from '../redux/actions/Profile'; 
 import Login from './login/Login';
 import PasswordForgotten from './passwordForgotten/PasswordForgotten'
 import PasswordForgottenUpdate from './passwordForgotten/passwordForgottenUpdate/PasswordForgottenUpdate'
@@ -68,8 +68,10 @@ class Main extends Component {
                       institutions = {this.props.institutions}
                       editProfile = {this.props.editProfile}/> } 
                       profileErr = { this.props.profile.errMess } />
-                <Route path =  '/studentlist' component={() => <StudentList studentsTeamedWith={this.props.studentTaskList.studentsTeamedWith}
-                      studentTasks = {this.props.studentTaskList.studentTasks}/>}/>
+                <Route path =  '/studentlist' 
+                       component={() => <StudentList 
+                                    studentsTeamedWith={this.props.studentTaskList.studentsTeamedWith}
+                                    studentTasks = {this.props.studentTaskList.studentTasks}/>}/>
                 <Route path = '/sign_up_sheet' component={SignupSheet}/>
                 <Route path ='/logout' component={(Logout)} />
                 <Route path ='/view_student_teams/:id' component={(StudentTeamComponent)} />

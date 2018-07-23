@@ -1,5 +1,5 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
-import { Profile } from './Profile';
+import { Profile } from './reducers/Profile';
 import studentTaskList from './reducers/StudentTaskList';
 import { Institutions } from './Institution';
 import { createForms } from 'react-redux-form';

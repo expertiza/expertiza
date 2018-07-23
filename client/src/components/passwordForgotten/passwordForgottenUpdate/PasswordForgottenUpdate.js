@@ -39,7 +39,8 @@ class PasswordForgottenUpdate extends Component {
         let output = (
             <div className="container" style={{marginTop: '10px'}}>
             <div className="row">
-                <div className="col-md-4">
+                <h4>Specify a new password for user:  </h4> <br />
+                <div className="col-md-4 col-md-offset-4">
                     <div className="row">
                         <div className="form-group">
                             <label >Email </label>

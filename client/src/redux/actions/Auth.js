@@ -1,6 +1,14 @@
 import  * as actions from '../index'
 import axios from 'axios'
 
+export const forgetUsername = () => {
+    return {
+        type: actions.FORGET_USERNAME
+    }
+}
+
+
+
 export const forgetPasswordUpdate = (email, password, repassword, token) => {
     console.log(email, password, repassword, token)
     return dispatch => {
@@ -12,7 +20,7 @@ export const forgetPasswordUpdate = (email, password, repassword, token) => {
         })
         .then(response => {
             console.log(response)
-            alert('password reset successful')
+            // alert('A password reset link has been sent to the address on file for this account.')
             dispatch(actions.passwordResetSuccess())
         })
         .catch(error => {
@@ -35,13 +43,14 @@ export const passwordResetFailure = () => {
     }
 }
 
-export const passwordResetEmailSend = (email) => {
+export const passwordResetEmailSend = (email, username) => {
     return dispatch => {
+        console.log('props recieved are:', email, username)
         axios({
             method: 'post',
             url: 'http://localhost:3001/api/v1/password_retrieval/forgottenPasswordSendLink',
             headers: { "Content-Type": "application/json"},
-            data: { "user": { "email" : email} }
+            data: { "user": { "email" : email, "username": username} }
         })
         .then(response => {
             console.log(response)
@@ -100,6 +109,10 @@ export const auth = (name, password) => {
             .then(response => {
                 localStorage.setItem('jwt', response.data.jwt)
                 dispatch(authSuccess(response.data.jwt))
+                dispatch(actions.fetchProfile())
+                dispatch(actions.fetchInstitutions())
+                dispatch(actions.fetchStudentsTeamedWith())
+                dispatch(actions.fetchStudentTasks())
             })
             .catch(error => {
                             console.log(error)

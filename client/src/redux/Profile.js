@@ -24,6 +24,8 @@ export const Profile = (state={ profile:{
             return {...state };
         case ActionTypes.EDIT_PROFILE:
             return {...state, profile: action.payload.response['user'], aq: action.payload.response['aq'], errMess: action.payload.servermsg}; 
+        case ActionTypes.CHANGE_HANDLE:
+            return {...state, handle: action.handle}; 
         default: 
             return state;
     }

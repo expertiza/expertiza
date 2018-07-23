@@ -7,16 +7,127 @@ Expertiza::Application.routes.draw do
     resources :sessions, only: [:create, :index, :destroy]
     resources :profile
     resources :institution
+    # resources :student_tasks_list
     resources :password_retrieval, only: [] do
       collection do
         post :forgottenPasswordSendLink
         post :forgottenPasswordUpdatePassword
       end
     end
+    resources :student_task, only: [] do
+      collection do
+        get :list
+        post :view
+        post :submission_allowed
+        post :check_reviewable_topic
+        post :metareview_allowed
+        post :get_current_stage
+        post :quiz_allowed
+        post :unsubmitted_self_review 
+        # get '/*other', to: redirect('/student_task/list')
+      end
+    end
+
+    resources :student_teams, only: %i[create edit update] do
+      collection do
+        post :view
+        get :remove_participant
+        get :auto_complete_for_user_name
+      end
+    end
+
+    resources :grades, only: %i[edit update] do
+      collection do
+        get :view
+        post :view_team
+        get :view_reviewer
+        post :view_my_scores
+        get :instructor_review
+        post :remove_hyperlink
+        post :save_grade_and_comment_for_submission
+      end
+    end
+
+    resources :sign_up_sheet, except: %i[index show] do
+      collection do
+        get :signup
+        get :delete_signup
+        get :add_signup_topics
+        get :add_signup_topics_staggered
+        get :delete_signup
+        post :list
+        get :signup_topics
+        get :signup
+        get :sign_up
+        get :team_details
+        get :intelligent_sign_up
+        get :intelligent_save
+        get :signup_as_instructor
+        post :signup_as_instructor_action
+        post :set_priority
+        post :save_topic_deadlines
+      end
+    end
+
+    resources :submitted_content, only: [:edit] do
+      collection do
+        get :download
+        get :folder_action
+        get :remove_hyperlink
+        post :remove_hyperlink
+        get :submit_file
+        post :submit_file
+        post :folder_action
+        post :submit_hyperlink
+        get :submit_hyperlink
+        get :view
+      end
+    end
+
+    resources :student_quizzes  do
+      collection do
+        post :index
+        post :student_quizzes
+        post :record_response
+        get :finished_quiz
+        get :take_quiz
+        get :review_questions
+      end
+    end
+
+    resources :student_review, only: [] do
+      collection do
+        post :list
+      end
+    end
+
+    resources :suggestion, only: %i[show  create] do
+      collection do
+        post :new
+        get :list
+        post :submit
+        post :student_submit
+        post :update_suggestion
+      end
+    end
+
+    resources :response, only: %i[new create edit update] do
+      collection do
+        get :new_feedback
+        post :view
+        get :remove_hyperlink
+        get :saving
+        get :redirection
+        get :show_calibration_results_for_student
+        post :custom_create
+        get :pending_surveys
+        get :json
+      end
+    end
   end
 end
 
-
+# #########################################################################3
 resources :admin, only: [] do
     collection do
       get :list_super_administrators

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardTitle} from 'reactstrap';
+// import { Card, CardTitle} from 'reactstrap';
 
 class ServerMessage extends Component {
 

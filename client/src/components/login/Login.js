@@ -9,17 +9,8 @@ class Login extends Component {
         username: '',
         password: ''
     } 
-
-    componentDidMount() {
-        console.log('component did mount')
-    }
-
-    componentWillUnmount() {
-        console.log('component will unmount')
-    }
     
     componentDidUpdate() {
-        console.log('component did update')
         if(this.props.loggedin) {
             this.props.history.push('/')
         }
@@ -27,29 +18,31 @@ class Login extends Component {
 
     onSubmitHandler = (event) => {
         event.preventDefault();
-        console.log(event);
         this.props.onSubmit(this.state.username, this.state.password)
         
     }
     usernameChangeHandler = (event) => {
-        console.log(event.target.value)
         this.setState({username: event.target.value})
     }
 
     passwordChangeHandler = (event) => {
-        console.log(event.target.value)
         this.setState({password: event.target.value})
     }
 
+    forgetUsernameHandler = () => {
+        this.props.onUsernameForget();
+    }
   
     render (){
-        let output =  ( <div className="container center" style= {{marginTop:'35px', marginLeft: '560px'}}>
-                            <div className="row">
-                                <div className="col-md-6 col-md-offset-6">
-                                    <h4> Welcome! </h4><br />
+        let output =  ( <div className="container center" style= {{marginTop:'35px', marginBottom:'50px'}}>
+                            <div className="row justify-content-md-center">
+                                <div className="col-md-4 col-md-offset-6">
+                                    <div className="text-center">
+                                    <h2> Welcome! </h2>
+                                    </div>
                                     <form onSubmit={this.onSubmitHandler}>
                                         <div className="form-group">
-                                            <label >username </label>
+                                            <label >Username </label>
                                             <input type="username" 
                                                     className="form-control" 
                                                     placeholder="Enter username" 
@@ -57,8 +50,13 @@ class Login extends Component {
                                                     onChange={this.usernameChangeHandler}
                                                     autoComplete={"on"}
                                                     />
+                                            <span>
+                                                <NavLink to="/password_retrieval/forgotten" onClick={this.forgetUsernameHandler} className="pull-right"> Forgot username?</NavLink>
+                                            </span>
                                         </div>
-                                        <div className="form-group">
+
+
+                                        <div className="form-group" style= {{marginTop: '20px', marginBottom: '20px'}}>
                                             <label >Password</label>
                                             <input type="password"
                                                     className="form-control" 
@@ -66,17 +64,17 @@ class Login extends Component {
                                                     value={this.state.password}
                                                     onChange={this.passwordChangeHandler}
                                                     />
-                                        </div>
-                                            <NavLink to="/password_retrieval/forgotten" className="pull-right"> Forgot password?</NavLink>
-                                        <div>
-                                            
-                                        </div>
-                                        <div className="row">
-                                            <button type="submit" className="btn btn-danger">Submit</button>
+                                            <span>
+                                                <NavLink to="/password_retrieval/forgotten" className="pull-right"> Forgot password?</NavLink>
+                                            </span>
                                         </div>
                                         <br />
-                                        <div className="row"> 
-                                            <button type="submit" className="btn btn-danger">Request account</button>
+                                        <div style={{ marginTop: '20px'}}>
+                                            <button type="submit" className="btn btn-danger btn-block">Sign in</button>
+                                        </div>
+                                        <br />
+                                        <div className="text-center" > 
+                                            <NavLink to="#" >Request account</NavLink>
                                         </div>
                                     </form>
                                 </div>
@@ -95,7 +93,8 @@ const mapStatetoProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onSubmit: (name, password) => {dispatch(actions.auth(name, password))}
+        onSubmit: (name, password) => {dispatch(actions.auth(name, password))},
+        onUsernameForget : () => {dispatch(actions.forgetUsername())}
     }
 }
 export default connect(mapStatetoProps, mapDispatchToProps)(Login);

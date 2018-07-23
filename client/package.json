@@ -27,7 +27,8 @@
     "reactstrap": "^6.1.0",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "run-all": "^1.0.1"
   },
   "scripts": {
     "build-css": "node-sass-chokidar src/ -o src/",

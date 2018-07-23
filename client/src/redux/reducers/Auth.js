@@ -6,11 +6,14 @@ const initialize = {
     error: false,
     loggedIn: false,
     isPasswordresetSuccess: false,
-    passwordResetEmailSent: false
+    passwordResetEmailSent: false,
+    usernameForget: false
 }
 
 const authReducer = (state = initialize, action) => {
     switch (action.type) {
+        case actionType.FORGET_USERNAME:
+            return updateObject(state, { usernameForget: true })
         case actionType.AUTH_SUCCESS:
             return updateObject(state, { error: false, jwt: action.jwt, loggedIn: true })
         case actionType.AUTH_FAILURE:

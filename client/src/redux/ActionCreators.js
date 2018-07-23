@@ -14,6 +14,7 @@ export const fetchProfile = () =>(dispatch) => {
 }
 
 export const fetchInstitutions = () =>(dispatch) => {
+    console.log('in fetchInstitutions')
     return axios({
         method: 'get',
         url: baseUrl + 'institution',
@@ -22,6 +23,35 @@ export const fetchInstitutions = () =>(dispatch) => {
     .then(response => response.data)
     .then(institutions => dispatch(addInstitutions(institutions)))
     .catch(error => console.log(error));
+}
+
+export const fetchStudentsTeamedWith = () =>(dispatch) => {
+    return axios ({
+        method : 'get',
+        url : baseUrl + 'student_task/list',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => dispatch(addStudentsTeamedWith(response.data.studentsTeamedWith[""])))
+    .catch(error => console.log(error));
+
+}
+
+export const fetchStudentTasks = () =>(dispatch) => {
+    return axios({
+        method: 'get',
+        url: baseUrl + 'student_task/list',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => response.data)
+    .then(studentTasks => dispatch(addStudentTasks(studentTasks)))
+    .catch(error => console.log(error));
+}
+
+export const changeHandle = (handle_name) => {
+    return {
+        type: ActionTypes.CHANGE_HANDLE,
+        handle: handle_name
+    }
 }
 
 export const addProfile = (profile) => ({
@@ -38,6 +68,17 @@ export const profileFailed = (errormess) => ({
     type: ActionTypes.PROFILE_FAILED,
     payload: errormess
 });
+
+export const addStudentsTeamedWith = (studentsTeamedWith) => ({
+    type: ActionTypes.ADD_STUDENTSTEAMEDWITH,
+    payload: studentsTeamedWith
+});
+
+export const addStudentTasks = (studentTasks) => ({
+    type: ActionTypes.ADD_STUDENTTASKS,
+    payload: studentTasks
+});
+
 
 export const editProfile = (profile,aq)  => (dispatch) => {
     const newprofile = 

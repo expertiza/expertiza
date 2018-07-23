@@ -122,6 +122,10 @@ export const auth = (name, password) => {
         }else {
             console.log('jwt exists allready')
             dispatch(authSuccess(localStorage.getItem('jwt')))
+            dispatch(actions.fetchProfile())
+            dispatch(actions.fetchInstitutions())
+            dispatch(actions.fetchStudentsTeamedWith())
+            dispatch(actions.fetchStudentTasks())
         }
     }
 }

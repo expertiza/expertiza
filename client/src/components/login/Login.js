@@ -11,9 +11,13 @@ class Login extends Component {
     } 
     
     componentDidUpdate() {
+        console.log('in component did update', this.props.loggedin)
         if(this.props.loggedin) {
-            this.props.history.push('/')
+            this.props.history.push('/studentlist')
         }
+    }
+    componentDidMount () {
+        console.log('in component did mount', this.props.loggedIn)
     }
 
     onSubmitHandler = (event) => {
@@ -33,6 +37,10 @@ class Login extends Component {
         this.props.onUsernameForget();
     }
   
+    componentWillUnmount () {
+        console.log('in component will unmount')
+            this.props.history.push('/studentlist')
+    }
     render (){
         let output =  ( <div className="container center" style= {{marginTop:'35px', marginBottom:'50px'}}>
                             <div className="row justify-content-md-center">
@@ -80,7 +88,7 @@ class Login extends Component {
                                 </div>
                             </div> 
                         </div>  ); 
-        output = this.props.loggedin ?  <Redirect to="/" /> : output ;
+        output = this.props.loggedin ?  <Redirect to="/studentlist" /> : output ;
         return output;
     }
 }

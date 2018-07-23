@@ -31,8 +31,10 @@ export const fetchStudentsTeamedWith = () =>(dispatch) => {
         url : baseUrl + 'student_task/list',
         headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
-    .then(response => dispatch(addStudentsTeamedWith(response.data.studentsTeamedWith[""])))
-    .catch(error => console.log(error));
+    .then(response =>{ console.log('hereeeeeeeeeee',response.data) 
+        dispatch(addStudentsTeamedWith(response.data.studentsTeamedWith[""]))
+    } )
+    .catch(error => console.log('eeeeeee',error));
 
 }
 

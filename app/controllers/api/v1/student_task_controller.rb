@@ -90,6 +90,10 @@ module Api::V1
       end
     end
   
+    def get_review_grade_information
+
+    end
+
     def metareview_allowed
       metareview_allowed = @assignment.metareview_allowed(params[:topic_id])
       render json: { status: :ok, metareview_allowed: metareview_allowed}

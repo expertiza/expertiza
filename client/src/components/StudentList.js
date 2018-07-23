@@ -1,27 +1,21 @@
 import { Table } from 'reactstrap';
 import React, { Component } from 'react';
 import PublishingRights from './PublishingRights'
+import {NavLink} from 'react-router-dom'
 
 class StudentList extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
+    state = {
             studentsTeamedWith: this.props.studentsTeamedWith.studentsTeamedWith,
             studentTasks: this.props.studentTasks.studentTasks
         };
-        
-        console.log(this.state.studentsTeamedWith.length);
-        console.log(this.state.studentTasks.studentTasks);
-    }
+    
     render(){
-        // const students = this.state.studentsTeamedWith;
-        // const student = this.state.studentsTeamedWith.map((d) => <li>{d}</li>);
         return(
             
             <div className="main_content">
                 <h2>Assignments</h2>
                 
-                <PublishingRights></PublishingRights>
+                {/* <PublishingRights></PublishingRights> */}
                 
             <div>
                 <div class="taskbox">
@@ -57,14 +51,14 @@ class StudentList extends Component {
                     ? 'Loading.....'
                     :this.state.studentTasks.studentTasks.map(studentTask =>(
                         <tr>
-                            <td key={studentTask.assignment.id}>{studentTask.assignment.name}</td>
-                            <td key={studentTask.assignment.id}> {studentTask.assignment.course_id== null ? "" : studentTask.assignment.course_id}</td>
+                            <td key={studentTask.assignment.id}><NavLink to={`/studentTaskView/${studentTask.assignment.id}`}>{studentTask.assignment.name}</NavLink></td>
+                            <td key={studentTask.assignment.id}> {studentTask.assignment.course_id== null ? "" : studentTask.course_name}</td>
                             <td key={studentTask.assignment.id}> {studentTask.topic == null ? "-" : studentTask.topic}</td>
                             <td key={studentTask.assignment.id}> {studentTask.current_stage}</td>
                             <td key={studentTask.assignment.id}> {"N/A"}</td>
                             <td key={studentTask.assignment.id}> {""}</td>
                             <td key={studentTask.assignment.id}> {studentTask.stage_deadline}</td>
-                            <td key={studentTask.assignment.id}> {""}</td>
+                            <td key={studentTask.assignment.id}> {(studentTask.participant.permission_granted) ? "allowed":"denied"}</td>
                         </tr>
                             
                     ))

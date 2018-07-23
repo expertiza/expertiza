@@ -25,12 +25,6 @@ class Header extends Component {
                         <Collapse isOpen={this.state.isNavOpen} navbar>
                             {this.props.loggedIn ?  <Nav navbar>
                                 <NavItem>
-                                    <NavLink className="nav-link" to="/studentTaskView">studentTaskView </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink className="nav-link" to="/studentlist">studentList </NavLink>
-                                </NavItem>
-                                <NavItem>
                                     <NavLink className="nav-link" to="/home">Home </NavLink>
                                 </NavItem>
                                 <NavItem>

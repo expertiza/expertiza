@@ -8,7 +8,8 @@ import Aux from '../../hoc/Aux/Aux'
 class StudentTaskView extends Component {
 
     componentDidMount () {
-        this.props.onLoad();
+        console.log('id recieved is ;', this.props.match.params.id)
+        this.props.onLoad(this.props.match.params.id);
     }
 
 
@@ -44,8 +45,8 @@ class StudentTaskView extends Component {
                        {
                         (this.props.topics.length === 0) ? 
                              (this.props.authorization === 'participant' || this.props.authorization === 'submitter') ? 
-                             <li><NavLink to={`/sign_up_sheet_list/${this.props.participant.id}`} > Signup sheet (Sign up for a topic)
-                                    </NavLink></li> :null :null
+                             <li><NavLink to={`/sign_up_sheet_list/${this.props.participant.id}`} > Signup sheet
+                                    </NavLink> (Sign up for a topic)</li> :null :null
                        } 
                        
                        {/* ACS Here we need to know the size of the team to decide whether or not to display the label "Your team" in the student assignment tasks */}
@@ -53,7 +54,7 @@ class StudentTaskView extends Component {
                        {
                         (this.props.assignment.max_team_size < 1) ? this.props.authorization === 'participant' ?
                                 <li><NavLink to={`/view_student_teams/${this.props.participant.id}`} >
-                                        Your team (View and manage your team) </NavLink> </li> : null :null
+                                        Your team</NavLink> (View and manage your team)  </li> : null :null
                        }
                       
                        {/* Your Work */}
@@ -62,7 +63,7 @@ class StudentTaskView extends Component {
                         (this.props.authorization === 'participant' || this.props.can_submit === true) ?
                              (this.props.topics.size > 0) ? 
                                     (this.props.topic_id && this.props.submission_allowed) ?
-                                        <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > 'Your work' (Submit and view your work) </NavLink></li> :
+                                        <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} >Your work</NavLink> (Submit and view your work)</li> :
                                         <li><font color="gray">Your work</font> <span>(You have to choose a topic first)</span></li>
                            :
                             (this.props.submission_allowed ) ? <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > Your work (Submit and view your work) </NavLink></li>
@@ -74,7 +75,7 @@ class StudentTaskView extends Component {
 
                         {(this.props.authorization === 'participant' || this.props.can_review) ? 
                                  (this.props.check_reviewable_topics || this.props.metareview_allowed || this.props.get_current_stage === "Finished") ?             
-                                  <li><NavLink to={`/student_review/list/${this.props.participant.id}`} > { this.getAliasName()} </NavLink></li>:
+                                  <li><NavLink to={`/student_review/list/${this.props.participant.id}`} > { this.getAliasName()} </NavLink> (Give feedback to others on their work)</li>:
                                   <li><font color="gray">{this.getAliasName()}</font> <span>  (Give feedback to others on their work)</span></li>
                                 : null
                         }  
@@ -84,7 +85,7 @@ class StudentTaskView extends Component {
                         {(this.props.assignment.require_quiz )? 
                             (this.props.authorization === 'participant' || this.props.can_take_quiz ) ?
                                 (this.props.assignment.require_quiz && (this.props.quiz_allowed || this.props.get_current_stage === "Finished")) ?
-                                    <li><NavLink to={`/student_quizzes/${this.props.participant.id}`} > Take quizzes (Take quizzes over the work you have read) </NavLink></li> :
+                                    <li><NavLink to={`/student_quizzes/${this.props.participant.id}`} > Take quizzes</NavLink> (Take quizzes over the work you have read) </li> :
                                     <li><font color="gray">Take quizzes</font><span> (Take quizzes over the work you have read)</span></li> 
                                 :null
                             : null
@@ -95,8 +96,7 @@ class StudentTaskView extends Component {
                         { (this.props.team && (this.props.authorization === 'participant' || this.props.can_submit))? 
                             (this.props.assignment.is_selfreview_enabled && this.props.unsubmitted_self_review) ?
                                 <li><font color="gray">Your scores</font><span> (You have to submit self-review under 'Your work' before checking 'Your scores'.)</span></li> :
-                                <li><NavLink to={`/grades/view_team/${this.props.participant.id}`}>Your scores </NavLink>
-                                    (View feedback on your work)  &nbsp;
+                                <li><NavLink to={`/grades/view_team/${this.props.participant.id}`}>Your scores </NavLink> (View feedback on your work)  &nbsp;
                                     <NavLink to={`/grades/view_my_scores/${this.props.participant.id}`} >Alternate View </NavLink>
                                 </li> 
                             : null
@@ -111,7 +111,7 @@ class StudentTaskView extends Component {
                         { (this.props.get_current_stage === "Complete") ? 
                             <li><NavLink to={`/suggestion/new/${this.props.assignment.id}`} >Take a survey </NavLink> </li>:null
                         }
-                        <li><NavLink to="/changeHandle" > Change your handle (Provide a different handle for this assignment)</NavLink></li>             
+                        <li><NavLink to="/changeHandle" > Change your handle</NavLink> (Provide a different handle for this assignment)</li>             
             </div>
 
              timeline =   this.props.timeline_list ? <TimelineComponent timeline_list={this.props.timeline_list}></TimelineComponent> :null
@@ -165,7 +165,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        onLoad: () => { dispatch(actions.onLoad())}
+        onLoad: (id) => { dispatch(actions.onLoad(id))}
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(StudentTaskView);

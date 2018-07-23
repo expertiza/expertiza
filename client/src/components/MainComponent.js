@@ -64,7 +64,7 @@ class Main extends Component {
           <Header />
           <Switch>
                 { !this.props.loggedIn ? <Route path ='/' component={Login} /> : null }
-                <Route path ='/home'  component={(HomePage)} /> 
+                
                 <Route path ='/profile' component={() => <Profile profile={this.props.profile} 
                       institutions = {this.props.institutions}
                       editProfile = {this.props.editProfile}/> } 
@@ -78,7 +78,7 @@ class Main extends Component {
                 <Route path ='/submitted_content/:id/edit' component={(SubmittedContentEditComponent)} />
                 <Route path ='/student_quizzes/:id' component={(StudentQuizzesComponent)} />
                 <Route path ='/changeHandle' component={(ChangeHandleComponent)} />
-                <Route path ='/studentTaskView' component={(StudentTaskView)} />
+                <Route path ='/studentTaskView/:id' component={(StudentTaskView)} />
                 <Route path ='/grades/view_team/:id' component={(GradesViewTeamComponent)} />
                 <Route path ='/grades/view_my_scores/:id' component={(GradesViewMyScores)} />
                 <Route path ='/student_review/list/:id' component={(StudentReviewListComponent)} />
@@ -86,7 +86,8 @@ class Main extends Component {
                 <Route path ='/response/view/:id' component={(responseViewComponent)} />
                 <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
                 <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />
-              <Redirect to="/home" />
+                <Route path ='/home'  component={(HomePage)} /> 
+              {/* <Redirect to="/home" /> */}
           </Switch>
           <Footer />
       </div>

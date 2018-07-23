@@ -8,7 +8,7 @@ export const onLoad = (id) => {
             url: 'http://localhost:3001/api/v1/student_task/view',
             headers: { "Content-Type": "application/json",
                        AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
-            data: { "id": 17 }
+            data: { "id": id }
         })
         .then(response => {
             console.log("data recieved is:", response.data)

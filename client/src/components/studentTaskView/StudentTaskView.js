@@ -65,7 +65,7 @@ class StudentTaskView extends Component {
                                         <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > 'Your work' (Submit and view your work) </NavLink></li> :
                                         <li><font color="gray">Your work</font> <span>(You have to choose a topic first)</span></li>
                            :
-                            (this.props.submission_allowed || true) ? <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > Your work (Submit and view your work) </NavLink></li>
+                            (this.props.submission_allowed ) ? <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > Your work (Submit and view your work) </NavLink></li>
                                 :<li><font color="gray">Your work</font> <span>(You are not allowed to submit your work right now)</span></li>
                         : null 
                        }
@@ -102,13 +102,13 @@ class StudentTaskView extends Component {
                             : null
                          }
                          
-                         { (this.props.can_provide_suggestions || true) ? 
+                         { (this.props.can_provide_suggestions ) ? 
                             <li><NavLink to={`/suggestion/new/${this.props.assignment.id}`} >Suggest a topic </NavLink></li> :null
                          }
                         
                         {/*  removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id) */}
                         {/* Need to ask prof about survey_response ... No controller found */}
-                        { (this.props.get_current_stage === "Complete" || true) ? 
+                        { (this.props.get_current_stage === "Complete") ? 
                             <li><NavLink to={`/suggestion/new/${this.props.assignment.id}`} >Take a survey </NavLink> </li>:null
                         }
                         <li><NavLink to="/changeHandle" > Change your handle (Provide a different handle for this assignment)</NavLink></li>             

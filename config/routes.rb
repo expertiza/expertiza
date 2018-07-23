@@ -110,6 +110,20 @@ Expertiza::Application.routes.draw do
         post :update_suggestion
       end
     end
+
+    resources :response, only: %i[new create edit update] do
+      collection do
+        get :new_feedback
+        post :view
+        get :remove_hyperlink
+        get :saving
+        get :redirection
+        get :show_calibration_results_for_student
+        post :custom_create
+        get :pending_surveys
+        get :json
+      end
+    end
   end
 end
 

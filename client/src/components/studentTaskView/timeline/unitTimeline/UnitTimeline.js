@@ -7,13 +7,13 @@ const  UnitTimeline = (props) => {
    
         let output;
          if( props.tl.updated_at > new Date() ) {
-             console.log('in unitttttt', props.tl)
+             console.log('in unitttttt', props.tl.link)
             output = <li className = "li">
                         <div className = "timestamp">
                             <p> {this.props.tl.updated_at}></p>
                         </div>
                         <div className = "status">
-                            {props.tl.id ? <p><NavLink to="#">{props.tl.label}</NavLink></p> : 
+                            {props.tl.id ? <p><NavLink to={`/response/view/${props.tl.id}`}>{props.tl.label}</NavLink></p> : 
                                                 props.tl.link ? <p><NavLink to="#">{props.tl.link}</NavLink> </p> :
                                                                      <p>{props.tl.label}</p> }
                         </div>
@@ -25,7 +25,7 @@ const  UnitTimeline = (props) => {
                             <p> {props.tl.updated_at}></p>
                         </div>
                         <div className = "status">
-                        {props.tl.id ? <p><NavLink to="#">{props.tl.label}</NavLink></p> : 
+                        {props.tl.id ? <p><NavLink to={`/response/view/${props.tl.id}`}>{props.tl.label}</NavLink></p> : 
                                                 props.tl.link ? <p><NavLink to="#">{props.tl.link}</NavLink> </p> :
                                                                      <p>{props.tl.label}</p> }
                         </div>

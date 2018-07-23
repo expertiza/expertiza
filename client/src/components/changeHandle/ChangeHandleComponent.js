@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
-// import Aux from '../hoc/Aux/Aux'
 import {NavLink} from 'react-router-dom';
 import {connect} from 'react-redux';
-// import * as actions from '../../redux/index';
 
 class ChangeHandleComponent extends Component {
     state = { profile : this.props.profile,

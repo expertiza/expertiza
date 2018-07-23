@@ -28,33 +28,20 @@ class Header extends Component {
                                     <NavLink className="nav-link" to="/home">Home </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                     <NavLink className="nav-link" to="/home">
-                                         Assignments
-                                     </NavLink>
+                                     <NavLink className="nav-link" to="/studentlist"> Assignments </NavLink>
                                 </NavItem>     
                                 <NavItem>
-                                    <NavLink className="nav-link" to="/home" >
-                                        Pending Surveys 
-                                     </NavLink>
+                                    <NavLink className="nav-link" to="/home" > Pending Surveys  </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink className="nav-link" to="/profile">
-                                        Profile 
-                                    </NavLink> 
+                                    <NavLink className="nav-link" to="/profile"> Profile  </NavLink> 
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink className="nav-link" to="/home">
-                                        Contact Us
-                                    </NavLink>
+                                    <NavLink className="nav-link" to="/home"> Contact Us </NavLink>
                                 </NavItem>
                             </Nav> : null}
                             <Nav className="ml-auto" navbar>
-                                {/* <NavItem>
-                                    <Button outline> Login</Button>
-                                </NavItem> */}
-                                { this.props.loggedIn ? <NavLink className="nav-link" to="/logout">Log out </NavLink> :
-                                                        null }
-                                                        {/* <NavLink className="nav-link" to="/login">Log in </NavLink>} */}
+                                { this.props.loggedIn ? <NavLink className="nav-link" to="/logout">Log out </NavLink> : null }
                             </Nav>
                         </Collapse>
                 </Navbar>

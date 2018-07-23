@@ -1,9 +1,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Profile } from './reducers/Profile';
 import studentTaskList from './reducers/StudentTaskList';
-import { Institutions } from './Institution';
-import { createForms } from 'react-redux-form';
-import { Profileform } from './profileform';
+import { Institutions } from './reducers/Institution';
 import studentTaskView from './reducers/StudentTaskView'
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
@@ -16,9 +14,6 @@ export const ConfigureStore = () => {
             studentTaskList: studentTaskList,
             institutions: Institutions,
             studentTaskView:  studentTaskView,
-            ...createForms({
-                profileForm: Profileform
-            }),
             auth: authReducer
         }),
         applyMiddleware(thunk, logger)

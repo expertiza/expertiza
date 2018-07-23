@@ -1,7 +1,7 @@
 import { Table } from 'reactstrap';
 import React, { Component } from 'react'
 import {NavLink} from 'react-router-dom'
-import { Loading } from './LoadingComponent';
+import { Loading } from '../UI/spinner/LoadingComponent';
 
 class StudentList extends Component {
     state = {

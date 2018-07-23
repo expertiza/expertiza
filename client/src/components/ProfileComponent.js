@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {  Label,  Col, Button, Form,FormGroup, Input, FormFeedback } from 'reactstrap';
-import { Loading } from './LoadingComponent';
+import { Loading } from './UI/spinner/LoadingComponent';
 import  ServerMessage  from './ServerMessComponent';
 import TimezonePicker from 'react-bootstrap-timezone-picker';
 // import 'react-bootstrap-timezone-picker/dist/react-bootstrap-timezone-picker.min.css';

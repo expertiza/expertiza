@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import Profile from './ProfileComponent';
-import StudentList from './StudentList';
+import StudentList from './studentList/StudentList';
 import SignupSheet from './SignupSheet';
 
 import {  editProfile } from '../redux/actions/Profile'; 

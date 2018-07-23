@@ -4,7 +4,7 @@ import * as actions from '../../redux/index'
 import { NavLink } from 'react-router-dom';
 import TimelineComponent from './timeline/TimelineComponent'
 import Aux from '../../hoc/Aux/Aux'
-import { Loading } from '../LoadingComponent';
+import { Loading } from '../UI/spinner/LoadingComponent';
 
 class StudentTaskView extends Component {
 

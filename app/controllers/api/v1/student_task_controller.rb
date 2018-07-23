@@ -24,7 +24,6 @@ module Api::V1
         student_task.instance_variables.each {|var| hash[var.to_s] = student_task.instance_variable_get(var) }
         if(student_task.course_name) 
           hash['course_name'] = student_task.course_name
-          puts hash
         end
         @student_task_array.push(hash)
       end

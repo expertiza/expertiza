@@ -1,4 +1,4 @@
-import React, {Component } from 'react'
+import React from 'react'
 import UnitTimelineComponent from './unitTimeline/UnitTimeline'
 import '../../../assets/stylesheets/timeline.css'
 

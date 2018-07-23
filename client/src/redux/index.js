@@ -19,7 +19,9 @@ export {
     STUDENT_TASK_VIEW_SUBMISSION_ALLOWED,
     STUDENT_TASK_VIEW_CHECK_REVIEWABLE_TOPICS,
     STUDENT_TASK_VIEW_METAREVIEW_ALLOWED,
-    STUDENT_TASK_VIEW_GET_CURRENT_STAGE
+    STUDENT_TASK_VIEW_GET_CURRENT_STAGE,
+    STUDENT_TASK_VIEW_QUIZ_ALLOWED,
+    STUDENT_TASK_VIEW_UNSUBMITTED_SELF_REVIEW
 } from './ActionTypes';
 
 export {
@@ -46,7 +48,11 @@ export {
     check_reviewable_topics,
     check_reviewable_topics_success,
     get_current_stage,
-    get_current_stage_success
+    get_current_stage_success,
+    quiz_allowed,
+    quiz_allowed_success,
+    unsubmitted_self_review,
+    unsubmitted_self_review_success
 } from './actions/StudentTaskView';
 export {
     fetchProfile,

@@ -18,7 +18,9 @@ const initialize = {
     submission_allowed: false,
     check_reviewable_topics: false,
     metareview_allowed: false,
-    get_current_stage: ''
+    get_current_stage: '',
+    quiz_allowed: false,
+    unsubmitted_self_review: false
 }
 
 const studentTaskViewReducer = (state = initialize, action) => {
@@ -46,6 +48,10 @@ const studentTaskViewReducer = (state = initialize, action) => {
             return updateObject(state, { metareview_allowed: action.metareview_allowed })
         case actionType.STUDENT_TASK_VIEW_GET_CURRENT_STAGE:
             return updateObject(state, {get_current_stage: action.get_current_stage})
+        case actionType.STUDENT_TASK_VIEW_QUIZ_ALLOWED:
+            return updateObject(state, {quiz_allowed: action.quiz_allowed})
+        case actionType.STUDENT_TASK_VIEW_UNSUBMITTED_SELF_REVIEW:
+            return updateObject(state, {unsubmitted_self_review: action.unsubmitted_self_review})
         default:
             return state;
     }

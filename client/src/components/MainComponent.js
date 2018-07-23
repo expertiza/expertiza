@@ -20,6 +20,10 @@ import ChangeHandleComponent from './changeHandle/ChangeHandleComponent';
 import SignUpSheetComponent from './signUpSheet/SignUpSheetComponent'
 import SubmittedContentEditComponent from './submittedContentEdit/SubmittedContentEditComponent';
 import StudentQuizzesComponent from './studentQuizzes/StudentQuizzesComponent';
+import GradesViewTeamComponent from './gradesViewTeam/GradesViewTeamComponent';
+import GradesViewMyScores from './gradesViewMyScores/GradesViewMyScores';
+import StudentReviewListComponent from './studentReviewList/StudentReviewListComponent';
+import SuggestionsComponent from './suggestions/SuggestionsComponent';
 
 
 const mapStateToProps = state => {
@@ -74,6 +78,10 @@ class Main extends Component {
                 <Route path ='/student_quizzes/:id' component={(StudentQuizzesComponent)} />
                 <Route path ='/changeHandle' component={(ChangeHandleComponent)} />
                 <Route path ='/studentTaskView' component={(StudentTaskView)} />
+                <Route path ='/grades/view_team/:id' component={(GradesViewTeamComponent)} />
+                <Route path ='/grades/view_my_scores/:id' component={(GradesViewMyScores)} />
+                <Route path ='/student_review/list/:id' component={(StudentReviewListComponent)} />
+                <Route path ='/suggestion/new/:id' component={(SuggestionsComponent)} />
                 <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
                 <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />
               <Redirect to="/home" />

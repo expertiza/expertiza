@@ -1,5 +1,5 @@
 module Api::V1
-  class GradesController < ApplicationController
+  class GradesController < BasicApiController
     helper :file
     helper :submitted_content
     helper :penalty
@@ -74,23 +74,31 @@ module Api::V1
     def view_my_scores
       @participant = AssignmentParticipant.find(params[:id])
       @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-      return if redirect_when_disallowed
-      @assignment = @participant.assignment
-      @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
-      questionnaires = @assignment.questionnaires
-      retrieve_questions questionnaires
-      # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-      @pscore = @participant.scores(@questions)
-      make_chart
-      @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
-      @stage = @participant.assignment.get_current_stage(@topic_id)
-      calculate_all_penalties(@assignment.id)
-      # prepare feedback summaries
-      summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-      sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
-      @summary = sum.summary
-      @avg_scores_by_round = sum.avg_scores_by_round
-      @avg_scores_by_criterion = sum.avg_scores_by_criterion
+      skip = false
+      if redirect_when_disallowed
+        skip = true
+      end
+      if !skip
+        @assignment = @participant.assignment
+        @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
+        questionnaires = @assignment.questionnaires
+        retrieve_questions questionnaires
+        # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
+        @pscore = @participant.scores(@questions)
+        make_chart
+        @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
+        @stage = @participant.assignment.get_current_stage(@topic_id)
+        calculate_all_penalties(@assignment.id)
+        # prepare feedback summaries
+        summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
+        sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
+        @summary = sum.summary
+        @avg_scores_by_round = sum.avg_scores_by_round
+        @avg_scores_by_criterion = sum.avg_scores_by_criterion
+        render json: {status: :ok, data: 'need to decide what to pass'}
+      else
+        render json: {status: :ok, data: 'access denied'}
+      end
     end
 
     # method for alternative view
@@ -129,6 +137,7 @@ module Api::V1
         @vmlist << vm
       end
       @current_role_name = current_role_name
+      render json: {status: :ok, data: "need to decide what to pass"}
     end
 
     def edit

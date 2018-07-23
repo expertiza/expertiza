@@ -20,7 +20,8 @@ export const onLoad = (id) => {
                 dispatch(actions.submission_allowed(response.data.assignment.id, response.data.topic_id))
                 dispatch(actions.check_reviewable_topics(response.data.assignment.id))
                 dispatch(actions.get_current_stage(response.data.assignment.id, response.data.topic_id))
-                
+                dispatch(actions.quiz_allowed(response.data.assignment.id, response.data.topic_id))   
+                dispatch(actions.unsubmitted_self_review(response.data.participant.id))             
             }
         })
         .catch(error => {
@@ -29,6 +30,46 @@ export const onLoad = (id) => {
     }
 }
 
+
+export const unsubmitted_self_review = (participant_id) => {
+    return dispatch => {
+        axios({
+            method: 'post',
+            url: 'http://localhost:3001/api/v1/student_task/unsubmitted_self_review',
+            headers: { "Content-Type": "application/json", AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
+            data: { "participant_id": participant_id }
+        })
+        .then( res => dispatch(actions.unsubmitted_self_review_success(res.data.unsubmitted_self_review)))
+        .catch( e => console.log(e))
+    }
+}
+
+export const unsubmitted_self_review_success = (quiz_allowed) => {
+    return {
+        type: actions.STUDENT_TASK_VIEW_UNSUBMITTED_SELF_REVIEW,
+        quiz_allowed: quiz_allowed
+    }
+}
+
+export const quiz_allowed = (assignment_id, topic_id) => {
+    return dispatch => {
+        axios({
+            method: 'post',
+            url: 'http://localhost:3001/api/v1/student_task/quiz_allowed',
+            headers: { "Content-Type": "application/json", AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
+            data: { "assignment_id": assignment_id, topic_id: topic_id  }
+        })
+        .then( res => dispatch(actions.quiz_allowed_success(res.data.quiz_allowed)))
+        .catch( e => console.log(e))
+    }
+}
+
+export const quiz_allowed_success = (quiz_allowed) => {
+    return {
+        type: actions.STUDENT_TASK_VIEW_QUIZ_ALLOWED,
+        quiz_allowed: quiz_allowed
+    }
+}
 export const get_current_stage = (assignment_id, topic_id) => {
     return dispatch => {
         axios({

@@ -6,9 +6,24 @@ module Api::V1
         def action_allowed?
             true
         end
+        
         def current_user
             @current_user
         end
+
+        def current_user_role?
+            current_user.role.name
+        end
+        
+        def current_role_name
+            current_role.try :name
+        end
+        
+        def current_role
+            current_user.try :role
+        end
+
+        def self.verify(_args); end
 
         def authenticate
             if !auth_present?

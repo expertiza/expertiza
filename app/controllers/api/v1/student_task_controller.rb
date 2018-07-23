@@ -1,7 +1,8 @@
 module Api::V1
   class StudentTaskController < BasicApiController
       # helper :submitted_content
-    before_action :getAssignment , only: [ :metareview_allowed, :submission_allowed, :check_reviewable_topic, :get_current_stage]
+    before_action :getAssignment , only: [ :metareview_allowed, :submission_allowed, :check_reviewable_topic, :get_current_stage,
+                                            :quiz_allowed]
     
     include StudentTaskHelper
 
@@ -107,6 +108,16 @@ module Api::V1
     def get_current_stage
       get_current_stage = @assignment.get_current_stage(params[:topic_id])
       render json: { status: :ok, get_current_stage: get_current_stage}
+    end
+
+    def quiz_allowed
+      quiz_allowed = @assignment.quiz_allowed(params[:topic_id])
+      render json: {status: :ok, quiz_allowed: quiz_allowed}
+    end
+
+    def unsubmitted_self_review
+      unsubmitted_self_review = unsubmitted_self_review?(params[:participant_id])
+      render json: {status: :ok, unsubmitted_self_review: unsubmitted_self_review}
     end
   end
 end

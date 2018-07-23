@@ -22,6 +22,8 @@ Expertiza::Application.routes.draw do
         post :check_reviewable_topic
         post :metareview_allowed
         post :get_current_stage
+        post :quiz_allowed
+        post :unsubmitted_self_review 
         # get '/*other', to: redirect('/student_task/list')
       end
     end
@@ -39,7 +41,7 @@ Expertiza::Application.routes.draw do
         get :view
         post :view_team
         get :view_reviewer
-        get :view_my_scores
+        post :view_my_scores
         get :instructor_review
         post :remove_hyperlink
         post :save_grade_and_comment_for_submission
@@ -90,6 +92,22 @@ Expertiza::Application.routes.draw do
         get :finished_quiz
         get :take_quiz
         get :review_questions
+      end
+    end
+
+    resources :student_review, only: [] do
+      collection do
+        post :list
+      end
+    end
+
+    resources :suggestion, only: %i[show  create] do
+      collection do
+        post :new
+        get :list
+        post :submit
+        post :student_submit
+        post :update_suggestion
       end
     end
   end

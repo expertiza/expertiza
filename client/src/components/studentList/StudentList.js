@@ -46,7 +46,7 @@ class StudentList extends Component {
                                 this.state.studentTasks === undefined ? <Loading /> :
                                 this.state.studentTasks.map(studentTask =>(
                                     <tr>
-                                        <td key={studentTask.assignment.id}><NavLink to={`/studentTaskView/${studentTask.assignment.id}`}>{studentTask.assignment.name}</NavLink> <br /> {studentTask.assignment.course_id== null ? "" : studentTask.course_name}</td>
+                                        <td key={studentTask.assignment.id}><NavLink to={`/studentTaskView/${studentTask.participant.id}`}>{studentTask.assignment.name}</NavLink> <br /> {studentTask.assignment.course_id== null ? "" : studentTask.course_name}</td>
                                         <td key={studentTask.assignment.id}> {studentTask.topic == null ? "-" : studentTask.topic}</td>
                                         <td key={studentTask.assignment.id}> {studentTask.current_stage}</td>
                                         <td key={studentTask.assignment.id}> {"N/A"}</td>

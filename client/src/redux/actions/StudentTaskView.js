@@ -3,6 +3,7 @@ import * as actions from '../index'
 
 export const onLoad = (id) => {
     return dispatch => {
+        console.log('id in actions is :', id)
         axios({
             method: 'post',
             url: 'student_task/view',
@@ -15,7 +16,7 @@ export const onLoad = (id) => {
             if(response.data.denied) {
                 dispatch(actions.loadFailure())
             }else {
-                console.log(response.data)
+                console.log("need to see data here",response.data)
                 dispatch(actions.loadSuccess(response.data));
                 dispatch(actions.submission_allowed(response.data.assignment.id, response.data.topic_id))
                 dispatch(actions.check_reviewable_topics(response.data.assignment.id))

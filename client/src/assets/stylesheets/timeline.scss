@@ -13,6 +13,7 @@
 .timestamp
 {
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .status {
@@ -21,10 +22,13 @@
   border-top: 2px solid #D6DCE0;
   position: relative;
   transition: all 200ms ease-in;
+  padding: 5px;
+
 }
 
 .status p {
   margin-top: 10px;
+  text-align: center;
 }
 
 .status:before {
@@ -36,7 +40,7 @@
   border: 1px solid #ddd;
   position: absolute;
   top: -15px;
-  left: 8%;
+  left: 35%;
   transition: all 200ms ease-in;
 }
 

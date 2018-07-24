@@ -5,7 +5,6 @@ import '../../../assets/stylesheets/timeline.css'
 const  TimelineComponent = (props) => {
         let output;
         if (props.timeline_list) {
-            console.log('heeerrrrr',props.timeline_list)
             output = props.timeline_list.map(tl =>  <UnitTimelineComponent tl={tl}> </UnitTimelineComponent> )
         } else {
             output = null
@@ -13,11 +12,11 @@ const  TimelineComponent = (props) => {
         ;
 
         return (
-                <div className = "scrollable">
-                    <ul className = "timeline" id = "timeline">
-                    {output}     
-                    </ul>                      
-                </div>
+            <div className = "scrollable">
+                <ul className = "timeline" id = "timeline">
+                {output}     
+                </ul>                      
+            </div>
         )
 }
 

@@ -133,7 +133,7 @@ class StudentTaskView extends Component {
                         { panel}
                     </div>
                 </div>
-                <div className="container" style={{marginTop: '100px'}}>
+                <div className="container-fluid" style={{marginTop: '100px'}}>
                     {timeline}
                 </div>
             </Aux>

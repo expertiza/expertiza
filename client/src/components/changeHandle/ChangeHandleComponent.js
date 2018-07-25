@@ -12,7 +12,6 @@ class ChangeHandleComponent extends Component {
     }
     
     handleNameChangeHandler = (e) => {
-        console.log(this.state.participant_handle);
         this.setState({participant_handle: e.target.value})
     }
     componentDidMount = () =>{
@@ -67,13 +66,15 @@ class ChangeHandleComponent extends Component {
 }
 
 const mapStateToProps = state => {
-    if(state.studentTaskView===null || state.studentTaskView===undefined)
-    return{
-        participant_handle: ""
+    if(state.studentTaskView===null || state.studentTaskView===undefined){
+        return{
+            participant_handle: ""
+        }
     }
-    else
-    return {
-        participant_handle: state.studentTaskView.participant.handle
+    else{
+        return {
+            participant_handle: state.studentTaskView.participant.handle
+        }
     }
 }
 

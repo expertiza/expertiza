@@ -13,7 +13,6 @@ class StudentTaskView extends Component {
         this.props.onLoad(this.props.match.params.id);
     }
 
-
     getAliasName = () => {
         let alias_name;
         if (this.props.authorization !== 'reader') {
@@ -112,7 +111,7 @@ class StudentTaskView extends Component {
                         { (this.props.get_current_stage === "Complete") ? 
                             <li><NavLink to={`/suggestion/new/${this.props.assignment.id}`} >Take a survey </NavLink> </li>:null
                         }
-                        <li><NavLink to="/changeHandle" > Change your handle</NavLink> (Provide a different handle for this assignment)</li>             
+                        <li><NavLink to={`/changeHandle/${this.props.participant.id}`}> Change your handle</NavLink> (Provide a different handle for this assignment)</li>             
             </div>
 
              timeline =   this.props.timeline_list ? <TimelineComponent timeline_list={this.props.timeline_list}></TimelineComponent> :null

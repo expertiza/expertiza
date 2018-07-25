@@ -1,19 +1,28 @@
 import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom';
 import {connect} from 'react-redux';
+import { editHandle } from '../../redux/actions/ParticipantHandle';
 
 class ChangeHandleComponent extends Component {
-    state = { profile : this.props.profile,
-                aq: this.props}
-  
-
-    handleNameChangeHandler = (e) => {
-        this.setState({handle: e.target.value})
+    constructor(props){
+        super(props)
+        this.state ={
+            participant_handle: ""
+        }
     }
-
+    
+    handleNameChangeHandler = (e) => {
+        console.log(this.state.participant_handle);
+        this.setState({participant_handle: e.target.value})
+    }
+    componentDidMount = () =>{
+        this.setState({
+            participant_handle: this.props.participant_handle
+        },()=>console.log(this.props.participant_handle));
+    }
     onSubmitHandler = (e) => {
-        e.preventDefault();
-        this.props.onSubmit(this.state.handle)
+         e.preventDefault();
+         this.props.editHandle(this.props.match.params.id,this.state.participant_handle);
     }
     render () {
 
@@ -40,13 +49,13 @@ class ChangeHandleComponent extends Component {
                     <p>Change handle <em>for current assignment</em>:</p>
                     <div className="form-group">
                         <input  className="form-control" 
-                                value={this.props.handle_name}
+                                value={ this.state.participant_handle}
                                 onChange={this.handleNameChangeHandler}/>
                     </div>
                     <p><em>Warning:</em> You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff.</p>
                     <div style={{ marginTop: '20px'}}>
                         <button type="submit"
-                                className="btn btn-success"
+                                className="btn btn-primary"
                                 onSubmit={this.onSubmitHandler}
                                 >Save</button>
                     </div>
@@ -54,18 +63,23 @@ class ChangeHandleComponent extends Component {
             </div>
         )
     }
+    
 }
 
-const mapStatetoProps = state => {
+const mapStateToProps = state => {
+    if(state.studentTaskView===null || state.studentTaskView===undefined)
+    return{
+        participant_handle: ""
+    }
+    else
     return {
-        profile: state.profile.profile,
-        aq: state.profile.aq
+        participant_handle: state.studentTaskView.participant.handle
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        onSubmit: (handle_name) => {dispatch()},
-    }
-}
-export default connect(mapStatetoProps,mapDispatchToProps)(ChangeHandleComponent);
+const mapDispatchToProps = dispatch =>({
+    // fetchParticiapantHandle: (handle) => {dispatch(fetchParticiapantHandle(handle))},
+    editHandle: (handle, id) => {dispatch(editHandle(handle,id))}
+  });
+
+export default connect(mapStateToProps, mapDispatchToProps)(ChangeHandleComponent);

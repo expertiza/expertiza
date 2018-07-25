@@ -11,7 +11,7 @@ class QuestionnairesController < ApplicationController
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
        'Administrator'
-       ].include? current_role_name)  ||
+       ].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
 
     else
@@ -19,8 +19,8 @@ class QuestionnairesController < ApplicationController
          'Administrator',
          'Instructor',
          'Teaching Assistant', 'Student'].include? current_role_name
-   end
- end
+    end
+  end
 
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
@@ -298,14 +298,14 @@ class QuestionnairesController < ApplicationController
     if params['save'] && params[:question].try(:keys)
       @questionnaire.update_attributes(questionnaire_params)
 
-      for qid in params[:question].keys
+      params[:question].keys.each do |qid|
         @question = Question.find(qid)
         @question.txt = params[:question][qid.to_sym][:txt]
         @question.save
 
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         i = 1
-        for quiz_question_choice in @quiz_question_choices
+        @quiz_question_choices.each do |quiz_question_choice|
           if @question.type == "MultipleChoiceCheckbox"
             if params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s]
               quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
@@ -382,8 +382,8 @@ class QuestionnairesController < ApplicationController
     save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
     # We do not create node for quiz questionnaires
     if @questionnaire.type != "QuizQuestionnaire"
-      pFolder = TreeFolder.find_by(name: @questionnaire.display_type)
-      parent = FolderNode.find_by(node_object_id: pFolder.id)
+      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
+      parent = FolderNode.find_by(node_object_id: p_folder.id)
       # create_new_node_if_necessary(parent)
     end
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
@@ -394,7 +394,7 @@ class QuestionnairesController < ApplicationController
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      for question_key in params[:new_question].keys
+      params[:new_question].keys.each do |question_key|
         q = Question.new
         q.txt = params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id
@@ -417,7 +417,7 @@ class QuestionnairesController < ApplicationController
     questions.each do |question|
       should_delete = true
       unless question_params.nil?
-        params[:question].keys.each do |question_key|
+        params[:question].each_key do |question_key|
           should_delete = false if question_key.to_s == question.id.to_s
         end
       end
@@ -437,7 +437,7 @@ class QuestionnairesController < ApplicationController
     save_new_questions questionnaire_id
 
     if params[:question]
-      for question_key in params[:question].keys
+      params[:question].keys.each do |question_key|
 
         if params[:question][question_key][:txt].strip.empty?
           # question text is empty, delete the question
@@ -455,13 +455,13 @@ class QuestionnairesController < ApplicationController
   # method to save the choices associated with a question in a quiz to the database
   # only for quiz questionnaire
   def save_choices(questionnaire_id)
-    if params[:new_question] and params[:new_choices]
+    return unless params[:new_question] or params[:new_choices]
       questions = Question.where(questionnaire_id: questionnaire_id)
       questionnum = 1
 
-      for question in questions
+      questions.each do |question|
         q_type = params[:question_type][questionnum.to_s][:type]
-        for choice_key in params[:new_choices][questionnum.to_s][q_type].keys
+        params[:new_choices][questionnum.to_s][q_type].keys.each do |choice_key|
           score = if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
                     1
                   else
@@ -498,7 +498,6 @@ class QuestionnairesController < ApplicationController
         questionnum += 1
         question.weight = 1
       end
-    end
   end
 
   def questionnaire_params
@@ -552,8 +551,8 @@ class QuestionnairesController < ApplicationController
         end
       end
 
-      pFolder = TreeFolder.find_by(name: @questionnaire.display_type)
-      parent = FolderNode.find_by(node_object_id: pFolder.id)
+      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
+      parent = FolderNode.find_by(node_object_id: p_folder.id)
       QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
       undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully.")
       redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id

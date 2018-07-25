@@ -86,12 +86,12 @@ class ResponseController < ApplicationController
     msg = ""
     begin
       @map = @response.map
-      @response.update_attribute('additional_comment', params[:review][:comments])
+      @response.update_attributes('additional_comment' => params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
-        @response.update_attribute('is_submitted', true)
+        @response.update_attributes('is_submitted' => true)
       else
         # this won't work, since the auto update click edit in the background and override the submit. Don't think this is necessary anyway
         # @response.update_attribute('is_submitted', false)
@@ -126,7 +126,7 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = Response.find(params[:id]) if !params[:id].nil?
+    review = Response.find(params[:id]) unless params[:id].nil?
     if review
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
@@ -149,7 +149,7 @@ class ResponseController < ApplicationController
 
   def create
     map_id = params[:id]
-    map_id = params[:map_id] if !params[:map_id].nil?# pass map_id as a hidden field in the review form
+    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
     set_all_responses
     if params[:review][:questionnaire_id]
@@ -159,7 +159,7 @@ class ResponseController < ApplicationController
       @round = nil
     end
     is_submitted = (params[:isSubmit] == 'Yes')
-    was_submitted = false
+    # was_submitted = false
     @response = Response.where(map_id: @map.id, round: @round.to_i).first
     if @response.nil?
       @response = Response.create(
@@ -170,7 +170,7 @@ class ResponseController < ApplicationController
       )
     end
     was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -346,8 +346,8 @@ class ResponseController < ApplicationController
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      score.update_attribute('answer', v[:score])
-      score.update_attribute('comments', v[:comment])
+      score.update_attributes('answer' => v[:score])
+      score.update_attributes('comments' => v[:comment])
     end
   end
 

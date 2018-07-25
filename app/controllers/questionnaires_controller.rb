@@ -438,7 +438,6 @@ class QuestionnairesController < ApplicationController
 
     if params[:question]
       params[:question].keys.each do |question_key|
-
         if params[:question][question_key][:txt].strip.empty?
           # question text is empty, delete the question
           Question.delete(question_key)
@@ -447,7 +446,6 @@ class QuestionnairesController < ApplicationController
           question = Question.find(question_key)
           Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
           end
-
       end
     end
   end
@@ -456,48 +454,48 @@ class QuestionnairesController < ApplicationController
   # only for quiz questionnaire
   def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
-      questions = Question.where(questionnaire_id: questionnaire_id)
-      questionnum = 1
+    questions = Question.where(questionnaire_id: questionnaire_id)
+    questionnum = 1
 
-      questions.each do |question|
-        q_type = params[:question_type][questionnum.to_s][:type]
-        params[:new_choices][questionnum.to_s][q_type].keys.each do |choice_key|
-          score = if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
-                    1
-                  else
-                    0
-                  end
-          if q_type == "MultipleChoiceCheckbox"
-            q = if params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+    questions.each do |question|
+      q_type = params[:question_type][questionnum.to_s][:type]
+      params[:new_choices][questionnum.to_s][q_type].keys.each do |choice_key|
+        score = if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
+                  1
                 else
-                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                  0
                 end
+        if q_type == "MultipleChoiceCheckbox"
+          q = if params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s
+                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+              else
+                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+              end
+          q.save
+        elsif q_type == "TrueFalse"
+          if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
+            q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
             q.save
-          elsif q_type == "TrueFalse"
-            if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
-              q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
-              q.save
-              q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
-              q.save
-            else
-              q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
-              q.save
-              q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
-              q.save
-            end
+            q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
+            q.save
           else
-            q = if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
-                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-                else
-                  QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-                end
+            q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
+            q.save
+            q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
             q.save
           end
+        else
+          q = if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
+                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+              else
+                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+              end
+          q.save
         end
-        questionnum += 1
-        question.weight = 1
       end
+      questionnum += 1
+      question.weight = 1
+    end
   end
 
   def questionnaire_params

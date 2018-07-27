@@ -56,10 +56,10 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_name = 'Survey Questionnaire 1'
     deploy_survey(@next_day, @next_to_next_day, survey_name)
 
-    survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
+    survey_questionnaire1 = Questionnaire.where(name: survey_name).first
 
     # adding some questions for the deployed survey
-    visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
+    visit '/questionnaires/' + survey_questionnaire1.id.to_s + '/edit'
     fill_in('question_total_num', with: '1')
     select('Criterion', from: 'question_type')
     click_button "Add"
@@ -69,8 +69,8 @@ describe "Survey questionnaire tests for instructor interface" do
     click_button "Save assignment survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')
 
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
-    question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire_1.id.to_s +
+    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire1.id).first
+    question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire1.id.to_s +
         " and (type = 'Criterion' OR type = 'Checkbox')")
 
     visit '/survey_deployment/generate_statistics/' + survey_deployment.id.to_s

@@ -86,12 +86,12 @@ class ResponseController < ApplicationController
     msg = ""
     begin
       @map = @response.map
-      @response.update_attributes('additional_comment' => params[:review][:comments])
+      @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
-        @response.update_attributes('is_submitted' => true)
+        @response.update_attribute('is_submitted', true)
       else
         # this won't work, since the auto update click edit in the background and override the submit. Don't think this is necessary anyway
         # @response.update_attribute('is_submitted', false)
@@ -346,8 +346,8 @@ class ResponseController < ApplicationController
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
-      score.update_attributes('answer' => v[:score])
-      score.update_attributes('comments' => v[:comment])
+      score.update_attribute('answer', v[:score])
+      score.update_attribute('comments', v[:comment])
     end
   end
 

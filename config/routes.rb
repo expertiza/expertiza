@@ -7,13 +7,18 @@ Expertiza::Application.routes.draw do
     resources :sessions, only: [:create, :index, :destroy]
     resources :profile
     resources :institution
-    # resources :student_tasks_list
     resources :password_retrieval, only: [] do
       collection do
         post :forgottenPasswordSendLink
         post :forgottenPasswordUpdatePassword
       end
     end
+    resources :participants, only: [] do
+        collection do
+          get :list
+          put :change_handle
+      end    
+    end  
     resources :student_task, only: [] do
       collection do
         get :list

@@ -33,6 +33,9 @@ Expertiza::Application.routes.draw do
         post :view
         get :remove_participant
         get :auto_complete_for_user_name
+        post :getUserDetails
+        post :getTeamUsers
+        post :getCurrentTeam
       end
     end
 

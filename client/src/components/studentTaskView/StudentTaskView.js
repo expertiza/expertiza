@@ -1,6 +1,6 @@
 import React, { Component } from 'react' 
 import { connect } from 'react-redux'
-import * as actions from '../../redux/index'
+import * as actions from '../../redux'
 import { NavLink } from 'react-router-dom';
 import TimelineComponent from './timeline/TimelineComponent'
 import Aux from '../../hoc/Aux/Aux'
@@ -25,7 +25,7 @@ class StudentTaskView extends Component {
     }
   
     render () {
-
+        let loading;
         let assign_name;
         let link;
         let panel;
@@ -44,7 +44,7 @@ class StudentTaskView extends Component {
                    
             panel = <div class="list-group col-md-7 " style={{marginLeft: '25px'}}>
                        {
-                        (this.props.topics.length === 0) ? 
+                        (this.props.topics.length > 0) ? 
                              (this.props.authorization === 'participant' || this.props.authorization === 'submitter') ? 
                              <li><NavLink to={`/sign_up_sheet_list/${this.props.participant.id}`} > Signup sheet
                                     </NavLink> (Sign up for a topic)</li> :null :null
@@ -53,7 +53,7 @@ class StudentTaskView extends Component {
                        {/* ACS Here we need to know the size of the team to decide whether or not to display the label "Your team" in the student assignment tasks */}
                        
                        {
-                        (this.props.assignment.max_team_size < 1) ? this.props.authorization === 'participant' ?
+                        (this.props.assignment.max_team_size > 1) ? this.props.authorization === 'participant' ?
                                 <li><NavLink to={`/view_student_teams/${this.props.participant.id}`} >
                                         Your team</NavLink> (View and manage your team)  </li> : null :null
                        }
@@ -119,11 +119,14 @@ class StudentTaskView extends Component {
           
                  
         }else {
-            assign_name = <Loading/>
+            loading = <Loading/>
         }
 
         return (
             <Aux>
+                <div className="container">
+                    {loading}
+                </div>
                 <div className="container-fluid left">
                 
                     {assign_name}

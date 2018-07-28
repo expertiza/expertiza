@@ -11,6 +11,13 @@ module Api::V1
             @current_user
         end
 
+        def current_user_id
+            if @current_user
+                return @current_user.id
+            end
+            nil
+        end
+
         def current_user_role?
             current_user.role.name
         end

@@ -16,17 +16,17 @@ module Api::V1
     attr_writer :student
 
     before_action :team, only: %i[edit update]
-    # before_action :student, only: %i[view update edit create remove_participant]
+    before_action :student, only: %i[view update edit create remove_participant]
 
     def action_allowed?
       # note, this code replaces the following line that cannot be called before action allowed?
       puts params.inspect
-      if ['Instructor',
-          'Teaching Assistant',
-          'Administrator',
-          'Super-Administrator',
-          'Student'].include? current_role_name and
-        ((%w[view].include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
+      if ["Instructor",
+          "Teaching Assistant",
+          "Administrator",
+          "Super-Administrator",
+          "Student"].include? current_role_name and
+         ((%w[view].include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
         # make sure the student is the owner if they are trying to create it
         return current_user_id? student.user_id if %w[create].include? action_name
         # make sure the student belongs to the group before allowed them to try and edit or update
@@ -41,12 +41,13 @@ module Api::V1
       # View will check if send_invs and recieved_invs are set before showing
       # only the owner should be able to see those.
       skip = false
-      if !(current_user_id? student.user_id) 
+      # if !(current_user_id? student.user_id)
+      if !(current_user_id? 6)
         skip = true
       end
       if !skip
         @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
-        @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
+        @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: "W"
         # Get the current due dates
         @student.assignment.due_dates.each do |due_date|
           if due_date.due_at > Time.now
@@ -54,42 +55,54 @@ module Api::V1
             break
           end
         end
-      
+
         current_team = @student.team
 
         @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
 
-        @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
-        render json: {status: :ok}
+        @teammate_review_allowed = true if @student.assignment.find_current_stage == "Finished" || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+        # <--- needed for view -->
+        @assignment = @student.assignment
+        @team = @student.team
+        @team_topic = nil
+        @team_topic = @team.topic unless !@team
+        @participants = @student.team.participants
+        full = @team.full?
+        @assignment_topics = @assignment.topics?
+        render json: {status: :ok, student: @student, current_due_date: @current_due_date, users_on_waiting_list: @users_on_waiting_list, teammate_review_allowed: @teammate_review_allowed,
+                      send_invs: @send_invs, recieved_invs: @recieved_invs, assignment: @assignment, team: @team, participants: @participants, full: full , team_topic: @team_topic,
+                      assignment_topics: @assignment_topics }
       else
-        render json: {status: :ok , data: 1}
+        render json: {status: :ok, data: 1}
       end
     end
 
     def create
-      existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
-      # check if the team name is in use
-      if existing_assignments.empty?
-        if params[:team][:name].blank?
-          flash[:notice] = 'The team name is empty.'
-          ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
-          redirect_to view_student_teams_path student_id: student.id
-          return
-        end
-        team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
-        team.save
-        parent = AssignmentNode.find_by node_object_id: student.parent_id
-        TeamNode.create parent_id: parent.id, node_object_id: team.id
-        user = User.find student.user_id
-        team.add_member user, team.parent_id
-        team_created_successfully(team)
-        redirect_to view_student_teams_path student_id: student.id
+      puts params.inspect
+      render json: {status: :ok}
+      #   existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
+      #   # check if the team name is in use
+      #   if existing_assignments.empty?
+      #     if params[:team][:name].blank?
+      #       flash[:notice] = 'The team name is empty.'
+      #       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
+      #       redirect_to view_student_teams_path student_id: student.id
+      #       return
+      #     end
+      #     team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
+      #     team.save
+      #     parent = AssignmentNode.find_by node_object_id: student.parent_id
+      #     TeamNode.create parent_id: parent.id, node_object_id: team.id
+      #     user = User.find student.user_id
+      #     team.add_member user, team.parent_id
+      #     team_created_successfully(team)
+      #     redirect_to view_student_teams_path student_id: student.id
 
-      else
-        flash[:notice] = 'That team name is already in use.'
-        ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Team name being created was already in use', request)
-        redirect_to view_student_teams_path student_id: student.id
-      end
+      # else
+      #   flash[:notice] = 'That team name is already in use.'
+      #   ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Team name being created was already in use', request)
+      #   redirect_to view_student_teams_path student_id: student.id
+      # end
     end
 
     def edit; end
@@ -97,22 +110,18 @@ module Api::V1
     def update
       matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
       if matching_teams.length.zero?
-        if team.update_attribute('name', params[:team][:name])
+        if team.update_attribute("name", params[:team][:name])
           team_created_successfully
 
           redirect_to view_student_teams_path student_id: params[:student_id]
-
         end
       elsif matching_teams.length == 1 && (matching_teams[0].name <=> team.name).zero?
-
         team_created_successfully
         redirect_to view_student_teams_path student_id: params[:student_id]
-
       else
-        flash[:notice] = 'That team name is already in use.'
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)
+        flash[:notice] = "That team name is already in use."
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Team name being updated to was already in use", request)
         redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
-
       end
     end
 
@@ -165,7 +174,7 @@ module Api::V1
       return false unless team_user
       team_user.destroy_all
       undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "User removed a participant from the team", request)
     end
 
     def team_created_successfully(current_team = nil)
@@ -174,12 +183,41 @@ module Api::V1
       else
         undo_link "The team \"#{team.name}\" has been successfully updated."
       end
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The team has been successfully created.", request)
     end
 
     def review
       @assignment = Assignment.find params[:assignment_id]
-      redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
+      redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: "AuthorFeedbackQuestionnaire").id
     end
+
+    def getUserDetails
+      @student = User.find(params[:user_id])
+      @assignment = Assignment.find(params[:assignment_id])
+      if params[:teammate_review_allowed]
+        if @assignment.questionnaires.find_by_type("TeammateReviewQuestionnaire") != nil and @student.id != current_user_id
+          map = TeammateReviewResponseMap.where(["reviewer_id = ? and reviewee_id = ?", current_user_id, @student.id]).first
+          if map.nil?
+            map = TeammateReviewResponseMap.create(:reviewer_id => current_user_id, :reviewee_id => @student.id, :reviewed_object_id => params[:assignment_id])
+          end
+          review = map.response.last
+        end
+      end
+      render json: {status: :ok, member: @student, map: map, review: review}
+    end
+
+
+    def getTeamUsers
+      teamUsers = TeamsUser.where(['user_id = ?', params[:user_id]])
+      render json: {status: :ok, teamUsers: teamUsers}
+    end
+
+    def getCurrentTeam
+      current_team = Team.where(['id = ? and parent_id = ?', params[:team_id], params[:assignment_id]]).first
+      
+      render json: { status: :ok, current_team: current_team}
+    end
+
+    
   end
 end

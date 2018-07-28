@@ -22,7 +22,8 @@ export {
     STUDENT_TASK_VIEW_METAREVIEW_ALLOWED,
     STUDENT_TASK_VIEW_GET_CURRENT_STAGE,
     STUDENT_TASK_VIEW_QUIZ_ALLOWED,
-    STUDENT_TASK_VIEW_UNSUBMITTED_SELF_REVIEW
+    STUDENT_TASK_VIEW_UNSUBMITTED_SELF_REVIEW,
+    STUDENTS_TEAM_VIEW_SUCCESS
 } from './ActionTypes';
 
 export {
@@ -67,4 +68,9 @@ export {
     addStudentsTeamedWith,
     addStudentTasks
 } 
-from './actions/StudentTaskList'
+from './actions/StudentTaskList';
+export { fetchStudentsTeamView,
+    fetchStudentsTeamViewSuccess,
+    updateTeamName
+}
+from './actions/StudentTeamView';

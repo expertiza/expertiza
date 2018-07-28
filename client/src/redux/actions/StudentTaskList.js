@@ -8,6 +8,7 @@ export const fetchStudentsTeamedWith = () =>(dispatch) => {
         headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
     })
     .then(response =>{ 
+        console.log('hhhh', response.data)
         dispatch(actions.addStudentsTeamedWith(response.data.studentsTeamedWith[""]))
     } )
     .catch(error => console.log(error));

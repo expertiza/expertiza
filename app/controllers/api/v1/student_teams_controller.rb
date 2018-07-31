@@ -42,7 +42,7 @@ module Api::V1
       # only the owner should be able to see those.
       skip = false
       # if !(current_user_id? student.user_id)
-      if !(current_user_id? 6)
+      if !(current_user_id? student.user_id)
         skip = true
       end
       if !skip
@@ -69,16 +69,17 @@ module Api::V1
         @participants = nil
         full = nil
         @assignment_topics = nil
-
+        @join_team_requests = nil
         if  @team
           @team_topic = @team.topic
           @participants = @student.team.participants
           full = @team.full?
           @assignment_topics = @assignment.topics?
+          @join_team_requests = JoinTeamRequest.where(team_id: @team.id)
         end
         render json: {status: :ok, student: @student, current_due_date: @current_due_date, users_on_waiting_list: @users_on_waiting_list, teammate_review_allowed: @teammate_review_allowed,
                       send_invs: @send_invs, recieved_invs: @recieved_invs, assignment: @assignment, team: @team, participants: @participants, full: full , team_topic: @team_topic,
-                      assignment_topics: @assignment_topics }
+                      assignment_topics: @assignment_topics, join_team_requests: @join_team_requests }
       else
         render json: {status: :ok, data: 1}
       end
@@ -235,6 +236,9 @@ module Api::V1
       render json: { status: :ok, current_team: current_team}
     end
 
-    
+    def getUserNameFromParticipant
+      user_name = User.find(Participant.find(params[:participant_id]).user_id).name
+      render json: {status: :ok , user_name: user_name}
+    end
   end
 end

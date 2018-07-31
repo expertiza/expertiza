@@ -213,11 +213,10 @@ class StudentTeamComponent extends Component {
     // <!--render partial for join team request-->
     if (this.props.student && this.props.team ) {
       request = (
-        <JoinTeamRequestListComponent
-          team_id={this.props.team.id}
-          teams_user_id={this.props.student.id}
-          assignment_id={this.props.assignment.id}
-        />
+        <JoinTeamRequestListComponent   join_team_requests = {this.props.join_team_requests}
+                                        team_id={this.props.team.id}
+                                        teams_user_id={this.props.student.id}
+                                        assignment_id={this.props.assignment.id} />
       );
     }
 
@@ -347,6 +346,7 @@ const mapStateToProps = state => {
     participants: state.studentTeamView.participants,
     team_full: state.studentTeamView.team_full,
     team_topic: state.studentTeamView.team_topic,
+    join_team_requests: state.studentTeamView.join_team_requests,
     loaded: state.studentTeamView.loaded
   };
 };

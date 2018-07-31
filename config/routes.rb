@@ -41,6 +41,7 @@ Expertiza::Application.routes.draw do
         post :getUserDetails
         post :getTeamUsers
         post :getCurrentTeam
+        post :getUserNameFromParticipant
       end
     end
 

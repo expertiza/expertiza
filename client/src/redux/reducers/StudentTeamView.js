@@ -14,6 +14,7 @@ const initialize = {
   participants: null,
   team_full: false,
   team_topic: null,
+  join_team_requests: null,
   loaded: false
 };
 
@@ -32,7 +33,8 @@ const studentTeamView = (state = initialize, action) => {
         team: action.payload.team,
         team_full: action.payload.full,
         team_topic: action.payload.team_topic,
-        participants: action.payload.participants
+        participants: action.payload.participants,
+        join_team_requests: action.payload.join_team_requests
       });
 
     default:

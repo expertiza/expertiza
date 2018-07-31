@@ -8,6 +8,7 @@
     }
   },
   "dependencies": {
+    "@tinymce/tinymce-react": "^2.2.5",
     "axios": "^0.18.0",
     "bootstrap": "^4.1.1",
     "font-awesome": "^4.7.0",

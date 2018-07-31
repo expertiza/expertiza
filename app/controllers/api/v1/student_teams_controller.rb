@@ -9,14 +9,14 @@ module Api::V1
     attr_writer :team
 
     def student
-      puts params.inspect
+      # puts params.inspect
       @student ||= AssignmentParticipant.find(params[:student_id])
     end
 
     attr_writer :student
 
     before_action :team, only: %i[edit update]
-    before_action :student, only: %i[view update edit create remove_participant]
+    before_action :student, only: %i[view update edit create remove_participant getUserDetails]
 
     def action_allowed?
       # note, this code replaces the following line that cannot be called before action allowed?
@@ -62,13 +62,20 @@ module Api::V1
 
         @teammate_review_allowed = true if @student.assignment.find_current_stage == "Finished" || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
         # <--- needed for view -->
+
         @assignment = @student.assignment
         @team = @student.team
         @team_topic = nil
-        @team_topic = @team.topic unless !@team
-        @participants = @student.team.participants
-        full = @team.full?
-        @assignment_topics = @assignment.topics?
+        @participants = nil
+        full = nil
+        @assignment_topics = nil
+
+        if  @team
+          @team_topic = @team.topic
+          @participants = @student.team.participants
+          full = @team.full?
+          @assignment_topics = @assignment.topics?
+        end
         render json: {status: :ok, student: @student, current_due_date: @current_due_date, users_on_waiting_list: @users_on_waiting_list, teammate_review_allowed: @teammate_review_allowed,
                       send_invs: @send_invs, recieved_invs: @recieved_invs, assignment: @assignment, team: @team, participants: @participants, full: full , team_topic: @team_topic,
                       assignment_topics: @assignment_topics }
@@ -167,14 +174,15 @@ module Api::V1
       old_invites = Invitation.where from_id: student.user_id, assignment_id: student.parent_id
       old_invites.each(&:destroy)
       student.save
-      redirect_to view_student_teams_path student_id: student.id
+      # redirect_to view_student_teams_path student_id: student.id
+      render json: { status: :ok }
     end
 
     def remove_team_user(team_user)
       return false unless team_user
       team_user.destroy_all
-      undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "User removed a participant from the team", request)
+      # undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
+      # ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "User removed a participant from the team", request)
     end
 
     def team_created_successfully(current_team = nil)
@@ -192,18 +200,27 @@ module Api::V1
     end
 
     def getUserDetails
-      @student = User.find(params[:user_id])
+      @member = User.find(params[:user_id])
+      @member_id = params[:member_id]
       @assignment = Assignment.find(params[:assignment_id])
+      @TeammateReviewQuestionnaire = @assignment.questionnaires.find_by_type("TeammateReviewQuestionnaire")
+      @studentIdEqualCurrentUserId = false
+      if (@member.id == current_user_id) 
+        @studentIdEqualCurrentUserId = true
+      end
+
       if params[:teammate_review_allowed]
-        if @assignment.questionnaires.find_by_type("TeammateReviewQuestionnaire") != nil and @student.id != current_user_id
-          map = TeammateReviewResponseMap.where(["reviewer_id = ? and reviewee_id = ?", current_user_id, @student.id]).first
+        if @assignment.questionnaires.find_by_type("TeammateReviewQuestionnaire") != nil and @member.id != current_user_id
+          map = TeammateReviewResponseMap.where(["reviewer_id = ? and reviewee_id = ?", @student.id, @member_id]).first
           if map.nil?
-            map = TeammateReviewResponseMap.create(:reviewer_id => current_user_id, :reviewee_id => @student.id, :reviewed_object_id => params[:assignment_id])
+            map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => @member_id, :reviewed_object_id => params[:assignment_id])
           end
           review = map.response.last
         end
       end
-      render json: {status: :ok, member: @student, map: map, review: review}
+      render json: { status: :ok, member: @member, map: map, review: review, 
+                                TeammateReviewQuestionnaire: @TeammateReviewQuestionnaire, 
+                                studentIdEqualCurrentUserId: @studentIdEqualCurrentUserId }
     end
 
 

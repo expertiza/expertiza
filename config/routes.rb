@@ -36,7 +36,7 @@ Expertiza::Application.routes.draw do
     resources :student_teams, only: %i[create edit update] do
       collection do
         post :view
-        get :remove_participant
+        post :remove_participant
         get :auto_complete_for_user_name
         post :getUserDetails
         post :getTeamUsers
@@ -119,9 +119,10 @@ Expertiza::Application.routes.draw do
       end
     end
 
-    resources :response, only: %i[new create edit update] do
+    resources :response, only: %i[new create update] do
       collection do
         get :new_feedback
+        post :edit
         post :view
         get :remove_hyperlink
         get :saving

@@ -41,3 +41,21 @@ export const updateTeamName = (student_id, team_name) => (dispatch) => {
         .then(response => console.log(response.data))
         .catch(error => console.log(error));
 }
+
+export const remove_participant_student_teams = (student_id, team_id) => dispatch => {
+    return axios({
+        method: 'post',
+        url: 'student_teams/remove_participant',
+        headers: {
+            AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')
+        },
+        data: {
+            "team_id" : team_id,
+            "student_id": student_id
+        }
+    })
+    .then(response => {console.log(response.data)
+                        dispatch(actions.fetchStudentsTeamView(student_id))}
+)
+    .catch(error => console.log(error)); 
+}

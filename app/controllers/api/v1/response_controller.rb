@@ -76,7 +76,8 @@ module Api::V1
         @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
       end
       @questionnaire = set_questionnaire
-      render action: 'response'
+      # render action: 'response'
+      render json: {status: :ok, data: "yet to decide which data to send"}
     end
 
     # Update the response and answers when student "edit" existing response
@@ -142,12 +143,14 @@ module Api::V1
     end
 
     # view response
-    def view
-      @response = Response.find(params[:id])
-      @map = @response.map
-      set_content
-      render json: {status: :ok, data: "need to decide what data is needed"}
-    end
+  def view
+    @response = Response.find(params[:id])
+    @map = @response.map
+    set_content
+    # content needed for view in react app
+    survey = @map.survey?
+    render json: {status: :ok, map: @map, survey: survey, survey_parent: @survey_parent, title: @title, assignment: @assignment}
+  end
 
     def create
       map_id = params[:id]

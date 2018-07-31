@@ -10,14 +10,21 @@ import InvitationComponent from "./invitation/InvitationComponent";
 import JoinTeamRequestListSentComponent from './joinTeamRequestListSent/JoinTeamRequestListSent'
 import "../../assets/stylesheets/goldberg.css";
 import RecievedInvitationComponent from "./recievedInvitation/recievedInvitationComponent";
+import Modal from '../UI/Modal/Modal'
+import EditNameComponent from './editName/EditNameComponent'
+import '../../assets/stylesheets/flash_messages.css'
 class StudentTeamComponent extends Component {
-  state = { team_name: "", user_name: "" };
+  state = { team_name: "", 
+            user_name: "", 
+            editNameModal: false,
+            updateNameSuccess: false };
 
   componentDidMount() {
     this.props.fetchStudentsTeamView(this.props.match.params.id);
   }
 
   onTeamNameChangeHandler = e => {
+    console.log('key was pressed', e.target.value)
     this.setState({ team_name: e.target.value });
   };
 
@@ -25,6 +32,8 @@ class StudentTeamComponent extends Component {
     e.preventDefault();
     console.log("submit pressed");
     this.props.updateTeamName(this.props.student.id, this.state.team_name);
+    this.setState({editNameModal: false, updateNameSuccess: true})
+
   };
 
   // handleBackButton = (e) => {
@@ -38,6 +47,10 @@ class StudentTeamComponent extends Component {
     //   <%= hidden_field_tag 'student_id', @student.id %>
     //   <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
   };
+
+  editNameHandler = () => {
+    this.setState({editNameModal: !this.state.editNameModal, updateNameSuccess: false})
+  }
 
   render() {
     let output;
@@ -67,12 +80,14 @@ class StudentTeamComponent extends Component {
     displayAdvertisementHelper = <NavLink to="#" >Create </NavLink> 
   }
 
+  
+
   if( this.props.team && this.props.assignment_topics && this.props.team_topic ) {
     displayAvertisement =
                         <Aux> 
                          <b>Advertisement for teammates</b>
                           <br />
-                          <table style="width:80%" align="center" >
+                          <table style={{width:"80%", align:"center" }} >
                             <tr>
                               <td>
                                 {displayAdvertisementHelper}                              
@@ -86,9 +101,9 @@ class StudentTeamComponent extends Component {
     // <!--display a table of received invitation-->
   if (this.props.received_invs && this.props.received_invs.length > 0) {
       received_invitations= 
-            <table style="width:80%" align="center" >
+            <table style={{width:"80%", align:"center"}} >
             <h3>Received Invitations</h3>
-            <tr style="border: 1px outset #000000; padding: 10px 20px" >
+            <tr style={{border: "1px outset #000000", padding: "10px 20px"}} >
               <th class="head">From </th>
               <th class="head">Team Name </th>
               <th class="head">Reply </th>
@@ -121,11 +136,11 @@ class StudentTeamComponent extends Component {
     
 
 
-    if (this.props.team !== null && this.props.assignment.max_team_size > 1) {
-      if (this.props.team === null) {
+    if (this.props.team && this.props.assignment.max_team_size > 1) {
+      if (!this.props.team) {
         sendInvitaion = (
           <form onSubmit={this.onTeamNameSubmitHandler}>
-            <h3>Name team</h3>
+            <h3>Name team 1</h3>
             <div className="form-group">
               <label for="team_name">team_name</label>
               <input
@@ -139,7 +154,7 @@ class StudentTeamComponent extends Component {
               Name team
             </button>
           </form>
-        );
+        )
       } else if (!this.props.team_full) {
         sendInvitaion = (
           <Aux>
@@ -170,8 +185,8 @@ class StudentTeamComponent extends Component {
           <br />
           <br />
           {/* <!-- start invited people table --> */}
-          <table style="width:80%" align="center">
-            <tr style="border: 1px outset #000000; ">
+          <table style={{width:"80%", align:"center"}}>
+            <tr style={{border: "1px outset #000000"}}>
               <th className="head">
                 <b>Username</b>
               </th>
@@ -196,7 +211,7 @@ class StudentTeamComponent extends Component {
     }
 
     // <!--render partial for join team request-->
-    if (this.props.student && this.props.student.team !== null) {
+    if (this.props.student && this.props.team ) {
       request = (
         <JoinTeamRequestListComponent
           team_id={this.props.team.id}
@@ -209,35 +224,43 @@ class StudentTeamComponent extends Component {
     if (this.props.loaded) {
       output = <div style= {{ padding: '15px'}}> <h1>Team Information for {this.props.assignment.name}</h1></div>;
 
-      if (this.props.student.team === null) {
+      if (!this.props.team) {
         form = (
-          <Aux>
+          <div className="container-fluid text-left">
             You no longer have a team!
-            <h3>Name team</h3>
+            <h3 style={{padding: '5px'}}>Name team 2</h3>
             <form onSubmit={this.onTeamNameSubmitHandler}>
-              <div className="form-group">
-                <label for="team_name">te[]am_name</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Team Name"
-                  value={this.state.team_name}
-                  onChange={this.onTeamNameChangeHandler}
-                />
+              <div className="form-group" >
+                <label for="team_name">team name</label>
+                <div className="col-5" >
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Team Name"
+                    value={this.state.team_name}
+                    onChange={this.onTeamNameChangeHandler}
+                  />
+                </div>
               </div>
               <button type="submit" className="btn btn-primary">
                 Name Team
               </button>
             </form>
-          </Aux>
+          </div>
         );
       } else {
         body = (
           <Aux>
             <b style={{ textAlign: "center" }}>Team Name: &nbsp;&nbsp;</b>
             {this.props.team.name} &nbsp;&nbsp;&nbsp;
-            <NavLink to="#"> Edit name </NavLink>
+            <NavLink to ="#" onClick={this.editNameHandler}> Edit name </NavLink>
             <br />
+            {this.state.editNameModal ? <Modal show = {this.state.editNameModal} back= { this.editNameHandler} > 
+                  {<EditNameComponent submitEditName = {this.onTeamNameSubmitHandler} 
+                                      backButton = {this.editNameHandler} 
+                                      team_name = {this.onTeamNameChangeHandler}
+                                      value = {this.state.team_name}
+                                      />} </Modal>: null}
             <br />
             <b>Team members</b>
             <br />
@@ -258,15 +281,17 @@ class StudentTeamComponent extends Component {
                 console.log(member);
                 return (
                   <StudentTeamMemberComponent
-                    member={member}
-                    assignment={this.props.assignment}
+                                student_id = {this.props.student.id}
+                                member={member}
+                                assignment={this.props.assignment}
+                                teammate_review_allowed = {this.props.teammate_review_allowed}
                   />
                 );
               })}
               <tr>
                 <td colspan="3">
                   <br />
-                  <NavLink to="#">Leave team</NavLink>
+                  <NavLink to="#" onClick={() => this.props.remove_participant_student_teams( this.props.student.id, this.props.team.id )}>Leave team</NavLink>
                 </td>
               </tr>
             </table>
@@ -283,6 +308,10 @@ class StudentTeamComponent extends Component {
         <div class="main">
           <div class="content">
             <div class="student_teams view">
+              {this.state.updateNameSuccess ? <div className="flash_success alert alert-success alert-dismissible fade show" role="alert">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                  <span aria-hidden="true">&times;</span>
+                                                </button> Name updated successfully</div> : null}
               {output}
               {form}
               {body}
@@ -290,6 +319,8 @@ class StudentTeamComponent extends Component {
               {sendInvitaion}
               {waiting_listed}
               {received_invitations}
+              <br />
+              {displayAvertisement}
               <br />
               {joinTeamRequestListSent}
               <br />
@@ -322,15 +353,13 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchStudentsTeamView: student_id => {
-      dispatch(actions.fetchStudentsTeamView(student_id));
-    },
-    updateTeamName: (student_id, team_name) => {
-      dispatch(actions.updateTeamName(student_id, team_name));
+    fetchStudentsTeamView: student_id => dispatch(actions.fetchStudentsTeamView(student_id)),
+    updateTeamName: (student_id, team_name) => dispatch(actions.updateTeamName(student_id, team_name)),
+    remove_participant_student_teams: (student_id, team_id) => dispatch(actions.remove_participant_student_teams(student_id, team_id))
     }
   };
-};
-export default connect(
+
+  export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(StudentTeamComponent);

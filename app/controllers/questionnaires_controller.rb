@@ -455,25 +455,25 @@ class QuestionnairesController < ApplicationController
   def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
     questions = Question.where(questionnaire_id: questionnaire_id)
-    questionnum = 1
+    question_num = 1
 
     questions.each do |question|
-      q_type = params[:question_type][questionnum.to_s][:type]
-      params[:new_choices][questionnum.to_s][q_type].keys.each do |choice_key|
-        score = if params[:new_choices][questionnum.to_s][q_type][choice_key]["weight"] == 1.to_s
+      q_type = params[:question_type][question_num.to_s][:type]
+      params[:new_choices][question_num.to_s][q_type].keys.each do |choice_key|
+        score = if params[:new_choices][question_num.to_s][q_type][choice_key]["weight"] == 1.to_s
                   1
                 else
                   0
                 end
         if q_type == "MultipleChoiceCheckbox"
-          q = if params[:new_choices][questionnum.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+          q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
               else
-                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
               end
           q.save
         elsif q_type == "TrueFalse"
-          if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
+          if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
             q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
             q.save
             q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
@@ -485,15 +485,15 @@ class QuestionnairesController < ApplicationController
             q.save
           end
         else
-          q = if params[:new_choices][questionnum.to_s][q_type][1.to_s][:iscorrect] == choice_key
-                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+          q = if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
               else
-                QuizQuestionChoice.new(txt: params[:new_choices][questionnum.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
               end
           q.save
         end
       end
-      questionnum += 1
+      question_num += 1
       question.weight = 1
     end
   end

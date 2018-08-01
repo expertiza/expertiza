@@ -10,17 +10,12 @@ class CollusionCycle
     collusion_cycles = []
     assignment_participant.reviewers.each do |ap|
       next unless ap.reviewers.include?(assignment_participant)
-      if assignment_participant.reviews_by_reviewer(ap).nil?
-        next
-      else
-        s01 = assignment_participant.reviews_by_reviewer(ap).total_score
-      end
 
-      if ap.reviews_by_reviewer(assignment_participant).nil?
-        next
-      else
-        s10 = ap.reviews_by_reviewer(assignment_participant).total_score
-      end
+      next if assignment_participant.reviews_by_reviewer(ap).nil?
+      s01 = assignment_participant.reviews_by_reviewer(ap).total_score
+
+      next if ap.reviews_by_reviewer(assignment_participant).nil?
+      s10 = ap.reviews_by_reviewer(assignment_participant).total_score
 
       collusion_cycles.push([[assignment_participant, s01], [ap, s10]])
     end
@@ -32,23 +27,16 @@ class CollusionCycle
     assignment_participant.reviewers.each do |ap1|
       ap1.reviewers.each do |ap2|
         next unless ap2.reviewers.include?(assignment_participant)
-        if assignment_participant.reviews_by_reviewer(ap1).nil?
-          next
-        else
-          s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
-        end
 
-        if ap1.reviews_by_reviewer(ap2).nil?
-          next
-        else
-          s12 = ap1.reviews_by_reviewer(ap2).total_score
-        end
+        next if assignment_participant.reviews_by_reviewer(ap1).nil?
+        s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
 
-        if ap2.reviews_by_reviewer(assignment_participant).nil?
-          next
-        else
-          s20 = ap2.reviews_by_reviewer(assignment_participant).total_score
-        end
+        next if ap1.reviews_by_reviewer(ap2).nil?
+        s12 = ap1.reviews_by_reviewer(ap2).total_score
+
+        next if ap2.reviews_by_reviewer(assignment_participant).nil?
+        s20 = ap2.reviews_by_reviewer(assignment_participant).total_score
+
         collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s20]])
       end
     end
@@ -63,29 +51,17 @@ class CollusionCycle
         ap2.reviewers.each do |ap3|
           next unless ap3.reviewers.include?(assignment_participant)
 
-          if assignment_participant.reviews_by_reviewer(ap1).nil?
-            next
-          else
-            s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
-          end
+          next if assignment_participant.reviews_by_reviewer(ap1).nil?
+          s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
 
-          if ap1.reviews_by_reviewer(ap2).nil?
-            next
-          else
-            s12 = ap1.reviews_by_reviewer(ap2).total_score
-          end
+          next if ap1.reviews_by_reviewer(ap2).nil?
+          s12 = ap1.reviews_by_reviewer(ap2).total_score
 
-          if ap2.reviews_by_reviewer(ap3).nil?
-            next
-          else
-            s23 = ap2.reviews_by_reviewer(ap3).total_score
-          end
+          next if ap2.reviews_by_reviewer(ap3).nil?
+          s23 = ap2.reviews_by_reviewer(ap3).total_score
 
-          if ap3.reviews_by_reviewer(assignment_participant).nil?
-            next
-          else
-            s30 = ap3.reviews_by_reviewer(assignment_participant).total_score
-          end
+          next if ap3.reviews_by_reviewer(assignment_participant).nil?
+          s30 = ap3.reviews_by_reviewer(assignment_participant).total_score
 
           collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
         end
@@ -98,9 +74,9 @@ class CollusionCycle
   def cycle_similarity_score(cycle)
     similarity_score = 0.0
     count = 0.0
-    for pivot in 0...cycle.size - 1 do
+    (0...cycle.size - 1).each do |pivot|
       pivot_score = cycle[pivot][1]
-      for other in pivot + 1...cycle.size do
+      (pivot + 1...cycle.size).each do |other|
         similarity_score += (pivot_score - cycle[other][1]).abs
         count += 1.0
       end
@@ -113,7 +89,7 @@ class CollusionCycle
   def cycle_deviation_score(cycle)
     deviation_score = 0.0
     count = 0.0
-    for member in 0...cycle.size do
+    (0...cycle.size).each do |member|
       participant = AssignmentParticipant.find(cycle[member][0].id)
       total_score = participant.review_score
       deviation_score += (total_score - cycle[member][1]).abs

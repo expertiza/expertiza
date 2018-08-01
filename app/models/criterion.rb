@@ -2,6 +2,8 @@ class Criterion < ScoredQuestion
   include ActionView::Helpers
   validates :size, presence: true
 
+  attr_accessible :id, :seq, :txt, :type, :weight, :size, :max_label, :min_label, :questionnaire
+
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
   def edit(_count)
     html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'
@@ -102,7 +104,7 @@ class Criterion < ScoredQuestion
 
     if dropdown_or_scale == 'dropdown'
       current_value = ""
-      current_value += 'data-current-rating =' + answer.answer.to_s if !answer.nil?
+      current_value += 'data-current-rating =' + answer.answer.to_s unless answer.nil?
       html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
       html += "<option value = ''>--</option>"
       questionnaire_min.upto(questionnaire_max).each do |j|
@@ -206,7 +208,6 @@ class Criterion < ScoredQuestion
       #### start code to show tag prompts ####
       unless tag_prompt_deployments.nil?
         # show check boxes for answer tagging
-        resp = Response.find(answer.response_id)
         question = Question.find(answer.question_id)
         if tag_prompt_deployments.count > 0
           html += '<tr><td colspan="2">'

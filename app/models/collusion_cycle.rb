@@ -6,6 +6,7 @@ class CollusionCycle
   # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
   # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
 
+  # Look for collusion cycles of size 'n' starting with 'assignment_participant'
   def n_node_cycles(assignment_participant, n)
     collusion_cycles = []
     nodes = Array.new(n)
@@ -13,28 +14,35 @@ class CollusionCycle
     collusion_cycles
   end
 
-  def find_collusion_cycles(assignment_participant, i, nodes, collusion_cycles)
-    nodes[i] = assignment_participant
-    if i >= nodes.length - 1
+  # recursive method to find collusion cycles
+  # ap --> current assignment participant, i--> level of recursion, nodes --> all nodes being explored currently, collusion_cycles --> all collusion cycles found
+  def find_collusion_cycles(ap, i, nodes, collusion_cycles)
+    nodes[i] = ap
+
+    # if all nodes have been filled; look for collusion
+    if i == nodes.length - 1
+      # is it a cycle?
       return unless nodes[i].reviewers.include?(nodes[0])
 
       collusion_cycle = get_collusion_cycle(nodes)
       collusion_cycles.push(collusion_cycle) unless collusion_cycle.nil?
     else
-      nodes[i].reviewers.each do |ap|
-        find_collusion_cycles(ap, i + 1, nodes, collusion_cycles)
+      # recursively try all possible options
+      nodes[i].reviewers.each do |ap1|
+        find_collusion_cycles(ap1, i + 1, nodes, collusion_cycles)
       end
     end
   end
 
+  # get collusion cycle for the current set of nodes
   def get_collusion_cycle(nodes)
     collusion_cycle = []
     (0...nodes.length).each do |i|
+      # next node in cycle
       j = (i + 1) % nodes.length
       return nil if nodes[i].reviews_by_reviewer(nodes[j]).nil?
-      sjk = nodes[i].reviews_by_reviewer(nodes[j]).total_score
-
-      collusion_cycle.push([nodes[i], sjk])
+      score_ij = nodes[i].reviews_by_reviewer(nodes[j]).total_score
+      collusion_cycle.push([nodes[i], score_ij])
     end
     collusion_cycle
   end

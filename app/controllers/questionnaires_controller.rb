@@ -3,7 +3,7 @@ class QuestionnairesController < ApplicationController
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)
-
+  include ToggleAccessHelper
   before_action :authorize
   
   def action_allowed?
@@ -156,14 +156,14 @@ class QuestionnairesController < ApplicationController
   end
 
   # Toggle the access permission for this assignment from public to private, or vice versa
-  def toggle_access
-    @questionnaire = Questionnaire.find(params[:id])
-    @questionnaire.private = !@questionnaire.private
-    @questionnaire.save
-    @access = @questionnaire.private == true ? "private" : "public"
-    undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
-    redirect_to controller: 'tree_display', action: 'list'
-  end
+  # def toggle_access
+  #   @questionnaire = Questionnaire.find(params[:id])
+  #   @questionnaire.private = !@questionnaire.private
+  #   @questionnaire.save
+  #   @access = @questionnaire.private == true ? "private" : "public"
+  #   undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
+  #   redirect_to controller: 'tree_display', action: 'list'
+  # end
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions

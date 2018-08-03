@@ -1,5 +1,5 @@
 class AssignmentsController < ApplicationController
-  include AssignmentHelper
+  include AssignmentHelper, ToggleAccessHelper
   autocomplete :user, :name
   before_action :authorize
 
@@ -19,12 +19,12 @@ class AssignmentsController < ApplicationController
   end
 
   # change access permission from public to private or vice versa
-  def toggle_access
-    assignment = Assignment.find(params[:id])
-    assignment.private = !assignment.private
-    assignment.save
-    redirect_to list_tree_display_index_path
-  end
+  # def toggle_access
+  #   assignment = Assignment.find(params[:id])
+  #   assignment.private = !assignment.private
+  #   assignment.save
+  #   redirect_to list_tree_display_index_path
+  # end
 
   def new
     @assignment_form = AssignmentForm.new

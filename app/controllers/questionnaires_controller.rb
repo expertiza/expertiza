@@ -154,17 +154,7 @@ class QuestionnairesController < ApplicationController
     end
     redirect_to action: 'list', controller: 'tree_display'
   end
-
-  # Toggle the access permission for this assignment from public to private, or vice versa
-  # def toggle_access
-  #   @questionnaire = Questionnaire.find(params[:id])
-  #   @questionnaire.private = !@questionnaire.private
-  #   @questionnaire.save
-  #   @access = @questionnaire.private == true ? "private" : "public"
-  #   undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
-  #   redirect_to controller: 'tree_display', action: 'list'
-  # end
-
+  
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?

@@ -1,4 +1,4 @@
-<h2>Export <%= @title %></h2>
+<h2>Export Questionnaire: "<%= Questionnaire.find_by_id(@id).name %>"</h2>
 <%= form_tag({:controller => 'export_file', :action => 'export'}, {:method => 'post', :multipart => true, :name => 'export_form'}) do %>
   <table>
     <tr>
@@ -34,6 +34,7 @@
   <br/><br/>
 <% end %>
 
+<% if @model == 'Assignment' %>
 <h2>Export Details</h2>
   <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>
@@ -55,4 +56,6 @@
     <input type='submit' value='Export Details' onclick='{export_details_form.submit();}'/>
     <br/><br/>
   <% end %>
+<% end %>
+
 <a href="<%= session[:return_to] %>">Back</a>

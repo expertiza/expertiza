@@ -86,7 +86,8 @@ class AssignmentsController < ApplicationController
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
+    @badges = Badge.where("instructor_id = ? or private = ?", current_user, false)
+
   end
 
   def update

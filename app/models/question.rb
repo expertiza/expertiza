@@ -126,16 +126,4 @@ class Question < ActiveRecord::Base
     end
   end
 
-  def self.export_fields(options)
-    ["Question", "Question Type", "Weight", "Size", "Alternatives", "Max Label",  "Min Label", "Break Before"]
-  end
-
-  def self.export(csv, _parent_id, options)
-    questionnaire = Questionnaire.find_by_id(_parent_id)
-    questions = questionnaire.questions.sort_by(&:seq)
-
-    questions.each do |question|
-      csv << [question.txt, question.type, question.weight, question.size, question.alternatives, question.max_label, question.min_label, question.break_before]
-    end
-  end
 end

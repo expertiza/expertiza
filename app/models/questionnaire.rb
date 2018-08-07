@@ -88,4 +88,31 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
+
+  def self.export_fields(options)
+    fields = []
+    fields.push("Question", "Question Type")
+    fields.push("Weight") if options['weight'] == 'true'
+    fields.push("Dimensions") if options['size'] == 'true'
+    fields.push("Dropdown Options") if options['alternatives'] == 'true'
+    fields.push("Max Label", "Min Label") if options['labels'] == 'true'
+    fields.push("Break Before") if options['break_before'] == 'true'
+    fields
+  end
+
+  def self.export(csv, _parent_id, options)
+    questionnaire = Questionnaire.find_by_id(_parent_id)
+    questions = questionnaire.questions.sort_by(&:seq)
+
+    questions.each do |question|
+      tcsv = []
+      tcsv.push(question.txt, question.type)
+      tcsv.push(question.weight) if options['weight'] == 'true'
+      tcsv.push(question.size) if options['size'] == 'true'
+      tcsv.push(question.alternatives) if options['alternatives'] == 'true'
+      tcsv.push(question.max_label, question.min_label) if options['labels'] == 'true'
+      tcsv.push(question.break_before) if options['break_before'] == 'true'
+      csv << tcsv
+    end
+  end
 end

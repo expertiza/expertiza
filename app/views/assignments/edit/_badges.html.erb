@@ -9,7 +9,7 @@
   <tbody>
   <% @badges.each do |badge| %>
     <tr>
-      <td style="text-align:center"><img width = "30px" src=<%= "/assets/badges/#{badge.image_name}" %> title="<%= badge.name %>"></td>
+      <td style="text-align:center"><img width = "30px" src=<%= "{badge.image_name}" %> title="<%= badge.name %>"></td>
       <td><%= badge.name %></td>
       <td><%= badge.description %></td>
       <!-- If a badge is already assigned to an assignment, the checkbox for the badge will be checked -->

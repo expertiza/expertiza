@@ -1,15 +1,251 @@
+<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+
+
+<script>
+
+  setupAwardCritTable = function () {
+      var conditions = [
+        { "Question": 22, "Operator": ">", "Threshold": 5 },
+        { "Question": 23, "Operator": ">", "Threshold": 5 },
+        { "Question": 32, "Operator": ">", "Threshold": 5 }
+      ];
+
+    var questions = [
+      { question: "OSS rubric'18 - State diagram quality?", question_id: 22 },
+      { question: "OSS rubric'18 - Use case diagram quality?", question_id: 23},
+      { question: "OSS rubric'18 - Sequence diagram quality?", question_id: 32},
+      { question: "OSS rubric'18 - Average score", question_id: 032},
+      { question: "Teammate review'18 - Meeting attendance?", question_id: 21},
+      { question: "Teammate review'18 - Work contribution?", question_id: 25},
+      { question: "Teammate review'18 - leadership quality?", question_id: 12},
+      { question: "Teammate review'18 - Average score", question_id: 034}
+    ];
+
+    var operator = [
+      { op: ">"},
+      { op: ">="},
+      { op: "="},
+      { op: "!="},
+      { op: "<"},
+      { op: "<="},
+    ];
+
+
+    $("#award_criteria_placeholder").jsGrid({
+        width: "100%",
+        height: "250px",
+        rownumbers: true,
+        filtering: true,
+        inserting: true,
+        editing: true,
+        sorting: true,
+        paging: true,
+        autoload: true,
+        pageSize: 10,
+        pageButtonCount: 5,
+        deleteConfirm: "Do you really want to delete the condition?",
+//        controller: {
+//          loadData: function(filter) {
+//            return $.ajax({
+//              type: "GET",
+//              url: "/badgecrit",
+//              data: filter
+//            });
+//          },
+//          insertItem: function(item) {
+//            return $.ajax({
+//              type: "POST",
+//              url: "/badgecrit",
+//              data: item
+//            });
+//          },
+//          updateItem: function(item) {
+//            return $.ajax({
+//              type: "PUT",
+//              url: "/badgecrit/" + item.id,
+//              data: item
+//            });
+//          },
+//          deleteItem: function(item) {
+//            return $.ajax({
+//              type: "DELETE",
+//              url: "/badgecrit/" + item.id
+//            });
+//          }
+//        },
+        data: conditions,
+
+        fields: [
+          { name: "Question", type: "select", items: questions, valueField: "question_id", textField: "question", width: 200, align: "left"  },
+          { name: "Operator", type: "select", items: operator, valueField: "op", textField: "op", width: 30, align: "center" },
+          { name: "Threshold", type: "number", width: 30, align: "right" },
+          { type: "control" }
+        ]
+      });
+  }
+
+  var upload_image = function(){
+    $("#badge-image-placeholder").html('' +
+        '<span class="btn btn-success fileinput-button">' +
+        '  <i class="glyphicon glyphicon-plus"></i>' +
+        '  <span>Select files...</span>' +
+        '   <input type="file" name="fileupload", id="fileupload">' +
+        '</span>' +
+        '<div id="upload_progress">' +
+        '   <div class="bar" style="width: 0%; height: 18px; background: green;"></div>' +
+        '</div>' +
+        '<div id="upload_status"></div>'
+    );
+    setupFileUpload();
+  }
+
+  var display_choose_image = function(){
+    //get the available icons for this instroctor from assets/image/user_id
+    $.get("icons?uid=<%=@current_user.id%>", function (data){
+      var options = ''
+      for(i in data){
+        options += '  <option data-img-src="' + data[i]  + '" data-img-class="first" data-img-alt="Page 1" value="' + data[i]  + '"">  ' + data[i]  + '  </option>'
+      }
+      var html = '<select id="image-list" class="image-picker show-html">' +
+          options +
+          '</select>' +
+          '<input type="button" class="btn btn-default" value="Choose image" onclick="confirm_existing_image_selection()" >'
+      $("#badge-image-placeholder").html(html);
+      $("#image-list").imagepicker();
+    });
+  }
+
+  var confirm_existing_image_selection = function() {
+    var imageUrl = document.getElementById("image-list").value;
+    displayAndSetImageIcon(imageUrl);
+  }
+
+  var open_credly_designer = function(){
+    //get the temp_token
+   $.get('credly_designer', function(data){
+      if(data.temp_token){
+        $("#badge-image-placeholder").html(
+        '<iframe ' +
+          'id="badge-builder-iframe" ' +
+          'frameborder="0" ' +
+          'scrolling="yes" ' +
+          'width="800" ' +
+          'height="600" ' +
+          'src="https://credly.com/badge-builder/embed/' + data.temp_token + ' ">' +
+        '</iframe>');
+      }
+   });
+  }
+
+  var displayAndSetImageIcon = function(imageUrl){
+    $("#badge-image-placeholder").html('<img id="show-icon" src="' + imageUrl +'" alt="My badge icon" width= "50" height="50">')
+    $("#image-icon").value = imageUrl;
+  }
+
+  var setupFileUpload = function(){
+    $('#fileupload').fileupload({
+      dataType: 'json',
+      url: 'icon_upload?uid=<%= @current_user.id %>',
+      //add button to upload the file
+      add: function (e, data) {
+        $('#upload_progress .bar').css('width', 0 + '%');
+        $('#upload_status').html('')
+        data.submit();
+      },
+      //print a confirmation after it's uploaded
+      done: function (e, data) {
+        $('#upload_status').html('<a href="' + data.result.fileurl + '" >' + data.result.filename + 'is uploaded.</a>');
+        //display and set hidden input to the icon's url
+        displayAndSetImageIcon(data.result.fileurl)
+      },
+      //show progress when uploading
+      progressall: function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#upload_progress .bar').css('width',progress + '%');
+      },
+      error:  function (jqXHR, textStatus, errorThrown) {
+        console.log(errorThrown);
+      }
+    });
+  }
+
+  $(document).ready(function () {
+
+    //this part listen to credly designer and get the image url
+    window.addEventListener("message", function(e) {
+      if (
+          e.origin ===
+          "https://credly.com" &&
+          typeof (data = e.data) === "object"
+      ) {
+        displayAndSetImageIcon(data.image);
+      }
+    });
+
+    $('input:radio[name=award_mechanism]').change(function () {
+      if ($("input[name='award_mechanism']:checked").val() == 'manual') {
+        $('#award_criteria_placeholder')
+            .html('<textarea ' +
+                'class="form-control width-700 height-200" ' +
+                'name="badge[award_criteria]" ' +
+                'id="badge_award_criteria" ' +
+                'class="form-control width-700" row="5"></textarea>');
+      }
+      if ($("input[name='award_mechanism']:checked").val() == 'automatic') {
+        setupAwardCritTable();
+      }
+    });
+  });
+</script>
 <%= error_messages_for 'badge' %>
 
+<table class="table borderless table-not-full-width">
 <!--[form:badge]-->
-<p><label for="badge_name">Name</label><br/>
-  <%= text_field 'badge', 'name'  %></p>
+  <tr>
+    <td style="">Name</td>
+    <td><%= text_field 'badge', 'name', class: "form-control width-400" %></td>
+  </tr>
+  <tr>
+    <td>Description</td>
+    <td><%= text_area 'badge', 'description', class: "form-control width-400" %></td>
+  <tr>
+  <tr>
+    <td>Badge image</td>
+    <td>
+      <input type="button" class="btn btn-default" value="Choose an existing image" onclick="display_choose_image()" >
+      <input type="button" class="btn btn-default" value="Upload an image file" onclick="upload_image()" >
+      <input type="button" class="btn btn-default" value="Design a new image" onclick="open_credly_designer()" >
+      <input type="hidden" id="image-icon" name="image-icon">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><div style="float:left" id="badge-image-placeholder"></div></td>
+  </tr>
+  <tr>
+    <td>Award method</td>
+    <td>
+      <%= radio_button_tag :award_mechanism, 'manual', true %>
+      <%= label_tag :award_mechanism_manual, 'Manual' %>
+      &nbsp;
+      <%= radio_button_tag :award_mechanism, 'automatic' %>
+      <%= label_tag :award_mechanism_automatic, 'Automatic' %>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">Award criteria</td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <div id="award_criteria_placeholder">
+        <textarea class="form-control width-700 height-500" name="badge[award_criteria]" id="badge_award_criteria" row="3"></textarea>
+      </div>
+    </td>
+  </tr>
+<div>
 
-<p><label for="badge_description">Description</label><br/>
-  <%= text_area 'badge', 'description', :rows => 3 %> </p>
-
-  <%= hidden_field 'badge', 'image_name' %>
-
-<p><label for="badge_image_file">Image File</label><br/>
-  <%= file_field 'badge', 'image_file'  %></p>
-
+</div>
+</table>
 <!--[eoform:badge]-->

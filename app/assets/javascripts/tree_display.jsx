@@ -233,7 +233,13 @@ jQuery(document).ready(function() {
                 </a>
               )
             }
-
+            if(this.props.has_badge) {
+              moreContent.push(
+                <a title="Award Badges" href={"/badges/award/"+(parseInt(this.props.id)/2).toString()}>
+                   <img src="/assets/tree_view/award-badges.png" />
+                </a>
+              )
+            }
             if (this.props.allow_suggestions) {
               moreContent.push(
                 <span>

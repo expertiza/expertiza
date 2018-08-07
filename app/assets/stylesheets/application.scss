@@ -26,3 +26,6 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 @import "confirm_box";
 @import "inner-pages";
 @import "homepage";
+@import "image-picker/image-picker/image-picker";
+@import "jquery-file-upload/css/jquery.fileupload";
+@import "jquery-file-upload/css/jquery.fileupload-ui";

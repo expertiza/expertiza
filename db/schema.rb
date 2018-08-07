@@ -152,10 +152,13 @@ ActiveRecord::Schema.define(version: 20180703203334) do
     t.string   "image_name",        limit: 255
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+    t.integer  "user_id",           limit: 4
     t.integer  "external_badge_id", limit: 4
     t.integer  "instructor_id",     limit: 4
     t.integer  "private",           limit: 1
   end
+
+  add_index "badges", ["user_id"], name: "index_badges_on_user_id", using: :btree
 
   create_table "bids", force: :cascade do |t|
     t.integer  "topic_id",   limit: 4
@@ -295,7 +298,13 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   end
 
   create_table "institutions", force: :cascade do |t|
-    t.string "name", limit: 255, default: "", null: false
+    t.string "name",        limit: 255, default: "", null: false
+    t.string "description", limit: 255
+    t.string "website",     limit: 255
+    t.string "address",     limit: 255
+    t.string "city",        limit: 255
+    t.string "zip",         limit: 255
+    t.string "phone",       limit: 255
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -740,14 +749,14 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
-    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "notification_id", limit: 4, null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -814,6 +823,7 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "awarded_badges", "badges"
   add_foreign_key "awarded_badges", "participants"
+  add_foreign_key "badges", "users"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
@@ -841,6 +851,4 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

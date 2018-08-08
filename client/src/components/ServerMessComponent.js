@@ -15,7 +15,13 @@ render(){
                 <div className="flash_success alert alert-success">    Your profile was successfully updated.  </div>    
         );
     }
-    else{
+    else if(this.props.error)
+    {
+        return(
+            <div className="flash_error alert alert-error" style={{ marginTop: '10px'}}> {this.props.error}</div>
+        );
+    }
+    else {
             return(
                 <div></div>
             );

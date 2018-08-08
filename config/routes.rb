@@ -134,6 +134,23 @@ Expertiza::Application.routes.draw do
         get :json
       end
     end
+
+    resources :invitations, only: %i[new create] do
+      collection do
+        post :cancel
+        post :accept
+        post :decline
+      end
+    end
+
+    resources :advertise_for_partner, only: %i[new create edit] do
+      collection do
+        get :remove
+        post ':id', action: :update
+        post :getAdContent
+        post :update
+      end
+    end
   end
 end
 

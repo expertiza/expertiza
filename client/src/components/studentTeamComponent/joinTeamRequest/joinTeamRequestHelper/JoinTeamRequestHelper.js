@@ -22,6 +22,20 @@ class JoinTeamRequestHelper extends Component {
         
     }
 
+    inviteHandler = () => {
+        // <%= form_tag :controller => 'invitations', :action => 'create' do %>
+        // <%= hidden_field_tag 'team_id', team_id %>
+        // <%= hidden_field_tag 'student_id', teams_user_id %>
+        // <%= hidden_field_tag 'session[:dummy][:assignment_id]', Participant.find(join_team_request.participant_id).parent_id %>
+        // <%= hidden_field_tag 'user[name]', User.find(Participant.find(join_team_request.participant_id).user_id).name %>
+        // <%= hidden_field_tag 'participant_id', join_team_request.participant_id %>
+        // <input type='submit' value='Invite'/>
+        
+    }
+
+    declineHandler = () => {
+        // button_to 'Decline', :controller => 'join_team_requests', :action => 'decline', :id=>join_team_request.id, :teams_user_id=>teams_user_id
+    }
     render () {
         let output;
         if (!this.state.loading) {
@@ -33,8 +47,7 @@ class JoinTeamRequestHelper extends Component {
                                 <table>
                                     <tr>
                                         <td> <button className="btn btn-lg btn-success" onClick={this.inviteHandler}>Invite</button></td>
-                                        <td> <button className="btn btn-lg btn-danger" >Decline</button></td> 
-                                        {/* button_to 'Decline', :controller => 'join_team_requests', :action => 'decline', :id=>join_team_request.id, :teams_user_id=>teams_user_id */}
+                                        <td> <button className="btn btn-lg btn-danger" onClick={this.declineHandler}> Decline</button></td> 
                                     </tr>
                                 </table>
                             </td>

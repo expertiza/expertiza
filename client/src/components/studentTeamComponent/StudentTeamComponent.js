@@ -1,23 +1,30 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import * as actions from "../../redux";
-import { Loading } from "../UI/spinner/LoadingComponent";
-import Aux from "../../hoc/Aux/Aux";
 import { NavLink } from "react-router-dom";
+
+import Aux from "../../hoc/Aux/Aux";
 import StudentTeamMemberComponent from "./studentTeamMember/studentTeamMemberComponent";
 import JoinTeamRequestListComponent from "./joinTeamRequest/JoinTeamRequestListComponent";
 import InvitationComponent from "./invitation/InvitationComponent";
 import JoinTeamRequestListSentComponent from './joinTeamRequestListSent/JoinTeamRequestListSent'
-import "../../assets/stylesheets/goldberg.css";
 import RecievedInvitationComponent from "./recievedInvitation/recievedInvitationComponent";
 import Modal from '../UI/Modal/Modal'
 import EditNameComponent from './editName/EditNameComponent'
+import * as actions from '../../redux/index';
+import { Loading } from "../UI/spinner/LoadingComponent";
+
+import "../../assets/stylesheets/goldberg.css";
 import '../../assets/stylesheets/flash_messages.css'
+import ServerMessage from "../ServerMessComponent";
+import EditAdvertisementComponent from "./advertisement/editAdvertisement/editAdvertisementComponent";
+
+
 class StudentTeamComponent extends Component {
   state = { team_name: "", 
             user_name: "", 
             editNameModal: false,
-            updateNameSuccess: false };
+            updateNameSuccess: false,
+            editAdvertisementModal: false };
 
   componentDidMount() {
     this.props.fetchStudentsTeamView(this.props.match.params.id);
@@ -40,16 +47,27 @@ class StudentTeamComponent extends Component {
   //   e.preventDefault();
   //   this.props.history.goBack();
   // }
+
+  invitePeopleUserNameChangeHandler = e => {
+    this.setState({user_name: e.target.value})
+  }
+
   onInvitationSubmitHandler = e => {
     e.preventDefault();
-    // <%= form_tag :controller => 'invitations', :action => 'create' do %>
-    //   <%= hidden_field_tag 'team_id', @student.team.id %>
-    //   <%= hidden_field_tag 'student_id', @student.id %>
-    //   <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
+    this.props.invitePeopleToAssignment(this.props.team.id, this.props.student.id, this.props.assignment.id, this.state.user_name)
+    this.setState({user_name : ""})
   };
 
   editNameHandler = () => {
     this.setState({editNameModal: !this.state.editNameModal, updateNameSuccess: false})
+  }
+
+  editAdvertisementHandler = () => {
+    this.setState({editAdvertisementModal : !this.state.editAdvertisementModal})
+  }
+
+  updateCommentForAdvertisement = (ad_content) => {
+    this.props.updateCommentForAdvertisement(this.props.team.id,ad_content)
   }
 
   render() {
@@ -64,6 +82,7 @@ class StudentTeamComponent extends Component {
     let displayAvertisement;
     let displayAdvertisementHelper;
     let joinTeamRequestListSent;
+
   // <!--display the advertisement-->
 
   joinTeamRequestListSent = <JoinTeamRequestListSentComponent />
@@ -72,7 +91,12 @@ class StudentTeamComponent extends Component {
     displayAdvertisementHelper =  <Aux>
                                     {this.props.team.comments_for_advertisement}
                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <NavLink to="#" >Edit </NavLink> 
+                                    <NavLink to="#" onClick={this.editAdvertisementHandler} >Edit </NavLink> 
+                                    {this.state.editAdvertisementModal ? <Modal show = {this.state.editAdvertisementModal} back= { this.editAdvertisementHandler} > 
+                                    <EditAdvertisementComponent team = {this.props.team} 
+                                                                ad_content = {this.props.ad_content} 
+                                                                updateCommentForAdvertisement = { this.updateCommentForAdvertisement} />
+                                    </Modal> : null}
                                     &nbsp;&nbsp;
                                     <NavLink to="#" >Delete </NavLink> 
                                   </Aux>
@@ -140,7 +164,7 @@ class StudentTeamComponent extends Component {
       if (!this.props.team) {
         sendInvitaion = (
           <form onSubmit={this.onTeamNameSubmitHandler}>
-            <h3>Name team 1</h3>
+            <h3>Name team </h3>
             <div className="form-group">
               <label for="team_name">team_name</label>
               <input
@@ -158,14 +182,14 @@ class StudentTeamComponent extends Component {
       } else if (!this.props.team_full) {
         sendInvitaion = (
           <Aux>
-            <b>Invite people</b>
+            <b>Invite people </b>
               <form onSubmit={this.onInvitationSubmitHandler}>
                 <table style={{ width: "80%", marginLeft: '10%' }}>
                   <tr>
                     <td>
-                      Enter user login: <input value={this.state.user_name} />
-                      <button type="submit" className="btn btn-secondary" value="Invite[]" style={{ marginLeft: "15px" }} > {" "}
-                        Invite{" "}
+                      Enter user login: <input value={this.state.user_name} onChange={this.invitePeopleUserNameChangeHandler} />
+                      <button type="submit" className="btn btn-secondary" value="Invite[]" style={{ marginLeft: "15px" }} > 
+                        Invite
                       </button>
                     </td>
                   </tr>
@@ -201,7 +225,7 @@ class StudentTeamComponent extends Component {
               </th>
             </tr>
             {this.props.send_invs.map(invitation => (
-              <InvitationComponent inv={invitation} />
+                  <InvitationComponent inv={invitation} />
             ))}
           </table>
           <br />
@@ -307,6 +331,7 @@ class StudentTeamComponent extends Component {
         <div class="main">
           <div class="content">
             <div class="student_teams view">
+              {this.props.alert ? <ServerMessage error={this.props.alert} /> : null}
               {this.state.updateNameSuccess ? <div className="flash_success alert alert-success alert-dismissible fade show" role="alert">
                                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                   <span aria-hidden="true">&times;</span>
@@ -347,16 +372,23 @@ const mapStateToProps = state => {
     team_full: state.studentTeamView.team_full,
     team_topic: state.studentTeamView.team_topic,
     join_team_requests: state.studentTeamView.join_team_requests,
+    alert: state.studentTeamView.alert,
+    ad_content: state.studentTeamView.ad_content,
     loaded: state.studentTeamView.loaded
   };
 };
+// ad_content = Team.find(params[:team_id]).comments_for_advertisement 
+// 
 
 const mapDispatchToProps = dispatch => {
   return {
     fetchStudentsTeamView: student_id => dispatch(actions.fetchStudentsTeamView(student_id)),
     updateTeamName: (student_id, team_name) => dispatch(actions.updateTeamName(student_id, team_name)),
-    remove_participant_student_teams: (student_id, team_id) => dispatch(actions.remove_participant_student_teams(student_id, team_id))
-    }
+    remove_participant_student_teams: (student_id, team_id) => dispatch(actions.remove_participant_student_teams(student_id, team_id)),
+    invitePeopleToAssignment: (team_id, student_id, assignment_id, user_name) => dispatch(actions.invitePeopleToAssignment(team_id, student_id, assignment_id, user_name)),
+    // getAdContent: team_id => dispatch(actions.getAdContent(team_id))  ,
+    updateCommentForAdvertisement: (team_id,ad_content) => dispatch(actions.updateCommentForAdvertisement(team_id, ad_content))
+  }
   };
 
   export default connect(

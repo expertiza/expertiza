@@ -4,9 +4,9 @@ const editNameComponent = (props) => {
     return (
         <div className="container text-center">
           <form onSubmit={props.submitEditName}>
-             <h1>Edit Team</h1>
+             <h1>Edit Team Name</h1>
             <div className="form-group text-left">
-              <label for="team_name" className="text-left">team name</label>
+              {/* <label for="team_name" className="text-left">team name</label> */}
               <input
                 type="text"
                 className="form-control"

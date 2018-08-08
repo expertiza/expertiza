@@ -7,7 +7,7 @@ module Api::V1
         def create
             user = User.find_by(name: auth_params[:name])
             if user && user.valid_password?(auth_params[:password])
-            jwt = JWT.encode( {user: user.id},
+            jwt = JWT.encode( {user: user.id , exp: (Time.now + 1.week).to_i },
                                 Rails.application.secrets.secret_key_base,
                                 'HS256')
             render json: {jwt: jwt}

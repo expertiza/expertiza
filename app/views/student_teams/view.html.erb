@@ -125,6 +125,7 @@
          <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
+          <% puts 'following are the attributes ',@student.team.id, @student.id, @student.parent_id  %>
          <table style="width:80%" align="center" >
            <tr>
             <td>
@@ -184,6 +185,7 @@
                     else
                       @team_id = @student.team.id
                     end %>
+                  <% puts 'parameters are : ', inv.id, @student.id, @team_id%>
                   <%= link_to "Accept",
                               {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
                               {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}

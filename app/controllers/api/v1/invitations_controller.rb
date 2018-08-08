@@ -16,12 +16,13 @@ module Api::V1
         create_utility
       else
         ExpertizaLogger.error LoggerMessage.new("", @student.name, "Student was already invited")
-        flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
+        # flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
+        render json: { status: :ok, error: "You have already sent an invitation to \"#{@user.name}\"."}
       end
 
       update_join_team_request @user, @student
-
-      redirect_to view_student_teams_path student_id: @student.id
+      render json: {status: :ok}
+      # redirect_to view_student_teams_path student_id: @student.id
     end
 
     def update_join_team_request(user, student)
@@ -43,10 +44,11 @@ module Api::V1
     def accept
       # Accept the invite and check whether the add was successful
       accepted = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
-      flash[:error] = 'The system failed to add you to the team that invited you.' unless accepted
-
+      # flash[:error] = 'The system failed to add you to the team that invited you.' unless accepted
+      render json: {status: :ok, error: 'The system failed to add you to the team that invited you.' } unless accepted
       ExpertizaLogger.info "Accepting Invitation #{params[:inv_id]}: #{accepted}"
-      redirect_to view_student_teams_path student_id: params[:student_id]
+      # redirect_to view_student_teams_path student_id: params[:student_id]
+      render json: {status: :ok}
     end
 
     def decline
@@ -56,7 +58,8 @@ module Api::V1
       @inv.save
       student = Participant.find(params[:student_id])
       ExpertizaLogger.info "Declined invitation #{params[:inv_id]} sent by #{@inv.from_id}"
-      redirect_to view_student_teams_path student_id: student.id
+      # redirect_to view_student_teams_path student_id: student.id
+      render json: { status: :ok }
     end
 
     def cancel
@@ -81,12 +84,14 @@ module Api::V1
       # student has information about the participant
       @student = AssignmentParticipant.find(params[:student_id])
 
-      return unless current_user_id?(@student.user_id)
+      render json: {status: :ok, error: "Access denied"} unless current_user_id?(@student.user_id)
 
       # check if the invited user is valid
       unless @user
-        flash[:error] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
-        redirect_to view_student_teams_path student_id: @student.id
+        # puts "user is invalid"
+        # flash[:error] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+        render json: {status: :ok, error: "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."}
+        # redirect_to view_student_teams_path student_id: @student.id
         return
       end
       check_participant_before_invitation
@@ -96,8 +101,9 @@ module Api::V1
       @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
       # check if the user is a participant of the assignment
       unless @participant
-        flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-        redirect_to view_student_teams_path student_id: @student.id
+        # flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+        render json: {status: :ok, error: "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment." }
+        # redirect_to view_student_teams_path student_id: @student.id
         return
       end
       check_team_before_invitation
@@ -108,8 +114,9 @@ module Api::V1
       @team = AssignmentTeam.find(params[:team_id])
 
       if @team.full?
-        flash[:error] = 'Your team already has the maximum number members.'
-        redirect_to view_student_teams_path student_id: @student.id
+        # flash[:error] = 'Your team already has the maximum number members.'
+        render json: {status: :ok, error: 'Your team already has the maximum number members.' }
+        # redirect_to view_student_teams_path student_id: @student.id
         return
       end
 
@@ -118,8 +125,9 @@ module Api::V1
       # check if invited user is already in the team
 
       return if team_member.empty?
-      flash[:error] = "The user \"#{@user.name}\" is already a member of the team."
-      redirect_to view_student_teams_path student_id: @student.id
+      # flash[:error] = "The user \"#{@user.name}\" is already a member of the team."
+      render json: {status: :ok, error: "The user \"#{@user.name}\" is already a member of the team." }
+      # redirect_to view_student_teams_path student_id: @student.id
     end
 
     def check_team_before_accept
@@ -127,11 +135,13 @@ module Api::V1
       # check if the inviter's team is still existing, and have available slot to add the invitee
       inviter_assignment_team = AssignmentTeam.team(AssignmentParticipant.find_by(user_id: @inv.from_id, parent_id: @inv.assignment_id))
       if inviter_assignment_team.nil?
-        flash[:error] = 'The team that invited you does not exist anymore.'
-        redirect_to view_student_teams_path student_id: params[:student_id]
+        # flash[:error] = 'The team that invited you does not exist anymore.'
+        # redirect_to view_student_teams_path student_id: params[:student_id]
+        render json: {status: :ok, error: 'The team that invited you does not exist anymore.' }
       elsif inviter_assignment_team.full?
-        flash[:error] = 'The team that invited you is full now.'
-        redirect_to view_student_teams_path student_id: params[:student_id]
+        # flash[:error] = 'The team that invited you is full now.'
+        # redirect_to view_student_teams_path student_id: params[:student_id]
+        render json: {status: :ok, error: 'The team that invited you is full now.'}
       else
         invitation_accept
       end

@@ -1,5 +1,6 @@
 import * as actions from "..";
 import { updateObject } from "../../shared/utility/utility";
+import { updateCommentFailure } from "../actions/StudentTeamView";
 
 const initialize = {
   student: null,
@@ -15,6 +16,10 @@ const initialize = {
   team_full: false,
   team_topic: null,
   join_team_requests: null,
+  alert: null,
+  ad_content: null,
+  updateCommentError: null,
+  updateCommentMessage: null,
   loaded: false
 };
 
@@ -36,7 +41,14 @@ const studentTeamView = (state = initialize, action) => {
         participants: action.payload.participants,
         join_team_requests: action.payload.join_team_requests
       });
-
+    case actions.SET_ALERT_AFTER_INV_SENT:
+      return updateObject(state, {alert: action.alert})
+    case actions.ADVERTISE_CONTENT_SUCCESS:
+      return updateObject(state, {ad_content: action.ad_content })
+    case actions.updateCommentSuccess:
+      return updateObject(state, {updateCommentMessage: action.message} )
+    case updateCommentFailure:
+      return updateObject(state, {updateCommentError: action.error})
     default:
       return state;
   }

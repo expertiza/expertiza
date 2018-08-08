@@ -34,12 +34,16 @@ module Api::V1
 
         def authenticate
             if !auth_present?
-            render json: {error: "unauthorized"}, status: 401 
+              render json: {error: "unauthorized"}, status: 401 
             end
             
-            user = User.find(JWT.decode( request.env["HTTP_AUTHORIZATION"].scan(/Bearer (.*)/).flatten.first,
+            begin
+                user = User.find(JWT.decode( request.env["HTTP_AUTHORIZATION"].scan(/Bearer (.*)/).flatten.first,
                                         Rails.application.secrets.secret_key_base, true, { algorithm: 'HS256' }).first["user"])
-            if user
+            rescue JWT::ExpiredSignature
+                render json: {error: "token expired"}, status: 401 
+            end
+                                        if user
             @current_user ||= user
             end
         end

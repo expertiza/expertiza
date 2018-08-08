@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {NavLink} from 'react-router-dom'
 import TeamUserComponent from './teamUser/teamUserComponent';
 import axios from '../../../axios-instance';
+import * as actions from '../../../redux/index'
 
 class RecievedInvitationComponent extends Component {
     state = {
@@ -36,15 +37,21 @@ class RecievedInvitationComponent extends Component {
                     </td>
                     <td>
                     {team_id = this.props.team === null ? 0 : this.props.team.id }
-                    <NavLink to="#" > Accept </NavLink>
-                                {/* {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id}, */}
-                                {/* {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"} */}
+                    <NavLink to="#"  onClick= {this.props.acceptInvitsationToAssignment(this.props.inv.id, this.props.team.id, this.props.student.id)}> Accept </NavLink>
                     
-                    <NavLink to="#" > Decline </NavLink> {/* {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id} */}
+                    <NavLink to="#" onClick = {this.props.declineInvitationToAssignment(this.props.inv.id, this.props.student.id)} > Decline </NavLink> 
                     </td>
                </tr>
         }
         return recievedInv;
+    }
+}
+
+
+export const mapDispatchToProps = (dispatch) => {
+    return {
+        acceptInvitationToAssignment: (inv_id, team_id, student_id) => dispatch(actions.acceptInvitationToAssignment(inv_id, team_id, student_id)),
+        declineInvitationToAssignment: (inv_id, student_id) => dispatch(actions.declineInvitationToAssignment(inv_id, student_id))
     }
 }
 

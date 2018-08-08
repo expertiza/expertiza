@@ -139,20 +139,27 @@ module Api::V1
     # If the participant parameters are available, update the participant
     # and redirect to the view_actions page
     def change_handle
-      @participant = AssignmentParticipant.find(params[:id])
+       @participant = AssignmentParticipant.find(params[:id])
       return unless current_user_id?(@participant.user_id)
       unless params[:participant].nil?
         if !AssignmentParticipant.where(parent_id: @participant.parent_id, handle: params[:participant][:handle]).empty?
           ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, "Handle #{params[:participant][:handle]} already in use", request)
           flash[:error] = "<b>The handle #{params[:participant][:handle]}</b> is already in use for this assignment. Please select a different one."
-          redirect_to controller: 'participants', action: 'change_handle', id: @participant
+          render json: {status: :not_ok}
+          # redirect_to controller: 'participants', action: 'change_handle', id: @participant
         else
           @participant.update_attributes(participant_params)
           ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, "The change handle is saved successfully", request)
-          redirect_to controller: 'student_task', action: 'view', id: @participant
+          render json: {status: :ok,participant: @participant}
+          # redirect_to controller: 'student_task', action: 'view', id: @participant
         end
       end
     end
+
+    def check_handle
+      current_participant = AssignmentParticipant.find(params[:id])
+      render json: { current_handle: current_participant.handle}
+    end  
 
     def delete_assignment_participant
       contributor = AssignmentParticipant.find(params[:id])

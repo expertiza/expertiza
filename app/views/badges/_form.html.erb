@@ -2,7 +2,12 @@
 <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
-
+<style>
+  .thumbnail img {
+    width: 100px;
+    height: 100px;
+  }
+</style>
 
 <script>
 
@@ -104,23 +109,25 @@
 
   var display_choose_image = function(){
     //get the available icons for this instroctor from assets/image/user_id
-    $.get("icons?uid=<%=@current_user.id%>", function (data){
+    $.get("icons", function (data){
       var options = ''
       for(i in data){
         options += '  <option data-img-src="' + data[i]  + '" data-img-class="first" data-img-alt="Page 1" value="' + data[i]  + '"">  ' + data[i]  + '  </option>'
       }
-      var html = '<select id="image-list" class="image-picker show-html">' +
-          options +
-          '</select>' +
-          '<input type="button" class="btn btn-default" value="Choose image" onclick="confirm_existing_image_selection()" >'
-      $("#badge-image-placeholder").html(html);
-      $("#image-list").imagepicker();
+      var select_control = '<select id="image-list" class="image-picker show-html fixed-image-size">' + options + '</select>'
+      $("#badge-image-placeholder").html(select_control);
+      //initialize the hidden input
+      $("#image-icon").val($("#image-list").val());
+      $("#image-list").imagepicker({
+        selected: function(select, option, event){
+          $("#image-icon").val($("#image-list").val());
+        }
+      });
     });
   }
 
   var confirm_existing_image_selection = function() {
-    var imageUrl = document.getElementById("image-list").value;
-    displayAndSetImageIcon(imageUrl);
+    displayAndSetImageIcon($("#image-list").val());
   }
 
   var open_credly_designer = function(){
@@ -141,15 +148,15 @@
   }
 
   var displayAndSetImageIcon = function(imageUrl){
-    $("#badge-image-placeholder").html('<img id="show-icon" src="' + imageUrl +'" alt="My badge icon" width= "50" height="50">')
+    $("#badge-image-placeholder").html('<img id="show-icon" src="' + imageUrl +'" alt="My badge icon" width= "100px" height="100px">')
     $("#image-icon").val(imageUrl);
   }
 
   var setupFileUpload = function(){
     $('#fileupload').fileupload({
       dataType: 'json',
-      url: 'icon_upload?uid=<%= @current_user.id %>',
-      //add button to upload the file
+      url: 'icon_upload',
+      //upload the file and update the progress bar
       add: function (e, data) {
         $('#upload_progress .bar').css('width', 0 + '%');
         $('#upload_status').html('')
@@ -173,14 +180,9 @@
   }
 
   $(document).ready(function () {
-
     //this part listen to credly designer and get the image url
     window.addEventListener("message", function(e) {
-      if (
-          e.origin ===
-          "https://credly.com" &&
-          typeof (data = e.data) === "object"
-      ) {
+      if (e.origin === "https://credly.com" && typeof (data = e.data) === "object") {
         displayAndSetImageIcon(data.image);
       }
     });
@@ -189,7 +191,6 @@
       if ($("input[name='award_mechanism']:checked").val() == 'manual') {
         $('#award_criteria_placeholder')
             .html('<textarea ' +
-                'class="form-control width-700 height-200" ' +
                 'name="badge[award_criteria]" ' +
                 'id="badge_award_criteria" ' +
                 'class="form-control width-700" row="5"></textarea>');
@@ -203,7 +204,6 @@
 <%= error_messages_for 'badge' %>
 
 <table class="table borderless table-not-full-width">
-<!--[form:badge]-->
   <tr>
     <td style="">Name</td>
     <td><%= text_field 'badge', 'name', class: "form-control width-400" %></td>
@@ -215,14 +215,17 @@
   <tr>
     <td>Badge image</td>
     <td>
-      <input type="button" class="btn btn-default" value="Choose an existing image" onclick="display_choose_image()" >
-      <input type="button" class="btn btn-default" value="Upload an image file" onclick="upload_image()" >
-      <input type="button" class="btn btn-default" value="Design a new image" onclick="open_credly_designer()" >
+      <div id="badge-image-placeholder"></div>
       <input type="hidden" id="image-icon" name="image-icon">
     </td>
   </tr>
   <tr>
-    <td colspan="2"><div style="float:left" id="badge-image-placeholder"></div></td>
+    <td />
+    <td>
+      <input type="button" class="btn btn-default" value="Choose an existing image" onclick="display_choose_image()" >
+      <input type="button" class="btn btn-default" value="Upload an image file" onclick="upload_image()" >
+      <input type="button" class="btn btn-default" value="Design a new image" onclick="open_credly_designer()" >
+    </td>
   </tr>
   <tr>
     <td>Award method</td>
@@ -242,7 +245,13 @@
       <div id="award_criteria_placeholder">
         <textarea class="form-control width-700 height-500" name="badge[award_criteria]" id="badge_award_criteria" row="3"></textarea>
       </div>
+      <div id="criteria_error" />
     </td>
+  </tr>
+  <td>Share badges with other instructor?</td>
+  <td>
+    <%= check_box_tag :private, checked=false %>
+  </td>
   </tr>
 <div>
 

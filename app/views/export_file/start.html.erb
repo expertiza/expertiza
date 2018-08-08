@@ -51,12 +51,11 @@
         </td>
       </tr>
     </table>
-    <%= render :partial => 'export_details' %>
+    <%= render :partial => 'export_file/export_details' %>
     <br/>
     <%= hidden_field_tag('id', @id) %>
     <%= hidden_field_tag('model', @model) %>
     <input type='submit' value='Export Details' onclick='{export_details_form.submit();}'/>
     <br/><br/>
   <% end %>
-
 <a href="<%= session[:return_to] %>">Back</a>

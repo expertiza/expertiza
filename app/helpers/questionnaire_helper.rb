@@ -54,7 +54,7 @@ module QuestionnaireHelper
         q.true_false = false
 
         row.each do |cell|
-        case i
+          case i
           when CSV_QUESTION
             q.txt = cell.strip unless cell.nil?
           when CSV_TYPE

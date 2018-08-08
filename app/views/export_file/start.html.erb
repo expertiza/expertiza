@@ -38,7 +38,7 @@
 <% end %>
 
 <h2>Export Details</h2>
-<%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
+  <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>
       <tr>
         <td valign='Top'>Delimiter:</td>
@@ -57,6 +57,6 @@
     <%= hidden_field_tag('model', @model) %>
     <input type='submit' value='Export Details' onclick='{export_details_form.submit();}'/>
     <br/><br/>
-<% end %>
+  <% end %>
 
 <a href="<%= session[:return_to] %>">Back</a>

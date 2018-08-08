@@ -4,7 +4,7 @@ module ToggleAccessHelper
       assignment = Assignment.find(params[:id])
       assignment.private = !assignment.private
       assignment.save
-    elsif Questionnaire.find(params[:id])
+    elsif Questionnaire.find_by(id: params[:id]).nil?
       @questionnaire = Questionnaire.find(params[:id])
       @questionnaire.private = !@questionnaire.private
       @questionnaire.save

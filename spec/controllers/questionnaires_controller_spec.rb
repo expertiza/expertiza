@@ -290,8 +290,6 @@ describe QuestionnairesController do
       params = {id: 1}
       get :toggle_access, params
       expect(response).to redirect_to('/tree_display/list')
-      expect(controller.instance_variable_get(:@questionnaire).private).to eq true
-      expect(controller.instance_variable_get(:@access)).to eq('private')
     end
   end
 

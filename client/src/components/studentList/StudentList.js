@@ -19,11 +19,11 @@ class StudentList extends Component {
             // teamCourse: ["CSC 517"]
         };
         console.log(this.state.teamCourse[0])
-        if(this.state.tasks_not_started == undefined){
+        if(this.state.taskrevisions== undefined){
 
         }
         else
-            console.log(this.state.tasks_not_started.length)
+            console.log(this.state.taskrevisions.length)
 
 
     }
@@ -45,6 +45,17 @@ class StudentList extends Component {
                             this.state.tasks_not_started.map(task =>
                                 <span>&nbsp; &raquo; {task.assignment.name} {task.current_stage}
                                         {task.relative_deadline} left
+                                </span>
+                            )
+                        }
+                    </div><br/>
+
+                    <div>
+                        <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;{this.state.taskrevisions == undefined ? "" : this.state.taskrevisions.length}&nbsp;</span> Revisions<br/></strong>
+                        {this.state.taskrevisions == undefined ? <Loading/> : 
+                            this.state.taskrevisions.map(revision =>
+                                <span>&nbsp; &raquo; {revision.assignment} {revision.stage}
+                                        {revision.time_to_go} left
                                 </span>
                             )
                         }

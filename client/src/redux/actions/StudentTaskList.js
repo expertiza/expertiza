@@ -43,6 +43,19 @@ export const fetchTasks = () =>(dispatch) => {
     .catch(error => console.log(error));
 }
 
+export const fetchRevisions = () =>(dispatch) => {
+    return axios({
+        method: 'get',
+        url: 'student_task/list',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => dispatch(actions.addTaskRevisions(response.data.taskrevisions)))
+    .catch(error => console.log(error));
+}
+
+
+
+
 
 
 export const addStudentsTeamedWith = (studentsTeamedWith) => ({
@@ -63,4 +76,9 @@ export const addTeamCourse = (teamCourse) => ({
 export const addTasks = (tasks_not_started) => ({
     type: actions.ADD_TASKS,
     payload: tasks_not_started
+});
+
+export const addTaskRevisions = (taskrevisions) => ({
+    type: actions.ADD_TASKREVISIONS,
+    payload: taskrevisions
 });

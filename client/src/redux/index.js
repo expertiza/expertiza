@@ -18,6 +18,7 @@ export {
     ADD_STUDENTTASKS,
     ADD_TEAMCOURSE,
     ADD_TASKS,
+    ADD_TASKREVISIONS,
     CHANGE_HANDLE,
     STUDENT_TASK_VIEW_SUBMISSION_ALLOWED,
     STUDENT_TASK_VIEW_CHECK_REVIEWABLE_TOPICS,
@@ -69,9 +70,11 @@ export {
     fetchStudentTasks,
     fetchTeamCourse,
     fetchTasks,
+    fetchRevisions,
     addStudentsTeamedWith,
     addStudentTasks,
     addTeamCourse,
-    addTasks
+    addTasks,
+    addTaskRevisions
 } 
 from './actions/StudentTaskList'

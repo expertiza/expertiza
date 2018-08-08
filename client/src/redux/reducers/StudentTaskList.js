@@ -3,7 +3,9 @@ import * as actions from '../index'
 const initialize={
          studentsTeamedWith:{ },
          studentTasks: [],
-         teamCourse: []
+         teamCourse: [],
+         tasks_not_started: [],
+         taskrevisions: []
     }
 
 const studentTaskList = (state = initialize, action) => {
@@ -16,6 +18,8 @@ const studentTaskList = (state = initialize, action) => {
             return {...state, teamCourse: action.payload};
         case actions.ADD_TASKS:
             return {...state, tasks_not_started: action.payload};
+        case actions.ADD_TASKREVISIONS:
+            return {...state, taskrevisions: action.payload};
         default: 
             return state;
     }

@@ -93,14 +93,54 @@ module Api::V1
       
 
       @taskrevisions = @student_tasks.select(&:revision?)
-  
+      @revisionsArray = []
+      @taskrevisions.each do |student_task|
+        participant = student_task.participant
+        stage = student_task.current_stage
+        topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+        duedate = participant.assignment.stage_deadline(topic_id)
+        controller = ""
+        action = ""
+        if stage == "submission"
+          controller = "submitted_content"
+          action = "edit"
+        elsif stage == "review" or stage == "metareview"
+          controller = "student_review"
+          action = "list"
+        end
+
+        hash = {}
+        # student_task.instance_variables.each {|var| hash[var.to_s] = student_task.instance_variable_get(var) }
+        hash['stage'] = stage
+        hash['time_to_go'] = time_ago_in_words(duedate)
+        hash['controller'] = controller
+        hash['action'] = action
+        hash['topic_id'] = topic_id
+        hash['participant'] = participant
+        hash['participant_id'] = participant_id
+        hash['assignment'] = participant.assignment.name
+        @revisionsArray.push(hash)
+
+      end
+
+      revisions_to_json = @revisionsArray.map{|s| {
+                                  assignment: s["assignment"] , 
+                                  stage: s["stage"], 
+                                  time_to_go: s["time_to_go"],
+                                  controller: s["controller"],
+                                  action: s["action"],
+                                  topic_id: s["topic_id"],
+                                  participant: s["participant"],
+                                  participant_id: s["participant_id"]
+                                  } 
+                              }
       ######## Students Teamed With###################
       @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip]).values
       @teamCourse = StudentTask.teamed_students(current_user, session[:ip]).keys
       # @teamCourse = ["CSC 517"]
       
 
-      render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: student_task_to_json, tasks_not_started: tasks_to_json, taskrevisions: @taskrevisions, teamCourse: @teamCourse}
+      render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: student_task_to_json, tasks_not_started: tasks_to_json, taskrevisions: revisions_to_json, teamCourse: @teamCourse}
       # render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: @student_tasks}
     end
 

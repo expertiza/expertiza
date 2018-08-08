@@ -115,6 +115,7 @@ export const auth = (name, password) => {
                 dispatch(actions.fetchStudentTasks())
                 dispatch(actions.fetchTeamCourse())
                 dispatch(actions.fetchTasks())
+                dispatch(actions.fetchRevisions())
             })
             .catch(error => {
                             console.log(error)
@@ -130,6 +131,7 @@ export const auth = (name, password) => {
             dispatch(actions.fetchStudentTasks())
             dispatch(actions.fetchTeamCourse())
             dispatch(actions.fetchTasks())
+            dispatch(actions.fetchRevisions())
         }
     }
 }

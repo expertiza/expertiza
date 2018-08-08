@@ -6,7 +6,10 @@ class BadgesController < ApplicationController
   require 'base64'
   require 'open-uri'
 
+  # this should be fetched from a table and we need an UI to populate instructor's access_token;
   @@access_token = "85d2e67ea0956aa7825e98ed9037f6c4627b593d28e537a9a7f1804b038b30dbf4b0544a68182f3d384e8aefb07e441a4abcac3100fb122b75491d1b816daa6e"
+  @@x_api_key = "ce56ea802fdee803531c310e30b0e32c"
+  @@x_api_secret = "fXYe3lH8xN62mvj5K8AuCmw2Ca7SQcIekvftil1aVFhKQcQuMLmjqqC6/hr1x4SlV9TfHSQxWdvZ+K0bUnCxmBXLYMrGSnigU22fy26thaH6u6duNoZX/4qx+y9iLYa/jotMe5X1GNom+230nw2hLqPH0EiIotZ0t+5TUWl5cvU="
 
   def action_allowed?
     ['Instructor',
@@ -24,32 +27,66 @@ class BadgesController < ApplicationController
   end
 
   def create
-    Thread.new do
-      image_icon = Base64.encode64(open(params['image-icon']){ |f| f.read })
-      form_data = { :title => params['badge']['name'],
-                    :attachment => image_icon,
-                    :short_description => params['badge']['description'],
-                    :criteria => params['badge']['award_criteria'],
-                    :is_giveable => true,
-                    :is_claimable => false,
-                    :expires_in => 60,
-                    :multipart => true}
-      headers = {"X-Api-Key":"ce56ea802fdee803531c310e30b0e32c",
-                 "X-Api-Secret": "fXYe3lH8xN62mvj5K8AuCmw2Ca7SQcIekvftil1aVFhKQcQuMLmjqqC6/hr1x4SlV9TfHSQxWdvZ+K0bUnCxmBXLYMrGSnigU22fy26thaH6u6duNoZX/4qx+y9iLYa/jotMe5X1GNom+230nw2hLqPH0EiIotZ0t+5TUWl5cvU="}
-      url = "https://api.credly.com/v1.1/badges?access_token=" + @@access_token
-      response = RestClient.post(url, form_data, headers=headers)
-
-      results = JSON.parse(response.to_str)
-      render :json => results
+    # in development mode, open() can't open files hosted by thin web server
+    result = nil
+    if Rails.env.development?
+      Thread.new do
+        do_create_badge
+      end
+    else
+      do_create_badge
     end
+
+
+
+    # need to return to whatever the starting point was
     redirect_to :action => 'new'
+  end
+
+  def do_create_badge
+    result = create_badge_in_credly
+    # save badge info in local db
+
+    newBadge = Badge.new(:name => params['badge']['name'],
+              :description => params['badge']['description'],
+              :image_name => params['image-icon'],
+              :instructor_id => current_user.id,
+              :private => !params['badge']['private'],
+              :external_badge_id => result['data'].to_i)
+    newBadge.save
+
+  end
+
+  def create_badge_in_credly
+    # maybe save the image file, so we can grab the ones created with credly designer
+    file_url = params['image-icon'];
+    file_name = file_url.split('/')[-1]
+    image_file = open(file_url)
+    directory = get_icon_directory_path
+    IO.copy_stream(image_file, directory + file_name) unless File.file?(directory + file_name)
+
+    # convert image to
+    image_icon = Base64.encode64(image_file.read)
+    form_data = {:title => params['badge']['name'],
+                 :attachment => image_icon,
+                 :short_description => params['badge']['description'],
+                 :criteria => params['badge']['award_criteria'],
+                 :is_giveable => true,
+                 :is_claimable => false,
+                 :expires_in => 0,
+                 :multipart => true}
+    headers = {"X-Api-Key": @@x_api_key,
+               "X-Api-Secret": @@x_api_secret}
+    url = "https://api.credly.com/v1.1/badges?access_token=" + @@access_token
+    response = RestClient.post(url, form_data, headers=headers)
+
+    return JSON.parse(response.to_str)
   end
 
   def icon_upload
     if params['fileupload'].content_type.include? "image"
       name = params['fileupload'].original_filename
-      user_id = params['uid']
-      directory = Rails.root.join('app', 'assets', 'images', 'badges', user_id)
+      directory = get_icon_directory_path
       # create dir
       FileUtils::mkdir_p(directory) unless File.exists?(directory)
       # create the file path
@@ -62,15 +99,18 @@ class BadgesController < ApplicationController
       # write the file
       File.open(path, "wb") { |f| f.write(params['fileupload'].read) }
     end
-    file_url = request.protocol + request.host_with_port + "/assets/badges/" + user_id + "/" + name
+    file_url = request.protocol + request.host_with_port + "/assets/badges/" + current_user.id.to_s + "/" + name
     render status: 200, json: {status: 200, message: "file uploaded", fileurl: file_url, filename: name}.to_json
   end
 
   def icons
-    user_id = params['uid']
-    directory = Rails.root.join('app', 'assets', 'images', 'badges', user_id)
+    directory = get_icon_directory_path
     image_icons = Dir.entries(directory).reject {|f| File.directory?(f) || f[0].include?('.')}
-    render status: 200, json: image_icons.map{|f| request.protocol + request.host_with_port + "/assets/badges/" + user_id + "/" + f}
+    render status: 200, json: image_icons.map{|f| request.protocol + request.host_with_port + "/assets/badges/" + current_user.id.to_s + "/" + f}
+  end
+
+  def get_icon_directory_path()
+    directory = Rails.root.join('app', 'assets', 'images', 'badges', current_user.id.to_s)
   end
 
   def badge_params
@@ -78,24 +118,19 @@ class BadgesController < ApplicationController
   end
 
   def award
-    @assignment = Assignment.find_by_id(params[:id])
-    if @assignment
-      @participants = @assignment.participants
-      @questionaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
 
-    end
 
   end
 
   def credly_designer
-    response = RestClient.post("https://credly.com/badge-builder/code", {
-        access_token: @@access_token},
-           headers={
-               "X-Api-Key": "36da6f26bae6b3247e915245e518fec9",
-               "X-Api-Secret": "FnRynfSWMybtY6nGzUEX1sCLfG6/UrDty1sHmnCCikJECbzSn+1jzOIzaE+IQqcigiXJ4s6ajBJunaVlId6vZVZ8eaF81S2muUUC7Iwu+knRYq6VSmkZzn/n13KL7ggXbqq7kw2ScfHfw/ZETM/CF6Z1snHD8kJ7LbvX07S/zxQ="})
+    response = RestClient.post("https://credly.com/badge-builder/code",
+                               {access_token: @@access_token},
+                               headers = {"X-Api-Key":@@x_api_key, "X-Api-Secret": @@x_api_secret})
     results = JSON.parse(response.to_str)
     if results['temp_token']
       render :json => results
+    else
+      render status: 0, :json => {"message":"badge builder is currently unreachable"}
     end
   end
 end

@@ -4,10 +4,29 @@ import {NavLink} from 'react-router-dom'
 import { Loading } from '../UI/spinner/LoadingComponent';
 
 class StudentList extends Component {
-    state = {
-            studentsTeamedWith: this.props.studentsTeamedWith,
-            studentTasks: this.props.studentTasks
+    constructor(props){
+        super(props);
+        var arr = []
+        var len = this.props.studentsTeamedWith.length;
+        for(var i=0; i<len; i++)
+            arr.push(this.props.studentsTeamedWith[i])
+
+        this.state = {
+            studentsTeamedWith: arr,
+            studentTasks: this.props.studentTasks,
+            teamCourse: this.props.teamCourse,
+            tasks_not_started: this.props.tasks_not_started
+            // teamCourse: ["CSC 517"]
         };
+        console.log(this.state.teamCourse[0])
+        if(this.state.tasks_not_started == undefined){
+
+        }
+        else
+            console.log(this.state.tasks_not_started.length)
+
+
+    }
     
     render(){
         return(
@@ -17,21 +36,53 @@ class StudentList extends Component {
                 {/* <PublishingRights></PublishingRights> */}
                 
             <div>
-                <div class="taskbox" style={{margin: '20px'}}>
-                    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;&nbsp;</span> Tasks not yet started<br/></strong><br/>
-                    <li>{this.state.studentsTeamedWith[0]}<br></br></li> 
-                    <li>{this.state.studentsTeamedWith[1]}<br></br></li>
-                    <li>{this.state.studentsTeamedWith[2]}<br></br></li> 
+                <div className="taskbox" style={{margin: '20px'}}>
+                
+                    
+                    <div>
+                        <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;{this.state.tasks_not_started == undefined ? "" : this.state.tasks_not_started.length}&nbsp;</span> Tasks not yet started<br/></strong>
+                        {this.state.tasks_not_started == undefined ? <Loading/> : 
+                            this.state.tasks_not_started.map(task =>
+                                <span>&nbsp; &raquo; {task.assignment.name} {task.current_stage}
+                                        {task.relative_deadline} left
+                                </span>
+                            )
+                        }
+                    </div><br/>
+                        
+                    <strong><span>Students who have teamed with you</span></strong>
+                    <br/>
+                    <br/>
+                    <div>
+                    {this.state.studentsTeamedWith.map((students, index) =>
+                        <div>                            
+                            <strong>&nbsp;&nbsp;<span className="tasknum">&nbsp;{students.length}&nbsp;</span>
+                                {this.state.teamCourse[index] == null ? " assignments not associated with any course" : this.state.teamCourse[index]}
+                            </strong><br/><br/>
+                            { 
+                                students.map(student => 
+                                    <div><span className="notification">&nbsp; &raquo; {student}</span><br></br></div>
+                                )
+                            }
+                            
+                        </div>
+                    )}
+                    </div>
                 </div>
             </div>
-            <div className="container">
+            {
+                this.state.studentTasks === undefined || this.state.studentTasks === null ? 
+                <Loading/> :
+                <div className="container">
                 <div className="row">
                 <div className="col-md-12">
                     <div className="topictable">
                         <Table className="table table-striped" cellpadding="2" >
+                            
                             <thead>
-                                <tr class = "taskheader">
-                                <th>Assignment</th>
+                                <tr className = "taskheader">
+                                <th>Assignment
+                                </th>
                                 <th>Topic</th>
                                 <th>Current Stage</th>
                                 <th>Review Grade</th>
@@ -43,15 +94,14 @@ class StudentList extends Component {
                                 </tr>
                             </thead>
                             {
-                                this.state.studentTasks === undefined ? <Loading /> :
                                 this.state.studentTasks.map(studentTask =>(
                                     <tr>
-                                        <td key={studentTask.assignment.id}><NavLink to={`/studentTaskView/${studentTask.participant.id}`}>{studentTask.assignment.name}</NavLink> <br /> {studentTask.assignment.course_id== null ? "" : studentTask.course_name}</td>
-                                        <td key={studentTask.assignment.id}> {studentTask.topic == null ? "-" : studentTask.topic}</td>
-                                        <td key={studentTask.assignment.id}> {studentTask.current_stage}</td>
-                                        <td key={studentTask.assignment.id}> {"N/A"}</td>
-                                        <td key={studentTask.assignment.id}> {""}</td>
-                                        <td key={studentTask.assignment.id}> {studentTask.stage_deadline}</td>
+                                        <td><NavLink to={`/studentTaskView/${studentTask.participant.id}`}>{studentTask.assignment.name}</NavLink> <br /> {studentTask.assignment.course_id== null ? "" : studentTask.course_name}</td>
+                                        <td> {studentTask.topic == null ? "-" : studentTask.topic}</td>
+                                        <td> {studentTask.current_stage}</td>
+                                        <td> {studentTask.review_grade}</td>
+                                        <td> {studentTask.badges}</td>
+                                        <td>{studentTask.stage_deadline.replace('T','\n')}</td>
                                         {/* <td key={studentTask.assignment.id}> {(studentTask.participant.permission_granted) ? "allowed":"denied"}</td> */}
                                     </tr>
                                 ))
@@ -61,6 +111,9 @@ class StudentList extends Component {
                     </div>
                 </div>
             </div>
+
+            }
+            
         </div>
         );
     }

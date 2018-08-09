@@ -7,11 +7,23 @@
     width: 100px;
     height: 100px;
   }
+  .text_title{
+    background-color: grey;
+    color: white;
+    padding: 10px;
+    font-size: large;
+    border-bottom-width: 1;
+  }
 </style>
 
 <script>
+  removeRuleTable = function(tablePlaceholder) {
+    $("#" + tablePlaceholder).remove();
+    $("#" + tablePlaceholder + "-header").remove();
+    $("#" + tablePlaceholder + "-button").remove();
+  }
 
-  setupAwardCritTable = function () {
+  setupAwardCritTable = function (assignmentId) {
       var conditions = [
         { "Question": 22, "Operator": ">", "Threshold": 5 },
         { "Question": 23, "Operator": ">", "Threshold": 5 },
@@ -21,14 +33,15 @@
     var questions = [
       { question: "OSS rubric'18 - State diagram quality?", question_id: 22 },
       { question: "OSS rubric'18 - Use case diagram quality?", question_id: 23},
-      { question: "OSS rubric'18 - Sequence diagram quality?", question_id: 32},
-      { question: "OSS rubric'18 - Average score", question_id: 032},
-      { question: "Teammate review'18 - Meeting attendance?", question_id: 21},
-      { question: "Teammate review'18 - Work contribution?", question_id: 25},
-      { question: "Teammate review'18 - leadership quality?", question_id: 12},
-      { question: "Teammate review'18 - Average score", question_id: 034}
+      { question: "OSS Teammate rubric'18 - Sequence diagram quality?", question_id: 32},
+      { question: "OSS Teammate rubric'18 - Average score", question_id: 032}
     ];
-
+    var questions2 = [
+      { question: "Final rubric'18 - Meeting attendance?", question_id: 21},
+      { question: "Final rubric'18 - Work contribution?", question_id: 25},
+      { question: "Final Teammate rubric'18 - leadership quality?", question_id: 12},
+      { question: "Final Teammate rubric'18 - Average score", question_id: 034}
+    ];
     var operator = [
       { op: ">"},
       { op: ">="},
@@ -38,8 +51,18 @@
       { op: "<="},
     ];
 
+    var tablePlaceholder = 'rule-table-' + assignmentId;
 
-    $("#award_criteria_placeholder").jsGrid({
+    if($("#" + tablePlaceholder).length == 0)
+      $("#award-criteria-placeholder").append(
+          '<div id="' + tablePlaceholder + '-header" class="text_title"> Set criteria from assignment ' + $( "#add-assignment-table option:selected" ).text()  +
+            '<button id="' + tablePlaceholder + '-button" type="button" class="close pull-right" aria-label="Close" onclick="removeRuleTable(\'' + tablePlaceholder +'\')">' +
+              '<span aria-hidden="true">&times;</span>' +
+           '</button>' +
+          '</div>' +
+          '<div id="' + tablePlaceholder + '"></div>');
+
+    $("#" + tablePlaceholder).jsGrid({
         width: "100%",
         height: "250px",
         rownumbers: true,
@@ -84,7 +107,7 @@
         data: conditions,
 
         fields: [
-          { name: "Question", type: "select", items: questions, valueField: "question_id", textField: "question", width: 200, align: "left"  },
+          { name: "Question", type: "select", items: (assignmentId == 1)? questions : questions2, valueField: "question_id", textField: "question", width: 200, align: "left"  },
           { name: "Operator", type: "select", items: operator, valueField: "op", textField: "op", width: 30, align: "center" },
           { name: "Threshold", type: "number", width: 30, align: "right" },
           { type: "control" }
@@ -179,6 +202,10 @@
     });
   }
 
+  var addAssignmentTable = function(){
+    setupAwardCritTable($('#add-assignment-table').val());
+  }
+
   $(document).ready(function () {
     //this part listen to credly designer and get the image url
     window.addEventListener("message", function(e) {
@@ -189,14 +216,23 @@
 
     $('input:radio[name=award_mechanism]').change(function () {
       if ($("input[name='award_mechanism']:checked").val() == 'manual') {
-        $('#award_criteria_placeholder')
+        $('#choose-assignment').html('');
+        $('#award-criteria-placeholder')
             .html('<textarea ' +
                 'name="badge[award_criteria]" ' +
                 'id="badge_award_criteria" ' +
                 'class="form-control width-700" row="5"></textarea>');
       }
       if ($("input[name='award_mechanism']:checked").val() == 'automatic') {
-        setupAwardCritTable();
+        $('#award-criteria-placeholder').html('');
+        $('#choose-assignment').html('' +
+            '<div class="form-inline">' +
+              '<select id="add-assignment-table" class="form-control">' +
+                '<option value="1">OSS project, Fall 2018</option>' +
+                '<option value="2">Final project, Fall 2018</option>' +
+              '</select>&nbsp;' +
+              '<button type="button" id="add-assignment-rule" class="btn btn-default" onclick="addAssignmentTable()">Add criteria from this assignment</button>' +
+            '</div>');
       }
     });
   });
@@ -213,7 +249,7 @@
     <td><%= text_area 'badge', 'description', class: "form-control width-400" %></td>
   <tr>
   <tr>
-    <td>Badge image</td>
+    <td>Badge icon</td>
     <td>
       <div id="badge-image-placeholder"></div>
       <input type="hidden" id="image-icon" name="image-icon">
@@ -238,17 +274,18 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2">Award criteria</td>
+    <td>Award criteria</td>
+    <td><div id="choose-assignment"></div></td>
   </tr>
   <tr>
     <td colspan="2">
-      <div id="award_criteria_placeholder">
+      <div id="award-criteria-placeholder">
         <textarea class="form-control width-700 height-500" name="badge[award_criteria]" id="badge_award_criteria" row="3"></textarea>
       </div>
       <div id="criteria_error" />
     </td>
   </tr>
-  <td>Share badges with other instructor?</td>
+  <td>Share this badge with other instructors?</td>
   <td>
     <%= check_box_tag :private, checked=false %>
   </td>

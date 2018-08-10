@@ -5,20 +5,19 @@ class QuestionnairesController < ApplicationController
   # Generally a questionnaire is associated with an assignment (Assignment)
   include ToggleAccessHelper
   before_action :authorize
-  
+
   def action_allowed?
     if action_name == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
-       'Administrator'
-       ].include? current_role_name) ||
+        'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
 
     else
-        ['Super-Administrator',
-         'Administrator',
-         'Instructor',
-         'Teaching Assistant', 'Student'].include? current_role_name
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant', 'Student'].include? current_role_name
     end
   end
 
@@ -154,7 +153,7 @@ class QuestionnairesController < ApplicationController
     end
     redirect_to action: 'list', controller: 'tree_display'
   end
-  
+
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?

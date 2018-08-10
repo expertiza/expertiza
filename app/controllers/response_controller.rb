@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = user_id = nil
     action = params[:action]
-    if %w(edit delete update view).include?(action)
+    if %w[edit delete update view].include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end

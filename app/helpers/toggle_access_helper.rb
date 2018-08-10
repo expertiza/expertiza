@@ -1,17 +1,17 @@
 module ToggleAccessHelper
   def toggle_access
     if !Assignment.find_by(id: params[:id]).nil?
-      assignment = Assignment.find(params[:id])
+      assignment = Assignment.find_by(id: params[:id])
       assignment.private = !assignment.private
       assignment.save
-    elsif Questionnaire.find_by(id: params[:id]).nil?
-      @questionnaire = Questionnaire.find(params[:id])
+    elsif !Questionnaire.find_by(id: params[:id]).nil?
+      @questionnaire = Questionnaire.find_by(id: params[:id])
       @questionnaire.private = !@questionnaire.private
       @questionnaire.save
       @access = @questionnaire.private == true ? "private" : "public"
       undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}.")
     elsif !Course.find_by(id: params[:id]).nil?
-      @course = Course.find(params[:id])
+      @course = Course.find_by(id: params[:id])
       @course.private = !@course.private
       begin
         @course.save!

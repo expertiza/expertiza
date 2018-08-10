@@ -96,7 +96,7 @@ class QuestionnairesController < ApplicationController
 
       save_choices @questionnaire.id
 
-      flash[:note] = "The quiz was successfully created." if @successful_create == true
+      flash[:note] = "The quiz was successfully created." if @successful_create
       redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
     else # if it is not a quiz questionnaire
       @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == "Teaching Assistant"
@@ -435,7 +435,7 @@ class QuestionnairesController < ApplicationController
           # Update existing question.
           question = Question.find(question_key)
           Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-          end
+        end
       end
     end
   end

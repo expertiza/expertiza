@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   def action_allowed?
     response = user_id = nil
     action = params[:action]
-    if %w[edit delete update view].include?(action)
+    if %w(edit delete update view).include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
@@ -32,7 +32,7 @@ class ResponseController < ApplicationController
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
         (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
-      return current_user_id?(user_id)
+      current_user_id?(user_id)
     end
   end
 
@@ -40,7 +40,7 @@ class ResponseController < ApplicationController
   def json
     response_id = params[:response_id] if params.key?(:response_id)
     response = Response.find(response_id)
-    render :json => response
+    render json: response
   end
 
   def delete
@@ -80,7 +80,7 @@ class ResponseController < ApplicationController
 
   # Update the response and answers when student "edit" existing response
   def update
-    render :nothing => true unless action_allowed?
+    render nothing: true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
@@ -92,9 +92,6 @@ class ResponseController < ApplicationController
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
-      else
-        # this won't work, since the auto update click edit in the background and override the submit. Don't think this is necessary anyway
-        # @response.update_attribute('is_submitted', false)
       end
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -102,7 +99,7 @@ class ResponseController < ApplicationController
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'saving', id: @map.map_id,
-      return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+                return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
   def new
@@ -163,10 +160,10 @@ class ResponseController < ApplicationController
     @response = Response.where(map_id: @map.id, round: @round.to_i).first
     if @response.nil?
       @response = Response.create(
-          map_id: @map.id,
-          additional_comment: params[:review][:comments],
-          round: @round.to_i,
-          is_submitted: is_submitted
+        map_id: @map.id,
+        additional_comment: params[:review][:comments],
+        round: @round.to_i,
+        is_submitted: is_submitted
       )
     end
     was_submitted = @response.is_submitted
@@ -184,7 +181,7 @@ class ResponseController < ApplicationController
       @response.email
     end
     redirect_to controller: 'response', action: 'saving', id: @map.map_id,
-      return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+                return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
   def saving
@@ -334,7 +331,7 @@ class ResponseController < ApplicationController
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
                                           .first.try(:dropdown)
-    @dropdown_or_scale = (use_dropdown == true ? 'dropdown' : 'scale')
+    @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
   def sort_questions(questions)

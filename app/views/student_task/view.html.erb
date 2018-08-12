@@ -73,6 +73,7 @@ to display the label "Your team" in the student assignment tasks-->
     </li>
   <% end %>
 
+  <%= @assignment.require_quiz === true ? nil : 'require quiz false'%>
     <!--Quiz-->
   <%if @assignment.require_quiz%>
     <% if @authorization == 'participant' or @can_take_quiz == true %>

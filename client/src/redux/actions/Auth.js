@@ -10,7 +10,7 @@ export const forgetUsername = () => {
 
 
 export const forgetPasswordUpdate = (email, password, repassword, token) => {
-    console.log(email, password, repassword, token)
+    // console.log(email, password, repassword, token)
     return dispatch => {
         axios({
             method: 'post',
@@ -99,7 +99,8 @@ export const logOut = () => {
 
 export const auth = (name, password) => {
     return dispatch => {
-        if(!localStorage.getItem('jwt')) {
+        if( !localStorage.getItem('jwt') || (localStorage.getItem('jwt') && 
+                localStorage.getItem('jwt_exp') <= (Date.now()/60) ) ) {
             axios({
                 method: 'post',
                 url: 'sessions',
@@ -108,6 +109,8 @@ export const auth = (name, password) => {
             })
             .then(response => {
                 localStorage.setItem('jwt', response.data.jwt)
+                localStorage.setItem('jwt_exp',(Date.now()/60) + 60*60*24*7)
+
                 dispatch(authSuccess(response.data.jwt))
                 dispatch(actions.fetchProfile())
                 dispatch(actions.fetchInstitutions())
@@ -121,6 +124,19 @@ export const auth = (name, password) => {
                             } )
         }else {
             console.log('jwt exists allready')
+            dispatch(authSuccess(localStorage.getItem('jwt')))
+            dispatch(actions.fetchProfile())
+            dispatch(actions.fetchInstitutions())
+            dispatch(actions.fetchStudentsTeamedWith())
+            dispatch(actions.fetchStudentTasks())
+        }
+    }
+}
+
+export const checkForAutoLogIn = () =>  {
+    return dispatch => {
+        if(localStorage.getItem('jwt') && localStorage.getItem('jwt_exp') > Date.now()/60 ) {
+            console.log( 'auto login', localStorage.getItem('jwt_exp'),  Date.now()/60 )
             dispatch(authSuccess(localStorage.getItem('jwt')))
             dispatch(actions.fetchProfile())
             dispatch(actions.fetchInstitutions())

@@ -6,6 +6,8 @@ import studentTaskView from './reducers/StudentTaskView';
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 import authReducer from './reducers/Auth';
+import studentTeamView from './reducers/StudentTeamView';
+import responseReducer from './reducers/Response';
 
 export const ConfigureStore = () => {
     const store = createStore(
@@ -14,7 +16,9 @@ export const ConfigureStore = () => {
             studentTaskList: studentTaskList,
             institutions: Institutions,
             studentTaskView:  studentTaskView,
-            auth: authReducer
+            auth: authReducer,
+            studentTeamView: studentTeamView,
+            responseReducer: responseReducer
         }),
         applyMiddleware(thunk, logger)
     );

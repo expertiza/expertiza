@@ -32,15 +32,19 @@
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
         <td><%= member.user.email(session[:ip]) %></td>
-
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+            <% puts 'in view student id', @student.id, "member_id",member.id %>
+            <% map1 = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first %>
+            <%# <% puts map1, 'session user id = ',session[:user].id%> %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
+            
             if map.nil?
               map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
             end
             review = map.response.last
+            puts 'review here is =', review
             if review.nil? %>
             <td>
               <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
@@ -121,6 +125,7 @@
          <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
+          <% puts 'following are the attributes ',@student.team.id, @student.id, @student.parent_id  %>
          <table style="width:80%" align="center" >
            <tr>
             <td>
@@ -180,6 +185,7 @@
                     else
                       @team_id = @student.team.id
                     end %>
+                  <% puts 'parameters are : ', inv.id, @student.id, @team_id%>
                   <%= link_to "Accept",
                               {:controller => 'invitations', :action => 'accept', :inv_id => inv.id, :student_id => @student.id, :team_id => @team_id},
                               {:onClick => "javascript: return confirm('Your topic (or place on waiting lists) will be relinquished if you accept the invitation. Do you want to continue?');"}

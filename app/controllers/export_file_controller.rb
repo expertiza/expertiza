@@ -40,17 +40,17 @@ class ExportFileController < ApplicationController
     [filename, delimiter]
   end
 
-  def exportdetails
+  def export_responses
     @delim_type = params[:delim_type2]
-    filename, delimiter = find_delim_filename(@delim_type, params[:other_char2], "_Details")
+    filename, delimiter = find_delim_filename(@delim_type, params[:other_char2], "_Responses")
 
     allowed_models = ['Assignment']
 
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
         csv << Object.const_get(params[:model]).export_headers(params[:id])
-        csv << Object.const_get(params[:model]).export_details_fields(params[:details])
-        Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
+        csv << Object.const_get(params[:model]).export_responses_fields(params[:responses_options])
+        Object.const_get(params[:model]).export_responses(csv, params[:id], params[:responses_options])
       end
     end
 

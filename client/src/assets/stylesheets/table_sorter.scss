@@ -1,0 +1,32 @@
+// Place all the styles related to the UserPastebins controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+/*TableSorter CSS styles */
+th.tablesorter-headerAsc{
+  /* Style for Up Arrow */
+  background-image: url('/assets/up-arrow.png');
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
+
+th.tablesorter-headerDesc{
+  /* Style for down arrow */
+  background-image: url('/assets/assetdown-arrow.png');
+  background-size: 15px 15px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+}
+
+/* Style for no-sort*/
+th.sorter-true.tablesorter-headerUnSorted{
+  /* Style for default view  */
+  background-image: url('/assets/sort.png');
+  background-size: 15px 7px;
+  background-repeat: no-repeat;
+  background-position: center right;
+  padding-right: 15px;
+
+}

@@ -3,6 +3,7 @@ import { Profile } from './reducers/Profile';
 import studentTaskList from './reducers/StudentTaskList';
 import { Institutions } from './reducers/Institution';
 import studentTaskView from './reducers/StudentTaskView';
+import Grades from './reducers/Grade';
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 import authReducer from './reducers/Auth';
@@ -18,7 +19,8 @@ export const ConfigureStore = () => {
             studentTaskView:  studentTaskView,
             auth: authReducer,
             studentTeamView: studentTeamView,
-            responseReducer: responseReducer
+            responseReducer: responseReducer,
+            grades: Grades
         }),
         applyMiddleware(thunk, logger)
     );

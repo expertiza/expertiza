@@ -1,0 +1,109 @@
+/* These are the colors used for coloring
+ * score cells within the heatgrid for the
+ * grades view.
+ */
+
+/* This is a null space in the table. Just leave
+
+ * it the way it is for now.
+ */
+.c0 {
+background-color: #d3d3d3;
+}
+
+/* This is a red, indicative of a poor score. */
+.c1 {
+  background-color: #ff8080;
+}
+
+/* This is an orange. */
+.c2 {
+  background-color: #FD992D;
+}
+
+/* This is a yellow, indicative of a median score. */
+.c3 {
+  background-color: #FFEC8B;
+}
+
+/* This is a light green. */
+.c4 {
+  background-color: #BCED91;
+}
+
+/* This is a green, indicative of a good score. */
+.c5 {
+  background-color: #2DE636;
+}
+
+.cf {
+  background-color: #FFFFFF;
+}
+
+/* To underline scores which have a comment. */
+.underlined {
+    text-decoration: underline;
+    font-weight:bold;
+}
+
+.tbl_heat {
+  border: 1px solid black;
+  margin-top: -9px;
+
+}
+.tbl_heat td {
+  cursor: pointer;
+  padding: 0px 2px 0px 2px;
+  border: 1px black solid;
+
+}
+
+.tbl_heat th {
+  border: 1px black solid;
+  padding: 5px 5px 5px 5px;
+  overflow-y: scroll;
+
+}
+
+.hiddenRow {padding:0 !important;}
+
+.tbl_questlist
+{
+  border: 1px solid grey;
+}
+
+.tbl_addlcmt
+{
+  border: 1px solid grey;
+}
+
+.tbl_questlist th{
+  border: 1px solid grey;
+  padding: 5px 5px 5px 5px;
+}
+
+.tbl_addlcmt td{
+  border: 1px solid grey;
+  padding: 2px 5px 2px 5px;
+  background-color: #ffffff;
+
+}
+
+.tbl_questlist th{
+  border: 1px solid grey;
+  padding: 5px 5px 5px 5px;
+}
+
+.tbl_addlcmt td{
+  border: 1px solid grey;
+  padding: 2px 5px 2px 5px;
+
+}
+
+.spn_tooltip {
+  padding-left:30px;color:grey;font-size:small;
+}
+
+.spn_qsttog {
+  padding-left:30px;cursor: pointer;text-decoration:underline;color:blue;font-size:small;
+}

@@ -137,7 +137,13 @@ module Api::V1
         @vmlist << vm
       end
       @current_role_name = current_role_name
-      render json: {status: :ok, data: "need to decide what to pass"}
+      render json: {
+                    status: :ok,
+                    questionnaires: questionnaires,
+                    vm: @vmlist,
+                    total: @pscore[:total_score],
+                    team_name: @team.name
+                  } 
     end
 
     def edit

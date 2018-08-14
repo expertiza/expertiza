@@ -1,0 +1,184 @@
+<% if @popup %>
+<!DOCTYPE html>
+    <html>
+    <head>
+      <title>Manage award criteria for badges in a course</title>
+      <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+      <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+      <%= csrf_meta_tags %>
+
+    </head>
+    <body>
+<% end %>
+
+<style>
+  .text_title{
+    background-color: grey;
+    color: white;
+    padding: 10px;
+    font-size: large;
+    border-bottom-width: 1;
+  }
+</style>
+
+<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+<script>
+
+
+  removeRuleTable = function(tablePlaceholder) {
+    $("#" + tablePlaceholder).remove();
+    $("#" + tablePlaceholder + "-header").remove();
+    $("#" + tablePlaceholder + "-button").remove();
+  }
+
+  setupAwardCritTable = function (assignment, questions) {
+
+    var conditions = [
+      { "Question": questions[0].question_id, "Operator": ">", "Threshold": 5 },
+      { "Question": questions[1].question_id, "Operator": ">", "Threshold": 5 }
+    ];
+
+
+    var operator = [
+      { op: ">"},
+      { op: ">="},
+      { op: "="},
+      { op: "!="},
+      { op: "<"},
+      { op: "<="},
+    ];
+
+    var tablePlaceholder = 'rule-table-' + assignment.id;
+
+    if($("#" + tablePlaceholder).length == 0)
+      $("#award-criteria-placeholder").append(
+          '<div class="panel panel-default">' +
+            '<div id="' + tablePlaceholder + '-header" class="panel-heading">' +
+              '<h4><a data-toggle="collapse" href="#' + tablePlaceholder + '">Specify criteria for awarding in assignment ' + assignment.name + '</a></h4>' +
+            '</div>' +
+          '<div class="panel-body" ><div id="' + tablePlaceholder + '" class="accordion-body collapse"></div></div>' +
+          '</div>');
+
+    $("#" + tablePlaceholder).jsGrid({
+      width: "100%",
+      height: "250px",
+      rownumbers: true,
+      filtering: true,
+      inserting: true,
+      editing: true,
+      sorting: true,
+      paging: true,
+      autoload: true,
+      pageSize: 10,
+      pageButtonCount: 5,
+      deleteConfirm: "Do you really want to delete the condition?",
+      //        controller: {
+      //          loadData: function(filter) {
+      //            return $.ajax({
+      //              type: "GET",
+      //              url: "/badgecrit",
+      //              data: filter
+      //            });
+      //          },
+      //          insertItem: function(item) {
+      //            return $.ajax({
+      //              type: "POST",
+      //              url: "/badgecrit",
+      //              data: item
+      //            });
+      //          },
+      //          updateItem: function(item) {
+      //            return $.ajax({
+      //              type: "PUT",
+      //              url: "/badgecrit/" + item.id,
+      //              data: item
+      //            });
+      //          },
+      //          deleteItem: function(item) {
+      //            return $.ajax({
+      //              type: "DELETE",
+      //              url: "/badgecrit/" + item.id
+      //            });
+      //          }
+      //        },
+      data: conditions,
+
+      fields: [
+        { name: "Question", type: "select", items: questions , valueField: "question_id", textField: "question", width: 200, align: "left"  },
+        { name: "Operator", type: "select", items: operator, valueField: "op", textField: "op", width: 30, align: "center" },
+        { name: "Threshold", type: "number", width: 30, align: "right" },
+        { type: "control" }
+      ]
+    });
+  }
+
+
+  var addAssignmentTable = function(){
+    setupAwardCritTable($('#add-assignment-table').val());
+  }
+
+  $(function(){
+    $('input:radio[name=award_mechanism]').change(function () {
+      if ($("input[name='award_mechanism']:checked").val() == 'manual') {
+        $('#choose-assignment').html('');
+        $('#award-criteria-placeholder').html('<textarea ' +
+            'name="badge[award_criteria]" ' +
+            'id="badge_award_criteria" ' +
+            'class="form-control width-700" row="5"></textarea>');
+      }
+      if ($("input[name='award_mechanism']:checked").val() == 'automatic') {
+        $('#award-criteria-placeholder').html('');
+        <% @assignments.each do |assignment| %>
+          var assignment = JSON.parse("<%=escape_javascript(assignment.to_json).html_safe %>");
+          var assignment_questions = JSON.parse("<%=escape_javascript(@assignment_questions.to_json).html_safe %>");
+          setupAwardCritTable(assignment, assignment_questions[assignment.id]);
+        <% end %>
+      }
+    });
+
+  });
+
+</script>
+
+<h1>Choose award criteria</h1>
+
+    <table class="table borderless table-not-full-width">
+      <tr>
+        <td class="width-250">Course name</td>
+        <td><%= @course.name %></td>
+      </tr>
+      <tr>
+        <td>Badge name</td>
+        <td><%= @badge.name %></td>
+      </tr>
+      <tr>
+        <td>Award method</td>
+        <td>
+          <%= radio_button_tag :award_mechanism, 'manual', true %>
+          <%= label_tag :award_mechanism_manual, 'Manual' %>
+          &nbsp;
+          <%= radio_button_tag :award_mechanism, 'automatic' %>
+          <%= label_tag :award_mechanism_automatic, 'Automatic' %>
+        </td>
+      </tr>
+      <tr>
+        <td>Award criteria</td>
+        <td><div></div></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div id="award-criteria-placeholder">
+            <textarea class="form-control width-700 height-500" name="badge[award_criteria]" id="badge_award_criteria" row="3"></textarea>
+          </div>
+          <div id="criteria_error" />
+        </td>
+      </tr>
+    </table>
+
+
+<% if @popup %>
+</body>
+<% end %>

@@ -339,5 +339,10 @@ module Api::V1
     def mean(array)
       array.inject(0) {|sum, x| sum += x } / array.size.to_f
     end
+    
+
+    # def isunderline?(score)
+    #   render :json {underlined?(score)}
+    # end
   end
 end

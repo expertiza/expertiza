@@ -23,7 +23,7 @@ class Profile extends Component {
                 timezonepref: this.props.profile.profile.timezonepref,
              },
             aq : {
-                 notification_limit: this.props.profile.aq.notification_limit
+                 notification_limit: this.props.profile.aq===null?null:this.props.profile.aq.notification_limit
             },
             touched: {
                 password: false,

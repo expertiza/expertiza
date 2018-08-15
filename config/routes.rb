@@ -108,7 +108,7 @@ Expertiza::Application.routes.draw do
       get :start
       get :export
       post :export
-      post :export_responses
+      post :export_reviews
     end
   end
 

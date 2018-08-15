@@ -419,8 +419,8 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
-  def self.export_responses(csv, parent_id, responses_options)
-    return csv unless responses_options.value?('true')
+  def self.export_reviews(csv, parent_id, reviews_options)
+    return csv unless reviews_options.value?('true')
     @assignment = Assignment.find(parent_id)
     @answers = {} # Contains all answer objects for this assignment
     # Find all unique response types
@@ -441,23 +441,23 @@ class Assignment < ActiveRecord::Base
         round_type = check_empty_rounds(@answers, round_num, res_type)
         csv << [round_type, '---', '---', '---', '---', '---', '---', '---'] unless round_type.nil?
         @answers[round_num][res_type].each do |answer|
-          csv << csv_row(responses_options, answer)
+          csv << csv_row(reviews_options, answer)
         end
       end
     end
   end
 
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
-  def self.export_responses_fields(responses_options)
+  def self.export_reviews_fields(reviews_options)
     fields = []
-    fields << 'Team ID / Author ID' if responses_options['team_id'] == 'true'
-    fields << 'Reviewee (Team / Student Name)' if responses_options['team_name'] == 'true'
-    fields << 'Reviewer' if responses_options['reviewer'] == 'true'
-    fields << 'Question / Criterion' if responses_options['question'] == 'true'
-    fields << 'Question ID' if responses_options['question_id'] == 'true'
-    fields << 'Answer / Comment ID' if responses_options['comment_id'] == 'true'
-    fields << 'Answer / Comment' if responses_options['comments'] == 'true'
-    fields << 'Score' if responses_options['score'] == 'true'
+    fields << 'Team ID / Author ID' if reviews_options['team_id'] == 'true'
+    fields << 'Reviewee (Team / Student Name)' if reviews_options['team_name'] == 'true'
+    fields << 'Reviewer' if reviews_options['reviewer'] == 'true'
+    fields << 'Question / Criterion' if reviews_options['question'] == 'true'
+    fields << 'Question ID' if reviews_options['question_id'] == 'true'
+    fields << 'Answer / Comment ID' if reviews_options['comment_id'] == 'true'
+    fields << 'Answer / Comment' if reviews_options['comments'] == 'true'
+    fields << 'Score' if reviews_options['score'] == 'true'
     fields
   end
 
@@ -466,22 +466,22 @@ class Assignment < ActiveRecord::Base
     csv_field
   end
 
-  # Generates a single row based on the responses_options selected
-  def self.csv_row(responses_options, answer)
+  # Generates a single row based on the reviews_options selected
+  def self.csv_row(reviews_options, answer)
     tcsv = []
     @response = Response.find(answer.response_id)
     map = ResponseMap.find(@response.map_id)
     @reviewee = Team.find_by id: map.reviewee_id
     @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
     reviewer = Participant.find(map.reviewer_id).user
-    tcsv << handle_nil(@reviewee.id) if responses_options['team_id'] == 'true'
-    tcsv << handle_nil(@reviewee.name) if responses_options['team_name'] == 'true'
-    tcsv << handle_nil(reviewer.name) if responses_options['reviewer'] == 'true'
-    tcsv << handle_nil(answer.question.txt) if responses_options['question'] == 'true'
-    tcsv << handle_nil(answer.question.id) if responses_options['question_id'] == 'true'
-    tcsv << handle_nil(answer.id) if responses_options['comment_id'] == 'true'
-    tcsv << handle_nil(answer.comments) if responses_options['comments'] == 'true'
-    tcsv << handle_nil(answer.answer) if responses_options['score'] == 'true'
+    tcsv << handle_nil(@reviewee.id) if reviews_options['team_id'] == 'true'
+    tcsv << handle_nil(@reviewee.name) if reviews_options['team_name'] == 'true'
+    tcsv << handle_nil(reviewer.name) if reviews_options['reviewer'] == 'true'
+    tcsv << handle_nil(answer.question.txt) if reviews_options['question'] == 'true'
+    tcsv << handle_nil(answer.question.id) if reviews_options['question_id'] == 'true'
+    tcsv << handle_nil(answer.id) if reviews_options['comment_id'] == 'true'
+    tcsv << handle_nil(answer.comments) if reviews_options['comments'] == 'true'
+    tcsv << handle_nil(answer.answer) if reviews_options['score'] == 'true'
     tcsv
   end
 

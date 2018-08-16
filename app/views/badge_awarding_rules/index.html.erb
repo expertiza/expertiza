@@ -34,14 +34,9 @@
     $("#" + tablePlaceholder + "-button").remove();
   }
 
-  setupAwardCritTable = function (assignment, questions) {
+  setupAwardCritTable = function (badge_id, assignment, questions) {
 
-    var conditions = [
-      { "Question": questions[0].question_id, "Operator": ">", "Threshold": 5 },
-      { "Question": questions[1].question_id, "Operator": ">", "Threshold": 5 }
-    ];
-
-
+    var logic_op = [{ op: "AND"}, { op: "OR"}]
     var operator = [
       { op: ">"},
       { op: ">="},
@@ -55,7 +50,7 @@
 
     if($("#" + tablePlaceholder).length == 0)
       $("#award-criteria-placeholder").append(
-          '<div class="panel panel-default">' +
+          '<div class="panel panel-default" >' +
             '<div id="' + tablePlaceholder + '-header" class="panel-heading">' +
               '<h4><a data-toggle="collapse" href="#' + tablePlaceholder + '">Specify criteria for awarding in assignment ' + assignment.name + '</a></h4>' +
             '</div>' +
@@ -63,10 +58,9 @@
           '</div>');
 
     $("#" + tablePlaceholder).jsGrid({
+      autoload: true,
       width: "100%",
       height: "250px",
-      rownumbers: true,
-      filtering: true,
       inserting: true,
       editing: true,
       sorting: true,
@@ -75,41 +69,43 @@
       pageSize: 10,
       pageButtonCount: 5,
       deleteConfirm: "Do you really want to delete the condition?",
-      //        controller: {
-      //          loadData: function(filter) {
-      //            return $.ajax({
-      //              type: "GET",
-      //              url: "/badgecrit",
-      //              data: filter
-      //            });
-      //          },
-      //          insertItem: function(item) {
-      //            return $.ajax({
-      //              type: "POST",
-      //              url: "/badgecrit",
-      //              data: item
-      //            });
-      //          },
-      //          updateItem: function(item) {
-      //            return $.ajax({
-      //              type: "PUT",
-      //              url: "/badgecrit/" + item.id,
-      //              data: item
-      //            });
-      //          },
-      //          deleteItem: function(item) {
-      //            return $.ajax({
-      //              type: "DELETE",
-      //              url: "/badgecrit/" + item.id
-      //            });
-      //          }
-      //        },
-      data: conditions,
-
+      controller: {
+        loadData: function(filter) {
+          return $.ajax({
+            type: "GET",
+            url: "/badge_awarding_rules/show?badge_id=" + badge_id + "&assignment_id=" + assignment.id,
+            data: filter
+          });
+        },
+        insertItem: function(item) {
+          return $.ajax({
+            type: "POST",
+            url: "/badge_awarding_rules?badge_id=" + badge_id + "&assignment_id=" + assignment.id,
+            data: item
+          });
+        },
+        updateItem: function(item) {
+          return $.ajax({
+            type: "PUT",
+            url: "/badge_awarding_rules/" + item.id,
+            data: item
+          });
+        },
+        deleteItem: function(item) {
+          return $.ajax({
+            type: "DELETE",
+            url: "/badge_awarding_rules/" + item.id
+          });
+        }
+      },
       fields: [
-        { name: "Question", type: "select", items: questions , valueField: "question_id", textField: "question", width: 200, align: "left"  },
-        { name: "Operator", type: "select", items: operator, valueField: "op", textField: "op", width: 30, align: "center" },
-        { name: "Threshold", type: "number", width: 30, align: "right" },
+        { name: "id", valueField: "id", visible: false },
+        { name: "assignment_id", valueField: "assignment_id", visible: false },
+        { name: "badge_id", valueField: "badge_id", visible: false },
+        { title: "Question", name: "question_id", type: "select", items: questions , valueField: "question_id", textField: "question", width: 200, align: "left"  },
+        { title: "Operator", name: "operator", type: "select", items: operator, valueField: "op", textField: "op", width: 30, align: "center" },
+        { title: "Threshold", name: "threshold", type: "number", width: 30, align: "right", validate: "required"},
+        { title: "", name: "logic_operator", type: "select", items: logic_op, valueField: "op", textField: "op", width: 30, align: "center" },
         { type: "control" }
       ]
     });
@@ -127,14 +123,15 @@
         $('#award-criteria-placeholder').html('<textarea ' +
             'name="badge[award_criteria]" ' +
             'id="badge_award_criteria" ' +
-            'class="form-control width-700" row="5"></textarea>');
+            'class="form-control" cols="60" rows="16"></textarea>');
       }
       if ($("input[name='award_mechanism']:checked").val() == 'automatic') {
         $('#award-criteria-placeholder').html('');
         <% @assignments.each do |assignment| %>
           var assignment = JSON.parse("<%=escape_javascript(assignment.to_json).html_safe %>");
           var assignment_questions = JSON.parse("<%=escape_javascript(@assignment_questions.to_json).html_safe %>");
-          setupAwardCritTable(assignment, assignment_questions[assignment.id]);
+          var badge_id = <%=@badge.id%>
+          setupAwardCritTable(badge_id, assignment, assignment_questions[assignment.id]);
         <% end %>
       }
     });
@@ -171,7 +168,7 @@
       <tr>
         <td colspan="2">
           <div id="award-criteria-placeholder">
-            <textarea class="form-control width-700 height-500" name="badge[award_criteria]" id="badge_award_criteria" row="3"></textarea>
+            <textarea class="form-control" name="badge[award_criteria]" id="badge_award_criteria" cols="60" rows="16"></textarea>
           </div>
           <div id="criteria_error" />
         </td>

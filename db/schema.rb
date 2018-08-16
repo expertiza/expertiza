@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180813185144) do
+ActiveRecord::Schema.define(version: 20180816153122) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -136,16 +136,18 @@ ActiveRecord::Schema.define(version: 20180813185144) do
   add_index "awarded_badges", ["participant_id"], name: "index_awarded_badges_on_participant_id", using: :btree
 
   create_table "badge_awarding_rules", force: :cascade do |t|
-    t.integer  "course_badge_id",  limit: 4
-    t.integer  "question_id",      limit: 4
-    t.string   "operator",         limit: 255
-    t.integer  "threshold",        limit: 4
-    t.string   "logical_operator", limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.integer  "badge_id",       limit: 4
+    t.integer  "assignment_id",  limit: 4
+    t.integer  "question_id",    limit: 4
+    t.string   "operator",       limit: 255
+    t.integer  "threshold",      limit: 4
+    t.string   "logic_operator", limit: 255, default: "AND"
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
   end
 
-  add_index "badge_awarding_rules", ["course_badge_id"], name: "index_badge_awarding_rules_on_course_badge_id", using: :btree
+  add_index "badge_awarding_rules", ["assignment_id"], name: "index_badge_awarding_rules_on_assignment_id", using: :btree
+  add_index "badge_awarding_rules", ["badge_id"], name: "index_badge_awarding_rules_on_badge_id", using: :btree
   add_index "badge_awarding_rules", ["question_id"], name: "index_badge_awarding_rules_on_question_id", using: :btree
 
   create_table "badges", force: :cascade do |t|
@@ -835,7 +837,8 @@ ActiveRecord::Schema.define(version: 20180813185144) do
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "awarded_badges", "badges"
   add_foreign_key "awarded_badges", "participants"
-  add_foreign_key "badge_awarding_rules", "course_badges"
+  add_foreign_key "badge_awarding_rules", "assignments"
+  add_foreign_key "badge_awarding_rules", "badges"
   add_foreign_key "badge_awarding_rules", "questions"
   add_foreign_key "badges", "users"
   add_foreign_key "course_badges", "badges"

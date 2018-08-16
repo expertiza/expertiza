@@ -1,9 +1,8 @@
 class BadgeAwardingRulesController < ApplicationController
-  before_action :set_badge_awarding_rule, only: [:show, :edit, :update, :destroy]
+  skip_before_action :verify_authenticity_token
 
-  # GET /badge_awarding_rules
+  # GET /badge_awarding_rules?course_id=X&badge_id=Y
   def index
-
     @course  = Course.find(params[:course_id])
     @badge = Badge.find(params[:badge_id])
     @assignments = Assignment.where(course_id: @course.id)
@@ -19,7 +18,8 @@ class BadgeAwardingRulesController < ApplicationController
             questionaire_question_array << { question_id: question.id, question: questionaire_question }
           end
         end
-        questionaire_question_array << { question_id: 'AVG' + questionaire.id.to_s, question: 'Average score in questionnaire ' + questionaire.name }
+        # mark as negative if it's a questionaire average
+        questionaire_question_array << { question_id: 0-questionaire.id, question: 'Average score in questionnaire ' + questionaire.name }
       end
       @assignment_questions[assignment.id] = questionaire_question_array;
     end
@@ -31,9 +31,11 @@ class BadgeAwardingRulesController < ApplicationController
     end
   end
 
-  # GET /badge_awarding_rules/1
+  # GET /badge_awarding_rules/show?badge_id=X&assignment_id=Y
   def show
-
+    #need to change the reference in BadgeAwardingRule from badge_course to assignment
+    rules = BadgeAwardingRule.where(badge_id: params['badge_id'],  assignment_id: params['assignment_id'])
+    render :json => rules
   end
 
   # GET /badge_awarding_rules/new
@@ -41,8 +43,9 @@ class BadgeAwardingRulesController < ApplicationController
     @badge_awarding_rule = BadgeAwardingRule.new
   end
 
-  # GET /badge_awarding_rules/1/edit
+  # POST /badge_awarding_rules/1
   def edit
+    # test
   end
 
   # POST /badge_awarding_rules
@@ -50,25 +53,27 @@ class BadgeAwardingRulesController < ApplicationController
     @badge_awarding_rule = BadgeAwardingRule.new(badge_awarding_rule_params)
 
     if @badge_awarding_rule.save
-      redirect_to @badge_awarding_rule, notice: 'Badge awarding rule was successfully created.'
+      render  :json => @badge_awarding_rule, :status => 200
     else
-      render :new
+      render :json => {message: "Database service unavailable"}, :status => 503
     end
   end
 
   # PATCH/PUT /badge_awarding_rules/1
   def update
+    set_badge_awarding_rule
     if @badge_awarding_rule.update(badge_awarding_rule_params)
-      redirect_to @badge_awarding_rule, notice: 'Badge awarding rule was successfully updated.'
+      render  :json => @badge_awarding_rule, :status => 200
     else
-      render :edit
+      render :json => {message: "Database service unavailable"}, :status => 503
     end
   end
 
   # DELETE /badge_awarding_rules/1
   def destroy
+    set_badge_awarding_rule
     @badge_awarding_rule.destroy
-    redirect_to badge_awarding_rules_url, notice: 'Badge awarding rule was successfully destroyed.'
+    render  :json => @badge_awarding_rule, :status => 200
   end
 
   private
@@ -79,6 +84,6 @@ class BadgeAwardingRulesController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def badge_awarding_rule_params
-      params.require(:badge_awarding_rule).permit(:course_badge_id, :question_id, :operator, :threshold, :logical_operator)
+      params.permit(:id, :assignment_id, :badge_id, :question_id, :operator, :threshold, :logic_operator)
     end
 end

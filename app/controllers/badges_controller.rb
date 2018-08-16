@@ -70,7 +70,6 @@ class BadgesController < ApplicationController
     form_data = {:title => params['badge']['name'],
                  :attachment => image_icon,
                  :short_description => params['badge']['description'],
-                 :criteria => params['badge']['award_criteria'],
                  :is_giveable => true,
                  :is_claimable => false,
                  :expires_in => 0,

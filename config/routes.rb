@@ -1,5 +1,4 @@
 Expertiza::Application.routes.draw do
-  resources :badge_awarding_rules
   resources :course_badges
   resources :instructions
   resources :evidences
@@ -68,6 +67,16 @@ Expertiza::Application.routes.draw do
       get :award
       get :icons
       post :icon_upload
+    end
+  end
+
+  resources :badge_awarding_rules, only: %i[index show] do
+    collection do
+      get :index
+      post :index, action: :create
+      put ':id', action: :update
+      delete ':id', action: :destroy
+      get :show
     end
   end
 

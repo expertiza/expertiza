@@ -1,7 +1,6 @@
 class BadgeAwardingRulesController < ApplicationController
-  skip_before_action :verify_authenticity_token
 
-  # GET /badge_awarding_rules?course_id=X&badge_id=Y
+   # GET /badge_awarding_rules?course_id=X&badge_id=Y
   def index
     @course  = Course.find(params[:course_id])
     @badge = Badge.find(params[:badge_id])

@@ -2,26 +2,55 @@ class BadgeAwardingRulesController < ApplicationController
 
    # GET /badge_awarding_rules?course_id=X&badge_id=Y
   def index
-    @course  = Course.find(params[:course_id])
-    @badge = Badge.find(params[:badge_id])
-    @assignments = Assignment.where(course_id: @course.id)
+    @error = ''
+    @error += " Please define course_id or assignment_id in query string." if !params[:course_id] && !params[:assignment_id]
+    @error += " Please define badge_id in query string." if !params[:badge_id]
 
-    @assignment_questions = Hash.new
-
-    @assignments.each do |assignment|
-      questionaire_question_array = []
-      assignment.questionnaires.each do |questionaire|
-        questionaire.questions.each do |question|
-          if question.is_a? Criterion or question.is_a? Scale
-            questionaire_question =  questionaire.name + '| ' + question.txt
-            questionaire_question_array << { question_id: question.id, question: questionaire_question }
-          end
-        end
-        # mark as negative if it's a questionaire average
-        questionaire_question_array << { question_id: 0-questionaire.id, question: 'Average score in questionnaire ' + questionaire.name }
-      end
-      @assignment_questions[assignment.id] = questionaire_question_array;
+    if !@error.empty?
+      flash[:error] = @error
+      return
     end
+
+    begin
+      if params[:assignment_id]
+        @assignment = Assignment.where(id: params[:assignment_id])
+        if @assignment.count < 1
+          @error = " Can't find assignment with an id of " + params[:assignment_id]
+          flash[:error] = @error
+          return
+        end
+      elsif params[:course_id]
+        @course  = Course.find(params[:course_id])
+      end
+      @badge = Badge.find(params[:badge_id])
+    rescue StandardError => e
+      @error += e.message
+      flash[:error] = @error
+      return
+    end
+
+    if  @badge && (@course || @assignment)
+      @assignments = @course ? Assignment.where(course_id: @course.id) : @assignment
+      @assignment_questions = Hash.new
+
+      @assignments.each do |assignment|
+        questionaire_question_array = []
+        assignment.questionnaires.each do |questionaire|
+          questionaire.questions.each do |question|
+            if question.is_a? Criterion or question.is_a? Scale
+              questionaire_question =  questionaire.name + '| ' + question.txt
+              questionaire_question_array << { question_id: question.id, question: questionaire_question }
+            end
+          end
+          # mark as negative if it's a questionaire average
+          questionaire_question_array << { question_id: 0-questionaire.id, question: 'Average score in questionnaire ' + questionaire.name }
+        end
+        @assignment_questions[assignment.id] = questionaire_question_array;
+      end
+    end
+
+    # take the first assignment so the UI can render it's name
+    @assignment = @assignment.first if @assignment
 
     @popup = false
     if params.key?(:popup) and params[:popup].to_s.casecmp('true').zero?

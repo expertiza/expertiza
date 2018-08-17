@@ -7,7 +7,7 @@ class BadgesController < ApplicationController
   require 'open-uri'
 
   # this should be fetched from a table and we need an UI to populate instructor's access_token;
-  @@access_token = "85d2e67ea0956aa7825e98ed9037f6c4627b593d28e537a9a7f1804b038b30dbf4b0544a68182f3d384e8aefb07e441a4abcac3100fb122b75491d1b816daa6e"
+  #@@access_token = "85d2e67ea0956aa7825e98ed9037f6c4627b593d28e537a9a7f1804b038b30dbf4b0544a68182f3d384e8aefb07e441a4abcac3100fb122b75491d1b816daa6e"
   @@x_api_key = "ce56ea802fdee803531c310e30b0e32c"
   @@x_api_secret = "fXYe3lH8xN62mvj5K8AuCmw2Ca7SQcIekvftil1aVFhKQcQuMLmjqqC6/hr1x4SlV9TfHSQxWdvZ+K0bUnCxmBXLYMrGSnigU22fy26thaH6u6duNoZX/4qx+y9iLYa/jotMe5X1GNom+230nw2hLqPH0EiIotZ0t+5TUWl5cvU="
 
@@ -19,7 +19,10 @@ class BadgesController < ApplicationController
   end
 
   def new
-
+    tokens = UserCredlyToken.where(user_id: current_user.id)
+    if tokens.count < 1
+      render action: 'login_credly'
+    end
   end
 
   def redirect_to_assignment
@@ -58,6 +61,8 @@ class BadgesController < ApplicationController
   end
 
   def create_badge_in_credly
+    tokens = UserCredlyToken.where(user_id: current_user.id).last
+
     # maybe save the image file, so we can grab the ones created with credly designer
     file_url = params['image-icon'];
     file_name = file_url.split('/')[-1]
@@ -76,7 +81,7 @@ class BadgesController < ApplicationController
                  :multipart => true}
     headers = {"X-Api-Key": @@x_api_key,
                "X-Api-Secret": @@x_api_secret}
-    url = "https://api.credly.com/v1.1/badges?access_token=" + @@access_token
+    url = "https://api.credly.com/v1.1/badges?access_token=" + tokens.access_token
     response = RestClient.post(url, form_data, headers=headers)
 
     return JSON.parse(response.to_str)
@@ -122,8 +127,10 @@ class BadgesController < ApplicationController
   end
 
   def credly_designer
+    tokens = UserCredlyToken.where(user_id: current_user.id).last
+
     response = RestClient.post("https://credly.com/badge-builder/code",
-                               {access_token: @@access_token},
+                               {access_token: tokens.access_token},
                                headers = {"X-Api-Key":@@x_api_key, "X-Api-Secret": @@x_api_secret})
     results = JSON.parse(response.to_str)
     if results['temp_token']
@@ -132,4 +139,27 @@ class BadgesController < ApplicationController
       render status: 0, :json => {"message":"badge builder is currently unreachable"}
     end
   end
+
+  def login_credly_submit
+      if !params['credly']['username'].nil? && !params['credly']['password'].nil?
+        begin
+          response = RestClient::Request.execute method: :post,
+                                                 url: "https://api.credly.com/v1.1/authenticate",
+                                                 user: params['credly']['username'].strip,
+                                                 password: params['credly']['password'].strip,
+                                                 headers: {"X-Api-Key":@@x_api_key, "X-Api-Secret": @@x_api_secret}
+          result = JSON.parse(response.to_str)
+
+          if !result['data']['token'].nil?
+            tokens = UserCredlyToken.new(user: current_user, access_token: result['data']['token'], refresh_token: result['data']['refresh_token'])
+            tokens.save
+            redirect_to action: 'new'
+          end
+        rescue StandardError => e
+          flash[:error] = "I can't log in wih the provided credential, please try again or <a href='https://connect.credly.com/#!/sign-in/user'>reset your credly password here</a>"
+          render action: 'login_credly'
+        end
+      end
+  end
+
 end

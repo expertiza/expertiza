@@ -1,0 +1,63 @@
+<h1>Log in to Credly</h1>
+
+<style>
+.warning{
+  background-color: #ff7661;
+}
+.text_warning{
+  background-color: #ff7661;
+  color: white;
+  padding: 10px;
+  font-size: large;
+}
+</style>
+<script>
+
+  $(document).ready(function() {
+    $('#login_credly').submit(function (e) {
+      var errors = 0;
+      $("#login_credly :input").map(function () {
+        if (!$(this).val()) {
+          $(this).parents('tr').addClass('warning');
+          errors++;
+        } else if ($(this).val()) {
+          $(this).parents('tr').removeClass('warning');
+          $('#errorwarn').removeClass('text_warning');
+          $('#errorwarn').html();
+        }
+      });
+      if (errors > 0) {
+        e.preventDefault();
+        $('#errorwarn').addClass('text_warning');
+        $('#errorwarn').text('All fields are required');
+        return false;
+      }
+    });
+  });
+</script>
+
+<div id="errorwarn" ></div>
+
+<p>
+  In order to create and award badges on your behalf, we must log in to Credly with your credential and get an “access token” so that the badges that you create, and award can be associated to yourself as an instructor.
+  If you do not have a Credly account, please <a href="https://connect.credly.com/#!/account-create/profile">create one here</a>, and then log in to your account from this page.
+  Please note that we will NOT store your user name nor password in our database. However we will store your access token.
+</p>
+
+<%= form_tag({action: 'login_credly'}, {id: 'credly-login-form'}) do %>
+    <%= error_messages_for 'badge' %>
+    <table class="table borderless table-not-full-width">
+      <tr>
+        <label for="login_name">Credly user name</label><br/>
+        <%= text_field 'credly', 'username', :size => 12, :class => 'form-control' %>
+      </tr>
+      <tr>
+        <label for="login_password">Credly password</label><br/>
+        <%= password_field 'credly', 'password', :size => 12, :class => 'form-control' %>
+      <tr>
+    </table>
+
+    <%= submit_tag "Login", class: "btn btn-default"%>
+<% end %>
+<p>
+<%= link_to 'Back', controller: 'badges', action: 'new' %>

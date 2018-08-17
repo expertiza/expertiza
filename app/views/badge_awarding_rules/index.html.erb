@@ -11,15 +11,7 @@
     <body>
 <% end %>
 
-<style>
-  .text_title{
-    background-color: grey;
-    color: white;
-    padding: 10px;
-    font-size: large;
-    border-bottom-width: 1;
-  }
-</style>
+<% if @error.empty? %>
 
 <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
 <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
@@ -144,8 +136,13 @@
 
     <table class="table borderless table-not-full-width">
       <tr>
-        <td class="width-250">Course name</td>
-        <td><%= @course.name %></td>
+        <% if !@course.nil? %>
+          <td class="width-250">Course name</td>
+          <td><%= @course.name %></td>
+        <%else # must be assignment%>
+          <td class="width-250">Assignment name</td>
+          <td><%= @assignment.name %></td>
+        <%end%>
       </tr>
       <tr>
         <td>Badge name</td>
@@ -174,7 +171,7 @@
         </td>
       </tr>
     </table>
-
+<% end %>
 
 <% if @popup %>
 </body>

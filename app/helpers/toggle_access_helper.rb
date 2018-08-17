@@ -1,6 +1,6 @@
 module ToggleAccessHelper
   def toggle_access
-
+    # toggle_Access is used by Assignment, Course and Questionnaire objects.
     @object = params[:controller].classify.constantize.find(params[:id])
     @object.private = !@object.private
 
@@ -9,7 +9,7 @@ module ToggleAccessHelper
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    @access = @object.private == true ? "private" : "public"
+    @access = @object.private ? "private" : "public"
 
     case params[:controller]
     when 'QuestionnairesController'

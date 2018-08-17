@@ -50,6 +50,11 @@ class CourseController < ApplicationController
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
+    if !params[:course][:private].nil?
+      @course.private = params[:course][:private]
+    else
+      @course.private = false
+    end
     @course.save
     undo_link("The course \"#{@course.name}\" has been updated successfully.")
     redirect_to controller: 'tree_display', action: 'list'

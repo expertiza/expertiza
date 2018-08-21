@@ -19,12 +19,7 @@ class BadgesController < ApplicationController
 
   def create
     @badge = Badge.new(badge_params)
-    image_file = params[:badge][:image_file]
-    if !image_file.nil?
-      File.open(Rails.root.join('app', 'assets', 'images', 'badges', image_file.original_filename), 'wb') do |file|
-      file.write(image_file.read)
-    end
-    @badge.image_name = image_file.original_filename
+    @badge.image_url = params[:badge][:image_url]
     else
       @badge.image_name = ''
     end
@@ -37,6 +32,20 @@ class BadgesController < ApplicationController
         format.json { render json: @badge.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  # def list
+  #   @instructor_id = params[:id]
+  #   @badges = Badge.where(instructor_id: @instructor_id)
+  #               .or(Badge.where(private: 0)).to_a
+  #   @badges.sort_by{|b| b.instructor_id == @instructor_id}
+  # end
+
+  def upload_evidence
+    participant = Participant.find_by_id(params[:id])
+    @assignment_badges = AwardedBadge.where(pariticpant_id: pariticpant.id, approval_status: 0)
+    #Can make the assumption that this is an assigment participant because assignment badge
+    @submissions = pariticpant.team.submissions
   end
 
   def badge_params

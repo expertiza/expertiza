@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180703203334) do
+ActiveRecord::Schema.define(version: 20180819194839) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -35,17 +35,6 @@ ActiveRecord::Schema.define(version: 20180703203334) do
 
   add_index "answers", ["question_id"], name: "fk_score_questions", using: :btree
   add_index "answers", ["response_id"], name: "fk_score_response", using: :btree
-
-  create_table "assignment_badges", force: :cascade do |t|
-    t.integer  "badge_id",      limit: 4
-    t.integer  "assignment_id", limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.integer  "auto_award",    limit: 1
-  end
-
-  add_index "assignment_badges", ["assignment_id"], name: "index_assignment_badges_on_assignment_id", using: :btree
-  add_index "assignment_badges", ["badge_id"], name: "index_assignment_badges_on_badge_id", using: :btree
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -110,7 +99,6 @@ ActiveRecord::Schema.define(version: 20180703203334) do
     t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
-    t.boolean  "has_badge"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -149,7 +137,7 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   create_table "badges", force: :cascade do |t|
     t.string   "name",              limit: 255
     t.string   "description",       limit: 255
-    t.string   "image_name",        limit: 255
+    t.string   "image_url",         limit: 255
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
     t.integer  "external_badge_id", limit: 4
@@ -218,6 +206,17 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   add_index "controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
   add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
 
+  create_table "course_badges", force: :cascade do |t|
+    t.integer  "badge_id",   limit: 4
+    t.integer  "course_id",  limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "auto_award", limit: 1
+  end
+
+  add_index "course_badges", ["badge_id"], name: "index_course_badges_on_badge_id", using: :btree
+  add_index "course_badges", ["course_id"], name: "index_course_badges_on_course_id", using: :btree
+
   create_table "courses", force: :cascade do |t|
     t.string   "name",            limit: 255
     t.integer  "instructor_id",   limit: 4
@@ -227,6 +226,7 @@ ActiveRecord::Schema.define(version: 20180703203334) do
     t.datetime "updated_at"
     t.boolean  "private",                       default: false, null: false
     t.integer  "institutions_id", limit: 4
+    t.integer  "has_badge",       limit: 1
   end
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
@@ -292,6 +292,7 @@ ActiveRecord::Schema.define(version: 20180703203334) do
     t.string   "instructions", limit: 255
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
+    t.integer  "badge_id",     limit: 4
   end
 
   create_table "institutions", force: :cascade do |t|
@@ -805,8 +806,6 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   add_foreign_key "answer_tags", "users"
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"
-  add_foreign_key "assignment_badges", "assignments"
-  add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
@@ -814,6 +813,8 @@ ActiveRecord::Schema.define(version: 20180703203334) do
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "awarded_badges", "badges"
   add_foreign_key "awarded_badges", "participants"
+  add_foreign_key "course_badges", "assignments", column: "course_id"
+  add_foreign_key "course_badges", "badges"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"

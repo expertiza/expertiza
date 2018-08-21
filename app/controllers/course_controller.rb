@@ -29,6 +29,9 @@ class CourseController < ApplicationController
   # Modify an existing course
   def edit
     @course = Course.find(params[:id])
+    @instructor_id = @course.instructor_id
+    @badges = Badge.where("badges.instructor_id = ? OR badges.private = 0", @instructor_id)
+    @badges.sort_by{|b| b.instructor_id == @instructor_id}
   end
 
   def update
@@ -83,12 +86,14 @@ class CourseController < ApplicationController
   # create a course
   def create
     @course = Course.new
+    puts params
     @course.name = params[:course][:name]
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
     @course.private = params[:course][:private]
     @course.instructor_id = session[:user].id
+    @course.has_badge = params[:course][:has_badge]
     begin
       @course.save!
       parent_id = CourseNode.get_parent_id

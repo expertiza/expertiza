@@ -99,7 +99,6 @@ ActiveRecord::Schema.define(version: 20180817185629) do
     t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
-    t.boolean  "has_badge"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -153,7 +152,7 @@ ActiveRecord::Schema.define(version: 20180817185629) do
   create_table "badges", force: :cascade do |t|
     t.string   "name",              limit: 255
     t.string   "description",       limit: 255
-    t.string   "image_name",        limit: 255
+    t.string   "image_url",         limit: 255
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
     t.integer  "user_id",           limit: 4
@@ -246,6 +245,7 @@ ActiveRecord::Schema.define(version: 20180817185629) do
     t.datetime "updated_at"
     t.boolean  "private",                       default: false, null: false
     t.integer  "institutions_id", limit: 4
+    t.integer  "has_badge",       limit: 1
   end
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
@@ -311,6 +311,7 @@ ActiveRecord::Schema.define(version: 20180817185629) do
     t.string   "instructions", limit: 255
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
+    t.integer  "badge_id",     limit: 4
   end
 
   create_table "institutions", force: :cascade do |t|

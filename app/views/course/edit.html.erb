@@ -6,4 +6,77 @@
 <% end %>
 
 <br/>
+
+<script>
+  data = "<%= @badges.to_json %>";
+  var badges = JSON.parse(data.replace(/&quot;/g,'"'));
+
+  function validateBadge(badge, filter){
+    return badge.name.toLowerCase() .includes(filter);
+  }
+
+  function filterBadges(){
+    filter = document.getElementById('filter').value.toLowerCase();
+
+    var filtered = badges.filter(badge => validateBadge(badge, filter));
+
+    table = document.getElementById('badge-info');
+    table.innerHTML = '';
+    
+    header_row = table.insertRow(-1);
+    th = document.createElement('th');
+    th.innerHTML = 'Badge';
+    header_row.appendChild(th);
+
+    th = document.createElement('th');
+    th.innerHTML = 'Description';
+    header_row.appendChild(th);
+
+    th = document.createElement('th');
+    th.innerHTML = 'Award Criteria';
+    header_row.appendChild(th);
+
+    th = document.createElement('th');
+    th.innerHTML = 'Use?';
+    header_row.appendChild(th);
+
+    for(var i = 0; i < filtered.length; i++){
+      let badge = filtered[i];
+      row = table.insertRow(-1);
+      
+      cell = row.insertCell(-1);
+      cell.innerHTML = badge.name;
+
+      cell = row.insertCell(-1);
+      cell.innerHTML = badge.description;
+
+      cell = row.insertCell(-1);
+      cell.innerHTML = 'BLANK';
+
+      cell = row.insertCell(-1);
+
+      checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.onclick = function(){
+        console.log(badge);
+      }
+      cell.appendChild(checkbox);
+    }
+  }
+</script>
+<% if @course.has_badge? %>
+  <table class="table table-striped" id="badge-info" style="width: 100%">
+    Filter: <input id='filter' type='text' oninput="filterBadges()">
+    <div align='right'>
+      <%= form_tag({:controller => "badges",
+                  :action => "new"}, {:method => "get"}) do %>
+        <%= submit_tag "New", class: "btn btn-default"%>
+      <% end %>
+    </div>
+  </table>
+<% end %>
+<script>
+  filterBadges();
+</script>
+
 <%= render :partial => '/shared_scripts/back' %>

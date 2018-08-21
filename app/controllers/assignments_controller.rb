@@ -85,9 +85,18 @@ class AssignmentsController < ApplicationController
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
-    @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.where("instructor_id = ? or private = ?", current_user, false)
-
+    # @assigned_badges = @assignment_form.assignment.badges
+    
+    @instructor_id = current_user
+    @course = Course.find(@assignment_form.assignment.course_id)
+    @badges = Badge.where("badges.instructor_id = ? OR badges.private = 0", @instructor_id)
+    @badge_in_course = {}
+    @badges.each do |b|
+      @badge_in_course[b.id] = b.used_in_course(@course.id)
+    end
+    @badges.sort_by{|b| b.instructor_id == @instructor_id}
+    # @assigned_badges = @assignment_form.assignment.badges
+    # @badges = Badge.where("instructor_id = ? or private = ?", current_user, false)
   end
 
   def update

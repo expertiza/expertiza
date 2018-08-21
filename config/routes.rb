@@ -115,6 +115,11 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :course_badge do
+    collection do
+    end
+  end
+
   resources :eula, only: [] do
     collection do
       get :accept

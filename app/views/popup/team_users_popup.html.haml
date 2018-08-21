@@ -39,7 +39,7 @@
               %td{:align => "center"}
                 = s.answer
             %td{:align => "left"}
-              = s.comments
+              = s.comments.html_safe
         %tr
           %th Reviewer Score (Σ weighted score/Σ weighted available score)
           %td{:align => "center"}
@@ -52,7 +52,7 @@
           %th Additional Comment
         %tr
           - additional_comment = Response.find(instance_variable_get('@response_id_round_' + round.to_s)).additional_comment
-          %td= additional_comment.nil? ? 'No Comments' : additional_comment
+          %td= additional_comment.nil? ? 'No Comments' : additional_comment.html_safe
       %hr/
   %br/
   .footer

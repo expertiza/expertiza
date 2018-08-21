@@ -1,5 +1,5 @@
 Expertiza::Application.routes.draw do
-  resources :file_instructions
+  resources :course_badges
   resources :instructions
   resources :evidences
   resources :nominations
@@ -60,9 +60,25 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :badges, only: %i[new create] do
+  resources :badges, only: %i[new create redirect_to_assignment credly_designer award icon_upload icons login_credly] do
     collection do
       get :redirect_to_assignment
+      get :credly_designer
+      get :award
+      get :icons
+      post :icon_upload
+      get :login_credly
+      post :login_credly, action: :login_credly_submit
+    end
+  end
+
+  resources :badge_awarding_rules, only: %i[index show] do
+    collection do
+      get :index
+      post :index, action: :create
+      put ':id', action: :update
+      delete ':id', action: :destroy
+      get :show
     end
   end
 

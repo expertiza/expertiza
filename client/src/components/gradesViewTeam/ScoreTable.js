@@ -97,7 +97,7 @@ class Scoretable extends Component {
                                                             </td>
                                                             )}
                                                             <td>
-                                                                {row.average_score_for_row}
+                                                                {(row.score_row.reduce( ( p, c ) => p + c.score_value, 0)/ row.score_row.length).toFixed(2)}
                                                             </td>
                                                             <td>
                                                                 {row.countofcomments}

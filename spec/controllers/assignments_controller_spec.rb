@@ -86,15 +86,6 @@ describe AssignmentsController do
     end
   end
 
-  describe '#toggle_access' do
-    it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page' do
-      allow(assignment).to receive(:save).and_return(true)
-      params = {id: 1}
-      get :toggle_access, params
-      expect(response).to redirect_to('/tree_display/list')
-    end
-  end
-
   describe '#new' do
     it 'creates a new AssignmentForm object and renders assignment#new page' do
       get :new

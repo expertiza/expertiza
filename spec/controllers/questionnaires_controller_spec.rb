@@ -283,16 +283,6 @@ describe QuestionnairesController do
     end
   end
 
-  describe '#toggle_access' do
-    it 'redirects to tree_display#list page' do
-      allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-      allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return(true)
-      params = {id: 1}
-      get :toggle_access, params
-      expect(response).to redirect_to('/tree_display/list')
-    end
-  end
-
   describe '#add_new_questions' do
     context 'when adding ScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do

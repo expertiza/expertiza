@@ -1,6 +1,5 @@
 class AssignmentsController < ApplicationController
   include AssignmentHelper
-  include ToggleAccessHelper
   autocomplete :user, :name
   before_action :authorize
 

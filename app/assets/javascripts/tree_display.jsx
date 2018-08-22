@@ -686,7 +686,7 @@ jQuery(document).ready(function() {
               <input type="hidden" name="private" value={this.props.private ? 1 : 0} />
               <button type="submit"
                       className="btn btn-primary pull-right new-button">
-                      New {this.props.private ? "private" : "public"} {this.props.dataType}
+                     <b>+</b>
               </button>
             </form>
           )
@@ -1078,10 +1078,6 @@ jQuery(document).ready(function() {
           <NewItemButton
             dataType={this.props.dataType}
             private={true}
-          />
-          <NewItemButton
-            dataType={this.props.dataType}
-            private={false}
           />
           <ContentTable
             data={this.state.tableData}

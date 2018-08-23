@@ -50,7 +50,7 @@ class CourseBadgesController < ApplicationController
           @score[course_participant.id][assignment.id]['avg_score'] = scores[:review][:scores][:avg].nil? ? 'N/A' : scores[:review][:scores][:avg].round(1)
           @score[course_participant.id][assignment.id]['avg_reviewing'] = scores[:feedback][:scores][:avg].nil? ? 'N/A' : scores[:feedback][:scores][:avg].round(1)
           @score[course_participant.id][assignment.id]['assignment_participant'] = participant.id
-          break if i>5 # debugging purpose
+          # break if i>5 # debugging purpose
         end
       end
     else

@@ -135,8 +135,7 @@ class BadgesController < ApplicationController
     params.require(:badge).permit(:name, :description, :image_name)
   end
 
-  def award
-
+  def awarding
 
   end
 
@@ -150,7 +149,7 @@ class BadgesController < ApplicationController
     if results['temp_token']
       render :json => results
     else
-      render status: 0, :json => {"message":"badge builder is currently unreachable"}
+      render status: 400, :json => {"message":"badge builder is currently unreachable"}
     end
   end
 

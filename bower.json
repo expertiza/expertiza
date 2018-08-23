@@ -33,6 +33,7 @@
     "js-grid": "latest",
     "jquery-colorbox": "latest",
     "jquery-bar-rating": "latest",
-    "jquery-file-upload": "latest"
+    "jquery-file-upload": "latest",
+    "jquery.tablesorter": "latest"
   }
 }

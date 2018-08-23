@@ -1,0 +1,63 @@
+<!-- Pick a theme, load the plugin & initialize plugin -->
+<script>
+  $(function(){
+    $('table').tablesorter({
+      sortReset      : true,
+      sortRestart    : true
+    });
+  });
+</script>
+
+<h1>Award Badges</h1>
+<%if !@error%>
+  <table class="tablesorter table table-striped">
+    <thead class="thead-light" align="center">
+      <tr>
+        <th colspan="2">Participant</th>
+        <% @assignments.each do |assig| %>
+        <th colspan="2" style="word-wrap: break-word;">Avg. in <%= assig.name %></th>
+        <% end %>
+        <th colspan="<%= @course_badges.count %>">Badges</th>
+      </tr>
+      <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <% @assignments.each do |assig| %>
+            <th>Score</th>
+            <th>Reviewing</th>
+        <% end %>
+        <% if @course_badges.count > 0
+             @course_badges.each do |course_badge| %>
+              <th style="text-align: center; word-wrap: break-word;"><div><img src="<%= course_badge.badge.image_name%>" width="25" height="25"/></div><%= course_badge.badge.name %></th>
+        <%   end
+           else %>
+             <th>N/A</th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @participants.each do |participant| %>
+      <tr>
+        <td><%= participant.user.name %></td>
+        <td><%= participant.user.fullname %></td>
+        <% @assignments.each do |assignment| %>
+
+            <td><a href="http://www.google.com" target="_blank"><%= @score[participant.id][assignment.id]['avg_score'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_score']  %></a></td>
+            <td><a href="http://www.google.com" target="_blank"><%= @score[participant.id][assignment.id]['avg_reviewing'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_reviewing']  %></a></td>
+
+        <% end %>
+        <% if @course_badges.count > 0
+             @course_badges.each do |course_badge| %>
+                <td style="text-align: center;" >
+                  <img src="<%= course_badge.badge.image_name%>" width="25" height="25"/>&nbsp;
+                  <input type="checkbox" id='award_<%= participant.id.to_s + "_" + course_badge.badge.id.to_s %>' <%= "checked" unless @award[participant.user.id][course_badge.badge.id].empty? %>/>
+                </td>
+        <%   end
+           else %>
+             <td>N/A</td>
+        <% end %>
+      </tr>
+      <% end %>
+    </tbody>
+  </table>
+<%end%>

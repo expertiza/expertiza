@@ -37,13 +37,16 @@
 </script>
 
 <div id="errorwarn" ></div>
-
-<p>
-  In order to create and award badges on your behalf, we must log in to Credly with your credential and get an “access token” so that the badges that you create, and award can be associated to yourself as an instructor.
-  If you do not have a Credly account, please <a href="https://connect.credly.com/#!/account-create/profile">create one here</a>, and then log in to your account from this page.
-  Please note that we will NOT store your user name nor password in our database. However we will store your access token.
-</p>
-
+<div class="panel panel-default">
+  <div class="panel-heading">Privacy notice</div>
+  <div class="panel-body">
+    In order to create and award badges on your behalf, we must log in to Credly with your credential and get an “access token” associated with your Credly profile.
+    This token enables you to certify the badges that you create and award through Expertiza.
+    If you do not have a Credly account, please <a href="https://connect.credly.com/#!/account-create/profile" target="_blank">create one here</a>, then log in to your account from this page.
+    Please note that we will NOT store your credly user name nor password in our database. However, we will store your access token.
+  </div>
+</div>
+<div class="">
 <%= form_tag({action: 'login_credly'}, {id: 'credly-login-form'}) do %>
     <%= error_messages_for 'badge' %>
     <table class="table borderless table-not-full-width">
@@ -59,5 +62,6 @@
 
     <%= submit_tag "Login", class: "btn btn-default"%>
 <% end %>
+</div>
 <p>
 <%= link_to 'Back', controller: 'badges', action: 'new' %>

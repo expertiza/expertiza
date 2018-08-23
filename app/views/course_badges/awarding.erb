@@ -41,10 +41,16 @@
         <td><%= participant.user.name %></td>
         <td><%= participant.user.fullname %></td>
         <% @assignments.each do |assignment| %>
-
-            <td><a href="http://www.google.com" target="_blank"><%= @score[participant.id][assignment.id]['avg_score'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_score']  %></a></td>
-            <td><a href="http://www.google.com" target="_blank"><%= @score[participant.id][assignment.id]['avg_reviewing'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_reviewing']  %></a></td>
-
+            <td>
+              <a href="../grades/view_team?id=<%=@score[participant.id][assignment.id]['assignment_participant']%>" target="_blank">
+                <%= @score[participant.id][assignment.id]['avg_score'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_score']  %>
+              </a>
+            </td>
+            <td>
+              <a href="../grades/view_team?id=<%=@score[participant.id][assignment.id]['assignment_participant']%>" target="_blank">
+                <%= @score[participant.id][assignment.id]['avg_reviewing'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_reviewing']  %>
+              </a>
+            </td>
         <% end %>
         <% if @course_badges.count > 0
              @course_badges.each do |course_badge| %>

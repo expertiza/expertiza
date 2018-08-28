@@ -53,7 +53,7 @@
               <%col_color_bg = 'yellow' if sentiment_value == 0.0%>
               <%col_color_bg = '#ABEBC6' if sentiment_value > 0.0 && sentiment_value <= 0.5%>
               <%col_color_bg = 'green' if sentiment_value > 0.5 && sentiment_value <= 1.0%>
-              <td align = 'left'; style="background-color:<%= col_color_bg %>"><p style="color: <%= col_color%>"><%= answer.comments.html_safe %></p></td>
+              <td align = 'left'; style="background-color:<%= col_color_bg %>"><p style="color: <%= col_color%>"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
               <% sentiment_counter = sentiment_counter + 1 %>
               
             </tr>

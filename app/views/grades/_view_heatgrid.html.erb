@@ -182,7 +182,7 @@ function toggleFunction(elementId) {
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <td>
-                                <%= row.score_row[index].comment.html_safe %>
+                                <%= row.score_row[index].comment.html_safe unless row.score_row[index].comment.nil? %>
                                 <% if row.score_row[index].vm_prompts.count > 0 %>
                                     <div class="tag_prompt_container">
                                       <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>

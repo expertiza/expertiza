@@ -5,6 +5,7 @@ Expertiza::Application.routes.draw do
   resources :instructions
   resources :evidences
   resources :nominations
+  resources :badge_awarding_rules
   ###
   # Please insert new routes alphabetically!
   ###

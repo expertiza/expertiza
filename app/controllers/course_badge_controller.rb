@@ -1,7 +1,7 @@
 class CourseBadgeController < ApplicationController
 	def action_allowed?
 	    current_role_name.eql?("Instructor")
-	  end
+	end
 
 	def create
 		@badge_id = params[:course_badge][:badge_id]

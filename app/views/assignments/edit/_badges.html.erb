@@ -46,7 +46,7 @@
       let button = document.createElement("a");
       button.innerHTML = "Edit criteria"
       button.setAttribute("class", "btn btn-default");
-      button.setAttribute("href", "localhost:3000/badge_awarding_rules?badge_id="+badge.id.toString()+"&course_id=<%= @course.id %>")
+      button.setAttribute("href", "http://localhost:3000/badge_awarding_rules?badge_id="+badge.id.toString()+"&assignment_id=<%= @assignment_form.assignment.id %>")
       cell.appendChild(button);
 
       cell = row.insertCell(-1);

@@ -75,21 +75,10 @@ jQuery(document).ready(function() {
               action={"/questionnaires/new"}
               method="GET">
               <input type="hidden" name="model" value={this.props.parent_name+"Questionnaire"} />
-              <input type="hidden" name="private" value={0} />
-              <button type="submit"
-                      className="btn btn-primary questionnaire-button">
-                      New public item
-              </button>
-            </form>
-            <form
-              style={formStyle}
-              action={"/questionnaires/new"}
-              method="GET">
-              <input type="hidden" name="model" value={this.props.parent_name+"Questionnaire"} />
               <input type="hidden" name="private" value={1} />
               <button type="submit"
                       className="btn btn-primary questionnaire-button">
-                      New private item
+                  <b>+</b>
               </button>
             </form>
           </span>

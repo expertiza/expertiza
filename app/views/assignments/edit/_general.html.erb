@@ -71,6 +71,14 @@ function microtaskChanged() {
   </tr>
 
   <tr>
+    <td style='padding:5px' id='assignment_access'>
+      <p><input name="assignment_form[assignment][private]" type="hidden" value="false"/>
+        <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private? || !params[:private].to_i.zero?) %>
+        <%= label_tag('assignment_form[assignment][private]', 'Private assignment') %></p>
+    </td>
+  </tr>
+
+  <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">

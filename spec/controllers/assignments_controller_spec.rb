@@ -111,6 +111,7 @@ describe AssignmentsController do
             name: 'test assignment',
             directory_path: '/test',
             spec_location: '',
+            private: false,
             show_teammate_reviews: false,
             require_quiz: false,
             num_quiz_questions: 0,
@@ -127,7 +128,7 @@ describe AssignmentsController do
       }
     end
     context 'when assignment_form is saved successfully' do
-      it 'redirets to assignment#edit page' do
+      it 'redirects to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)

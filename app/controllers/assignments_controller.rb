@@ -90,6 +90,10 @@ class AssignmentsController < ApplicationController
     @instructor_id = params[:id]
     @course = Course.find(@assignment_form.assignment.course_id)
     @badges = Badge.where("badges.instructor_id = ? OR badges.private = 0", @instructor_id)
+    @badge_in_course = {}
+    @badges.each do |b|
+      @badge_in_course[b.id] = b.used_in_course(@course.id)
+    end
     @badges.sort_by{|b| b.instructor_id == @instructor_id}
     # @assigned_badges = @assignment_form.assignment.badges
     # @badges = Badge.where("instructor_id = ? or private = ?", current_user, false)

@@ -10,6 +10,10 @@ class Badge < ActiveRecord::Base
   validates :description, presence: true
   validates :image_name, presence: true
 
+  def used_in_course(course_id)
+    CourseBadge.exists?(badge_id: self.id, course_id: course_id)
+  end
+
   def self.get_id_from_name(badge_name)
     Badge.find_by(name: badge_name).try(:id)
   end

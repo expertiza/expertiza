@@ -1,7 +1,8 @@
 <script>
-  data = "<%= @badges.to_json %>";
-  var badges = JSON.parse(data.replace(/&quot;/g,'"'));
-
+  badge_data = "<%= @badges.to_json %>";
+  course_badge_data = "<%= @badge_in_course.to_json %>";
+  var badges = JSON.parse(badge_data.replace(/&quot;/g,'"'));
+  var used_in_course = JSON.parse(course_badge_data.replace(/&quot;/g,'"'));
   function validateBadge(badge, filter){
     return badge.name.toLowerCase() .includes(filter);
   }
@@ -42,25 +43,46 @@
       cell.innerHTML = badge.description;
 
       cell = row.insertCell(-1);
-      cell.innerHTML = 'BLANK';
+      let button = document.createElement("a");
+      button.innerHTML = "Edit criteria"
+      button.setAttribute("class", "btn btn-default");
+      button.setAttribute("href", "localhost:3000/badge_awarding_rules?badge_id="+badge.id.toString()+"&course_id=<%= @course.id %>")
+      cell.appendChild(button);
 
       cell = row.insertCell(-1);
 
-      checkbox = document.createElement('input');
+      let checkbox = document.createElement('input');
+
       checkbox.type = 'checkbox';
+      checkbox.checked = used_in_course[badge.id];
       checkbox.onclick = function(){
-        console.log(badge);
-        console.log("<%= @assignment.course_id %>");
-
-        var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-        xmlhttp.open("POST", "/course_badge");
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        xmlhttp.setRequestHeader("Accept", "application/json");
-        xmlhttp.send(JSON.stringify({
-          course_id: <%= @assignment.course_id %>,
-          badge_id: badge.id
-        }));
-
+        if(checkbox.checked){
+          used_in_course[badge.id] = true;
+          var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+          xmlhttp.open("POST", "/course_badge");
+          xmlhttp.setRequestHeader("Content-Type", "application/json");
+          xmlhttp.setRequestHeader("Accept", "application/json");
+          xmlhttp.setRequestHeader("X-CSRF-Token", "<%= form_authenticity_token.to_s %>");
+          xmlhttp.send(JSON.stringify({
+            course_id: <%= @assignment.course_id %>,
+            badge_id: badge.id
+          }));
+        }else{
+          if(window.confirm("This badge will not longer be usable in any assignments in this course")){
+            used_in_course[badge.id] = false;
+            var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+            xmlhttp.open("DELETE", "/course_badge/delete_badge_from_course");
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.setRequestHeader("Accept", "application/json");
+            xmlhttp.setRequestHeader("X-CSRF-Token", "<%= form_authenticity_token.to_s %>");
+            xmlhttp.send(JSON.stringify({
+              course_id: <%= @assignment.course_id %>,
+              badge_id: badge.id
+            }));
+          }else{
+            checkbox.checked = true;
+          }
+        }
       }
       cell.appendChild(checkbox);
     }
@@ -68,7 +90,7 @@
 </script>
 
 <table class="table table-striped" id="badge-info" style="width: 100%">
-  Filter: <input id='filter' type='text' oninput="filterBadges()">
+  Search: <input id='filter' type='text' oninput="filterBadges()">
   <div align='right'>
     <%= form_tag({:controller => "badges",
                 :action => "new"}, {:method => "get"}) do %>

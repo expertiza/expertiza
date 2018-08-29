@@ -1,5 +1,7 @@
 Expertiza::Application.routes.draw do
-  resources :file_instructions
+  get 'course_badges/awarding'
+
+  resources :course_badges
   resources :instructions
   resources :evidences
   resources :nominations

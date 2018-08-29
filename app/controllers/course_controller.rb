@@ -31,6 +31,10 @@ class CourseController < ApplicationController
     @course = Course.find(params[:id])
     @instructor_id = @course.instructor_id
     @badges = Badge.where("badges.instructor_id = ? OR badges.private = 0", @instructor_id)
+    @badge_in_course = {}
+    @badges.each do |b|
+      @badge_in_course[b.id] = b.used_in_course(@course.id)
+    end
     @badges.sort_by{|b| b.instructor_id == @instructor_id}
   end
 

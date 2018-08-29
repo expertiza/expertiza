@@ -141,7 +141,7 @@ module Api::V1
                     status: :ok,
                     questionnaires: questionnaires,
                     vm: @vmlist,
-                    total: @pscore[:total_score],
+                    total: @pscore[:review][:scores][:avg],
                     team_name: @team.name
                   } 
     end

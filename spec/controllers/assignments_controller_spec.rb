@@ -100,9 +100,9 @@ describe AssignmentsController do
         button: '',
         assignment_form: {
           assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
-                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
-          due_date: [{"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"1", "due_at"=>"2017/12/05 00:00", "submission_allowed_id"=>"3", "review_allowed_id"=>"1", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}, 
-                    {"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"2", "due_at"=>"2017/12/02 00:00", "submission_allowed_id"=>"1", "review_allowed_id"=>"3", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}], 
+                                      "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          due_date: [{"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "1", "due_at" => "2017/12/05 00:00", "submission_allowed_id" => "3", "review_allowed_id" => "1", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"},
+                     {"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "2", "due_at" => "2017/12/02 00:00", "submission_allowed_id" => "1", "review_allowed_id" => "3", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"}],
           assignment: {
             instructor_id: 2,
             course_id: 1,
@@ -156,7 +156,7 @@ describe AssignmentsController do
       it 'shows an error flash message and renders edit page' do
         allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([double('SignUpTopic'), double('SignUpTopic')])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1')
-                                                         .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+          .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
         allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
@@ -215,7 +215,7 @@ describe AssignmentsController do
           id: 1,
           course_id: 1,
           set_pressed: {
-              bool: 'true'
+            bool: 'true'
           },
           assignment_form: {
             assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",

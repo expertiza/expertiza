@@ -23,6 +23,7 @@ gem 'engtagger'
 gem 'expertiza-authlogic', git: 'https://github.com/expertiza/authlogic.git', require: 'authlogic'
 gem 'fastercsv'
 gem 'font-awesome-rails'
+gem 'foreman'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
 gem "googlecharts", require: "gchart"

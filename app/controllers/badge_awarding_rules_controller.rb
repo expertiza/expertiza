@@ -1,15 +1,11 @@
 class BadgeAwardingRulesController < ApplicationController
 
-  def action_allowed?
-      current_role_name.eql?("Instructor")
-  end
-
-   # GET /badge_awarding_rules?course_id=X&badge_id=Y
+   # GET /badge_awarding_rules?course_id=X&badge_id=Y&popup=true
   def index
     @error = ''
     @error += " Please define course_id or assignment_id in query string." if !params[:course_id] && !params[:assignment_id]
     @error += " Please define badge_id in query string." if !params[:badge_id]
-    puts params
+
     if !@error.empty?
       flash[:error] = @error
       return

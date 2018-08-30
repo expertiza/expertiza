@@ -28,7 +28,7 @@
         <% end %>
         <% if @course_badges.count > 0
              @course_badges.each do |course_badge| %>
-              <th style="text-align: center; word-wrap: break-word;"><div><img src="<%= course_badge.badge.image_name%>" width="25" height="25"/></div><%= course_badge.badge.name %></th>
+              <th style="text-align: center; word-wrap: break-word;"><div><img src="<%= course_badge.badge.image_url%>" width="25" height="25"/></div><%= course_badge.badge.name %></th>
         <%   end
            else %>
              <th>N/A</th>
@@ -55,7 +55,7 @@
         <% if @course_badges.count > 0
              @course_badges.each do |course_badge| %>
                 <td style="text-align: center;" >
-                  <img src="<%= course_badge.badge.image_name%>" width="25" height="25"/>&nbsp;
+                  <img src="<%= course_badge.badge.image_url%>" width="25" height="25"/>&nbsp;
                   <input type="checkbox" id='award_<%= participant.id.to_s + "_" + course_badge.badge.id.to_s %>' <%= "checked" unless @award[participant.user.id][course_badge.badge.id].empty? %>/>
                 </td>
         <%   end

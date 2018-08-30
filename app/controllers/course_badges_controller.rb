@@ -34,7 +34,8 @@ class CourseBadgesController < ApplicationController
       # get avg score of each participant in different assignment in the course
       @assignments = Assignment.where(course_id: course.id)
       @course_badges = CourseBadge.where(course_id: course.id)
-      @participants = CourseParticipant.where(parent_id: course.id)
+      ta_user_ids = TaMapping.where(course: course).pluck(:id)
+      @participants = CourseParticipant.where(parent_id: course.id).where.not(user_id: ta_user_ids)
 
       # initialize nested hash
       # From: http://www.ruby-forum.com/topic/111524, Author: Daniel Martin
@@ -42,7 +43,7 @@ class CourseBadgesController < ApplicationController
       @award = Hash.new{ |h,k| h[k]=Hash.new(&h.default_proc) }
       @assignments.each do |assignment|
         questions = retrieve_questions assignment.questionnaires, assignment.id
-        assignment_participants = AssignmentParticipant.where(assignment: assignment)
+        assignment_participants = AssignmentParticipant.where(assignment: assignment).where.not(user_id: ta_user_ids)
         assignment_participants.each_with_index do |participant, i|
           course_participant = CourseParticipant.where(user_id: participant.user.id, parent_id: params['course_id']).first
           next if course_participant.nil?

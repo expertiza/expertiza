@@ -5,6 +5,8 @@ language: ruby
 dist: trusty
 cache:
   bundler: true
+  directories:
+    - vendor/assets/components
 rvm:
   - 2.2.7
 branches:
@@ -52,5 +54,5 @@ notifications:
     recipients:
       - expertiza-support@lists.ncsu.edu
     on_success: change
-    on_failure: change
+    on_failure: always
   slack: expertiza-support:DS8GtpbAybxHVwwYNRvvbb39

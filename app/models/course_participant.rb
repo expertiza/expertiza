@@ -12,6 +12,14 @@ class CourseParticipant < Participant
     end
   end
 
+  def assignment_participants
+    participants = []
+    course.assignments.each do |assignment|
+      participants << AssignmentParticipant.where(user_id: self.user_id, parent_id: assignment.id).first
+    end
+    return participants
+  end
+
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
   def self.import(row_hash, _row_header = nil, session, id)

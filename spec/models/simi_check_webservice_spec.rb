@@ -1,13 +1,11 @@
 xdescribe "SimiCheckWebservice" do
   def poll(comp_id)
     is_success = false
-    print 'Waiting'
     until is_success
       begin
         response = SimiCheckWebService.get_similarity_nxn(comp_id)
         is_success = (response.code == 200)
       rescue StandardError
-        print '.'
         sleep(2)
         next
       end

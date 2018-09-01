@@ -6,10 +6,8 @@ class BadgesController < ApplicationController
   require 'base64'
   require 'open-uri'
 
-  # this should be fetched from a table and we need an UI to populate instructor's access_token;
-  #@@access_token = "85d2e67ea0956aa7825e98ed9037f6c4627b593d28e537a9a7f1804b038b30dbf4b0544a68182f3d384e8aefb07e441a4abcac3100fb122b75491d1b816daa6e"
-  @@x_api_key = "ce56ea802fdee803531c310e30b0e32c"
-  @@x_api_secret = "fXYe3lH8xN62mvj5K8AuCmw2Ca7SQcIekvftil1aVFhKQcQuMLmjqqC6/hr1x4SlV9TfHSQxWdvZ+K0bUnCxmBXLYMrGSnigU22fy26thaH6u6duNoZX/4qx+y9iLYa/jotMe5X1GNom+230nw2hLqPH0EiIotZ0t+5TUWl5cvU="
+  @@x_api_key =  CREDLY_CONFIG["api_key"]
+  @@x_api_secret = CREDLY_CONFIG["api_secret"]
 
   def action_allowed?
     ['Instructor',
@@ -81,7 +79,7 @@ class BadgesController < ApplicationController
                  :multipart => true}
     headers = {"X-Api-Key": @@x_api_key,
                "X-Api-Secret": @@x_api_secret}
-    url = "https://api.credly.com/v1.1/badges?access_token=" + tokens.access_token
+    url = CREDLY_CONFIG["credly_api_url"] + "badges?access_token=" + tokens.access_token
     response = RestClient.post(url, form_data, headers=headers)
 
     return JSON.parse(response.to_str)
@@ -142,12 +140,12 @@ class BadgesController < ApplicationController
   def credly_designer
     tokens = UserCredlyToken.where(user_id: current_user.id).last
 
-    response = RestClient.post("https://credly.com/badge-builder/code",
+    response = RestClient.post(CREDLY_CONFIG["credly_badge_builder"],
                                {access_token: tokens.access_token},
                                headers = {"X-Api-Key":@@x_api_key, "X-Api-Secret": @@x_api_secret})
     results = JSON.parse(response.to_str)
     if results['temp_token']
-      render :json => results
+      render status: 200, :json => results
     else
       render status: 400, :json => {"message":"badge builder is currently unreachable"}
     end
@@ -157,7 +155,7 @@ class BadgesController < ApplicationController
       if !params['credly']['username'].nil? && !params['credly']['password'].nil?
         begin
           response = RestClient::Request.execute method: :post,
-                                                 url: "https://api.credly.com/v1.1/authenticate",
+                                                 url: CREDLY_CONFIG["credly_api_url"] + "authenticate",
                                                  user: params['credly']['username'].strip,
                                                  password: params['credly']['password'].strip,
                                                  headers: {"X-Api-Key":@@x_api_key, "X-Api-Secret": @@x_api_secret}

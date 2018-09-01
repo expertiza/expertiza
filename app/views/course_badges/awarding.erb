@@ -10,6 +10,7 @@
 
 <h1>Award Badges</h1>
 <%if !@error%>
+  <%= form_tag url_for(action: 'awarding_submit'), method: "post" do %>
   <table class="tablesorter table table-striped">
     <thead class="thead-light" align="center">
       <tr>
@@ -56,7 +57,8 @@
              @course_badges.each do |course_badge| %>
                 <td style="text-align: center;" >
                   <img src="<%= course_badge.badge.image_url%>" width="25" height="25"/>&nbsp;
-                  <input type="checkbox" id='award_<%= participant.id.to_s + "_" + course_badge.badge.id.to_s %>' <%= "checked" unless @award[participant.user.id][course_badge.badge.id].empty? %>/>
+                  <%= check_box_tag "award_" + participant.id.to_s + "_" + course_badge.badge.id.to_s, "awarded", @award[participant.id][course_badge.badge.id].eql?(true)  %>
+
                 </td>
         <%   end
            else %>
@@ -66,4 +68,8 @@
       <% end %>
     </tbody>
   </table>
+    <div class="largewidth" align="right">
+      <button class="btn btn-default btn-block">Award badges</button>
+    </div>
+  <% end %>
 <%end%>

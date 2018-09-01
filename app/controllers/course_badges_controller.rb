@@ -2,6 +2,9 @@ class CourseBadgesController < ApplicationController
   before_action :set_course_badge, only: [:show, :edit, :update, :destroy]
   include GradesHelper
 
+  @@x_api_key =  CREDLY_CONFIG["api_key"]
+  @@x_api_secret = CREDLY_CONFIG["api_secret"]
+
   # GET /course_badges
   def index
     @course_badges = CourseBadge.all
@@ -22,7 +25,6 @@ class CourseBadgesController < ApplicationController
 
   # GET /course_badges/awarding?course_id
   def awarding
-
     if !params['course_id'].nil?
        course = Course.find(params['course_id'])
     elsif !params['assignment_id'].nil?
@@ -41,17 +43,29 @@ class CourseBadgesController < ApplicationController
       # From: http://www.ruby-forum.com/topic/111524, Author: Daniel Martin
       @score = Hash.new{ |h,k| h[k]=Hash.new(&h.default_proc) }
       @award = Hash.new{ |h,k| h[k]=Hash.new(&h.default_proc) }
+
+      # load awarded badges to this participant
+      @participants.each do |p|
+        @course_badges.each do |course_badge|
+          awarded = AwardedBadge.where(participant: p, badge: course_badge.badge)
+          @award[p.id][course_badge.badge.id] = true if awarded.count > 0
+        end
+      end
+
       @assignments.each do |assignment|
+        # load all scores from different assignments
         questions = retrieve_questions assignment.questionnaires, assignment.id
         assignment_participants = AssignmentParticipant.where(assignment: assignment).where.not(user_id: ta_user_ids)
         assignment_participants.each_with_index do |participant, i|
+          # next if i<59 # debugging purpose
           course_participant = CourseParticipant.where(user_id: participant.user.id, parent_id: params['course_id']).first
           next if course_participant.nil?
+
           scores = participant.scores(questions)
           @score[course_participant.id][assignment.id]['avg_score'] = scores[:review][:scores][:avg].nil? ? 'N/A' : scores[:review][:scores][:avg].round(1)
           @score[course_participant.id][assignment.id]['avg_reviewing'] = scores[:feedback][:scores][:avg].nil? ? 'N/A' : scores[:feedback][:scores][:avg].round(1)
-          @score[course_participant.id][assignment.id]['assignment_participant'] = participant.id
-          # break if i>5 # debugging purpose
+          @score[course_participant.id][assignment.id]['assignment_participant'] = course_participant.id
+
         end
       end
     else
@@ -59,6 +73,54 @@ class CourseBadgesController < ApplicationController
       flash[:error] = "Couldn't find courses with id " + params['course_id']
       return
     end
+  end
+
+  def awarding_submit
+    # the id of each check box contains the user_id (index 1) and badge_id (index 2) seperated by underscore
+    checkboxes = params
+                     .select { |key, value| key.to_s.starts_with?("award_") }
+                     .map{|k, v| k.split("_") << v}
+    checkboxes.each do |cb|
+      if !cb[3].eql? "awarded"
+
+        participant = Participant.find(cb[1])
+        user = participant.user
+        badge = Badge.find(cb[2])
+        awarded = AwardedBadge.find_or_create_by(:participant => participant, :badge => badge)
+
+        # for now include all links from all assignment,
+        # TODO: create a UI for instructor to choose which links to be included
+        txt = ""
+        participant.assignment_participants.each do |p|
+          next if p.nil?
+          submissions = p.team.submitted_hyperlinks
+          txt += p.assignment.name + ":\n" + "\t" + submissions.gsub("-","").gsub("\n","") + "\n\n" unless submissions.nil?
+        end
+
+        evidence = Base64.encode64(txt)
+
+        tokens = UserCredlyToken.where(user_id: current_user.id).last
+        form_data = {email: user.email,
+                     first_name: user.fullname.split(",")[1],
+                     last_name: user.fullname.split(",")[0],
+                     badge_id: badge.external_badge_id,
+                     distributed_at:  Time.now.strftime('%Y-%m-%d %X'),
+                     evidence_file: evidence,
+                     :multipart => true}
+        headers = {"X-Api-Key": @@x_api_key,
+                   "X-Api-Secret": @@x_api_secret}
+        url = CREDLY_CONFIG["credly_api_url"] + "member_badges?access_token=" + tokens.access_token
+        begin
+          response = RestClient.post(url, form_data, headers=headers)
+        rescue StandardError => e
+          flash[:error] = e.message
+        end
+        # JSON.parse(response.to_str)
+      end
+
+    end
+
+    redirect_to :back
   end
 
   # POST /course_badges

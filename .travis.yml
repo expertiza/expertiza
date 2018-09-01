@@ -43,10 +43,7 @@ before_script:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
   - sleep 3 # give xvfb some time to start
 script:
-  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rspec spec/helpers 2> /dev/null"
-  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rspec spec/models 2> /dev/null"
-  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rspec spec/controllers 2> /dev/null"
-  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rspec spec/features 2> /dev/null"
+  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake 2> /dev/null"
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 services:

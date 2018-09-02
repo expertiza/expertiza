@@ -5,6 +5,15 @@
       sortReset      : true,
       sortRestart    : true
     });
+
+    $('.checkbox_award').click(function(data){
+      if(!this.checked) {
+        var id = "deleted_" + this.id;
+        $('#placeholder_deleted_' + this.id).html('<input type="hidden" id="' + id + '" name="' + id + '"></input>');
+      }else
+        $('#placeholder_deleted_' + this.id).html('')
+    });
+
   });
 </script>
 
@@ -57,8 +66,11 @@
              @course_badges.each do |course_badge| %>
                 <td style="text-align: center;" >
                   <img src="<%= course_badge.badge.image_url%>" width="25" height="25"/>&nbsp;
-                  <%= check_box_tag "award_" + participant.id.to_s + "_" + course_badge.badge.id.to_s, "awarded", @award[participant.id][course_badge.badge.id].eql?(true)  %>
-
+                  <%= check_box_tag "award_" + participant.id.to_s + "_" + course_badge.badge.id.to_s,
+                                    @award[participant.id][course_badge.badge.id].eql?(true) ? "awarded" : "",
+                                    @award[participant.id][course_badge.badge.id].eql?(true),
+                                    :class => 'checkbox_award' %>
+                  <div id='<%= "placeholder_deleted_award_" + participant.id.to_s + "_" + course_badge.badge.id.to_s %>'></div>
                 </td>
         <%   end
            else %>

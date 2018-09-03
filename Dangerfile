@@ -126,7 +126,7 @@ end
 if github.pr_diff.include? "TODO" or
   github.pr_diff.include? "Todo" or
   github.pr_diff.include? "todo" or
-  github.pr_diff.include? "toDo" or
+  github.pr_diff.include? "toDo"
   TODO_MESSAGE =
   markdown <<-MARKDOWN
 This pull request contains `TODO` task(s), please fix them.

@@ -74,8 +74,9 @@ end
 # ------------------------------------------------------------------------------
 # The PR should not include temp, tmp, cache file.
 # ------------------------------------------------------------------------------
-if git.modified_files.include? "temp" or
-   git.modified_files.include? "tmp"
+if git.modified_files.include? /.*temp.*/ or
+   git.modified_files.include? /.*tmp.*/ or
+   git.modified_files.include? /.*cache.*/
    TEMP_FILE_MESSAGE =
    markdown <<-MARKDOWN
 You committed `temp`, `tmp` or `cache` file. 
@@ -90,11 +91,11 @@ end
 # ------------------------------------------------------------------------------
 if github.pr_diff.include? "xdescribe" or
   github.pr_diff.include? "xit" or
-  github.pr_diff.include? "pending"
+  github.pr_diff.include? "pending" or
+  github.pr_diff.include? "skip"
   TEST_SKIPPED_MESSAGE =
     markdown <<-MARKDOWN
 There are one or more skipped/pending test cases in your pull request.
-Because we find `xdescribe`, `xit` or `pending` in your code.
 Please fix them.
     MARKDOWN
 
@@ -129,7 +130,7 @@ end
 # The PR should avoid using global variables and/or class variables.
 # ------------------------------------------------------------------------------
 # if github.pr_diff.include? "$" or github.pr_diff.include? /@@[A-Za-z0-9_]+/
-if github.pr_diff.include? "$"
+if github.pr_diff.include? /\$[A-Za-z0-9_]+/
   warn("You are using global variables (`$`), please double check if it is necessary", sticky: true)
 end
 
@@ -137,6 +138,7 @@ end
 # The PR should avoid keeping debugging code.
 # ------------------------------------------------------------------------------
 if github.pr_diff.include? "puts" or
+   github.pr_diff.include? "print" or
    github.pr_diff.include? "binding.pry" or
    github.pr_diff.include? "debugger;" or
    github.pr_diff.include? "console.log"
@@ -172,7 +174,7 @@ if git.modified_files.include? "Gemfile" or git.modified_files.include? "Gemfile
   GEMFILE_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You are modifying `Gemfile` or `Gemfile.lock`, please double check if it is necessary.
-You are suppose to add a new gem only if you have a very concret reason.
+You are suppose to add a new gem only if you have a very concrete reason.
 Please revert changes of `Gemfile.lock` made by IDE.
     MARKDOWN
   warn(GEMFILE_CHANGE_MESSAGE, sticky: true)
@@ -196,7 +198,7 @@ if github.pr_diff.include? "require 'spec_helper'" or
    github.pr_diff.include? "require \"factory_girl_rails\""
   RSPEC_REQUIRE_MESSAGE =
     markdown <<-MARKDOWN
-You are requiring different helper methods in Rspec tests.
+You are requiring different helper methods in RSpec tests.
 There have already been included, you do not need to require them again.
 Please remove them.
     MARKDOWN

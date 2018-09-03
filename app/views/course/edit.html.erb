@@ -104,7 +104,9 @@
     <%= form_tag({:controller => "badges",
                 :action => "new"}, {:method => "get"}) do %>
       <%= submit_tag "New", class: "btn btn-default"%>
-    <% end %>
+      <%= button_tag "Award badges", onclick: "location.href='/course_badges/awarding?course_id=" + @course.id.to_s + "'" , type: :button, class: "btn btn-primary"%>
+
+  <% end %>
   </div>
 </table>
 

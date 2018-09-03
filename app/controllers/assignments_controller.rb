@@ -87,7 +87,7 @@ class AssignmentsController < ApplicationController
     # added it to display the assigned badges while creating a badge in the assignments page
     # @assigned_badges = @assignment_form.assignment.badges
     
-    @instructor_id = params[:id]
+    @instructor_id = current_user
     @course = Course.find(@assignment_form.assignment.course_id)
     @badges = Badge.where("badges.instructor_id = ? OR badges.private = 0", @instructor_id)
     @badge_in_course = {}

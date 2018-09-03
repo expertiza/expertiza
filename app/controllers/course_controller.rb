@@ -29,7 +29,7 @@ class CourseController < ApplicationController
   # Modify an existing course
   def edit
     @course = Course.find(params[:id])
-    @instructor_id = @course.instructor_id
+    @instructor_id = current_user
     @badges = Badge.where("badges.instructor_id = ? OR badges.private = 0", @instructor_id)
     @badge_in_course = {}
     @badges.each do |b|
@@ -57,6 +57,7 @@ class CourseController < ApplicationController
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
+    @course.has_badge = params[:course][:has_badge] unless params[:course][:has_badge].nil?
     @course.save
     undo_link("The course \"#{@course.name}\" has been updated successfully.")
     redirect_to controller: 'tree_display', action: 'list'

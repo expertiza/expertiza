@@ -103,7 +103,7 @@ end
 # Your PR should not have too many duplicated commit messages.
 # ------------------------------------------------------------------------------
 messages = git.commits.map(&:message)
-if messages.size - messages.uniq.size > 5
+if messages.size - messages.uniq.size >= 5
   DUP_COMMIT_MESSAGE =
     markdown <<-MARKDOWN
 It seems that you have many duplicated commit messages, please try to squash similar commits.

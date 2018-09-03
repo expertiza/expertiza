@@ -38,8 +38,6 @@ class BadgesController < ApplicationController
       do_create_badge
     end
 
-
-
     # need to return to whatever the starting point was
     redirect_to :action => 'new'
   end
@@ -131,10 +129,6 @@ class BadgesController < ApplicationController
 
   def badge_params
     params.require(:badge).permit(:name, :description, :image_name)
-  end
-
-  def awarding
-
   end
 
   def credly_designer

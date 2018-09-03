@@ -48,7 +48,7 @@ class BadgesController < ApplicationController
 
     newBadge = Badge.new(:name => params['badge']['name'],
               :description => params['badge']['description'],
-              :image_name => params['image-icon'],
+              :image_url => params['image-icon'],
               :instructor_id => current_user.id,
               :private => !params['badge']['private'],
               :external_badge_id => result['data'].to_i)
@@ -129,7 +129,7 @@ class BadgesController < ApplicationController
   end
 
   def badge_params
-    params.require(:badge).permit(:name, :description, :image_name)
+    params.require(:badge).permit(:name, :description, :image_url)
   end
 
   def credly_designer

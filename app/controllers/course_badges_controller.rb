@@ -156,7 +156,7 @@ class CourseBadgesController < ApplicationController
       end
 
     end
-
+    flash[:success] = "badge awards have been sucessfully updated"
     redirect_to :back
   end
 

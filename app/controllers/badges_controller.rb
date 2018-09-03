@@ -53,7 +53,7 @@ class BadgesController < ApplicationController
               :private => !params['badge']['private'],
               :external_badge_id => result['data'].to_i)
     newBadge.save
-
+    flash[:success] = "the badge has been sucessfully created"
   end
 
   def create_badge_in_credly

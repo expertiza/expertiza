@@ -105,6 +105,7 @@ class BadgesController < ApplicationController
 
   def icons
     directory = get_icon_directory_path
+    FileUtils::mkdir_p(directory) unless File.exists?(directory)
     image_icons = Dir.entries(directory).reject {|f| File.directory?(f) || f[0].include?('.')}
     render status: 200, json: image_icons.map{|f| request.protocol + request.host_with_port + "/assets/badges/" + current_user.id.to_s + "/" + f}
   end

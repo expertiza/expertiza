@@ -129,7 +129,7 @@ end
 # The PR should avoid using global variables and/or class variables.
 # ------------------------------------------------------------------------------
 # if github.pr_diff.include? "$" or github.pr_diff.include? /@@[A-Za-z0-9_]+/
-if github.pr_diff.include? "$"
+if github.pr_diff.include? /\$[A-Za-z0-9_]+/
   warn("You are using global variables (`$`), please double check if it is necessary", sticky: true)
 end
 

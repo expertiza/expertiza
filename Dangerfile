@@ -1,18 +1,33 @@
 # ------------------------------------------------------------------------------
-# Has any changes happened inside the actual library code?
+# Welcome message
 # ------------------------------------------------------------------------------
 if github.pr_author
-  WELCOME_MESSAGE =
-    markdown <<-MARKDOWN
+  if github.pr_title =~ /E[0-9]\{4\}/
+    WELCOME_MESSAGE_COURSE_PROJECT =
+      markdown <<-MARKDOWN
+Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
+
+This repository is being automatically checked for code quality issues using `Code Climate`.
+You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a Pull Request is considered ready to review.
+
+Also, please spend some time looking at the instrucitons at the top of your course project writeup.
+If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
+      MARKDOWN
+
+    message(WELCOME_MESSAGE_COURSE_PROJECT)
+  else
+    WELCOME_MESSAGE =
+      markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
 
 This repository is being automatically checked for code quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a Pull Request is considered ready to review.
 
 If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
-    MARKDOWN
+      MARKDOWN
 
-  message(WELCOME_MESSAGE) 
+    message(WELCOME_MESSAGE)
+  end
 end
 
 # ------------------------------------------------------------------------------
@@ -52,6 +67,20 @@ Please make sure you did not commit unnecessary changes, such as `node_modules`,
 end
 
 # ------------------------------------------------------------------------------
+# Your course project PR is too small (less than 50 LoC).
+# ------------------------------------------------------------------------------
+if github.pr_title =~ /E[0-9]\{4\}/ and git.lines_of_code < 50
+  SMALL_PR_MESSAGE = 
+    markdown <<-MARKDOWN
+Your pull request is less than 50 LoC.
+If you finishing refactoring the code, please consider writing corresponding tests.
+    MARKDOWN
+
+  warn(SMALL_PR_MESSAGE, sticky: true)
+end
+
+
+# ------------------------------------------------------------------------------
 # Your PR touches too many files (more than 30 files).
 # ------------------------------------------------------------------------------
 if git.modified_files.size > 30
@@ -65,6 +94,14 @@ Please make sure you did not commit unnecessary changes, such as `node_modules`,
 end
 
 # ------------------------------------------------------------------------------
+# Your PR should not have too many duplicated commit messages.
+# ------------------------------------------------------------------------------
+messages = git.commits.map(&:message)
+if messages.size - messages.uniq.size > 5
+  warn("It seems that you have many duplicated commit messages, please use meaningful commit messages later.")
+end
+
+# ------------------------------------------------------------------------------
 # If a PR is a work in progress and it shouldn't be merged.
 # ------------------------------------------------------------------------------
 if github.pr_title.include? "WIP" or github.pr_title.include? "wip"
@@ -72,11 +109,21 @@ if github.pr_title.include? "WIP" or github.pr_title.include? "wip"
 end
 
 # ------------------------------------------------------------------------------
+# The PR should not contains "Todo".
+# ------------------------------------------------------------------------------
+if github.pr_diff.include? "TODO" or
+   github.pr_diff.include? "Todo" or
+   github.pr_diff.include? "todo" or
+   github.pr_diff.include? "toDo" or
+  warn("This pull request contains `TODO` task(s), please fix them.", sticky: true)
+end
+
+# ------------------------------------------------------------------------------
 # The PR should not include temp, tmp, cache file.
 # ------------------------------------------------------------------------------
-if git.modified_files.include? /.*temp.*/ or
-   git.modified_files.include? /.*tmp.*/ or
-   git.modified_files.include? /.*cache.*/
+if git.modified_files =~ /.*temp.*/ or
+   git.modified_files =~ /.*tmp.*/ or
+   git.modified_files =~ /.*cache.*/
    TEMP_FILE_MESSAGE =
    markdown <<-MARKDOWN
 You committed `temp`, `tmp` or `cache` file. 
@@ -129,9 +176,8 @@ end
 # ------------------------------------------------------------------------------
 # The PR should avoid using global variables and/or class variables.
 # ------------------------------------------------------------------------------
-# if github.pr_diff.include? "$" or github.pr_diff.include? /@@[A-Za-z0-9_]+/
-if github.pr_diff.include? /\$[A-Za-z0-9_]+/
-  warn("You are using global variables (`$`), please double check if it is necessary", sticky: true)
+if github.pr_diff =~ /\$[A-Za-z0-9_]+/ or github.pr_diff =~ /@@[A-Za-z0-9_]+/
+  warn("You are using global variables (`$`) or class variables (`@@`), please double check if it is necessary", sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -183,7 +229,7 @@ end
 # ------------------------------------------------------------------------------
 # The PR should not modifying /spec/factories/ folder.
 # ------------------------------------------------------------------------------
-unless git.modified_files.grep(%r{spec\/factories}).empty?
+unless git.modified_files.grep(/spec\/factories/).empty?
   warn("You are modifying `/spec/factories/` folder, please double check if it is necessary", sticky: true)
 end
 
@@ -203,4 +249,35 @@ There have already been included, you do not need to require them again.
 Please remove them.
     MARKDOWN
   warn(RSPEC_REQUIRE_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# Unit tests and integration tests should avoid using "create" keyword.
+# ------------------------------------------------------------------------------
+git.modified_files.each do |file|
+  if file =~ /spec\/models/ or file =~ /spec\/controllers/
+    if git.diff_for_file(file).include? "create"
+      warn("Use `create` in unit tests or integration tests may be overkilled. Try to use `build` or `double`.")
+      break
+    end
+  end
+end
+
+# ------------------------------------------------------------------------------
+# RSpec tests should avoid using "should" keyword.
+# ------------------------------------------------------------------------------
+git.modified_files.each do |file|
+  if file =~ /.*_spec\.rb$/
+    if git.diff_for_file(file).include? "should"
+      warn("The `should` syntax is deprecated in RSpec 3. Please use `expect` syntax instead.")
+      break
+    end
+  end
+end
+
+# ------------------------------------------------------------------------------
+# RSpec tests should avoid committing text files for testing purpose.
+# ------------------------------------------------------------------------------
+unless git.modified_files.grep(/spec\/.*\.txt/).empty?
+  warn("You committed text files for testing purpose, please double check if it is necessary", sticky: true)
 end

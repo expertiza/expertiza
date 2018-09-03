@@ -104,7 +104,13 @@ end
 # ------------------------------------------------------------------------------
 messages = git.commits.map(&:message)
 if messages.size - messages.uniq.size > 5
-  warn("It seems that you have many duplicated commit messages, please use meaningful commit messages later.", sticky: true)
+  DUP_COMMIT_MESSAGE =
+    markdown <<-MARKDOWN
+It seems that you have many duplicated commit messages, please try to squash similar commits.
+And using meaningful commit messages later.
+    MARKDOWN
+
+  warn(DUP_COMMIT_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------

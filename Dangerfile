@@ -1,18 +1,40 @@
+CURRENT_MAINTAINERS = %w(
+  efg
+  yangsong8
+  Winbobob
+  ferryxo
+)
+
 # ------------------------------------------------------------------------------
-# Has any changes happened inside the actual library code?
+# Welcome message
 # ------------------------------------------------------------------------------
-if github.pr_author
-  WELCOME_MESSAGE =
-    markdown <<-MARKDOWN
+if !CURRENT_MAINTAINERS.include? github.pr_author
+  if github.pr_title =~ /E[0-9]\{4\}/
+    WELCOME_MESSAGE_COURSE_PROJECT =
+      markdown <<-MARKDOWN
+Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
+
+This repository is being automatically checked for code quality issues using `Code Climate`.
+You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a Pull Request is considered ready to review.
+
+Also, please spend some time looking at the instrucitons at the top of your course project writeup.
+If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
+      MARKDOWN
+
+    message(WELCOME_MESSAGE_COURSE_PROJECT)
+  else
+    WELCOME_MESSAGE =
+      markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
 
 This repository is being automatically checked for code quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a Pull Request is considered ready to review.
 
 If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
-    MARKDOWN
+      MARKDOWN
 
-  message(WELCOME_MESSAGE) 
+    message(WELCOME_MESSAGE)
+  end
 end
 
 # ------------------------------------------------------------------------------
@@ -52,6 +74,19 @@ Please make sure you did not commit unnecessary changes, such as `node_modules`,
 end
 
 # ------------------------------------------------------------------------------
+# Your course project PR is too small (less than 50 LoC).
+# ------------------------------------------------------------------------------
+if github.pr_title =~ /E[0-9]\{4\}/ and git.lines_of_code < 50
+  SMALL_PR_MESSAGE = 
+    markdown <<-MARKDOWN
+Your pull request is less than 50 LoC.
+If you finishing refactoring the code, please consider writing corresponding tests.
+    MARKDOWN
+
+  warn(SMALL_PR_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
 # Your PR touches too many files (more than 30 files).
 # ------------------------------------------------------------------------------
 if git.modified_files.size > 30
@@ -65,21 +100,55 @@ Please make sure you did not commit unnecessary changes, such as `node_modules`,
 end
 
 # ------------------------------------------------------------------------------
+# Your PR should not have too many duplicated commit messages.
+# ------------------------------------------------------------------------------
+messages = git.commits.map(&:message)
+if messages.size - messages.uniq.size >= 5
+  DUP_COMMIT_MESSAGE =
+    markdown <<-MARKDOWN
+Your pull request have many duplicated commit messages, please try to `squash` similar commits.
+And using meaningful commit messages later.
+    MARKDOWN
+
+  warn(DUP_COMMIT_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
 # If a PR is a work in progress and it shouldn't be merged.
 # ------------------------------------------------------------------------------
 if github.pr_title.include? "WIP" or github.pr_title.include? "wip"
-  warn("This pull request is classed as Work in Progress", sticky: true)
+  WIP_MESSAGE =
+    markdown <<-MARKDOWN
+This pull request is classed as `Work in Progress`. It cannot be merged right now.
+    MARKDOWN
+
+  warn(WIP_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# The PR should not contains "Todo".
+# ------------------------------------------------------------------------------
+if github.pr_diff.include? "TODO" or
+  github.pr_diff.include? "Todo" or
+  github.pr_diff.include? "todo" or
+  github.pr_diff.include? "toDo"
+  TODO_MESSAGE =
+  markdown <<-MARKDOWN
+This pull request contains `TODO` task(s), please fix them.
+  MARKDOWN
+
+  warn(TODO_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
 # The PR should not include temp, tmp, cache file.
 # ------------------------------------------------------------------------------
-if git.modified_files.include? /.*temp.*/ or
-   git.modified_files.include? /.*tmp.*/ or
-   git.modified_files.include? /.*cache.*/
+if git.modified_files =~ /.*temp.*/ or
+   git.modified_files =~ /.*tmp.*/ or
+   git.modified_files =~ /.*cache.*/
    TEMP_FILE_MESSAGE =
    markdown <<-MARKDOWN
-You committed `temp`, `tmp` or `cache` file. 
+You committed `temp`, `tmp` or `cache` files. 
 Please remove them.
    MARKDOWN
 
@@ -105,7 +174,7 @@ end
 # ------------------------------------------------------------------------------
 # Most of time, the PR should not change README.md.
 # ------------------------------------------------------------------------------
-unless git.modified_files.grep(/\.md/).empty?
+if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/\.md/).empty?
   MARKDOWN_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You changed MARKDOWN (`*.md`) documents, please double check if it is necessary.
@@ -117,7 +186,9 @@ end
 # ------------------------------------------------------------------------------
 # The PR should change db schema only if there is new db migrations.
 # ------------------------------------------------------------------------------
-if git.modified_files.include? "schema.rb" or git.modified_files.include? "schema.json"
+if !CURRENT_MAINTAINERS.include? github.pr_author and
+  git.modified_files.include? "schema.rb" or
+  git.modified_files.include? "schema.json"
   DB_SCHEMA_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You should commit the changes of DB schema only if you created new DB migrations.
@@ -129,9 +200,13 @@ end
 # ------------------------------------------------------------------------------
 # The PR should avoid using global variables and/or class variables.
 # ------------------------------------------------------------------------------
-# if github.pr_diff.include? "$" or github.pr_diff.include? /@@[A-Za-z0-9_]+/
-if github.pr_diff.include? /\$[A-Za-z0-9_]+/
-  warn("You are using global variables (`$`), please double check if it is necessary", sticky: true)
+if github.pr_diff =~ /\$[A-Za-z0-9_]+/ or github.pr_diff =~ /@@[A-Za-z0-9_]+/
+  GLOBAL_CLASS_VARIABLE_MESSAGE =
+    markdown <<-MARKDOWN
+You are using global variables (`$`) or class variables (`@@`), please double check if it is necessary.
+    MARKDOWN
+
+  warn(GLOBAL_CLASS_VARIABLE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -148,29 +223,46 @@ end
 # ------------------------------------------------------------------------------
 # The PR should not modifying *.yml or *.yml.example file.
 # ------------------------------------------------------------------------------
-unless git.modified_files.grep(/\.yml/).empty?
-  fail("You should not change YAML (`*.yml`) or example (`*.yml.example`) files, please revert these changes.", sticky: true)
+if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/\.yml/).empty?
+  YAML_FILE_MESSAGE =
+    markdown <<-MARKDOWN
+You should not change YAML (`*.yml`) or example (`*.yml.example`) files, please revert these changes.
+    MARKDOWN
+
+  fail(YAML_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
 # The PR should not modifying vendor folder.
 # ------------------------------------------------------------------------------
-unless git.modified_files.grep(/vendor/).empty?
-  warn("You are modifying `vendor` folder, please double check if it is necessary", sticky: true)
+if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/vendor/).empty?
+  VENDOR_MESSAGE =
+    markdown <<-MARKDOWN
+You are modifying `vendor` folder, please double check if it is necessary.
+    MARKDOWN
+
+  warn(VENDOR_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
 # The PR should not modifying rails_helper.rb or spec_helper.rb file.
 # ------------------------------------------------------------------------------
 if git.modified_files.include? "rails_helper.rb" or
-   git.modified_files.include? "spec_helper.rb"
-  fail("You should not change `rails_helper.rb` or `spec_helper.rb` file, please revert these changes.", sticky: true)
+  git.modified_files.include? "spec_helper.rb"
+  TEST_HELPER_FILE_MESSAGE =
+  markdown <<-MARKDOWN
+You should not change `rails_helper.rb` or `spec_helper.rb` file, please revert these changes.
+  MARKDOWN
+
+  fail(TEST_HELPER_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
 # The PR should not modifying Gemfile, Gemfile.lock.
 # ------------------------------------------------------------------------------
-if git.modified_files.include? "Gemfile" or git.modified_files.include? "Gemfile.lock"
+if !CURRENT_MAINTAINERS.include? github.pr_author and
+  git.modified_files.include? "Gemfile" or
+  git.modified_files.include? "Gemfile.lock"
   GEMFILE_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You are modifying `Gemfile` or `Gemfile.lock`, please double check if it is necessary.
@@ -183,8 +275,13 @@ end
 # ------------------------------------------------------------------------------
 # The PR should not modifying /spec/factories/ folder.
 # ------------------------------------------------------------------------------
-unless git.modified_files.grep(%r{spec\/factories}).empty?
-  warn("You are modifying `/spec/factories/` folder, please double check if it is necessary", sticky: true)
+if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/spec\/factories/).empty?
+  FIXTURE_FILE_MESSAGE =
+  markdown <<-MARKDOWN
+You are modifying `/spec/factories/` folder, please double check if it is necessary.
+  MARKDOWN
+
+  warn(FIXTURE_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -203,4 +300,71 @@ There have already been included, you do not need to require them again.
 Please remove them.
     MARKDOWN
   warn(RSPEC_REQUIRE_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# Unit tests and integration tests should avoid using "create" keyword.
+# ------------------------------------------------------------------------------
+git.modified_files.each do |file|
+  next unless file =~ /spec\/models/ or file =~ /spec\/controllers/
+  if git.diff_for_file(file).patch.include? "create"
+    CREATE_MOCK_UP_OBJ_MESSAGE =
+      markdown <<-MARKDOWN
+Use `create` in unit tests or integration tests may be overkilled. Try to use `build` or `double` instead.
+      MARKDOWN
+
+    warn(CREATE_MOCK_UP_OBJ_MESSAGE, sticky: true)
+    break
+  end
+end
+
+# ------------------------------------------------------------------------------
+# RSpec tests should avoid using "should" keyword.
+# ------------------------------------------------------------------------------
+git.modified_files.each do |file|
+  next unless file =~ /.*_spec\.rb$/
+  if git.diff_for_file(file).patch.include? "should"
+    NO_SHOULD_SYNTAX_MESSAGE =
+      markdown <<-MARKDOWN
+The `should` syntax is deprecated in RSpec 3. Please use `expect` syntax instead.
+Even in test descriptions, please avoid using `should`.
+      MARKDOWN
+
+    warn(NO_SHOULD_SYNTAX_MESSAGE, sticky: true)
+    break
+  end
+end
+
+# ------------------------------------------------------------------------------
+# RSpec tests should avoid committing text files for testing purpose.
+# ------------------------------------------------------------------------------
+unless git.modified_files.grep(/spec\/.*\.txt/).empty?
+  warn("You committed text files for testing purpose, please double check if it is necessary", sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# You should not change Dangerfile.
+# ------------------------------------------------------------------------------
+if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/Dangerfile/).empty?
+  fail("You should not change Dangerfile!", sticky: true)
+end
+
+
+# ------------------------------------------------------------------------------
+# RSpec tests should avoid shallow tests.
+# ------------------------------------------------------------------------------
+git.modified_files.each do |file|
+  next unless file =~ /.*_spec\.rb$/
+  diff = git.diff_for_file(file).patch
+  num_of_expectations_of_obj_on_page = diff.scan(/expect\(page\).to have/).count
+  if num_of_expectations_of_obj_on_page >= 5
+    EXPECT_ON_OBJ_ON_PAGE_MESSAGE =
+      markdown <<-MARKDOWN
+In your tests, there are many expectations of elements on page, which is good.
+To avoid `shallow tests` - tests concentrating on irrelevant, unlikely-to-fail conditions, please write more expectations to validate other things, such as database records.
+      MARKDOWN
+
+    warn(EXPECT_ON_OBJ_ON_PAGE_MESSAGE, sticky: true)
+    break
+  end
 end

@@ -106,7 +106,7 @@ messages = git.commits.map(&:message)
 if messages.size - messages.uniq.size >= 5
   DUP_COMMIT_MESSAGE =
     markdown <<-MARKDOWN
-It seems that you have many duplicated commit messages, please try to squash similar commits.
+Your pull request have many duplicated commit messages, please try to `squash` similar commits.
 And using meaningful commit messages later.
     MARKDOWN
 
@@ -347,4 +347,24 @@ end
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/Dangerfile/).empty?
   fail("You should not change Dangerfile!", sticky: true)
+end
+
+
+# ------------------------------------------------------------------------------
+# Each RSpec test should have at least one expectation.
+# ------------------------------------------------------------------------------
+git.modified_files.each do |file|
+  next unless file =~ /.*_spec\.rb$/
+  diff = git.diff_for_file(file)
+  num_of_tests = diff.scan(/it\s"/).count + diff.scan(/it\s'/).count
+  num_of_expectations = diff.scan(/expect/).count
+  if num_of_tests > num_of_expectations
+    AT_LEAST_ONE_EXPECTATION_MESSAGE =
+      markdown <<-MARKDOWN
+Each RSpec test should have at least one expectations. Please double check your testing code.
+      MARKDOWN
+
+    warn(AT_LEAST_ONE_EXPECTATION_MESSAGE, sticky: true)
+    break
+  end
 end

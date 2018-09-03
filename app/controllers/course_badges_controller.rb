@@ -57,7 +57,7 @@ class CourseBadgesController < ApplicationController
         questions = retrieve_questions assignment.questionnaires, assignment.id
         assignment_participants = AssignmentParticipant.where(assignment: assignment).where.not(user_id: ta_user_ids)
         assignment_participants.each_with_index do |participant, i|
-          break if i>3 # debugging purpose
+          # break if i>3 # debugging purpose
           course_participant = CourseParticipant.where(user_id: participant.user.id, parent_id: params['course_id']).first
           next if course_participant.nil?
 
@@ -123,7 +123,7 @@ class CourseBadgesController < ApplicationController
         txt = ""
         participant.assignment_participants.each do |p|
           next if p.nil?
-          submissions = p.team.hyperlinks
+          submissions = p.team.hyperlinks unless p.team.nil?
           txt += "Submissions in the assignment \"" + p.assignment.name + "\":"
           submissions.each do |link|
             txt += "\n\t" + link

@@ -8,11 +8,13 @@ end
 
 def deploy_global_survey(start_date, end_date, survey_name)
   login_as('instructor6')
+  expect(page).to have_content('Manage content')
   create_global_questionnaire survey_name
   survey = Questionnaire.where(name: survey_name)
   instructor = User.where(name: 'instructor6').first
   course = Course.where(instructor_id: instructor.id).first
   visit '/survey_deployment/new?id=' + course.id.to_s + '&type=CourseSurveyDeployment'
+  expect(page).to have_content('New Survey Deployment')
   fill_in 'survey_deployment_start_date', with: start_date
   fill_in 'survey_deployment_end_date', with: end_date
   check("add_global_survey")
@@ -38,12 +40,14 @@ describe "Global Survey questionnaire tests for instructor interface" do
   it "is able to deploy a global survey with valid dates" do
     survey_name = 'Global Survey Questionnaire 1'
     deploy_global_survey(@next_day, @next_to_next_day, survey_name)
+    expect(Questionnaire.where(name: survey_name)).to exist
   end
 
   it "is not able to deploy a global survey with invalid dates" do
     survey_name = 'Global Survey Questionnaire 1'
     # passing current time - 1 day for start date and current time + 2 days for end date
     deploy_global_survey(@previous_day, @next_day, survey_name)
+    expect(Questionnaire.where(name: survey_name)).to exist
   end
 
   it "is able to add and edit questions to a course survey" do
@@ -56,8 +60,10 @@ describe "Global Survey questionnaire tests for instructor interface" do
     fill_in('question_total_num', with: '1')
     select('Criterion', from: 'question_type')
     click_button "Add"
+    expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
+    expect(page).to have_content('All questions has been successfully saved!')
   end
 
   it "is able to delete question from a global survey" do
@@ -68,10 +74,14 @@ describe "Global Survey questionnaire tests for instructor interface" do
     fill_in('question_total_num', with: '1')
     select('Criterion', from: 'question_type')
     click_button "Add"
+    expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
+    expect(page).to have_content('All questions has been successfully saved!')
     question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire.id.to_s)
+    print question
     click_link('Remove')
+    expect(page).to have_content("You have successfully deleted the question!")
   end
 
 end

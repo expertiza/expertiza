@@ -63,7 +63,7 @@ describe "peer review testing" do
     # Fill in a textbox with a multi word comment
     fill_in "responses[0][comment]", with: "Excellent Work"
     click_button "Submit Review"
-    expect(page).to have_content "Your response was successfully saved."
+    expect(page).to have_content "Your  response was successfully saved."
   end
 
   it "fills in a single comment with single word and saves" do

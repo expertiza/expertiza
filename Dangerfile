@@ -307,7 +307,7 @@ end
 # ------------------------------------------------------------------------------
 git.modified_files.each do |file|
   next unless file =~ /spec\/models/ or file =~ /spec\/controllers/
-  if git.diff_for_file(file).include? "create"
+  if git.diff_for_file(file).patch.include? "create"
     CREATE_MOCK_UP_OBJ_MESSAGE =
       markdown <<-MARKDOWN
 Use `create` in unit tests or integration tests may be overkilled. Try to use `build` or `double` instead.
@@ -323,7 +323,7 @@ end
 # ------------------------------------------------------------------------------
 git.modified_files.each do |file|
   next unless file =~ /.*_spec\.rb$/
-  if git.diff_for_file(file).include? "should"
+  if git.diff_for_file(file).patch.include? "should"
     NO_SHOULD_SYNTAX_MESSAGE =
       markdown <<-MARKDOWN
 The `should` syntax is deprecated in RSpec 3. Please use `expect` syntax instead.
@@ -351,20 +351,20 @@ end
 
 
 # ------------------------------------------------------------------------------
-# Each RSpec test should have at least one expectation.
+# RSpec tests should avoid shallow tests.
 # ------------------------------------------------------------------------------
 git.modified_files.each do |file|
   next unless file =~ /.*_spec\.rb$/
-  diff = git.diff_for_file(file)
-  num_of_tests = diff.scan(/it\s"/).count + diff.scan(/it\s'/).count
-  num_of_expectations = diff.scan(/expect/).count
-  if num_of_tests > num_of_expectations
-    AT_LEAST_ONE_EXPECTATION_MESSAGE =
+  diff = git.diff_for_file(file).patch
+  num_of_expectations_of_obj_on_page = diff.scan(/expect\(page\).to have/).count
+  if num_of_expectations_of_obj_on_page >= 5
+    EXPECT_ON_OBJ_ON_PAGE_MESSAGE =
       markdown <<-MARKDOWN
-Each RSpec test should have at least one expectations. Please double check your testing code.
+In your tests, there are many expectations of elements on page, which is good.
+To avoid `shallow tests` - tests concentrating on irrelevant, unlikely-to-fail conditions, please write more expectations to validate other things, such as database records.
       MARKDOWN
 
-    warn(AT_LEAST_ONE_EXPECTATION_MESSAGE, sticky: true)
+    warn(EXPECT_ON_OBJ_ON_PAGE_MESSAGE, sticky: true)
     break
   end
 end

@@ -161,7 +161,7 @@ class BadgesController < ApplicationController
             redirect_to action: 'new'
           end
         rescue StandardError => e
-          flash[:error] = "I can't log in wih the provided credential, please try again or <a href='https://connect.credly.com/#!/sign-in/user?callback=credly.com'>reset your credly password here</a>"
+          flash[:error] = "I can't log in wih the provided credential, please try again or <a href='https://connect.credly.com/#!/sign-in/user?callback=credly.com' target='_blank'>reset your credly password here</a>"
           render action: 'login_credly'
         end
       end

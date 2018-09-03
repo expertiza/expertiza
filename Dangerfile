@@ -86,7 +86,6 @@ If you finishing refactoring the code, please consider writing corresponding tes
   warn(SMALL_PR_MESSAGE, sticky: true)
 end
 
-
 # ------------------------------------------------------------------------------
 # Your PR touches too many files (more than 30 files).
 # ------------------------------------------------------------------------------

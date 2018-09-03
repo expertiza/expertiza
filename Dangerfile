@@ -104,7 +104,7 @@ end
 # ------------------------------------------------------------------------------
 messages = git.commits.map(&:message)
 if messages.size - messages.uniq.size > 5
-  warn("It seems that you have many duplicated commit messages, please use meaningful commit messages later.")
+  warn("It seems that you have many duplicated commit messages, please use meaningful commit messages later.", sticky: true)
 end
 
 # ------------------------------------------------------------------------------

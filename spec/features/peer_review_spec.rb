@@ -30,19 +30,14 @@ describe "peer review testing" do
 
   def load_questionnaire
     login_as('student2064')
-
-
     expect(page).to have_content "User: student2064"
-
     expect(page).to have_content "TestAssignment"
 
     click_link "TestAssignment"
-
     expect(page).to have_content "Submit or Review work for TestAssignment"
     expect(page).to have_content "Others' work"
 
     click_link "Others' work"
-
     expect(page).to have_content 'Reviews for "TestAssignment"'
 
     choose "topic_id"
@@ -59,7 +54,6 @@ describe "peer review testing" do
     fill_in "responses[0][comment]", with: "HelloWorld"
     select 5, from: "responses[0][score]"
     click_button "Submit Review"
-
     expect(page).to have_content "Your response was successfully saved."
   end
 
@@ -69,7 +63,6 @@ describe "peer review testing" do
     # Fill in a textbox with a multi word comment
     fill_in "responses[0][comment]", with: "Excellent Work"
     click_button "Submit Review"
-
     expect(page).to have_content "Your response was successfully saved."
   end
 
@@ -88,7 +81,6 @@ describe "peer review testing" do
     # Fill in a dropdown with some points
     select 5, from: "responses[0][score]"
     click_button "Submit Review"
-    
     expect(page).to have_content "Your response was successfully saved."
   end
 
@@ -96,7 +88,6 @@ describe "peer review testing" do
     # Load questionnaire with generic setup
     load_questionnaire
     click_button "Submit Review"
-
     expect(page).to have_content "Your response was successfully saved."
   end
 
@@ -107,7 +98,6 @@ describe "peer review testing" do
     # Filling in Additional Comments only
     fill_in "review[comments]", with: "Excellent work done!"
     click_button "Submit Review"
-
     expect(page).to have_content "Your response was successfully saved."
   end
 end

@@ -36,7 +36,7 @@ gem 'jquery-tablesorter'
 gem 'jquery-ui-sass-rails'
 gem 'json'
 gem 'lingua'
-gem 'mysql2'
+gem 'mysql2', '~> 0.4.0'
 gem 'nokogiri'
 gem 'omniauth-google-oauth2'
 gem 'open-uri-cached'
@@ -68,6 +68,7 @@ gem 'timecop'
 gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
+gem 'zapata', git: 'https://github.com/Winbobob/zapata.git', ref: '844276c', require: false
 gem 'zip-zip'
 
 group :development do

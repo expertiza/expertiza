@@ -68,7 +68,7 @@
         if(checkbox.checked){
           used_in_course[badge.id] = true;
           var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-          xmlhttp.open("POST", "/course_badge");
+          xmlhttp.open("POST", "/course_badges");
           xmlhttp.setRequestHeader("Content-Type", "application/json");
           xmlhttp.setRequestHeader("Accept", "application/json");
           xmlhttp.setRequestHeader("X-CSRF-Token", "<%= form_authenticity_token.to_s %>");
@@ -80,7 +80,7 @@
           if(window.confirm("This badge will not longer be usable in any assignments in this course")){
             used_in_course[badge.id] = false;
             var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-            xmlhttp.open("DELETE", "/course_badge/delete_badge_from_course");
+            xmlhttp.open("DELETE", "/course_badges/delete_badge_from_course");
             xmlhttp.setRequestHeader("Content-Type", "application/json");
             xmlhttp.setRequestHeader("Accept", "application/json");
             xmlhttp.setRequestHeader("X-CSRF-Token", "<%= form_authenticity_token.to_s %>");

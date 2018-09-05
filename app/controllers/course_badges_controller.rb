@@ -5,6 +5,10 @@ class CourseBadgesController < ApplicationController
   @@x_api_key =  CREDLY_CONFIG["api_key"]
   @@x_api_secret = CREDLY_CONFIG["api_secret"]
 
+  def action_allowed?
+    current_role_name.eql?("Instructor")
+  end
+
   # GET /course_badges
   def index
     @course_badges = CourseBadge.all
@@ -21,6 +25,15 @@ class CourseBadgesController < ApplicationController
 
   # GET /course_badges/1/edit
   def edit
+  end
+
+  def delete_badge_from_course
+    @badge_id = params[:course_badge][:badge_id]
+    @course_id = params[:course_badge][:course_id]
+
+    CourseBadge.where(badge_id: @badge_id, course_id: @course_id).destroy_all
+
+    render status: 200, json: {status: 200, message: "Course badge destroyed"}
   end
 
   # GET /course_badges/awarding?course_id
@@ -160,15 +173,13 @@ class CourseBadgesController < ApplicationController
     redirect_to :back
   end
 
-  # POST /course_badges
   def create
-    @course_badge = CourseBadge.new(course_badge_params)
+    @badge_id = params[:course_badge][:badge_id]
+    @course_id = params[:course_badge][:course_id]
 
-    if @course_badge.save
-      redirect_to @course_badge, notice: 'Course badge was successfully created.'
-    else
-      render :new
-    end
+    CourseBadge.create(badge_id: @badge_id, course_id: @course_id)
+
+    render status: 200, json: {status: 200, message: "Course badge created"}
   end
 
   # PATCH/PUT /course_badges/1

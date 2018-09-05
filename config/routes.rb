@@ -2,7 +2,12 @@ Expertiza::Application.routes.draw do
   get 'course_badges/awarding'
   post 'course_badges/awarding_submit'
 
-  resources :course_badges
+  resources :course_badges do
+    collection do
+      delete :delete_badge_from_course
+    end
+  end
+
   resources :instructions
   resources :evidences
   resources :nominations
@@ -115,12 +120,6 @@ Expertiza::Application.routes.draw do
       post :add_ta
       get :auto_complete_for_user_name
       post :remove_ta
-    end
-  end
-
-  resources :course_badge do
-    collection do
-      delete :delete_badge_from_course
     end
   end
 

@@ -6,7 +6,10 @@ class CourseBadgesController < ApplicationController
   @@x_api_secret = CREDLY_CONFIG["api_secret"]
 
   def action_allowed?
-    current_role_name.eql?("Instructor")
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
   end
 
   # GET /course_badges

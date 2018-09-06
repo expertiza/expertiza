@@ -1,5 +1,13 @@
 class BadgeAwardingRulesController < ApplicationController
 
+
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
+  end
+
    # GET /badge_awarding_rules?course_id=X&badge_id=Y&popup=true
   def index
     @error = ''

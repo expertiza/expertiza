@@ -124,7 +124,7 @@ Expertiza::Application.routes.draw do
       collection do
         get :new_feedback
         post :edit
-        post :view
+        get :view
         get :remove_hyperlink
         get :saving
         get :redirection

@@ -145,6 +145,7 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @map = @response.map
     set_content
+    # render json: {status: ok, response: @response, map: @map}
   end
 
   def create

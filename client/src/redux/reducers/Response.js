@@ -13,11 +13,11 @@ const initialize = {
 const responseReducer = (state = initialize, action) => {
     switch (action.type) {
         case actions.FETCH_REVIEW_DATA_SUCCESS:
-            return updateObject(state, {    map: action.payload.map, 
-                                            survey: action.payload.survey, 
-                                            survey_parent: action.payload.survey_parent, 
+            return updateObject(state, {                                     
                                             title: action.payload.title,
                                             assignment: action.payload.assignment,
+                                            ans: action.payload.ans,
+                                            questions: action.payload.questions,
                                             loading: false })
         case actions.FETCH_REVIEW_DATA_FAILURE:
             return updateObject(state, { laoding: true })  

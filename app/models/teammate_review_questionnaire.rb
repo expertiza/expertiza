@@ -1,5 +1,11 @@
 class TeammateReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
+  @@print_name = "Team Review Rubric"
+
+  def self.print_name
+    @@print_name
+  end
+
   def post_initialization
     self.display_type = 'Teammate Review'
   end

@@ -1,5 +1,11 @@
 class BookmarkRatingQuestionnaire < Questionnaire
   after_initialize :post_initialization
+  @@print_name = "Bookmarkrating Rubric"
+
+  def self.print_name
+    @@print_name
+  end
+
   def post_initialization
     self.display_type = 'Bookmark Rating'
   end

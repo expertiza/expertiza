@@ -1,5 +1,11 @@
 class AuthorFeedbackQuestionnaire < Questionnaire
   after_initialize :post_initialization
+  @@print_name = "Author Feedback Rubric"
+
+  def self.print_name
+    @@print_name
+  end
+
   def post_initialization
     self.display_type = 'Author Feedback'
   end

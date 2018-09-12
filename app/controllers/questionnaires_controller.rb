@@ -36,25 +36,6 @@ class QuestionnairesController < ApplicationController
 
   def new
     @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
-    @type = params[:model]
-    case @type
-      when "ReviewQuestionnaire"
-        @type = "Review Rubric"
-      when "MetareviewQuestionnaire"
-        @type = "Metareview Rubric"
-      when "Author FeedbackQuestionnaire"
-        @type = "Author Feedback Rubric"
-      when "Teammate ReviewQuestionnaire"
-        @type = "Teammate Review Rubric"
-      when "Assignment SurveyQuestionnaire"
-        @type = "Assignment Survey"
-      when "Global SurveyQuestionnaire"
-        @type = "Global Survey"
-      when "Course SurveyQuestionnaire"
-        @type = "Course Survey"
-      when "BookmarkratingQuestionnaire"
-        @type = "Bookmarkrating Rubric"
-    end
   end
 
   def create

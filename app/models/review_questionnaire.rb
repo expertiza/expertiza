@@ -1,5 +1,11 @@
 class ReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
+  @@print_name = "Review Rubric"
+
+  def self.print_name
+    @@print_name
+  end
+
   def post_initialization
     self.display_type = 'Review'
   end

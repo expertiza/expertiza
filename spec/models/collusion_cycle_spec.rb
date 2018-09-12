@@ -97,7 +97,7 @@ describe CollusionCycle do
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team2.id).and_return([])
 
         # Tests if current reviewer does not include current assignment participant
-        expect(cycle.two_node_cycles(participant1)).to eq([])
+        expect(cycle.n_node_cycles(participant1, 2)).to eq([])
       end
     end
 
@@ -117,7 +117,7 @@ describe CollusionCycle do
           allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(nil)
 
           # Tests if current assignment participant was not reviewed by current reviewer
-          expect(cycle.two_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 2)).to eq([])
         end
       end
 
@@ -129,7 +129,7 @@ describe CollusionCycle do
           allow(Response).to receive(:where).with(map_id: [response_map_team_2_1]).and_return([response_2_1])
 
           # Tests if current assignment participant was reviewed by current reviewer and insert related information into collusion cycles array
-          expect(cycle.two_node_cycles(participant1)[0][0]).to eq([participant1, 90])
+          expect(cycle.n_node_cycles(participant1, 2)[0][0]).to eq([participant1, 90])
         end
       end
 
@@ -139,7 +139,7 @@ describe CollusionCycle do
           allow(participant2).to receive(:reviews_by_reviewer).with(participant1).and_return(nil)
 
           # Tests if reviewer was not reviewed by assignment participant
-          expect(cycle.two_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 2)).to eq([])
         end
       end
 
@@ -151,7 +151,7 @@ describe CollusionCycle do
           allow(Response).to receive(:where).with(map_id: [response_map_team_2_1]).and_return([response_2_1])
 
           # Tests if reviewer was reviewed by assignment participant and inserted related information into coluusion cycle arr
-          expect(cycle.two_node_cycles(participant1)).to eq([[[participant1, 90], [participant2, 95]]])
+          expect(cycle.n_node_cycles(participant1, 2)).to eq([[[participant1, 90], [participant2, 95]]])
         end
       end
     end
@@ -174,7 +174,7 @@ describe CollusionCycle do
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team3.id).and_return([])
 
         # Tests if current reviewer does not include current assignment participant
-        expect(cycle.three_node_cycles(participant1)).to eq([])
+        expect(cycle.n_node_cycles(participant1, 3)).to eq([])
       end
     end
 
@@ -195,7 +195,7 @@ describe CollusionCycle do
         it 'skips current reviewer (ap2) and returns corresponding collusion cycles' do
           allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(nil)
           # Tests if current assignment participant was not reviewed by current reviewer
-          expect(cycle.three_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 3)).to eq([])
         end
       end
 
@@ -212,20 +212,20 @@ describe CollusionCycle do
           it 'inserts related information into collusion cycles and returns results' do
             # Sets up stubs for test
             # Tests if current assignment participant was reviewed by current reviewer and insert related information into collusion cycles array
-            expect(cycle.three_node_cycles(participant1)[0][0]).to eq([participant1, 90])
+            expect(cycle.n_node_cycles(participant1, 3)[0][0]).to eq([participant1, 90])
           end
         end
 
         context 'when current reviewee (ap1) was reviewed by current reviewer (ap2)' do
           it 'inserts related information into collusion cycles and returns results' do
-            expect(cycle.three_node_cycles(participant1)).to eq([[[participant1, 90], [participant2, 82], [participant3, 97]]])
+            expect(cycle.n_node_cycles(participant1, 3)).to eq([[[participant1, 90], [participant2, 82], [participant3, 97]]])
           end
         end
 
         context 'when current reviewer (ap2) was reviewed by current assignment participant' do
           it 'inserts related information into collusion cycles and returns results' do
             # Tests if reviewer (ap2) was reviewed by assignment participant and inserted related information into collusion cycle arr
-            expect(cycle.three_node_cycles(participant1)).to eq([[[participant1, 90], [participant2, 82], [participant3, 97]]])
+            expect(cycle.n_node_cycles(participant1, 3)).to eq([[[participant1, 90], [participant2, 82], [participant3, 97]]])
           end
         end
       end
@@ -235,7 +235,7 @@ describe CollusionCycle do
           allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
           allow(participant3).to receive(:reviews_by_reviewer).with(participant1).and_return(nil)
           allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(response_2_3)
-          expect(cycle.three_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 3)).to eq([])
         end
       end
 
@@ -244,7 +244,7 @@ describe CollusionCycle do
           allow(participant1).to receive(:reviews_by_reviewer).with(participant2).and_return(response_1_2)
           allow(participant3).to receive(:reviews_by_reviewer).with(participant1).and_return(response_3_1)
           allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(nil)
-          expect(cycle.three_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 3)).to eq([])
         end
       end
     end
@@ -269,7 +269,7 @@ describe CollusionCycle do
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team4.id).and_return([])
 
         # Tests if current reviewer does not include current assignment participant
-        expect(cycle.four_node_cycles(participant1)).to eq([])
+        expect(cycle.n_node_cycles(participant1, 4)).to eq([])
       end
     end
 
@@ -303,7 +303,7 @@ describe CollusionCycle do
           it 'inserts related information into collusion cycles and returns results' do
             # Tests if current assignment participant was reviewed by current
             # reviewer and insert related information into collusion cycles array
-            expect(cycle.four_node_cycles(participant1)[0][0]).to eq([participant1, 90])
+            expect(cycle.n_node_cycles(participant1, 4)[0][0]).to eq([participant1, 90])
           end
         end
 
@@ -311,21 +311,21 @@ describe CollusionCycle do
           it 'inserts related information into collusion cycles and returns results' do
             allow(ReviewResponseMap).to receive(:where).with(any_args).and_return([])
             # Tests if reviewer was not reviewed by assignment participant
-            expect(cycle.four_node_cycles(participant1)).to eq([])
+            expect(cycle.n_node_cycles(participant1, 4)).to eq([])
           end
         end
 
         context 'when current reviewee (ap2) was reviewed by current reviewer (ap3)' do
           it 'inserts related information into collusion cycles and returns results' do
             # Tests if reviewer was reviewed by assignment participant and inserted related information into coluusion cycle arr
-            expect(cycle.four_node_cycles(participant1)).to eq([[[participant1, 90], [participant2, 82], [participant3, 80], [participant4, 0]]])
+            expect(cycle.n_node_cycles(participant1, 4)).to eq([[[participant1, 90], [participant2, 82], [participant3, 80], [participant4, 0]]])
           end
         end
 
         context 'when current reviewer (ap3) was reviewed by current assignment participant' do
           it 'inserts related information into collusion cycles and returns results' do
             # Tests if reviewer was reviewed by assignment participant and inserted related information into coluusion cycle arr
-            expect(cycle.four_node_cycles(participant1)).to eq([[[participant1, 90], [participant2, 82], [participant3, 80], [participant4, 0]]])
+            expect(cycle.n_node_cycles(participant1, 4)).to eq([[[participant1, 90], [participant2, 82], [participant3, 80], [participant4, 0]]])
           end
         end
       end
@@ -338,7 +338,7 @@ describe CollusionCycle do
           allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
 
           # Tests if current assignment participant was not reviewed by current reviewer
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 4)).to eq([])
         end
       end
 
@@ -348,7 +348,7 @@ describe CollusionCycle do
           allow(participant2).to receive(:reviews_by_reviewer).with(participant3).and_return(nil)
           allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
           allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 4)).to eq([])
         end
       end
 
@@ -360,7 +360,7 @@ describe CollusionCycle do
           allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(response_4_1)
 
           # Tests if current assignment participant was not reviewed by current reviewer
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 4)).to eq([])
         end
       end
 
@@ -371,7 +371,7 @@ describe CollusionCycle do
           allow(participant3).to receive(:reviews_by_reviewer).with(participant4).and_return(response_3_4)
           allow(participant4).to receive(:reviews_by_reviewer).with(participant1).and_return(nil)
           # Tests if reviewer was not reviewed by assignment participant
-          expect(cycle.four_node_cycles(participant1)).to eq([])
+          expect(cycle.n_node_cycles(participant1, 4)).to eq([])
         end
       end
     end

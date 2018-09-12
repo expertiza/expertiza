@@ -419,8 +419,8 @@ class Assignment < ActiveRecord::Base
     review_questionnaire_id
   end
 
-  def self.export_details(csv, parent_id, detail_options)
-    return csv unless detail_options.value?('true')
+  def self.export_reviews(csv, parent_id, reviews_options)
+    return csv unless reviews_options.value?('true')
     @assignment = Assignment.find(parent_id)
     @answers = {} # Contains all answer objects for this assignment
     # Find all unique response types
@@ -441,23 +441,23 @@ class Assignment < ActiveRecord::Base
         round_type = check_empty_rounds(@answers, round_num, res_type)
         csv << [round_type, '---', '---', '---', '---', '---', '---', '---'] unless round_type.nil?
         @answers[round_num][res_type].each do |answer|
-          csv << csv_row(detail_options, answer)
+          csv << csv_row(reviews_options, answer)
         end
       end
     end
   end
 
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
-  def self.export_details_fields(detail_options)
+  def self.export_reviews_fields(reviews_options)
     fields = []
-    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'
-    fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
-    fields << 'Reviewer' if detail_options['reviewer'] == 'true'
-    fields << 'Question / Criterion' if detail_options['question'] == 'true'
-    fields << 'Question ID' if detail_options['question_id'] == 'true'
-    fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
-    fields << 'Answer / Comment' if detail_options['comments'] == 'true'
-    fields << 'Score' if detail_options['score'] == 'true'
+    fields << 'Team ID / Author ID' if reviews_options['team_id'] == 'true'
+    fields << 'Reviewee (Team / Student Name)' if reviews_options['team_name'] == 'true'
+    fields << 'Reviewer' if reviews_options['reviewer'] == 'true'
+    fields << 'Question / Criterion' if reviews_options['question'] == 'true'
+    fields << 'Question ID' if reviews_options['question_id'] == 'true'
+    fields << 'Answer / Comment ID' if reviews_options['comment_id'] == 'true'
+    fields << 'Answer / Comment' if reviews_options['comments'] == 'true'
+    fields << 'Score' if reviews_options['score'] == 'true'
     fields
   end
 
@@ -466,22 +466,22 @@ class Assignment < ActiveRecord::Base
     csv_field
   end
 
-  # Generates a single row based on the detail_options selected
-  def self.csv_row(detail_options, answer)
+  # Generates a single row based on the reviews_options selected
+  def self.csv_row(reviews_options, answer)
     tcsv = []
     @response = Response.find(answer.response_id)
     map = ResponseMap.find(@response.map_id)
     @reviewee = Team.find_by id: map.reviewee_id
     @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
     reviewer = Participant.find(map.reviewer_id).user
-    tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
-    tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
-    tcsv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
-    tcsv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
-    tcsv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
-    tcsv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
-    tcsv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
-    tcsv << handle_nil(answer.answer) if detail_options['score'] == 'true'
+    tcsv << handle_nil(@reviewee.id) if reviews_options['team_id'] == 'true'
+    tcsv << handle_nil(@reviewee.name) if reviews_options['team_name'] == 'true'
+    tcsv << handle_nil(reviewer.name) if reviews_options['reviewer'] == 'true'
+    tcsv << handle_nil(answer.question.txt) if reviews_options['question'] == 'true'
+    tcsv << handle_nil(answer.question.id) if reviews_options['question_id'] == 'true'
+    tcsv << handle_nil(answer.id) if reviews_options['comment_id'] == 'true'
+    tcsv << handle_nil(answer.comments) if reviews_options['comments'] == 'true'
+    tcsv << handle_nil(answer.answer) if reviews_options['score'] == 'true'
     tcsv
   end
 
@@ -563,12 +563,12 @@ class Assignment < ActiveRecord::Base
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-      export_data_fields(options)
+      export_data_fields(options, team, pscore, tcsv)
       csv << tcsv
     end
   end
 
-  def self.export_data_fields(options)
+  def self.export_data_fields(options, team, pscore, tcsv)
     if options['team_score'] == 'true'
       team[:scores] ?
         tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
@@ -579,12 +579,12 @@ class Assignment < ActiveRecord::Base
                                 feedback: 'author_feedback_score',
                                 teammate: 'teammate_review_score'}
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name)
+      export_individual_data_fields(options, review_type, score_name, pscore, tcsv)
     end
     tcsv.push(pscore[:total_score])
   end
 
-  def self.export_individual_data_fields(review_type, score_name)
+  def self.export_individual_data_fields(options, review_type, score_name, pscore, tcsv)
     if pscore[review_type]
       tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
     else

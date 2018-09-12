@@ -6,101 +6,54 @@ class CollusionCycle
   # Consider a 3 node cycle: A --> B --> C --> A (A reviewed B; B reviewed C and C reviewed A)
   # For the above cycle, the data structure would be: [[A, SCA], [B, SAB], [C, SCB]], where SCA is the score given by C to A.
 
-  def two_node_cycles(assignment_participant)
+  # Look for collusion cycles of size 'n' starting with 'assignment_participant'
+  def n_node_cycles(assignment_participant, n)
     collusion_cycles = []
-    assignment_participant.reviewers.each do |ap|
-      next unless ap.reviewers.include?(assignment_participant)
-      if assignment_participant.reviews_by_reviewer(ap).nil?
-        next
-      else
-        s01 = assignment_participant.reviews_by_reviewer(ap).total_score
-      end
-
-      if ap.reviews_by_reviewer(assignment_participant).nil?
-        next
-      else
-        s10 = ap.reviews_by_reviewer(assignment_participant).total_score
-      end
-
-      collusion_cycles.push([[assignment_participant, s01], [ap, s10]])
-    end
+    nodes = Array.new(n)
+    find_collusion_cycles(assignment_participant, 0, nodes, collusion_cycles)
     collusion_cycles
   end
 
-  def three_node_cycles(assignment_participant)
-    collusion_cycles = []
-    assignment_participant.reviewers.each do |ap1|
-      ap1.reviewers.each do |ap2|
-        next unless ap2.reviewers.include?(assignment_participant)
-        if assignment_participant.reviews_by_reviewer(ap1).nil?
-          next
-        else
-          s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
-        end
+  # recursive method to find collusion cycles
+  # ap --> current assignment participant, i--> level of recursion, nodes --> all nodes being explored currently, collusion_cycles --> all collusion cycles found
+  def find_collusion_cycles(ap, i, nodes, collusion_cycles)
+    nodes[i] = ap
 
-        if ap1.reviews_by_reviewer(ap2).nil?
-          next
-        else
-          s12 = ap1.reviews_by_reviewer(ap2).total_score
-        end
+    # if all nodes have been filled; look for collusion
+    if i == nodes.length - 1
+      # is it a cycle?
+      return unless nodes[i].reviewers.include?(nodes[0])
 
-        if ap2.reviews_by_reviewer(assignment_participant).nil?
-          next
-        else
-          s20 = ap2.reviews_by_reviewer(assignment_participant).total_score
-        end
-        collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s20]])
+      collusion_cycle = get_collusion_cycle(nodes)
+      collusion_cycles.push(collusion_cycle) unless collusion_cycle.nil?
+    else
+      # recursively try all possible options
+      nodes[i].reviewers.each do |ap1|
+        find_collusion_cycles(ap1, i + 1, nodes, collusion_cycles)
       end
     end
-
-    collusion_cycles
   end
 
-  def four_node_cycles(assignment_participant)
-    collusion_cycles = []
-    assignment_participant.reviewers.each do |ap1|
-      ap1.reviewers.each do |ap2|
-        ap2.reviewers.each do |ap3|
-          next unless ap3.reviewers.include?(assignment_participant)
-
-          if assignment_participant.reviews_by_reviewer(ap1).nil?
-            next
-          else
-            s01 = assignment_participant.reviews_by_reviewer(ap1).total_score
-          end
-
-          if ap1.reviews_by_reviewer(ap2).nil?
-            next
-          else
-            s12 = ap1.reviews_by_reviewer(ap2).total_score
-          end
-
-          if ap2.reviews_by_reviewer(ap3).nil?
-            next
-          else
-            s23 = ap2.reviews_by_reviewer(ap3).total_score
-          end
-
-          if ap3.reviews_by_reviewer(assignment_participant).nil?
-            next
-          else
-            s30 = ap3.reviews_by_reviewer(assignment_participant).total_score
-          end
-
-          collusion_cycles.push([[assignment_participant, s01], [ap1, s12], [ap2, s23], [ap3, s30]])
-        end
-      end
+  # get collusion cycle for the current set of nodes
+  def get_collusion_cycle(nodes)
+    collusion_cycle = []
+    (0...nodes.length).each do |i|
+      # next node in cycle
+      j = (i + 1) % nodes.length
+      return nil if nodes[i].reviews_by_reviewer(nodes[j]).nil?
+      score_ij = nodes[i].reviews_by_reviewer(nodes[j]).total_score
+      collusion_cycle.push([nodes[i], score_ij])
     end
-    collusion_cycles
+    collusion_cycle
   end
 
   # Per cycle
   def cycle_similarity_score(cycle)
     similarity_score = 0.0
     count = 0.0
-    for pivot in 0...cycle.size - 1 do
+    (0...cycle.size - 1).each do |pivot|
       pivot_score = cycle[pivot][1]
-      for other in pivot + 1...cycle.size do
+      (pivot + 1...cycle.size).each do |other|
         similarity_score += (pivot_score - cycle[other][1]).abs
         count += 1.0
       end
@@ -113,7 +66,7 @@ class CollusionCycle
   def cycle_deviation_score(cycle)
     deviation_score = 0.0
     count = 0.0
-    for member in 0...cycle.size do
+    (0...cycle.size).each do |member|
       participant = AssignmentParticipant.find(cycle[member][0].id)
       total_score = participant.review_score
       deviation_score += (total_score - cycle[member][1]).abs

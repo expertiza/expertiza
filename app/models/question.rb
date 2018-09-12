@@ -126,23 +126,4 @@ class Question < ActiveRecord::Base
     end
   end
 
-  def self.export_fields(options)
-    fields = []
-    User.columns.each do |column|
-      fields.push(column.name)
-    end
-    fields
-  end
-
-  def self.export(csv, _parent_id, options)
-    questionnaire = Questionnaire.find_by_id(_parent_id)
-    questions = questionnaire.questions
-    for question in questions
-      tcsv = []
-      question.attributes.each_pair do |name,value|
-        tcsv.push(value)
-      end
-      csv << tcsv
-    end
-  end
 end

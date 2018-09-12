@@ -11,36 +11,33 @@ module QuestionnaireHelper
 
   def self.create_questionnaire_csv(questionnaire, _user_name)
     csv_data = CSV.generate do |csv|
-      for question in questionnaire.questions
+      questionnaire.questions.each do |question|
         # Each row is formatted as follows
         # Question, question advice (from high score to low), type, weight
-        row = []
-        row << question.txt
-        row << question.type
-
-        row << question.alternatives || ''
-        row << question.size || ''
-
-        row << question.weight
-
-        # if questionnaire.section == "Custom"
-        #  row << QuestionType.find_by_question_id(question.id).parameters
-        # else
-        #  row << ""
-        # end
+        row = create_row_from_question(question)
 
         # loop through all the question advice from highest score to lowest score
         adjust_advice_size(questionnaire, question)
-        for advice in question.question_advices.sort {|x, y| y.score <=> x.score }
+        (question.question_advices.sort {|x, y| y.score <=> x.score }).each do |advice|
           row << advice.advice
         end
 
         csv << row
-    end
+      end
     end
 
     csv_data
-end
+  end
+
+  def self.create_row_from_question(question)
+    row = []
+    row << question.txt
+    row << question.type
+    row << question.alternatives || ''
+    row << question.size || ''
+    row << question.weight
+    row
+  end
 
   def self.get_questions_from_csv(questionnaire, file)
     questions = []
@@ -97,19 +94,17 @@ end
 
   def self.adjust_advice_size(questionnaire, question)
     # now we only support question advices for scored questions
-    if question.is_a?(ScoredQuestion)
+    return unless question.is_a?(ScoredQuestion)
 
-      max = questionnaire.max_question_score
-      min = questionnaire.min_question_score
+    max = questionnaire.max_question_score
+    min = questionnaire.min_question_score
 
-      QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)", question.id, max, min]) if !max.nil? && !min.nil?
+    QuestionAdvice.delete_all(["question_id = ? AND (score > ? OR score < ?)", question.id, max, min]) if !max.nil? && !min.nil?
 
-      for i in (questionnaire.min_question_score..questionnaire.max_question_score)
-        qas = QuestionAdvice.where("question_id = ? AND score = ?", question.id, i)
-        question.question_advices << QuestionAdvice.new(score: i) if qas.first.nil?
-        QuestionAdvice.delete(["question_id = ? AND score = ?", question.id, i]) if qas.size > 1
-
-      end
+    (questionnaire.min_question_score..questionnaire.max_question_score).each do |i|
+      qas = QuestionAdvice.where("question_id = ? AND score = ?", question.id, i)
+      question.question_advices << QuestionAdvice.new(score: i) if qas.first.nil?
+      QuestionAdvice.delete(["question_id = ? AND score = ?", question.id, i]) if qas.size > 1
     end
   end
 end

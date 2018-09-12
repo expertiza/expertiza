@@ -21,6 +21,7 @@ class BadgesController < ApplicationController
     if tokens.count < 1
       render action: 'login_credly'
     end
+    @referrer = params['referrer']
   end
 
   def redirect_to_assignment
@@ -38,8 +39,9 @@ class BadgesController < ApplicationController
       do_create_badge
     end
 
+    flash[:success] = "The badge '#{params['badge']['name']}' has been sucessfully created"
     # need to return to whatever the starting point was
-    redirect_to :action => 'new'
+    redirect_to params['referrer']
   end
 
   def do_create_badge

@@ -153,12 +153,18 @@ module Api::V1
       curr_ans= Answer.where(question_id: question.id, response_id: @response.id).first
       @ans << curr_ans
     end
+    @author_answers = Answer.where(response_id: @response_id)
     survey = @map.survey?
-    render json: {status: :ok, 
+    render json: {
+                  status: :ok, 
                   title: @title, 
+                  response: @response,
                   assignment: @assignment,
                   questions: @questions,
-                  ans: @ans
+                  contributor: @contributor,
+                  ans: @ans,
+                  author_answers: @author_answers,
+                  map: @map
                 }
   end
 

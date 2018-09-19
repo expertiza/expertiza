@@ -18,6 +18,8 @@ const responseReducer = (state = initialize, action) => {
                                             assignment: action.payload.assignment,
                                             ans: action.payload.ans,
                                             questions: action.payload.questions,
+                                            response: action.payload.response,
+                                            contributor: action.payload.contributor,
                                             loading: false })
         case actions.FETCH_REVIEW_DATA_FAILURE:
             return updateObject(state, { laoding: true })  

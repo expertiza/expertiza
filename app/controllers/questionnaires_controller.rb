@@ -35,13 +35,21 @@ class QuestionnairesController < ApplicationController
   end
 
   def new
-    @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
+    begin
+    @questionnaire = Object.const_get(params[:model].split.join).new
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+    end
   end
 
   def create
     questionnaire_private = params[:questionnaire][:private] == "true"
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+    begin
+    @questionnaire = Object.const_get(params[:questionnaire][:type]).new
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+    end
     begin
       @questionnaire.private = questionnaire_private
       @questionnaire.name = params[:questionnaire][:name]

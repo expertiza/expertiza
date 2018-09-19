@@ -3,7 +3,7 @@ test:
   script:
   - apt-get update -qy
   - apt-get upgrade -qy
-  - apt-get install -qy build-essential ruby irb ri rdoc ruby1.8-dev libaspell-dev
+  - apt-get install -qy build-essential ruby irb ri rdoc libaspell-dev
   - wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.7.tgz
   - tar -xzvf rubygems-1.3.7.tgz
   - cd rubygems-1.3.7

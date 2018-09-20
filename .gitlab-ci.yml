@@ -1,0 +1,35 @@
+test:
+  stage: test
+  script:
+  - apt-get update -qy
+  - apt-get upgrade -qy
+  - apt-get install -qy build-essential wget ruby irb ri rdoc libaspell-dev
+  - wget https://rubygems.org/rubygems/rubygems-2.7.7.tgz
+  - tar -xzvf rubygems-2.7.7.tgz
+  - cd rubygems-2.7.7
+  - ruby setup.rb
+  - apt-get install -qy mysql-server mysql-client libmysql-ruby libmysqlclient-dev libssl-dev libopenssl-ruby1.8 libopenssl-ruby graphviz sqlfairy
+  - gem install rails -v 2.2.2
+  - rake gems:install
+  - cd expertiza
+  - apt-get install -y nodejs
+  - bundle install --path /cache
+  - bundle exec rake db:create RAILS_ENV=test
+  - bundle exec rake db:migrate
+  - bundle exec rake test
+
+staging:
+  stage: deploy
+  script:
+  - gem install dpl
+  - dpl --provider=heroku --app=gitlab-ci-ruby-test-staging --api-key=$HEROKU_STAGING_API_KEY
+  only:
+  - master
+
+production:
+  stage: deploy
+  script:
+  - gem install dpl
+  - dpl --provider=heroku --app=gitlab-ci-ruby-test-prod --api-key=$HEROKU_PRODUCTION_API_KEY
+  only:
+  - tags

@@ -73,7 +73,7 @@ class CourseBadgesController < ApplicationController
         questions = retrieve_questions assignment.questionnaires, assignment.id
         assignment_participants = AssignmentParticipant.where(assignment: assignment).where.not(user_id: ta_user_ids)
         assignment_participants.each_with_index do |participant, i|
-          # break if i>3 # debugging purpose
+          break if i>5 # debugging purpose
           course_participant = CourseParticipant.where(user_id: participant.user.id, parent_id: params['course_id']).first
           next if course_participant.nil?
 
@@ -104,7 +104,9 @@ class CourseBadgesController < ApplicationController
     # if there are any hiden field for checkboxes that were unchecked, we delete the award in the DB, then ask credly to revoke the badges
     # badges revocation in credly only works for premium membership, but I'll leave the code there
     deleted_cb.each do |del_cb|
+      # del_cb[2] contains the id of the assignment participant
       participant = Participant.find(del_cb[2])
+      # del_cb[3] contains the id of the badge
       badge = Badge.find(del_cb[3])
       awarded = AwardedBadge.where(:participant => participant, :badge => badge).first
       awarded.destroy

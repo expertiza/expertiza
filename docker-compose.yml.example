@@ -2,7 +2,7 @@ version: '3'
 
 services:
   expertiza:
-    image: winbobob/expertiza:ruby-2.2.7
+    image: winbobob/expertiza:test
     ports:
       - '3000:3000'
     volumes:

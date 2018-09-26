@@ -1,9 +1,9 @@
 class ReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
-  @@print_name = "Review Rubric"
+  @print_name = "Review Rubric"
 
   def self.print_name
-    @@print_name
+    @print_name
   end
 
   def post_initialization

@@ -1,9 +1,9 @@
 class AuthorFeedbackQuestionnaire < Questionnaire
   after_initialize :post_initialization
-  @@print_name = "Author Feedback Rubric"
+  @print_name = "Author Feedback Rubric"
 
   def self.print_name
-    @@print_name
+    @print_name
   end
 
   def post_initialization

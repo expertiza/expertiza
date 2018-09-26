@@ -1,10 +1,10 @@
 class CourseSurveyQuestionnaire < SurveyQuestionnaire
   after_initialize :post_initialization
 
-  @@print_name = "Course Survey"
+  @print_name = "Course Survey"
 
   def self.print_name
-    @@print_name
+    @print_name
   end
 
   def post_initialization

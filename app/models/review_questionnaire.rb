@@ -2,8 +2,8 @@ class ReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
   @print_name = "Review Rubric"
 
-  def self.print_name
-    @print_name
+  class << self
+    attr_reader :print_name
   end
 
   def post_initialization

@@ -3,8 +3,8 @@ class CourseSurveyQuestionnaire < SurveyQuestionnaire
 
   @print_name = "Course Survey"
 
-  def self.print_name
-    @print_name
+  class << self
+    attr_reader :print_name
   end
 
   def post_initialization

@@ -2,8 +2,8 @@ class MetareviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
   @print_name = "Metareview Rubric"
 
-  def self.print_name
-    @print_name
+  class << self
+    attr_reader :print_name
   end
 
   def post_initialization

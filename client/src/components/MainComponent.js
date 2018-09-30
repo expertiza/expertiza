@@ -25,6 +25,8 @@ import GradesViewMyScores from './gradesViewMyScores/GradesViewMyScores';
 import StudentReviewListComponent from './studentReviewList/StudentReviewListComponent';
 import SuggestionsComponent from './suggestions/SuggestionsComponent';
 import responseViewComponent from './responseView/responseViewComponent';
+import ResponseEditComponent from './responseView/responseEdit/ResponseEditComponent';
+
 
 
 const mapStateToProps = state => {
@@ -88,6 +90,7 @@ class Main extends Component {
                 <Route path ='/student_review/list/:id' component={(StudentReviewListComponent)} />
                 <Route path ='/suggestion/new/:id' component={(SuggestionsComponent)} />
                 <Route path ='/response/view/:id' component={(responseViewComponent)} />
+                <Route path ='/response/edit/:id' component={(ResponseEditComponent)} />
                 <Route path ='/password_retrieval/forgotten' component={PasswordForgotten} />
                 <Route path = '/password_edit/check_reset_url' component = {PasswordForgottenUpdate} />
                 <Route path ='/home'  component={(HomePage)} /> 

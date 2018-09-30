@@ -43,22 +43,23 @@ class StudentList extends Component {
                         <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;{this.state.tasks_not_started == undefined ? "" : this.state.tasks_not_started.length}&nbsp;</span> Tasks not yet started<br/></strong>
                         {this.state.tasks_not_started == undefined ? <Loading/> : 
                             this.state.tasks_not_started.map(task =>
-                                <span>&nbsp; &raquo; {task.assignment.name} {task.current_stage}
-                                        {task.relative_deadline} left
-                                </span>
+                                <NavLink to={`/sign_up_sheet_list/${task.participant.id}`}><span>&nbsp; &raquo;{task.assignment.name} {task.current_stage}
+                                ({task.relative_deadline}) left </span></NavLink>
+                                
                             )
                         }
                     </div><br/>
 
                     <div>
-                        <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;{this.state.taskrevisions == undefined ? "" : this.state.taskrevisions.length}&nbsp;</span> Revisions<br/></strong>
-                        {this.state.taskrevisions == undefined ? <Loading/> : 
+                        <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;0&nbsp;</span> Revisions<br/></strong>
+                        {/* {this.state.taskrevisions == undefined ? <Loading/> : 
                             this.state.taskrevisions.map(revision =>
                                 <span>&nbsp; &raquo; {revision.assignment} {revision.stage}
                                         {revision.time_to_go} left
                                 </span>
                             )
-                        }
+                        } */}
+                        {/* {this.state.taskrevisions == undefined ? "" : this.state.taskrevisions.length} */}
                     </div><br/>
                         
                     <strong><span>Students who have teamed with you</span></strong>

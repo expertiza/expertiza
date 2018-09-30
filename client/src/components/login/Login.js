@@ -10,14 +10,15 @@ class Login extends Component {
         password: ''
     } 
     
+    componentWillMount () {
+        this.props.checkForAutoLogin();
+    }
+
     componentDidUpdate() {
-        console.log('in component did update', this.props.loggedin)
+        // console.log('in component did update', this.props.loggedin)
         if(this.props.loggedin) {
             this.props.history.push('/studentlist')
         }
-    }
-    componentDidMount () {
-        console.log('in component did mount', this.props.loggedIn)
     }
 
     onSubmitHandler = (event) => {
@@ -41,6 +42,7 @@ class Login extends Component {
         console.log('in component will unmount')
             this.props.history.push('/studentlist')
     }
+
     render (){
         let output =  ( <div className="container center" style= {{marginTop:'35px', marginBottom:'50px'}}>
                             <div className="row justify-content-md-center">
@@ -102,7 +104,8 @@ const mapStatetoProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         onSubmit: (name, password) => {dispatch(actions.auth(name, password))},
-        onUsernameForget : () => {dispatch(actions.forgetUsername())}
+        onUsernameForget : () => {dispatch(actions.forgetUsername())},
+        checkForAutoLogin : () => { dispatch(actions.checkForAutoLogIn())}
     }
 }
 export default connect(mapStatetoProps, mapDispatchToProps)(Login);

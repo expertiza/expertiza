@@ -77,17 +77,16 @@ module Api::V1
          end
          hash = {}
          student_task.instance_variables.each {|var| hash[var.to_s] = student_task.instance_variable_get(var) }
-         hash['controller'] = controller
-         hash['action'] = action
+         hash['relative_deadline'] = student_task.relative_deadline
+         hash['participant'] = participant
          @tasksarray.push(hash)
         end
 
         tasks_to_json = @tasksarray.map{|s| {
                                   assignment: s["@assignment"] , 
                                   current_stage: s["@current_stage"], 
-                                  relative_deadline: s["@relative_deadline"],
-                                  controller: s["controller"],
-                                  action: s["action"]
+                                  relative_deadline: s["relative_deadline"],
+                                  participant: s["participant"]
                                   } 
                               }
       

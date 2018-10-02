@@ -1,6 +1,7 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Profile } from './reducers/Profile';
 import studentTaskList from './reducers/StudentTaskList';
+import signUpSheetList from './reducers/SignUpSheetList';
 import { Institutions } from './reducers/Institution';
 import studentTaskView from './reducers/StudentTaskView';
 import Grades from './reducers/Grade';
@@ -20,7 +21,8 @@ export const ConfigureStore = () => {
             auth: authReducer,
             studentTeamView: studentTeamView,
             responseReducer: responseReducer,
-            grades: Grades
+            grades: Grades,
+            signUpSheetList: signUpSheetList
         }),
         applyMiddleware(thunk, logger)
     );

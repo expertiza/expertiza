@@ -16,6 +16,12 @@ export {
     STUDENT_TASK_VIEW_FAILURE,
     ADD_STUDENTSTEAMEDWITH,
     ADD_STUDENTTASKS,
+    ADD_TEAMCOURSE,
+    ADD_TASKS,
+    ADD_TASKREVISIONS,
+    ADD_SIGNUPSHEETLIST,
+    ADD_SIGNUP,
+    ADD_DELETE,
     CHANGE_HANDLE,
     STUDENT_TASK_VIEW_SUBMISSION_ALLOWED,
     STUDENT_TASK_VIEW_CHECK_REVIEWABLE_TOPICS,
@@ -48,6 +54,16 @@ export {
     forgetUsername,
     checkForAutoLogIn
 } from './actions/Auth'
+
+export {
+    onSignUpSheetLoad,
+    onSignUp,
+    onDelete,
+    addSignUpSheetList,
+    addSignUp,
+    addDelete
+
+} from './actions/SignUpSheetList'
 export {
     onLoad,
     loadSuccess,
@@ -74,8 +90,14 @@ from './actions/Profile'
 export {
     fetchStudentsTeamedWith,
     fetchStudentTasks,
+    fetchTeamCourse,
+    fetchTasks,
+    fetchRevisions,
     addStudentsTeamedWith,
-    addStudentTasks
+    addStudentTasks,
+    addTeamCourse,
+    addTasks,
+    addTaskRevisions
 } 
 from './actions/StudentTaskList';
 export { fetchStudentsTeamView,

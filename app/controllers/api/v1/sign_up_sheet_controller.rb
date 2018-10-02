@@ -151,7 +151,8 @@ module Api::V1
     end
 
     def list
-      puts 'in list .....', params.inspect
+      puts 'in list .....'
+      puts params.inspect
       @participant = AssignmentParticipant.find(params[:id].to_i)
       @assignment = @participant.assignment
       @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
@@ -181,29 +182,98 @@ module Api::V1
 
       unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
         @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
-
+          puts 'in block'
         # Find whether the user has signed up for any topics; if so the user won't be able to
         # sign up again unless the former was a waitlisted topic
         # if team assignment, then team id needs to be passed as parameter else the user's id
-        users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
-        @selected_topics = if users_team.empty?
-                            nil
-                          else
-                            # TODO: fix this; cant use 0
-                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
-                          end
+        users_team = SignedUpTeam.find_team_users(@assignment.id, @participant.id)
+        @selected_topics = SignedUpTeam.find_user_signup_topics(@assignment.id, team_id)
+                          
       end
-      render 'sign_up_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
+      # render 'sign_up_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
+      i = 0
+      arr = []
+      for topic in @sign_up_topics
+        hash = {}
+        hash['topic'] = topic
+        found_in_slots = false
+        for slot in @slots_filled
+          if slot.topic_id.to_s == topic.id.to_s
+            hash['available_slots'] = topic.max_choosers.to_int - slot.count.to_i
+            found_in_slots = true
+          end
+        end
+        if found_in_slots == false
+          hash['available_slots'] = topic.max_choosers.to_int
+        end
+
+        found_in_slots = false
+        for slot in @slots_waitlisted
+          if slot.topic_id.to_s == topic.id.to_s
+            hash['num_waiting'] = slot.count.to_i
+          end
+        end
+
+        if found_in_slots == false
+          hash['num_waiting'] = 0
+        end
+        i += 1
+        color = ""
+        if !@selected_topics.nil? && @selected_topics.size != 0
+          for selected_topic in @selected_topics
+            if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted
+              color = "yellow"
+            elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted
+              color = "lightgray"
+            end
+          end
+        end
+        hash['color'] = color
+        arr.push(hash)
+      end
+
+      topics_to_json = arr.map{|s| {
+          topic: s["topic"],
+          available_slots: s["available_slots"],
+          num_waiting: s["num_waiting"],
+          color: s["color"]
+      }}
+
+    
+      render json: {status: :ok,
+       participant: @participant, 
+       assignment: @assignment,
+       slots_filled: @slots_filled,
+       slots_waitlisted: @slots_waitlisted,
+       selected_topics: @selected_topics,
+       show_actions: @show_actions,
+       team_id: team_id,
+       users_team: users_team,
+       bids: @bids,
+      #  sign_up_topics: @sign_up_topics,
+       sign_up_topics: topics_to_json,
+      }
+    
     end
 
     def sign_up
+      puts params.inspect
       @assignment = AssignmentParticipant.find(params[:id]).assignment
-      @user_id = session[:user].id
+      puts current_user_id
+      puts params[:topic_id]
+      @user_id = current_user_id
+      error = ""
+      action = "signup"
       # Always use team_id ACS
       # s = Signupsheet.new
       # Team lazy initialization: check whether the user already has a team for this assignment
-      flash[:error] = "You've already signed up for a topic!" unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
-      redirect_to action: 'list', id: params[:id]
+      error = "You've already signed up for a topic!" unless SignUpSheet.signup_team(@assignment.id, @user_id, params[:topic_id])
+      # redirect_to action: 'list', id: params[:id]
+      render json: {
+        status: :ok,
+        error: error,
+        action: action
+      }
     end
 
     # routes to new page to specficy student
@@ -235,22 +305,30 @@ module Api::V1
       participant = AssignmentParticipant.find(params[:id])
       assignment = participant.assignment
       drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+      error = ""
+      success = ""
       # A student who has already submitted work should not be allowed to drop his/her topic!
       # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
       # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
       # If there is a drop topic deadline, student cannot drop topic after this deadline.
       if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
-        flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
-        ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for already submitted a work: ' + params[:topic_id].to_s)
+        error = "You have already submitted your work, so you are not allowed to drop your topic."
+        ExpertizaLogger.error LoggerMessage.new(controller_name, current_user_id, 'Dropping topic for already submitted a work: ' + params[:topic_id].to_s)
       elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
-        flash[:error] = "You cannot drop your topic after the drop topic deadline!"
-        ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
+        error = "You cannot drop your topic after the drop topic deadline!"
+        ExpertizaLogger.error LoggerMessage.new(controller_name, current_user_id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
       else
-        delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
-        flash[:success] = "You have successfully dropped your topic!"
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
+        delete_signup_for_topic(assignment.id, params[:topic_id], current_user_id)
+        success = "You have successfully dropped your topic!"
+        ExpertizaLogger.info LoggerMessage.new(controller_name, current_user_id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
       end
-      redirect_to action: 'list', id: params[:id]
+      # redirect_to action: 'list', id: params[:id]
+      action = "delete"
+      render json: {
+        status: :ok,
+        error: error,
+        success: success,
+      }
     end
 
     def delete_signup_as_instructor

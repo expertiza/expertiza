@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import  { UnmountClosed as Collapse } from 'react-collapse';
 import { Table, Tooltip } from 'react-bootstrap';
 import { Loading } from './../UI/spinner/LoadingComponent';
+import { NavLink } from 'react-router-dom';
 
 class Scoretable extends Component {
 
@@ -76,10 +77,13 @@ class Scoretable extends Component {
                                                     <tr>
                                                         <th class="sorter-true">    Criterion </th>
                                                         {  
-                                                            rq.list_of_reviewers.map((i, index) =>
-                                                            <th key={`reviewer${index}`}> Review {index+1}
+                                                            rq.list_of_reviews.map((i, index) =>
+                                                            <th>
+                                                             <NavLink to={`/response/view/${i.id}`}> Review {index+1} </NavLink>
+                                                             {/* <th key={`reviewer${index}`}> Review {index+1} { i.id} */}
                                                             </th>
                                                         )}
+
                                                         <th class="sorter-true"> Avg </th>
                                                         <th class="sorter-true"> metric-1 </th>
                                                     </tr>

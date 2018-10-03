@@ -36,7 +36,7 @@ class QuestionnairesController < ApplicationController
 
   def new
     begin
-    @questionnaire = Object.const_get(params[:model].split.join).new
+      @questionnaire = Object.const_get(params[:model].split.join).new
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -46,7 +46,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_private = params[:questionnaire][:private] == "true"
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     begin
-    @questionnaire = Object.const_get(params[:questionnaire][:type]).new
+      @questionnaire = Object.const_get(params[:questionnaire][:type]).new
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -250,7 +250,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
+    if valid_request
       @questionnaire = Object.const_get(params[:model]).new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0

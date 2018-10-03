@@ -6,10 +6,10 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
-      ['Super-Administrator', 'Administrator'].include? current_role_name or
-      assignment.instructor_id == current_user.try(:id) or
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
-      assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+      (%w[Super-Administrator Administrator].include? current_role_name) ||
+      (assignment.instructor_id == current_user.try(:id)) ||
+      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
+      (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
     else
       ['Super-Administrator',
        'Administrator',
@@ -28,31 +28,31 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-        if @assignment_form.save
-          @assignment_form.create_assignment_node
-          existAssignment = Assignment.find_by_name(@assignment_form.assignment.name)
-          assignment_form_params[:assignment][:id] = existAssignment.id.to_s
-          quesparams = assignment_form_params
-          questArray = quesparams[:assignment_questionnaire]
-          dueArray = quesparams[:due_date]
-          questArray.each do |curquestionnaire|
-            curquestionnaire[:assignment_id] = existAssignment.id.to_s
-          end
-          dueArray.each do |curDue|
-            curDue[:parent_id] = existAssignment.id.to_s
-          end
-          quesparams[:assignment_questionnaire] = questArray
-          quesparams[:due_date] = dueArray
-          @assignment_form.update(quesparams,current_user)
-          aid = Assignment.find_by_name(@assignment_form.assignment.name).id
-          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-          redirect_to edit_assignment_path aid
-          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-          return
-        else
-          flash.now[:error] = "Failed to create assignment"
-          render 'new'
+      if @assignment_form.save
+        @assignment_form.create_assignment_node
+        exist_assignment = Assignment.find_by_name(@assignment_form.assignment.name)
+        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        ques_params = assignment_form_params
+        ques_array = ques_params[:assignment_questionnaire]
+        due_array = ques_params[:due_date]
+        ques_array.each do |cur_questionnaire|
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
         end
+        due_array.each do |cur_due|
+          cur_due[:parent_id] = exist_assignment.id.to_s
+        end
+        ques_params[:assignment_questionnaire] = ques_array
+        ques_params[:due_date] = due_array
+        @assignment_form.update(ques_params,current_user)
+        aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+        redirect_to edit_assignment_path aid
+        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+        return
+      else
+        flash.now[:error] = "Failed to create assignment"
+        render 'new'
+      end
     else
       render 'new'
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -65,7 +65,7 @@ class AssignmentsController < ApplicationController
     edit_params_setting
     assignment_form_assignment_staggered_deadline?
     @due_date_all.each do |dd|
-      check_due_date_nameurl_notempty(dd)
+      check_due_date_nameurl_not_empty(dd)
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
@@ -192,23 +192,22 @@ class AssignmentsController < ApplicationController
         rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
       end
     end
-    rubrics_list.delete("TeammateReviewQuestionnaire") if @assignment_form.assignment.max_team_size == 1
-    rubrics_list.delete("MetareviewQuestionnaire") unless @metareview_allowed
-    rubrics_list.delete("BookmarkRatingQuestionnaire") unless @assignment_form.assignment.use_bookmark
+    rubrics_list.delete('TeammateReviewQuestionnaire') if @assignment_form.assignment.max_team_size == 1
+    rubrics_list.delete('MetareviewQuestionnaire') unless @metareview_allowed
+    rubrics_list.delete('BookmarkRatingQuestionnaire') unless @assignment_form.assignment.use_bookmark
     rubrics_list
   end
 
   def needed_rubrics(empty_rubrics_list)
-    needed_rub = "<b>["
+    needed_rub = '<b>['
     empty_rubrics_list.each do |item|
-      needed_rub += item[0...-13] + ", "
+      needed_rub += item[0...-13] + ', '
     end
     needed_rub = needed_rub[0...-2]
-    needed_rub += "] </b>"
-    needed_rub
+    needed_rub += '] </b>'
   end
 
-  def due_date_nameurl_notempty?(dd)
+  def due_date_nameurl_not_empty?(dd)
     dd.deadline_name.present? || dd.description_url.present?
   end
 
@@ -257,8 +256,8 @@ class AssignmentsController < ApplicationController
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @reviewvarycheck = false
-    @due_date_nameurl_notempty = false
-    @due_date_nameurl_notempty_checkbox = false
+    @due_date_nameurl_not_empty = false
+    @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
     @metareview_allowed_checkbox = false
     @signup_allowed = false
@@ -280,9 +279,9 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.staggered_deadline == true
   end
 
-  def check_due_date_nameurl_notempty(dd)
-    @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
-    @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
+  def check_due_date_nameurl_not_empty(dd)
+    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
+    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
     @metareview_allowed = meta_review_allowed?(dd)
     @drop_topic_allowed = drop_topic_allowed?(dd)
     @signup_allowed = signup_allowed?(dd)
@@ -294,7 +293,7 @@ class AssignmentsController < ApplicationController
   end
 
   def validate_due_date
-    @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+    @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 

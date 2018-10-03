@@ -15,7 +15,7 @@ class CourseController < ApplicationController
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where role_id=6") if search.present?
+    @users = User.where(role_id: 6) if search.present?
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
@@ -33,7 +33,7 @@ class CourseController < ApplicationController
 
   def update
     @course = Course.find(params[:id])
-    if params[:course][:directory_path] and @course.directory_path != params[:course][:directory_path]
+    if params[:course][:directory_path] && @course.directory_path != params[:course][:directory_path]
       begin
         FileHelper.delete_directory(@course)
       rescue StandardError

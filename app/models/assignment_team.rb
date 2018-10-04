@@ -137,11 +137,6 @@ class AssignmentTeam < Team
     end
   end
 
-  # Return the parent Assignment
-  def assignment
-    Assignment.find(self.parent_id)
-  end
-
   # return a hash of scores that the team has received for the questions
   def scores(questions)
     scores = {}

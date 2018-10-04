@@ -79,17 +79,6 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  # This method adds a new entry in the ResponseMap
-  def self.add_reviewer(contributor_id, reviewer_id, assignment_id)
-    if where(reviewee_id: contributor_id, reviewer_id: reviewer_id).count > 0
-      create(reviewee_id: contributor_id,
-             reviewer_id: reviewer_id,
-             reviewed_object_id: assignment_id)
-    else
-      raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
-    end
-  end
-
   def metareview_response_maps
     responses = Response.where(map_id: self.id)
     metareview_list = []

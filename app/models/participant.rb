@@ -28,11 +28,11 @@ class Participant < ActiveRecord::Base
   has_paper_trail
 
   def get_current_stage
-    assignment.try :get_current_stage, topic_id
+    assignment.get_current_stage
   end
 
   def stage_deadline
-    assignment.stage_deadline topic_id
+    assignment.stage_deadline
   end
 
   def name(ip_address = nil)

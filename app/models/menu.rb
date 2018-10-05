@@ -13,16 +13,9 @@ class Menu
       @name = item.name
       @id = item.id
       @label = item.label
-
-      if item.controller_action
-        @site_controller_id   = item.controller_action.controller.id
-        @controller_action_id = item.controller_action.id
-      else
-        @site_controller_id   = nil
-        @controller_action_id = nil
-      end
-
-      @content_page_id = (item.content_page.id if item.content_page)
+      @site_controller_id = item.try(:controller_action).try(:controller).try(:id)
+      @controller_action_id = item.try(:controller_action).try(:id)
+      @content_page_id = item.try(:content_page).try(:id)
       @url = if item.controller_action
                item.controller_action.url_to_use.presence || "/#{item.controller_action.controller.name}/#{item.controller_action.name}"
              else
@@ -57,40 +50,30 @@ class Menu
     @selected = {}
     @vector = []
     @crumbs = []
-
-    items = nil
-    if role
-      items = MenuItem.items_for_permissions(role.cache[:credentials].permission_ids) unless role.cache[:credentials].permission_ids.nil?
-    else # No role given: build menu of everything
-      items = MenuItem.items_for_permissions
+    items = MenuItem.items_for_permissions(role.try(:cache)[:credentials].try(:permission_ids))
+    return if items.nil? or items.empty?
+    # Build hashes of items by name and id
+    items.each do |item|
+      node = Node.new
+      node.setup(item)
+      @by_id[item.id] = node
+      @by_name[item.name] = node
     end
 
-    return unless items
-    unless items.empty?
-      # Build hashes of items by name and id
-      items.each do |item|
-        node = Node.new
-        node.setup(item)
-        @by_id[item.id] = node
-        @by_name[item.name] = node
-      end
-
-      # Then build tree of items
-      items.each do |item|
-        node = @by_id[item.id]
-        p_id = node.parent_id
-        if p_id
-          @by_id[p_id].add_child(node) if @by_id.key?(p_id)
-        else
-          @root.add_child(node)
-        end
+    # Then build tree of items
+    items.each do |item|
+      node = @by_id[item.id]
+      p_id = node.parent_id
+      if p_id
+        @by_id[p_id].try(:add_child, node)
+      else
+        @root.add_child(node)
       end
     end
-    select(@by_id[@root.children[0]].name) if @root.children.present?
+    select(@by_id[@root.children[0]].try(:name))
   end
 
-  # Selects the menu item for the given name, if it exists in this
-  # menu.  If not returns nil.
+  # Selects the menu item for the given name, if it exists in this menu.  If not returns nil.
 
   def select(name)
     return unless @by_name.key?(name)
@@ -115,13 +98,12 @@ class Menu
 
   # Returns the array of items at the given level.
   def get_menu(level)
-    @vector[level].children if @vector.length > level
+    @vector[level].try(:children)
   end
 
-  # Returns the name of the currently-selected item
-  # or nil if no item is selected.
+  # Returns the name of the currently-selected item or nil if no item is selected.
   def selected
-    @vector[@vector.length - 1].name unless @vector.empty?
+    @vector.last.try(:name)
   end
 
   # Returns true if the specified item is selected; false if otherwise.
@@ -131,10 +113,7 @@ class Menu
 
   def crumbs
     crumbs = []
-    @crumbs.each do |crumb|
-      item = get_item(crumb)
-      crumbs << item
-    end
+    @crumbs.each {|crumb| crumbs << get_item(crumb) }
     crumbs
   end
 end

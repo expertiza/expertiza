@@ -15,16 +15,14 @@ class Menu
       @label = item.label
 
       if item.controller_action
-        @site_controller_id = item.controller_action.controller.id
+        @site_controller_id   = item.controller_action.controller.id
         @controller_action_id = item.controller_action.id
       else
-        @site_controller_id = nil
+        @site_controller_id   = nil
         @controller_action_id = nil
       end
 
       @content_page_id = (item.content_page.id if item.content_page)
-
-      @url = ''
       @url = if item.controller_action
                item.controller_action.url_to_use.presence || "/#{item.controller_action.controller.name}/#{item.controller_action.name}"
              else
@@ -33,28 +31,22 @@ class Menu
     end
 
     def site_controller
-      unless @site_controller
-        @site_controller = SiteController.find(@site_controller_id) if @site_controller_id
-      end
+      @site_controller ||= SiteController.find_by(id: @site_controller_id)
     end
 
     def controller_action
-      unless @controller_action
-        @controller_action = ControllerAction.find(@controller_action_id) if @controller_action_id
-      end
+      @controller_action ||= ControllerAction.find_by(id: @controller_action_id)
     end
 
     def content_page
-      unless @content_page
-        @content_page = ContentPage.find(@content_page_id) if @content_page_id
-      end
+      @content_page = ContentPage.find_by(id: @content_page_id)
     end
 
     def add_child(child)
       @children ||= []
       @children << child.id
     end
-  end # class Node
+  end
 
   attr_accessor :root, :selected
 
@@ -73,51 +65,48 @@ class Menu
       items = MenuItem.items_for_permissions
     end
 
-    if items
-      unless items.empty?
-        # Build hashes of items by name and id
-        for item in items do
-          node = Node.new
-          node.setup(item)
-          @by_id[item.id] = node
-          @by_name[item.name] = node
-        end
+    return unless items
+    unless items.empty?
+      # Build hashes of items by name and id
+      items.each do |item|
+        node = Node.new
+        node.setup(item)
+        @by_id[item.id] = node
+        @by_name[item.name] = node
+      end
 
-        # Then build tree of items
-        for item in items do
-          node = @by_id[item.id]
-          p_id = node.parent_id
-          if p_id
-            @by_id[p_id].add_child(node) if @by_id.key?(p_id)
-          else
-            @root.add_child(node)
-          end
+      # Then build tree of items
+      items.each do |item|
+        node = @by_id[item.id]
+        p_id = node.parent_id
+        if p_id
+          @by_id[p_id].add_child(node) if @by_id.key?(p_id)
+        else
+          @root.add_child(node)
         end
-      end # if items.size > 0
-
-      select(@by_id[@root.children[0]].name) if @root.children.present?
-    end # if items
+      end
+    end
+    select(@by_id[@root.children[0]].name) if @root.children.present?
   end
 
   # Selects the menu item for the given name, if it exists in this
   # menu.  If not returns nil.
 
   def select(name)
-    if @by_name.key?(name)
-      node = @by_name[name]
-      @selected = {}
-      @vector = []
-      @crumbs = []
+    return unless @by_name.key?(name)
+    node = @by_name[name]
+    @selected = {}
+    @vector = []
+    @crumbs = []
 
-      while node && node.id
-        @selected[node.id] = node
-        @vector.unshift node
-        @crumbs.unshift node.id
-        node = @by_id[node.parent_id]
-      end
-      @vector.unshift @root
-      @by_name[name]
+    while node && node.id
+      @selected[node.id] = node
+      @vector.unshift node
+      @crumbs.unshift node.id
+      node = @by_id[node.parent_id]
     end
+    @vector.unshift @root
+    @by_name[name]
   end
 
   def get_item(item_id)
@@ -142,7 +131,7 @@ class Menu
 
   def crumbs
     crumbs = []
-    for crumb in @crumbs do
+    @crumbs.each do |crumb|
       item = get_item(crumb)
       crumbs << item
     end

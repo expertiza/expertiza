@@ -1,0 +1,178 @@
+<% if @popup %>
+<!DOCTYPE html>
+    <html>
+    <head>
+      <title>Manage award criteria for badges in a course</title>
+      <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+      <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+      <%= csrf_meta_tags %>
+
+    </head>
+    <body>
+<% end %>
+
+<% if @error.empty? %>
+
+<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+<script>
+
+
+  removeRuleTable = function(tablePlaceholder) {
+    $("#" + tablePlaceholder).remove();
+    $("#" + tablePlaceholder + "-header").remove();
+    $("#" + tablePlaceholder + "-button").remove();
+  }
+
+  setupAwardCritTable = function (badge_id, assignment, questions) {
+
+    var logic_op = [{ op: "AND"}, { op: "OR"}]
+    var operator = [
+      { op: ">"},
+      { op: ">="},
+      { op: "="},
+      { op: "!="},
+      { op: "<"},
+      { op: "<="},
+    ];
+
+    var tablePlaceholder = 'rule-table-' + assignment.id;
+
+    if($("#" + tablePlaceholder).length == 0)
+      $("#award-criteria-placeholder").append(
+          '<div class="panel panel-default" >' +
+            '<div id="' + tablePlaceholder + '-header" class="panel-heading">' +
+              '<h4><a data-toggle="collapse" href="#' + tablePlaceholder + '">Specify criteria for awarding in assignment ' + assignment.name + '</a></h4>' +
+            '</div>' +
+          '<div class="panel-body" ><div id="' + tablePlaceholder + '" class="accordion-body collapse"></div></div>' +
+          '</div>');
+
+    $("#" + tablePlaceholder).jsGrid({
+      autoload: true,
+      width: "100%",
+      height: "250px",
+      inserting: true,
+      editing: true,
+      sorting: true,
+      paging: true,
+      autoload: true,
+      pageSize: 10,
+      pageButtonCount: 5,
+      deleteConfirm: "Do you really want to delete the condition?",
+      controller: {
+        loadData: function(filter) {
+          return $.ajax({
+            type: "GET",
+            url: "/badge_awarding_rules/show?badge_id=" + badge_id + "&assignment_id=" + assignment.id,
+            data: filter
+          });
+        },
+        insertItem: function(item) {
+          return $.ajax({
+            type: "POST",
+            url: "/badge_awarding_rules?badge_id=" + badge_id + "&assignment_id=" + assignment.id,
+            data: item
+          });
+        },
+        updateItem: function(item) {
+          return $.ajax({
+            type: "PUT",
+            url: "/badge_awarding_rules/" + item.id,
+            data: item
+          });
+        },
+        deleteItem: function(item) {
+          return $.ajax({
+            type: "DELETE",
+            url: "/badge_awarding_rules/" + item.id
+          });
+        }
+      },
+      fields: [
+        { name: "id", valueField: "id", visible: false },
+        { name: "assignment_id", valueField: "assignment_id", visible: false },
+        { name: "badge_id", valueField: "badge_id", visible: false },
+        { title: "Question", name: "question_id", type: "select", items: questions , valueField: "question_id", textField: "question", width: 200, align: "left"  },
+        { title: "Operator", name: "operator", type: "select", items: operator, valueField: "op", textField: "op", width: 30, align: "center" },
+        { title: "Threshold", name: "threshold", type: "number", width: 30, align: "right", validate: "required"},
+        { title: "", name: "logic_operator", type: "select", items: logic_op, valueField: "op", textField: "op", width: 30, align: "center" },
+        { type: "control" }
+      ]
+    });
+  }
+
+
+  var addAssignmentTable = function(){
+    setupAwardCritTable($('#add-assignment-table').val());
+  }
+
+  $(function(){
+    $('input:radio[name=award_mechanism]').change(function () {
+      if ($("input[name='award_mechanism']:checked").val() == 'manual') {
+        $('#choose-assignment').html('');
+        $('#award-criteria-placeholder').html('<textarea ' +
+            'name="badge[award_criteria]" ' +
+            'id="badge_award_criteria" ' +
+            'class="form-control" cols="60" rows="16"></textarea>');
+      }
+      if ($("input[name='award_mechanism']:checked").val() == 'automatic') {
+        $('#award-criteria-placeholder').html('');
+        <% @assignments.each do |assignment| %>
+          var assignment = JSON.parse("<%=escape_javascript(assignment.to_json).html_safe %>");
+          var assignment_questions = JSON.parse("<%=escape_javascript(@assignment_questions.to_json).html_safe %>");
+          var badge_id = <%=@badge.id%>
+          setupAwardCritTable(badge_id, assignment, assignment_questions[assignment.id]);
+        <% end %>
+      }
+    });
+
+  });
+
+</script>
+
+<h1>Choose award criteria</h1>
+
+    <table class="table borderless table-not-full-width">
+      <tr>
+        <% if !@course.nil? %>
+          <td class="width-250">Course name</td>
+          <td><%= @course.name %></td>
+        <%else # must be assignment%>
+          <td class="width-250">Assignment name</td>
+          <td><%= @assignment.name %></td>
+        <%end%>
+      </tr>
+      <tr>
+        <td>Badge name</td>
+        <td><%= @badge.name %></td>
+      </tr>
+      <tr>
+        <td>Award method</td>
+        <td>
+          <%= radio_button_tag :award_mechanism, 'manual', true %>
+          <%= label_tag :award_mechanism_manual, 'Manual' %>
+          &nbsp;
+          <%= radio_button_tag :award_mechanism, 'automatic' %>
+          <%= label_tag :award_mechanism_automatic, 'Automatic' %>
+        </td>
+      </tr>
+      <tr>
+        <td>Award criteria</td>
+        <td><div></div></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div id="award-criteria-placeholder">
+            <textarea class="form-control" name="badge[award_criteria]" id="badge_award_criteria" cols="60" rows="16"></textarea>
+          </div>
+          <div id="criteria_error" />
+        </td>
+      </tr>
+    </table>
+<% end %>
+
+<% if @popup %>
+</body>
+<% end %>

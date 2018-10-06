@@ -1,0 +1,18 @@
+development:
+  credly_api_url: 'https://api.credly.com/v1.1/'
+  credly_badge_builder: 'https://credly.com/badge-builder/code'
+  api_key: 'ce56ea802fdee803531c310e30b0e32c'
+  api_secret: 'fXYe3lH8xN62mvj5K8AuCmw2Ca7SQcIekvftil1aVFhKQcQuMLmjqqC6/hr1x4SlV9TfHSQxWdvZ+K0bUnCxmBXLYMrGSnigU22fy26thaH6u6duNoZX/4qx+y9iLYa/jotMe5X1GNom+230nw2hLqPH0EiIotZ0t+5TUWl5cvU='
+
+test:
+  credly_api_url: 'https://api.credly.com/v1.1/'
+  credly_badge_builder: 'https://credly.com/badge-builder/code'
+  api_key: 'ce56ea802fdee803531c310e30b0e32c'
+  api_secret: 'fXYe3lH8xN62mvj5K8AuCmw2Ca7SQcIekvftil1aVFhKQcQuMLmjqqC6/hr1x4SlV9TfHSQxWdvZ+K0bUnCxmBXLYMrGSnigU22fy26thaH6u6duNoZX/4qx+y9iLYa/jotMe5X1GNom+230nw2hLqPH0EiIotZ0t+5TUWl5cvU='
+
+
+production:
+  credly_api_url: 'https://api.credly.com/v1.1/'
+  credly_badge_builder: 'https://credly.com/badge-builder/code'
+  api_key: 'ce56ea802fdee803531c310e30b0e32c'
+  api_secret: 'fXYe3lH8xN62mvj5K8AuCmw2Ca7SQcIekvftil1aVFhKQcQuMLmjqqC6/hr1x4SlV9TfHSQxWdvZ+K0bUnCxmBXLYMrGSnigU22fy26thaH6u6duNoZX/4qx+y9iLYa/jotMe5X1GNom+230nw2hLqPH0EiIotZ0t+5TUWl5cvU='

@@ -32,7 +32,7 @@ module StudentTaskHelper
       badge = awarded_badge.badge
       # In the student task homepage, list only those badges that are approved
       if awarded_badge.is_approved?
-        info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
+        info += '<img width="30px" src="' + badge.image_url+ '" title="' + badge.name + '" />'
       end
     end
     info.html_safe

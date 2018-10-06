@@ -33,6 +33,12 @@
 //= require jquery-tablesorter
 //= require awesome_input
 //= require jquery-bar-rating/jquery.barrating
+//= require jquery-file-upload/js/jquery.fileupload
+//= require jquery-file-upload/js/jquery.iframe-transport
+//= require jquery-file-upload/js/vendor/jquery.ui.widget
+//= require image-picker/image-picker/image-picker
+
+
 
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();

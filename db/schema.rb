@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180427030840) do
+ActiveRecord::Schema.define(version: 20180901222912) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -35,17 +35,6 @@ ActiveRecord::Schema.define(version: 20180427030840) do
 
   add_index "answers", ["question_id"], name: "fk_score_questions", using: :btree
   add_index "answers", ["response_id"], name: "fk_score_response", using: :btree
-
-  create_table "assignment_badges", force: :cascade do |t|
-    t.integer  "badge_id",      limit: 4
-    t.integer  "assignment_id", limit: 4
-    t.integer  "threshold",     limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-  end
-
-  add_index "assignment_badges", ["assignment_id"], name: "index_assignment_badges_on_assignment_id", using: :btree
-  add_index "assignment_badges", ["badge_id"], name: "index_assignment_badges_on_badge_id", using: :btree
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -110,7 +99,6 @@ ActiveRecord::Schema.define(version: 20180427030840) do
     t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
-    t.boolean  "has_badge"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -141,17 +129,36 @@ ActiveRecord::Schema.define(version: 20180427030840) do
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
     t.integer  "approval_status", limit: 4
+    t.integer  "external_id",     limit: 4
   end
 
   add_index "awarded_badges", ["badge_id"], name: "index_awarded_badges_on_badge_id", using: :btree
   add_index "awarded_badges", ["participant_id"], name: "index_awarded_badges_on_participant_id", using: :btree
 
+  create_table "badge_awarding_rules", force: :cascade do |t|
+    t.integer  "badge_id",       limit: 4
+    t.integer  "assignment_id",  limit: 4
+    t.integer  "question_id",    limit: 4
+    t.string   "operator",       limit: 255
+    t.integer  "threshold",      limit: 4
+    t.string   "logic_operator", limit: 255, default: "AND"
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+  end
+
+  add_index "badge_awarding_rules", ["assignment_id"], name: "index_badge_awarding_rules_on_assignment_id", using: :btree
+  add_index "badge_awarding_rules", ["badge_id"], name: "index_badge_awarding_rules_on_badge_id", using: :btree
+  add_index "badge_awarding_rules", ["question_id"], name: "index_badge_awarding_rules_on_question_id", using: :btree
+
   create_table "badges", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.string   "description", limit: 255
-    t.string   "image_name",  limit: 255
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.string   "name",              limit: 255
+    t.string   "description",       limit: 255
+    t.string   "image_url",         limit: 255
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "external_badge_id", limit: 4
+    t.integer  "instructor_id",     limit: 4
+    t.integer  "private",           limit: 1
   end
 
   create_table "bids", force: :cascade do |t|
@@ -215,6 +222,18 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_index "controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
   add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
 
+  create_table "course_badges", force: :cascade do |t|
+    t.integer  "badge_id",              limit: 4
+    t.integer  "course_id",             limit: 4
+    t.string   "award_mechanism",       limit: 255
+    t.string   "manual_award_criteria", limit: 255
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "course_badges", ["badge_id"], name: "index_course_badges_on_badge_id", using: :btree
+  add_index "course_badges", ["course_id"], name: "index_course_badges_on_course_id", using: :btree
+
   create_table "courses", force: :cascade do |t|
     t.string   "name",            limit: 255
     t.integer  "instructor_id",   limit: 4
@@ -224,6 +243,7 @@ ActiveRecord::Schema.define(version: 20180427030840) do
     t.datetime "updated_at"
     t.boolean  "private",                       default: false, null: false
     t.integer  "institutions_id", limit: 4
+    t.integer  "has_badge",       limit: 1
   end
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
@@ -275,6 +295,22 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
   add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
   add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+
+  create_table "evidences", force: :cascade do |t|
+    t.integer  "awarded_badge_id", limit: 4
+    t.string   "file_name",        limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  create_table "file_instructions", force: :cascade do |t|
+    t.string   "host_url",     limit: 255
+    t.string   "file_type",    limit: 255
+    t.string   "instructions", limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "badge_id",     limit: 4
+  end
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -336,6 +372,14 @@ ActiveRecord::Schema.define(version: 20180427030840) do
     t.integer "parent_id",      limit: 4
     t.integer "node_object_id", limit: 4
     t.string  "type",           limit: 255
+  end
+
+  create_table "nominations", force: :cascade do |t|
+    t.integer  "assignment_badge_id", limit: 4
+    t.integer  "recipient_id",        limit: 4
+    t.integer  "nominator_id",        limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -714,20 +758,30 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "notification_id", limit: 4, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
     t.string  "child_type", limit: 255
     t.integer "parent_id",  limit: 4
   end
+
+  create_table "user_credly_tokens", force: :cascade do |t|
+    t.integer  "user_id",       limit: 4
+    t.string   "access_token",  limit: 255
+    t.string   "refresh_token", limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "user_credly_tokens", ["user_id"], name: "index_user_credly_tokens_on_user_id", using: :btree
 
   create_table "user_pastebins", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
@@ -779,8 +833,6 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_foreign_key "answer_tags", "users"
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"
-  add_foreign_key "assignment_badges", "assignments"
-  add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
@@ -788,6 +840,11 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
   add_foreign_key "awarded_badges", "badges"
   add_foreign_key "awarded_badges", "participants"
+  add_foreign_key "badge_awarding_rules", "assignments"
+  add_foreign_key "badge_awarding_rules", "badges"
+  add_foreign_key "badge_awarding_rules", "questions"
+  add_foreign_key "course_badges", "badges"
+  add_foreign_key "course_badges", "courses"
   add_foreign_key "courses", "users", column: "instructor_id", name: "fk_course_users"
   add_foreign_key "due_dates", "deadline_rights", column: "review_allowed_id", name: "fk_due_date_review_allowed"
   add_foreign_key "due_dates", "deadline_rights", column: "review_of_review_allowed_id", name: "fk_due_date_review_of_review_allowed"
@@ -815,4 +872,7 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "track_notifications", "notifications"
+  add_foreign_key "track_notifications", "users"
+  add_foreign_key "user_credly_tokens", "users"
 end

@@ -6,4 +6,113 @@
 <% end %>
 
 <br/>
+
+<script>
+  badge_data = "<%= @badges.to_json %>";
+  course_badge_data = "<%= @badge_in_course.to_json %>";
+  var badges = JSON.parse(badge_data.replace(/&quot;/g,'"'));
+  var used_in_course = JSON.parse(course_badge_data.replace(/&quot;/g,'"'));
+  function validateBadge(badge, filter){
+    return badge.name.toLowerCase() .includes(filter);
+  }
+
+  function filterBadges(){
+    filter = document.getElementById('filter').value.toLowerCase();
+
+    var filtered = badges.filter(badge => validateBadge(badge, filter));
+
+    table = document.getElementById('badge-info');
+    table.innerHTML = '';
+    
+    header_row = table.insertRow(-1);
+    th = document.createElement('th');
+    th.innerHTML = 'Badge';
+    header_row.appendChild(th);
+
+    th = document.createElement('th');
+    th.innerHTML = 'Description';
+    header_row.appendChild(th);
+
+    th = document.createElement('th');
+    th.innerHTML = 'Award Criteria';
+    header_row.appendChild(th);
+
+    th = document.createElement('th');
+    th.innerHTML = 'Use?';
+    header_row.appendChild(th);
+
+    for(var i = 0; i < filtered.length; i++){
+      let badge = filtered[i];
+      row = table.insertRow(-1);
+      
+      cell = row.insertCell(-1);
+      cell.innerHTML = badge.name;
+
+      cell = row.insertCell(-1);
+      cell.innerHTML = badge.description;
+
+      cell = row.insertCell(-1);
+      let button = document.createElement("a");
+      button.innerHTML = "Edit criteria"
+      button.setAttribute("class", "btn btn-default");
+      button.setAttribute("href", "/badge_awarding_rules?badge_id="+badge.id.toString()+"&course_id=<%= @course.id %>")
+      cell.appendChild(button);
+
+      cell = row.insertCell(-1);
+
+      let checkbox = document.createElement('input');
+
+      checkbox.type = 'checkbox';
+      checkbox.checked = used_in_course[badge.id];
+      checkbox.onclick = function(){
+        if(checkbox.checked){
+          used_in_course[badge.id] = true;
+          var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+          xmlhttp.open("POST", "/course_badges");
+          xmlhttp.setRequestHeader("Content-Type", "application/json");
+          xmlhttp.setRequestHeader("Accept", "application/json");
+          xmlhttp.setRequestHeader("X-CSRF-Token", "<%= form_authenticity_token.to_s %>");
+          xmlhttp.send(JSON.stringify({
+            course_id: <%= @course.id %>,
+            badge_id: badge.id
+          }));
+        }else{
+          if(window.confirm("This badge will not longer be usable in any assignments in this course")){
+            used_in_course[badge.id] = false;
+            var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+            xmlhttp.open("DELETE", "/course_badges/delete_badge_from_course");
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.setRequestHeader("Accept", "application/json");
+            xmlhttp.setRequestHeader("X-CSRF-Token", "<%= form_authenticity_token.to_s %>");
+            xmlhttp.send(JSON.stringify({
+              course_id: <%= @course.id %>,
+              badge_id: badge.id
+            }));
+          }else{
+            checkbox.checked = true;
+          }
+        }
+      }
+      cell.appendChild(checkbox);
+    }
+  }
+</script>
+
+<table class="table table-striped" id="badge-info" style="width: 100%">
+  Search: <input id='filter' type='text' oninput="filterBadges()">
+  <div align='right'>
+    <%= form_tag({:controller => "badges",
+                :action => "new"}, {:method => "get"}) do %>
+      <%= hidden_field_tag "referrer", "/course/" + @course.id.to_s + "/edit" %>
+      <%= submit_tag "New", class: "btn btn-default"%>
+      <%= button_tag "Award badges", onclick: "location.href='/course_badges/awarding?course_id=" + @course.id.to_s + "'" , type: :button, class: "btn btn-primary"%>
+
+  <% end %>
+  </div>
+</table>
+
+<script>
+  filterBadges();
+</script>
+
 <%= render :partial => '/shared_scripts/back' %>

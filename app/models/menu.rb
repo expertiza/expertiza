@@ -108,7 +108,7 @@ class Menu
 
   # Returns true if the specified item is selected; false if otherwise.
   def selected?(menu_id)
-    @selected.key?(menu_id) ? true : false
+    @selected.key?(menu_id)
   end
 
   def crumbs

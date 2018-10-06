@@ -53,12 +53,7 @@ class AssignmentTeam < Team
   # Topic picked by the team for the assignment
   # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
   def topic
-    team_topic = nil
-    participants.each do |p|
-      team_topic = SignedUpTeam.topic_id(p.parent_id, p.user_id)
-      break if team_topic
-    end
-    team_topic
+    SignedUpTeam.find_by(team_id: self.id, is_waitlisted: 0).try(:topic_id)
   end
 
   # Whether the team has submitted work or not

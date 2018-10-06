@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 20180817185629) do
-=======
 ActiveRecord::Schema.define(version: 20180901222912) do
->>>>>>> Change the evidence format. Add award external id to enable award revocation
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4

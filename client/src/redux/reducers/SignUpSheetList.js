@@ -1,6 +1,5 @@
 import * as actions from '../index'
 import {updateObject}  from '../../shared/utility/utility'
-import SignUpSheetComponent from '../../components/signUpSheet/SignUpSheetComponent';
 
 const initialize={
         loaded : false, 

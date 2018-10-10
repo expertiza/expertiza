@@ -12,6 +12,7 @@ class  ResponseViewComponent extends Component {
     }    
 
     render () {
+        // eslint-disable-next-line
         let title;
         var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',hour: 'numeric', minute: 'numeric', second: 'numeric'  };
         if(!this.props.loading) {
@@ -44,13 +45,13 @@ class  ResponseViewComponent extends Component {
                                 </table>
                                 <table className="table">
                                     {this.props.questions.map((i, index) =>
-                                        <tr className={(index%2)==0?"table_warning":"table_info"}>
+                                        <tr className={(index%2)===0?"table_warning":"table_info"}>
                                             <tbody>
                                                 <tr key={"question_"+index}>
                                                     <td ><span style={{"fontWeight":"bold"}}>{index+1 +". "+i.txt}</span></td>
                                                 </tr>
                                                 <table>
-                                                    <tr key={"answer_"+index} className={(index%2)==0?"table_warning":"table_info"}>
+                                                    <tr key={"answer_"+index} className={(index%2)===0?"table_warning":"table_info"}>
                                                             <td>
                                                                 <div className={"c"+this.props.answers[index].answer}
                                                                     style={{"width":"30px",

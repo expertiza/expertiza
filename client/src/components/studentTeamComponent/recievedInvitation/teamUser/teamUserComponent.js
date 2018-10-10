@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {NavLink} from 'react-router-dom'
 import axios from '../../../../axios-instance';
 
 class TeamUserComponent extends Component {

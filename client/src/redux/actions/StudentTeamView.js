@@ -63,6 +63,7 @@ export const remove_participant_student_teams = (student_id, team_id) => dispatc
     .catch(error => console.log(error)); 
 }
 
+// eslint-disable-next-line
 {/* {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} */}
 export const retractInvitation = (inv_id, student_id) => dispatch => {
     return axios({

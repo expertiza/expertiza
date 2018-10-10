@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Editor } from '@tinymce/tinymce-react';
 import Aux from '../../../hoc/Aux/Aux'
 import axios from '../../../axios-instance';
 import {NavLink} from 'react-router-dom';

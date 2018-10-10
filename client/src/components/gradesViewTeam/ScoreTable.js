@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import  { UnmountClosed as Collapse } from 'react-collapse';
-import { Table, Tooltip } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 import { Loading } from './../UI/spinner/LoadingComponent';
 
 class Scoretable extends Component {

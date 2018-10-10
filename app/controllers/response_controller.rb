@@ -283,21 +283,21 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # preparing the params for Edit and New actions
+  # assigning the instance variables for Edit and New actions
   def assign_instance_vars
     case params[:action]
-      when 'edit'
-        @header = 'Edit'
-        @next_action = 'update'
-        @response = Response.find(params[:id])
-        @map = @response.map
-        @contributor = @map.contributor
-      when 'new'
-        @header = 'New'
-        @next_action = 'create'
-        @feedback = params[:feedback]
-        @map = ResponseMap.find(params[:id])
-        @modified_object = @map.id
+    when 'edit'
+      @header = 'Edit'
+      @next_action = 'update'
+      @response = Response.find(params[:id])
+      @map = @response.map
+      @contributor = @map.contributor
+    when 'new'
+      @header = 'New'
+      @next_action = 'create'
+      @feedback = params[:feedback]
+      @map = ResponseMap.find(params[:id])
+      @modified_object = @map.id
     end
     @return = params[:return]
   end

@@ -28,6 +28,7 @@ class  ResponseViewComponent extends Component {
 
     }
     render () {
+        // eslint-disable-next-line
         let title;
         if(!this.props.loading) {
             if ( this.props.survey ) {
@@ -58,6 +59,49 @@ class  ResponseViewComponent extends Component {
                                 : <div></div>
                             }
 
+                            <div className="row" style={{paddingTop: 20, paddingLeft: 20}}>
+                                <table width="100%">
+                                    <tbody>
+                                        <tr>
+                                            <td align="left" width="70%"><b>Review</b></td>
+                                            <td align="left"><b>Last Reviewed:</b><span>
+                                            {(this.props.response.updated_at===null)?'Not Available':
+                                        new Date(this.props.response.updated_at.split('T')).toLocaleString("en-US", options)}</span></td> 
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table className="table">
+                                    {this.props.questions.map((i, index) =>
+                                        <tr className={(index%2)===0?"table_warning":"table_info"}>
+                                            <tbody>
+                                                <tr key={"question_"+index}>
+                                                    <td ><span style={{"fontWeight":"bold"}}>{index+1 +". "+i.txt}</span></td>
+                                                </tr>
+                                                <table>
+                                                    <tr key={"answer_"+index} className={(index%2)===0?"table_warning":"table_info"}>
+                                                            <td>
+                                                                <div className={"c"+this.props.answers[index].answer}
+                                                                    style={{"width":"30px",
+                                                                            "height":"30px",
+                                                                            "borderRadius":"50%",
+                                                                            "fontSize":"15px",
+                                                                            "color":"black",
+                                                                            "lineHeight":"30px",
+                                                                            "textAlign":"center"}
+                                                                            }> 
+                                                                    {this.props.answers[index].answer}
+                                                                </div>
+                                                            </td>
+                                                            <td style={{"paddingLeft":"10px"}}>
+                                                                {this.props.answers[index].comments}            
+                                                            </td>
+                                                    </tr>
+                                                </table>
+                                            </tbody> 
+                                        </tr>
+                                    )}
+                                </table>
+                                </div>
                         </div>
                     )
                 else

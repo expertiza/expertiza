@@ -27,6 +27,7 @@ class RecievedInvitationComponent extends Component {
 
     render () {
         let recievedInv;
+        // eslint-disable-next-line
         let team_id;
         if (this.props.inv.reply_status === 'W') {
             recievedInv = 

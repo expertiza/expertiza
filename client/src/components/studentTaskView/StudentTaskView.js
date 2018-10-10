@@ -30,7 +30,7 @@ class StudentTaskView extends Component {
         let panel;
         let timeline;
         if(this.props.loaded){
-            assign_name = (this.props.assignment.spec_location === null|| this.props.assignment.spec_location.length===0) ?
+            assign_name = (this.props.assignment.name !== null|| this.props.assignment.name.length!==0) ?
                  <div style={{marginTop: '10px', padding: '5px'}}>
                     <h1> Submit or Review work for { this.props.assignment.name} </h1> 
                     <div class="flash_note">
@@ -38,8 +38,8 @@ class StudentTaskView extends Component {
                     </div>
                 </div> : <h1> Submit or Review work for  link_to @assignment.name, @assignment.spec_location </h1>
 
-            link = ( this.props.assignment.spec_location && this.props.assignment.spec_location.length > 0 ) ?
-                  <NavLink className="nav-link" to="#assignment.spec_location">Assignment Description</NavLink> : null;
+            link = ( this.props.assignment.spec_location !==null && this.props.assignment.spec_location.length > 0 ) ?
+                  <a href={this.props.assignment.spec_location} className="nav-link">Assignment Description</a> : null;
                    
             panel = <div class="list-group col-md-7 " style={{marginLeft: '25px'}}>
                        {
@@ -62,11 +62,11 @@ class StudentTaskView extends Component {
                        {
                         (this.props.authorization === 'participant' || this.props.can_submit === true) ?
                              (this.props.topics.size > 0) ? 
-                                    (this.props.topic_id && this.props.submission_allowed) ?
-                                        <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} >Your work</NavLink> (Submit and view your work)</li> :
+                                    (this.props.topic_id && !this.props.submission_allowed) ?
+                                        <li><NavLink className="StudentTaskUpload" to={`/submitted_content/${this.props.participant.id}/edit`} >Your work</NavLink> (Submit and view your work)</li> :
                                         <li><font color="gray">Your work</font> <span>(You have to choose a topic first)</span></li>
                            :
-                            (this.props.submission_allowed ) ? <li><NavLink to={`/submitted_content/${this.props.participant.id}/edit`} > Your work (Submit and view your work) </NavLink></li>
+                            (!this.props.submission_allowed ) ? <li><NavLink className="StudentTaskUpload" to={`/submitted_content/${this.props.participant.id}/edit`} > Your work (Submit and view your work) </NavLink></li>
                                 :<li><font color="gray">Your work</font> <span>(You are not allowed to submit your work right now)</span></li>
                         : null 
                        }

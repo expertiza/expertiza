@@ -1,8 +1,7 @@
 CURRENT_MAINTAINERS = %w(
   efg
-  yangsong8
   Winbobob
-  ferryxo
+  TheAkbar
 )
 
 # ------------------------------------------------------------------------------

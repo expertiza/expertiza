@@ -7,7 +7,7 @@ describe Participant do
       expect(participant.name).to eq "Student"
     end
   end
-
+     # adding white space
   describe "#fullname" do
     it "returns the full name of the user" do
       expect(participant.fullname).to eq "Test, Student"

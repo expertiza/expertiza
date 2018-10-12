@@ -345,6 +345,19 @@ if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/
   fail("You should not change Dangerfile!", sticky: true)
 end
 
+# ------------------------------------------------------------------------------
+# You should not change .gitignore.
+# ------------------------------------------------------------------------------
+if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/gitignore/).empty?
+  fail("You should not change .gitignore!", sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# You should not change .mention-bot.
+# ------------------------------------------------------------------------------
+if !CURRENT_MAINTAINERS.include? github.pr_author and !git.modified_files.grep(/mention-bot/).empty?
+  fail("You should not change .mention-bot!", sticky: true)
+end
 
 # ------------------------------------------------------------------------------
 # RSpec tests should avoid shallow tests.

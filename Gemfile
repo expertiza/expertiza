@@ -8,6 +8,7 @@ gem 'activesupport', '~> 4.2.7.1'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
+gem 'cap_blue_green_deploy'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem "capistrano-db-tasks", require: false

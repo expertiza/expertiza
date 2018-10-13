@@ -1,5 +1,6 @@
 # CapistranoDbTasks (https://github.com/sgruhier/capistrano-db-tasks)
 require 'capistrano-db-tasks'
+require 'cap_blue_green_deploy'
 
 
 # if you haven't already specified
@@ -43,9 +44,9 @@ set :rvm_ruby_version, '2.2.7'
 
 # Default value for :linked_files is []
 # append :linked_files, "config/database.yml", "config/secrets.yml"
-set :linked_files, %w{config/database.yml 
-                      config/secrets.yml 
-                      public1.pem 
+set :linked_files, %w{config/database.yml
+                      config/secrets.yml
+                      public1.pem
                       private2.pem}
 
 # Default value for linked_dirs is []
@@ -54,7 +55,7 @@ set :linked_dirs, %w{log pg_data vendor/assets/components}
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
-set :default_env, { 
+set :default_env, {
   "PASSENGER_INSTANCE_REGISTRY_DIR" => "/var/run/passenger-instreg"
 }
 

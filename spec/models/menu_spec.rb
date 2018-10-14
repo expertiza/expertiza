@@ -89,6 +89,7 @@ describe Node do
   #let(:site_controller) {}
   before :all do
      @site_controller = FactoryBot.build(:site_controller, :id => 2, :name => 'fake1')
+     @controller_action = FactoryBot.build(:controller_action, id => 2, : name => 'fake1')
   end
 
   describe '#site_controller' do
@@ -96,13 +97,13 @@ describe Node do
     it 'sets site_controller instance variable from factory' do
       expect(@site_controller).to be_valid
     end
-    #it 'allows site_controller variable to be nil' do
-    #  @site_controller = nil
-    #  expect(@site_controller).to be_valid
-    #end
-    
-    #it 'should set instance variable to nil or value of site_controller' do
-    #end
+  end
+
+  describe '#controller_action' do
+    context "for controller_action not nil "
+    it 'sets controller_ action instance variable from factory' do
+      expect(@controller_action).to be_valid
+    end
   end
 
 

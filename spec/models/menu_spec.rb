@@ -83,6 +83,24 @@ describe Node do
     end
   end
 
+  describe '#site_controller' do
+    before (:example)  do
+     @foundid = FactoryBot.build(:site_controller, :id => 2, :name => 'fake1')
+    end
+    it 'sets site_controller instance variable from factory' do
+      site_controller = @foundid
+      expect(site_controller == @foundid).to be_truthy
+    end
+    it 'sets site_controller instance variable to nil' do
+      site_controller = nil
+      expect(site_controller).to be_nil
+    end
+    it 'sets site_controller from nil to the find site_cpntroller_id' do
+      site_controller = nil
+      expect {site_controller = @foundid}.to change{site_controller}.from(nil).to(@foundid)
+    end
+  end
+
   # it '#site_controller' do
     # expect(node.site_controller).to eq('Fill this in by hand')
   # end

@@ -1,3 +1,6 @@
+require 'spec_helper.rb'
+require 'rails_helper.rb' 
+
 describe Node do
   ###
   # Please do not share this file with other teams.
@@ -83,13 +86,25 @@ describe Node do
     end
   end
 
-  # it '#site_controller' do
-    # expect(node.site_controller).to eq('Fill this in by hand')
-  # end
+  #let(:site_controller) {}
+  before :all do
+     @site_controller = FactoryBot.build(:site_controller, :id => 2, :name => 'fake1')
+  end
 
-  # it '#controller_action' do
-    # expect(node.controller_action).to eq('Fill this in by hand')
-  # end
+  describe '#site_controller' do
+    context "for site_controller not nil "
+    it 'sets site_controller instance variable from factory' do
+      expect(@site_controller).to be_valid
+    end
+    #it 'allows site_controller variable to be nil' do
+    #  @site_controller = nil
+    #  expect(@site_controller).to be_valid
+    #end
+    
+    #it 'should set instance variable to nil or value of site_controller' do
+    #end
+  end
+
 
   # it '#content_page' do
   #   expect(node.content_page).to eq('Fill this in by hand')

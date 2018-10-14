@@ -87,13 +87,12 @@ describe Node do
   end
 
   #let(:site_controller) {}
-  before :all do
-     @foundid = FactoryBot.build(:site_controller, :id => 2, :name => 'fake1')
-     #@controller_action = FactoryBot.build(:controller_action, id => 2, :name => 'fake1')
-  end
+  
 
   describe '#site_controller' do
-    context "for site_controller not nil "
+    before (:example)  do
+     @foundid = FactoryBot.build(:site_controller, :id => 2, :name => 'fake1')
+    end
     it 'sets site_controller instance variable from factory' do
       site_controller = @foundid
       expect(site_controller == @foundid).to be_truthy

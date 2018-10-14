@@ -1,39 +1,41 @@
 describe Node do
-  ###
-  # Please do not share this file with other teams.
-  # Use factories to `build` necessary objects.
-  # Please avoid duplicated code as much as you can by moving the code to `before(:each)` block or separated methods.
-  # RSpec tutorial video (until 9:32): https://youtu.be/dzkVfaKChSU?t=35s
-  # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
-  ###
-
   let(:node) do
     Menu::Node.new
   end
 
+  let(:item) do
+    double('Item',
+           parent_id: 1,
+           name: 'test_name',
+           id: 2,
+           label: 'test_label',
+           controller_action: nil
+    )
+  end
+
+  let(:controller_action) do
+    double('ControllerAction', id: 99, name: 'test_controller_action', url_to_use: 'https://test_url.com')
+  end
+
+  let(:controller) do
+    double('Controller', id: 3, name: 'test_controller')
+  end
+
+  let(:content_page) do
+    double('ContentPage', id: 1, name: 'test_content_page_name')
+  end
+
+  let(:child_node) do
+    Menu::Node.new
+  end
+
+  describe '#initialize' do
+    it 'sets parent to nil' do
+        expect(node.parent).to eq(nil)
+    end
+  end
+
   describe '#setup' do
-    let(:item) do
-      double('Item',
-        parent_id: 1,
-        name: 'test_name',
-        id: 2,
-        label: 'test_label',
-        controller_action: nil
-      )
-    end
-
-    let(:controller_action) do
-      double('ControllerAction', id: 99, name: 'test_controller_action', url_to_use: 'https://test_url.com')
-    end
-
-    let(:controller) do
-      double('Controller', id: 3, name: 'test_controller')
-    end
-
-    let(:content_page) do
-      double('ContentPage', id: 1, name: 'test_content_page_name')
-    end
-
     it 'sets up basic fields' do
       allow(item).to receive_message_chain(:content_page, :name)
       node.setup(item)
@@ -113,22 +115,27 @@ describe Node do
   #   expect(node.content_page).to eq('Fill this in by hand')
   # end
 
-  # it '#add_child' do
-    # expect(node.add_child('Missing "child"')).to eq('Fill this in by hand')
-  # end
+  describe '#add_child' do
+    it 'adds one child to node' do
+      allow(item).to receive(:content_page).and_return(content_page)
+      child_node.setup(item)
+      expect(node.add_child(child_node)).to eq(node.children)
+    end
+
+    it 'adds multiple children to node' do
+      allow(item).to receive(:content_page).and_return(content_page)
+      child_node.setup(item)
+      expect(node.add_child(child_node)).to eq(node.children)
+      expect(node.add_child(child_node)).to eq(node.children)
+      expect(node.add_child(child_node)).to eq(node.children)
+    end
+  end
 end
 
 describe Menu do
   let(:menu) do
     Menu.new
   end
-
-  # let(:menu1) { double(:menu) }
-  # describe '#initialize' do
-    # it 'sets parent to nil' do
-      # expect(menu1.initialize).parent.to eq(nil)
-    # end
-  # end
 
   # it '#select' do
     # expect(menu.select('Missing "name"')).to eq('Fill this in by hand')

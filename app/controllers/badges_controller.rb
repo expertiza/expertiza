@@ -5,6 +5,7 @@ class BadgesController < ApplicationController
   require 'rest-client'
   require 'base64'
   require 'open-uri'
+  require 'fileutils'
 
   @@x_api_key =  CREDLY_CONFIG["api_key"]
   @@x_api_secret = CREDLY_CONFIG["api_secret"]
@@ -47,7 +48,6 @@ class BadgesController < ApplicationController
   def do_create_badge
     result = create_badge_in_credly
     # save badge info in local db
-
     newBadge = Badge.new(:name => params['badge']['name'],
               :description => params['badge']['description'],
               :image_url => params['image-icon'],
@@ -67,7 +67,6 @@ class BadgesController < ApplicationController
     image_file = open(file_url)
     directory = get_icon_directory_path
     IO.copy_stream(image_file, directory + file_name) unless File.file?(directory + file_name)
-
     # convert image to
     image_icon = Base64.encode64(image_file.read)
     form_data = {:title => params['badge']['name'],
@@ -81,7 +80,6 @@ class BadgesController < ApplicationController
                "X-Api-Secret": @@x_api_secret}
     url = CREDLY_CONFIG["credly_api_url"] + "badges?access_token=" + tokens.access_token
     response = RestClient.post(url, form_data, headers=headers)
-
     return JSON.parse(response.to_str)
   end
 
@@ -114,6 +112,10 @@ class BadgesController < ApplicationController
 
   def get_icon_directory_path()
     directory = Rails.root.join('app', 'assets', 'images', 'badges', current_user.id.to_s)
+    unless File.directory?(directory)
+      FileUtils.mkdir_p(directory)
+    end
+    directory
   end
 
   # def list

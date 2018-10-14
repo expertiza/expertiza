@@ -1,14 +1,12 @@
 describe Node do
-  ###
-  # Please do not share this file with other teams.
-  # Use factories to `build` necessary objects.
-  # Please avoid duplicated code as much as you can by moving the code to `before(:each)` block or separated methods.
-  # RSpec tutorial video (until 9:32): https://youtu.be/dzkVfaKChSU?t=35s
-  # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
-  ###
-
   let(:node) do
     Menu::Node.new
+  end
+
+  describe '#initialize' do
+    it 'sets parent to nil' do
+        expect(node.parent).to eq(nil)
+    end
   end
 
   describe '#setup' do
@@ -104,13 +102,6 @@ describe Menu do
   let(:menu) do
     Menu.new
   end
-
-  # let(:menu1) { double(:menu) }
-  # describe '#initialize' do
-    # it 'sets parent to nil' do
-      # expect(menu1.initialize).parent.to eq(nil)
-    # end
-  # end
 
   # it '#select' do
     # expect(menu.select('Missing "name"')).to eq('Fill this in by hand')

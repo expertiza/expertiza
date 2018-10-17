@@ -92,16 +92,7 @@ class CourseController < ApplicationController
     @course.instructor_id = session[:user].id
     begin
       @course.save!
-      parent_id = CourseNode.get_parent_id
-      if parent_id
-        @course_node = CourseNode.new
-        @course_node.node_object_id = @course.id
-        @course_node.parent_id = parent_id
-      else
-        @course_node = CourseNode.new
-        @course_node.node_object_id = @course.id
-      end
-      @course_node.save
+      create_course_node
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'
@@ -121,19 +112,6 @@ class CourseController < ApplicationController
     end
     @course.destroy
     undo_link("The course \"#{@course.name}\" has been successfully deleted.")
-    redirect_to controller: 'tree_display', action: 'list'
-  end
-
-  def toggle_access
-    @course = Course.find(params[:id])
-    @course.private = !@course.private
-    begin
-      @course.save!
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
-    end
-    @access = @course.private == true ? "private" : "public"
-    undo_link("The course \"#{@course.name}\" has been successfully made #{@access}.")
     redirect_to controller: 'tree_display', action: 'list'
   end
 
@@ -176,5 +154,17 @@ class CourseController < ApplicationController
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
     render action: 'remove_ta.js.erb', layout: false
+  end
+
+  def create_course_node
+    parent_id = CourseNode.get_parent_id
+    @course_node = CourseNode.new
+    if parent_id
+      @course_node.node_object_id = @course.id
+      @course_node.parent_id = parent_id
+    else
+      @course_node.node_object_id = @course.id
+    end
+    @course_node.save
   end
 end

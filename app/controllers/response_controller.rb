@@ -36,6 +36,13 @@ class ResponseController < ApplicationController
     end
   end
 
+  # GET /response/json?response_id=xx
+  def json
+    response_id = params[:response_id] if params.key?(:response_id)
+    response = Response.find(response_id)
+    render :json => response
+  end
+
   def delete
     @response = Response.find(params[:id])
     # user cannot delete other people's responses. Needs to be authenticated.
@@ -67,12 +74,13 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
+    @questionnaire = set_questionnaire
     render action: 'response'
   end
 
   # Update the response and answers when student "edit" existing response
   def update
-    return unless action_allowed?
+    render :nothing => true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
@@ -92,7 +100,9 @@ class ResponseController < ApplicationController
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id,
+      return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
   def new
@@ -104,6 +114,14 @@ class ResponseController < ApplicationController
     @modified_object = @map.id
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
+    # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
+    # The response must be created when the review begin.
+    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
+    # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
+    @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
+    @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
+    questions = sort_questions(@questionnaire.questions)
+    init_answers(questions)
     render action: 'response'
   end
 
@@ -144,22 +162,18 @@ class ResponseController < ApplicationController
     end
 
     is_submitted = (params[:isSubmit] == 'Yes')
-
-    if params[:saved].nil? || params[:saved] == "0" # a flag so the autosave doesn't create different versions. The value's changed by the javascript in response.js
+    was_submitted = false
+    @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    if @response.nil?
       @response = Response.create(
           map_id: @map.id,
           additional_comment: params[:review][:comments],
-          round: @round,
+          round: @round.to_i,
           is_submitted: is_submitted
       )
-    else
-      @response = Response.find_by(map_id: @map.id, round: @round)
-      if !@response.nil?
-        @response.update(additional_comment: params[:review][:comments]) # ignore if autoupdate try to save when the response object is not yet created.
-      else
-        logger.error("Can't find response with '#{@map.id}' and round '#{@round}' to update, even though params[:saved] = #{params[:saved]}")
-      end
     end
+    was_submitted = @response.is_submitted
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
 
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -167,23 +181,32 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-    # @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-    # @response.email
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+    # only notify if is_submitted changes from false to true
+    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+      @response.notify_instructor_on_difference
+      @response.email
+    end
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id,
+      return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    # Award Good Teammate Badge
-    if @map.assignment.has_badge? and @map.is_a? TeammateReviewResponseMap
-      participant = Participant.find_by(id: @map.reviewee_id)
-      teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
-      badge_id = Badge.get_id_from_name('Good Teammate')
-      assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
-      AwardedBadge.award(participant.id, teammate_review_score, assignment_badge.try(:threshold), badge_id)
+    participant = Participant.find_by(id: @map.reviewee_id)
+    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
+    if @map.assignment.has_badge?
+      if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Teammate')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
+      if @map.is_a? FeedbackResponseMap and params[:review][:good_reviewer_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Reviewer')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
     end
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
@@ -328,6 +351,14 @@ class ResponseController < ApplicationController
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       score.update_attribute('answer', v[:score])
       score.update_attribute('comments', v[:comment])
+    end
+  end
+
+  def init_answers(questions)
+    questions.each do |q|
+      # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
+      a = Answer.where(response_id: @response.id, question_id: q.id).first
+      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
     end
   end
 

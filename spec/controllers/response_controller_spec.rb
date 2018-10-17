@@ -3,6 +3,7 @@ describe ResponseController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
   let(:review_response) { build(:response, id: 1, map_id: 1) }
+  let(:review_response_round1) { build(:response, id: 1, map_id: 1, round: 1, is_submitted: 0) }
   let(:review_response_map) { build(:review_response_map, id: 1, reviewer: participant) }
   let(:questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
@@ -95,8 +96,9 @@ describe ResponseController do
             comments: 'some comments'
           }
         }
-        post :update, params
-        expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21')
+        session = {user: instructor}
+        post :update, params, session
+        expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
       end
     end
 
@@ -119,8 +121,9 @@ describe ResponseController do
           },
           isSubmit: 'No'
         }
-        post :update, params
-        expect(response).to redirect_to('/response/saving?id=1&msg=')
+        session = {user: instructor}
+        post :update, params, session
+        expect(response).to redirect_to('/response/saving?id=1&msg=&review%5Bcomments%5D=some+comments')
       end
     end
   end
@@ -134,10 +137,13 @@ describe ResponseController do
       # varying_rubrics_by_round?
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
       # review_questionnaire_id
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: nil).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
       # set_dropdown_or_scale
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire])
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
+      allow(Questionnaire).to receive(:questions).and_return(question)
+      allow(Answer).to receive(:create).and_return(answer)
       params = {
         id: 1,
         feedback: '',
@@ -197,6 +203,7 @@ describe ResponseController do
   describe '#create' do
     it 'creates a new response and redirects to response#saving page' do
       allow(Response).to receive(:where).with(map_id: 1).and_return([review_response])
+      allow(Response).to receive(:where).with(map_id: 1, round: 1).and_return([review_response_round1])
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
       allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
@@ -214,7 +221,7 @@ describe ResponseController do
         isSubmit: 'No'
       }
       post :create, params
-      expect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.')
+      expect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
     end
   end
 
@@ -226,7 +233,8 @@ describe ResponseController do
         id: 1,
         return: ''
       }
-      post :saving, params
+      session = {user: instructor}
+      post :saving, params, session
       expect(response).to redirect_to('/response/redirection?id=1&return=')
     end
   end

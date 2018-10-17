@@ -18,7 +18,7 @@ class Response < ActiveRecord::Base
     id
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -32,7 +32,7 @@ class Response < ActiveRecord::Base
       self_id = self.id.to_s
       code = construct_student_html identifier, self_id, count
     end
-    code = construct_review_response code, self_id
+    code = construct_review_response code, self_id, show_tags, current_user
     code.html_safe
   end
 
@@ -233,7 +233,7 @@ class Response < ActiveRecord::Base
 						 '</tr></table>'
   end
 
-  def construct_review_response code, self_id
+  def construct_review_response code, self_id, show_tags = nil, current_user = nil
     code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
@@ -241,8 +241,8 @@ class Response < ActiveRecord::Base
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
-      tag_prompt_deployments = TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id)
-      code = add_table_rows questionnaire_max, questions, answers, code
+      tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
+      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
@@ -253,7 +253,7 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max, questions, answers, code
+  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
@@ -263,10 +263,13 @@ class Response < ActiveRecord::Base
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
-        code += if question.instance_of? Criterion or question.instance_of? Scale
-                  question.view_completed_question(count, answer, questionnaire_max)
+        code += if question.instance_of? Criterion
+                  #Answer Tags are enabled only for Criterion questions at the moment.
+                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
+                elsif question.instance_of? Scale
+                  question.view_completed_question(count, answer, questionnaire_max) || ''
                 else
-                  question.view_completed_question(count, answer)
+                  question.view_completed_question(count, answer) || ''
                 end
       end
       code += '</td></tr>'

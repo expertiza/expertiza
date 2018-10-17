@@ -74,9 +74,11 @@ module GradesHelper
     questionnaires.each do |questionnaire|
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
                  AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+               else
+                 nil
                end
       next unless questionnaire.type == type
-      vm = VmQuestionResponse.new(questionnaire, @assignment)
+      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
       questions = questionnaire.questions
       vm.add_questions(questions)
       vm.add_team_members(@team)

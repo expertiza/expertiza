@@ -2,7 +2,7 @@
 
 
   <%= form_for @assignment_form.assignment, html: { id: 'assignment_form' } do %>
-    <div class= "chart-table" id="tabs">
+    <div class= "table" id="tabs">
       <ul>
         <li><a href="#tabs-1" id="General">General</a></li>
         <li><a href="#tabs-2" id="Topics">Topics</a></li>
@@ -13,14 +13,15 @@
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <% end %>
         <% if @assignment_form.assignment.has_badge? %>
-          <li><a href="#tabs-7" id="Badges">Badges</li>
+          <li><a href="#tabs-7" id="Badges">Badges</a></li>
         <% end %>
+        <li><a href="#tabs-8" id="Other">Other stuff</a></li>
       </ul>
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
       </div>
       <div id="tabs-2">
-        <h1>Topics for <%= @assignment_form.assignment.name %> assignment</h1>
+        <h3>Topics for <%= @assignment_form.assignment.name %> assignment</h3><br>
             <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
             <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
@@ -35,7 +36,7 @@
             <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
             <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
             <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>
-            <img src="/assets/info.png" title="If checked, it is possible that the auhtors review another artifact on the same topic "/>
+            <img src="/assets/info.png" title="If checked, it is possible that the authors review another artifact on the same topic "/>
             <br>
 
             <input name="assignment_form[assignment][can_choose_topic_to_review]" type="hidden" value="false"/>
@@ -72,7 +73,12 @@
           <%= render 'assignments/edit/badges' %>
         </div>
       <% end %>
-      <%= button_tag "Save", :id => 'submit_btn' %> | <%= render :partial => '/shared_scripts/back' %>
+      <div id="tabs-8">
+        <%= render 'assignments/edit/other' %>
+      </div>
+      <div style="margin-bottom: 20px">
+      <%= button_tag "Save", :id => 'submit_btn', class: 'btn btn-md btn-default', :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
+      </div>
     </div>
     <script>
       var useBookmarkChanged = function () {
@@ -93,7 +99,7 @@
         jQuery("#submit_btn").click(function(e) {
           var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
           if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
-              alert("Maxinum number of members per team must be greater than 1!");
+              alert("Maximum number of members per team must be greater than 1!");
               e.preventDefault()
           }
         })
@@ -104,7 +110,7 @@
             var max_team_size = jQuery('#assignment_form_assignment_max_team_size').val();
             if (max_team_size == '1' && jQuery('#team_assignment').is(':checked')) {
               deleteTeam = 1;
-              alert("Maxinum number of members per team must be greater than 1!");
+              alert("Maximum number of members per team must be greater than 1!");
             }
             if (deleteTeam == 0) {
               jQuery.ajax({

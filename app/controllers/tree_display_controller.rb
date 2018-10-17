@@ -152,9 +152,24 @@ class TreeDisplayController < ApplicationController
   end
 
   # getting result nodes for child
+  # Changes to this method were done as part of E1788_OSS_project_Maroon_Heatmap_fixes
+  #
+  # courses_assignments_obj method makes a call to update_in_ta_course_listing which
+  # separates out courses based on if he/she is the TA for the course passed
+  # by marking private to be true in that case
+  #
+  # this also ensures that instructors (who are not ta) would have update_in_ta_course_listing
+  # not changing the private value if he/she is not TA which was set to true for all courses before filtering
+  # in update_tmp_obj in courses_assignments_obj
+  #
+  # below objects/variable names were part of the project as before and
+  # refactoring could have affected other functionalities too, so it was avoided in this fix
+  #
+  # fix comment end
+  #
   def res_node_for_child(tmp_res)
     res = {}
-    tmp_res.keys.each do |node_type|
+    tmp_res.each_key do |node_type|
       res[node_type] = []
       tmp_res[node_type].each do |node|
         tmp_object = {
@@ -162,7 +177,7 @@ class TreeDisplayController < ApplicationController
           "name" => node.get_name,
           "type" => node.type
         }
-        courses_assignments_obj(node_type, tmp_object, node) if node_type == 'Courses' || node_type == "Assignments"
+        courses_assignments_obj(node_type, tmp_object, node) if %w[Courses Assignments].include? node_type
         res[node_type] << tmp_object
       end
     end
@@ -188,41 +203,37 @@ class TreeDisplayController < ApplicationController
 
   # for child nodes
   def children_node_ng
-    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? (params[:reactParams][:child_nodes])
+    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
     child_nodes.each do |node|
       initialize_fnode_update_children(params, node, tmp_res)
     end
     res = res_node_for_child(tmp_res)
+    res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')
     respond_to do |format|
       format.html { render json: res }
     end
   end
 
   # check if nodetype is coursenode
-  def is_type_coursenode?(ta_mappings, node)
-    ta_mappings.each do |ta_mapping|
-      return true if ta_mapping.course_id == node.node_object_id
-    end
+  def course_node_for_current_ta?(ta_mappings, node)
+    ta_mappings.each {|ta_mapping| return true if ta_mapping.course_id == node.node_object_id }
+    false
   end
 
   # check if nodetype is assignmentnode
-  def is_type_assignmentnode?(ta_mappings, node)
+  def assignment_node_for_current_ta?(ta_mappings, node)
     course_id = Assignment.find(node.node_object_id).course_id
-    ta_mappings.each do |ta_mapping|
-      return true if ta_mapping.course_id == course_id
-    end
+    ta_mappings.each {|ta_mapping| return true if ta_mapping.course_id == course_id }
+    false
   end
 
   # check if user is ta for current course
   def ta_for_current_course?(node)
     ta_mappings = TaMapping.where(ta_id: session[:user].id)
-    if node.type == "CourseNode"
-      return true if is_type_coursenode?(ta_mappings, node)
-    elsif node.type == "AssignmentNode"
-      return true if is_type_assignmentnode?(ta_mappings, node)
-    end
+    return course_node_for_current_ta?(ta_mappings, node) if node.is_a? CourseNode
+    return assignment_node_for_current_ta?(ta_mappings, node) if node.is_a? AssignmentNode
     false
   end
 
@@ -273,7 +284,7 @@ class TreeDisplayController < ApplicationController
           "creation_date" => child.get_creation_date,
           "updated_date" => child.get_modified_date
         }
-        coursenode_assignmentnode(res2, child) if node_type == 'CourseNode' || node_type == "AssignmentNode"
+        coursenode_assignmentnode(res2, child) if %w[CourseNode AssignmentNode].include? node_type
         res << res2
       end
     end
@@ -342,7 +353,7 @@ class TreeDisplayController < ApplicationController
       end
     end
     qid
-   end
+  end
 
   def filter
     qid = 'filter+'

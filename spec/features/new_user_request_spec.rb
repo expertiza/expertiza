@@ -12,7 +12,7 @@ describe 'new user request' do
     it 'works correctly', js: true do
       # click 'REQUEST ACCOUNT' button on root path, redirect to users#request_new page
       visit '/'
-      click_link 'REQUEST ACCOUNT'
+      click_link 'Request account'
       expect(page).to have_current_path('/users/request_new?role=Instructor')
       select 'Instructor', from: 'user_role_id'
       fill_in 'user_name', with: 'requester'
@@ -93,7 +93,7 @@ describe 'new user request' do
           visit '/'
           fill_in 'login_name', with: 'approved_requster1'
           fill_in 'login_password', with: 'password'
-          click_button 'SIGN IN'
+          click_button 'Sign in'
           expect(page).to have_current_path("/student_task/list")
         end
       end

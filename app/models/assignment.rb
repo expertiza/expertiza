@@ -425,11 +425,20 @@ class Assignment < ActiveRecord::Base
   end
 
   def review_questionnaire_id(round = nil)
-    rev_q_ids = AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+    # Get the round it's in from the next duedates
+    if round.nil?
+      next_due_date = DueDate.get_next_due_date(self.id)
+      round = next_due_date.try(:round)
+    end
     # for program 1 like assignment, if same rubric is used in both rounds,
     # the 'used_in_round' field in 'assignment_questionnaires' will be null,
     # since one field can only store one integer
     # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+    rev_q_ids = if round.nil?
+                  AssignmentQuestionnaire.where(assignment_id: self.id)
+                else
+                  AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+                end
     if rev_q_ids.empty?
       AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
         rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
@@ -610,7 +619,7 @@ class Assignment < ActiveRecord::Base
       export_individual_data_fields(review_type, score_name)
     end
     tcsv.push(pscore[:total_score])
- end
+  end
 
   def self.export_individual_data_fields(review_type, score_name)
     if pscore[review_type]

@@ -5,6 +5,8 @@ language: ruby
 dist: trusty
 cache:
   bundler: true
+  directories:
+    - vendor/assets/components
 rvm:
   - 2.2.7
 branches:
@@ -30,6 +32,7 @@ before_script:
   - cp config/secrets.yml.example config/secrets.yml
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
   - bundle install
+  - bundle exec danger
   - bundle exec rake db:setup
   # Test coverage offered by Code Climate
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -52,5 +55,9 @@ notifications:
     recipients:
       - expertiza-support@lists.ncsu.edu
     on_success: change
-    on_failure: change
+    on_failure: always
   slack: expertiza-support:DS8GtpbAybxHVwwYNRvvbb39
+  webhooks:
+    urls:
+      - https://www.travisbuddy.com/
+    on_success: never

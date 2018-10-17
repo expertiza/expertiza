@@ -1,7 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<%= form_tag :action => 'response_report', :id => @id do %>
-  <select name='report[type]' style="width: 15em">
+<%= form_tag :action => 'response_report', :id => @id, :class => "form-inline" do %>
+  <table>
+    <tr>
+      <td><select name='report[type]' style="width: 15em" class="form-control">
     <option value='ReviewResponseMap' selected>
       Review report
     </option>
@@ -22,10 +24,10 @@
       </option>
     <% end %>
     <option value='SummaryByCriteria' >
-      Summary by Criteria
+      Aggregated comments by rubric question
     </option>
     <option value='SummaryByRevieweeAndCriteria' >
-      Summary by Reviewee and Criteria
+      Comment summary by reviewee (team)
     </option>
     <option value='Collusion' >
       Potential collusion report
@@ -35,11 +37,16 @@
     </option>
     <% if @assignment.simicheck > -1 %>
         <option value='PlagiarismCheckerReport' >
-          Plagiarism Checker Report
+          Plagiarism checker report
         </option>
     <% end %>
-  </select>
-  <%= submit_tag("Submit") %>
+  </select></td>
+      <td align = "right"><%= submit_tag("View", :class => "btn btn-default") %></td>
+    </tr>
+
+  </table>
+  
+  
 <% end %>
 
 <% if @type == "ReviewResponseMap" %>
@@ -51,14 +58,14 @@
       </div>
 
 
-      <div id="searchform" style = " border: solid; border-width: 1px; border-color: #986633;">
+      <div id="searchform">
 
         <%= form_for :user, :url => {:action => 'response_report', :id => @id} do |n| %>
             <table>
               <tr>
                 <th>Reviewer's Name</th>
-                <td><%= n.text_field :fullname %></td>
-                <td align = "right"><%= submit_tag "Search"%></td>
+                <td><%= n.text_field :fullname, :class => "form-control"%></td>
+                <td align = "right"><%= submit_tag "Search", :class => "btn btn-default"%></td>
               </tr>
 
             </table>

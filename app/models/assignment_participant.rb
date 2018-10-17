@@ -22,7 +22,6 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2
   attr_accessor :avg_vol_in_round_3
-  #attr_accessible 
 
   def dir_path
     assignment.try :directory_path
@@ -288,5 +287,4 @@ class AssignmentParticipant < Participant
     end
     stage
   end
-
 end

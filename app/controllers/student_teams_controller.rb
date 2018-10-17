@@ -62,6 +62,7 @@ class StudentTeamsController < ApplicationController
     if existing_assignments.empty?
       if params[:team][:name].blank?
         flash[:notice] = 'The team name is empty.'
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
         redirect_to view_student_teams_path student_id: student.id
         return
       end
@@ -76,6 +77,7 @@ class StudentTeamsController < ApplicationController
 
     else
       flash[:notice] = 'That team name is already in use.'
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Team name being created was already in use', request)
       redirect_to view_student_teams_path student_id: student.id
     end
   end
@@ -98,7 +100,7 @@ class StudentTeamsController < ApplicationController
 
     else
       flash[:notice] = 'That team name is already in use.'
-
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)
       redirect_to edit_student_teams_path team_id: params[:team_id], student_id: params[:student_id]
 
     end
@@ -116,12 +118,7 @@ class StudentTeamsController < ApplicationController
   def remove_participant
     # remove the record from teams_users table
     team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
-
-    if team_user
-      team_user.destroy_all
-      undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
-    end
-
+    remove_team_user(team_user)
     # if your old team does not have any members, delete the entry for the team
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
@@ -147,15 +144,18 @@ class StudentTeamsController < ApplicationController
         end
       end
     end
-
     # remove all the sent invitations
     old_invites = Invitation.where from_id: student.user_id, assignment_id: student.parent_id
-
     old_invites.each(&:destroy)
-
     student.save
-
     redirect_to view_student_teams_path student_id: student.id
+  end
+
+  def remove_team_user(team_user)
+    return false unless team_user
+    team_user.destroy_all
+    undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
   end
 
   def team_created_successfully(current_team = nil)
@@ -164,6 +164,7 @@ class StudentTeamsController < ApplicationController
     else
       undo_link "The team \"#{team.name}\" has been successfully updated."
     end
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
   end
 
   def review

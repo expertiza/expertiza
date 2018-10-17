@@ -2,16 +2,18 @@
  * Created by ferry on 3/8/16.
  */
 
-var mImg = "/assets/arrow_down.png";
-var pImg = "/assets/arrow_right.png";
+var mImg = "/assets/expand.png";
+var pImg = "/assets/collapse.png";
 $(document).ready(function(){
 
-    // used for instructor's summary
-    $('.header_class').click(function(){
-        if($(this).find("img").attr("src") == mImg){
-            $(this).find("img").attr("src", pImg)
+    // toggle icon collapse
+    $('.header_class').click(function(e){
+        e.preventDefault();
+        var a = $(this).find("img");
+        if(a.attr("src") == mImg){
+            a.attr("src", pImg)
         }else {
-            $(this).find("img").attr("src", mImg)
+            a.attr("src", mImg)
         }
     });
 

@@ -157,6 +157,7 @@ class UsersController < ApplicationController
         prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
         prepared_mail.deliver
       end
+      ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
       flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
       redirect_to '/instructions/home'
       return
@@ -165,6 +166,7 @@ class UsersController < ApplicationController
     else
       flash[:error] = requested_user.errors.full_messages.to_sentence
     end
+    ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
     redirect_to controller: 'users', action: 'request_new', role: 'Student'
   end
 

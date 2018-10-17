@@ -28,6 +28,12 @@ module InstructorInterfaceHelperSpec
     set_assignment_due_date
   end
 
+  def course_setup
+    create(:course)
+    create_list(:participant, 3)
+    create(:course_node)
+  end
+
   def import_topics(filepath)
     login_as("instructor6")
     visit '/assignments/1/edit'

@@ -1,10 +1,9 @@
-<table>
+<table class="table table-striped" style="width: 100%">
   <thead>
   <tr>
     <th>Badge</th>
     <th>Name</th>
     <th>Description</th>
-    <th>Threshold</th>
   </tr>
   </thead>
   <tbody>
@@ -13,9 +12,19 @@
       <td style="text-align:center"><img width = "30px" src=<%= "/assets/badges/#{badge.image_name}" %> title="<%= badge.name %>"></td>
       <td><%= badge.name %></td>
       <td><%= badge.description %></td>
-      <% badge_threshold =  AssignmentBadge.find_by(assignment_id: params[:id], badge_id: badge.id).threshold rescue 95 %>
-      <td><%= number_field_tag("assignment_form[badge][badge_#{badge.name}_threshold]", badge_threshold ,min: 0, max: 100, maxlength: 3, size: 3, style: 'width: 4em') %></td>
+      <!-- If a badge is already assigned to an assignment, the checkbox for the badge will be checked -->
+      <% if @assigned_badges.where(id: badge.id).any? %>
+        <td><input type="checkbox" name=<%="assignment_form[badge][id][#{badge.id}]"%> checked></td>
+      <% else %>
+        <td><input type="checkbox" name=<%="assignment_form[badge][id][#{badge.id}]"%>></td>
+      <% end %>
     </tr>
   <% end %>
+  <tr>
+    <%= form_tag({:controller => "badges",
+                  :action => "new"}, {:method => "get"}) do %>
+      <td><%= submit_tag "+" %></td>
+    <% end %>
+  </tr>
   </tbody>
 </table>

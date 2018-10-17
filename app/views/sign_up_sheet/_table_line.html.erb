@@ -1,17 +1,13 @@
 <td><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
-
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>
   <% if @assignment.microtask? %>
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
-
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
-
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
-
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %></td>
   <% end %>

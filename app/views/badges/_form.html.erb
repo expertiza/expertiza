@@ -1,0 +1,15 @@
+<%= error_messages_for 'badge' %>
+
+<!--[form:badge]-->
+<p><label for="badge_name">Name</label><br/>
+  <%= text_field 'badge', 'name'  %></p>
+
+<p><label for="badge_description">Description</label><br/>
+  <%= text_area 'badge', 'description', :rows => 3 %> </p>
+
+  <%= hidden_field 'badge', 'image_name' %>
+
+<p><label for="badge_image_file">Image File</label><br/>
+  <%= file_field 'badge', 'image_file'  %></p>
+
+<!--[eoform:badge]-->

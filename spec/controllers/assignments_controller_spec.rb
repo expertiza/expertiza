@@ -3,7 +3,7 @@ describe AssignmentsController do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
-  let(:assignment_form) { double('AssignmentForm') }
+  let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
@@ -106,7 +106,12 @@ describe AssignmentsController do
     before(:each) do
       allow(AssignmentForm).to receive(:new).with(any_args).and_return(assignment_form)
       @params = {
+        button: '',
         assignment_form: {
+          assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
+                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          due_date: [{"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"1", "due_at"=>"2017/12/05 00:00", "submission_allowed_id"=>"3", "review_allowed_id"=>"1", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}, 
+                    {"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"2", "due_at"=>"2017/12/02 00:00", "submission_allowed_id"=>"1", "review_allowed_id"=>"3", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}], 
           assignment: {
             instructor_id: 2,
             course_id: 1,
@@ -134,7 +139,10 @@ describe AssignmentsController do
       it 'redirets to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
+        allow(assignment).to receive(:id).and_return(1)
+        allow(Assignment).to receive(:find_by_name).with('test assignment').and_return(assignment)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
@@ -162,7 +170,8 @@ describe AssignmentsController do
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         params = {id: 1}
-        get :edit, params
+        session = {user: instructor}
+        get :edit, params, session
         expect(flash.now[:error]).to eq("You did not specify all the necessary rubrics. You need <b>[AuthorFeedback, TeammateReview] "\
           "</b> of assignment <b>test assignment</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>.")
         expect(controller.instance_variable_get(:@metareview_allowed)).to be false
@@ -183,7 +192,8 @@ describe AssignmentsController do
             id: 1,
             course_id: 1
           }
-          post :update, params
+          session = {user: instructor}
+          post :update, params, session
           expect(flash[:note]).to eq('The assignment was successfully saved.')
           expect(response).to redirect_to('/tree_display/list')
         end
@@ -196,7 +206,8 @@ describe AssignmentsController do
             id: 1,
             course_id: 1
           }
-          post :update, params
+          session = {user: instructor}
+          post :update, params, session
           expect(flash[:error]).to eq('Failed to save the assignment: ')
           expect(response).to redirect_to('/assignments/1/edit')
         end
@@ -211,6 +222,9 @@ describe AssignmentsController do
         @params = {
           id: 1,
           course_id: 1,
+          set_pressed: {
+              bool: 'true'
+          },
           assignment_form: {
             assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
                                         "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
@@ -241,7 +255,8 @@ describe AssignmentsController do
         it 'shows an error message and redirects to assignments#edit page' do
           instructor.timezonepref = nil
           allow(User).to receive(:find).and_return(double('User', timezonepref: 'Eastern Time (US & Canada)'))
-          post :update, @params
+          session = {user: instructor}
+          post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. "\
                                       "For now we assume you are in Eastern Time (US & Canada)")
@@ -251,7 +266,8 @@ describe AssignmentsController do
 
       context 'when the timezone preference of current user is not nil and assignment form updates attributes successfully' do
         it 'shows an error message and redirects to assignments#edit page' do
-          post :update, @params
+          session = {user: instructor}
+          post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to be nil
           expect(response).to redirect_to('/assignments/2/edit')

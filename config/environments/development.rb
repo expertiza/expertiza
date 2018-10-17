@@ -32,6 +32,22 @@ Expertiza::Application.configure do
   # Print development logs
   config.log_level = :error
 
+  config.log_tags = [ :remote_ip, :uuid ]
+
+  config.log_formatter = proc do |s, ts, pg, msg|
+    if msg.is_a?(LoggerMessage)
+      "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}] UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]\n"
+    else
+      "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[] RID=[] CTR=[] UID=[] MSG=[#{filter(msg)}]\n"
+    end
+  end
+
+  def filter(msg)
+    msg.tr("\n",' ')
+  end
+
+  config.action_view.logger = nil
+
   # Raise an error on page load if there are pending migrations
   config.active_record.migration_error = :page_load
 

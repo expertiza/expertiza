@@ -8,7 +8,7 @@
 @import "flash_messages";
 @import "grades";
 @import "goldberg";
-@import "layout";
+@import "layout_2";
 @import "redbox";
 @import "react-simpletabs/dist/react-simpletabs";
 @import "jquery.datetimepicker";
@@ -23,3 +23,6 @@ $icon-font-path: "bootstrap-sass/assets/fonts/bootstrap/";
 @import "three_state_toogle";
 @import "table_sorter";
 @import "response";
+@import "confirm_box";
+@import "inner-pages";
+@import "homepage";

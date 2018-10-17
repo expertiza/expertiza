@@ -6,8 +6,7 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
-      ['Super-Administrator',
-       'Administrator'].include? current_role_name or
+      ['Super-Administrator', 'Administrator'].include? current_role_name or
       assignment.instructor_id == current_user.try(:id) or
       TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
       assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
@@ -30,22 +29,46 @@ class AssignmentsController < ApplicationController
   def new
     @assignment_form = AssignmentForm.new
     @assignment_form.assignment.instructor ||= current_user
+    @num_submissions_round = 0
+    @num_reviews_round = 0
   end
 
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
-
-    if @assignment_form.save
-      @assignment_form.create_assignment_node
-
-      redirect_to edit_assignment_path @assignment_form.assignment.id
-      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+    if params[:button]
+        if @assignment_form.save
+          @assignment_form.create_assignment_node
+          existAssignment = Assignment.find_by_name(@assignment_form.assignment.name)
+          assignment_form_params[:assignment][:id] = existAssignment.id.to_s
+          quesparams = assignment_form_params
+          questArray = quesparams[:assignment_questionnaire]
+          dueArray = quesparams[:due_date]
+          questArray.each do |curquestionnaire|
+            curquestionnaire[:assignment_id] = existAssignment.id.to_s
+          end
+          dueArray.each do |curDue|
+            curDue[:parent_id] = existAssignment.id.to_s
+          end
+          quesparams[:assignment_questionnaire] = questArray
+          quesparams[:due_date] = dueArray
+          @assignment_form.update(quesparams,current_user)
+          aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+          redirect_to edit_assignment_path aid
+          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+          return
+        else
+          flash.now[:error] = "Failed to create assignment"
+          render 'new'
+        end
     else
       render 'new'
+      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     end
   end
 
   def edit
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
     assignment_form_assignment_staggered_deadline?
@@ -60,7 +83,10 @@ class AssignmentsController < ApplicationController
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
-    @badges = @assignment_form.assignment.badges
+    # assigned badges will hold all the badges that have been assigned to an assignment
+    # added it to display the assigned badges while creating a badge in the assignments page
+    @assigned_badges = @assignment_form.assignment.badges
+    @badges = Badge.all
   end
 
   def update
@@ -113,9 +139,11 @@ class AssignmentsController < ApplicationController
       @user = session[:user]
       id = @user.get_instructor
       if id != @assignment_form.assignment.instructor_id
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "You are not authorized to delete this assignment.", request)
         raise "You are not authorized to delete this assignment."
       else
         @assignment_form.delete(params[:force])
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{@assignment_form.assignment.id} was deleted.", request)
         flash[:success] = "The assignment was successfully deleted."
       end
     rescue StandardError => e
@@ -225,6 +253,11 @@ class AssignmentsController < ApplicationController
 
   # helper methods for edit
   def edit_params_setting
+
+    @assignment = Assignment.find(params[:id])
+    @num_submissions_round = @assignment.find_due_dates('submission') == nil ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review') == nil ? 0 : @assignment.find_due_dates('review').count
+
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @user = current_user
@@ -285,14 +318,17 @@ class AssignmentsController < ApplicationController
   def handle_rubrics_not_assigned_case
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
       flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
           " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
     end
   end
 
   def handle_assignment_directory_path_nonexist_case_and_answer_tagging
-    flash.now[:error] = "You did not specify your submission directory." if @assignment_form.assignment.directory_path.blank?
-
+    if @assignment_form.assignment.directory_path.blank?
+      flash.now[:error] = "You did not specify your submission directory."
+      ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
+    end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
 
@@ -302,9 +338,11 @@ class AssignmentsController < ApplicationController
     @assignment.course_id = params[:course_id]
 
     if @assignment.save
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
       flash[:note] = 'The assignment was successfully saved.'
       redirect_to list_tree_display_index_path
     else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
       flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
       redirect_to edit_assignment_path @assignment.id
     end
@@ -315,6 +353,14 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.instructor ||= current_user
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
+    end
+
+    # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+
+    @due_date_info = DueDate.find_each(parent_id: params[:id])
+
+    if params[:metareviewAllowed] == "false"
+      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
     end
   end
 
@@ -328,11 +374,16 @@ class AssignmentsController < ApplicationController
   end
 
   def update_feedback_assignment_form_attributes
-    if @assignment_form.update_attributes(assignment_form_params, current_user)
-      flash[:note] = 'The assignment was successfully saved....'
+    if params[:set_pressed][:bool] == 'false'
+      flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      if @assignment_form.update_attributes(assignment_form_params, current_user)
+        flash[:note] = 'The assignment was successfully saved....'
+      else
+        flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      end
     end
+    ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
   def assignment_form_params

@@ -3,8 +3,8 @@
 <%= form_for @questionnaire do %>
   <table>
     <tr>
-      <td valign="top"><label for="questionnaire_name">Name:</label>
-        <%= text_field 'questionnaire', 'name'  %>
+      <td valign="top" class="form-inline"><label for="questionnaire_name">Name:</label>
+        <%= text_field 'questionnaire', 'name', class: "form-control width-250"  %>
         <%= hidden_field 'questionnaire', 'id' %>
         <%= hidden_field 'questionnaire', 'type' %>
       </td>
@@ -12,20 +12,17 @@
   </table>
   <br/>
   <table>
-     <tr>
-       <td>Min question score:</td>
-       <td><%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0 %>&nbsp;&nbsp;</td>
-       <td>Max question score:</td>
-       <td><%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5 %>&nbsp;&nbsp;</td>
-       <td>Is this <%= @questionnaire.display_type %> private:</td>
-       <td><%= select(:questionnaire, :private, [ ['no', false],['yes',  true]])%>
+     <tr class="form-inline">
+       <td><label for="min_question_score">Min question score:</label>&nbsp;<%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
+       <td><label for="max_question_score">Min question score:</label>&nbsp;<%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
+       <td><label for="questionnaire_private">Is this <%= @questionnaire.display_type %> private:</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
        </td>
      </tr>
   </table>
   <% if params[:action] == 'new' %>
-    <%= submit_tag 'Create' %>
+    <%= submit_tag 'Create', class: "btn btn-default" %>
   <% else %>
-    <%= submit_tag 'Update'%>
+    <%= submit_tag 'Update', class: "btn btn-default" %>
   <% end %>
 <% end %>
 
@@ -36,8 +33,8 @@
     <tr>
       <td>
         <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
-          <%= submit_tag 'Add' %>
-          <%= text_field 'question', 'total_num', :size => 1, :value => "1" %> more 
+         <p class="form-inline"> <%= submit_tag 'Add', class: "btn btn-default"%>
+          <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more 
           <%= select "question", "type", 
               {"Criterion" =>"Criterion",
                "Scale"=>"Scale",
@@ -49,7 +46,7 @@
                "SectionHeader"=>"SectionHeader",
                "TableHeader"=>"TableHeader",
                "ColumnHeader"=>"ColumnHeader",
-               } %> question(s)
+               }, {}, {class: "form-control"} %> question(s)</p>
         <% end %>
       </td>
     </tr>
@@ -71,15 +68,17 @@
         <% i += 1 %>
       <% end %>
     </table>
-    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save" %>
-    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice"/>
+    <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save", :class => "btn btn-primary" %>
+    <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice" class="btn btn-default"/>
     <hr/>
-    <h4>Import/Export (from/to CSV format)</h4>
+        <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
+        <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
+    <!--<h4>Import/Export (from/to CSV format)</h4>
     <input type="file" name="csv" />
     <br />
     <input type="submit" name="import" value="Import questions"/>
     <br />
-    <input type="submit" name="export" value="Export questions to CSV"%>
+    <input type="submit" name="export" value="Export questions to CSV"%>-->
   <% end %>
 <% end %>
 

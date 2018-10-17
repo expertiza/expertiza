@@ -27,6 +27,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :answer
+
   resources :answer_tags, only: [:index] do
     collection do
       post :create_edit
@@ -51,6 +53,12 @@ Expertiza::Application.routes.draw do
       get :list_submissions
       get :delete_delayed_mailer
       get :remove_assignment_from_course
+    end
+  end
+
+  resources :badges, only: %i[new create] do
+    collection do
+      get :redirect_to_assignment
     end
   end
 
@@ -126,18 +134,12 @@ Expertiza::Application.routes.draw do
   resources :import_file, only: [] do
     collection do
       get :start
+      get :show
       get :import
+      post :show
       post :import
-
-      # MAY BE ABLE TO PUT ROUTE HERE
-
     end
   end
-
-
-  get '/import_file/import', controller: :import_file, action: :import
-  get '/import_file/show', controller: :import_file, action: :show
-  post '/import_file/show', controller: :import_file, action: :show
 
 resources :institution, except: [:destroy] do
     collection do
@@ -267,6 +269,7 @@ resources :institution, except: [:destroy] do
       get :show_calibration_results_for_student
       post :custom_create
       get :pending_surveys
+      get :json
     end
   end
 
@@ -444,6 +447,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
+      get :list_pending_requested
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name

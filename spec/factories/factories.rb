@@ -9,6 +9,12 @@ FactoryBot.define do
     description ''
   end
 
+  factory :role_of_superadministrator, class: Role do
+    name 'Super-Administrator'
+    parent_id nil
+    description ''
+  end
+
   factory :role_of_student, class: Role do
     name "Student"
     parent_id  nil
@@ -33,6 +39,28 @@ FactoryBot.define do
     password "password"
     password_confirmation "password"
     sequence(:fullname) {|n| "#{n}, administrator" }
+    email "expertiza@mailinator.com"
+    parent_id 1
+    private_by_default  false
+    mru_directory_path  nil
+    email_on_review true
+    email_on_submission true
+    email_on_review_of_review true
+    is_new_user false
+    master_permission_granted 0
+    handle "handle"
+    digital_certificate nil
+    timezonepref nil
+    public_key nil
+    copy_of_emails  false
+  end
+
+  factory :superadmin, class: User do
+    sequence(:name) {|n| "superadmin#{n}" }
+    role { Role.where(name: 'Super-Administrator').first || association(:role_of_superadministrator) }
+    password "password"
+    password_confirmation "password"
+    sequence(:fullname) {|n| "#{n}, superadministrator" }
     email "expertiza@mailinator.com"
     parent_id 1
     private_by_default  false
@@ -145,7 +173,7 @@ FactoryBot.define do
     max_reviews_per_submission 2
     review_topic_threshold 0
     copy_flag false
-    rounds_of_reviews 1
+    rounds_of_reviews 2
     microtask false
     require_quiz false
     num_quiz_questions 0
@@ -165,6 +193,42 @@ FactoryBot.define do
     num_metareviews_allowed 3
     is_calibrated false
     has_badge false
+  end
+
+  factory :assignment_mapping, class: Assignment do
+    sequence(:name) {|n| "final#{n + 100}" }
+    directory_path "final_test"
+    submitter_count 0
+    course { Course.first || association(:course) }
+    instructor { Instructor.first || association(:instructor) }
+    private false
+    num_reviews 1
+    num_review_of_reviews 1
+    num_review_of_reviewers 1
+    reviews_visible_to_all false
+    num_reviewers 1
+    spec_location "https://expertiza.ncsu.edu/"
+    max_team_size 3
+    staggered_deadline false
+    allow_suggestions false
+    review_assignment_strategy "Auto-Selected"
+    max_reviews_per_submission 2
+    review_topic_threshold 0
+    copy_flag false
+    rounds_of_reviews 1
+    microtask false
+    require_quiz false
+    num_quiz_questions 0
+    is_coding_assignment false
+    is_intelligent false
+    calculate_penalty false
+    late_policy_id nil
+    is_penalty_calculated false
+    show_teammate_reviews true
+    availability_flag true
+    use_bookmark false
+    can_review_same_topic true
+    can_choose_topic_to_review true
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -409,5 +473,14 @@ FactoryBot.define do
   factory :awarded_badge, class: AwardedBadge do
     badge { Badge.first || association(:badge) }
     participant { AssignmentParticipant.first || association(:participant) }
+  end
+
+  factory :menu_item, class: MenuItem do
+    parent_id nil
+    name 'home'
+    label 'Home'
+    seq 1
+    controller_action_id nil
+    content_page_id nil
   end
 end

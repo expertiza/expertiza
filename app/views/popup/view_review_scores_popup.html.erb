@@ -1,6 +1,8 @@
 <h2> Review scores </h2>
 
 <%keys = @review_final_versions.keys%>
+<%sentiment_counter = 0%>
+<%round = 0%>
 <%keys.each do |key|%>
   <h3><%=key%></h3>
   <table border="1">
@@ -45,7 +47,15 @@
               <!--Score-->
               <td align = 'center'><p style="color: <%= col_color%>"><%= answer.answer%></p></td>
               <!--Comments-->
-              <td align = 'left'><p style="color: <%= col_color%>"><%= answer.comments %></p></td>
+              <%sentiment_value = @sentiment_summary[round]['sentiments'][sentiment_counter]['sentiment'].to_f%>
+              <%col_color_bg = 'red' if sentiment_value >= -1.0 && sentiment_value < -0.5%>
+              <%col_color_bg = '#DC7633' if sentiment_value >= -0.5 && sentiment_value < 0.0%>
+              <%col_color_bg = 'yellow' if sentiment_value == 0.0%>
+              <%col_color_bg = '#ABEBC6' if sentiment_value > 0.0 && sentiment_value <= 0.5%>
+              <%col_color_bg = 'green' if sentiment_value > 0.5 && sentiment_value <= 1.0%>
+              <td align = 'left'; style="background-color:<%= col_color_bg %>"><p style="color: <%= col_color%>"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
+              <% sentiment_counter = sentiment_counter + 1 %>
+              
             </tr>
           <%else%>
                 <td>N/A</td>
@@ -64,6 +74,7 @@
       </tr>
     <%end%>
     </table>
-
+    <% round = round + 1%>
+    <% sentiment_counter = 0 %>
 <% end #loop for keys%>
 <br/>

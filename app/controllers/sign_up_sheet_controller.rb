@@ -216,11 +216,14 @@ class SignUpSheetController < ApplicationController
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
           flash[:success] = "You have successfully signed up the student for the topic!"
+          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
         else
           flash[:error] = "The student has already signed up for a topic!"
+          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
         end
       else
         flash[:error] = "The student is not registered for the assignment!"
+        ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
       end
     end
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
@@ -237,11 +240,14 @@ class SignUpSheetController < ApplicationController
     # If there is a drop topic deadline, student cannot drop topic after this deadline.
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for already submitted a work: ' + params[:topic_id].to_s)
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop your topic after the drop topic deadline!"
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
     else
       delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
       flash[:success] = "You have successfully dropped your topic!"
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
     end
     redirect_to action: 'list', id: params[:id]
   end
@@ -255,11 +261,14 @@ class SignUpSheetController < ApplicationController
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "The student has already submitted their work, so you are not allowed to remove them."
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       flash[:error] = "You cannot drop a student after the drop topic deadline!"
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
       delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
       flash[:success] = "You have successfully dropped the student from the topic!"
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
     end
     redirect_to controller: 'assignments', action: 'edit', id: assignment.id
   end
@@ -374,7 +383,7 @@ class SignUpSheetController < ApplicationController
     assignment = AssignmentParticipant.find(params[:id]).assignment
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
-    SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
+    SignUpTopic.find(params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(params[:topic_id])
     if SignedUpTeam.exists?(team_id: team_id, is_waitlisted: 0)
       SignedUpTeam.where(team_id: team_id, is_waitlisted: 0).first.update_attribute('topic_id', params[:topic_id].to_i)
     end
@@ -388,7 +397,7 @@ class SignUpSheetController < ApplicationController
   end
 
   def publish_approved_suggested_topic
-    SignUpTopic.find(params[:topic_id]).update_attribute('private_to', nil) if SignUpTopic.exists?(params[:topic_id])
+    SignUpTopic.find(params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(params[:topic_id])
     redirect_to action: 'list', id: params[:id]
   end
 

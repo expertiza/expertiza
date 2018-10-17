@@ -125,7 +125,7 @@ class Criterion < ScoredQuestion
       html += '<textarea' + ' id="responses_' + count.to_s + '_comments"' \
        ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
-      html += '</textarea></td></br><br/>'
+      html += '</textarea></td>'
     elsif dropdown_or_scale == 'scale'
       html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
       html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
@@ -163,14 +163,14 @@ class Criterion < ScoredQuestion
       html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
-      html += '</textarea><br/><br/>'
+      html += '</textarea>'
 
     end
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
-  def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil)
+  def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, current_user = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
 
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
@@ -214,7 +214,7 @@ class Criterion < ScoredQuestion
           tag_prompt_deployments.each do |tag_dep|
             tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
             if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
-              html += tag_prompt.html_control(tag_dep, answer)
+              html += tag_prompt.html_control(tag_dep, answer, current_user)
             end
           end
           html += '</td></tr>'

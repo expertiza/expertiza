@@ -92,7 +92,7 @@ class CourseController < ApplicationController
     @course.instructor_id = session[:user].id
     begin
       @course.save!
-      create_course_node
+      create_course_node(@course)
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'
@@ -156,14 +156,14 @@ class CourseController < ApplicationController
     render action: 'remove_ta.js.erb', layout: false
   end
 
-  def create_course_node
+  def create_course_node(course)
     parent_id = CourseNode.get_parent_id
     @course_node = CourseNode.new
     if parent_id
-      @course_node.node_object_id = @course.id
+      @course_node.node_object_id = course.id
       @course_node.parent_id = parent_id
     else
-      @course_node.node_object_id = @course.id
+      @course_node.node_object_id = course.id
     end
     @course_node.save
   end

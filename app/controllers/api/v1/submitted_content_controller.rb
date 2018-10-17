@@ -19,7 +19,7 @@ module Api::V1
       if(current_user_id?(@participant.user_id))
         skip = true
       end
-      if(!skip) 
+      if(skip) 
         @assignment = @participant.assignment
         # ACS We have to check if this participant has team or not
         # hence use team count for the check
@@ -27,7 +27,7 @@ module Api::V1
         # @can_submit is the flag indicating if the user can submit or not in current stage
         @can_submit = !params.key?(:view)
         @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
-        render json: {status: :ok, data: "need to decide what things to return"}
+        render json: {status: :ok, assignment: @assignment, can_submit: @can_submit, stage: @stage}
       else
         render json: {status: 400, error: "no access allowed" }
       end

@@ -18,6 +18,10 @@ module Api::V1
       @student_tasks = StudentTask.from_user current_user
       @student_tasks.select! {|t| t.assignment.availability_flag }
       @student_task_array = []
+
+      @hasTopics = false
+      @hasBadges = false
+
       
       @student_tasks.each do |student_task|
         participant = student_task.participant
@@ -25,6 +29,15 @@ module Api::V1
         student_task.instance_variables.each {|var| hash[var.to_s] = student_task.instance_variable_get(var) }
         if(student_task.course_name) 
           hash['course_name'] = student_task.course_name
+        end
+        topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+
+        if SignUpTopic.exists?(topic_id)
+          hash['topic'] = SignUpTopic.find(topic_id).try :topic_name
+          @hasTopics = true
+        end
+        if(get_awarded_badges(participant) != "")
+          @hasBadges = true
         end
         hash['badges'] = get_awarded_badges(participant)
         hash['review_grade'] = get_review_grade_info(participant)
@@ -37,7 +50,7 @@ module Api::V1
                                   current_stage: s["@current_stage"],
                                   participant: s["@participant"], 
                                   stage_deadline: s["stage_deadline"], 
-                                  topic:s["@topic"],
+                                  topic:s["topic"],
                                   course_name: s["course_name"],
                                   badges: s["badges"],
                                   review_grade: s["review_grade"]
@@ -139,7 +152,10 @@ module Api::V1
       # @teamCourse = ["CSC 517"]
       
 
-      render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: student_task_to_json, tasks_not_started: tasks_to_json, taskrevisions: revisions_to_json, teamCourse: @teamCourse}
+      render json: {status: :ok, studentsTeamedWith: @students_teamed_with, 
+                    studentTasks: student_task_to_json, tasks_not_started: tasks_to_json, 
+                    taskrevisions: revisions_to_json, teamCourse: @teamCourse, 
+                    containsTopics: @hasTopics, containsBadges: @hasBadges}
       # render json: {status: :ok, studentsTeamedWith: @students_teamed_with, studentTasks: @student_tasks}
     end
 

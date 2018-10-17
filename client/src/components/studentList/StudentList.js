@@ -15,9 +15,11 @@ class StudentList extends Component {
             studentsTeamedWith: arr,
             studentTasks: this.props.studentTasks,
             teamCourse: this.props.teamCourse,
-            tasks_not_started: this.props.tasks_not_started
-            // teamCourse: ["CSC 517"]
+            tasks_not_started: this.props.tasks_not_started,
+            hasTopics: this.props.hasTopics,
+            hasBadges: this.props.hasBadges
         };
+        console.log(this.state.hasTopics)
         console.log(this.state.teamCourse[0])
         if(this.state.taskrevisions== undefined){
 
@@ -33,7 +35,6 @@ class StudentList extends Component {
             
             <div className="main_content">
                 <h2>Assignments</h2>
-                {/* <PublishingRights></PublishingRights> */}
                 
             <div>
                 <div className="taskbox" style={{margin: '20px'}}>
@@ -43,8 +44,10 @@ class StudentList extends Component {
                         <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;{this.state.tasks_not_started == undefined ? "" : this.state.tasks_not_started.length}&nbsp;</span> Tasks not yet started<br/></strong>
                         {this.state.tasks_not_started == undefined ? <Loading/> : 
                             this.state.tasks_not_started.map(task =>
-                                <NavLink to={`/sign_up_sheet_list/${task.participant.id}`}><span>&nbsp; &raquo;{task.assignment.name} {task.current_stage}
-                                ({task.relative_deadline}) left </span></NavLink>
+                                <div><NavLink to={`/submitted_content/${task.participant.id}/edit`}>
+                                        <span>&nbsp; &raquo;{task.assignment.name} {task.current_stage} ({task.relative_deadline}) left </span>
+                                    </NavLink><br></br>
+                                </div>
                                 
                             )
                         }
@@ -93,12 +96,11 @@ class StudentList extends Component {
                             
                             <thead>
                                 <tr className = "taskheader">
-                                <th>Assignment
-                                </th>
-                                <th>Topic</th>
+                                <th>Assignment</th>
+                                {this.state.hasTopics == true ? <th>Topic</th> : <th hidden></th>}
                                 <th>Current Stage</th>
                                 <th>Review Grade</th>
-                                <th>Badges</th>
+                                {this.state.hasBadges == true ? <th>Badges</th> : <th hidden></th>}
                                 <th>Stage Deadline<img src='assets/images/info.png' 
                                 title="You can change 'Prefered time Zone' in 'Profile' in the banner. " alt="img">
                                 </img></th>  
@@ -109,11 +111,13 @@ class StudentList extends Component {
                                 this.state.studentTasks.map(studentTask =>(
                                     <tr>
                                         <td><NavLink to={`/studentTaskView/${studentTask.participant.id}`}>{studentTask.assignment.name}</NavLink> <br /> {studentTask.assignment.course_id== null ? "" : studentTask.course_name}</td>
-                                        <td> {studentTask.topic == null ? "-" : studentTask.topic}</td>
+                                        {this.state.hasTopics == true ?
+                                            <td>{studentTask.topic == null ? '-' : studentTask.topic}</td> : 
+                                            <td hidden></td> }
                                         <td> {studentTask.current_stage}</td>
                                         <td> {studentTask.review_grade}</td>
-                                        <td> {studentTask.badges}</td>
-                                        <td>{studentTask.stage_deadline.replace('T','\n')}</td>
+                                        {this.state.hasBadges == true ? <td> {studentTask.badges}</td> : <td hidden></td>}
+                                        <td>{studentTask.stage_deadline.replace('T','\n').substring(0, studentTask.stage_deadline.lastIndexOf('.'))}</td>
                                         {/* <td key={studentTask.assignment.id}> {(studentTask.participant.permission_granted) ? "allowed":"denied"}</td> */}
                                     </tr>
                                 ))

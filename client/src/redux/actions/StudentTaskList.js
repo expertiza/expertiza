@@ -53,6 +53,28 @@ export const fetchRevisions = () =>(dispatch) => {
     .catch(error => console.log(error));
 }
 
+export const containsTopics = () =>(dispatch) => {
+    return axios({
+        method: 'get',
+        url: 'student_task/list',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => dispatch(actions.hasTopics(response.data.containsTopics)))
+    .catch(error => console.log(error));
+}
+
+export const containsBadges = () =>(dispatch) => {
+    return axios({
+        method: 'get',
+        url: 'student_task/list',
+        headers: { AUTHORIZATION: "Bearer " + localStorage.getItem('jwt') }
+    })
+    .then(response => dispatch(actions.hasBadges(response.data.containsBadges)))
+    .catch(error => console.log(error));
+}
+
+
+
 
 
 
@@ -82,3 +104,16 @@ export const addTaskRevisions = (taskrevisions) => ({
     type: actions.ADD_TASKREVISIONS,
     payload: taskrevisions
 });
+
+export const hasTopics = (containsTopics) => ({
+    type: actions.HAS_TOPICS,
+    payload: containsTopics
+});
+
+export const hasBadges = (containsBadges) => ({
+    type: actions.HAS_BADGES,
+    payload: containsBadges
+});
+
+
+

@@ -159,12 +159,8 @@ class CourseController < ApplicationController
   def create_course_node(course)
     parent_id = CourseNode.get_parent_id
     @course_node = CourseNode.new
-    if parent_id
-      @course_node.node_object_id = course.id
-      @course_node.parent_id = parent_id
-    else
-      @course_node.node_object_id = course.id
-    end
+    @course_node.node_object_id = course.id
+    @course_node.parent_id = parent_id if parent_id
     @course_node.save
   end
 end

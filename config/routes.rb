@@ -148,6 +148,13 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :instructor, only: [] do
+    collection do
+      post  :set_student_view
+      post  :revert_to_instructor_view
+    end
+  end
+
   resources :invitations, only: %i[new create] do
     collection do
       get :cancel

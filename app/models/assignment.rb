@@ -50,6 +50,7 @@ class Assignment < ActiveRecord::Base
   def team_assignment?
     true
   end
+
   alias team_assignment team_assignment?
 
   def topics?
@@ -97,7 +98,7 @@ class Assignment < ActiveRecord::Base
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
     # Reject response maps without responses
-    response_map_set.reject! {|response_map| response_map.response.empty? }
+    response_map_set.reject! {|response_map| response_map.response.empty?}
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
@@ -107,13 +108,13 @@ class Assignment < ActiveRecord::Base
     raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
 
     # Metareviewer can only metareview each review once
-    response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer) }
+    response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer)}
     raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
     # Reduce to the response maps with the least number of metareviews received
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count}
     min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
+    response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews}
 
     # Reduce the response maps to the reviewers with the least number of metareviews received
     reviewers = {} # <reviewer, number of metareviews>
@@ -121,15 +122,15 @@ class Assignment < ActiveRecord::Base
       reviewer = response_map.reviewer
       reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
     end
-    reviewers = reviewers.sort_by {|a| a[1] }
+    reviewers = reviewers.sort_by {|a| a[1]}
     min_metareviews = reviewers.first[1]
-    reviewers.reject! {|reviewer| reviewer[1] == min_metareviews }
-    response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
+    reviewers.reject! {|reviewer| reviewer[1] == min_metareviews}
+    response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer)}
 
     # Pick the response map whose most recent meta_reviewer was assigned longest ago
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count}
     min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
+    response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id} if min_metareviews > 0
     # The first review_map is the best to metareview
     response_map_set.first
   end
@@ -142,11 +143,13 @@ class Assignment < ActiveRecord::Base
     end
     mappings
   end
+
   #--------------------metareview assignment end
 
   def dynamic_reviewer_assignment?
     self.review_assignment_strategy == RS_AUTO_SELECTED
   end
+
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
   def scores(questions)
@@ -208,7 +211,7 @@ class Assignment < ActiveRecord::Base
     path_text = ""
     path_text = if !self.course_id.nil? && self.course_id > 0
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
-                    FileHelper.clean_path(self.course.directory_path) + '/'
+                      FileHelper.clean_path(self.course.directory_path) + '/'
                 else
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
                 end
@@ -250,14 +253,14 @@ class Assignment < ActiveRecord::Base
   def delete(force = nil)
     begin
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each {|map| map.delete(force) }
+      maps.each {|map| map.delete(force)}
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each {|map| map.delete(force) }
+      maps.each {|map| map.delete(force)}
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -298,7 +301,7 @@ class Assignment < ActiveRecord::Base
     user = User.find_by(name: user_name)
     if user.nil?
       raise "The user account with the name #{user_name} does not exist. Please <a href='" +
-        url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
+                url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id: user.id)
     raise "The user #{user.name} is already a participant." if participant
@@ -507,11 +510,11 @@ class Assignment < ActiveRecord::Base
   def self.check_empty_rounds(answers, round_num, res_type)
     unless answers[round_num][res_type].empty?
       round_type =
-        if round_num.nil?
-          "Round Nill - " + res_type
-        else
-          "Round " + round_num.to_s + " - " + res_type.to_s
-        end
+          if round_num.nil?
+            "Round Nill - " + res_type
+          else
+            "Round " + round_num.to_s + " - " + res_type.to_s
+          end
       return round_type
     end
     nil
@@ -571,8 +574,8 @@ class Assignment < ActiveRecord::Base
   def self.export_data_fields(options)
     if options['team_score'] == 'true'
       team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
-        tcsv.push('---', '---', '---')
+          tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+          tcsv.push('---', '---', '---')
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',
@@ -607,6 +610,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id}
   end
 end

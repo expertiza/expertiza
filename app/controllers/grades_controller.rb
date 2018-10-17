@@ -37,6 +37,7 @@ class GradesController < ApplicationController
   # in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
+    @id = params[:id]
     @questions = {}
     questionnaires = @assignment.questionnaires
 
@@ -54,13 +55,83 @@ class GradesController < ApplicationController
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
 
+    if @assignment.varying_rubrics_by_round?
+      @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
+          FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+      else
+        @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, "FeedbackResponseMap")
+      end
+
+    # These functon calls were added by Team E1742 in the spring semester of 2017
+    # ==================================================================================================================
+    # private functions for generating a valid highchart
+    min, max, number_of_review_questions = calculate_review_questions(@assignment, questionnaires)
+    team_data = get_team_data(@assignment, questionnaires, @scores)
+    highchart_data = get_highchart_data(team_data, @assignment, min, max, number_of_review_questions)
+    highchart_series_data, highchart_categories, highchart_colors = generate_highchart(highchart_data, min, max, number_of_review_questions)
+    # ==================================================================================================================
+    @flot_series_data, @flot_categories = highchart_to_flot_adapter(min, max, highchart_series_data)
+
+    add_scores_by_round
+
     @show_reputation = false
+  end
+
+  # Adds a scores_by_round object to each @scores[:teams][team_idx.to_s.to_sym][:scores][scores_by_round]
+  # object where team_idx=0..num_teams_on_assignment
+  def add_scores_by_round
+    scores_by_team_round = get_raw_scores_by_team_round(@questions)
+    @scores[:teams].each_value do |value|
+      team_id = value[:team][:id]
+      value[:scores][:scores_by_round] = scores_by_team_round[:teams][team_id]
+    end
+  end
+
+  # Retrieves sum of raw score occurrences as 6-element array for each team by round
+  def get_raw_scores_by_team_round(questions)
+    scores = {}
+
+    scores[:teams] = {}
+    if !questions.nil? && !questions.empty?
+      @assignment.teams.collect {|team| team.id}.each do |team_id|
+        first_round_sym = (@assignment.num_review_rounds == 1) ? :review : :review1 # if there is only one round, the first round is called "review", otherwise, it is "review1"
+        scores[:teams][team_id] = get_team_raw_scores_by_round(team_id,questions[first_round_sym][0].questionnaire.id) if !questions[first_round_sym].nil? && !questions[first_round_sym].empty?
+      end
+    end
+    scores
+  end
+
+  # for a particular team and questionnaire, sum up the occurrences of 0s to 5s
+  # and return as six element numerical arrays(one for each round)
+  def get_team_raw_scores_by_round(team_id, questionnaire_id)
+    scores = {}
+    maps = ResponseMap.where(reviewee_id: team_id, type: "ReviewResponseMap")
+    assessments_by_team_id = {}
+    res_round = {}
+    maps.each do |m|
+      responses = m.response.each{|r| r.response_id} # response_id is the actual response here
+      assessments_by_team_id[team_id] = [] if assessments_by_team_id[team_id].nil?
+      responses.each{|res| assessments_by_team_id[team_id] << res.id if res.is_submitted} if !responses.nil? && !responses.empty?
+      responses.each{|res| res_round[res.id] = res.round if res.is_submitted} if !responses.nil? && !responses.empty?
+    end
+
+    qData = ScoreView.find_by_sql ["SELECT q1_id,s_response_id, question_weight,s_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id in (?)", questionnaire_id, assessments_by_team_id[team_id]]
+    scores[team_id] = {}
+    (1..@assignment.num_review_rounds).each{|idx| scores[team_id].merge!("#{idx}": [0, 0, 0, 0, 0, 0])} # [num0s,num1s,num2s,num3s,num4s,num5s]
+    qData.each do |qd|
+      if !qd.s_score.nil? && !res_round[qd.s_response_id].nil? # if res_round[qd.s_response_id].nil?, then not submitted
+        scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] = scores[team_id][res_round[qd.s_response_id].to_s.to_sym][qd.s_score] + 1
+      end
+    end
+
+    scores[team_id]
   end
 
   # This method is used to retrieve questions for different review rounds
   def retrieve_questions(questionnaires)
+    all_questionnaires_for_assignment = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
     questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
+      round = all_questionnaires_for_assignment.select{|q| q.questionnaire_id == questionnaire.id }.first.used_in_round
       questionnaire_symbol = if !round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              else
@@ -218,6 +289,23 @@ class GradesController < ApplicationController
     false
   end
 
+  def calculate_review_questions(assignment, questionnaires)
+    min = 0
+    max = 5
+
+    number_of_review_questions = 0
+    questionnaires.each do |questionnaire|
+      next unless assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire" # WHAT ABOUT NOT VARYING RUBRICS?
+      number_of_review_questions = questionnaire.questions.size
+      min = questionnaire.min_question_score < min ? questionnaire.min_question_score : min
+      max = questionnaire.max_question_score > max ? questionnaire.max_question_score : max
+      break
+    end
+    [min, max, number_of_review_questions]
+  end
+
+
+
   def calculate_all_penalties(assignment_id)
     @all_penalties = {}
     @assignment = Assignment.find(assignment_id)
@@ -293,6 +381,178 @@ class GradesController < ApplicationController
   def calculate_average_vector(scores)
     scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
     scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
+  end
+
+  # This block of code was completed by Team E1742 in the spring semester of 2017.
+  # The functions get_team_data, get_highchart_data, and generate_highchart
+  # ====================================================================================================================
+  def get_team_data(assignment, questionnaires, scores)
+    team_data = []
+    for index in 0..scores[:teams].length - 1
+      unless scores[:teams][index.to_s.to_sym][:team].participants.first.nil?
+        participant = AssignmentParticipant.find(scores[:teams][index.to_s.to_sym][:team].participants.first.id)
+        team = participant.team
+      end
+      vmlist = []
+
+      questionnaires.each do |questionnaire|
+        round = if assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+                  AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id).used_in_round
+                else
+                  nil
+                end
+
+        vm = VmQuestionResponse.new(questionnaire, assignment,round)
+        questions = questionnaire.questions
+        vm.add_questions(questions)
+        vm.add_team_members(team)
+        vm.add_reviews(participant, team, assignment.varying_rubrics_by_round?)
+        vm.get_number_of_comments_greater_than_10_words
+
+        vmlist << vm
+      end
+      team_data << vmlist
+    end
+    team_data
+  end
+
+  def get_highchart_data(team_data, assignment, min, max, number_of_review_questions)
+    chart_data = {}  # @chart_data is supposed to hold the general information for creating the highchart stack charts
+
+    # Dynamic initialization
+    for i in 1..assignment.rounds_of_reviews
+      chart_data[i] = Hash[(min..max).map {|score| [score, Array.new(number_of_review_questions, 0)] }]
+    end
+
+    # Dynamically filling @chart_data with values (For each team, their score to each rubric in the related submission
+    # round will be added to the count in the corresponded array field)
+    team_data.each do |team|
+      team.each do |vm|
+        next if vm.round.nil?
+        j = 0
+        vm.list_of_rows.each do |row|
+          row.score_row.each do |score|
+            unless score.score_value.nil?
+              chart_data[vm.round][score.score_value][j] += 1
+            end
+          end
+          j += 1
+        end
+      end
+    end
+    chart_data
+  end
+
+  def generate_highchart(chart_data, min, max, number_of_review_questions)
+    # Here we actually build the 'series' array which will be used directly in the highchart Object in the _team_charts view file
+    # This array holds the actual data of our chart with legend names
+    highchart_series_data = []
+    chart_data.each do |round, scores|
+      scores.to_a.reverse.to_h.each do |score, rubric_distribution|
+        highchart_series_data.push(name: "Score #{score} - Submission #{round}", data: rubric_distribution, stack: "S#{round}")
+      end
+    end
+
+    # Here we dynamically creates the categories which will be used later in the highchart Object
+    highchart_categories = []
+    for i in 1..number_of_review_questions
+       highchart_categories.push("Rubric #{i}")
+    end
+
+    # Here we dynamically creates an array of the colors which the highchart uses to show the stack charts and rotate on
+    # Currently we create 6 different colors based on the assumption that we always have scores from 0 to 5
+    # Future Works: Maybe adding the minimum score and maximum score instead of the hard-coded 0..5 range
+    highchart_colors = []
+    for _i in min..max
+      highchart_colors.push("\##{sprintf('%06x', (rand * 0xffffff))}")
+    end
+    [highchart_series_data, highchart_categories, highchart_colors]
+  end
+  # ====================================================================================================================
+
+  # This adapter is used to convert the data from the form highchart required to the form flot requires.
+  # It takes in the data formed by the generate_highchart method and molds it into a form to make a flot stacked bar graph
+  # Variable explanations:
+  # flot_series_data contains the data hash elements required to send to the view and create the stacked bar graph
+  # flot_categories contains the category names in the format required for the stacked bar graph
+  # highchart_data contains the specific data array that is being processed and converted into flot data
+  # flot_data contains the direct converted hash of arrays that will be pushed into the flot_series_data hash
+  # score_index contains which score data is being looked at, for each review round, 0, 1, 2, 3, 4, or 5 currently
+  # rubric_question_number is used to create the flot_categories
+  # num_rounds holds the number of review rounds currently processed
+  def highchart_to_flot_adapter(min, max, highchart_series_data)
+    flot_series_data = []
+    flot_categories = []
+    highchart_data = []
+    flot_data = []
+    score_index = 0
+    rubric_question_number = 1
+    num_rounds = 0
+    highchart_series_index = 0
+    previous_review_round = highchart_series_data.to_a.reverse[0][:stack]
+    flot_colors = ["#FF0000", "#FF6600", "#FFCC00", "#CCFF00", "#66FF00", "#00FF00"] # These are the six colors from red to green
+
+    # This loop will look at every element of the highchart_series_data and use them to form the flot_series_data
+    # and flot_categories. Flot_series_data is of the form [{data: [[0,x], [1,x], [2,x], [3,x], [4,x], ...], color: "#......"},...].
+    # It is an array of hashes of the size of the number of different scores, which for us is 6: 0, 1, 2, 3, 4, 5. The first
+    # value in each of those arrays within the hash indicates the specific question, while the x indicates the percentage
+    # of people which scored a certain score on that question. Flot_categories is a hash of the form [[0,""], [1,""], [2,""]],
+    # where the first value in each of the inner arrays indicates the question number and the quotes indicate the name
+    # of that question.
+    highchart_series_data.to_a.reverse.each do |element|
+      highchart_data = element[:data]
+      current_review_round = element[:stack]
+      round_number = current_review_round.scan(/[0-9]/)
+      # This tells flot_categories and flot_series_data that it is a new round
+      unless current_review_round.eql?(previous_review_round)
+        num_rounds += 1
+        previous_review_round = current_review_round
+        rubric_question_number = 1
+      end
+      # Every sixth element tells flot_categories to create as many ticks as there were questions in that round
+      # This needs to change in the case that you want to support a different min and max, a different number of score data
+      if highchart_series_index % 6 == 1
+        for i in 0..highchart_data.size-1
+          flot_categories.push([rubric_question_number-1 + (num_rounds*highchart_data.size), "Rubric \##{rubric_question_number} Round \##{round_number[0]}"])
+          rubric_question_number += 1
+        end
+      end
+      # Pushes the data into flot_series_data in the correct form specified above
+      for i in 0..highchart_data.size-1
+        if num_rounds > 0
+          flot_series_data[score_index][:data].push([i + (num_rounds*highchart_data.size), highchart_data[i]])
+        end
+        if num_rounds.zero?
+          flot_data.push([i, highchart_data[i]])
+        end
+      end
+      flot_series_data.push(data: flot_data, color: flot_colors[score_index]) if num_rounds.zero?
+
+      # This process would need to be modified in the case of a different score set. currently it processed 0 - 5, 6 score value data series
+      score_index += 1
+      if score_index > max
+        score_index = 0
+      end
+      flot_data = []
+      highchart_data = []
+      highchart_series_index += 1
+    end
+
+    # This loop calculates the percentages and stores them in the correct data series
+    num_reviewees = 0
+    for i in 0..flot_series_data[0][:data].size-1
+      for j in 0..flot_series_data.size - 1
+        num_reviewees += flot_series_data[j][:data][i][1]
+      end
+      for j in 0..flot_series_data.size - 1
+        unless num_reviewees.zero?
+          flot_series_data[j][:data][i][1] /= num_reviewees.to_f
+          flot_series_data[j][:data][i][1] *= 100.0
+        end
+      end
+      num_reviewees = 0
+    end
+    [flot_series_data, flot_categories]
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)

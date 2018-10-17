@@ -121,36 +121,6 @@ module ReviewMappingHelper
     html.html_safe
   end
 
-  # Zhewei - 2017-02-27
-  # This is for all Dr.Kidd's courses
-  def calcutate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
-    review_response = ResponseMap.where(id: response_map_id).try(:first).try(:response).try(:last)
-    author_feedback_avg_score = "-- / --"
-    unless review_response.nil?
-      user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
-      author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
-      feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
-    end
-    author_feedback_avg_score
-  end
-
-  # Zhewei - 2016-10-20
-  # This is for Dr.Kidd's assignment (806)
-  # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
-  # Since we do not have hyperlink question type, we hacked this requirement
-  # Maybe later we can create a hyperlink question type to deal with this situation.
-  def list_hyperlink_submission(response_map_id, question_id)
-    assignment = Assignment.find(@id)
-    curr_round = assignment.try(:num_review_rounds)
-    curr_response = Response.where(map_id: response_map_id, round: curr_round).first
-    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
-    comments = answer_with_link.try(:comments)
-    html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? and comments.start_with?('http')
-    html.html_safe
-  end
-
   #
   # for author feedback report
   #

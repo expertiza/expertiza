@@ -33,7 +33,7 @@ describe GradesController do
     context 'when current assignment varys rubric by round' do
       it 'retrieves questions, calculates scores and renders grades#view page' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
         params = {id: 1}
         get :view, params
         expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
@@ -91,7 +91,7 @@ describe GradesController do
     end
   end
 
-  xdescribe '#view_team' do
+  describe '#view_team' do
     it 'renders grades#view_team page' do
       allow(participant).to receive(:team).and_return(team)
       params = {id: 1}

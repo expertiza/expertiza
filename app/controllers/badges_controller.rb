@@ -33,9 +33,7 @@ class BadgesController < ApplicationController
     # in development mode, open() can't open files hosted by thin web server
     result = nil
     if Rails.env.development?
-      Thread.new do
-        do_create_badge
-      end
+      do_create_badge
     else
       do_create_badge
     end

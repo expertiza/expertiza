@@ -11,14 +11,17 @@ describe Node do
   let(:node) { Menu::Node.new }
 
   describe "#initialize" do
-    it "initializes the parent attribute"
+    it "initializes the parent attribute" do
     # Write your test here!
+      expect(node.parent).to be_nil
+    end  
   end
 
   describe "#setup" do
     context "when the controller action attribute of the item is nil" do
-      it "assigns content page path of the current menu item to the URL variable"
+      it "assigns content page path of the current menu item to the URL variable" do
       # Write your test here!
+      end
     end
 
     context "when the controller action attribute of the item is not nil" do

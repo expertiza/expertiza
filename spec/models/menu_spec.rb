@@ -133,13 +133,17 @@ describe Node do
 end
 
 describe Menu do
-  let(:menu) do
-    Menu.new
+  let(:menu1) do
+    @admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
+    Menu.new(@admin_role)
   end
 
-  # it '#select' do
-    # expect(menu.select('Missing "name"')).to eq('Fill this in by hand')
-  # end
+  describe '#select' do
+    it 'returns when name is not in by_name{}' do
+      expect(menu1.select("not_in_menu")).to be_nil
+    end
+
+  end
 
   # it '#get_item' do
     # expect(menu.get_item('Missing "item_id"')).to eq('Fill this in by hand')

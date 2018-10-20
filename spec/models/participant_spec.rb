@@ -13,4 +13,9 @@ describe Participant do
       expect(participant.fullname).to eq "Test, Student"
     end
   end
+  
+  # verify pull request
+  #describe "#team" do
+   #it "returns the team name" do
+   #end
 end

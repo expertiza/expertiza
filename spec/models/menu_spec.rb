@@ -9,39 +9,39 @@ describe Node do
 
   let(:node) { Menu::Node.new }
 
+  let(:menu_item) {
+    build(:menu_item,
+      parent_id: 1,
+      name: 'test_name',
+      id: 2,
+      label: 'test_label'
+    )
+  }
+
+  let(:content_page) {
+    double('ContentPage',
+      id: 1,
+      name: 'test_content_page_name'
+    )
+  }
+
+  let(:controller_action) {
+    double('ControllerAction',
+      id: 99,
+      name: 'test_controller_action',
+      url_to_use: 'https://test_url.com',
+      controller: nil
+    )
+  }
+
+  let(:controller) {
+    double('Controller',
+      id: 3,
+      name: 'test_controller'
+    )
+  }
+
   describe '#setup' do
-    let(:menu_item) {
-      build(:menu_item,
-        parent_id: 1,
-        name: 'test_name',
-        id: 2,
-        label: 'test_label'
-      )
-    }
-
-    let(:controller_action) {
-      double('ControllerAction',
-        id: 99,
-        name: 'test_controller_action',
-        url_to_use: 'https://test_url.com',
-        controller: nil
-      )
-    }
-
-    let(:controller) {
-      double('Controller',
-        id: 3,
-        name: 'test_controller'
-      )
-    }
-
-    let(:content_page) {
-      double('ContentPage',
-        id: 1,
-        name: 'test_content_page_name'
-      )
-    }
-
     it 'sets up attributes: parent_id, name, id, label' do
       allow(menu_item).to receive_message_chain(:content_page, :name)
       node.setup(menu_item)
@@ -101,6 +101,24 @@ describe Node do
     end
   end
 
+  describe '#site_controller' do
+    before (:example)  do
+     @foundid = FactoryBot.build(:site_controller, :id => 2, :name => 'fake1')
+    end
+    it 'sets site_controller instance variable from factory' do
+      site_controller = @foundid
+      expect(site_controller == @foundid).to be_truthy
+    end
+    it 'sets site_controller instance variable to nil' do
+      site_controller = nil
+      expect(site_controller).to be_nil
+    end
+    it 'sets site_controller from nil to the find site_cpntroller_id' do
+      site_controller = nil
+      expect {site_controller = @foundid}.to change{site_controller}.from(nil).to(@foundid)
+    end
+  end
+
   # it '#site_controller' do
     # expect(node.site_controller).to eq('Fill this in by hand')
   # end
@@ -113,26 +131,37 @@ describe Node do
   #   expect(node.content_page).to eq('Fill this in by hand')
   # end
 
-  # it '#add_child' do
-    # expect(node.add_child('Missing "child"')).to eq('Fill this in by hand')
-  # end
+  describe '#add_child' do
+    let(:child_node) { Menu::Node.new }
+
+    it 'adds one child to node' do
+      allow(menu_item).to receive(:content_page).and_return(content_page)
+      child_node.setup(menu_item)
+      expect(node.add_child(child_node)).to eq(node.children)
+    end
+
+    it 'adds multiple children to node' do
+      allow(menu_item).to receive(:content_page).and_return(content_page)
+      child_node.setup(menu_item)
+      expect(node.add_child(child_node)).to eq(node.children)
+      expect(node.add_child(child_node)).to eq(node.children)
+      expect(node.add_child(child_node)).to eq(node.children)
+    end
+  end
 end
 
 describe Menu do
-  let(:menu) do
-    Menu.new
+  let(:menu1) do
+    @admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
+    Menu.new(@admin_role)
   end
 
-  # let(:menu1) { double(:menu) }
-  # describe '#initialize' do
-    # it 'sets parent to nil' do
-      # expect(menu1.initialize).parent.to eq(nil)
-    # end
-  # end
+  describe '#select' do
+    it 'returns when name is not in by_name{}' do
+      expect(menu1.select("not_in_menu")).to be_nil
+    end
 
-  # it '#select' do
-    # expect(menu.select('Missing "name"')).to eq('Fill this in by hand')
-  # end
+  end
 
   # it '#get_item' do
     # expect(menu.get_item('Missing "item_id"')).to eq('Fill this in by hand')

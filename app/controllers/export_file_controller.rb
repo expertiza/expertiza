@@ -18,6 +18,8 @@ class ExportFileController < ApplicationController
       @title = 'Teams'
     elsif @model == 'User'
       @title = 'Users'
+    elsif @model == 'Question'
+      @title = 'Questions'
     end
     @id = params[:id]
   end

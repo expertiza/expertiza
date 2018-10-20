@@ -159,7 +159,7 @@ describe Menu do
   let!(:menu_item2) { create(:menu_item, name: "menu_item2", parent_id: 1,    seq: 2) }
   let!(:menu_item3) { create(:menu_item, name: "menu_item3", parent_id: 1,    seq: 3) }
   let!(:menu_item4) { create(:menu_item, name: "menu_item4", parent_id: nil,  seq: 2) }
-  let!(:menu_item5) { create(:menu_item, name: "menu_item5", parent_id: nil,  seq: 5) }
+  let!(:menu_item5) { create(:menu_item, name: "menu_item5", parent_id: nil,  seq: 4) }
   (1..7).each do |i|
     let!("controller_action#{i}".to_sym) { ControllerAction.create(site_controller_id: i, name: 'name', permission_id: i) }
     let!("content_page#{i}".to_sym) { ContentPage.create(title: "home page#{i}", name: "home#{i}", content: '', permission_id: i, content_cache: '') }
@@ -181,6 +181,7 @@ describe Menu do
     end
     it 'returns when name is in by_name{}'do
       menu1.select("menu_item1")
+      expect(menu1.crumbs.first.id).to eq(menu_item1.id)
       expect(menu1.selected).to eq("menu_item1")
       expect(menu1.selected?(menu_item1.id)).to be true
     end
@@ -195,9 +196,16 @@ describe Menu do
     # expect(menu.get_menu('Missing "level"')).to eq('Fill this in by hand')
   # end
 
-  # it '#selected' do
-    # expect(menu.selected).to eq('Fill this in by hand')
-  # end
+  describe '#selected' do
+    it 'returns root if nothing is selected previously' do
+      # menu_item has seq: 1, so it is the root.
+      expect(menu1.selected).to eq("menu_item1")
+    end
+    it 'returns the name of the selected menu_item' do
+      menu1.select("menu_item2")
+      expect(menu1.selected).to eq("menu_item2")
+    end
+  end
 
   # it '#selected?' do
     # expect(menu.selected?('Missing "menu_id"')).to eq('Fill this in by hand')

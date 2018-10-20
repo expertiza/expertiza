@@ -7,79 +7,97 @@ describe Node do
   # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
   ###
 
-  let(:node) do
-    Menu::Node.new
-  end
+  let(:node) { Menu::Node.new }
 
   describe '#setup' do
-    let(:item) do
-      double('Item',
+    let(:menu_item) {
+      build(:menu_item,
         parent_id: 1,
         name: 'test_name',
         id: 2,
-        label: 'test_label',
-        controller_action: nil
+        label: 'test_label'
       )
+    }
+
+    let(:controller_action) {
+      double('ControllerAction',
+        id: 99,
+        name: 'test_controller_action',
+        url_to_use: 'https://test_url.com',
+        controller: nil
+      )
+    }
+
+    let(:controller) {
+      double('Controller',
+        id: 3,
+        name: 'test_controller'
+      )
+    }
+
+    let(:content_page) {
+      double('ContentPage',
+        id: 1,
+        name: 'test_content_page_name'
+      )
+    }
+
+    it 'sets up attributes: parent_id, name, id, label' do
+      allow(menu_item).to receive_message_chain(:content_page, :name)
+      node.setup(menu_item)
+      expect(node.parent_id).to eq(menu_item.parent_id)
+      expect(node.name).to eq(menu_item.name)
+      expect(node.id).to eq(menu_item.id)
+      expect(node.label).to eq(menu_item.label)
     end
 
-    let(:controller_action) do
-      double('ControllerAction', id: 99, name: 'test_controller_action', url_to_use: 'https://test_url.com')
+    context 'when menu_item has controller_action' do
+      before(:each) do
+        allow(menu_item).to receive(:controller_action).and_return(controller_action)
+        node.setup(menu_item)
+      end
+
+      it 'sets up controller_action_id' do
+        expect(node.controller_action_id).to eq(controller_action.id)
+      end
+
+      it 'assigns url to controller_action.url_to_use' do
+        expect(node.url).to eq(controller_action.url_to_use)
+      end
+
+      context 'when controller_action has controller' do
+        before(:each) do
+          allow(controller_action).to receive(:controller).and_return(controller)
+        end
+
+        it 'sets up site_controller_id' do
+          node.setup(menu_item)
+          expect(node.site_controller_id).to eq(controller.id)
+        end
+
+        context 'when controller_action has no url_to_use' do
+          it 'assembles url from controller_action.controller' do
+            allow(controller_action).to receive(:url_to_use)
+            node.setup(menu_item)
+            expect(node.url).to eq("/#{controller.name}/#{controller_action.name}")
+          end
+        end
+      end
     end
 
-    let(:controller) do
-      double('Controller', id: 3, name: 'test_controller')
-    end
+    context 'when menu_item has content_page' do
+      before(:each) {
+        allow(menu_item).to receive(:content_page).and_return(content_page)
+        node.setup(menu_item)
+      }
 
-    let(:content_page) do
-      double('ContentPage', id: 1, name: 'test_content_page_name')
-    end
+      it 'sets up content_page_id' do
+        expect(node.content_page_id).to eq(content_page.id)
+      end
 
-    it 'sets up basic fields' do
-      allow(item).to receive_message_chain(:content_page, :name)
-      node.setup(item)
-      expect(node.parent_id).to eq(item.parent_id)
-      expect(node.name).to eq(item.name)
-      expect(node.id).to eq(item.id)
-      expect(node.label).to eq(item.label)
-    end
-
-    it 'sets up site_controller_id' do
-      allow(controller_action).to receive(:controller).and_return(controller)
-      allow(item).to receive(:controller_action).and_return(controller_action)
-      node.setup(item)
-      expect(node.site_controller_id).to eq(item.controller_action.controller.id)
-    end
-
-    it 'sets up controller_action_id' do
-      allow(item).to receive(:controller_action).and_return(controller_action)
-      node.setup(item)
-      expect(node.controller_action_id).to eq(item.controller_action.id)
-    end
-
-    it 'sets up content_page_id' do
-      allow(item).to receive(:content_page).and_return(content_page)
-      node.setup(item)
-      expect(node.content_page_id).to eq(item.content_page.id)
-    end
-
-    it 'sets up url from content_page' do
-      allow(item).to receive(:content_page).and_return(content_page)
-      node.setup(item)
-      expect(node.url).to eq("/#{item.content_page.name}")
-    end
-
-    it 'sets up url from controller_action.url_to_use' do
-      allow(item).to receive(:controller_action).and_return(controller_action)
-      node.setup(item)
-      expect(node.url).to eq(item.controller_action.url_to_use)
-    end
-
-    it 'sets up url from controller_action.controller' do
-      allow(controller_action).to receive(:url_to_use)
-      allow(controller_action).to receive(:controller).and_return(controller)
-      allow(item).to receive(:controller_action).and_return(controller_action)
-      node.setup(item)
-      expect(node.url).to eq("/#{controller.name}/#{controller_action.name}")
+      it 'sets up url to content_page name' do
+        expect(node.url).to eq("/#{content_page.name}")
+      end
     end
   end
 

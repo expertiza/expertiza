@@ -151,14 +151,38 @@ describe Node do
 end
 
 describe Menu do
+  # To test menu, a variety of menu_items must exist.
+  # role_admin.yml defines the permissionIds for admin as 5,5,6,3,2
+  # we must assign controlleractions and contentpages with permissionIds of those numbers
+  # to enable menuitems's items_for_permissions function to succeed.
+  let!(:menu_item1) { create(:menu_item, name: "menu_item1", parent_id: nil,  seq: 1) }
+  let!(:menu_item2) { create(:menu_item, name: "menu_item2", parent_id: 1,    seq: 2) }
+  let!(:menu_item3) { create(:menu_item, name: "menu_item3", parent_id: 1,    seq: 3) }
+  let!(:menu_item4) { create(:menu_item, name: "menu_item4", parent_id: nil,  seq: 2) }
+  let!(:menu_item5) { create(:menu_item, name: "menu_item5", parent_id: nil,  seq: 5) }
+  (1..7).each do |i|
+    let!("controller_action#{i}".to_sym) { ControllerAction.create(site_controller_id: i, name: 'name', permission_id: i) }
+    let!("content_page#{i}".to_sym) { ContentPage.create(title: "home page#{i}", name: "home#{i}", content: '', permission_id: i, content_cache: '') }
+  end
+
   let(:menu1) do
-    @admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
+    @admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: 1, default_page_id: 1)
+    menu_item1.update_attributes(controller_action_id: nil, content_page_id: 5)
+    menu_item2.update_attributes(controller_action_id: nil, content_page_id: 5)
+    menu_item3.update_attributes(controller_action_id: nil, content_page_id: 6)
+    menu_item4.update_attributes(controller_action_id: nil, content_page_id: 3)
+    menu_item5.update_attributes(controller_action_id: nil, content_page_id: 2)
     Menu.new(@admin_role)
   end
 
   describe '#select' do
     it 'returns when name is not in by_name{}' do
       expect(menu1.select("not_in_menu")).to be_nil
+    end
+    it 'returns when name is in by_name{}'do
+      menu1.select("menu_item1")
+      expect(menu1.selected).to eq("menu_item1")
+      expect(menu1.selected?(menu_item1.id)).to be true
     end
 
   end

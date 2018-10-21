@@ -1,3 +1,4 @@
+
 describe Node do
   ###
   # Please do not share this file with other teams.
@@ -175,22 +176,50 @@ describe Menu do
     Menu.new(@admin_role)
   end
 
+  let(:node) { Menu::Node.new }
+
+
   describe '#select' do
     it 'returns when name is not in by_name{}' do
       expect(menu1.select("not_in_menu")).to be_nil
     end
     it 'returns when name is in by_name{}'do
-      menu1.select("menu_item1")
+      menu1.select("menu_item2")
+      # selected checks the last element in the @vector [], which will be the node passed to select.
+      # the selected node's parents will also be in vector, with the root node being first.
+      expect(menu1.selected).to eq("menu_item2")
+      # crumbs returns an array of ids which is populated in same way as @vector, so it contains
+      # the selected menu_item id as the last element, and each of its parents.
+      expect(menu1.crumbs.last.id).to eq(menu_item2.id)
       expect(menu1.crumbs.first.id).to eq(menu_item1.id)
-      expect(menu1.selected).to eq("menu_item1")
-      expect(menu1.selected?(menu_item1.id)).to be true
+      # selected? checks the @selected{} collection, which will contain
+      # a selected item and its parents.
+      expect(menu1.selected?(menu_item2.id)).to be true
+      expect(menu1.selected?(menu_item2.parent_id)).to be true
     end
 
   end
 
-  # it '#get_item' do
-    # expect(menu.get_item('Missing "item_id"')).to eq('Fill this in by hand')
-  # end
+  describe '#get_item' do
+    it 'returns nil when id is not in by_id{}' do
+      id_not_in_menu = 1738
+      expect(menu1.get_item(id_not_in_menu)).to be_nil
+    end
+    it 'returns an equivalent item' do
+      allow(menu_item5).to receive(:content_page).and_return(content_page2)
+      node.setup(menu_item5)
+      current_item = menu1.get_item(menu_item5.id)
+      expect(current_item.content_page_id).to eq(node.content_page_id)
+      expect(current_item.controller_action_id).to eq(node.controller_action_id)
+      expect(current_item.id).to eq(node.id)
+      expect(current_item.label).to eq(node.label)
+      expect(current_item.name).to eq(node.name)
+      expect(current_item.parent).to eq(node.parent)
+      expect(current_item.parent_id).to eq(node.parent_id)
+      expect(current_item.site_controller_id).to eq(node.site_controller_id)
+      expect(current_item.url).to eq(node.url)
+    end
+  end
 
   # it '#get_menu' do
     # expect(menu.get_menu('Missing "level"')).to eq('Fill this in by hand')
@@ -207,9 +236,17 @@ describe Menu do
     end
   end
 
-  # it '#selected?' do
-    # expect(menu.selected?('Missing "menu_id"')).to eq('Fill this in by hand')
-  # end
+  describe '#selected?' do
+    it 'contains root is nothing is selected previously' do
+      puts "Menu Selected?: #{menu1.selected}"
+      expect(menu1.selected?(menu_item1.id)).to be true
+    end
+    it 'contains selected node and its parents' do
+      menu1.select("menu_item2")
+      expect(menu1.selected?(menu_item2.id)).to be true
+      expect(menu1.selected?(menu_item1.id)).to be true
+    end
+  end
 
   # it '#crumbs' do
     # expect(menu.crumbs).to eq('Fill this in by hand')

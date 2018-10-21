@@ -206,7 +206,48 @@ describe Menu do
     # expect(menu.selected?('Missing "menu_id"')).to eq('Fill this in by hand')
   # end
 
-  # it '#crumbs' do
-    # expect(menu.crumbs).to eq('Fill this in by hand')
-  # end
+  describe '#crumbs' do
+    let(:menu) do
+      role = double('Role')
+      allow(role).to receive_message_chain(:cache, :[])
+      Menu.new(role)
+    end
+
+    context 'no menu item is selected' do
+      it 'returns empty array' do
+        expect(menu.crumbs).to be_empty
+      end
+    end
+
+    context 'top level menu item is selected' do
+      before(:each) do
+        menu1.select(menu_item1.name)
+      end
+
+      it 'has one crumb' do
+        expect(menu1.crumbs.length).to eq(1)
+      end
+
+      it 'has crumb with menu id' do
+        crumb = menu1.crumbs[0];
+        expect(crumb.id).to eq(menu_item1.id)
+      end
+    end
+
+    context 'bottom level menu item is selected' do
+      before(:each) do
+        menu1.select(menu_item2.name)
+      end
+
+      it 'has two crumbs' do
+        expect(menu1.crumbs.length).to eq(2)
+      end
+
+      it 'has crumb order from child to parent' do
+        actualCrumbIds = menu1.crumbs.collect { |c| c.id }
+        expectedCrumbIds = [menu_item1.id, menu_item2.id]
+        expect(actualCrumbIds).to eq(expectedCrumbIds)
+      end
+    end
+  end
 end

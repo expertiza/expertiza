@@ -52,27 +52,27 @@
 
                     <% current_round = @assignment.number_of_current_round(topic_id) %>
 
-                    <td style="color:saddlebrown">
-                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                    <td>
+                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id}, {:style=>'color:saddlebrown;'} %>
                     </td>
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
                       <%- # show the link as edit when latest review is done in current deadline   -%>
                       <%- # show link as update when latest review is done in different deadline than current phase   -%>
                       <% if (last_response_round == current_round)%>
-                        <td style="color:orange">
+                        <td>
                           <% if (!@latest_response.is_submitted) %>
-                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id}, {:style=>'color:orange;'} %>
                           <%end%>
                         </td>
                       <% else %>
-                        <td style="color:orange"><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id}, {:style=>'color:orange;'} %></td>
                       <% end %>
                     <% end %>
                     <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
           <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
-                <td style="color=#ff000d;"><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id}, {:style=>'color:red;'} %></td>
                 <td>&nbsp;&nbsp;</td>
             <% else %>
                 <td>Begin</td>

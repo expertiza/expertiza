@@ -128,8 +128,11 @@ class ResponseController < ApplicationController
   def new_feedback
     review = Response.find(params[:id]) if !params[:id].nil?
     if review
-      reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
+      reviewer = Team.where(id: TeamsUser.team_id(review.map.assignment.id,session[:user].id))
+
+      # reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
+
       if map.nil?
         # if no feedback exists by dat user den only create for dat particular response/review
         map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)

@@ -71,9 +71,8 @@ class Mailer < ActionMailer::Base
     @suggestion_title = defn[:body][:suggestion_title]
     @proposer = defn[:body][:proposer]
 
-    if Rails.env.development? || Rails.env.test?
-      defn[:to] = 'expertiza.development@gmail.com'
-    end
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+
 
     mail(subject: defn[:subject],
          body: defn[:body],

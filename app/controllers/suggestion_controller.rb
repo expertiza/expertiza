@@ -209,17 +209,17 @@ class SuggestionController < ApplicationController
   end
 
   def mail_instructor
-    proposer=set_proposer
+    proposer = set_proposer
     @assignment = Assignment.find(@suggestion.assignment_id)
-    instructor = User.find(@assignment.instructor_id)
+    instructor = User.find_by(id: @assignment.instructor_id)
 
     Mailer.new_suggested_topic(
-              to:instructor.email,
-              subject:"New suggestion with name '#{@suggestion.title}'",
-              body: {
-                  suggestion_title: @suggestion.title,
-                  proposer: proposer
-              }
+        to: instructor.email,
+        subject: "New suggestion with name '#{@suggestion.title}'",
+        body: {
+          suggestion_title: @suggestion.title,
+          proposer: proposer
+        }
     ).deliver_now!
   end
 

@@ -402,11 +402,13 @@ class ReviewMappingController < ApplicationController
       assignment_id = params[:id]
       participant = AssignmentParticipant.where(parent_id: assignment_id, user_id: session[:user].id).first rescue nil
       if participant.nil?
-        participant = AssignmentParticipant.create(parent_id: assignment_id, user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+        create_params = {parent_id: assignment_id, user_id: session[:user].id, can_submit: 1, can_review: 1,
+                         can_take_quiz: 1, handle: 'handle'}
+        participant = AssignmentParticipant.create(create_params)
       end
 
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-      @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(params[:id]).first
+      @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(assignment_id).first
       @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
       @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: params[:id], calibrate_to: 1)
       @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: params[:id], calibrate_to: 0)

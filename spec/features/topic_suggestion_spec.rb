@@ -30,6 +30,12 @@ describe "Assignment Topic Suggestion Test" do
       visit '/student_task/list'
       expect(page).to have_content "Assignment_suggest_topic"
 
+<<<<<<< HEAD
+=======
+      #assign an instructor before creating new suggestion
+      instructor = User.find_by(name: 'instructor6')
+
+>>>>>>> 2d12b2611d8986e43439700cdb47b130c8d66046
       # student2065 suggest topic
       click_link('Assignment_suggest_topic')
       expect(page).to have_content "Suggest a topic"

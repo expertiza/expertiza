@@ -14,9 +14,7 @@ Setup
 
 ### NCSU VCL image
 
-The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
-If you have access, this is quickest way to get a development environment running for Expertiza.
-See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).
+The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "[CSC517, S18] Ruby on Rails / Expertiza".
 
 Using the VCL is the quickest way to get started, but you may find it awkward developing on a remote machine
 with network lag and having to reinstall gems every time you connect. Installing locally can be a pain though too.
@@ -25,12 +23,10 @@ and switch to another environment if you don't like the one you started with.
 
 ### Installing locally
 
-See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information.
+See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).
 
- * [OSX](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:OSX)
- * [RedHat Linux](http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:Linux:RHEL)
- * [Ubuntu](http://wiki.expertiza.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_Expertiza_-_Installation_Guide)
- * [Docker-compose](https://github.com/expertiza/expertiza/tree/master/docker)
+
+<sub>Depreciation warning: See the Expertiza wiki for setup instructions. Please update the wiki with corrections or additional helpful information. (http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:OSX, http://wiki.expertiza.ncsu.edu/index.php/Development:Setup:Linux:RHEL, http://wiki.expertiza.ncsu.edu/index.php/Creating_a_Linux_Development_Environment_for_Expertiza_-_Installation_Guide)</sub>
 
 Contributing
 ------------

@@ -1,5 +1,5 @@
 {
-  "maxReviewers": 5,
+  "maxReviewers": 3,
   "numFilesToCheck": 20,
   "message": "Hi @pullRequester, thank you for your contributions! @reviewers, please review this pull request.",
   "alwaysNotifyForPaths": [
@@ -21,12 +21,12 @@
       "skipTeamPrs": false
     },
     {
-      "name": "ferryxo",
+      "name": "TheAkbar",
       "files": ["app", "config", "db"],
       "skipTeamPrs": false
     }
   ],
-  "findPotentialReviewers": true,
+  "findPotentialReviewers": false,
   "fileBlacklist": ["*.md"],
   "userBlacklist": [],
   "userBlacklistForPR": [],

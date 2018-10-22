@@ -2,6 +2,9 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
+
   resources :admin, only: [] do
     collection do
       get :list_super_administrators

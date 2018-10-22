@@ -9,6 +9,18 @@ describe Node do
   # Write your mocked object here!
   let(:menu) { Menu.new }
   let(:node) { Menu::Node.new }
+  let(:node2) { Menu::Node.new }
+  let(:node3) { Menu::Node.new }
+  let!(:sc_test1) {create(:site_controller, name:"site1")}
+  let!(:ca_test1) {create(:controller_action, site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
+  let!(:ca_test2) {create(:controller_action, site_controller_id: 1, name: "action2", permission_id: 1)}
+  let!(:cp_test1) {create(:content_page, name:"content1" )}
+  let!(:test1) { create(:menu_item, name: "home1", parent_id: nil,  seq: 1, content_page_id:1) }
+  let!(:test2) { create(:menu_item, name: "home2", parent_id: 1,    seq: 2, controller_action_id:1, content_page_id: 1) }
+  let!(:test3) { create(:menu_item, name: "home3", parent_id: 1,    seq: 3, controller_action_id:2, content_page_id: 1) }
+
+
+
 
   describe "#initialize" do
     it "initializes the parent attribute" do
@@ -20,27 +32,38 @@ describe Node do
   describe "#setup" do
     context "when the controller action attribute of the item is nil" do
       it "assigns content page path of the current menu item to the URL variable" do
-      # Write your test here!
+        # Write your test here!
+        allows(node).to receive(:setup).with(test1)
+        # expect(node.parent_id).to eq(1)
+
+        expect(node.url).to eq("/#{cp_test1.name}")
       end
     end
 
     context "when the controller action attribute of the item is not nil" do
       context "when the URL of the controller action is available" do
-        it "assigns the URL of controller action to the URL variable"
-        # Write your test here!
+        it "assigns the URL of controller action to the URL variable" do
+          # Write your test here!
+          allows(node2).to receive(:setup).with(test2)
+          expect(node2.url).to eq("/#{ca_test1.url_to_use}")
+          end
       end
 
       context "when the URL of the controller action is unavailable" do
-        it "assigns a customized path to the URL variable"
-        # Write your test here!
+        it "assigns a customized path to the URL variable" do
+          # Write your test here!
+          allows(node3).to receive(:setup).with(test3)
+          expect(node3.url).to eq("/#{sc_test1.name}/#{ca_test2.name}")
+          end
       end
     end
   end
 
   describe "#site_controller" do
     context "when the site_controller variable is nil" do
-      it "finds the site controller by id"
-      # Write your test here!
+      it "finds the site controller by id" do
+        # Write your test here!
+      end
     end
 
     context "when the site_controller variable is not nil" do

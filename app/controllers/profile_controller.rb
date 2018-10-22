@@ -50,6 +50,7 @@ class ProfileController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
+								 :copy_of_all_emails,			# Added
                                  :institution_id)
   end
 end

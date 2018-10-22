@@ -124,6 +124,12 @@ class UsersController < ApplicationController
     @user.timezonepref = User.find(@user.parent_id).timezonepref
     if @user.save
       password = @user.reset_password # the password is reset
+	  
+	  if current_user.copy_of_all_emails				# Added
+		prepared_mail = MailerHelper.there_is_no_other_way_email(@user, current_user, "Your Expertiza account and password have been created.", "user_welcome", password)
+		prepared_mail.deliver
+	  end
+	  
       prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
       prepared_mail.deliver
       flash[:success] = "A new password has been sent to new user's e-mail address."
@@ -292,6 +298,7 @@ class UsersController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
+								 :copy_of_all_emails,		# Added
                                  :institution_id)
   end
 

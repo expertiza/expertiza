@@ -17,6 +17,7 @@ class User < ActiveRecord::Base
   has_many :track_notifications, dependent: :destroy
   belongs_to :parent, class_name: 'User'
   belongs_to :role
+  attr_accessor :anonymous_mode			# Added
   validates :name, presence: true
   validates :name, uniqueness: true
 
@@ -231,6 +232,7 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
+	@copy_of_all_emails = false					# Added
   end
 
   def self.export(csv, _parent_id, options)
@@ -240,7 +242,7 @@ class User < ActiveRecord::Base
       tcsv.push(user.name, user.fullname, user.email) if options["personal_details"] == "true"
       tcsv.push(user.role.name) if options["role"] == "true"
       tcsv.push(user.parent.name) if options["parent"] == "true"
-      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
+      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails, user.copy_of_all_emails) if options["email_options"] == "true"
       tcsv.push(user.handle) if options["handle"] == "true"
       csv << tcsv
     end

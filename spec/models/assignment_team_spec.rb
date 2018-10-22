@@ -1,7 +1,5 @@
 describe 'AssignmentTeam' do
-  let(:assignment) { build(:assignment) }
   let(:team) { build(:assignment_team) }
-  let(:participant) { build(:participant) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: "") }
 
   describe "#hyperlinks" do
@@ -18,11 +16,16 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe "#include?" do
+  describe "#includes?" do
+    let(:assignment) { build(:assignment, id: 1) }
+    let(:team) { build(:assignment_team, parent_id: 1) }
+    let(:user) { build(:student, id: 2) }
+    let(:participant) { build(:participant, parent_id: 1, user_id: 2) }
+
     context "when an assignment team has one participant" do
       it "includes one participant" do
-        participant.parent_id = team.parent_id
-        Assignment.find(team.parent_id).add_participant(User.find(participant.user_id), true , true , true)
+        assignment
+        user
         expect(team.includes?(participant)).to eq true
       end
     end

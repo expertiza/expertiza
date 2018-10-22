@@ -66,6 +66,19 @@ class Mailer < ActionMailer::Base
          bcc: defn[:cc])
   end
 
+  def new_suggested_topic(defn)
+    @body = defn[:body]
+    @suggestion_title = defn[:body][:suggestion_title]
+    @proposer = defn[:body][:proposer]
+
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+
+
+    mail(subject: defn[:subject],
+         body: defn[:body],
+         bcc: defn[:bcc])
+  end
+
   def notify_grade_conflict_message(defn)
     @body = defn[:body]
 

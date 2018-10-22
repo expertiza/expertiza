@@ -82,6 +82,7 @@ class SuggestionController < ApplicationController
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID == ''
+      mail_instructor if @assignment.instructor_id
     end
     redirect_to action: 'new', id: @suggestion.assignment_id
   end
@@ -205,5 +206,30 @@ class SuggestionController < ApplicationController
     else
       flash[:error] = 'An error occurred when approving the suggestion.'
     end
+  end
+
+  def mail_instructor
+    proposer = set_proposer
+    @assignment = Assignment.find(@suggestion.assignment_id)
+    instructor = User.find_by(id: @assignment.instructor_id)
+
+    Mailer.new_suggested_topic(
+        to: instructor.email,
+        subject: "New suggestion with name '#{@suggestion.title}'",
+        body: {
+            suggestion_title: @suggestion.title,
+            proposer: proposer
+        }
+    ).deliver_now!
+  end
+
+  def set_proposer
+    if params[:suggestion_anonymous].nil?
+      @user_id = User.find_by(name: @suggestion.unityID).try(:id)
+      proposer = User.find(@user_id).name
+    else
+      proposer = "Anonymous"
+    end
+    proposer
   end
 end

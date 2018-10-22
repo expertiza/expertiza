@@ -253,6 +253,7 @@ development:
         - 33
         - 50
         - 51
+        - 73
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -485,6 +486,16 @@ development:
         parent_id: 37
         site_controller_id: 10
         url: "/users/list_pending_requested"
+      73: &26 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 112
+        id: 51
+        label: Student View
+        name: student_view
+        parent:
+        parent_id: 37
+        site_controller_id: 10
+        url: "/users/set_anonymized_view"
     by_name:
       home: *1
       manage instructor content: *2
@@ -510,6 +521,7 @@ development:
       manage/questionnaires/course surveys: *23
       anonymized_view: *24
       manage/pending requests: *25
+      student_view: *26
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node
@@ -1238,6 +1250,7 @@ production:
         - 33
         - 50
         - 51
+        - 73
       35: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -1470,6 +1483,16 @@ production:
        parent_id: 37
        site_controller_id: 10
        url: "/users/list_pending_requested"
+      73: &26 !ruby/object:Menu::Node
+       content_page_id:
+       controller_action_id: 112
+       id: 73
+       label: Anonymized view
+       name: anonymized_view
+       parent:
+       parent_id: 37
+       site_controller_id: 35
+       url: "/users/set_anonymized_view"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1495,6 +1518,7 @@ production:
       manage/questionnaires/course surveys: *23
       anonymized_view: *24
       manage/pending requests: *25
+      student_view: *26
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node

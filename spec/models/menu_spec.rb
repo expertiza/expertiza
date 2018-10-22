@@ -1,13 +1,5 @@
 
 describe Node do
-  ###
-  # Please do not share this file with other teams.
-  # Use factories to `build` necessary objects.
-  # Please avoid duplicated code as much as you can by moving the code to `before(:each)` block or separated methods.
-  # RSpec tutorial video (until 9:32): https://youtu.be/dzkVfaKChSU?t=35s
-  # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
-  ###
-
   let(:node) { Menu::Node.new }
 
   let(:menu_item) {
@@ -216,9 +208,24 @@ describe Menu do
     end
   end
 
-  # it '#get_menu' do
-    # expect(menu.get_menu('Missing "level"')).to eq('Fill this in by hand')
-  # end
+  describe '#get_menu' do
+    # [@root, menu_item1, menu_item2]
+    before(:each) do
+      menu1.select(menu_item2.name)
+    end
+
+    it 'returns nil for the last level' do
+      expect(menu1.get_menu(2)).to eq(nil)
+    end
+
+    it 'returns children of menu_item1' do
+      expect(menu1.get_menu(1)).to eq([2, 3])
+    end
+
+    it 'returns children of root' do
+      expect(menu1.get_menu(0)).to eq([1, 4, 5])
+    end
+  end
 
   describe '#selected' do
     it 'returns root if nothing is selected previously' do
@@ -233,7 +240,6 @@ describe Menu do
 
   describe '#selected?' do
     it 'contains root is nothing is selected previously' do
-      puts "Menu Selected?: #{menu1.selected}"
       expect(menu1.selected?(menu_item1.id)).to be true
     end
     it 'contains selected node and its parents' do

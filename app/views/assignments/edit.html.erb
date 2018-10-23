@@ -86,11 +86,7 @@
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {
             addQuestionnaireTableRow(
-                    'BookmarkRatingQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
+                    'BookmarkRatingQuestionnaire',null, <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>, <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>, <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
             );
           }
       }
@@ -133,5 +129,16 @@
       });
     </script>
   <% end %>
+<div id="add_topic">
+<%= form_for :topic, :url => sign_up_sheet_index_path(:id => @assignment_form.assignment.id) do |f| %>
+  <%= f.text_field :topic_identifier %>
+  <%= f.text_field :topic_name %>
+  <%= f.text_field :max_choosers %>
+  <%= f.submit %>
+<% end %>
+  <script>
+    $("#add_topic").appendTo("#topic_table");
+  </script>
+</div>
 
   <br/>

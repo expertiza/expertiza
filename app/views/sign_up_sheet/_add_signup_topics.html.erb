@@ -7,10 +7,12 @@
 <% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
 <% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
+<% @sign_up_topic = SignUpTopic.new %>
+<% @topic = @sign_up_topic %>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>
-    <table class="table table-striped">
+    <table class="table table-striped" id="topic_table">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
       <% i=1 %>
@@ -21,8 +23,8 @@
           <% i=i+1 %>
       <% end %>
 
-    </table>
 
+    </table>
 <% else %>
     <div class="flash_note alert alert-danger">
       <%= "Signup topics have not yet been created." %>

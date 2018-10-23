@@ -82,7 +82,8 @@ class AssignmentsController < ApplicationController
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
-    handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    #comment for issue 1
+    #handle_assignment_directory_path_nonexist_case_and_answer_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges

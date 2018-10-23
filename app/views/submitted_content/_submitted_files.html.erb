@@ -25,7 +25,12 @@
       <div class="form-group">
         <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
       </div>
-      <%= submit_tag 'Upload file', class: 'btn btn-default' %>
+      <% if @assignment.directory_path != "" %>
+        <% puts "Asssign Directory: #{@assignment.directory_path}" %>
+        <%= submit_tag 'Upload file', class: 'btn btn-default' %>
+      <% else %>
+        <%= 'File Submissions are disabled' %>
+      <%end%>
       <br/><br/>
     <% end %>
   <% end %>

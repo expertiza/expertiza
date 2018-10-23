@@ -9,6 +9,7 @@
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
 <% @sign_up_topic = SignUpTopic.new %>
 <% @topic = @sign_up_topic %>
+<% @topic.max_choosers=1 %>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>

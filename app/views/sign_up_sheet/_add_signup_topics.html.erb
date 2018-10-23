@@ -1,3 +1,11 @@
+<script>
+  $(function () {
+    /*Function for sorting the table */
+    $(".sortable").tablesorter({
+      sortList: [[0,0]] //sort First Column by default when page loads
+    });
+  });
+</script>
 <% @assignment = Assignment.find(params[:id]) %>
 <% if flash[:notice] %>
     <div class="flash_note"><%= flash_message :notice %></div>
@@ -10,9 +18,10 @@
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>
-    <table class="table table-striped">
+    <table class="table table-striped sortable">
+      <thead>
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
-
+      </thead>
       <% i=1 %>
       <% for topic in @sign_up_topics %>
           <tr>

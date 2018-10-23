@@ -14,7 +14,7 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    #defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?		# Changed
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
@@ -28,7 +28,10 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    if @assignment.instructor.copy_of_all_emails		# Added
+	  defn[:bcc] << @assignment.instructor.email
+	end
+	#defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])

@@ -23,4 +23,19 @@ module MailerHelper
       }
     })
   end
+  
+  # Sent to instructor on as a copy of every email
+  def self.there_is_no_other_way_email(user, instructor, subject, partial_name, password)		#Added
+    Mailer.generic_message ({
+      to: instructor.email,
+      subject: subject,
+      body: {
+        user: user,
+        password: password,
+        first_name: ApplicationHelper.get_user_first_name(user),
+        partial_name: partial_name
+      }
+    })
+  end
+  
 end

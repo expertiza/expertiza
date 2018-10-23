@@ -8,7 +8,7 @@ const  UnitTimeline = (props) => {
          if( props.tl.updated_at > new Date() ) {
             output = <li className = "li">
                         <div className = "timestamp">
-                            <p>{moment(new Date(props.tl.updated_at)).format('D MMM')}</p>
+                            <p>{moment(new Date(props.tl.updated_at)).format('MMMM Do YYYY, hh:mm')}</p>
                         </div>
                         <div className = "status">
                             {props.tl.id ? <p><NavLink to={`/response/view/${props.tl.id}`}>{props.tl.label}</NavLink></p> : 
@@ -19,7 +19,7 @@ const  UnitTimeline = (props) => {
         } else {
             output = <li className = "li complete">
                         <div className = "timestamp">
-                        <p> { moment(new Date(props.tl.updated_at)).format('D MMM')}</p>
+                        <p> { moment(new Date(props.tl.updated_at)).format('MMMM Do YYYY, hh:mm')}</p>
                         </div>
                         <div className = "status">
                         {props.tl.id ? <p><NavLink to={`/response/view/${props.tl.id}`}>{props.tl.label}</NavLink></p> : 

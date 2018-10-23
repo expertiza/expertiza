@@ -48,7 +48,7 @@ Expertiza::Application.routes.draw do
     resources :grades, only: %i[edit update] do
       collection do
         get :view
-        post :view_team
+        get :view_team
         get :view_reviewer
         post :view_my_scores
         get :instructor_review
@@ -124,7 +124,7 @@ Expertiza::Application.routes.draw do
       collection do
         get :new_feedback
         post :edit
-        post :view
+        get :view
         get :remove_hyperlink
         get :saving
         get :redirection

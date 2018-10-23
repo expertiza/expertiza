@@ -4,6 +4,7 @@ import studentTaskList from './reducers/StudentTaskList';
 import signUpSheetList from './reducers/SignUpSheetList';
 import { Institutions } from './reducers/Institution';
 import studentTaskView from './reducers/StudentTaskView';
+import Grades from './reducers/Grade';
 import thunk from 'redux-thunk';
 import logger from 'redux-logger';
 import authReducer from './reducers/Auth';
@@ -22,7 +23,8 @@ export const ConfigureStore = () => {
             studentTeamView: studentTeamView,
             responseReducer: responseReducer,
             signUpSheetList: signUpSheetList,
-            submittedContent: submittedContent
+            submittedContent: submittedContent,
+            grades: Grades
         }),
         applyMiddleware(thunk, logger)
     );

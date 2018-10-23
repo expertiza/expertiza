@@ -4,8 +4,8 @@ import axios from '../../axios-instance';
 export const fetchReviewData = (response_id) => {
     return dispatch => {
         axios({
-            method: 'post',
-            url: 'response/view',
+            method: 'get',
+            url: 'response/view?id='+response_id,
             headers: { "Content-Type": "application/json",
                        AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')},
             data:{ "id" : response_id }

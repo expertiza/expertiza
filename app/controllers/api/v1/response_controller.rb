@@ -146,10 +146,26 @@ module Api::V1
   def view
     @response = Response.find(params[:id])
     @map = @response.map
+    @ans = []
     set_content
     # content needed for view in react app
+    @questions.each do |question|
+      curr_ans= Answer.where(question_id: question.id, response_id: @response.id).first
+      @ans << curr_ans
+    end
+    @author_answers = Answer.where(response_id: @response_id)
     survey = @map.survey?
-    render json: {status: :ok, map: @map, survey: survey, survey_parent: @survey_parent, title: @title, assignment: @assignment}
+    render json: {
+                  status: :ok, 
+                  title: @title, 
+                  response: @response,
+                  assignment: @assignment,
+                  questions: @questions,
+                  contributor: @contributor,
+                  ans: @ans,
+                  author_answers: @author_answers,
+                  map: @map
+                }
   end
 
     def create

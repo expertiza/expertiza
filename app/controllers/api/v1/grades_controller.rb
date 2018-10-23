@@ -137,7 +137,13 @@ module Api::V1
         @vmlist << vm
       end
       @current_role_name = current_role_name
-      render json: {status: :ok, data: "need to decide what to pass"}
+      render json: {
+                    status: :ok,
+                    questionnaires: questionnaires,
+                    vm: @vmlist,
+                    total: @pscore[:review][:scores][:avg],
+                    team_name: @team.name
+                  } 
     end
 
     def edit
@@ -333,5 +339,10 @@ module Api::V1
     def mean(array)
       array.inject(0) {|sum, x| sum += x } / array.size.to_f
     end
+    
+
+    # def isunderline?(score)
+    #   render :json {underlined?(score)}
+    # end
   end
 end

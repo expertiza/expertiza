@@ -92,6 +92,8 @@
 
                 fix comment end
               -->
+
+      
         <div class="overflow-container">
           <table id="scoresTable<%= vm.round.to_s  %>" class="scoresTable tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
@@ -103,7 +105,12 @@
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
+                      <th class="sorter-false">
+                          <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  
+                          data-toggle="tooltip" data-placement="right" title="Click to see details">
+                            <%= "Review " + i.to_s %>
+                          </a>  
+                      </th>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
@@ -155,6 +162,10 @@
                     <%= row.countofcomments.to_s %>
                   </td>
                 </tr>
+
+
+
+
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
                   <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">

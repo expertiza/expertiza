@@ -81,3 +81,9 @@ table.general td {
 .taskheader {
   font-family: verdana; font-size: 13px; text-align:left;
 }
+.table_warning{
+  background-color:#fcf8e3;
+}
+.table_info{
+  background-color:#d9edf7;
+}

@@ -9,20 +9,17 @@
   height: 140px; }
 
 .timestamp {
-  margin-bottom: 20px;
-  text-align: center; }
+  margin-bottom: 20px; }
 
 .status {
   display: flex;
   justify-content: center;
   border-top: 2px solid #D6DCE0;
   position: relative;
-  transition: all 200ms ease-in;
-  padding: 5px; }
+  transition: all 200ms ease-in; }
 
 .status p {
-  margin-top: 10px;
-  text-align: center; }
+  margin-top: 10px; }
 
 .status:before {
   content: "";
@@ -33,7 +30,7 @@
   border: 1px solid #ddd;
   position: absolute;
   top: -15px;
-  left: 35%;
+  left: 8%;
   transition: all 200ms ease-in; }
 
 .li.complete .status {

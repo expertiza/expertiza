@@ -5,6 +5,8 @@ class ReviewMappingController < ApplicationController
   require 'gchart'
   # helper :dynamic_review_assignment
   helper :submitted_content
+  #including the following helper to refactor the code in response_report function
+  helper :report_formatter
 
   @@time_create_last_review_mapping_record = nil
 
@@ -55,8 +57,8 @@ class ReviewMappingController < ApplicationController
       begin
         user = User.from_params(params)
         # contributor_id is team_id
-        regurl = url_for action: 'add_user_to_assignment',
-                         id: assignment.id,
+        #regurl = url_for action: 'add_user_to_assignment',
+        regurl = url_for id: assignment.id,
                          user_id: user.id,
                          contributor_id: params[:contributor_id]
 
@@ -352,6 +354,8 @@ class ReviewMappingController < ApplicationController
 
   def response_report
     # Get the assignment id and set it in an instance variable which will be used in view
+    #Code commented between =begin and =end in order to refactor this function using report_format_helper
+=begin
     @id = params[:id]
     @assignment = Assignment.find(@id)
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
@@ -435,6 +439,22 @@ class ReviewMappingController < ApplicationController
     when "SelfReview"
       @self_review_response_maps = SelfReviewResponseMap.where(reviewed_object_id: @id)
     end
+=end
+    @id = params[:id]
+    @assignment = Assignment.find(@id)
+
+    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
+    @summary = sum.summary
+    @reviewers = sum.reviewers
+    @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
+    @avg_scores_by_round = sum.avg_scores_by_round
+
+    # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
+    #Call the respective function of ReportFormatterHelper module
+    ReportFormatterHelper.send(@type , params, session)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 

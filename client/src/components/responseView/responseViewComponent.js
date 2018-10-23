@@ -6,11 +6,27 @@ import * as actions from '../../redux/index'
 import ResponseTable from './responseTable';
 
 class  ResponseViewComponent extends Component {
-  
+    constructor(props){
+        super(props)
+        this.state = {
+            author_feedback: false,
+            toggle_button: 'unhide',
+        }
+        this.toggleAuthorFeedback = this.toggleAuthorFeedback.bind(this)
+    }
     componentDidMount () {
         this.props.fetchReviewData(this.props.match.params.id)
     }    
+    toggleAuthorFeedback = () => {
+        this.setState({
+            author_feedback: !this.state.author_feedback,
+        }, () => {
+            this.setState({
+                toggle_button: (this.state.author_feedback)?'hide':'unhide'
+            })
+        })
 
+    }
     render () {
         let title;
         if(!this.props.loading) {
@@ -31,9 +47,17 @@ class  ResponseViewComponent extends Component {
                                 </div>
                             </div>
                             <ResponseTable title="Review" questions={this.props.questions} answers={this.props.answers} response={this.props.response} type="normal"/>
-                            <br/><h3> Feedback from author </h3>
-                            <ResponseTable title="Review" questions={this.props.author_questions} answers = {this.props.author_answers} 
-                                response={this.props.author_response_map[0]} type ="author"/>
+                                <br/><h3 style={{float: 'left'}} > Feedback from author </h3>
+                                <a style={{float: 'left', paddingTop: '10px', paddingLeft: '10px'}} href="#!" onClick = {()=>this.toggleAuthorFeedback()}>
+                                    {this.state.toggle_button}
+                                </a><br/>
+                            {(this.state.author_feedback)?
+
+                                <div style={{clear: 'both'}}><ResponseTable title="Review" questions={this.props.author_questions} answers = {this.props.author_answers} 
+                                response={this.props.author_response_map[0]} type ="author"/></div>
+                                : <div></div>
+                            }
+
                         </div>
                     )
                 else

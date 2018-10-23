@@ -19,7 +19,10 @@
   transition: all 200ms ease-in; }
 
 .status p {
-  margin-top: 10px; }
+  margin-top: 10px;
+  margin-top: 30px;
+  transform: rotate(15deg);
+  margin-left: 10px; }
 
 .status:before {
   content: "";

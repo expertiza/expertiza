@@ -9,7 +9,7 @@ class ResponseTable extends Component {
                 <tbody>
                     <tr>
                         <td align="left" width="70%"><b>{this.props.title}</b></td>
-                        <td align="left"><b>Last Reviewed:</b><span>
+                        <td align="left"><b>Last Reviewed: </b><span>
                         {(!this.props.response.updated_at)?'Not Available':
                           new Date(this.props.response.updated_at.split('T')).toLocaleString("en-US", options)}
                     </span></td> 

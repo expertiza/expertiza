@@ -1,7 +1,7 @@
 describe 'AssignmentTeam' do
-  let(:team) { build(:assignment_team) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: "") }
-
+  let(:team) { build(:assignment_team) }
+  
   describe "#hyperlinks" do
     context "when current teams submitted hyperlinks" do
       it "returns the hyperlinks submitted by the team" do
@@ -17,15 +17,13 @@ describe 'AssignmentTeam' do
   end
 
   describe "#includes?" do
-    let(:assignment) { build(:assignment, id: 1) }
-    let(:team) { build(:assignment_team, parent_id: 1) }
-    let(:user) { build(:student, id: 2) }
-    let(:participant) { build(:participant, parent_id: 1, user_id: 2) }
-
     context "when an assignment team has one participant" do
       it "includes one participant" do
-        assignment
-        user
+        create(:assignment, id: 1)
+        team = create(:assignment_team, id: 1, parent_id: 1)
+        create(:student, id: 2)
+        participant = create(:participant, parent_id: 1, user_id: 2)
+        create(:team_user, id: 1, team_id: 1, user_id: 2)
         expect(team.includes?(participant)).to eq true
       end
     end

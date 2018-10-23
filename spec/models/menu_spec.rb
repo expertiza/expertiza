@@ -1,12 +1,5 @@
-describe Node do
-  ###
-  # Please do not share this file with other teams.
-  # Use factories to `build` necessary objects.
-  # Please avoid duplicated code as much as you can by moving the code to `before(:each)` block or separated methods.
-  # RSpec tutorial video (until 9:32): https://youtu.be/dzkVfaKChSU?t=35s
-  # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
-  ###
 
+describe Node do
   let(:node) { Menu::Node.new }
 
   let(:menu_item) {
@@ -181,26 +174,69 @@ describe Menu do
     Menu.new(@admin_role)
   end
 
+  let(:node) { Menu::Node.new }
+
+
   describe '#select' do
     it 'returns when name is not in by_name{}' do
       expect(menu1.select("not_in_menu")).to be_nil
     end
     it 'returns when name is in by_name{}'do
-      menu1.select("menu_item1")
+      menu1.select("menu_item2")
+      # selected checks the last element in the @vector [], which will be the node passed to select.
+      # the selected node's parents will also be in vector, with the root node being first.
+      expect(menu1.selected).to eq("menu_item2")
+      # crumbs returns an array of ids which is populated in same way as @vector, so it contains
+      # the selected menu_item id as the last element, and each of its parents.
+      expect(menu1.crumbs.last.id).to eq(menu_item2.id)
       expect(menu1.crumbs.first.id).to eq(menu_item1.id)
-      expect(menu1.selected).to eq("menu_item1")
-      expect(menu1.selected?(menu_item1.id)).to be true
+      # selected? checks the @selected{} collection, which will contain
+      # a selected item and its parents.
+      expect(menu1.selected?(menu_item2.id)).to be true
+      expect(menu1.selected?(menu_item2.parent_id)).to be true
     end
 
   end
 
-  # it '#get_item' do
-    # expect(menu.get_item('Missing "item_id"')).to eq('Fill this in by hand')
-  # end
+  describe '#get_item' do
+    it 'returns nil when id is not in by_id{}' do
+      id_not_in_menu = 1738
+      expect(menu1.get_item(id_not_in_menu)).to be_nil
+    end
+    it 'returns an equivalent item' do
+      allow(menu_item5).to receive(:content_page).and_return(content_page2)
+      node.setup(menu_item5)
+      current_item = menu1.get_item(menu_item5.id)
+      expect(current_item.content_page_id).to eq(node.content_page_id)
+      expect(current_item.controller_action_id).to eq(node.controller_action_id)
+      expect(current_item.id).to eq(node.id)
+      expect(current_item.label).to eq(node.label)
+      expect(current_item.name).to eq(node.name)
+      expect(current_item.parent).to eq(node.parent)
+      expect(current_item.parent_id).to eq(node.parent_id)
+      expect(current_item.site_controller_id).to eq(node.site_controller_id)
+      expect(current_item.url).to eq(node.url)
+    end
+  end
 
-  # it '#get_menu' do
-    # expect(menu.get_menu('Missing "level"')).to eq('Fill this in by hand')
-  # end
+  describe '#get_menu' do
+    # [@root, menu_item1, menu_item2]
+    before(:each) do
+      menu1.select(menu_item2.name)
+    end
+
+    it 'returns nil for the last level' do
+      expect(menu1.get_menu(2)).to eq(nil)
+    end
+
+    it 'returns children of menu_item1' do
+      expect(menu1.get_menu(1)).to eq([2, 3])
+    end
+
+    it 'returns children of root' do
+      expect(menu1.get_menu(0)).to eq([1, 4, 5])
+    end
+  end
 
   describe '#selected' do
     it 'returns root if nothing is selected previously' do
@@ -213,11 +249,59 @@ describe Menu do
     end
   end
 
-  # it '#selected?' do
-    # expect(menu.selected?('Missing "menu_id"')).to eq('Fill this in by hand')
-  # end
+  describe '#selected?' do
+    it 'contains root is nothing is selected previously' do
+      expect(menu1.selected?(menu_item1.id)).to be true
+    end
+    it 'contains selected node and its parents' do
+      menu1.select("menu_item2")
+      expect(menu1.selected?(menu_item2.id)).to be true
+      expect(menu1.selected?(menu_item1.id)).to be true
+    end
+  end
 
-  # it '#crumbs' do
-    # expect(menu.crumbs).to eq('Fill this in by hand')
-  # end
+  describe '#crumbs' do
+    let(:menu) do
+      role = double('Role')
+      allow(role).to receive_message_chain(:cache, :[])
+      Menu.new(role)
+    end
+
+    context 'no menu item is selected' do
+      it 'returns empty array' do
+        expect(menu.crumbs).to be_empty
+      end
+    end
+
+    context 'top level menu item is selected' do
+      before(:each) do
+        menu1.select(menu_item1.name)
+      end
+
+      it 'has one crumb' do
+        expect(menu1.crumbs.length).to eq(1)
+      end
+
+      it 'has crumb with menu id' do
+        crumb = menu1.crumbs[0];
+        expect(crumb.id).to eq(menu_item1.id)
+      end
+    end
+
+    context 'bottom level menu item is selected' do
+      before(:each) do
+        menu1.select(menu_item2.name)
+      end
+
+      it 'has two crumbs' do
+        expect(menu1.crumbs.length).to eq(2)
+      end
+
+      it 'has crumb order from child to parent' do
+        actualCrumbIds = menu1.crumbs.collect { |c| c.id }
+        expectedCrumbIds = [menu_item1.id, menu_item2.id]
+        expect(actualCrumbIds).to eq(expectedCrumbIds)
+      end
+    end
+  end
 end

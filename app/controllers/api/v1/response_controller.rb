@@ -145,7 +145,7 @@ module Api::V1
     # view response
   def view
     @response = Response.find(params[:id])
-    @map = @response.map
+    @map = @response.map #find map with reviewed object id id equal to this ID. // Authorfeedbackresponse
     @ans = []
     set_content
     # content needed for view in react app
@@ -153,7 +153,16 @@ module Api::V1
       curr_ans= Answer.where(question_id: question.id, response_id: @response.id).first
       @ans << curr_ans
     end
-    @author_answers = Answer.where(response_id: @response_id)
+    @feedbackmap = FeedbackResponseMap.find_by(reviewed_object_id: @response.id)
+    @author_response_map = Response.where(map_id: @feedbackmap.id)
+    @author_answers = Answer.where(response_id: @author_response_map.first.response_id)
+
+    @author_questions=[]
+
+    @author_answers.each do | answer| 
+      @author_questions << Question.find(answer.question_id)
+    end
+    
     survey = @map.survey?
     render json: {
                   status: :ok, 
@@ -164,7 +173,9 @@ module Api::V1
                   contributor: @contributor,
                   ans: @ans,
                   author_answers: @author_answers,
-                  map: @map
+                  author_questions: @author_questions,
+                  map: @map,
+                  author_response_map: @author_response_map
                 }
   end
 

@@ -19,12 +19,12 @@ const  UnitTimeline = (props) => {
         } else {
             output = <li className = "li complete">
                         <div className = "timestamp">
-                        <p> { moment(new Date(props.tl.updated_at)).format('MMMM Do YYYY, hh:mm')}</p>
+                             <p> { moment(new Date(props.tl.updated_at)).format('D MMM')}</p>
                         </div>
                         <div className = "status">
                         {props.tl.id ? <p><NavLink to={`/response/view/${props.tl.id}`}>{props.tl.label}</NavLink></p> : 
                                                 props.tl.link ? <p><NavLink to="#">{props.tl.link}</NavLink> </p> :
-                                                                     <p>{props.tl.label}</p> }
+                                                                     <p><a>{props.tl.label}</a></p> }
                         </div>
                     </li>
 

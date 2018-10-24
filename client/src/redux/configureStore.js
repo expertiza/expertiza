@@ -10,6 +10,7 @@ import logger from 'redux-logger';
 import authReducer from './reducers/Auth';
 import studentTeamView from './reducers/StudentTeamView';
 import responseReducer from './reducers/Response';
+import submittedContent from './reducers/SubmittedContent'
 
 export const ConfigureStore = () => {
     const store = createStore(
@@ -21,8 +22,9 @@ export const ConfigureStore = () => {
             auth: authReducer,
             studentTeamView: studentTeamView,
             responseReducer: responseReducer,
-            grades: Grades,
-            signUpSheetList: signUpSheetList
+            signUpSheetList: signUpSheetList,
+            submittedContent: submittedContent,
+            grades: Grades
         }),
         applyMiddleware(thunk, logger)
     );

@@ -119,6 +119,8 @@ export const auth = (name, password) => {
                 dispatch(actions.fetchTeamCourse())
                 dispatch(actions.fetchTasks())
                 dispatch(actions.fetchRevisions())
+                dispatch(actions.containsTopics())
+                dispatch(actions.containsBadges())
             })
             .catch(error => {
                             console.log(error)
@@ -135,6 +137,8 @@ export const auth = (name, password) => {
             dispatch(actions.fetchTeamCourse())
             dispatch(actions.fetchTasks())
             dispatch(actions.fetchRevisions())
+            dispatch(actions.containsTopics())
+            dispatch(actions.containsBadges())
         }
     }
 }
@@ -148,6 +152,11 @@ export const checkForAutoLogIn = () =>  {
             dispatch(actions.fetchInstitutions())
             dispatch(actions.fetchStudentsTeamedWith())
             dispatch(actions.fetchStudentTasks())
+            dispatch(actions.fetchTeamCourse())
+            dispatch(actions.fetchTasks())
+            dispatch(actions.fetchRevisions())
+            dispatch(actions.containsTopics())
+            dispatch(actions.containsBadges())
         }
     }
 }

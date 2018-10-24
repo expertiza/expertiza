@@ -52,10 +52,12 @@ class SignUpSheetComponent extends Component {
                 }
                 <h1>Signup sheet for {this.props.assignment.name}</h1>
                 <br></br>
-                <b>Your topic(s):</b>
-                <br></br>
+                {this.props.sign_up_topics.map(sign_up_topic =>(
+                    sign_up_topic.color == "yellow" ?
+                    <div><b>Your topic(s):</b> {sign_up_topic.topic.topic_name} <br/></div> :
+                    console.log()
+                ))}
                 
-                <br></br>
                 <br></br>
 
                 <table class="general">

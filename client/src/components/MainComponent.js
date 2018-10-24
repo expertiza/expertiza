@@ -76,7 +76,9 @@ class Main extends Component {
                                     studentTasks = {this.props.studentTaskList.studentTasks}
                                     teamCourse = {this.props.studentTaskList.teamCourse}
                                     tasks_not_started = {this.props.studentTaskList.tasks_not_started}
-                                    taskrevisions = {this.props.studentTaskList.taskrevisions}/>}/>
+                                    taskrevisions = {this.props.studentTaskList.taskrevisions}
+                                    hasTopics = {this.props.studentTaskList.hasTopics}
+                                    hasBadges = {this.props.studentTaskList.hasBadges}/>}/>
                 <Route path = '/sign_up_sheet' component={SignupSheet}/>
                 <Route path ='/logout' component={(Logout)} />
                 <Route path ='/view_student_teams/:id' component={(StudentTeamComponent)} />

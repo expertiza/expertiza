@@ -5,7 +5,9 @@ const initialize={
          studentTasks: [],
          teamCourse: [],
          tasks_not_started: [],
-         taskrevisions: []
+         taskrevisions: [],
+         hasTopics: {},
+         hasBadges: {}
     }
 
 const studentTaskList = (state = initialize, action) => {
@@ -20,6 +22,10 @@ const studentTaskList = (state = initialize, action) => {
             return {...state, tasks_not_started: action.payload};
         case actions.ADD_TASKREVISIONS:
             return {...state, taskrevisions: action.payload};
+        case actions.HAS_TOPICS:
+            return {...state, hasTopics: action.payload};
+        case actions.HAS_BADGES:
+            return {...state, hasBadges: action.payload};
         default: 
             return state;
     }

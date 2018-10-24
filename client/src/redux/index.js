@@ -18,10 +18,13 @@ export {
     ADD_STUDENTTASKS,
     ADD_TEAMCOURSE,
     ADD_TASKS,
+    HAS_TOPICS,
+    HAS_BADGES,
     ADD_TASKREVISIONS,
     ADD_SIGNUPSHEETLIST,
     ADD_SIGNUP,
     ADD_DELETE,
+    ADD_SUBMITTEDCONTENT,
     CHANGE_HANDLE,
     STUDENT_TASK_VIEW_SUBMISSION_ALLOWED,
     STUDENT_TASK_VIEW_CHECK_REVIEWABLE_TOPICS,
@@ -88,6 +91,11 @@ export {
 }
 from './actions/Profile'
 export {
+    onSubmittedContentLoad,
+    getSumittedContent
+}
+from './actions/SubmittedContent'
+export {
     fetchStudentsTeamedWith,
     fetchStudentTasks,
     fetchTeamCourse,
@@ -97,7 +105,11 @@ export {
     addStudentTasks,
     addTeamCourse,
     addTasks,
-    addTaskRevisions
+    addTaskRevisions,
+    containsTopics,
+    hasTopics,
+    containsBadges,
+    hasBadges
 } 
 from './actions/StudentTaskList';
 export { fetchStudentsTeamView,

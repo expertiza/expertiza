@@ -201,20 +201,20 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
 
-    failedCount = 0
+    num_unsuccessful_deletes = 0
 
     mmappings.each do |mmapping|
       begin
         mmapping.delete(params[:force])
       rescue StandardError
-        failedCount += 1
+        num_unsuccessful_deletes += 1
       end
     end
 
-    if failedCount > 0
+    if num_unsuccessful_deletes > 0
       url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
       url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
     else
       flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
     end

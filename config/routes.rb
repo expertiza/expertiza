@@ -109,6 +109,7 @@ Expertiza::Application.routes.draw do
       get :export
       post :export
       post :exportdetails
+      post :export_advices
     end
   end
 

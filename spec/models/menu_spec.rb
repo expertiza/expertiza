@@ -90,24 +90,35 @@ describe Node do
       allow(controller_action).to receive(:controller).and_return(controller)
       node.setup(menu_item)
     end
-    it 'sets site_controller instance variable from factory' do
+    it 'sets @site_controller instance variable' do
       result = controller_action.id;
       expect(SiteController).to receive(:find_by).with(id: controller.id).and_return(result)
       expect(node.site_controller).to eq(result)
     end
   end
 
-  # it '#site_controller' do
-    # expect(node.site_controller).to eq('Fill this in by hand')
-  # end
-
-  # it '#controller_action' do
-    # expect(node.controller_action).to eq('Fill this in by hand')
-  # end
-
-  # it '#content_page' do
-  #   expect(node.content_page).to eq('Fill this in by hand')
-  # end
+  describe '#controller_action' do
+    before (:example)  do
+      allow(menu_item).to receive(:controller_action).and_return(controller_action)
+      node.setup(menu_item)
+    end
+    it 'sets @controller_action instance variable ' do
+      result = controller_action.id;
+      expect(ControllerAction).to receive(:find_by).with(id: controller_action.id).and_return(result)
+      expect(node.controller_action).to eq(result)
+    end
+  end
+  describe '#content_page' do
+    before (:example)  do
+      allow(menu_item).to receive(:content_page).and_return(content_page)
+      node.setup(menu_item)
+    end
+    it 'sets @content_page instance variable ' do
+      result = content_page.id;
+      expect(ContentPage).to receive(:find_by).with(id: content_page.id).and_return(result)
+      expect(node.content_page).to eq(result)
+    end
+  end
 
   describe '#add_child' do
     let(:child_node) { Menu::Node.new }

@@ -262,11 +262,13 @@ describe ReviewMappingController do
 
     context 'when failed times are bigger than 0' do
       it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
-        allow(ResponseMap).to receive(:delete_mappings).with(@metareview_response_maps, true).and_return(5)
+        @metareview_response_maps.each do |metareview_response_map|
+          allow(metareview_response_map).to receive(:delete).with(true).and_raise('Boom')
+        end
         params = {id: 1, force: true}
         post :delete_all_metareviewers, params
         expect(flash[:note]).to be nil
-        expect(flash[:error]).to eq("A delete action failed:<br/>5 metareviews exist for these mappings. "\
+        expect(flash[:error]).to eq("A delete action failed:<br/>1 metareviews exist for these mappings. "\
           "Delete these mappings anyway?&nbsp;<a href='http://test.host/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
           "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><BR/>")
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
@@ -275,7 +277,9 @@ describe ReviewMappingController do
 
     context 'when failed time is equal to 0' do
       it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
-        allow(ResponseMap).to receive(:delete_mappings).with(@metareview_response_maps, true).and_return(0)
+        @metareview_response_maps.each do |metareview_response_map|
+          allow(metareview_response_map).to receive(:delete).with(true)
+        end
         params = {id: 1, force: true}
         post :delete_all_metareviewers, params
         expect(flash[:error]).to be nil

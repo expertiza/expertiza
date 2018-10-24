@@ -30,6 +30,7 @@ class  ResponseViewComponent extends Component {
     render () {
         // eslint-disable-next-line
         let title;
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',hour: 'numeric', minute: 'numeric', second: 'numeric'  };
         if(!this.props.loading) {
             if ( this.props.survey ) {
                 return(

@@ -1,6 +1,6 @@
 # CapistranoDbTasks (https://github.com/sgruhier/capistrano-db-tasks)
 require 'capistrano-db-tasks'
-
+require 'cap_blue_green_deploy'
 
 # if you haven't already specified
 set :rails_env, "production"

@@ -50,4 +50,27 @@ describe 'AssignmentTeam' do
       expect(AssignmentTeam.parent_model(1)).to eq assignment
     end
   end
+
+  describe "#fullname" do
+    context "when the team has a name" do
+      it "provides the name of the class" do
+        team = build(:assignment_team, id: 1, name: "abcd")
+        expect(team.fullname()).to eq "abcd"
+      end
+    end
+  end
+
+  describe "#review_map_type" do
+    it "provides the review map type" do
+      expect(team.review_map_type).to eq "ReviewResponseMap"
+    end
+  end
+
+  describe ".prototype" do
+    it "provides the instance of the AssignmentTeam" do
+
+      expect(AssignmentTeam).to receive(:new).with(no_args())
+      AssignmentTeam.prototype
+    end
+  end
 end

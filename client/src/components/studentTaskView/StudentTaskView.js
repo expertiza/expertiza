@@ -63,7 +63,7 @@ class StudentTaskView extends Component {
                         (this.props.authorization === 'participant' || this.props.can_submit === true) ?
                              (this.props.topics.size > 0) ? 
                                     (this.props.topic_id && !this.props.submission_allowed) ?
-                                        <li><NavLink className="StudentTaskUpload" to={`/submitted_content/${this.props.participant.id}/edit`} >Your work</NavLink> (Submit and view your work)</li> :
+                                        <li><NavLink className="StudentTaskUpload" to={`/submitted_content/${this.props.participant.id}`} >Your work</NavLink> (Submit and view your work)</li> :
                                         <li><font color="gray">Your work</font> <span>(You have to choose a topic first)</span></li>
                            :
                             (!this.props.submission_allowed ) ? <li><NavLink className="StudentTaskUpload" to={`/submitted_content/${this.props.participant.id}/edit`} > Your work (Submit and view your work) </NavLink></li>

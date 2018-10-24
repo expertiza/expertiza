@@ -12,7 +12,7 @@ class ReviewMappingController < ApplicationController
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'release_reservation', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
+    when 'add_dynamic_reviewer', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
       true
     else
       ['Instructor',
@@ -409,12 +409,16 @@ class ReviewMappingController < ApplicationController
       # If review report for teammate is required call teammate_response_report method in teammate_review_response_map model
       @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
     when "Calibration"
-      participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
+      assignment_id = params[:id]
+      participant = AssignmentParticipant.where(parent_id: assignment_id, user_id: session[:user].id).first rescue nil
       if participant.nil?
-        participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+        create_params = {parent_id: assignment_id, user_id: session[:user].id, can_submit: 1, can_review: 1,
+                         can_take_quiz: 1, handle: 'handle'}
+        participant = AssignmentParticipant.create(create_params)
       end
+
       @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-      @assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: params[:id], questionnaire_id: @review_questionnaire_ids).first
+      @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(assignment_id).first
       @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
       @calibration_response_maps = ReviewResponseMap.where(reviewed_object_id: params[:id], calibrate_to: 1)
       @review_response_map_ids = ReviewResponseMap.select('id').where(reviewed_object_id: params[:id], calibrate_to: 0)
@@ -466,13 +470,14 @@ class ReviewMappingController < ApplicationController
   # E1600
   # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
   def start_self_review
+    user_id = params[:reviewer_userid]
     assignment = Assignment.find(params[:assignment_id])
-    team_id = TeamsUser.find_by_sql(["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", assignment.id, params[:reviewer_userid]])
+    team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first
     begin
       # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
-      if SelfReviewResponseMap.where(reviewee_id: team_id[0].t_id, reviewer_id: params[:reviewer_id]).first.nil?
-        SelfReviewResponseMap.create(reviewee_id: team_id[0].t_id,
+      if SelfReviewResponseMap.where(reviewee_id: team.id, reviewer_id: params[:reviewer_id]).first.nil?
+        SelfReviewResponseMap.create(reviewee_id: team.id,
                                      reviewer_id: params[:reviewer_id],
                                      reviewed_object_id: assignment.id)
       else

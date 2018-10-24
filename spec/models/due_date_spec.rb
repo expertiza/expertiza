@@ -4,7 +4,7 @@ describe "due_date_functions" do
     @deadline_right = build(:deadline_right)
     @assignment_due_date = build(:assignment_due_date, deadline_type: @deadline_type,
                                                        submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
-                                                       review_of_review_allowed_id: @deadline_right.id, due_at: '2015-12-30 23:30:12')
+                                                       review_of_review_allowed_id: @deadline_right.id, due_at: '2018-10-31 23:59:59')
 
     @due_dates = []
     10.times.each do |n|

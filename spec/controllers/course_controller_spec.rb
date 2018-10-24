@@ -9,7 +9,7 @@ describe CourseController do
         expect(controller.send(:action_allowed?)).to be false
       end
 
-      it 'disallows certain action' do
+      it 'allows all course actions' do
         user = instructor
         stub_current_user(user, user.role.name, user.role)
         expect(controller.send(:action_allowed?)).to be true

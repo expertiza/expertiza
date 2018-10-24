@@ -649,10 +649,7 @@ describe ReviewMappingController do
 
   describe '#start_self_review' do
     before(:each) do
-      allow(TeamsUser).to receive(:find_by_sql).with(
-        ["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", 1, '1']
-      )
-                                               .and_return([double('TeamsUser', t_id: 1)])
+      allow(Team).to receive(:find_team_for_assignment_and_user).with(1, '1').and_return([double('Team', id: 1)])
     end
 
     context 'when self review response map does not exist' do

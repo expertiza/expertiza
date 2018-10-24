@@ -1,13 +1,3 @@
-# describe QuestionnairesController do
-#   let(:questionnaire) { build(:questionnaire) }
-#   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
-#   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
-#   let(:question) { build(:question, id: 1) }
-#   let(:instructor) { build(:instructor, id: 6) }
-#   before(:each) do
-#     stub_current_user(instructor, instructor.role.name, instructor.role)
-#   end
-
 describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }

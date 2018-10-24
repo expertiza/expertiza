@@ -1,7 +1,9 @@
 describe 'AssignmentTeam' do
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: "") }
-  let(:team) { build(:assignment_team) }
-  let(:assignment) { build(:assignment) }
+  let(:team) { build(:assignment_team, parent_id: 1) }
+  let(:assignment) { build(:assignment, id: 1) }
+  let(:participant) { build(:participant) }
+  let(:user) { build(:student, id: 2) }
 
   describe "#hyperlinks" do
     context "when current teams submitted hyperlinks" do
@@ -20,19 +22,16 @@ describe 'AssignmentTeam' do
   describe "#includes?" do
     context "when an assignment team has one participant" do
       it "includes one participant" do
-        team = create(:assignment_team, id: 1)
-        create(:student, id: 2)
-        participant = create(:participant, user_id: 2)
-        create(:team_user, team_id: 1, user_id: 2)
+        allow(team).to receive(:users).with(no_args()).and_return([user])
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user.id, parent_id: team.parent_id).and_return(participant)
         expect(team.includes?(participant)).to eq true
       end
     end
     
-    context "when an assignment team has no participants" do
+    context "when an assignment team has a user but no participants" do
       it "includes no participants" do
-        team = create(:assignment_team, id: 1)
-        create(:student, id: 2)
-        participant = create(:participant, user_id: 2)
+        allow(team).to receive(:users).with(no_args()).and_return([])
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user.id, parent_id: team.parent_id).and_return(nil)
         expect(team.includes?(participant)).to eq false
       end
     end

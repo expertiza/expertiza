@@ -3,26 +3,16 @@ describe Node do
   let(:node) { Menu::Node.new }
 
   let(:menu_item) {
-    build(:menu_item,
-      parent_id: 1,
-      name: 'test_name',
-      id: 2,
-      label: 'test_label'
-    )
+    build(:menu_item, parent_id: 1, name: 'name', id: 2, label: 'label')
   }
 
-  let(:content_page) { double('ContentPage', id: 1, name: 'test_name') }
+  let(:content_page) { double('ContentPage', id: 1, name: 'name') }
 
   let(:controller_action) {
-    double('ControllerAction',
-      id: 99,
-      name: 'test_controller_action',
-      url_to_use: 'https://test_url.com',
-      controller: nil
-    )
+    double('ControllerAction', id: 99, name: 'name', url_to_use: 'url', controller: nil)
   }
 
-  let(:controller) { double('Controller', id: 3, name: 'test_name') }
+  let(:controller) { double('Controller', id: 3, name: 'name') }
 
   describe '#setup' do
     it 'sets up attributes: parent_id, name, id, label' do

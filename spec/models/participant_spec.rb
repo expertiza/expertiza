@@ -17,24 +17,27 @@ describe Participant do
   # RSpec unit tests examples: https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
   ###
 
-  # Create Necessary objects for testing.
-  let(:student) { build(:student, name: "Student", fullname: "Test, Student") }
-  let(:student2) { build(:student, name: "A", fullname: "A, A") }
-  let(:student3) { build(:student, name: "B", fullname: "B, B") }
+  # Create necessary student participants for testing.
+  let(:participant) {
+	build(:participant, user: build(:student, name: "Student", fullname: "Test, Student", id: 1 ) ) }
+  let(:participant2) { 
+	build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2 ) ) }
+  let(:participant3) { 
+	build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3 ) ) }
 
-  let(:participant) { build(:participant, user: student) }
-  let(:participant2) { build(:participant, user: student2) }
-  let(:participant3) { build(:participant, can_review: false, user: student3) }
+##create assignment
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   
-  #create user 
+##create team 
   let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
   let(:team) { build(:assignment_team, id: 1, name: 'myTeam', users: [user]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
 
-  #create review response 
-  let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
-  let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
+##create review response 
+  let(:review_response_map) {
+	build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
+  let(:response) {
+	build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
  
   #create question
@@ -46,9 +49,7 @@ describe Participant do
     it 'returns nil for a participant not assigned to a team' do
       expect( participant.team ).to eq( nil )
     end
-  end
 
-  describe '#team' do
     it 'returns the team of the participant' do
       allow( participant ).to receive( :team ).and_return( team.name )
       expect( participant.team ).to eq( 'myTeam' )
@@ -172,12 +173,11 @@ describe Participant do
     end
   end
 
-#  describe '#sort_by_name' do
-#    it 'returns a sorted list of participants alphabetical by name' do
-#      #send_part=[participant,participant2]
-#      #rec=[ participant2,participant]
-#      #allow(participant).to receive(:sort_by_name).and_return(rec)
-#      #expect(Participant.sort_by_name( send_part)).to eq(rec)
-#    end
-#  end
+  describe '#sort_by_name' do
+    it 'returns a sorted list of participants alphabetical by name' do
+      unsorted = [ participant, participant2, participant3 ]
+      sorted = [ participant2, participant3, participant ]
+      expect( Participant.sort_by_name( unsorted ) ).to eq( sorted )
+    end
+  end
 end

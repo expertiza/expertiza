@@ -601,8 +601,8 @@ describe ReviewMappingController do
           .with(parent_id: '1', user_id: 3, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle').and_return(participant)
         allow(ReviewQuestionnaire).to receive(:select).with('id').and_return([1, 2, 3])
         assignment_questionnaire = double('AssignmentQuestionnaire')
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1', questionnaire_id: [1, 2, 3])
-                                                         .and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:retrieve_questionnaire_for_assignment).with('1')
+                                              .and_return([assignment_questionnaire])
         allow(assignment_questionnaire).to receive_message_chain(:questionnaire, :questions).and_return([double('Question', type: 'Criterion')])
         allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
         allow(ReviewResponseMap).to receive_message_chain(:select, :where).with('id').with(reviewed_object_id: '1', calibrate_to: 0)
@@ -653,10 +653,7 @@ describe ReviewMappingController do
 
   describe '#start_self_review' do
     before(:each) do
-      allow(TeamsUser).to receive(:find_by_sql).with(
-        ["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", 1, '1']
-      )
-                                               .and_return([double('TeamsUser', t_id: 1)])
+      allow(Team).to receive(:find_team_for_assignment_and_user).with(1, '1').and_return([double('Team', id: 1)])
     end
 
     context 'when self review response map does not exist' do

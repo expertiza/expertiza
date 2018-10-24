@@ -141,12 +141,20 @@ Expertiza::Application.routes.draw do
     end
   end
 
-resources :institution, except: [:destroy] do
+  resources :institution, except: [:destroy] do
     collection do
       get :list
       post ':id', action: :update
     end
   end
+
+  resources :role_switch, only: [] do
+    collection do
+      post  :set_student_role
+      post  :revert_to_instructor_role
+    end
+  end
+
 
   resources :invitations, only: %i[new create] do
     collection do

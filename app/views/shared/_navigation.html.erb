@@ -13,30 +13,37 @@
 
       <ul class="nav navbar-nav menuposition">
         <% if session[:menu] %>
-            <%= render :partial => 'menu_items/suckerfish',
+        <%= render :partial => 'menu_items/suckerfish',
                        :locals => { items: session[:menu].get_menu(0), level: 0 } %>
         <% end %>
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
         <% if current_user %>
-            <li class="impersonate-box">
-              <span id="impersonate-user-info">User: <%= current_user.name(session[:ip]) %></span>
-              <% if session[:super_user] %>
-                  <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
-                      <div class="input-group">
-                        <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
-                        <span class="input-group-btn">
-                        <button type="button" class="btn btn-primary" id="impersonate-button">Revert</button>
-                        </span>
-                      </div>
-                  <% end %>
-              <% end %>
-            </li>
-            <li class="divider-vertical"></li>
-            <li class="right-most logout-box">
-              <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>
-            </li>
+        <li class="impersonate-box">
+          <span id="impersonate-user-info">User: <%= current_user.name(session[:ip]) %></span>
+          <% if session[:super_user] %>
+          <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
+          <div class="input-group">
+            <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-primary" id="impersonate-button">Revert</button>
+            </span>
+          </div>
+          <% end %>
+          <% end %>
+          <% if session[:user] and session[:user].role.instructor? %>
+            <% if session.key?(:student_view) %>
+              <%= link_to "Revert to Instructor View", {controller: "role_switch", action: "revert_to_instructor_role"}, method: :post, :style => "color: white" %>
+            <% else %>
+              <%= link_to "Switch to Student View", {controller: "role_switch", action: "set_student_role"}, method: :post, :style => "color: white" %>
+            <% end %>
+          <% end %>
+        </li>
+        <li class="divider-vertical"></li>
+        <li class="right-most logout-box">
+          <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>
+        </li>
         <% end %>
       </ul>
     </div>

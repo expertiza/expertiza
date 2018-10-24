@@ -11,12 +11,7 @@ describe Node do
     )
   }
 
-  let(:content_page) {
-    double('ContentPage',
-      id: 1,
-      name: 'test_content_page_name'
-    )
-  }
+  let(:content_page) { double('ContentPage', id: 1, name: 'test_name') }
 
   let(:controller_action) {
     double('ControllerAction',
@@ -27,12 +22,7 @@ describe Node do
     )
   }
 
-  let(:controller) {
-    double('Controller',
-      id: 3,
-      name: 'test_controller'
-    )
-  }
+  let(:controller) { double('Controller', id: 3, name: 'test_name') }
 
   describe '#setup' do
     it 'sets up attributes: parent_id, name, id, label' do
@@ -143,59 +133,69 @@ describe Menu do
   # role_admin.yml defines the permissionIds for admin as 5,5,6,3,2
   # we must assign controlleractions and contentpages with permissionIds of those numbers
   # to enable menuitems's items_for_permissions function to succeed.
-  let!(:menu_item1) { create(:menu_item, name: "menu_item1", parent_id: nil,  seq: 1) }
-  let!(:menu_item2) { create(:menu_item, name: "menu_item2", parent_id: 1,    seq: 2) }
-  let!(:menu_item3) { create(:menu_item, name: "menu_item3", parent_id: 1,    seq: 3) }
-  let!(:menu_item4) { create(:menu_item, name: "menu_item4", parent_id: nil,  seq: 2) }
-  let!(:menu_item5) { create(:menu_item, name: "menu_item5", parent_id: nil,  seq: 4) }
-  (1..7).each do |i|
-    let!("controller_action#{i}".to_sym) { ControllerAction.create(site_controller_id: i, name: 'name', permission_id: i) }
-    let!("content_page#{i}".to_sym) { ContentPage.create(title: "home page#{i}", name: "home#{i}", content: '', permission_id: i, content_cache: '') }
+
+  let(:permission_ids) { [5, 5, 6, 3, 2] }
+
+  let(:role) {
+    role = double('Role')
+    permissions = double('Permissions', permission_ids: permission_ids)
+    allow(role).to receive_message_chain(:cache, :[]).with(:credentials).and_return(permissions)
+    role
+  }
+
+  let(:controller_action) { double('ControllerAction', url_to_use: 'https://test_url.com') }
+
+  let(:menu_items) {
+    (1..5).collect { |i| build(:menu_item,
+      id: i,
+      name: "menu_item#{i}",
+      controller_action: controller_action,
+      parent_id: (i == 2 || i == 3) ? 1 : nil)
+    }
+  }
+
+  (1..5).each { |i| let("menu_item#{i}") { menu_items[i - 1] } }
+
+  before(:each) do
+    allow(ControllerAction).to receive(:find_by).and_return(controller_action)
+    allow(ContentPage).to receive(:find_by)
+    allow(MenuItem).to receive(:items_for_permissions)
+      .with(permission_ids).and_return(menu_items)
   end
 
-  let(:menu1) do
-    @admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: 1, default_page_id: 1)
-    menu_item1.update_attributes(controller_action_id: nil, content_page_id: 5)
-    menu_item2.update_attributes(controller_action_id: nil, content_page_id: 5)
-    menu_item3.update_attributes(controller_action_id: nil, content_page_id: 6)
-    menu_item4.update_attributes(controller_action_id: nil, content_page_id: 3)
-    menu_item5.update_attributes(controller_action_id: nil, content_page_id: 2)
-    Menu.new(@admin_role)
-  end
+  let(:menu) { Menu.new(role) }
 
   let(:node) { Menu::Node.new }
 
-
   describe '#select' do
     it 'returns when name is not in by_name{}' do
-      expect(menu1.select("not_in_menu")).to be_nil
-    end
-    it 'returns when name is in by_name{}'do
-      menu1.select("menu_item2")
-      # selected checks the last element in the @vector [], which will be the node passed to select.
-      # the selected node's parents will also be in vector, with the root node being first.
-      expect(menu1.selected).to eq("menu_item2")
-      # crumbs returns an array of ids which is populated in same way as @vector, so it contains
-      # the selected menu_item id as the last element, and each of its parents.
-      expect(menu1.crumbs.last.id).to eq(menu_item2.id)
-      expect(menu1.crumbs.first.id).to eq(menu_item1.id)
-      # selected? checks the @selected{} collection, which will contain
-      # a selected item and its parents.
-      expect(menu1.selected?(menu_item2.id)).to be true
-      expect(menu1.selected?(menu_item2.parent_id)).to be true
+      expect(menu.select("not_in_menu")).to be_nil
     end
 
+    it 'returns when name is in by_name{}'do
+      menu.select(menu_item2.name)
+      # selected checks the last element in the @vector [], which will be the node passed to select.
+      # the selected node's parents will also be in vector, with the root node being first.
+      expect(menu.selected).to eq(menu_item2.name)
+      # crumbs returns an array of ids which is populated in same way as @vector, so it contains
+      # the selected menu_item id as the last element, and each of its parents.
+      expect(menu.crumbs.last.id).to eq(menu_item2.id)
+      expect(menu.crumbs.first.id).to eq(menu_item1.id)
+      # selected? checks the @selected{} collection, which will contain
+      # a selected item and its parents.
+      expect(menu.selected?(menu_item2.id)).to be true
+      expect(menu.selected?(menu_item2.parent_id)).to be true
+    end
   end
 
   describe '#get_item' do
     it 'returns nil when id is not in by_id{}' do
       id_not_in_menu = 1738
-      expect(menu1.get_item(id_not_in_menu)).to be_nil
+      expect(menu.get_item(id_not_in_menu)).to be_nil
     end
     it 'returns an equivalent item' do
-      allow(menu_item5).to receive(:content_page).and_return(content_page2)
       node.setup(menu_item5)
-      current_item = menu1.get_item(menu_item5.id)
+      current_item = menu.get_item(menu_item5.id)
       expect(current_item.content_page_id).to eq(node.content_page_id)
       expect(current_item.controller_action_id).to eq(node.controller_action_id)
       expect(current_item.id).to eq(node.id)
@@ -211,83 +211,88 @@ describe Menu do
   describe '#get_menu' do
     # [@root, menu_item1, menu_item2]
     before(:each) do
-      menu1.select(menu_item2.name)
+      menu.select(menu_item2.name)
     end
 
     it 'returns nil for the last level' do
-      expect(menu1.get_menu(2)).to eq(nil)
+      expect(menu.get_menu(2)).to eq(nil)
     end
 
     it 'returns children of menu_item1' do
-      expect(menu1.get_menu(1)).to eq([2, 3])
+      expect(menu.get_menu(1)).to eq([2, 3])
     end
 
     it 'returns children of root' do
-      expect(menu1.get_menu(0)).to eq([1, 4, 5])
+      expect(menu.get_menu(0)).to eq([1, 4, 5])
     end
   end
 
   describe '#selected' do
     it 'returns root if nothing is selected previously' do
       # menu_item has seq: 1, so it is the root.
-      expect(menu1.selected).to eq("menu_item1")
+      expect(menu.selected).to eq("menu_item1")
     end
     it 'returns the name of the selected menu_item' do
-      menu1.select("menu_item2")
-      expect(menu1.selected).to eq("menu_item2")
+      menu.select(menu_item2.name)
+      expect(menu.selected).to eq("menu_item2")
     end
   end
 
   describe '#selected?' do
     it 'contains root is nothing is selected previously' do
-      expect(menu1.selected?(menu_item1.id)).to be true
+      expect(menu.selected?(menu_item1.id)).to be true
     end
+
     it 'contains selected node and its parents' do
-      menu1.select("menu_item2")
-      expect(menu1.selected?(menu_item2.id)).to be true
-      expect(menu1.selected?(menu_item1.id)).to be true
+      menu.select(menu_item2.name)
+      expect(menu.selected?(menu_item2.id)).to be true
+      expect(menu.selected?(menu_item1.id)).to be true
+    end
+
+    context 'no menu items for provided role' do
+      it 'returns false when MenuItem returns nil' do
+        allow(MenuItem).to receive(:items_for_permissions)
+          .with(permission_ids).and_return(nil)
+        menu = Menu.new(role)
+        expect(menu.selected?(menu_item1.id)).to eq(false)
+      end
+
+      it 'returns false when MenuItem returns empty array' do
+        allow(MenuItem).to receive(:items_for_permissions)
+          .with(permission_ids).and_return([])
+        menu = Menu.new(role)
+        expect(menu.selected?(menu_item1.id)).to eq(false)
+      end
     end
   end
 
   describe '#crumbs' do
-    let(:menu) do
-      role = double('Role')
-      allow(role).to receive_message_chain(:cache, :[])
-      Menu.new(role)
-    end
-
-    context 'no menu item is selected' do
-      it 'returns empty array' do
-        expect(menu.crumbs).to be_empty
-      end
-    end
-
     context 'top level menu item is selected' do
       before(:each) do
-        menu1.select(menu_item1.name)
+        menu.select(menu_item1.name)
       end
 
       it 'has one crumb' do
-        expect(menu1.crumbs.length).to eq(1)
+        expect(menu.crumbs.length).to eq(1)
       end
 
       it 'has crumb with menu id' do
-        crumb = menu1.crumbs[0];
+        crumb = menu.crumbs[0];
         expect(crumb.id).to eq(menu_item1.id)
       end
     end
 
     context 'bottom level menu item is selected' do
       before(:each) do
-        menu1.select(menu_item2.name)
+        menu.select(menu_item2.name)
       end
 
       it 'has two crumbs' do
-        expect(menu1.crumbs.length).to eq(2)
+        expect(menu.crumbs.length).to eq(2)
       end
 
       it 'has crumb order from child to parent' do
-        actualCrumbIds = menu1.crumbs.collect { |c| c.id }
+        actualCrumbIds = menu.crumbs.collect { |c| c.id }
         expectedCrumbIds = [menu_item1.id, menu_item2.id]
         expect(actualCrumbIds).to eq(expectedCrumbIds)
       end

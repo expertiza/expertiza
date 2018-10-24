@@ -53,22 +53,20 @@ module Api::V1
       if team_hyperlinks.include?(params['submission'])
         ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
         flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
+        render json: {status: :ok, assignment: @assignment}
       else
-        begin
           team.submit_hyperlink(params['submission'])
           SubmissionRecord.create(team_id: team.id,
                                   content: params['submission'],
                                   user: @participant.name,
                                   assignment_id: @participant.assignment.id,
                                   operation: "Submit Hyperlink")
-        rescue StandardError
-          ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
-          flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
-        end
-        ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
-        undo_link("The link has been successfully submitted.")
+          
+          render json: {status: :ok, assignment: @assignment}
+        #ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
+        #undo_link("The link has been successfully submitted.")
       end
-      redirect_to action: 'edit', id: @participant.id
+      #redirect_to action: 'edit', id: @participant.id
     end
 
     # Note: This is not used yet in the view until we all decide to do so
@@ -125,9 +123,9 @@ module Api::V1
       # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
       participant.assignment.email(participant.id) rescue nil
       if params[:origin] == 'review'
-        redirect_to :back
+        #redirect_to :back
       else
-        redirect_to action: 'edit', id: participant.id
+        #redirect_to action: 'edit', id: participant.id
       end
     end
 

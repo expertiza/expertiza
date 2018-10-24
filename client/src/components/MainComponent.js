@@ -81,7 +81,7 @@ class Main extends Component {
                 <Route path ='/logout' component={(Logout)} />
                 <Route path ='/view_student_teams/:id' component={(StudentTeamComponent)} />
                 <Route path ='/sign_up_sheet_list/:id' component={(SignUpSheetComponent)} />
-                <Route path ='/submitted_content/:id/edit' component={(StudentTaskUpload)} />
+                <Route path ='/submitted_content/:id' component={(StudentTaskUpload)} />
                 <Route path ='/student_quizzes/:id' component={(StudentQuizzesComponent)} />
                 <Route path ='/changeHandle/:id' component={(ChangeHandleComponent)} /> 
                 <Route path ='/studentTaskView/:id' component={(StudentTaskView)} />

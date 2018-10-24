@@ -13,6 +13,9 @@ module Api::V1
     def action_allowed?
       ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
     end
+
+    def time_ago_in_words(duedate)
+    end
   
     def list
       @student_tasks = StudentTask.from_user current_user
@@ -86,7 +89,8 @@ module Api::V1
                                   assignment: s["@assignment"] , 
                                   current_stage: s["@current_stage"], 
                                   relative_deadline: s["relative_deadline"],
-                                  participant: s["participant"]
+                                  participant: s["participant"],
+                                  participant_id: s["participant_id"]
                                   } 
                               }
       
@@ -98,6 +102,7 @@ module Api::V1
         stage = student_task.current_stage
         topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
         duedate = participant.assignment.stage_deadline(topic_id)
+        #participant_id = student_task.participant_id
         controller = ""
         action = ""
         if stage == "submission"
@@ -111,12 +116,12 @@ module Api::V1
         hash = {}
         # student_task.instance_variables.each {|var| hash[var.to_s] = student_task.instance_variable_get(var) }
         hash['stage'] = stage
-        hash['time_to_go'] = time_ago_in_words(duedate)
+        #hash['time_to_go'] = time_ago_in_words(duedate)
         hash['controller'] = controller
         hash['action'] = action
         hash['topic_id'] = topic_id
         hash['participant'] = participant
-        hash['participant_id'] = participant_id
+        #hash['participant_id'] = participant_id
         hash['assignment'] = participant.assignment.name
         @revisionsArray.push(hash)
 

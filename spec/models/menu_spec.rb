@@ -11,10 +11,10 @@ describe Node do
   let(:node) { Menu::Node.new }
   let(:node2) { Menu::Node.new }
   let(:node3) { Menu::Node.new }
-  let!(:sc_test1) {SiteController.create( name:"site1")}
-  let!(:ca_test1) {ControllerAction.create( site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
-  let!(:ca_test2) {ControllerAction.create( site_controller_id: 1, name: "action2", permission_id: 1)}
-  let!(:cp_test1) {ContentPage.create( name:"content1" )}
+  let!(:sc_test1) {SiteController.create(id:1,  name:"site1")}
+  let!(:ca_test1) {ControllerAction.create( id: 1,site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
+  let!(:ca_test2) {ControllerAction.create(id: 2, site_controller_id: 1, name: "action2", permission_id: 1)}
+  let!(:cp_test1) {ContentPage.create( id: 1, name:"content1" )}
   let!(:test1) { create(:menu_item, name: "home1", parent_id: nil,  seq: 1, content_page_id:1) }
   let!(:test2) { create(:menu_item, name: "home2", parent_id: 1,    seq: 2, controller_action_id:1, content_page_id: 1) }
   let!(:test3) { create(:menu_item, name: "home3", parent_id: 1,    seq: 3, controller_action_id:2, content_page_id: 1) }
@@ -33,10 +33,17 @@ describe Node do
     context "when the controller action attribute of the item is nil" do
       it "assigns content page path of the current menu item to the URL variable" do
         # Write your test here!
-        allow(node).to receive(:setup).with(test2)
+        # allow(node).to receive(:setup).with(test2)
         # expect(node.parent_id).to eq(1)
-        expect(cp_test1.name).to eq("content1");
-        # expect(node.url).to eq("/#{cp_test1.name}")
+        # node.setup(test1)
+        # expect(cp_test1.name).to eq("content1");
+        # expect(node.setup(test1).name).to eq("/#{cp_test1.name}")
+        test1.content_page = cp_test1
+        node.setup(test1)
+        expect(node.url).to eq("/#{cp_test1.name}")
+
+        # expect(node.controller_action_id).to eq(1)
+
       end
     end
 
@@ -44,15 +51,24 @@ describe Node do
       context "when the URL of the controller action is available" do
         it "assigns the URL of controller action to the URL variable" do
           # Write your test here!
-          allow(node2).to receive(:setup).with(test2)
-          expect(node2.url).to eq("/#{ca_test1.url_to_use}")
+          # allow(node2).to receive(:setup).with(test2)
+          ca_test1.site_controller = sc_test1
+          test2.controller_action = ca_test1
+          test2.content_page = cp_test1
+          node2.setup(test2)
+          expect(node2.url).to eq("#{ca_test1.url_to_use}")
           end
       end
 
       context "when the URL of the controller action is unavailable" do
         it "assigns a customized path to the URL variable" do
           # Write your test here!
-          allow(node3).to receive(:setup).with(test3)
+          # allow(node3).to receive(:setup).with(test3)
+
+          ca_test2.site_controller = sc_test1
+          test3.controller_action = ca_test2
+          test3.content_page = cp_test1
+          node3.setup(test3)
           expect(node3.url).to eq("/#{sc_test1.name}/#{ca_test2.name}")
           end
       end
@@ -63,12 +79,21 @@ describe Node do
     context "when the site_controller variable is nil" do
       it "finds the site controller by id" do
         # Write your test here!
+        test3.controller_action = ca_test2
+        node.setup(test3)
+        expect(node.site_controller).to eq(sc_test1)
+
       end
     end
 
     context "when the site_controller variable is not nil" do
-      it "returns the site_controller variable"
-      # Write your test here!
+      it "returns the site_controller variable" do
+        # Write your test here!
+        ca_test2.site_controller = sc_test1
+        test3.controller_action = ca_test2
+        node.setup(test3)
+        expect(node.site_controller).to eq(sc_test1)
+      end
     end
   end
 

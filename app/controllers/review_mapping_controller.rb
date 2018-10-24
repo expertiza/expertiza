@@ -201,7 +201,16 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
 
-    failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
+    failedCount = 0
+
+    mmappings.each do |mmapping|
+      begin
+        mmapping.delete(params[:force])
+      rescue StandardError
+        failedCount += 1
+      end
+    end
+
     if failedCount > 0
       url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
       url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id

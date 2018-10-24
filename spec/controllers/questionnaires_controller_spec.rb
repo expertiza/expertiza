@@ -1,11 +1,90 @@
+# describe QuestionnairesController do
+#   let(:questionnaire) { build(:questionnaire) }
+#   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
+#   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
+#   let(:question) { build(:question, id: 1) }
+#   let(:instructor) { build(:instructor, id: 6) }
+#   before(:each) do
+#     stub_current_user(instructor, instructor.role.name, instructor.role)
+#   end
+
 describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
+  let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:instructor2) { build(:instructor, id: 66) }
+  let(:ta) { build(:teaching_assistant, id: 8) }
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
+  end
+
+  describe '#action_allowed?' do
+    context 'when params action is edit or update' do
+      before(:each) do
+        controller.params = {id: '1', action: 'edit'}
+      end
+
+      context 'when the role name of current user is super admin or admin' do
+        it 'allows certain action' do
+          stub_current_user(admin, admin.role.name, admin.role)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the instructor of current questionnaires' do
+        it 'allows certain action' do
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the ta of the course which current questionnaires belongs to' do
+        it 'allows certain action' do
+          stub_current_user(ta, ta.role.name, ta.role)
+          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do
+        it 'does not allow certain action' do
+          stub_current_user(ta, ta.role.name, ta.role)
+          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(false)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is the instructor of the course which current questionnaires belongs to' do
+        it 'allows certain action' do
+          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+      context 'when current user is an instructor but not the instructor of current course or current questionnaires' do
+        it 'does not allow certain action' do
+          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 666))
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+    end
+
+    context 'when params action is not edit and update' do
+      before(:each) do
+        controller.params = {id: '1', action: 'new'}
+      end
+
+      context 'when the role current user is super admin/admin/instructor/ta' do
+        it 'allows certain action except edit and update' do
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+    end
   end
 
   describe '#copy,  #copy_questionnaire_details and #assign_instructor_id' do
@@ -64,13 +143,13 @@ describe QuestionnairesController do
   describe '#create' do
     it 'redirects to questionnaires#edit page after create a new questionnaire' do
       params = {
-        questionnaire: {
-          name: 'test questionnaire',
-          private: false,
-          min_question_score: 0,
-          max_question_score: 5,
-          type: 'ReviewQuestionnaire'
-        }
+          questionnaire: {
+              name: 'test questionnaire',
+              private: false,
+              min_question_score: 0,
+              max_question_score: 5,
+              type: 'ReviewQuestionnaire'
+          }
       }
       session = {user: double('Instructor', id: 6)}
       tree_folder = double('TreeFolder', id: 1)
@@ -99,12 +178,12 @@ describe QuestionnairesController do
       context 'when questionnaire type is QuizQuestionnaire' do
         it 'redirects to submitted_content#edit page' do
           params = {
-            aid: 1,
-            pid: 1,
-            questionnaire: {
-              name: 'Test questionnaire',
-              type: 'QuizQuestionnaire'
-            }
+              aid: 1,
+              pid: 1,
+              questionnaire: {
+                  name: 'Test questionnaire',
+                  type: 'QuizQuestionnaire'
+              }
           }
           # create_questionnaire
           participant = double('Participant')
@@ -129,12 +208,12 @@ describe QuestionnairesController do
       context 'when questionnaire type is not QuizQuestionnaire' do
         it 'redirects to submitted_content#edit page' do
           params = {
-            aid: 1,
-            pid: 1,
-            questionnaire: {
-              name: 'Test questionnaire',
-              type: 'ReviewQuestionnaire'
-            }
+              aid: 1,
+              pid: 1,
+              questionnaire: {
+                  name: 'Test questionnaire',
+                  type: 'ReviewQuestionnaire'
+              }
           }
           # create_questionnaire
           allow(ReviewQuestionnaire).to receive(:new).with(any_args).and_return(review_questionnaire)
@@ -160,12 +239,12 @@ describe QuestionnairesController do
     context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
       it 'redirects to submitted_content#edit page' do
         params = {
-          aid: 1,
-          pid: 1,
-          questionnaire: {
-            name: 'test questionnaire',
-            type: 'QuizQuestionnaire'
-          }
+            aid: 1,
+            pid: 1,
+            questionnaire: {
+                name: 'test questionnaire',
+                type: 'QuizQuestionnaire'
+            }
         }
         # create_quiz_questionnaire
         allow_any_instance_of(QuestionnairesController).to receive(:valid_quiz).and_return('Please select a correct answer for all questions')
@@ -204,17 +283,17 @@ describe QuestionnairesController do
       @questionnaire1 = double('Questionnaire', id: 1)
       allow(Questionnaire).to receive(:find).with('1').and_return(@questionnaire1)
       @params = {
-        id: 1,
-        questionnaire: {
-          name: 'test questionnaire',
-          instructor_id: 6,
-          private: 0,
-          min_question_score: 0,
-          max_question_score: 5,
-          type: 'ReviewQuestionnaire',
-          display_type: 'Review',
-          instructor_loc: ''
-        }
+          id: 1,
+          questionnaire: {
+              name: 'test questionnaire',
+              instructor_id: 6,
+              private: 0,
+              min_question_score: 0,
+              max_question_score: 5,
+              type: 'ReviewQuestionnaire',
+              display_type: 'Review',
+              instructor_loc: ''
+          }
       }
     end
     context 'successfully updates the attributes of questionnaire' do
@@ -241,7 +320,7 @@ describe QuestionnairesController do
     context 'when @questionnaire.assignments returns non-empty array' do
       it 'sends the error message to flash[:error]' do
         questionnaire1 = double('Questionnaire', name: 'test questionnaire',
-                                                 assignments: [double('Assignment', name: 'test assignment')])
+                                assignments: [double('Assignment', name: 'test assignment')])
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
         params = {id: 1}
         get :delete, params
@@ -253,7 +332,7 @@ describe QuestionnairesController do
     context 'when question.answers returns non-empty array' do
       it 'sends the error message to flash[:error]' do
         questionnaire1 = double('Questionnaire', name: 'test questionnaire', assignments: [],
-                                                 questions: [double('Question', answers: [double('Answer')])])
+                                questions: [double('Question', answers: [double('Answer')])])
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
         params = {id: 1}
         get :delete, params
@@ -268,7 +347,7 @@ describe QuestionnairesController do
         question = double('Question', answers: [], question_advices: advices)
         questionnaire_node = double('QuestionnaireNode')
         questionnaire1 = double('Questionnaire', name: 'test questionnaire', assignments: [],
-                                                 questions: [question], questionnaire_node: questionnaire_node)
+                                questions: [question], questionnaire_node: questionnaire_node)
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
         allow(advices).to receive(:each).with(any_args).and_return(true)
         allow(question).to receive(:delete).and_return(true)
@@ -302,11 +381,11 @@ describe QuestionnairesController do
         allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
         allow(question).to receive(:save).and_return(true)
         params = {
-          id: 1,
-          question: {
-            total_num: 2,
-            type: 'Criterion'
-          }
+            id: 1,
+            question: {
+                total_num: 2,
+                type: 'Criterion'
+            }
         }
         post :add_new_questions, params
         expect(response).to redirect_to('/questionnaires/1/edit')
@@ -319,11 +398,11 @@ describe QuestionnairesController do
         allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
         allow(question).to receive(:save).and_return(true)
         params = {
-          id: 1,
-          question: {
-            total_num: 2,
-            type: 'Dropdown'
-          }
+            id: 1,
+            question: {
+                total_num: 2,
+                type: 'Dropdown'
+            }
         }
         post :add_new_questions, params
         expect(response).to redirect_to('/questionnaires/1/edit')
@@ -337,18 +416,18 @@ describe QuestionnairesController do
         allow(Question).to receive(:find).with('1').and_return(question)
         allow(question).to receive(:save).and_return(true)
         params = {
-          id: 1,
-          save: true,
-          question: {
-            '1' => {
-              seq: 66.0,
-              txt: 'WOW',
-              weight: 10,
-              size: '50,3',
-              max_label: 'Strong agree',
-              min_label: 'Not agree'
+            id: 1,
+            save: true,
+            question: {
+                '1' => {
+                    seq: 66.0,
+                    txt: 'WOW',
+                    weight: 10,
+                    size: '50,3',
+                    max_label: 'Strong agree',
+                    min_label: 'Not agree'
+                }
             }
-          }
         }
         post :save_all_questions, params
         expect(flash[:success]).to eq('All questions has been successfully saved!')
@@ -359,9 +438,9 @@ describe QuestionnairesController do
     context 'when params[:save] is nil, params[:view_advice] is not nil' do
       it 'redirects to advice#edit_advice page' do
         params = {
-          id: 1,
-          view_advice: true,
-          question: {}
+            id: 1,
+            view_advice: true,
+            question: {}
         }
         post :save_all_questions, params
         expect(response).to redirect_to('/advice/edit_advice/1')
@@ -383,10 +462,10 @@ describe QuestionnairesController do
     context 'when an assignment requires quiz' do
       before(:each) do
         @params = {
-          aid: 1,
-          model: 'QuizQuestionnaire',
-          pid: 1,
-          private: 0
+            aid: 1,
+            model: 'QuizQuestionnaire',
+            pid: 1,
+            private: 0
         }
         @assignment = double('Assignment')
         allow(Assignment).to receive(:find).with('1').and_return(@assignment)
@@ -423,10 +502,10 @@ describe QuestionnairesController do
     context 'when an assignment does not require quiz' do
       it 'shows error message and redirects to submitted_content#view' do
         params = {
-          aid: 1,
-          model: 'QuizQuestionnaire',
-          pid: 1,
-          private: 0
+            aid: 1,
+            model: 'QuizQuestionnaire',
+            pid: 1,
+            private: 0
         }
         assignment = double('Assignment')
         allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -477,32 +556,32 @@ describe QuestionnairesController do
     context 'when @questionnaire is not nil' do
       it 'updates all quiz questions and redirects to submitted_content#view page' do
         params = {
-          id: 1,
-          pid: 1,
-          save: true,
-          questionnaire: {
-            name: 'test questionnaire',
-            instructor_id: 6,
-            private: 0,
-            min_question_score: 0,
-            max_question_score: 5,
-            type: 'ReviewQuestionnaire',
-            display_type: 'Review',
-            instructor_loc: ''
-          },
-          question: {
-            '1' => {txt: 'Q1'},
-            '2' => {txt: 'Q2'},
-            '3' => {txt: 'Q3'}
-          },
-          quiz_question_choices: {
-            '1' => {MultipleChoiceRadio:
-                    {:correctindex => 1, '1' => {txt: 'a11'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-            '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
-            '3' => {MultipleChoiceCheckbox:
-                    {'1' => {iscorrect: '1', txt: 'a31'}, '2' => {iscorrect: '0', txt: 'a32'},
-                     '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
-          }
+            id: 1,
+            pid: 1,
+            save: true,
+            questionnaire: {
+                name: 'test questionnaire',
+                instructor_id: 6,
+                private: 0,
+                min_question_score: 0,
+                max_question_score: 5,
+                type: 'ReviewQuestionnaire',
+                display_type: 'Review',
+                instructor_loc: ''
+            },
+            question: {
+                '1' => {txt: 'Q1'},
+                '2' => {txt: 'Q2'},
+                '3' => {txt: 'Q3'}
+            },
+            quiz_question_choices: {
+                '1' => {MultipleChoiceRadio:
+                            {:correctindex => 1, '1' => {txt: 'a11'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
+                '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
+                '3' => {MultipleChoiceCheckbox:
+                            {'1' => {iscorrect: '1', txt: 'a31'}, '2' => {iscorrect: '0', txt: 'a32'},
+                             '3' => {iscorrect: '1', txt: 'a33'}, '4' => {iscorrect: '0', txt: 'a34'}}}
+            }
         }
         questionnaire = double('Questionnaire')
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
@@ -538,8 +617,8 @@ describe QuestionnairesController do
     context 'when user does not specify quiz name' do
       it 'returns message (Please specify quiz name (please do not use your name or id).)' do
         controller.params = {
-          aid: 1,
-          questionnaire: {name: ''}
+            aid: 1,
+            questionnaire: {name: ''}
         }
         expect(controller.valid_quiz).to eq('Please specify quiz name (please do not use your name or id).')
       end
@@ -548,8 +627,8 @@ describe QuestionnairesController do
     context 'when user does not specify a type for each question' do
       it 'returns message (Please select a type for each question)' do
         controller.params = {
-          aid: 1,
-          questionnaire: {name: 'test questionnaire'}
+            aid: 1,
+            questionnaire: {name: 'test questionnaire'}
         }
         expect(controller.valid_quiz).to eq('Please select a type for each question')
       end
@@ -558,11 +637,11 @@ describe QuestionnairesController do
     context 'when user does not specify choice info for one question' do
       it 'returns mesage (Please select a correct answer for all questions)' do
         controller.params = {
-          aid: 1,
-          questionnaire: {name: 'test questionnaire'},
-          question_type: {'1' => {type: 'TrueFalse'}},
-          new_question: {'1' => {iscorrect: 'True'}},
-          new_choices: {'1' => {}}
+            aid: 1,
+            questionnaire: {name: 'test questionnaire'},
+            question_type: {'1' => {type: 'TrueFalse'}},
+            new_question: {'1' => {iscorrect: 'True'}},
+            new_choices: {'1' => {}}
         }
         expect(controller.valid_quiz).to eq('Please select a correct answer for all questions')
       end
@@ -571,11 +650,11 @@ describe QuestionnairesController do
     context 'when user specifies all necessary information' do
       it 'returns mesage (valid)' do
         controller.params = {
-          aid: 1,
-          questionnaire: {name: 'test questionnaire'},
-          question_type: {'1' => {type: 'TrueFalse'}},
-          new_question: {'1' => {iscorrect: 'True'}},
-          new_choices: {'1' => {'TrueFalse' => 'sth'}}
+            aid: 1,
+            questionnaire: {name: 'test questionnaire'},
+            question_type: {'1' => {type: 'TrueFalse'}},
+            new_question: {'1' => {iscorrect: 'True'}},
+            new_choices: {'1' => {'TrueFalse' => 'sth'}}
         }
         question = build(:question, type: 'TrueFalse')
         allow(TrueFalse).to receive(:create).with(txt: '', type: 'TrueFalse', break_before: true).and_return(question)
@@ -588,19 +667,19 @@ describe QuestionnairesController do
   describe '#save_choices' do
     it 'is able to save different kinds of quiz questions' do
       controller.params = {
-        new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
-        new_choices:
-        {'1' =>
-          {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-         '2' =>
-          {TrueFalse: {'1' => {iscorrect: '1'}}},
-         '3' =>
-          {MultipleChoiceCheckbox:
-            {'1' => {iscorrect: '1', txt: 'a31'},
-             '2' => {iscorrect: '0', txt: 'a32'},
-             '3' => {iscorrect: '1', txt: 'a33'},
-             '4' => {iscorrect: '0', txt: 'a34'}}}},
-        question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
+          new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
+          new_choices:
+              {'1' =>
+                   {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'}, '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
+               '2' =>
+                   {TrueFalse: {'1' => {iscorrect: '1'}}},
+               '3' =>
+                   {MultipleChoiceCheckbox:
+                        {'1' => {iscorrect: '1', txt: 'a31'},
+                         '2' => {iscorrect: '0', txt: 'a32'},
+                         '3' => {iscorrect: '1', txt: 'a33'},
+                         '4' => {iscorrect: '0', txt: 'a34'}}}},
+          question_type: {'1' => {type: 'MultipleChoiceRadio'}, '2' => {type: 'TrueFalse'}, '3' => {type: 'MultipleChoiceCheckbox'}}
       }
       q1 = build(:question, id: 1, type: 'MultipleChoiceRadio')
       q2 = build(:question, id: 2, type: 'TrueFalse')

@@ -20,10 +20,6 @@ class RolesController < ApplicationController
     foreign
   end
 
-  def new
-    @role = Role.new
-    foreign
-  end
 
   def create
     @role = Role.new(params[:role])

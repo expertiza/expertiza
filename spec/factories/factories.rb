@@ -483,4 +483,15 @@ FactoryBot.define do
     controller_action_id nil
     content_page_id nil
   end
+
+  factory :bookmark, class: Bookmark do
+    id 1
+    url 'test.com'
+    title 'Test'
+    description 'This is a test topic'
+    user_id { User.where(role: Role.where(name: 'Student')).first || association(:user) }
+    topic_id { SignUpTopic.first || association(:topic) }
+    created_at '2018-10-24 21:18:19'
+    updated_at '2018-10-24 21:18:19'
+  end
 end

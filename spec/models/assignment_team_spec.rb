@@ -22,7 +22,7 @@ describe 'AssignmentTeam' do
   describe "#includes?" do
     context "when an assignment team has one participant" do
       it "includes one participant" do
-        allow(team).to receive(:users).with(no_args()).and_return([user])
+        allow(team).to receive(:users).with(no_args).and_return([user])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user.id, parent_id: team.parent_id).and_return(participant)
         expect(team.includes?(participant)).to eq true
       end

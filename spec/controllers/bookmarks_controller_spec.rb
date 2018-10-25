@@ -36,6 +36,7 @@ describe BookmarksController do
         expect(controller.instance_variable_get(:@topic).topic_name).to eq('Hello world!')
         expect(response.body).to include '<td>This is a test topic</td>'
         expect(response.body).to include '<td><a href=http://test.com target=\'_blank\'>Test</td>'
+        expect(response.body.match(%r{<td>\s+-\s+<\/td>}m)).to be_truthy
       end
     end
   end

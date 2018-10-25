@@ -64,7 +64,6 @@ describe 'AssignmentTeam' do
     context "when a team has an id" do
       it "deleted the team by id" do
         team = create(:assignment_team, id: 1)
-	team.inspect()
 	expect(AssignmentTeam.remove_team_by_id(team.id)).to eq(team)
       end
     end

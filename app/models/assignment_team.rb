@@ -39,7 +39,7 @@ class AssignmentTeam < Team
 
   # Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
-    assignment = Assignment.find(self.parent_id)
+    assignment = Assignment.find_by(id: self.parent_id)
     raise "The assignment cannot be found." if assignment.nil?
     ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
   end

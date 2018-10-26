@@ -5,17 +5,12 @@ describe AssignmentTeam do
   let(:participant1) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:participant2) { build(:participant, id: 2) }
   let(:participant3) { build(:participant, id: 3) }
-  # let(:assignment_participant1) { build(:assignment_participant, id: 1)}
-  # let(:assignment_participant2) { build(:assignment_participant, id: 2) }
-  # let(:participant3) { build(:participant, id: 3) }
   let(:assignment1) { build(:assignment, id: 1, name: 'Test Assgt') }
-  # let(:assignment2) { build(:assignment, id: 2) }
   let(:assignment_team1) {build(:assignment_team, id: 1, parent_id: 1, name: "team1")}
   let(:assignment_team2) {build(:assignment_team, id: 2, parent_id: 2, name: "team2")}
-  # let(:review_response_map1) {build(id: 1)}
   let(:review_response_map1) { build( :review_response_map,id: 1, assignment: assignment1, reviewer: participant1, reviewee: assignment_team1) }
-
   let(:signed_up_team1) {build(:signed_up_team, id:1, team_id: 1, is_waitlisted: 0, topic_id:1)}
+  # let(:review_response_map2) { build( :review_response_map,id: 2, assignment: nil, reviewer: participant2, reviewee: ) }
 
   # let(:reviewer1) {build(id:1)}
 
@@ -111,9 +106,8 @@ describe AssignmentTeam do
   describe "#assign_reviewer" do
     context "when the assignment record cannot be found by the parent id of the current assignment team" do
       it "raises a customized exception" do
-        # allow(Assignment).to receive(:find).with().and_return(assignment1)
-        expect{assignment_team2.assign_reviewer(participant1)}.to raise_exception(ActiveRecord::RecordNotFound)
-        # expect{assignment_team2.assign_reviewer(participant2)}.to raise_exception("The assignment cannot be found.")
+        # expect{assignment_team2.assign_reviewer(participant1)}.to raise_exception(ActiveRecord::RecordNotFound)
+        expect{assignment_team2.assign_reviewer(participant2)}.to raise_exception("The assignment cannot be found.")
       end
     end
 
@@ -125,18 +119,23 @@ describe AssignmentTeam do
   end
   #?
   describe "#reviewd_by?" do
+
     context "when one or more submissions of this assignment team were reviewed by this reviewer" do
       it "returns true" do
         # allow(AssignmentParticipant).to receive(:find).with(3).and_return(assignment_participant3)
         # allow(assignment_team1).to receive(:assign_reviewer).with(assignment_participant3).and_return(true)
-        allow(ReviewResponseMap).to receive(:find).with(1).and_return(review_response_map1)
-        expect(assignment_team1.reviewed_by? (participant1)).to be false
+        allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
+          1, 1, 1).and_return([review_response_map1])
+        expect(assignment_team1.reviewed_by? (participant1)).to be true
       end
     end
 
     context "when no submission of this assignment team was reviewed by this reviewer" do
       it "returns false" do
-        expect(assignment_team1.reviewed_by? (participant2)).to be false
+        # expect(assignment_team1.reviewed_by? (participant2)).to be false
+        allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
+          1, 1, 1).and_return([])
+        expect(assignment_team1.reviewed_by? (participant1)).to be false
       end
     end
   end
@@ -144,28 +143,34 @@ describe AssignmentTeam do
   #?
   describe "#topic" do
     it "returns the topic id chosen by this team" do
-      allow(SignedUpTeam).to receive(:find).with(1).and_return(signed_up_team1)
-      expect(assignment_team1.topic).to eq(nil)
+      allow(SignedUpTeam).to receive(:find_by).with(team_id:1, is_waitlisted: 0).and_return(signed_up_team1)
+      expect(assignment_team1.topic).to eq(1)
     end
   end
   #?
   describe "has_submissions?" do
+
     context "when current assignment team submitted files" do
       it "returns true" do
         # allow(assignment_team1).to receive(:path).and_return(path1)
-        # allow(assignment_team1).to receive(:submitted_files).and_return(file1)
-        # allow(file1).to receive(:any?).with(true)
-        # expect(assignment_team1.has_submissions? ).to be true
+        allow(assignment_team1).to receive(:submitted_files).and_return([double(:File)])
+        # # allow(file1).to receive(:any?).with(true)
+        expect(assignment_team1.has_submissions? ).to be true
       end
     end
 
     context "when current assignment team did not submit files but submitted hyperlinks" do
-         it "returns true"
-         # Write your test here!
+         it "returns true" do
+         allow(assignment_team1).to receive(:submitted_hyperlinks).and_return([double(:Hyperlink)])
+         # # allow(file1).to receive(:any?).with(true)
+         expect(assignment_team1.has_submissions? ).to be true
+        end
        end
 
        context "when current assignment team did not submit either files or hyperlinks" do
-         it "returns false"
+         it "returns false" do
+           expect(assignment_team2.has_submissions? ).to be false
+         end
          # Write your test here!
        end
      end

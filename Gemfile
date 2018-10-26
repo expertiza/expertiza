@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.7.1'
 
-## Gems in Alphabetical Order
+## Gems in Alphabetical Order.
 gem 'activerecord-session_store'
 gem 'activesupport', '~> 4.2.7.1'
 gem 'airbrake'

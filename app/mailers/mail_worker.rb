@@ -15,7 +15,7 @@ class MailWorker
     self.due_at = due_at
     
     assignment = Assignment.find(self.assignment_id)
-    team_mails = find_team_members_email
+    partcipant_mails = find_participant_emails
 
     if ["drop_one_member_topics", "drop_outstanding_reviews", "compare_files_with_simicheck"].include?(self.deadline_type)
       drop_one_member_topics if self.deadline_type == "drop_outstanding_reviews" && assignment.team_assignment
@@ -29,8 +29,8 @@ class MailWorker
         self.deadline_type
       end
 
-      email_reminder(team_mails, deadlineText) unless team_mails.empty?
-      puts team_mails.inspect
+      email_reminder(partcipant_mails, deadlineText) unless partcipant_mails.empty?
+      puts partcipant_mails.inspect
     end
   end
 
@@ -48,11 +48,11 @@ class MailWorker
     @mail.deliver_now
   end
 
-  def find_team_members_email
+  def find_participant_emails
     emails = []
-    teams = Team.where(parent_id: self.assignment_id)
-    teams.each do |team|
-      team.users.each {|team_member| emails << team_member.email }
+    participants = Participant.where(parent_id: self.assignment_id)
+    participants.each do |participant|
+      emails<<participant.user.email unless participant.user.nil?
     end
     emails
   end

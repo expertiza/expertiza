@@ -6,7 +6,7 @@ describe AssignmentTeam do
   let(:participant2) { build(:participant, id: 2) }
   let(:participant3) { build(:participant, id: 3) }
   let(:assignment1) { build(:assignment, id: 1, name: 'Test Assgt') }
-  let(:assignment_team1) {build(:assignment_team, id: 1, parent_id: 1, name: "team1")}
+  let(:assignment_team1) {build(:assignment_team, id: 1, parent_id: 1, name: "team1", submitted_hyperlinks: "")}
   let(:assignment_team2) {build(:assignment_team, id: 2, parent_id: 2, name: "team2")}
   let(:review_response_map1) { build( :review_response_map,id: 1, assignment: assignment1, reviewer: participant1, reviewee: assignment_team1) }
   let(:signed_up_team1) {build(:signed_up_team, id:1, team_id: 1, is_waitlisted: 0, topic_id:1)}
@@ -147,7 +147,7 @@ describe AssignmentTeam do
       expect(assignment_team1.topic).to eq(1)
     end
   end
-  #?
+
   describe "has_submissions?" do
 
     context "when current assignment team submitted files" do
@@ -169,7 +169,8 @@ describe AssignmentTeam do
 
        context "when current assignment team did not submit either files or hyperlinks" do
          it "returns false" do
-           expect(assignment_team2.has_submissions? ).to be false
+           expect(assignment_team1.has_submissions? ).to be false
+
          end
          # Write your test here!
        end

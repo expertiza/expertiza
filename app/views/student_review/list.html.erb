@@ -4,7 +4,7 @@
 
 <% else %>
     <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
-  <h4>Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
+    <h4>Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 
@@ -34,6 +34,7 @@
 
     <% else %>
         <h4>Number of Meta-Reviews Allowed: "<%= @assignment.num_metareviews_allowed %>"</h4>
+        <h4>Number of Meta-Reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
     <% end %>
     <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
 

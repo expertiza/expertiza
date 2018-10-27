@@ -151,7 +151,7 @@ class Team < ActiveRecord::Base
   def self.generate_team_name(team_name_prefix)
     counter = 1
     loop do
-      team_name = team_name_prefix + "_Team#{counter}"
+      team_name = "Team#{counter}"
       return team_name unless Team.find_by(name: team_name)
       counter += 1
     end

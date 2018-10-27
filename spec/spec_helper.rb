@@ -97,6 +97,10 @@ RSpec.configure do |config|
     mocks.verify_doubled_constant_names = false
   end
 
+  config.around(:each) do |example|
+    Timeout.timeout(5, &example)
+  end
+
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")
   end

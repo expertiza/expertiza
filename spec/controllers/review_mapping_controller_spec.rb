@@ -462,6 +462,27 @@ describe ReviewMappingController do
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end
+
+      context 'when student review num is greater than or equal to team size' do
+        it 'throws error stating that student review number cannot be greather than or equal to team size' do
+          allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, calibrate_to: 1)
+                                          .and_return([double('ReviewResponseMap', reviewee_id: 2)])
+          allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
+          params = {
+              id: 1,
+              max_team_size: 1,
+              num_reviews_per_student: 45,
+              num_reviews_per_submission: 0,
+              num_calibrated_artifacts: 0,
+              num_uncalibrated_artifacts: 0
+          }
+          post :automatic_review_mapping, params
+          expect(flash[:error]).to eq('You cannot set the number of reviews done ' \
+                                      'by each student to be greater than or equal to total number of teams ' \
+                                      '[or "participants" if it is an individual assignment].')
+          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        end
+      end
     end
 
     context 'when teams is empty, max team size is 1 and when review params are not 0' do

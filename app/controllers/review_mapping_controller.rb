@@ -215,10 +215,9 @@ class ReviewMappingController < ApplicationController
     if num_unsuccessful_deletes > 0
       url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
       url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      message = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. "
-      message += 'Delete these mappings anyway?'
-      message += "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
-      flash[:error] = message
+      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. " \
+                      'Delete these mappings anyway?' \
+                      "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
     else
       flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
     end
@@ -309,6 +308,12 @@ class ReviewMappingController < ApplicationController
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
       elsif student_review_num != 0 and submission_review_num != 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+      elsif student_review_num >= teams.size
+        # Exception detection: If instructor want to assign too many reviews done
+        # by each student, there will be an error msg.
+        flash[:error] = 'You cannot set the number of reviews done ' \
+                         'by each student to be greater than or equal to total number of teams ' \
+                         '[or "participants" if it is an individual assignment].'
       else
         # REVIEW: mapping strategy
         automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
@@ -336,24 +341,18 @@ class ReviewMappingController < ApplicationController
     participants_hash = {}
     participants.each {|participant| participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
-    num_participants = participants.size
     if student_review_num != 0 and submission_review_num == 0
-      num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
-      exact_num_of_review_needed = participants.size * student_review_num
-      student_review_num = student_review_num
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
     elsif student_review_num == 0 and submission_review_num != 0
-      num_reviews_per_team = submission_review_num
-      exact_num_of_review_needed = teams.size * submission_review_num
-      student_review_num = (exact_num_of_review_needed * 1.0 / participants.size).round
+      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
     end
-    execute_peer_review_strategy(assignment_id, teams, num_participants,
-                                 student_review_num, num_reviews_per_team,
-                                 participants, participants_hash)
+
+    peer_review_strategy(assignment_id, review_strategy, participants_hash)
+
     # after assigning peer reviews for each team,
     # if there are still some peer reviewers not obtain enough peer review,
     # just assign them to valid teams
-    assign_reviewers_for_team(assignment_id, student_review_num, participants_hash,
-                              exact_num_of_review_needed)
+    assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
   end
 
   # This is for staggered deadline assignment
@@ -495,15 +494,14 @@ class ReviewMappingController < ApplicationController
 
   private
 
-  def assign_reviewers_for_team(assignment_id, student_review_num, participants_hash,
-                                exact_num_of_review_needed)
+  def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
                         .where("created_at > :time",
-                               time: @@time_create_last_review_mapping_record).size < exact_num_of_review_needed
+                               time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
 
       participants_with_insufficient_review_num = []
       participants_hash.each do |participant_id, review_num|
-        participants_with_insufficient_review_num << participant_id if review_num < student_review_num
+        participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
       end
       unsorted_teams_hash = {}
 
@@ -536,29 +534,17 @@ class ReviewMappingController < ApplicationController
                                                last.created_at
   end
 
-  def execute_peer_review_strategy(assignment_id, teams, num_participants,
-                                   student_review_num, num_reviews_per_team,
-                                   participants, participants_hash)
-    # Exception detection: If instructor want to assign too many reviews done
-    # by each student, there will be an error msg.
-    if student_review_num >= teams.size
-      flash[:error] = 'You cannot set the number of reviews done \
-      by each student to be greater than or equal to total number of teams \
-      [or "participants" if it is an individual assignment].'
-    end
+  def peer_review_strategy(assignment_id, review_strategy, participants_hash)
+    teams = review_strategy.teams
+    participants = review_strategy.participants
+    num_participants = participants.size
 
-    peer_review_strategy(assignment_id, teams, num_participants,
-                         student_review_num, num_reviews_per_team,
-                         participants, participants_hash)
-  end
-
-  def peer_review_strategy(assignment_id, teams, num_participants, student_review_num, num_reviews_per_team, participants, participants_hash)
     iterator = 0
     teams.each do |team|
       selected_participants = []
       if !team.equal? teams.last
         # need to even out the # of reviews for teams
-        while selected_participants.size < num_reviews_per_team
+        while selected_participants.size < review_strategy.reviews_per_team
           num_participants_this_team = TeamsUser.where(team_id: team.id).size
           # If there are some submitters or reviewers in this team, they are not treated as normal participants.
           # They should be removed from 'num_participants_this_team'
@@ -594,7 +580,7 @@ class ReviewMappingController < ApplicationController
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 
-          if_condition_1 = (participants_hash[participants[rand_num].id] < student_review_num)
+          if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
           if_condition_2 = (!selected_participants.include? participants[rand_num].id)
           if if_condition_1 and if_condition_2
             # selected_participants cannot include duplicate num
@@ -603,7 +589,7 @@ class ReviewMappingController < ApplicationController
           end
           # remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
-            if participants_hash[participant.id] == student_review_num
+            if participants_hash[participant.id] == review_strategy.reviews_per_student
               participants.delete_at(rand_num)
               num_participants -= 1
             end
@@ -614,7 +600,7 @@ class ReviewMappingController < ApplicationController
         # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
         participants.each do |participant|
           # avoid last team receives too many peer reviews
-          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < num_reviews_per_team
+          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < review_strategy.reviews_per_team
             selected_participants << participant.id
             participants_hash[participant.id] += 1
           end

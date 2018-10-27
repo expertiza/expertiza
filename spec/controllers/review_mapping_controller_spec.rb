@@ -270,7 +270,7 @@ describe ReviewMappingController do
         expect(flash[:note]).to be nil
         expect(flash[:error]).to eq("A delete action failed:<br/>1 metareviews exist for these mappings. "\
           "Delete these mappings anyway?&nbsp;<a href='http://test.host/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
-          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><BR/>")
+          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><br/>")
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
     end

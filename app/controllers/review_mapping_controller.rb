@@ -12,7 +12,8 @@ class ReviewMappingController < ApplicationController
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
     case params[:action]
-    when 'add_dynamic_reviewer', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
+      when 'add_dynamic_reviewer', 'show_available_submissions', 'assign_reviewer_dynamically',
+          'assign_metareviewer_dynamically', 'assign_quiz_dynamically', 'start_self_review'
       true
     else
       ['Instructor',
@@ -214,7 +215,10 @@ class ReviewMappingController < ApplicationController
     if num_unsuccessful_deletes > 0
       url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
       url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+      message = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. "
+      message += 'Delete these mappings anyway?'
+      message += "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
+      flash[:error] = message
     else
       flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
     end
@@ -281,7 +285,7 @@ class ReviewMappingController < ApplicationController
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
-    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select {|p| p.can_review }.shuffle!
+    participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
     teams = AssignmentTeam.where(parent_id: params[:id].to_i).to_a.shuffle!
     max_team_size = Integer(params[:max_team_size]) # Assignment.find(assignment_id).max_team_size
     # Create teams if its an individual assignment.
@@ -300,7 +304,7 @@ class ReviewMappingController < ApplicationController
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
 
     if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
-      #check for exit paths first
+      # check for exit paths first
       if student_review_num == 0 and submission_review_num == 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
       elsif student_review_num != 0 and submission_review_num != 0
@@ -320,7 +324,7 @@ class ReviewMappingController < ApplicationController
       automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, calibrated_artifacts_num, 0)
       # REVIEW: mapping strategy
       # since after first mapping, participants (delete_at) will be nil
-      participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select {|p| p.can_review }.shuffle!
+      participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
       automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
     end
     redirect_to action: 'list_mappings', id: assignment_id

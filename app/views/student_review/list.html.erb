@@ -28,8 +28,7 @@
 <% end %>
 
 <% if @assignment.metareview_allowed(@topic_id) or @assignment.get_current_stage() == "Complete" %>
-    <h2>Metareviews for "<%= @assignment.name %>"</h2>
-
+    <h2>Meta-reviews for "<%= @assignment.name %>"</h2>
     <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1%>
 
     <% else %>

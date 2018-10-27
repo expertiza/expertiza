@@ -214,7 +214,6 @@ module ReviewMappingHelper
   end
 
   class StudentReviewStrategy < ReviewStrategy
-
     def reviews_per_team
       (@participants.size * @review_num * 1.0 / @teams.size).round
     end
@@ -229,7 +228,6 @@ module ReviewMappingHelper
   end
 
   class TeamReviewStrategy < ReviewStrategy
-
     def reviews_per_team
       @review_num
     end

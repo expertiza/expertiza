@@ -160,6 +160,12 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
+    @drop_topic_deadline1 = @assignment.due_dates.find_by(deadline_type_id: 6)
+    topic_id1 = SignedUpTeam.where(team_id: team_id).first
+
+    if !@drop_topic_deadline1.nil? and Time.now > @drop_topic_deadline1.due_at
+        SignedUpTeam.update_is_waitlisted(topic_id1.topic_id,team_id)
+    end
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)

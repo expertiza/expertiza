@@ -183,7 +183,7 @@ class SuggestionController < ApplicationController
 
   def update_feedback	
     Suggestion.find(params[:suggestion_id]).update_attributes(feedback: params[:suggestion][:feedback])
-    redirect_to list_suggestion_index_path(id => params[:id], type => params[:type])
+    redirect_to list_suggestion_index_path(:id => params[:id], :type => params[:type])
   end
 
   private

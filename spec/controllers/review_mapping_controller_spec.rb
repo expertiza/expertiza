@@ -262,20 +262,24 @@ describe ReviewMappingController do
 
     context 'when failed times are bigger than 0' do
       it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
-        allow(ResponseMap).to receive(:delete_mappings).with(@metareview_response_maps, true).and_return(5)
+        @metareview_response_maps.each do |metareview_response_map|
+          allow(metareview_response_map).to receive(:delete).with(true).and_raise('Boom')
+        end
         params = {id: 1, force: true}
         post :delete_all_metareviewers, params
         expect(flash[:note]).to be nil
-        expect(flash[:error]).to eq("A delete action failed:<br/>5 metareviews exist for these mappings. "\
+        expect(flash[:error]).to eq("A delete action failed:<br/>1 metareviews exist for these mappings. "\
           "Delete these mappings anyway?&nbsp;<a href='http://test.host/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
-          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><BR/>")
+          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><br/>")
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
     end
 
     context 'when failed time is equal to 0' do
       it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
-        allow(ResponseMap).to receive(:delete_mappings).with(@metareview_response_maps, true).and_return(0)
+        @metareview_response_maps.each do |metareview_response_map|
+          allow(metareview_response_map).to receive(:delete).with(true)
+        end
         params = {id: 1, force: true}
         post :delete_all_metareviewers, params
         expect(flash[:error]).to be nil
@@ -458,6 +462,28 @@ describe ReviewMappingController do
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end
+
+      context 'when student review num is greater than or equal to team size' do
+        it 'throws error stating that student review number cannot be greather than or equal to team size' do
+          allow(ReviewResponseMap).to receive(:where)
+            .with(reviewed_object_id: 1, calibrate_to: 1)
+            .and_return([double('ReviewResponseMap', reviewee_id: 2)])
+          allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
+          params = {
+            id: 1,
+            max_team_size: 1,
+            num_reviews_per_student: 45,
+            num_reviews_per_submission: 0,
+            num_calibrated_artifacts: 0,
+            num_uncalibrated_artifacts: 0
+          }
+          post :automatic_review_mapping, params
+          expect(flash[:error]).to eq('You cannot set the number of reviews done ' \
+                                      'by each student to be greater than or equal to total number of teams ' \
+                                      '[or "participants" if it is an individual assignment].')
+          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        end
+      end
     end
 
     context 'when teams is empty, max team size is 1 and when review params are not 0' do
@@ -597,12 +623,15 @@ describe ReviewMappingController do
           .with(parent_id: '1', user_id: 3, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle').and_return(participant)
         allow(ReviewQuestionnaire).to receive(:select).with('id').and_return([1, 2, 3])
         assignment_questionnaire = double('AssignmentQuestionnaire')
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1', questionnaire_id: [1, 2, 3])
-                                                         .and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:retrieve_questionnaire_for_assignment)
+          .with('1')
+          .and_return([assignment_questionnaire])
         allow(assignment_questionnaire).to receive_message_chain(:questionnaire, :questions).and_return([double('Question', type: 'Criterion')])
         allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
-        allow(ReviewResponseMap).to receive_message_chain(:select, :where).with('id').with(reviewed_object_id: '1', calibrate_to: 0)
-                                                                          .and_return([1, 2])
+        allow(ReviewResponseMap).to receive_message_chain(:select, :where)
+          .with('id')
+          .with(reviewed_object_id: '1', calibrate_to: 0)
+          .and_return([1, 2])
         allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
         params = {
           id: 1,
@@ -649,10 +678,7 @@ describe ReviewMappingController do
 
   describe '#start_self_review' do
     before(:each) do
-      allow(TeamsUser).to receive(:find_by_sql).with(
-        ["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", 1, '1']
-      )
-                                               .and_return([double('TeamsUser', t_id: 1)])
+      allow(Team).to receive(:find_team_for_assignment_and_user).with(1, '1').and_return([double('Team', id: 1)])
     end
 
     context 'when self review response map does not exist' do

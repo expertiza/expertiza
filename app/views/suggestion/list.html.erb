@@ -16,7 +16,7 @@
 
     <% for suggestion in @suggestions %>
       <tr class="listingRow">
-	<%= form_for :suggestion, :url => update_feedback_suggestion_index_path(:suggestion_id => suggestion.id, :id => params[:id], :type=>params[:type])   	do |f| %>
+	<%= form_for :suggestion, :url => update_feedback_suggestion_index_path(:suggestion_id => suggestion.id, :id => params[:id], :type => params[:type])   	do |f| %>
         <td style="max-width: 200px"><%=h suggestion.title %></td>
         <td align="center"><%=h suggestion.status %></td>
         <td align="center"><%=h suggestion.unityID %></td>

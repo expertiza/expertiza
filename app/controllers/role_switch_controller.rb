@@ -3,7 +3,11 @@ class RoleSwitchController < ApplicationController
   def action_allowed?
     # only an instructor is allowed to perform all the actions in
     # this controller
-    return true if session[:user].role.instructor?
+   # return true if session[:user].role.instructor?
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
   end
 
   # sets student_view in session object and redirects to
@@ -24,7 +28,6 @@ class RoleSwitchController < ApplicationController
     session.delete(:student_view)
     role = Role.instructor
     session[:menu] = role.cache[:menu]
-    # MenuItemsHelper.update_hidden_menu_items_for_instructor_view(session)
     redirect_to controller: 'tree_display', action: 'list'
   end
 end

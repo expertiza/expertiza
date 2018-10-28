@@ -281,16 +281,6 @@ development:
         url: "/survey_deployment/list"
         children:
         - 36
-      26: &5 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 33
-        id: 26
-        label: Assignments
-        name: student_task
-        parent:
-        parent_id:
-        site_controller_id: 23
-        url: "/student_task/list"
       30: &6 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -629,7 +619,6 @@ development:
       admin: *2
       manage instructor content: *3
       Survey Deployments: *4
-      student_task: *5
       Course Evaluation: *6
       profile: *7
       contact_us: *8
@@ -670,7 +659,6 @@ development:
       - 3
       - 37
       - 35
-      - 26
       - 30
       - 27
       - 2
@@ -880,7 +868,6 @@ test:
       - 2
       - 3
       - 4
-      - 5
       - 6
       - 7
     by_id:
@@ -935,16 +922,7 @@ test:
         url: "/survey_deployment/list"
         children:
         - 18
-      5: &5 !ruby/object:Menu::Node
-        parent:
-        parent_id:
-        name: student_task
-        id: 5
-        label: Assignments
-        site_controller_id: 20
-        controller_action_id: 33
-        content_page_id:
-        url: "/student_task/list"
+
       6: &6 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -1252,7 +1230,6 @@ test:
       admin: *2
       manage instructor content: *3
       Survey Deployments: *4
-      student_task: *5
       profile: *6
       contact_us: *7
       setup: *9
@@ -1571,16 +1548,6 @@ production:
         url: "/survey_deployment/list"
         children:
         - 36
-      26: &5 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id: 33
-        id: 26
-        label: Assignments
-        name: student_task
-        parent:
-        parent_id:
-        site_controller_id: 23
-        url: "/student_task/list"
       30: &6 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -1919,7 +1886,6 @@ production:
       admin: *2
       manage instructor content: *3
       Survey Deployments: *4
-      student_task: *5
       Course Evaluation: *6
       profile: *7
       contact_us: *8
@@ -1960,7 +1926,6 @@ production:
       - 3
       - 37
       - 35
-      - 26
       - 30
       - 27
       - 2

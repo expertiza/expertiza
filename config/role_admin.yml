@@ -66,8 +66,6 @@ development:
         list: true
       institution:
         list: false
-      student_task:
-        list: true
       profile:
         edit: true
       survey_response:
@@ -161,7 +159,6 @@ development:
       participants: true
       reports: true
       institution: false
-      student_task: true
       profile: true
       survey_response: true
       team: true
@@ -591,8 +588,6 @@ test:
         change_handle: true
       institution:
         list: false
-      student_task:
-        list: true
       profile:
         edit: true
       survey_response:
@@ -678,7 +673,6 @@ test:
       participants: true
       reports: true
       institution: false
-      student_task: true
       profile: true
       survey_response: true
       team: true
@@ -1040,8 +1034,6 @@ production:
         list: true
       institution:
         list: false
-      student_task:
-        list: true
       profile:
         edit: true
       survey_response:
@@ -1135,7 +1127,6 @@ production:
       participants: true
       reports: true
       institution: false
-      student_task: true
       profile: true
       survey_response: true
       team: true

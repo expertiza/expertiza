@@ -351,8 +351,10 @@ class AssignmentsController < ApplicationController
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
+    if !params[:assignment_form][:assignment_questionnaire].nil?
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
+      end
     end
 
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni

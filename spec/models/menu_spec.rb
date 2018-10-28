@@ -11,15 +11,27 @@ describe Node do
   let(:node) { Menu::Node.new }
   let(:node2) { Menu::Node.new }
   let(:node3) { Menu::Node.new }
-  let!(:sc_test1) {SiteController.create(id:1,  name:"site1")}
-  let!(:ca_test1) {ControllerAction.create( id: 1,site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
-  let!(:ca_test2) {ControllerAction.create(id: 2, site_controller_id: 1, name: "action2", permission_id: 1)}
-  let!(:cp_test1) {ContentPage.create( id: 1, name:"content1" )}
-  let!(:test1) { create(:menu_item, name: "home1", parent_id: nil,  seq: 1, content_page_id:1) }
-  let!(:test2) { create(:menu_item, name: "home2", parent_id: 1,    seq: 2, controller_action_id:1, content_page_id: 1) }
-  let!(:test3) { create(:menu_item, name: "home3", parent_id: 1,    seq: 3, controller_action_id:2, content_page_id: 1) }
+  # let(:sc_test1) {SiteController.create(id:1,  name:"site1")}
+  # let(:sc_test2) {SiteController.create(id:2,  name:"site2")}
+  let(:sc_test1) {build(:site_controller, id:1,  name:"site1")}
+  let(:sc_test2) {build(:site_controller, id:2,  name:"site2")}
+
+  # let(:ca_test1) {ControllerAction.create( id: 1,site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
+  # let(:ca_test2) {ControllerAction.create(id: 2, site_controller_id: 1, name: "action2", permission_id: 1)}
+  let(:ca_test1) {build(:controller_action, id: 1, site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
+  let(:ca_test2) {build(:controller_action, id: 2, site_controller_id: 1, name: "action2", permission_id: 1, url_to_use: nil)}
+  # let(:cp_test1) {ContentPage.create( id: 1, name:"content1" )}
+  # let(:cp_test2) {ContentPage.create( id: 2, name:"content2" )}
+  let(:cp_test1) {build(:content_page, id: 1, name:"content1" )}
+  let(:cp_test2) {build(:content_page, id: 2, name:"content2" )}
+  let(:item1) { build(:menu_item, name: "home1", parent_id: nil,  seq: 1, content_page_id:1) }
+  let(:item2) { build(:menu_item, name: "home2", parent_id: 1,    seq: 2, controller_action_id:1, content_page_id: 1) }
+  let(:item3) { build(:menu_item, name: "home3", parent_id: 1,    seq: 3, controller_action_id:2, content_page_id: 1) }
 
 
+  # before(:each) do
+  #   allow(ControllerAction).to receive(:find).and_return(review_response_map)
+  # end
 
 
   describe "#initialize" do
@@ -33,13 +45,11 @@ describe Node do
     context "when the controller action attribute of the item is nil" do
       it "assigns content page path of the current menu item to the URL variable" do
         # Write your test here!
-        # allow(node).to receive(:setup).with(test2)
-        # expect(node.parent_id).to eq(1)
-        # node.setup(test1)
-        # expect(cp_test1.name).to eq("content1");
-        # expect(node.setup(test1).name).to eq("/#{cp_test1.name}")
-        test1.content_page = cp_test1
-        node.setup(test1)
+        # allow(MenuItem).to receive_message_chain(:try, :try).with(:content_page,:id).and_return(cp_test1.id)
+        # allow(item1).to receive_message_chain(:content_page, :name).and_return("#{cp_test1.name}")
+
+        item1.content_page = cp_test1
+        node.setup(item1)
         expect(node.url).to eq("/#{cp_test1.name}")
 
         # expect(node.controller_action_id).to eq(1)
@@ -52,10 +62,13 @@ describe Node do
         it "assigns the URL of controller action to the URL variable" do
           # Write your test here!
           # allow(node2).to receive(:setup).with(test2)
-          ca_test1.site_controller = sc_test1
-          test2.controller_action = ca_test1
-          test2.content_page = cp_test1
-          node2.setup(test2)
+          allow(SiteController).to receive(:find).with(sc_test1.id).and_return(sc_test1)
+          ca_test1.controller
+
+          # ca_test1.controller = sc_test1
+          item2.controller_action = ca_test1
+          item2.content_page = cp_test1
+          node2.setup(item2)
           expect(node2.url).to eq("#{ca_test1.url_to_use}")
           end
       end
@@ -65,10 +78,10 @@ describe Node do
           # Write your test here!
           # allow(node3).to receive(:setup).with(test3)
 
-          ca_test2.site_controller = sc_test1
-          test3.controller_action = ca_test2
-          test3.content_page = cp_test1
-          node3.setup(test3)
+          ca_test2.controller = sc_test1
+          item3.controller_action = ca_test2
+          item3.content_page = cp_test1
+          node3.setup(item3)
           expect(node3.url).to eq("/#{sc_test1.name}/#{ca_test2.name}")
           end
       end
@@ -79,51 +92,75 @@ describe Node do
     context "when the site_controller variable is nil" do
       it "finds the site controller by id" do
         # Write your test here!
-        test3.controller_action = ca_test2
-        node.setup(test3)
+        # test3.controller_action = ca_test2
+        # node.setup(test3)
+        # expect(node.site_controller).to eq(sc_test1)
+        node.site_controller_id = sc_test1.id
+        allow(SiteController).to receive(:find_by).with(id: sc_test1.id).and_return(sc_test1)
         expect(node.site_controller).to eq(sc_test1)
-
       end
     end
 
     context "when the site_controller variable is not nil" do
       it "returns the site_controller variable" do
         # Write your test here!
-        ca_test2.site_controller = sc_test1
-        test3.controller_action = ca_test2
-        node.setup(test3)
-        expect(node.site_controller).to eq(sc_test1)
+        # ca_test2.site_controller = sc_test1
+        # test3.controller_action = ca_test2
+        # node.setup(test3)
+        # expect(node.site_controller).to eq("sc_test1")
+        # node.site_controller =
+        node.instance_variable_set(:@site_controller, sc_test2)
+        expect(node.site_controller).to eq(sc_test2)
       end
     end
   end
 
   describe "#controller_action" do
     context "when controller_action variable is nil" do
-      it "finds the controller action by id"
-      # Write your test here!
+      it "finds the controller action by id"do
+        # Write your test here!
+        node.controller_action_id = ca_test1.id
+        allow(ControllerAction).to receive(:find_by).with(id: ca_test1).and_return(ca_test1)
+        expect(node.controller_action).to eq(ca_test1)
+      end
     end
 
     context "when the controller_action variable is not nil" do
-      it "returns the controller action variable"
-      # Write your test here!
+      it "returns the controller action variable" do
+        # Write your test here!
+        node.instance_variable_set(:@controller_action, ca_test2)
+        expect(node.controller_action).to eq(ca_test2)
+      end
     end
   end
 
   describe "#content_page" do
     context "when content_page variable is nil" do
-      it "finds the content page by id"
-      # Write your test here!
+      it "finds the content page by id" do
+        # Write your test here!
+        node.content_page_id = cp_test1
+        allow(ContentPage).to receive(:find_by).with(id: cp_test1).and_return(cp_test1)
+        expect(node.content_page).to eq(cp_test1)
+      end
     end
 
     context "when the content_page variable is not nil" do
-      it "returns the content page variable"
-      # Write your test here!
+      it "returns the content page variable" do
+        # Write your test here!
+        node.instance_variable_set(:@content_page, cp_test2)
+        expect(node.content_page).to eq(cp_test2)
+      end
     end
   end
 
   describe "#add_child" do
-    it "adds a node to @children list and returns the list"
-    # Write your test here!
+    it "adds a node to @children list and returns the list" do
+      # Write your test here!
+      # node2.instance_variable_set(:@id, 2)
+      node2.id = 2
+      node.add_child(node2)
+      expect(node.children[0]).to eq(2)
+    end
   end
 end
 

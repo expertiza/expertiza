@@ -49,7 +49,7 @@ module ReportFormatterHelper
     @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
   end
 
-  #def self.Calibration(params)
+  # def self.Calibration(params)
   def self.Collusion(params, session)
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?
@@ -77,7 +77,7 @@ module ReportFormatterHelper
     @user_tagging_report = {}
     tag_prompt_deployments.each do |tag_dep|
       @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
-      #generate a summary report per user
+      # generate a summary report per user
       @questionnaire_tagging_report[tag_dep].each do |line|
         if @user_tagging_report[line.user.name].nil?
           @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)

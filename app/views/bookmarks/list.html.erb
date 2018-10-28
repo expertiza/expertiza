@@ -62,7 +62,7 @@
 						<% end %>
 					<% else %>
 						<!-- This will be used to show the rubric -->
-						<%= link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %>
+						<!-- TODO: Show the rubric or a link to fill it -->
 					<% end %>
 	    </td>
 	      <% if bookmark.user_id == session[:user].id %>

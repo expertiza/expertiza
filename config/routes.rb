@@ -65,7 +65,6 @@ Expertiza::Application.routes.draw do
   resources :bookmarks, except: %i[index show] do
     collection do
       get :list
-      post :save_bookmark_rating_score
     end
   end
 

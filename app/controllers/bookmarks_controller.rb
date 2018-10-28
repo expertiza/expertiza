@@ -62,19 +62,4 @@ class BookmarksController < ApplicationController
     flash[:success] = 'Your bookmark has been successfully deleted!'
     redirect_to action: 'list', id: @bookmark.topic_id
   end
-
-  def bookmark_rating
-    @bookmark = Bookmark.find(params[:id])
-  end
-
-  def save_bookmark_rating_score
-    @bookmark = Bookmark.find(params[:id])
-    @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first
-    if @bookmark_rating.blank?
-      BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: params[:rating])
-    else
-      @bookmark_rating.update_attribute('rating', params[:rating].to_i)
-    end
-    redirect_to action: 'list', id: @bookmark.topic_id
-  end
 end

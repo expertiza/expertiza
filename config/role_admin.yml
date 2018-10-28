@@ -486,7 +486,7 @@ development:
         parent:
         parent_id: 37
         site_controller_id: 10
-        url: "/role_switch/set_student_role"
+        url: "/role_switch/open_student_view"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1459,7 +1459,7 @@ production:
        parent:
        parent_id: 37
        site_controller_id: 35
-       url: "/role_switch/set_student_role"
+       url: "/role_switch/open_student_view"
     by_name:
       home: *1
       manage instructor content: *2

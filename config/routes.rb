@@ -150,8 +150,8 @@ Expertiza::Application.routes.draw do
 
   resources :role_switch, only: [] do
     collection do
-      post  :set_student_role
-      post  :revert_to_instructor_role
+      post  :open_student_view
+      post  :close_student_view
     end
   end
 

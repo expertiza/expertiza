@@ -7,9 +7,9 @@ class AssignmentsController < ApplicationController
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
       ['Super-Administrator', 'Administrator'].include? current_role_name or
-      assignment.instructor_id == current_user.try(:id) or
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
-      assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+          assignment.instructor_id == current_user.try(:id) or
+          TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
+          assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
     else
       ['Super-Administrator',
        'Administrator',
@@ -36,31 +36,31 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-        if @assignment_form.save
-          @assignment_form.create_assignment_node
-          existAssignment = Assignment.find_by_name(@assignment_form.assignment.name)
-          assignment_form_params[:assignment][:id] = existAssignment.id.to_s
-          quesparams = assignment_form_params
-          questArray = quesparams[:assignment_questionnaire]
-          dueArray = quesparams[:due_date]
-          questArray.each do |curquestionnaire|
-            curquestionnaire[:assignment_id] = existAssignment.id.to_s
-          end
-          dueArray.each do |curDue|
-            curDue[:parent_id] = existAssignment.id.to_s
-          end
-          quesparams[:assignment_questionnaire] = questArray
-          quesparams[:due_date] = dueArray
-          @assignment_form.update(quesparams,current_user)
-          aid = Assignment.find_by_name(@assignment_form.assignment.name).id
-          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-          redirect_to edit_assignment_path aid
-          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-          return
-        else
-          flash.now[:error] = "Failed to create assignment"
-          render 'new'
+      if @assignment_form.save
+        @assignment_form.create_assignment_node
+        existAssignment = Assignment.find_by_name(@assignment_form.assignment.name)
+        assignment_form_params[:assignment][:id] = existAssignment.id.to_s
+        quesparams = assignment_form_params
+        questArray = quesparams[:assignment_questionnaire]
+        dueArray = quesparams[:due_date]
+        questArray.each do |curquestionnaire|
+          curquestionnaire[:assignment_id] = existAssignment.id.to_s
         end
+        dueArray.each do |curDue|
+          curDue[:parent_id] = existAssignment.id.to_s
+        end
+        quesparams[:assignment_questionnaire] = questArray
+        quesparams[:due_date] = dueArray
+        @assignment_form.update(quesparams, current_user)
+        aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+        redirect_to edit_assignment_path aid
+        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+        return
+      else
+        flash.now[:error] = "Failed to create assignment"
+        render 'new'
+      end
     else
       render 'new'
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -282,8 +282,8 @@ class AssignmentsController < ApplicationController
   def assignment_form_assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_SUBMISSION }
-      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_REVIEW }
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_SUBMISSION}
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_REVIEW}
     end
     @assignment_form.assignment.staggered_deadline == true
   end
@@ -303,7 +303,7 @@ class AssignmentsController < ApplicationController
 
   def validate_due_date
     @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
-      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+        (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
   def check_assignment_questionnaires_usage
@@ -351,9 +351,9 @@ class AssignmentsController < ApplicationController
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
-    if !params[:assignment_form][:assignment_questionnaire].nil?
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
-      q[:questionnaire_id].empty?
+    unless params[:assignment_form][:assignment_questionnaire].nil?
+      params[:assignment_form][:assignment_questionnaire].reject! do |q|
+        q[:questionnaire_id].empty?
       end
     end
 

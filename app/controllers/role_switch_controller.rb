@@ -1,8 +1,6 @@
 class RoleSwitchController < ApplicationController
   # check to see if the current action is allowed
   def action_allowed?
-    # instructor,admin,superadmin is allowed to perform all the actions in
-    # this controller
     ['Super-Administrator',
      'Administrator',
      'Instructor'].include? current_role_name

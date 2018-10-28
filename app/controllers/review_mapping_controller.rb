@@ -6,7 +6,7 @@ class ReviewMappingController < ApplicationController
   # helper :dynamic_review_assignment
   helper :submitted_content
   #including the following helper to refactor the code in response_report function
-  helper :report_formatter
+  include ReportFormatterHelper
 
   @@time_create_last_review_mapping_record = nil
 
@@ -383,7 +383,7 @@ class ReviewMappingController < ApplicationController
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
     # Call the respective function of ReportFormatterHelper module
-    ReportFormatterHelper.send(@type, params, session)
+    render_report(@type, params, session)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 

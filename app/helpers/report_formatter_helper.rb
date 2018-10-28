@@ -1,5 +1,36 @@
 module ReportFormatterHelper
-  def self.SummaryByRevieweeAndCriteria(_params, _session)
+  def render_report(type, params, session)
+    case type
+      when "SummaryByRevieweeAndCriteria"
+        summary_by_reviewee_and_criteria(params, session)
+
+      when "SummaryByCriteria"
+        summary_by_criteria(params, session)
+
+      when "ReviewResponseMap"
+        review_response_map(params, session)
+
+      when "FeedbackResponseMap"
+        feedback_response_map(params, session)
+
+      when "TeammateReviewResponseMap"
+        teammate_review_response_map(params, session)
+
+      when "Collusion"
+        collusion(params, session)
+
+      when "PlagiarismCheckerReport"
+        plagiarism_checker_report(params, session)
+
+      when "AnswerTaggingReport"
+        answer_tagging_report(params, session)
+
+      when "SelfReview"
+        self_review(params , session)
+    end
+  end
+
+  def summary_by_reviewee_and_criteria(_params, _session)
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
     # list of variables used in the view and the parameters (should have been done as objects instead of hash maps)
@@ -16,7 +47,7 @@ module ReportFormatterHelper
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
-  def self.SummaryByCriteria(_params, _session)
+  def summary_by_criteria(_params, _session)
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, summary_ws_url)
 
@@ -25,7 +56,7 @@ module ReportFormatterHelper
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
-  def self.ReviewResponseMap(params, _session)
+  def review_response_map(params, _session)
     @assignment = Assignment.find(params[:id])
     @review_user = params[:user]
     # If review response is required call review_response_report method in review_response_map model
@@ -34,26 +65,29 @@ module ReportFormatterHelper
     @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
   end
 
-  def self.FeedbackResponseMap(params, _session)
+  def feedback_response_map(params, _session)
     @assignment = Assignment.find(params[:id])
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
     if @assignment.varying_rubrics_by_round?
-      @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(@id, @type)
+      @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two,
+          @all_review_response_ids_round_three = FeedbackResponseMap.feedback_response_report(@id, @type)
     else
       @authors, @all_review_response_ids = FeedbackResponseMap.feedback_response_report(@id, @type)
     end
   end
 
-  def self.TeammateReviewResponseMap(_params, _session)
+  def teammate_review_response_map(_params, _session)
     # If review report for teammate is required call teammate_response_report method in teammate_review_response_map model
     @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
   end
 
   # def self.Calibration(params)
-  def self.Collusion(params, session)
+  def collusion(params, session)
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?
-      participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+      participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id,
+                                                 can_submit: 1, can_review: 1, can_take_quiz: 1,
+                                                 handle: 'handle')
     end
 
     @assignment = Assignment.find(params[:id])
@@ -65,13 +99,13 @@ module ReportFormatterHelper
     @responses = Response.where(map_id: @review_response_map_ids)
   end
 
-  def self.PlagiarismCheckerReport(params, _session)
+  def plagiarism_checker_report(params, _session)
     @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
                                                                             PlagiarismCheckerAssignmentSubmission.where(assignment_id:
                                                                                                                             params[:id]).pluck(:id))
   end
 
-  def self.AnswerTaggingReport(params, _session)
+  def answer_tagging_report(params, _session)
     tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
     @questionnaire_tagging_report = {}
     @user_tagging_report = {}
@@ -91,7 +125,7 @@ module ReportFormatterHelper
     end
   end
 
-  def self.SelfReview(params, session)
+  def self_review(_params, _session)
     @self_review_response_maps = SelfReviewResponseMap.where(reviewed_object_id: @id)
   end
 end

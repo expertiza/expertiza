@@ -397,6 +397,7 @@ resources :institution, except: [:destroy] do
       post :submit
       post :student_submit
       post :update_suggestion
+      post :update_feedback
     end
   end
 
@@ -483,4 +484,8 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+
+
+
+  
 end

@@ -483,4 +483,28 @@ FactoryBot.define do
     controller_action_id nil
     content_page_id nil
   end
+
+  factory :site_controller, class: SiteController do
+    name 'site'
+    permission_id nil
+    builtin nil
+  end
+
+  factory :controller_action, class: ControllerAction do
+    name 'action'
+    url_to_use "/test/"
+    site_controller_id nil
+    permission_id nil
+  end
+
+  factory :content_page, class: ContentPage do
+    name 'content'
+    title "page"
+    content 'This is a test page'
+    markup_style_id nil
+    permission_id nil
+    created_at Time.now
+    updated_at Time.now
+    content_cache nil
+  end
 end

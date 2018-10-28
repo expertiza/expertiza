@@ -1,5 +1,5 @@
 module ReportFormatterHelper
-  def self.SummaryByRevieweeAndCriteria(params, session)
+  def self.SummaryByRevieweeAndCriteria(_params, _session)
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
     # list of variables used in the view and the parameters (should have been done as objects instead of hash maps)
@@ -16,7 +16,7 @@ module ReportFormatterHelper
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
-  def self.SummaryByCriteria(params, session)
+  def self.SummaryByCriteria(_params, _session)
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, summary_ws_url)
 
@@ -25,7 +25,7 @@ module ReportFormatterHelper
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
-  def self.ReviewResponseMap(params, session)
+  def self.ReviewResponseMap(params, _session)
     @assignment = Assignment.find(params[:id])
     @review_user = params[:user]
     # If review response is required call review_response_report method in review_response_map model
@@ -34,7 +34,7 @@ module ReportFormatterHelper
     @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
   end
 
-  def self.FeedbackResponseMap(params, session)
+  def self.FeedbackResponseMap(params, _session)
     @assignment = Assignment.find(params[:id])
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
     if @assignment.varying_rubrics_by_round?
@@ -44,7 +44,7 @@ module ReportFormatterHelper
     end
   end
 
-  def self.TeammateReviewResponseMap(params, session)
+  def self.TeammateReviewResponseMap(_params, _session)
     # If review report for teammate is required call teammate_response_report method in teammate_review_response_map model
     @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
   end
@@ -65,13 +65,13 @@ module ReportFormatterHelper
     @responses = Response.where(map_id: @review_response_map_ids)
   end
 
-  def self.PlagiarismCheckerReport(params, session)
+  def self.PlagiarismCheckerReport(params, _session)
     @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id:
                                                                             PlagiarismCheckerAssignmentSubmission.where(assignment_id:
                                                                                                                             params[:id]).pluck(:id))
   end
 
-  def self.AnswerTaggingReport(params, session)
+  def self.AnswerTaggingReport(params, _session)
     tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
     @questionnaire_tagging_report = {}
     @user_tagging_report = {}
@@ -85,7 +85,7 @@ module ReportFormatterHelper
           @user_tagging_report[line.user.name].no_tagged += line.no_tagged
           @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
           @user_tagging_report[line.user.name].no_tagable += line.no_tagable
-          @user_tagging_report[line.user.name].percentage = @user_tagging_report[line.user.name].no_tagable == 0 ? "-" : format("%.1f", @user_tagging_report[line.user.name].no_tagged.to_f / @user_tagging_report[line.user.name].no_tagable * 100)
+          @user_tagging_report[line.user.name].percentage = @user_tagging_report[line.user.name].no_tagable.zero ? "-" : format("%.1f", @user_tagging_report[line.user.name].no_tagged.to_f / @user_tagging_report[line.user.name].no_tagable * 100)
         end
       end
     end

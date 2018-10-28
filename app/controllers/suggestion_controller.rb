@@ -181,7 +181,7 @@ class SuggestionController < ApplicationController
     redirect_to action: 'show', id: @suggestion
   end
 
-  def update_feedback	
+  def update_feedback
     Suggestion.find(params[:suggestion_id]).update_attributes(feedback: params[:suggestion][:feedback])
     redirect_to list_suggestion_index_path(:id => params[:id], :type => params[:type])
   end

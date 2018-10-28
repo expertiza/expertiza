@@ -68,6 +68,8 @@ class ImpersonateController < ApplicationController
             end
             AuthController.clear_user_info(session, nil)
             session[:user] = user
+            session[:impersonate] =  true
+            session[:original_user] = original_user
           else
             flash[:error] = message
             redirect_back

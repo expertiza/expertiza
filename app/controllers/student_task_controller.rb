@@ -9,6 +9,9 @@ class StudentTaskController < ApplicationController
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
+    if session[:impersonate]
+      @student_tasks = @student_tasks.select {|t| session[:original_user].id = t.assignment.instructor_id }
+    end
     @student_tasks.select! {|t| t.assignment.availability_flag }
 
     # #######Tasks and Notifications##################

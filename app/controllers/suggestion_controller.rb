@@ -181,11 +181,16 @@ class SuggestionController < ApplicationController
     redirect_to action: 'show', id: @suggestion
   end
 
+  def update_feedback
+    Suggestion.find(params[:suggestion_id]).update_attributes(feedback: params[:suggestion][:feedback])
+    redirect_to list_suggestion_index_path(:id => params[:id], :type => params[:type])
+  end
+
   private
 
   def suggestion_params
     params.require(:suggestion).permit(:assignment_id, :title, :description,
-                                       :status, :unityID, :signup_preference)
+                                       :status, :unityID, :signup_preference, :feedback)
   end
 
   def approve

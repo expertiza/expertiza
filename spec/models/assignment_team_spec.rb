@@ -144,4 +144,34 @@ describe 'AssignmentTeam' do
     end
   end
 
+  describe "#copy" do
+    context "for given assignment team" do
+      it "copies the assignment team to course team" do
+	assignment = team.assignment
+	course = assignment.course
+	expect(team.copy(course.id)).to eq([])
+      end
+    end
+  end
+
+  describe "#add_participant" do
+    context "when a user is not a part of the team" do
+      it "adds the user to the team" do
+	user = build(:student, id: 10)
+	assignment = team.assignment
+	expect(team.add_participant(assignment.id, user)).to be_an_instance_of(AssignmentParticipant)
+      end
+    end
+
+    context "when a user is already a part of the team" do
+      it "returns without adding user to the team" do
+	allow(team).to receive(:users).with(no_args).and_return([user1])
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
+
+	assignment = team.assignment
+	expect(team.add_participant(assignment.id, user1)).to eq(nil)
+      end
+    end
+  end
+
 end

@@ -3,6 +3,7 @@ class RoleSwitchController < ApplicationController
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
+     'Teaching Assistant',
      'Instructor'].include? current_role_name
   end
 

@@ -32,7 +32,7 @@
           </div>
           <% end %>
           <% end %>
-          <%  if session[:user] and !session[:user].role.student? and !session[:user].role.ta? %>
+          <%  if session[:user] and !session[:user].role.student? %>
             <% if session.key?(:student_view) %>
               <%= link_to "Close Student View", {controller: "role_switch", action: "close_student_view"}, method: :post, :style => "color: white" %>
             <% else %>

@@ -12,8 +12,7 @@ assign_instructor_id in quiz_questionnaire model (Sam)
 [] Test valid_quiz in questionnaire model (Sam)
 
 [] Test toggle_access in questionnaire model  (Sam)
-	-- for this one, leave it alone, ask Bhavik about it and worry
-	-- about it later
+	-- for this one, leave it alone, ask Bhavik about it and worry about it later
 
 [] Test set_display_type in questionnaire model (Sam)
 

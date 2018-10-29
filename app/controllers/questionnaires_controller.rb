@@ -1,6 +1,5 @@
 class QuestionnairesController < ApplicationController
   # Controller for Questionnaire objects
-  #Modifying this controller
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)

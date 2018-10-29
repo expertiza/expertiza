@@ -10,11 +10,11 @@
 </p>
 <%= form_tag :action => "save_bookmark_rating_score", :id => @bookmark.id do %>
   <p>
-    <% params[:rate_score] = "0" %>
-    <select id="rate_score" name="rate_score" style="font-size:20px">
+    <% params[:rating] = "0" %>
+    <select id="rating" name="rating" style="font-size: 20px">
       <% (0..5).each do |i| %>
-        <option value=<%= i.to_s %> 
-          <% if params[:rate_score] == i.to_s -%>
+        <option value=<%= i.to_s %>
+          <% if params[:rating] == i.to_s -%>
             selected
           <% end -%>
         ><%= i.to_s %></option>

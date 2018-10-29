@@ -41,7 +41,7 @@
         //Weight
         html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
         '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>';
-        //Notification Limit 
+        //Notification Limit
         if (round_no ==null) {
              html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
         }
@@ -224,7 +224,8 @@
           ['ReviewQuestionnaire',
             'MetareviewQuestionnaire',
             'AuthorFeedbackQuestionnaire',
-            'TeammateReviewQuestionnaire'].forEach(function(item){
+            'TeammateReviewQuestionnaire',
+            'BookmarkRatingQuestionnaire'].forEach(function(item){
             removeQuestionnaireTableRow(item);
           });
             for (i = 1; i <= round_count; i++) {
@@ -257,6 +258,13 @@
                     <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
                     <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
             );
+            addQuestionnaireTableRow(
+                    'BookmarkRatingQuestionnaire',
+                    null,
+                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
+                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
+            );
             <%@avoidrepeatsign=1%>;
         }
         if (state == false && round_count>1){
@@ -264,7 +272,8 @@
           ['ReviewQuestionnaire',
             'MetareviewQuestionnaire',
             'AuthorFeedbackQuestionnaire',
-            'TeammateReviewQuestionnaire'].forEach(function(item){
+            'TeammateReviewQuestionnaire',
+            'BookmarkRatingQuestionnaire'].forEach(function(item){
             if(item==='ReviewQuestionnaire')
               for (i=1;i<=round_count+1;i++) {
                 removeQuestionnaireTableRow(item);
@@ -298,6 +307,13 @@
                     <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
                     <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
                     <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+            );
+            addQuestionnaireTableRow(
+                    'BookmarkRatingQuestionnaire',
+                    null,
+                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
+                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
             );
         }
       initTagPrompts();

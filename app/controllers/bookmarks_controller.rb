@@ -12,6 +12,16 @@ class BookmarksController < ApplicationController
   def list
     @bookmarks = Bookmark.where(topic_id: params[:id])
     @topic = SignUpTopic.find(params[:id])
+    bookmark_rating_questionnaire = @topic.assignment.questionnaires.where(type: 'BookmarkRatingQuestionnaire')
+    if !bookmark_rating_questionnaire.empty?
+      bookmark_rating_questionnaire = bookmark_rating_questionnaire[0]
+      dropdowns = bookmark_rating_questionnaire.assignment_questionnaires.select do |x|
+        x.assignment.id == @topic.assignment.id && x.dropdown
+      end
+      @has_dropdown = !dropdowns.empty?
+    else
+      @has_dropdown = false
+    end
   end
 
   def new

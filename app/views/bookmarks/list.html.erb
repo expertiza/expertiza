@@ -40,24 +40,30 @@
 	      		<% rating = "0" %>
 	      	<% end %>
 	      	<!--If instructor choose to use dropdown, Expertiza will not redirect to this page. Otherwise, we will use this page to do bookmark rating (rubric).-->
-	      	<% link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %>
-	      	<%= form_tag :action => "save_bookmark_rating_score", :id => bookmark.id do %>
-			    <% params[:rating] = rating %>
-			    <select id=<%= bookmark.id %> name="rating" style="font-size:10px">
-			      <% (0..5).each do |i| %>
-			        <option value=<%= i.to_s %> 
-			          <% if params[:rating] == i.to_s -%>
-			            selected
-			          <% end -%>
-			        ><%= i.to_s %></option>
-			      <% end %>
-			    </select>
-			    <% if BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.blank? %>
-			    	<%= button_tag "Rate", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
-			    <% else %>
-			    	<%= button_tag "Update", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
-				<% end %>
-			<% end %>
+					<% if @has_dropdown %>
+						<%= form_tag :action => "save_bookmark_rating_score", :id => bookmark.id do %>
+							<% params[:rating] = rating %>
+							<select id=<%= bookmark.id %> name="rating" style="font-size: 10px">
+								<% (0..5).each do |i| %>
+									<option value=<%= i.to_s %>
+										<% if params[:rating] == i.to_s %>
+											selected
+										<% end %>
+									>
+										<%= i.to_s %>
+									</option>
+								<% end %>
+							</select>
+							<% if BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.blank? %>
+								<%= button_tag "Rate", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+							<% else %>
+								<%= button_tag "Update", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
+							<% end %>
+						<% end %>
+					<% else %>
+						<!-- This will be used to show the rubric -->
+						<%= link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %>
+					<% end %>
 	    </td>
 	      <% if bookmark.user_id == session[:user].id %>
 	      	<td><%= link_to 'Edit', :action => 'edit', :id => bookmark.id %></td>

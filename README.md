@@ -1,38 +1,56 @@
-To Do: \n
+To Do:
+
 OSS project testing:
+
 [] Test CRUD questionnaire (Sam)
+
 [] Test CRUD quiz questionnaire (Sam)
+
 [] Test import, export, copy_questionnaire_details, and
 assign_instructor_id in quiz_questionnaire model (Sam)
+
 [] Test valid_quiz in questionnaire model (Sam)
+
 [] Test toggle_access in questionnaire model  (Sam)
 	-- for this one, leave it alone, ask Bhavik about it and worry
 	-- about it later
+
 [] Test set_display_type in questionnaire model (Sam)
 
 OSS Project to do:
+
 [] Move case statement from create in questionaire_controller.rb into
 a method called set_display_type in questionaire model (Reddy)
+
 [] Delete create_questionnaire method and replace the call to it in
 create_quiz_questionnaire with the code of create_questionnaire. Also,
 in an Object Oriented system, you should not have to check the type of
 an object. (Reddy)
+
 [] Move view_quiz to quiz_questionnaires_controller.rb, and rename it view
 (Abhisu)
+
 [] Move new_quiz to quiz_questionnaires_controller.rb, and rename it new
 (Abhisu)
+
 [] Move create_quiz_questionnaire to quiz_questionnaires_controller.rb and
 rename it create
 (Abhisu)
+
 [] Move edit_quiz to quiz_questionnaires_controller.rb and rename it edit
 (Abhisu)
+
 [] Move update_quiz to quiz_questionnaires_controller.rb and rename it update
 (Abhisu)
+
 [] Move large block of for and if statements into method called
 change_question_types in the quiz_questionnaire model. (Reddy)
+
 [] Replace large block of for and if statements in update_quiz with a call
 to the new change_question_types method. (Reddy)
+
 [] Move valid_quiz into quiz_questionnaire model and rename it valid? (Abhisu)
+
 [] Move export, import, copy_questionnaire_details, and assign_instructor_id
 to questionaire model. (Reddy)
 

@@ -148,7 +148,7 @@ class Team < ActiveRecord::Base
   end
 
   # Generate the team name
-  def self.generate_team_name(team_name_prefix)
+  def self.generate_team_name(*)
     counter = 1
     loop do
       team_name = "Team_#{counter}"

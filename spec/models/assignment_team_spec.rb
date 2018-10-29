@@ -7,6 +7,8 @@ describe 'AssignmentTeam' do
   let(:user1) { build(:student, id: 2) }
   let(:user2) { build(:student, id: 3) }
   let(:review_response_map) { build(:review_response_map, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
+  let(:topic) { build(:topic, id: 1, topic_name: "New Topic") }
+  let(:signedupteam) { build(:signed_up_team) }
 
   describe "#hyperlinks" do
     context "when current teams submitted hyperlinks" do
@@ -74,12 +76,10 @@ describe 'AssignmentTeam' do
   describe ".get_first_member" do
     context "when team id is present" do
       it "get first member of the  team" do
-
 	team = build(:assignment_team, id: 1)
         build(:student, id: 3)
         participant1 = build(:participant, id: 1, user_id: 3)
-        team_user1 = build(:team_user, team_id: 1, user_id: 3)	        				
-		
+        team_user1 = build(:team_user, team_id: 1, user_id: 3)	        					
 	allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
 	expect(AssignmentTeam.get_first_member(team.id)).to eq(participant1)
       end
@@ -167,9 +167,19 @@ describe 'AssignmentTeam' do
       it "returns without adding user to the team" do
 	allow(team).to receive(:users).with(no_args).and_return([user1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-
 	assignment = team.assignment
 	expect(team.add_participant(assignment.id, user1)).to eq(nil)
+      end
+    end
+  end
+
+  describe "#topic" do
+    context "when the team has picked a topic" do
+      it "provides the topic id" do
+        assignment = team.assignment
+        allow(SignUpTopic).to receive(:find_by).with(assignment: assignment).and_return(topic)
+	allow(SignedUpTeam).to receive_message_chain(:find_by, :try).with(team_id: team.id).with(:topic_id).and_return(topic.id)
+	expect(team.topic).to eq(topic.id)
       end
     end
   end

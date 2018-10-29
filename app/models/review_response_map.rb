@@ -136,7 +136,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  def prepare_final_review_versions(assignment, maps)
+  def self.prepare_final_review_versions(assignment, maps)
     review_final_versions = {}
     rounds_num = assignment.rounds_of_reviews
     if rounds_num and rounds_num > 1
@@ -149,7 +149,7 @@ class ReviewResponseMap < ResponseMap
     review_final_versions
   end
 
-  def prepare_review_response(assignment, maps, review_final_versions, round)
+  def self.prepare_review_response(assignment, maps, review_final_versions, round)
     symbol = if round.nil?
                :review
              else

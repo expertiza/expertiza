@@ -103,7 +103,7 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe "has_submissions?" do
+  describe "#has_submissions?" do
     context "when the team has submitted hyperlinks" do
       it "returns true" do
         assignment_team.submitted_hyperlinks << ""

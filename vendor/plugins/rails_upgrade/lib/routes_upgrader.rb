@@ -228,7 +228,7 @@ module Rails
           base = "match '%s' => '%s#%s'"
           extra_options = []
         
-          if not name.empty?
+          unless name.empty?
             extra_options << ":as => :#{name}"
           end
           

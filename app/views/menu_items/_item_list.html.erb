@@ -30,7 +30,7 @@ for item_id in items do
 <% end %></td>
 
 <td>
-  <% if not item.children or item.children.length == 0 -%>
+  <% unless item.children or item.children.length == 0 -%>
     <%= link_to image_tag("/assets/delete.png"),
       {:action => 'destroy', :id => item.id},
       :confirm => 'Delete this menu item?', :method => :post %>

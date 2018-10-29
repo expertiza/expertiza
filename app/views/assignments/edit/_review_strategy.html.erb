@@ -83,7 +83,7 @@
 
   <tr id="assignment_review_topic_threshold_row">
 <td>
-        <span id="meta_reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_metareviews_allowed.nil?%>>
+        <span id="meta_reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_metareviews_allowed.nil?%> class="form-inline">
 
         <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', ' Set Allowed Number of Meta-reviews per Reviewer') %>
 

@@ -1,4 +1,12 @@
 describe Menu do
+
+    before :example do
+        controller = double("controller", :id => 43, :name => "controller1")
+        temp = double("temp", :id => 33, :controller => controller, :name => "temp", :url_to_use => nil)
+        allow_any_instance_of(MenuItem).to receive(:controller_action).and_return(temp)
+        allow_any_instance_of(MenuItem).to receive(:content_page).and_return(temp)
+    end
+
     before :all do
         @student_role = build(:role_of_student, id: 1, name: "Student", description: '', parent_id: nil, default_page_id: nil)
         @instructor_role = build(:role_of_instructor, id: 2, name: "Instructor", description: '', parent_id: nil, default_page_id: nil)
@@ -6,18 +14,14 @@ describe Menu do
         @invalid_role = build(:role_of_student, id: 1, name: nil, description: "", parent_id: nil, default_page_id: nil)
     end
 
-    # describe Node do
-        
-    # end
-
- let!(:test1) { create(:menu_item, name: "home1", parent_id: nil,  seq: 1) }
- let!(:test2) { create(:menu_item, name: "home2", parent_id: 1,    seq: 2) }
- let!(:test3) { create(:menu_item, name: "home3", parent_id: 1,    seq: 3) }
- let!(:test4) { create(:menu_item, name: "home4", parent_id: 1,    seq: 4) }
- let!(:test5) { create(:menu_item, name: "home5", parent_id: 2,  seq: 2) }
- let!(:test6) { create(:menu_item, name: "home6", parent_id: 3,  seq: 5) }
+    let!(:test1) { create(:menu_item, name: "home1", parent_id: nil,  seq: 1) }
+    let!(:test2) { create(:menu_item, name: "home2", parent_id: 1,    seq: 2) }
+    let!(:test3) { create(:menu_item, name: "home3", parent_id: 1,    seq: 3) }
+    let!(:test4) { create(:menu_item, name: "home4", parent_id: 1,    seq: 4) }
+    let!(:test5) { create(:menu_item, name: "home5", parent_id: 2,  seq: 2) }
+    let!(:test6) { create(:menu_item, name: "home6", parent_id: 3,  seq: 5) }
     
-    describe Node do
+    describe Menu::Node do
         describe "#initilize" do
             it "should initialize with a nil parent" do
                 @node = Menu::Node.new

@@ -412,7 +412,7 @@ class SignUpSheetController < ApplicationController
     end
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-2"
+      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
     else
       render action: 'new', id: params[:id]
     end

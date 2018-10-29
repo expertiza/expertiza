@@ -5,7 +5,7 @@ class ReviewMappingController < ApplicationController
   require 'gchart'
   # helper :dynamic_review_assignment
   helper :submitted_content
-  #including the following helper to refactor the code in response_report function
+  # including the following helper to refactor the code in response_report function
   include ReportFormatterHelper
 
   @@time_create_last_review_mapping_record = nil
@@ -59,7 +59,6 @@ class ReviewMappingController < ApplicationController
       begin
         user = User.from_params(params)
         # contributor_id is team_id
-        #regurl = url_for action: 'add_user_to_assignment',
         regurl = url_for id: assignment.id,
                          user_id: user.id,
                          contributor_id: params[:contributor_id]

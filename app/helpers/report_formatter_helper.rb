@@ -1,32 +1,24 @@
 module ReportFormatterHelper
   def render_report(type, params, session)
     case type
-      when "SummaryByRevieweeAndCriteria"
+    when "SummaryByRevieweeAndCriteria"
         summary_by_reviewee_and_criteria(params, session)
-
-      when "SummaryByCriteria"
-        summary_by_criteria(params, session)
-
-      when "ReviewResponseMap"
-        review_response_map(params, session)
-
-      when "FeedbackResponseMap"
-        feedback_response_map(params, session)
-
-      when "TeammateReviewResponseMap"
-        teammate_review_response_map(params, session)
-
-      when "Collusion"
-        collusion(params, session)
-
-      when "PlagiarismCheckerReport"
-        plagiarism_checker_report(params, session)
-
-      when "AnswerTaggingReport"
-        answer_tagging_report(params, session)
-
-      when "SelfReview"
-        self_review(params , session)
+    when "SummaryByCriteria"
+      summary_by_criteria(params, session)
+    when "ReviewResponseMap"
+      review_response_map(params, session)
+    when "FeedbackResponseMap"
+      feedback_response_map(params, session)
+    when "TeammateReviewResponseMap"
+      teammate_review_response_map(params, session)
+    when "Collusion"
+      collusion(params, session)
+    when "PlagiarismCheckerReport"
+      plagiarism_checker_report(params, session)
+    when "AnswerTaggingReport"
+      answer_tagging_report(params, session)
+    when "SelfReview"
+      self_review(params, session)
     end
   end
 
@@ -83,13 +75,6 @@ module ReportFormatterHelper
 
   # def self.Calibration(params)
   def collusion(params, session)
-    participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
-    if participant.nil?
-      participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id,
-                                                 can_submit: 1, can_review: 1, can_take_quiz: 1,
-                                                 handle: 'handle')
-    end
-
     @assignment = Assignment.find(params[:id])
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.where(assignment_id: params[:id], questionnaire_id: @review_questionnaire_ids).first
@@ -119,7 +104,12 @@ module ReportFormatterHelper
           @user_tagging_report[line.user.name].no_tagged += line.no_tagged
           @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
           @user_tagging_report[line.user.name].no_tagable += line.no_tagable
-          @user_tagging_report[line.user.name].percentage = @user_tagging_report[line.user.name].no_tagable.zero ? "-" : format("%.1f", @user_tagging_report[line.user.name].no_tagged.to_f / @user_tagging_report[line.user.name].no_tagable * 100)
+
+          number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
+          number_taggable = @user_tagging_report[line.user.name].no_tagable
+          formatted_percentage = format("%.1f",  (number_tagged / number_taggable) * 100)
+          @user_tagging_report[line.user.name].percentage =
+              @user_tagging_report[line.user.name].no_tagable.zero ? "-" : formatted_percentage
         end
       end
     end

@@ -209,6 +209,7 @@ class AssignmentParticipant < Participant
       new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
       new_part.set_handle
     end
+    # E1834 Fall 18
     prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
     prepared_mail.deliver_now
   end
@@ -288,5 +289,17 @@ class AssignmentParticipant < Participant
       return (assignment.staggered_deadline? ? TopicDueDate.find_by(parent_id: topic_id).try(:last).try(:due_at) : assignment.due_dates.last.due_at).to_s
     end
     stage
+  end
+
+  # E1834 Fall 18
+  def is_round_valid_for_mail?
+    topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
+    return assignment.review_deadline(topic_id, assignment.num_review_rounds)
+  end
+
+  #E1834 Fall 18
+  def number_of_current_round
+    topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
+    assignment.number_of_current_round(topic_id)
   end
 end

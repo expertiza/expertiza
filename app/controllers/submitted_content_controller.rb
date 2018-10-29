@@ -36,7 +36,8 @@ class SubmittedContentController < ApplicationController
   end
 
   def submit_hyperlink
-    @participant = AssignmentParticipant.find(params[:id])
+    # @participant = AssignmentParticipant.find(params[:id])
+    participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     team = @participant.team
     team_hyperlinks = team.hyperlinks
@@ -57,6 +58,17 @@ class SubmittedContentController < ApplicationController
       end
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
+
+      # E1834 Fall 18
+      # Send email to reviewers to review new submission, if review_round is valid and not last.
+      if participant.is_round_valid_for_mail?
+        current_round = participant.number_of_current_round
+        reviewers = []
+        participant.reviewers.each do |reviewer|
+          reviewers << User.find(reviewer.user_id).email
+        end
+        Mailer.delayed_message(bcc: reviewers, subject: "You have a new submission to review for Review #{current_round}", body: "Please visit #{team.hyperlinks['submission']} and proceed to peer reviews.").deliver_now
+      end
     end
     redirect_to action: 'edit', id: @participant.id
   end

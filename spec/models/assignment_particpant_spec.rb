@@ -309,6 +309,7 @@ describe AssignmentParticipant do
         end
       end
 
+      # E1834 Fall 18
       context "when participant is added to assignment using csv" do
         let(:row) do
           {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}

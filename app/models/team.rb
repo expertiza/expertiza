@@ -152,7 +152,7 @@ class Team < ActiveRecord::Base
     counter = 1
     loop do
       team_name = team_name_prefix + "_Team#{counter}"
-      return team_name unless Team.find_by(name: team_name)
+      return team_name unless !Team.find_by(name: team_name).nil?
       counter += 1
     end
   end
@@ -178,6 +178,7 @@ class Team < ActiveRecord::Base
   def self.import(row_hash, id, options, teamtype)
 
     raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
+    puts "hi, im in import"
     if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
       name = row_hash[:teamname].to_s
       team = where(["name =? && parent_id =?", name, id]).first
@@ -203,6 +204,13 @@ class Team < ActiveRecord::Base
 
   # Handle existence of the duplicate team
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
+    puts "in duplicate"
+    puts team.to_s # team object
+    puts name.to_s #team name
+
+
+
+
     return name if team.nil? # no duplicate
     return nil if handle_dups == "ignore" # ignore: do not create the new team
     if handle_dups == "rename" # rename: rename new team
@@ -212,10 +220,23 @@ class Team < ActiveRecord::Base
         return self.generate_team_name(Assignment.find(id).name)
       end
     end
+    if handle_dups == "rename_existing" # rename: rename existing team
+
+      if teamtype.is_a?(CourseTeam)
+        team.update(name:self.generate_team_name(Course.find(id).name)) # update the old team name
+      elsif  teamtype.is_a?(AssignmentTeam)
+        team.update(name:self.generate_team_name(Assignment.find(id).name)) # update the old team name
+      end
+      #team.update(name:self.generate_team_name(Assignment.find(id).name))
+      return name # send the new team name
+    end
     if handle_dups == "replace" # replace: delete old team
       team.delete
       return name
-    else # handle_dups = "insert"
+
+    end
+    if handle_dups=="insert"
+      team.import_team_members(row_hash)
       return nil
     end
   end

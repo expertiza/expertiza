@@ -168,21 +168,32 @@ describe Menu do
   # Write your mocked object here!
   let(:node) { Menu::Node.new }
   let(:role1) {build(:role_of_student)}
+  let(:role2) {build(:role_of_student)}
   let(:item1) { build(:menu_item, id: 1, name: "home1", parent_id: nil, seq: 1, controller_action_id:1, content_page_id: 1) }
   let(:item2) { build(:menu_item, id: 2, name: "home2", parent_id: 1, seq: 2, controller_action_id:1, content_page_id: 1) }
+  let(:item3) { build(:menu_item, id: 3, name: "home3", parent_id: 1, seq: 3, controller_action_id:2, content_page_id: 1) }
+  before(:each) do
+    items = [item1, item2, item3]
+    empty_hash = {}
+    allow(role1).to receive(:cache).and_return(empty_hash)
+    allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
+    allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
+    allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
+    allow(item3).to receive_message_chain(:content_page, :name).and_return("test")
+    allow(MenuItem).to receive(:items_for_permissions).and_return(items)
+    node.setup(item1)
+  end
+  let(:menu){Menu.new(role1)}
 
   describe "#initialize" do
     context "when menu items are nil or empty" do
       it "terminates later initialization and returns nil" do
         # Write your test here!
-        # allow(Role).to receive(:cache).and_return(nil)
         empty_hash = {}
-        allow(role1).to receive(:cache).and_return(empty_hash)
-        allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(nil)
-        # allow(nil).to receive(:pemission_id)
-        # allow(Role).to receive_message_chain(:try, :[], :try).with(empty_hash, 0, 0).and_return(nil)
+        allow(role2).to receive(:cache).and_return(empty_hash)
+        allow(role2).to receive_message_chain(:try, :[]).with(:credentials).and_return(nil)
         allow(MenuItem).to receive(:items_for_permissions).with(nil).and_return(nil)
-        expect(Menu.new(role1).selected).to be_nil
+        expect(Menu.new(role2).selected).to be_nil
       end
     end
 
@@ -190,35 +201,29 @@ describe Menu do
       context "when the parent id of the node is nil" do
         it "builds hashes of items by name and id and make the node as a child node of root node" do
           # Write your test here!
-          items = [item1]
-          # node.id = 1
-          empty_hash = {}
-          allow(role1).to receive(:cache).and_return(empty_hash)
-          allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(item1)
-          # # allow(item1).to receive(:try).with(:permission_ids).and_return(items)
-          # # allow(node).to receive(:setup).with(item1).and_return(node)
-          #
-          allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-          allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-          expect(Menu.new(role1).root.children[0]).to eq(1)
+          # items = [item1,item2]
+          # empty_hash = {}
+          # allow(role1).to receive(:cache).and_return(empty_hash)
+          # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
+          # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
+          # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
+          # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
+          # menu = Menu.new(role1)
+          expect(menu.root.children[0]).to eq(1)
         end
       end
 
       context "when the parent id of the node is not nil" do
         it "builds hashes of items by name and id and make the node as a child node of its parent node" do
             # Write your test here!
-            items = [item1, item2]
-            # node.id = 1
-            empty_hash = {}
-            allow(role1).to receive(:cache).and_return(empty_hash)
-            allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-            # # allow(item1).to receive(:try).with(:permission_ids).and_return(items)
-            # # allow(node).to receive(:setup).with(item1).and_return(node)
-            #
-            allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-            allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-            allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-            menu = Menu.new(role1)
+            # items = [item1, item2]
+            # empty_hash = {}
+            # allow(role1).to receive(:cache).and_return(empty_hash)
+            # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
+            # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
+            # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
+            # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
+            # menu = Menu.new(role1)
             id = menu.instance_variable_get(:@by_id)[1].children[0]
             expect(id).to eq(2)
           end
@@ -230,14 +235,14 @@ describe Menu do
     context "when by_name hash does not contain the given node name" do
       it "returns nil" do
         # Write your test here!
-        items = [item1, item2]
-        empty_hash = {}
-        allow(role1).to receive(:cache).and_return(empty_hash)
-        allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-        allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-        allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-        allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-        menu = Menu.new(role1)
+        # items = [item1, item2]
+        # empty_hash = {}
+        # allow(role1).to receive(:cache).and_return(empty_hash)
+        # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
+        # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
+        # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
+        # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
+        # menu = Menu.new(role1)
         expect(menu.select("hi")).to be_nil
       end
     end
@@ -245,16 +250,16 @@ describe Menu do
     context "when by_name hash contains the given node name" do
       it "selects the menu item for the given name" do
         # Write your test here!
-        items = [item1, item2]
-        empty_hash = {}
-        allow(role1).to receive(:cache).and_return(empty_hash)
-        allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-        allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-        allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-        allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-        menu = Menu.new(role1)
-        node = menu.instance_variable_get(:@by_id)[1]
-        expect(menu.select("home1")).to eq(node)
+        # items = [item1, item2]
+        # empty_hash = {}
+        # allow(role1).to receive(:cache).and_return(empty_hash)
+        # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
+        # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
+        # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
+        # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
+        # menu = Menu.new(role1)
+        # node = menu.instance_variable_get(:@by_id)[1]
+        expect(menu.select("home1").name).to eq(node.name)
       end
     end
   end
@@ -262,43 +267,62 @@ describe Menu do
   describe "#get_item" do
     it "returns menu item by id" do
     # Write your test here!
-      items = [item1, item2]
-      empty_hash = {}
-      allow(role1).to receive(:cache).and_return(empty_hash)
-      allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-      allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-      allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-      allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-      menu = Menu.new(role1)
-      node = menu.instance_variable_get(:@by_name)["home1"]
-      expect(menu.get_item(1)).to eq(node)
+    #   items = [item1, item2]
+    #   empty_hash = {}
+    #   allow(role1).to receive(:cache).and_return(empty_hash)
+    #   allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
+    #   allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
+    #   allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
+    #   allow(MenuItem).to receive(:items_for_permissions).and_return(items)
+    #   menu = Menu.new(role1)
+      # node = menu.instance_variable_get(:@by_name)["home1"]
+      expect(menu.get_item(1).name).to eq(node.name)
     end
   end
 
   describe "#get_menu" do
-    it "returns the array of child nodes at the given level"
-    # Write your test here!
+    it "returns the array of child nodes at the given level" do
+      # Write your test here!
+      children = menu.get_menu(1)
+      expect(children.size).to eq(2)
+      expect(children[0]).to eq(2)
+      expect(children[1]).to eq(3)
+    end
   end
 
   describe "#selected" do
-    it "returns the name of the currently-selected element"
-    # Write your test here!
+    it "returns the name of the currently-selected element" do
+      # Write your test here!
+      expect(menu.selected).to eq("home1")
+    end
   end
 
   describe "#selected?" do
     context "when @selected hash contains menu_id" do
-      it "returns true"
-      # Write your test here!
+      it "returns true" do
+        # Write your test here!
+        expect(menu.selected?(item1.id)).to eq(true)
+      end
     end
 
     context "when @selected hash does not contain menu_id" do
-      it "returns false"
-      # Write your test here!
+      it "returns false" do
+        # Write your test here!
+        expect(menu.selected?(item2.id)).to eq(false)
+      end
     end
   end
 
   describe "#crumbs" do
-    it "returns get a list of menu items based on contents in crumbs array"
-    # Write your test here!
+    it "returns get a list of menu items based on contents in crumbs array" do
+      # Write your test here!
+      menu.select("home3")
+      # size = menu.instance_variable_get(:@crumbs)
+      list = menu.crumbs
+      # expect(size).to eq([1, 3])
+      expect(list.size).to eq(2)
+      expect(list[0].id).to eq(1)
+      expect(list[1].id).to eq(3)
+    end
   end
 end

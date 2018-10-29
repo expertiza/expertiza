@@ -51,10 +51,25 @@ describe Participant do
 	Criterion.new(id: 1, weight: 2, break_before: true ) }
   let( :questionnaire ) { 
 	ReviewQuestionnaire.new(id: 1, questions: [ question ], max_question_score: 5) }
-
+let(:questionnaire1){
+	build(:questionnaire, id:2,name: 'q1',type: "Assignmentquestionnaire")
+}
+let(:assignment_questionnaire){
+	build(:assignment_questionnaire , used_in_round: 0, assignment_id: assignment.id, questionnaire_id: questionnaire1.id)
+}
   after(:each) do
     ActionMailer::Base.deliveries.clear
   end
+describe '#grade' do
+	it 'validates the type of grade (numericality)' do
+		participant.grade='a'
+		expect(participant).not_to be_valid
+	end
+	it 'allow grade to be nil' do
+		participant.grade=nil
+		expect(participant).to be_valid
+	end
+end
 
 #  describe '#team' do
 #    it 'returns the team of the participant' do
@@ -143,16 +158,34 @@ describe Participant do
     end
   end
 
-#  describe '#score' do
-#    it '???' do
-#      question = double( 'ScoredQuestion', weight: 2 )
-#      allow( Question ).to receive( :find ).with( 1 ).and_return( question )
-#      allow( question ).to receive( :is_a? ).with( ScoredQuestion ).and_return( true )
-#      expect( response.total_score ).to eq( 2 )
-#      allow( participant ).to receive( :scores ).and_return( response.total_score )
-#      expect( participant.scores( question ) ).to eq( response.total_score )
-#    end 
-#  end
+ # describe '#score' do
+  #  it 'return scores' do
+   #   question1 = double( 'Question', weight: 2 ,questionnaire_id: questionnaire1.id)
+#	questions=[question]
+#	questionnairenew=double('questionnaire')
+#	p questionnairenew.symbol
+ #     scores={}
+#	scores[:participant]=participant
+#	allow(participant).to receive(:assignment).and_return(assignment)
+
+#	allow(assignment).to receive(:questionnaire).and_return(questionnaire1)
+#	p assignment.questionnaire
+	#allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: participant.assignment.id, questionnaire_id: questionnaire1.id).and_return(assignment_questionnaire)
+#round=assignment_questionnaire.used_in_round	
+#	questionnaire_symbol=questionnaire1.symbol
+#	scores[questionnaire_symbol]={}
+#	p scores
+#scores[questionnaire_symbol][:assesments]=allow(questionnaire1).to receive(:get_assessments_for).with(participant).and_return(a_value)
+#	p scores      
+#scores[questionnaire_symbol][:scores]=allow(Answer).to receive(:compute_scores).with(scores[questionnaire_symbol][:assesments],questions[questionnaire_symbol]).and_return(a_value)
+#	p scores
+
+#	scores[:total_score]=0
+
+	#p scores
+#	expect( participant.scores( [question1] ) ).to eq( scores )
+ #   end 
+ #end
 
   describe '#get_permissions' do
     it 'returns the permissions of participant' do

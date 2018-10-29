@@ -11,7 +11,7 @@
     <td>
       <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review Strategy:') %>
       <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
-      <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options, {:selected => @assignment_form.assignment.review_assignment_strategy}, {:class => "form-control width-200"}) %>
+      <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options,  {:selected => @assignment_form.assignment.review_assignment_strategy, :style => 'margin-left :250px', :class => "form-control width-200"}) %>
       <script>
           jQuery(document).ready(function() {reviewStrategyChanged();});
           jQuery('#assignment_form_assignment_review_assignment_strategy').on('change', function() {reviewStrategyChanged();});
@@ -33,7 +33,7 @@
     <td>
       <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum Number of Reviews Per Submission:') %>
       <img src="/assets/info.png" title='You can set the maximum number of reviews can be done for a particular submissions.'>
-      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 2, class: "form-control width-70", :style => 'margin-left : 250px') %>
+      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 2, class: "form-control width-70", :style => 'margin-left : 100px') %>
     </td>
   </tr>
   <tr>
@@ -109,7 +109,7 @@
         <%= radio_button_tag 'num_reviews', 'student', true %>
         <%= label_tag('num_reviews_per_student', 'Set number of reviews done by each student') %>&nbsp;&nbsp;&nbsp;&nbsp;
         <span id='num_reviews_per_student_threshold' class="form-inline">
-            <%= text_field_tag('num_reviews_per_student', 0, {:class => 'form-control width-50'}) %>
+            <%= text_field_tag('num_reviews_per_student', 0, {:class => 'form-control width-50', :style => 'margin-left :100px'}) %>
           <%= submit_tag 'Assign reviewers', :id => 'first_submit_tag', :class => "btn btn-default" %>
           </span><br/>
 

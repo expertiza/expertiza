@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180427030840) do
+ActiveRecord::Schema.define(version: 20181028223640) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -160,6 +160,7 @@ ActiveRecord::Schema.define(version: 20180427030840) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "priority",   limit: 4
+    t.integer  "user_id",    limit: 4
   end
 
   add_index "bids", ["team_id"], name: "index_bids_on_team_id", using: :btree

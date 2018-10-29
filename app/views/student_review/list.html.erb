@@ -1,11 +1,13 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 
+<!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
 
 <% else %>
     <h4>Number of reviews allowed: <%= @assignment.num_reviews_allowed %></h4>
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
+<h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
 
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
@@ -35,8 +37,10 @@
         <h4>Number of Meta-Reviews Allowed: "<%= @assignment.num_metareviews_allowed %>"</h4>
     <% end %>
     <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
+    <h4> Number of Meta-Reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
 
-    <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
+
+  <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
     <br/>
     <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
         <% if @num_metareviews_in_progress == 0 %>

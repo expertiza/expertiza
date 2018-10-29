@@ -15,8 +15,33 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :set_time_zone
   before_action :authorize
+  before_action :filter_ascii
 
-  def self.verify(_args); end
+  def filter_ascii
+    remove_ascii(params)
+  end
+
+  def remove_ascii(hash)
+    # remove non-ascii chars from
+    hash.each_pair do |key, value|
+      if value.is_a?(Hash)
+        remove_ascii(value)
+      else
+        if value.is_a?(String)
+          encode_opts = {
+              :invalid => :replace,
+              :undef => :replace,
+              :replace => ''
+          }
+          value.encode!(Encoding.find('ASCII'), encode_opts)
+        end
+      end
+    end
+  end
+
+  def self.verify(_args)
+    ;
+  end
 
   def current_user_role?
     current_user.role.name
@@ -60,11 +85,13 @@ class ApplicationController < ActionController::Base
   def current_user
     @current_user ||= session[:user]
   end
+
   helper_method :current_user
 
   def current_user_role
     current_user.role
   end
+
   alias current_user_role? current_user_role
 
   def logged_in?
@@ -94,8 +121,8 @@ class ApplicationController < ActionController::Base
 
   def is_available(user, owner_id)
     user.id == owner_id ||
-      user.admin? ||
-      user.super_admin?
+        user.admin? ||
+        user.super_admin?
   end
 
   def record_not_found

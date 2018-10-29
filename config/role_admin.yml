@@ -477,7 +477,7 @@ development:
       73: &26 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 112
-        id: 51
+        id: 73
         label: Student View
         name: student_view
         parent:
@@ -1445,8 +1445,8 @@ production:
        content_page_id:
        controller_action_id: 112
        id: 73
-       label: Anonymized view
-       name: anonymized_view
+       label: Student View
+       name: student_view
        parent:
        parent_id: 37
        site_controller_id: 35

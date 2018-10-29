@@ -54,8 +54,8 @@ module MailerHelper
     @sender = defn [:body][:sender]
     @receiver = defn[:body][:receiver]
     mail(subject: defn[:subject],
-    to: defn[:to],
-    bcc:[:bcc])
+		to: defn[:to],
+		bcc:[:bcc])
   end
   
 end

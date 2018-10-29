@@ -7,12 +7,10 @@
   <col width="70"/>
 
 
-  <tr id='assignment_review_assignment_strategy_row'>
-    <td class="form-inline">
+  <tr id='assignment_review_assignment_strategy_row' class="form-inline">
+    <td>
       <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review Strategy:') %>
       <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
-    </td>
-    <td class="form-inline">
       <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options, {:selected => @assignment_form.assignment.review_assignment_strategy}, {:class => "form-control width-200"}) %>
       <script>
           jQuery(document).ready(function() {reviewStrategyChanged();});
@@ -28,14 +26,14 @@
     <td class="form-inline">
       <%= label_tag('assignment_form[assignment][review_topic_threshold]', 'Review Topic Threshold (k):') %>
       <img src="/assets/info.png" title='A topic is reviewable if the minimum number of reviews already done for the submissions on that topic is within k of the minimum number of reviews done on the least-reviewed submission on any topic.'>
-      <%= text_field_tag('assignment_form[assignment][review_topic_threshold]', @assignment_form.assignment.review_topic_threshold, size: 1, class: "form-control width-70", :style => 'margin-left :160px') %>
+      <%= text_field_tag('assignment_form[assignment][review_topic_threshold]', @assignment_form.assignment.review_topic_threshold, size: 1, class: "form-control width-70", :style => 'margin-left :220px') %>
     </td>
   </tr>
-  <tr id="assignment_review_topic_threshold_row">
+  <tr id="assignment_review_topic_threshold_row" class="form-inline">
     <td>
       <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum Number of Reviews Per Submission:') %>
       <img src="/assets/info.png" title='You can set the maximum number of reviews can be done for a particular submissions.'>
-      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 2, class: "form-control width-70", :style => 'margin-left :9110px0px') %>
+      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 2, class: "form-control width-70", :style => 'margin-left :100px') %>
     </td>
   </tr>
   <tr>

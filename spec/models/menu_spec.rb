@@ -5,6 +5,8 @@ describe Menu do
         temp = double("temp", :id => 33, :controller => controller, :name => "temp", :url_to_use => nil)
         allow_any_instance_of(MenuItem).to receive(:controller_action).and_return(temp)
         allow_any_instance_of(MenuItem).to receive(:content_page).and_return(temp)
+        items = [test1, test2, test3, test4, test5, test6]
+        allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
     end
 
     before :all do
@@ -69,7 +71,7 @@ describe Menu do
         describe "#content_page" do
             it "should update the content_page instance variable" do
                 node = Menu::Node.new
-                allow(Content_page).to recieve(:find_by).with(anything).and_return("test content page")
+                allow(ContentPage).to receive(:find_by).with(anything).and_return("test content page")
                 expect(node.content_page).to eq("test content page")
             end
         end
@@ -95,8 +97,6 @@ describe Menu do
         end
         context "when menu has items" do
             it "creates a new menu with items" do
-                items = [test1, test2, test3, test4, test5, test6]
-                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
                 menu = Menu.new
                 expect(menu.root.children[0]).to eq(1)
             end
@@ -105,8 +105,6 @@ describe Menu do
     #Ask for help on how this works
     describe "#select" do
         it "returns a node.id based on the given name" do
-            items = [test1, test2, test3, test4, test5, test6]
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
             menu = Menu.new
             expect(menu.select("home3").id).to eq(test3.id)
         end
@@ -114,8 +112,6 @@ describe Menu do
     describe"#selected" do
         context "when an item is selected" do
             it "returns the name of the currently selected item" do
-                items = [test1, test2, test3, test4, test5, test6]
-                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
                 menu = Menu.new
                 menu.select("home3")
                 expect(menu.selected).to eq(test3.name)
@@ -141,8 +137,6 @@ describe Menu do
         end
         context "when menu has items" do
             it "returns the correct item" do
-                items = [test1, test2, test3, test4, test5, test6]
-                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
                 menu = Menu.new
                 expect(menu.get_item(2).id).to eq(test2.id)
             end
@@ -151,12 +145,35 @@ describe Menu do
     describe "#get_menu" do
         context "when a node is selected" do
             it "returns a list of nodes that are the children of the selected node" do
-                items = [test1, test2, test3, test4, test5, test6]
-                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
                 menu = Menu.new
                 expect(menu.get_menu(1)).to eq([2,3,4])
                 #this seems like it might be broken
                 #expect(menu.get_menu(2)).to eq([6])
+            end
+        end
+    end
+    describe "#selected?" do
+        it "should return true if the passed the id of the selected menu item" do
+            menu = Menu.new
+            expect(menu.selected?(1)).to be true
+        end
+        it "should return false if the id is not that of the selected item" do
+            menu = Menu.new
+            expect(menu.selected?(3)).to be false
+        end
+    end
+    describe "#crumbs" do
+        context "when root is selected" do
+            it "should return a list of nodes based on the root" do
+                menu = Menu.new
+                expect(menu.crumbs[0].id).to eq(1)
+            end
+        end
+        context "when home node is selected" do
+            it "should return a list of nodes based on the selected item" do
+                menu = Menu.new
+                menu.select("home2")
+                expect(menu.crumbs[1]).to eq(menu.get_item(2))
             end
         end
     end

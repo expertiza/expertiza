@@ -7,7 +7,7 @@ class MailWorker
   sidekiq_options queue: 'mailers'
   attr_accessor :assignment_id
   attr_accessor :deadline_type
-  attr_accessor :_due_at
+  attr_accessor :due_at
 
   def perform(assignment_id, deadline_type, due_at)
     self.assignment_id = assignment_id

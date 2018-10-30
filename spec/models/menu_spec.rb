@@ -23,37 +23,47 @@ describe Menu do
     
     describe Menu::Node do
         describe "#initilize" do
-            it "should initialize with a nil parent" do
-                @node = Menu::Node.new
-                expect(@node.parent).to be_nil
+            context "when role is nil" do
+                it "initializes with a nil parent" do
+                    @node = Menu::Node.new
+                    expect(@node.parent).to be_nil
+                end
             end
         end
         describe "#site_controller" do
-            it "update site_controller property if it is nil" do
-                node = Menu::Node.new
-                allow(SiteController).to receive(:find_by).with(anything).and_return("test site_controller")
-                expect(node.site_controller).to eq("test site_controller")
+            context "when @site_controller is nil" do
+                it "updates @site_controller" do
+                    node = Menu::Node.new
+                    allow(SiteController).to receive(:find_by).with(anything).and_return("test site_controller")
+                    expect(node.site_controller).to eq("test site_controller")
+                end
             end
-            it "should remain the same if it already has a value" do
-                node = Menu::Node.new
-                allow(SiteController).to receive(:find_by).with(anything).and_return("test site_controller")
-                node.site_controller
-                allow(SiteController).to receive(:find_by).with(anything).and_return("second controller")
-                expect(node.site_controller).to eq("test site_controller")
+            context "when @site_controller already has a value" do
+                it "remains the same" do
+                    node = Menu::Node.new
+                    allow(SiteController).to receive(:find_by).with(anything).and_return("test site_controller")
+                    node.site_controller
+                    allow(SiteController).to receive(:find_by).with(anything).and_return("second controller")
+                    expect(node.site_controller).to eq("test site_controller")
+                end
             end
         end
         describe "#controller_action" do
-            it "update controller_action property if it is nil" do
-                node = Menu::Node.new
-                allow(ControllerAction).to receive(:find_by).with(anything).and_return("test controller_action")
-                expect(node.controller_action).to eq("test controller_action")
+            context "when @controller_action is nil" do
+                it "updates @controller_action" do
+                    node = Menu::Node.new
+                    allow(ControllerAction).to receive(:find_by).with(anything).and_return("test controller_action")
+                    expect(node.controller_action).to eq("test controller_action")
+                end
             end
-            it "should remain the same if it already has a value" do
-                node = Menu::Node.new
-                allow(ControllerAction).to receive(:find_by).with(anything).and_return("test controller_action")
-                node.controller_action
-                allow(ControllerAction).to receive(:find_by).with(anything).and_return("second action")
-                expect(node.controller_action).to eq("test controller_action")
+            context "when @controller_action already has a value" do
+                it "remains the same" do
+                    node = Menu::Node.new
+                    allow(ControllerAction).to receive(:find_by).with(anything).and_return("test controller_action")
+                    node.controller_action
+                    allow(ControllerAction).to receive(:find_by).with(anything).and_return("second action")
+                    expect(node.controller_action).to eq("test controller_action")
+                end
             end
         end
 
@@ -62,31 +72,36 @@ describe Menu do
 
         #add_children should update children array (test multiple children)
         describe "#add_child" do
-            it "should add a child" do
-                node = Menu::Node.new
-                node.add_child(test1)
-                expect(node.children[0]).to eq(1)
+            context "when node has no children" do
+                it "adds a child" do
+                    node = Menu::Node.new
+                    node.add_child(test1)
+                    expect(node.children[0]).to eq(1)
+                end
             end
         end
     end
 
     describe "#initialize" do
-        it "should create a new menu for a nil role" do
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
-            menu = Menu.new
-            expect(menu.instance_of?Menu)
+        context "when role is nil" do
+            it "creates a new menu" do
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
+                menu = Menu.new
+                expect(menu.instance_of?Menu)
+            end
         end
-        it "should create a new menu with items" do
-            items = [test1, test2, test3, test4, test5, test6]
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
-            menu = Menu.new
-            expect(menu.root.children[0]).to eq(1)
+        context "when menu has items" do
+            it "creates a new menu with items" do
+                items = [test1, test2, test3, test4, test5, test6]
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
+                menu = Menu.new
+                expect(menu.root.children[0]).to eq(1)
+            end
         end
-
     end
     #Ask for help on how this works
     describe "#select" do
-        it "should return a node.id based on the given name" do
+        it "returns a node.id based on the given name" do
             items = [test1, test2, test3, test4, test5, test6]
             allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
             menu = Menu.new
@@ -94,44 +109,54 @@ describe Menu do
         end
     end
     describe"#selected" do
-        it "should return the name of the currently selected item if an item is selected" do
-            items = [test1, test2, test3, test4, test5, test6]
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
-            menu = Menu.new
-            menu.select("home3")
-            expect(menu.selected).to eq(test3.name)
+        context "when an item is selected" do
+            it "returns the name of the currently selected item" do
+                items = [test1, test2, test3, test4, test5, test6]
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
+                menu = Menu.new
+                menu.select("home3")
+                expect(menu.selected).to eq(test3.name)
+            end
         end
         #how is this even possible????
-        it "should return nil if nothing is selected" do 
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
-            menu = Menu.new
-            menu.select("DNE")
-            expect(menu.selected).to be_nil
+        context "when nothing is selected" do
+            it "returns nil" do 
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
+                menu = Menu.new
+                menu.select("DNE")
+                expect(menu.selected).to be_nil
+            end
         end
     end
 
     describe "#get_item" do
-        it "should return nil if menu has no items" do
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
-            menu = Menu.new
-            expect(menu.get_item(0)).to be_nil
+        context "when menu has no items" do
+            it "returns nil" do
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
+                menu = Menu.new
+                expect(menu.get_item(0)).to be_nil
+            end
         end
-        it "should return the correct item" do
-            items = [test1, test2, test3, test4, test5, test6]
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
-            menu = Menu.new
-            expect(menu.get_item(2).id).to eq(test2.id)
+        context "when menu has items" do
+            it "returns the correct item" do
+                items = [test1, test2, test3, test4, test5, test6]
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
+                menu = Menu.new
+                expect(menu.get_item(2).id).to eq(test2.id)
+            end
         end
     end
 
     describe "#get_menu" do
-        it "should return a list of nodes that are the children of the selected node" do
-            items = [test1, test2, test3, test4, test5, test6]
-            allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
-            menu = Menu.new
-            expect(menu.get_menu(1)).to eq([2,3,4])
-            #this seems like it might be broken
-            #expect(menu.get_menu(2)).to eq([6])
+        context "when a node is selected" do
+            it "returns a list of nodes that are the children of the selected node" do
+                items = [test1, test2, test3, test4, test5, test6]
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
+                menu = Menu.new
+                expect(menu.get_menu(1)).to eq([2,3,4])
+                #this seems like it might be broken
+                #expect(menu.get_menu(2)).to eq([6])
+            end
         end
     end
 

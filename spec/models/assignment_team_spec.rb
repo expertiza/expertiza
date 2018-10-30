@@ -184,4 +184,13 @@ describe 'AssignmentTeam' do
     end
   end
 
+  describe "#delete" do
+    it "deletes the team" do
+      allow(team).to receive(:users).with(no_args).and_return([user1, user2])
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user2.id, parent_id: team.parent_id).and_return(participant2)
+      signupteam = build(:signed_up_team, id: 1, team_id: team.id)
+      expect(team.delete).to eq(team)
+    end
+  end
 end

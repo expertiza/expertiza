@@ -184,10 +184,9 @@ class AssignmentForm
 
   # add DelayedJob into queue and return it
   def add_delayed_job(assignment, deadline_type, due_date, min_left)
-    delayed_job = DelayedJob.enqueue(DelayedMailer.new(assignment.id, deadline_type, due_date.due_at.to_s(:db)),
-                                     1, min_left.minutes.from_now)
-    change_item_type(delayed_job.id)
-    delayed_job
+    delayed_job_id = MailWorker.perform_in(min_left*60, due_date.parent_id, due_date.deadline_name, due_date.due_at )
+    change_item_type(delayed_job_id)
+    delayed_job_id
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
@@ -290,9 +289,8 @@ class AssignmentForm
   end
 
   def enqueue_simicheck_task(due_date, simicheck_delay)
-   # DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
-    #                   1, find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now)
-   MailerWorker.perform(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)  )
+    DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
+                       1, find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now)
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

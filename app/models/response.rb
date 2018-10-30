@@ -82,6 +82,7 @@ class Response < ActiveRecord::Base
     defn = {}
     defn[:body] = {}
     defn[:body][:partial_name] = partial
+	defn[:body][:team_id] = response_map.reviewer_id
     response_map = ResponseMap.find map_id
     participant = Participant.find(response_map.reviewer_id)
     # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
@@ -195,6 +196,9 @@ class Response < ActiveRecord::Base
     reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
     reviewee_name = User.find(reviewee_participant.user_id).fullname
     assignment = Assignment.find(reviewer_participant.parent_id)
+	map_class = self.map.class
+    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    average_score, _count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     Mailer.notify_grade_conflict_message(
       to: assignment.instructor.email,
       subject: 'Expertiza Notification: A review score is outside the acceptable range',
@@ -203,6 +207,7 @@ class Response < ActiveRecord::Base
         type: 'review',
         reviewee_name: reviewee_name,
         new_score: total_score.to_f / maximum_score,
+		avg_score: average_score,
         assignment: assignment,
         conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
         summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,

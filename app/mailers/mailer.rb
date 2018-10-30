@@ -90,6 +90,7 @@ class Mailer < ActionMailer::Base
     @type = @body[:type]
     @reviewee_name = @body[:reviewee_name]
     @new_score = @body[:new_score]
+	@avg_score = @body[:avg_score]
     @conflicting_response_url = @body[:conflicting_response_url]
     @summary_url = @body[:summary_url]
     @assignment_edit_url = @body[:assignment_edit_url]

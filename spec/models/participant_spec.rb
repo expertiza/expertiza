@@ -1,6 +1,6 @@
 describe Participant do
-  let(:student) { build(:student, name: "Student", fullname: "Test, Student") }
-  let(:participant) { build(:participant, user: student) }
+  #let(:student) { build(:student, name: "Student", fullname: "Test, Student") }
+  #let(:participant) { build(:participant, user: student) }
 
   describe "#name" do
     it "returns the name of the user" do

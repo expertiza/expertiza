@@ -65,9 +65,8 @@ describe 'AssignmentTeam' do
 
  describe ".remove_team_by_id" do
     context "when a team has an id" do
-      it "delete the team by id" do
-        team = build(:assignment_team, id: 1)
-	allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
+      it "delete the team by id" do        
+	allow(AssignmentTeam).to receive(:find).with(team.id).and_return(team)
 	expect(AssignmentTeam.remove_team_by_id(team.id)).to eq(team)
       end
     end
@@ -75,11 +74,7 @@ describe 'AssignmentTeam' do
 
   describe ".get_first_member" do
     context "when team id is present" do
-      it "get first member of the  team" do
-	team = build(:assignment_team, id: 1)
-        build(:student, id: 3)
-        participant1 = build(:participant, id: 1, user_id: 3)
-        team_user1 = build(:team_user, team_id: 1, user_id: 3)	        					
+      it "get first member of the  team" do	
 	allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
 	expect(AssignmentTeam.get_first_member(team.id)).to eq(participant1)
       end

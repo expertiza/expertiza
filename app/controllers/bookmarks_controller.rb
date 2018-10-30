@@ -1,7 +1,8 @@
 class BookmarksController < ApplicationController
   def action_allowed?
+
     case params[:action]
-    when 'list', 'new', 'create', 'bookmark_rating', 'new_bookmark_review'
+    when 'list', 'new', 'create', 'bookmark_rating', 'new_bookmark_review','save_bookmark_rating_score'
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
       # edit, update, delete bookmarks can only be done by owner
@@ -49,9 +50,10 @@ class BookmarksController < ApplicationController
 
   def update
     @bookmark = Bookmark.find(params[:id].to_i)
-    @bookmark.update_attributes(url: params[:bookmark][:url], title: params[:bookmark][:title], description: params[:bookmark][:description])
+   if @bookmark.update_attributes(url: params[:bookmark][:url], title: params[:bookmark][:title], description: params[:bookmark][:description])
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully updated!', request)
     flash[:success] = 'Your bookmark has been successfully updated!'
+   end
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
@@ -64,19 +66,20 @@ class BookmarksController < ApplicationController
   end
 
   def save_bookmark_rating_score
-    @bookmark = Bookmark.find(params[:id])
+    @bookmark = Bookmark.find(params[:id].to_i)
     @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first
     if @bookmark_rating.blank?
       BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: params[:rating])
     else
       @bookmark_rating.update_attribute('rating', params[:rating].to_i)
+
     end
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
   def new_bookmark_review
-    bookmark = Bookmark.find(params[:id])
-    topic = SignUpTopic.find(bookmark.topic_id)
+    bookmark = Bookmark.find(params[:id].to_i)
+    topic = SignUpTopic.find(bookmark.topic_id.to_s)
     assignment_participant = AssignmentParticipant.find_by(user_id: current_user.id)
     response_map = BookmarkRatingResponseMap.where(
       reviewed_object_id: topic.assignment.id,

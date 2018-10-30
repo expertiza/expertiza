@@ -489,8 +489,16 @@ FactoryBot.define do
     url 'test.com'
     title 'Test'
     description 'This is a test topic'
-    user_id { User.where(role: Role.where(name: 'Student')).first || association(:user) }
-    topic_id { SignUpTopic.first || association(:topic) }
+    user_id '42'
+    topic_id '1'
+    created_at '2018-10-24 21:18:19'
+    updated_at '2018-10-24 21:18:19'
+  end
+  factory :bookmarkrating, class: BookmarkRating do
+    id 1
+    bookmark_id 1
+    user_id '42'
+    rating '4'
     created_at '2018-10-24 21:18:19'
     updated_at '2018-10-24 21:18:19'
   end

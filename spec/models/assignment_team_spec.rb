@@ -292,4 +292,18 @@ describe 'AssignmentTeam' do
       expect(team.received_any_peer_review?).to be true
     end
   end
+
+  describe "#submitted_files" do
+    context "given a path" do
+      it "returns submitted files" do  
+	files = ["file1.rb"]
+	path = "assignment_path/5"	
+	allow(team).to receive(:path).with(path)
+	allow(team).to receive(:files).with(path).and_return(files)
+        expect(team.submitted_files(path)).to match_array(files)
+      end
+    end
+  end
+
+
 end

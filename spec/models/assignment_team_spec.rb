@@ -223,6 +223,21 @@ describe 'AssignmentTeam' do
     allow(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
     expect(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
     AssignmentTeam.export([], 1, [])
-end
+    end
+  end
+
+  describe "#path" do
+    it "returns the path" do
+      expect(team.path).to eq "/home/expertiza_developer/Desktop/expertiza/pg_data/instructor6/csc517/test/final_test/0"
+    end
+  end
+
+  describe "#set_student_directory_num" do
+    it "sets the directory for the team" do      
+      team = build(:assignment_team, id: 1, parent_id: 1,directory_num: -1)
+      max_num = 0
+      allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)      
+      expect(team.set_student_directory_num).to be true
+    end
   end
 end

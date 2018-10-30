@@ -28,7 +28,7 @@ tar -xzf expertiza_scrubbed_db.sql.tar.gz
 cd $DIR
 
 # Get the docker-compose file
-cp docker-compose.yml.example docker-compose.yml
+cp ./docker/docker-compose.yml.example docker-compose.yml
 
 # Get the MYSQL_ROOT_PASSWORD
 read -p "Please enter your MYSQL ROOT PASSWORD: " MYSQL_ROOT_PASSWORD

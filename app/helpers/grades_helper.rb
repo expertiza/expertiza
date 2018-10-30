@@ -59,18 +59,24 @@ module GradesHelper
     css_class
   end
 
-  def view_heatgrid(participant_id, type)
+  def view_heatgrid(id, type)
     # get participant, team, questionnaires for assignment.
-    @participant = AssignmentParticipant.find(participant_id)
-    @assignment = @participant.assignment
-    @team = @participant.team
-    @team_id = @team.id
+    if ! type.eql? "AuthorFeedbackQuestionnaire"
+      @participant = AssignmentParticipant.find(id)
+      @team = @participant.team
+      @team_id = @team.id
+    else
+      @team_id = id
+      @team = Team.find(id)
+    end
+
+    @assignment = @team.assignment
     @type = type
     questionnaires = @assignment.questionnaires
     @vmlist = []
-
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
+
     questionnaires.each do |questionnaire|
       @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
                  AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round

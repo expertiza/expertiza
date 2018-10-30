@@ -58,7 +58,7 @@ class VmQuestionResponse
       end
       @list_of_reviews = reviews
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
-      reviews = participant.feedback # feedback reviews
+      reviews = team.feedback # feedback reviews
       reviews.each do |review|
         review_mapping = FeedbackResponseMap.where(id: review.map_id).first
         participant = Participant.find(review_mapping.reviewer_id)

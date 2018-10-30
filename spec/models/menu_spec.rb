@@ -52,10 +52,13 @@ describe Menu do
                 expect(node.controller_action).to eq("test controller_action")
             end
         end
-
-        #Content_page should update the property
-        #content_page should update every time it is called
-
+        describe "#content_page" do
+            it "should update the content_page instance variable" do
+                node = Menu::Node.new
+                allow(Content_page).to recieve(:find_by).with(anything).and_return("test content page")
+                expect(node.content_page).to eq("test content page")
+            end
+        end
         #add_children should update children array (test multiple children)
         describe "#add_child" do
             it "should add a child" do
@@ -78,7 +81,6 @@ describe Menu do
             menu = Menu.new
             expect(menu.root.children[0]).to eq(1)
         end
-
     end
     #Ask for help on how this works
     describe "#select" do
@@ -105,7 +107,6 @@ describe Menu do
             expect(menu.selected).to be_nil
         end
     end
-
     describe "#get_item" do
         it "should return nil if menu has no items" do
             allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
@@ -119,7 +120,6 @@ describe Menu do
             expect(menu.get_item(2).id).to eq(test2.id)
         end
     end
-
     describe "#get_menu" do
         it "should return a list of nodes that are the children of the selected node" do
             items = [test1, test2, test3, test4, test5, test6]
@@ -130,6 +130,4 @@ describe Menu do
             #expect(menu.get_menu(2)).to eq([6])
         end
     end
-
-
 end

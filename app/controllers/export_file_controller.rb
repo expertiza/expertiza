@@ -8,19 +8,9 @@ class ExportFileController < ApplicationController
 
   def start
     @model = params[:model]
-    if @model == 'Assignment'
-      @title = 'Grades'
-    elsif @model == 'CourseParticipant'
-      @title = 'Course Participants'
-    elsif @model == 'AssignmentTeam'
-      @title = 'Teams'
-    elsif @model == 'CourseTeam'
-      @title = 'Teams'
-    elsif @model == 'User'
-      @title = 'Users'
-    elsif @model == 'Question'
-      @title = 'Questions'
-    end
+    titles = {"Assignment" => "Grades", "CourseParticipant" => "Course Participants", "AssignmentTeam" => "Teams",
+              "CourseTeam" => "Teams", "User" => "Users", "Question" => "Questions"}
+    @title = titles[@model]
     @id = params[:id]
   end
 
@@ -92,7 +82,7 @@ class ExportFileController < ApplicationController
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
 
     allowed_models = ['Question']
-    advice_model = 'QuestionAdvice';
+    advice_model = 'QuestionAdvice'
 
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]

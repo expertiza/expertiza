@@ -11,28 +11,15 @@ describe Node do
   let(:node) { Menu::Node.new }
   let(:node2) { Menu::Node.new }
   let(:node3) { Menu::Node.new }
-  # let(:sc_test1) {SiteController.create(id:1,  name:"site1")}
-  # let(:sc_test2) {SiteController.create(id:2,  name:"site2")}
   let(:sc_test1) {build(:site_controller, id:1,  name:"site1")}
   let(:sc_test2) {build(:site_controller, id:2,  name:"site2")}
-
-  # let(:ca_test1) {ControllerAction.create( id: 1,site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
-  # let(:ca_test2) {ControllerAction.create(id: 2, site_controller_id: 1, name: "action2", permission_id: 1)}
   let(:ca_test1) {build(:controller_action, id: 1, site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
   let(:ca_test2) {build(:controller_action, id: 2, site_controller_id: 1, name: "action2", permission_id: 1, url_to_use: nil)}
-  # let(:cp_test1) {ContentPage.create( id: 1, name:"content1" )}
-  # let(:cp_test2) {ContentPage.create( id: 2, name:"content2" )}
   let(:cp_test1) {build(:content_page, id: 1, name:"content1" )}
   let(:cp_test2) {build(:content_page, id: 2, name:"content2" )}
   let(:item1) { build(:menu_item, name: "home1", parent_id: nil,  seq: 1, content_page_id:1) }
   let(:item2) { build(:menu_item, name: "home2", parent_id: 1,    seq: 2, controller_action_id:1, content_page_id: 1) }
   let(:item3) { build(:menu_item, name: "home3", parent_id: 1,    seq: 3, controller_action_id:2, content_page_id: 1) }
-
-
-  # before(:each) do
-  #   allow(ControllerAction).to receive(:find).and_return(review_response_map)
-  # end
-
 
   describe "#initialize" do
     it "initializes the parent attribute" do
@@ -45,15 +32,9 @@ describe Node do
     context "when the controller action attribute of the item is nil" do
       it "assigns content page path of the current menu item to the URL variable" do
         # Write your test here!
-        # allow(MenuItem).to receive_message_chain(:try, :try).with(:content_page,:id).and_return(cp_test1.id)
-        # allow(item1).to receive_message_chain(:content_page, :name).and_return("#{cp_test1.name}")
-
         item1.content_page = cp_test1
         node.setup(item1)
         expect(node.url).to eq("/#{cp_test1.name}")
-
-        # expect(node.controller_action_id).to eq(1)
-
       end
     end
 
@@ -61,11 +42,8 @@ describe Node do
       context "when the URL of the controller action is available" do
         it "assigns the URL of controller action to the URL variable" do
           # Write your test here!
-          # allow(node2).to receive(:setup).with(test2)
           allow(SiteController).to receive(:find).with(sc_test1.id).and_return(sc_test1)
           ca_test1.controller
-
-          # ca_test1.controller = sc_test1
           item2.controller_action = ca_test1
           item2.content_page = cp_test1
           node2.setup(item2)
@@ -76,8 +54,6 @@ describe Node do
       context "when the URL of the controller action is unavailable" do
         it "assigns a customized path to the URL variable" do
           # Write your test here!
-          # allow(node3).to receive(:setup).with(test3)
-
           ca_test2.controller = sc_test1
           item3.controller_action = ca_test2
           item3.content_page = cp_test1
@@ -92,9 +68,6 @@ describe Node do
     context "when the site_controller variable is nil" do
       it "finds the site controller by id" do
         # Write your test here!
-        # test3.controller_action = ca_test2
-        # node.setup(test3)
-        # expect(node.site_controller).to eq(sc_test1)
         node.site_controller_id = sc_test1.id
         allow(SiteController).to receive(:find_by).with(id: sc_test1.id).and_return(sc_test1)
         expect(node.site_controller).to eq(sc_test1)
@@ -104,11 +77,6 @@ describe Node do
     context "when the site_controller variable is not nil" do
       it "returns the site_controller variable" do
         # Write your test here!
-        # ca_test2.site_controller = sc_test1
-        # test3.controller_action = ca_test2
-        # node.setup(test3)
-        # expect(node.site_controller).to eq("sc_test1")
-        # node.site_controller =
         node.instance_variable_set(:@site_controller, sc_test2)
         expect(node.site_controller).to eq(sc_test2)
       end
@@ -143,20 +111,11 @@ describe Node do
         expect(node.content_page).to eq(cp_test1)
       end
     end
-
-    # context "when the content_page variable is not nil" do
-    #   it "returns the content page variable" do
-    #     # Write your test here!
-    #     node.instance_variable_set(:@content_page, cp_test2)
-    #     expect(node.content_page).to eq(cp_test2)
-    #   end
-    # end
   end
 
   describe "#add_child" do
     it "adds a node to @children list and returns the list" do
       # Write your test here!
-      # node2.instance_variable_set(:@id, 2)
       node2.id = 2
       node.add_child(node2)
       expect(node.children[0]).to eq(2)
@@ -201,14 +160,6 @@ describe Menu do
       context "when the parent id of the node is nil" do
         it "builds hashes of items by name and id and make the node as a child node of root node" do
           # Write your test here!
-          # items = [item1,item2]
-          # empty_hash = {}
-          # allow(role1).to receive(:cache).and_return(empty_hash)
-          # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-          # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-          # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-          # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-          # menu = Menu.new(role1)
           expect(menu.root.children[0]).to eq(1)
         end
       end
@@ -216,14 +167,6 @@ describe Menu do
       context "when the parent id of the node is not nil" do
         it "builds hashes of items by name and id and make the node as a child node of its parent node" do
             # Write your test here!
-            # items = [item1, item2]
-            # empty_hash = {}
-            # allow(role1).to receive(:cache).and_return(empty_hash)
-            # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-            # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-            # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-            # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-            # menu = Menu.new(role1)
             id = menu.instance_variable_get(:@by_id)[1].children[0]
             expect(id).to eq(2)
           end
@@ -235,14 +178,6 @@ describe Menu do
     context "when by_name hash does not contain the given node name" do
       it "returns nil" do
         # Write your test here!
-        # items = [item1, item2]
-        # empty_hash = {}
-        # allow(role1).to receive(:cache).and_return(empty_hash)
-        # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-        # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-        # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-        # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-        # menu = Menu.new(role1)
         expect(menu.select("hi")).to be_nil
       end
     end
@@ -250,15 +185,6 @@ describe Menu do
     context "when by_name hash contains the given node name" do
       it "selects the menu item for the given name" do
         # Write your test here!
-        # items = [item1, item2]
-        # empty_hash = {}
-        # allow(role1).to receive(:cache).and_return(empty_hash)
-        # allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-        # allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-        # allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-        # allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-        # menu = Menu.new(role1)
-        # node = menu.instance_variable_get(:@by_id)[1]
         expect(menu.select("home1").name).to eq(node.name)
       end
     end
@@ -267,15 +193,6 @@ describe Menu do
   describe "#get_item" do
     it "returns menu item by id" do
     # Write your test here!
-    #   items = [item1, item2]
-    #   empty_hash = {}
-    #   allow(role1).to receive(:cache).and_return(empty_hash)
-    #   allow(role1).to receive_message_chain(:try, :[]).with(:credentials).and_return(items)
-    #   allow(item1).to receive_message_chain(:content_page, :name).and_return("test")
-    #   allow(item2).to receive_message_chain(:content_page, :name).and_return("test")
-    #   allow(MenuItem).to receive(:items_for_permissions).and_return(items)
-    #   menu = Menu.new(role1)
-      # node = menu.instance_variable_get(:@by_name)["home1"]
       expect(menu.get_item(1).name).to eq(node.name)
     end
   end
@@ -317,12 +234,10 @@ describe Menu do
     it "returns get a list of menu items based on contents in crumbs array" do
       # Write your test here!
       menu.select("home3")
-      # size = menu.instance_variable_get(:@crumbs)
       list = menu.crumbs
-      # expect(size).to eq([1, 3])
       expect(list.size).to eq(2)
-      expect(list[0].id).to eq(1)
-      expect(list[1].id).to eq(3)
+      expect(list[0].id).to eq(item1.id)
+      expect(list[1].id).to eq(item3.id)
     end
   end
 end

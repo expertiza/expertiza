@@ -297,9 +297,9 @@ class AssignmentParticipant < Participant
     return assignment.review_deadline(topic_id, assignment.num_review_rounds)
   end
 
-  #E1834 Fall 18
-  def number_of_current_round
-    topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
-    assignment.number_of_current_round(topic_id)
-  end
+  # #E1834 Fall 18
+  # def number_of_current_round
+  #   topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
+  #   assignment.number_of_current_round(topic_id)
+  # end
 end

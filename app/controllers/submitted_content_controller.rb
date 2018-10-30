@@ -62,12 +62,18 @@ class SubmittedContentController < ApplicationController
       # E1834 Fall 18
       # Send email to reviewers to review new submission, if review_round is valid and not last.
       if participant.is_round_valid_for_mail?
-        current_round = participant.number_of_current_round
-        reviewers = []
+        #reviewers = []
         participant.reviewers.each do |reviewer|
-          reviewers << User.find(reviewer.user_id).email
+          #reviewers << User.find(reviewer.user_id).email
+          review_mappings = ResponseMap.where(reviewer_id: reviewer.id)
+          review_mappings.each do |map|
+            reviewed_object_id = ''
+            if map.reviewee_id == @participant.id || map.reviewee_id == @participant.team.id
+              reviewed_object_id = map.reviewed_object_id
+              Mailer.delayed_message(bcc: User.find(reviewer.user_id).email, subject: "You have a new submission to review", body: "Please visit https://expertiza.ncsu.edu/response/edit?id=#{reviewed_object_id} and proceed to peer reviews.").deliver_now
+            end
+          end
         end
-        Mailer.delayed_message(bcc: reviewers, subject: "You have a new submission to review for Review #{current_round}", body: "Please visit #{team.hyperlinks['submission']} and proceed to peer reviews.").deliver_now
       end
     end
     redirect_to action: 'edit', id: @participant.id

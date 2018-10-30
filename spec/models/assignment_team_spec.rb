@@ -193,4 +193,11 @@ describe 'AssignmentTeam' do
       expect(team.delete).to eq(team)
     end
   end
+
+  describe "#path" do
+    it "returns the path" do
+      expect(team.path).to eq "/home/expertiza_developer/Desktop/expertiza/pg_data/instructor6/csc517/test/final_test/0"
+    end
+  end
+
 end

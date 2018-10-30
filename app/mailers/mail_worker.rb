@@ -1,4 +1,4 @@
-arequire 'sidekiq'
+require 'sidekiq'
 
 class MailWorker
   include Sidekiq::Worker

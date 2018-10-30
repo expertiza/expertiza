@@ -128,9 +128,6 @@ class Question < ActiveRecord::Base
 
   def self.export_fields(_options)
     fields = ["Seq", "Question", "Type", "Weight", "text area size", "max_label", "min_label"]
-    # Questionnaire.columns.each do |column|
-    #   fields.push(column.name)
-    # end
     fields
   end
 

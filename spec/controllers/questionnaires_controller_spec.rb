@@ -302,8 +302,11 @@ describe QuestionnairesController do
 
     context 'when question.answers returns non-empty array' do
       it 'sends the error message to flash[:error]' do
-        questionnaire1 = double('Questionnaire', name: 'test questionnaire', assignments: [],
-                                questions: [double('Question', answers: [double('Answer')])])
+        questionnaire1 = double('Questionnaire',
+                                name: 'test questionnaire',
+                                assignments: [],
+                                questions: [double('Question',
+                                                   answers: [double('Answer')])])
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
         params = {id: 1}
         get :delete, params
@@ -577,8 +580,7 @@ describe QuestionnairesController do
     context 'when user does not specify a type for each question' do
       it 'returns message (Please select a type for each question)' do
         controller.params = {aid: 1,
-                             questionnaire: {name: 'test questionnaire'}
-        }
+                             questionnaire: {name: 'test questionnaire'}}
         expect(controller.valid_quiz).to eq('Please select a type for each question')
       end
     end

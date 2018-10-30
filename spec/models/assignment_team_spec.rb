@@ -318,4 +318,19 @@ describe 'AssignmentTeam' do
     end
   end
 
+  describe "#files" do
+    context "when file is present in the directory" do
+      it "provides the list of files in directory and checks if file is present" do
+        directory = "spec/models"
+        expect(team.files(directory)).to include("spec/models/assignment_team_spec.rb")
+      end
+    end
+
+    context "when file is not present in the directory" do
+      it "provides the list of files in directory and checks if file is not present" do
+        directory = "spec/controllers"
+        expect(team.files(directory)).not_to include("spec/models/assignment_team_spec.rb")
+      end
+    end
+  end
 end

@@ -240,4 +240,47 @@ describe 'AssignmentTeam' do
       expect(team.set_student_directory_num).to be true
     end
   end
+
+  describe "#submit_hyperlink" do
+    context "when a hyperlink is empty" do
+      it "causes an exception to be raised" do
+        expect { team.submit_hyperlink("") }.to raise_error("The hyperlink cannot be empty!")
+      end
+    end
+
+    context "when a hyperlink is invalid" do
+      it "causes an exception to be raised with the proper HTTP status code" do
+        invalid_hyperlink = "https://expertiza.ncsu.edu/not_a_valid_path"
+        #allow(URI).to receive(:initialize).with(hyperlink).and_return(hyperlink)
+        allow(Net::HTTP).to receive(:get_response).and_return("404")
+        expect { team.submit_hyperlink(invalid_hyperlink) }.to raise_error("HTTP status code: 404")
+      end
+    end
+
+    context "when a valid hyperlink not in a certain improper format is submitted" do 
+      it "it is fixed and is saved to the database" do
+        allow(team).to receive(:hyperlinks).and_return(["https://expertiza.ncsu.edu"])
+        allow(team).to receive(:submitted_hyperlinks=)
+        allow(team).to receive(:save)
+        allow(Net::HTTP).to receive(:get_response).and_return("0")
+        allow(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu", "www.ncsu.edu"])
+        expect(team).to receive(:submitted_hyperlinks=)
+        expect(team).to receive(:save)
+        expect(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu", "http://www.ncsu.edu"])
+        team.submit_hyperlink("www.ncsu.edu  ")
+      end
+    end
+  end
+
+  describe "#remove_hyperlink" do
+    context "when the hyperlink is in the assignment team's hyperlinks" do
+      it "is removed from the team's list of hyperlinks" do
+        allow(team).to receive(:hyperlinks).and_return(["https://expertiza.ncsu.edu", "https://www.ncsu.edu"])
+        expect(team).to receive(:submitted_hyperlinks=)
+        expect(team).to receive(:save)
+        expect(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu"])
+        team.remove_hyperlink("https://www.ncsu.edu")
+      end
+    end
+  end
 end

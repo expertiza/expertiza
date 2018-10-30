@@ -200,4 +200,13 @@ describe 'AssignmentTeam' do
     end
   end
 
+  describe "#set_student_directory_num" do
+    it "sets the directory for the team" do      
+      team = build(:assignment_team, id: 1, parent_id: 1,directory_num: -1)
+      max_num = 0
+      allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)      
+      expect(team.set_student_directory_num).to be true
+    end
+  end
+
 end

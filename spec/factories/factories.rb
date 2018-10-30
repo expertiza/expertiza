@@ -484,7 +484,7 @@ FactoryBot.define do
     content_page_id nil
   end
 
-   factory :site_controller, class: SiteController do
+  factory :site_controller, class: SiteController do
     id 1
     name 'fake_site'
   end

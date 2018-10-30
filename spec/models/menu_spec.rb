@@ -59,10 +59,10 @@ describe Node do
     end
 
     context 'when menu_item has content_page' do
-      before(:each) {
+      before(:each) do
         allow(menu_item).to receive(:content_page).and_return(content_page)
         node.setup(menu_item)
-      }
+      end
 
       it 'sets up content_page_id' do
         expect(node.content_page_id).to eq(content_page.id)
@@ -75,36 +75,36 @@ describe Node do
   end
 
   describe '#site_controller' do
-    before (:example)  do
+    before(:each) do
       allow(menu_item).to receive(:controller_action).and_return(controller_action)
       allow(controller_action).to receive(:controller).and_return(controller)
       node.setup(menu_item)
     end
     it 'sets @site_controller instance variable' do
-      result = controller_action.id;
+      result = controller_action.id
       expect(SiteController).to receive(:find_by).with(id: controller.id).and_return(result)
       expect(node.site_controller).to eq(result)
     end
   end
 
   describe '#controller_action' do
-    before (:example)  do
+    before(:each) do
       allow(menu_item).to receive(:controller_action).and_return(controller_action)
       node.setup(menu_item)
     end
     it 'sets @controller_action instance variable ' do
-      result = controller_action.id;
+      result = controller_action.id
       expect(ControllerAction).to receive(:find_by).with(id: controller_action.id).and_return(result)
       expect(node.controller_action).to eq(result)
     end
   end
   describe '#content_page' do
-    before (:example)  do
+    before(:each) do
       allow(menu_item).to receive(:content_page).and_return(content_page)
       node.setup(menu_item)
     end
     it 'sets @content_page instance variable ' do
-      result = content_page.id;
+      result = content_page.id
       expect(ContentPage).to receive(:find_by).with(id: content_page.id).and_return(result)
       expect(node.content_page).to eq(result)
     end
@@ -137,21 +137,22 @@ describe Menu do
 
   let(:permission_ids) { [5, 5, 6, 3, 2] }
 
-  let(:role) {
+  let(:role) do
     role = double('Role')
     permissions = double('Permissions', permission_ids: permission_ids)
     allow(role).to receive_message_chain(:cache, :[]).with(:credentials).and_return(permissions)
     role
-  }
+  end
 
   let(:controller_action) { double('ControllerAction', url_to_use: 'https://test_url.com') }
 
   let(:menu_items) {
-    (1..5).collect { |i| build(:menu_item,
-      id: i,
-      name: "menu_item#{i}",
-      controller_action: controller_action,
-      parent_id: (i == 2 || i == 3) ? 1 : nil)
+    (1..5).collect { |i|
+      build :menu_item,
+            id: i,
+            name: "menu_item#{i}",
+            controller_action: controller_action,
+            parent_id: i == 2 || i == 3 ? 1 : nil
     }
   }
 
@@ -173,7 +174,7 @@ describe Menu do
       expect(menu.select("not_in_menu")).to be_nil
     end
 
-    it 'returns when name is in by_name{}'do
+    it 'returns when name is in by_name{}' do
       menu.select(menu_item2.name)
       # selected checks the last element in the @vector [], which will be the node passed to select.
       # the selected node's parents will also be in vector, with the root node being first.
@@ -278,7 +279,7 @@ describe Menu do
       end
 
       it 'has crumb with menu id' do
-        crumb = menu.crumbs[0];
+        crumb = menu.crumbs[0]
         expect(crumb.id).to eq(menu_item1.id)
       end
     end
@@ -293,9 +294,9 @@ describe Menu do
       end
 
       it 'has crumb order from child to parent' do
-        actualCrumbIds = menu.crumbs.collect { |c| c.id }
-        expectedCrumbIds = [menu_item1.id, menu_item2.id]
-        expect(actualCrumbIds).to eq(expectedCrumbIds)
+        actual_crumb_ids = menu.crumbs.collect { |c| c.id }
+        expected_crumb_ids = [menu_item1.id, menu_item2.id]
+        expect(actual_crumb_ids).to eq(expected_crumb_ids)
       end
     end
   end

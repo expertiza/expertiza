@@ -48,7 +48,7 @@ class BookmarksController < ApplicationController
   end
 
   def update
-    @bookmark = Bookmark.find(params[:id])
+    @bookmark = Bookmark.find(params[:id].to_i)
     @bookmark.update_attributes(url: params[:bookmark][:url], title: params[:bookmark][:title], description: params[:bookmark][:description])
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully updated!', request)
     flash[:success] = 'Your bookmark has been successfully updated!'
@@ -56,7 +56,7 @@ class BookmarksController < ApplicationController
   end
 
   def destroy
-    @bookmark = Bookmark.find(params[:id])
+    @bookmark = Bookmark.find(params[:id].to_i)
     @bookmark.destroy
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully deleted!', request)
     flash[:success] = 'Your bookmark has been successfully deleted!'

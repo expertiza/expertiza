@@ -160,7 +160,7 @@ describe Menu do
       context "when the parent id of the node is nil" do
         it "builds hashes of items by name and id and make the node as a child node of root node" do
           # Write your test here!
-          expect(menu.root.children[0]).to eq(1)
+          expect(menu.root.children[0]).to eq(item1.id)
         end
       end
 
@@ -168,7 +168,7 @@ describe Menu do
         it "builds hashes of items by name and id and make the node as a child node of its parent node" do
             # Write your test here!
             id = menu.instance_variable_get(:@by_id)[1].children[0]
-            expect(id).to eq(2)
+            expect(id).to eq(item2.id)
           end
       end
     end
@@ -202,8 +202,8 @@ describe Menu do
       # Write your test here!
       children = menu.get_menu(1)
       expect(children.size).to eq(2)
-      expect(children[0]).to eq(2)
-      expect(children[1]).to eq(3)
+      expect(children[0]).to eq(item2.id)
+      expect(children[1]).to eq(item3.id)
     end
   end
 

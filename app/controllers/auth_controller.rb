@@ -121,6 +121,7 @@ class AuthController < ApplicationController
     session[:menu] = nil
     session[:clear] = true
     session[:assignment_id] = nil
+    session[:original_user] = nil
   end
 
   # clears any identifying info from session
@@ -135,5 +136,6 @@ class AuthController < ApplicationController
     end
     session[:clear] = true
     session[:assignment_id] = assignment_id
+    session[:original_user] = nil
   end
 end

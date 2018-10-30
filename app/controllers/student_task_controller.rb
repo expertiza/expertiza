@@ -5,12 +5,18 @@ class StudentTaskController < ApplicationController
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
 
+  def impersonating_as_admin?
+    original_user = session[:original_user]
+    admin_role_ids = Role.where(name:['Administrator','Super-Administrator']).pluck(:id)
+    admin_role_ids.include? original_user.role_id
+  end
+
   def list
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
-    if session[:impersonate]
-      @student_tasks = @student_tasks.select {|t| session[:original_user].id = t.assignment.instructor_id }
+    if session[:impersonate] && !impersonating_as_admin?
+      @student_tasks = @student_tasks.select {|t| session[:original_user].id == t.assignment.instructor_id }
     end
     @student_tasks.select! {|t| t.assignment.availability_flag }
 

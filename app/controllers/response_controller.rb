@@ -3,16 +3,25 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
+
     response = user_id = nil
     action = params[:action]
     if %w[edit delete update view].include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
+      # In case of Author Feedback reviewer is team so user_id is set as participant's user id
+      user_id = Participant.find(params[:participant_id]).user_id if response.map.is_a? FeedbackResponseMap
     end
     case action
-    when 'edit' # If response has been submitted, no further editing allowed
-      return false if response.is_submitted
+      when 'edit' # If response has been submitted, no further editing allowed
+        if response.is_submitted
+          # Team members can edit a feedback response
+          if !response.map.is_a?(FeedbackResponseMap)
+            return false
+          end
+        end
       return current_user_id?(user_id)
+
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
       return current_user_id?(user_id)
@@ -61,6 +70,7 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @response = Response.find(params[:id])
     @map = @response.map
+    @participant_id = params[:participant_id]
     @contributor = @map.contributor
     set_all_responses
     if @prev.present?
@@ -102,7 +112,7 @@ class ResponseController < ApplicationController
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'saving', id: @map.map_id,
-      return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+      return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options], participant_id: params[:participant_id]
   end
 
   def new
@@ -112,6 +122,11 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @modified_object = @map.id
+
+    if map.is_a? FeedbackResponseMap
+      @participant = Participant.find(params[:participant_id]);
+      @participant_id = params[:participant_id]
+    end
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
@@ -128,16 +143,15 @@ class ResponseController < ApplicationController
   def new_feedback
     review = Response.find(params[:id]) if !params[:id].nil?
     if review
-      reviewer = Team.where(id: TeamsUser.team_id(review.map.assignment.id,session[:user].id))
-
-      # reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
-      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
+      # In FeedBack, reviewer is the team
+      reviewer_id = TeamsUser.team_id(review.map.assignment.id,session[:user].id)
+      map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer_id).first
 
       if map.nil?
         # if no feedback exists by dat user den only create for dat particular response/review
-        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer.id, reviewee_id: review.map.reviewer.id)
+        map = FeedbackResponseMap.create(reviewed_object_id: review.id, reviewer_id: reviewer_id, reviewee_id: review.map.reviewer.id)
       end
-      redirect_to action: 'new', id: map.id, return: "feedback"
+      redirect_to action: 'new', id: map.id, return: "feedback", participant_id: params[:participant_id]
     else
       redirect_to :back
     end
@@ -147,6 +161,10 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     @map = @response.map
+    if (@map.is_a? FeedbackResponseMap) && !(params[:participant_id].nil?)
+      @participant = Participant.find(params[:participant_id])
+    end
+
     set_content
   end
 
@@ -163,7 +181,12 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     was_submitted = false
-    @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    if @map.is_a? FeedbackResponseMap
+      @response = Response.where(map_id: @map.id).first
+    else
+      @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    end
+
     if @response.nil?
       @response = Response.create(
           map_id: @map.id,
@@ -172,6 +195,7 @@ class ResponseController < ApplicationController
           is_submitted: is_submitted
       )
     end
+
     was_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
 
@@ -187,14 +211,14 @@ class ResponseController < ApplicationController
       @response.email
     end
     redirect_to controller: 'response', action: 'saving', id: @map.map_id,
-      return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+      return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options],
+      participant_id: params[:participant_id]
   end
 
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    participant = Participant.find_by(id: @map.reviewee_id)
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
     if @map.assignment.has_badge?
       if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
@@ -207,15 +231,17 @@ class ResponseController < ApplicationController
       end
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
-    redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg],
+                participant_id: params[:participant_id]
   end
 
   def redirection
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by(map_id: params[:id])
+    @response_map = ResponseMap.find_by(id: params[:id])
     if params[:return] == "feedback"
-      redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
+      redirect_to controller: 'response', action: 'view', id: @response_map.reviewed_object_id
     elsif params[:return] == "teammate"
       redirect_to view_student_teams_path student_id: @map.reviewer.id
     elsif params[:return] == "instructor"
@@ -284,14 +310,18 @@ class ResponseController < ApplicationController
   # if false: we figure out which questionnaire to display base on @response object
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
+
     @title = @map.get_title
     if @map.survey?
       @survey_parent = @map.survey_parent
     else
       @assignment = @map.assignment
     end
-    @participant = @map.reviewer
+    if (!@map.is_a? FeedbackResponseMap) || (@participant.nil?)
+     @participant = @map.reviewer
+    end
     @contributor = @map.contributor
+
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)

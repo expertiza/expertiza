@@ -17,7 +17,7 @@ describe BookmarksController do
   let(:student) { build(:student, id: 42) }
   let(:topic) { build(:topic) }
   let(:bookmark) { build(:bookmark) }
-  let(:bookmark1) { build(:bookmark1) }
+
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)

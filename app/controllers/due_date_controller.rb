@@ -28,6 +28,7 @@ class DueDateController < ApplicationController
   end
 
   def create
+    Rails.logger.info "Inside Create method of DueDateController"
     if params[:assignment_id].nil?
       flash[:error] = "Missing assignment:" + params[:assignment_id]
       return
@@ -47,7 +48,7 @@ class DueDateController < ApplicationController
 
     @due_date = AssignmentDueDate.new(params)
     @due_date.save
-
+    Rails.logger.info "Calling the perform_in method"
     MailWorker.perform_in((@due_date.due_at - Time.now - 2*60), @due_date.parent_id, @due_date.deadline_name, @due_date.due_at )
 
 

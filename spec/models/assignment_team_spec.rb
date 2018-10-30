@@ -340,8 +340,23 @@ describe 'AssignmentTeam' do
 	allow(Assignment).to receive(:find).with(team.parent_id).and_return(assignment)
 	allow(ReviewResponseMap).to receive(:create).with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id).and_return(review_response_map)	
 	expect(team.assign_reviewer(participant1)).to eq(review_response_map)
-
       end
+    end
+  end
+
+  describe "#has_submissions?" do
+    context "when the team has submitted files" do      
+      it "checks if the team has submissions" do
+        allow(team).to receive_message_chain(:submitted_files, :any?).with(no_args).with(no_args).and_return(true)      
+        expect(team.has_submissions?).to be true
+      end    
+    end
+
+    context "when the team has submitted hyperlink" do      
+      it "checks if the team has submissions" do
+        allow(team).to receive_message_chain(:submitted_hyperlinks, :present?).with(no_args).with(no_args).and_return(true)      
+        expect(team.has_submissions?).to be true
+      end    
     end
   end
 end

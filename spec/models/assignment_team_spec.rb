@@ -193,4 +193,36 @@ describe 'AssignmentTeam' do
       expect(team.delete).to eq(team)
     end
   end
+
+  describe ".import" do
+    context "when an assignment team does not already exist with the same id" do
+      it "cannot be imported" do
+        assignment_id = 1
+        allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(nil)
+        error_message = "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+        expect {AssignmentTeam.import([], assignment_id, [])}.
+          to raise_error(ImportError, error_message)
+      end
+    end
+
+    context "when an assignment team with the same id already exists" do
+      it "gets imported through Team.import" do
+        row = []
+        assignment_id = 1
+        options = []
+        allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(assignment)
+        allow(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
+        expect(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
+        AssignmentTeam.import(row, assignment_id, options)
+      end
+    end
+  end
+
+  describe ".export" do
+     it "redirects to Team.export with a new AssignmentTeam object" do
+    allow(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
+    expect(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
+    AssignmentTeam.export([], 1, [])
+end
+  end
 end

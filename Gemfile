@@ -69,7 +69,8 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-
+heroku_java_home = '/usr/lib/jvm/java-7-openjdk-amd64'
+ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)
 group :development do
   gem 'daemons'
   gem 'pry'

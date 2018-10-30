@@ -1,4 +1,4 @@
-require 'sidekiq'
+arequire 'sidekiq'
 
 class MailWorker
   include Sidekiq::Worker
@@ -7,7 +7,7 @@ class MailWorker
   sidekiq_options queue: 'mailers'
   attr_accessor :assignment_id
   attr_accessor :deadline_type
-  attr_accessor :due_at
+  attr_accessor :_due_at
 
   def perform(assignment_id, deadline_type, due_at)
     self.assignment_id = assignment_id
@@ -15,7 +15,7 @@ class MailWorker
     self.due_at = due_at
     
     assignment = Assignment.find(self.assignment_id)
-    partcipant_mails = find_participant_emails
+    participant_mails = find_participant_emails
 
     if ["drop_one_member_topics", "drop_outstanding_reviews", "compare_files_with_simicheck"].include?(self.deadline_type)
       drop_one_member_topics if self.deadline_type == "drop_outstanding_reviews" && assignment.team_assignment
@@ -29,8 +29,8 @@ class MailWorker
         self.deadline_type
       end
 
-      email_reminder(partcipant_mails, deadlineText) unless partcipant_mails.empty?
-      puts partcipant_mails.inspect
+      email_reminder(participant_mails, deadlineText) unless participant_mails.empty?
+      puts participant_mails.inspect
     end
   end
 

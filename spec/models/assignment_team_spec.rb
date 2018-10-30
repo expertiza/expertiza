@@ -285,4 +285,11 @@ describe 'AssignmentTeam' do
       end
     end
   end
+
+  describe "#received_any_peer_review?" do
+    it "checks if the team has received any reviews" do  
+      allow(ResponseMap).to receive_message_chain(:where, :any?).with(reviewee_id: team.id, reviewed_object_id: team.parent_id).with(no_args).and_return(true)
+      expect(team.received_any_peer_review?).to be true
+    end
+  end
 end

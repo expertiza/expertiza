@@ -1,7 +1,7 @@
 class BookmarksController < ApplicationController
   def action_allowed?
     case params[:action]
-    when 'list', 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
+    when 'list', 'new', 'create', 'bookmark_rating', 'new_bookmark_review'
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
       # edit, update, delete bookmarks can only be done by owner
@@ -62,4 +62,44 @@ class BookmarksController < ApplicationController
     flash[:success] = 'Your bookmark has been successfully deleted!'
     redirect_to action: 'list', id: @bookmark.topic_id
   end
+
+  def save_bookmark_rating_score
+    @bookmark = Bookmark.find(params[:id])
+    @bookmark_rating = BookmarkRating.where(bookmark_id: @bookmark.id, user_id: session[:user].id).first
+    if @bookmark_rating.blank?
+      BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: params[:rating])
+    else
+      @bookmark_rating.update_attribute('rating', params[:rating].to_i)
+    end
+    redirect_to action: 'list', id: @bookmark.topic_id
+  end
+
+  def new_bookmark_review
+    bookmark = Bookmark.find(params[:id])
+    topic = SignUpTopic.find(bookmark.topic_id)
+    assignment_participant = AssignmentParticipant.find_by(user_id: current_user.id)
+    response_map = BookmarkRatingResponseMap.where(
+      reviewed_object_id: topic.assignment.id,
+      reviewer_id: assignment_participant.id,
+      reviewee_id: bookmark.id
+    ).first
+    if response_map.nil?
+      response_map = BookmarkRatingResponseMap.create(
+        reviewed_object_id: topic.assignment.id,
+        reviewer_id: assignment_participant.id,
+        reviewee_id: bookmark.id
+      )
+    end
+    redirect_to new_response_url(id: response_map.id, return: 'bookmark')
+  end
+
+  def get_bookmark_rating_response_map(bookmark)
+    BookmarkRatingResponseMap.find_by(
+      reviewed_object_id: SignUpTopic.find(bookmark.topic_id).assignment.id,
+      reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id,
+      reviewee_id: bookmark.id
+    )
+  end
+
+  helper_method :get_bookmark_rating_response_map
 end

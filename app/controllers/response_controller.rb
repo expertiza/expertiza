@@ -223,6 +223,9 @@ class ResponseController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
+    elsif params[:return] == "bookmark"
+      bookmark = Bookmark.find(@map.response_map.reviewee_id)
+      redirect_to controller: 'bookmarks', action: 'list', id: bookmark.topic_id
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
@@ -308,7 +311,8 @@ class ResponseController < ApplicationController
       "FeedbackResponseMap",
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
+      "GlobalSurveyResponseMap",
+      "BookmarkRatingResponseMap"
       @questionnaire = @map.questionnaire
     end
   end

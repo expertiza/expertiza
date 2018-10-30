@@ -228,7 +228,9 @@ describe 'AssignmentTeam' do
 
   describe "#path" do
     it "returns the path" do
-      expect(team.path).to eq "/home/expertiza_developer/Desktop/expertiza/pg_data/instructor6/csc517/test/final_test/0"
+      allow(team).to receive_message_chain(:assignment, :path).and_return("assignment_path")
+      allow(team).to receive(:directory_num).and_return(5)
+      expect(team.path).to eq "assignment_path/5"
     end
   end
 

@@ -11,19 +11,19 @@ describe Node do
   let(:node) { Menu::Node.new }
   let(:node2) { Menu::Node.new }
   let(:node3) { Menu::Node.new }
-  let(:sc_test1) {build(:site_controller, id:1,  name:"site1")}
-  let(:sc_test2) {build(:site_controller, id:2,  name:"site2")}
-  let(:ca_test1) {build(:controller_action, id: 1, site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/")}
-  let(:ca_test2) {build(:controller_action, id: 2, site_controller_id: 1, name: "action2", permission_id: 1, url_to_use: nil)}
-  let(:cp_test1) {build(:content_page, id: 1, name:"content1" )}
-  let(:cp_test2) {build(:content_page, id: 2, name:"content2" )}
-  let(:item1) { build(:menu_item, name: "home1", parent_id: nil,  seq: 1, content_page_id:1) }
-  let(:item2) { build(:menu_item, name: "home2", parent_id: 1,    seq: 2, controller_action_id:1, content_page_id: 1) }
-  let(:item3) { build(:menu_item, name: "home3", parent_id: 1,    seq: 3, controller_action_id:2, content_page_id: 1) }
+  let(:sc_test1) { build(:site_controller, id: 1,  name: "site1") }
+  let(:sc_test2) { build(:site_controller, id: 2,  name: "site2") }
+  let(:ca_test1) { build(:controller_action, id: 1, site_controller_id: 1, name: "action1", permission_id: 1, url_to_use: "/test/") }
+  let(:ca_test2) { build(:controller_action, id: 2, site_controller_id: 1, name: "action2", permission_id: 1, url_to_use: nil) }
+  let(:cp_test1) { build(:content_page, id: 1, name: "content1") }
+  let(:cp_test2) { build(:content_page, id: 2, name: "content2") }
+  let(:item1) { build(:menu_item, name: "home1", parent_id: nil,  seq: 1, content_page_id: 1) }
+  let(:item2) { build(:menu_item, name: "home2", parent_id: 1,    seq: 2, controller_action_id: 1, content_page_id: 1) }
+  let(:item3) { build(:menu_item, name: "home3", parent_id: 1,    seq: 3, controller_action_id: 2, content_page_id: 1) }
 
   describe "#initialize" do
     it "initializes the parent attribute" do
-    # Write your test here!
+      # Write your test here!
       expect(node.parent).to be_nil
     end  
   end
@@ -47,8 +47,8 @@ describe Node do
           item2.controller_action = ca_test1
           item2.content_page = cp_test1
           node2.setup(item2)
-          expect(node2.url).to eq("#{ca_test1.url_to_use}")
-          end
+          expect(node2.url).to eq(ca_test1.url_to_use.to_s)
+        end
       end
 
       context "when the URL of the controller action is unavailable" do
@@ -59,7 +59,7 @@ describe Node do
           item3.content_page = cp_test1
           node3.setup(item3)
           expect(node3.url).to eq("/#{sc_test1.name}/#{ca_test2.name}")
-          end
+        end
       end
     end
   end
@@ -85,7 +85,7 @@ describe Node do
 
   describe "#controller_action" do
     context "when controller_action variable is nil" do
-      it "finds the controller action by id"do
+      it "finds the controller action by id" do
         # Write your test here!
         node.controller_action_id = ca_test1.id
         allow(ControllerAction).to receive(:find_by).with(id: ca_test1.id).and_return(ca_test1)
@@ -126,11 +126,11 @@ end
 describe Menu do
   # Write your mocked object here!
   let(:node) { Menu::Node.new }
-  let(:role1) {build(:role_of_student)}
-  let(:role2) {build(:role_of_student)}
-  let(:item1) { build(:menu_item, id: 1, name: "home1", parent_id: nil, seq: 1, controller_action_id:1, content_page_id: 1) }
-  let(:item2) { build(:menu_item, id: 2, name: "home2", parent_id: 1, seq: 2, controller_action_id:1, content_page_id: 1) }
-  let(:item3) { build(:menu_item, id: 3, name: "home3", parent_id: 1, seq: 3, controller_action_id:2, content_page_id: 1) }
+  let(:role1) { build(:role_of_student) }
+  let(:role2) { build(:role_of_student) }
+  let(:item1) { build(:menu_item, id: 1, name: "home1", parent_id: nil, seq: 1, controller_action_id: 1, content_page_id: 1) }
+  let(:item2) { build(:menu_item, id: 2, name: "home2", parent_id: 1, seq: 2, controller_action_id: 1, content_page_id: 1) }
+  let(:item3) { build(:menu_item, id: 3, name: "home3", parent_id: 1, seq: 3, controller_action_id: 2, content_page_id: 1) }
   before(:each) do
     items = [item1, item2, item3]
     empty_hash = {}
@@ -142,7 +142,7 @@ describe Menu do
     allow(MenuItem).to receive(:items_for_permissions).and_return(items)
     node.setup(item1)
   end
-  let(:menu){Menu.new(role1)}
+  let(:menu) { Menu.new(role1) }
 
   describe "#initialize" do
     context "when menu items are nil or empty" do
@@ -169,7 +169,7 @@ describe Menu do
             # Write your test here!
             id = menu.instance_variable_get(:@by_id)[1].children[0]
             expect(id).to eq(item2.id)
-          end
+        end
       end
     end
   end
@@ -192,7 +192,7 @@ describe Menu do
 
   describe "#get_item" do
     it "returns menu item by id" do
-    # Write your test here!
+      # Write your test here!
       expect(menu.get_item(item1.id).name).to eq(node.name)
     end
   end

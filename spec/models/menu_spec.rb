@@ -193,7 +193,7 @@ describe Menu do
   describe "#get_item" do
     it "returns menu item by id" do
     # Write your test here!
-      expect(menu.get_item(1).name).to eq(node.name)
+      expect(menu.get_item(item1.id).name).to eq(node.name)
     end
   end
 
@@ -210,7 +210,7 @@ describe Menu do
   describe "#selected" do
     it "returns the name of the currently-selected element" do
       # Write your test here!
-      expect(menu.selected).to eq("home1")
+      expect(menu.selected).to eq(node.name)
     end
   end
 

@@ -234,18 +234,21 @@ class UsersController < ApplicationController
 
   def destroy
     begin
-      @user = User.find(params[:id])
-      AssignmentParticipant.where(user_id: @user.id).each(&:delete)
-      TeamsUser.where(user_id: @user.id).each(&:delete)
-      AssignmentQuestionnaire.where(user_id: @user.id).each(&:destroy)
-      # Participant.delete(true)
-      @user.destroy
-      flash[:note] = undo_link("The user \"#{@user.name}\" has been successfully deleted.")
+      @name_of_deleted_user = User.find(params[:id]).name
+      UsersController.destroy_helper params
+      flash[:note] = ("The user \"#{@name_of_deleted_user}\" has been successfully deleted.")
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-
     redirect_to action: 'list'
+  end
+
+  def self.destroy_helper params
+    @user = User.find(params[:id])
+    AssignmentParticipant.where(user_id: @user.id).each(&:delete)
+    TeamsUser.where(user_id: @user.id).each(&:delete)
+    AssignmentQuestionnaire.where(user_id: @user.id).each(&:destroy)
+    @user.destroy
   end
 
   def keys

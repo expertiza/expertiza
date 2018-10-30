@@ -30,7 +30,6 @@ class MailWorker
       end
 
       email_reminder(participant_mails, deadlineText) unless participant_mails.empty?
-      puts participant_mails.inspect
     end
   end
 

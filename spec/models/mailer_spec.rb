@@ -2,7 +2,7 @@ describe 'Tests mailer' do
   it 'should send email to required email address with proper content ' do
     # Send the email, then test that it got queued
     email = Mailer.sync_message(
-      to: 'psingh22@ncsu.edu',
+      to: 'tluo@ncsu.edu',
       subject: "Test",
       body: {
         obj_name: 'assignment',

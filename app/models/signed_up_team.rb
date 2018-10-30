@@ -1,7 +1,6 @@
 class SignedUpTeam < ActiveRecord::Base
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team, class_name: 'Team'
-
   # the below has been added to make is consistent with the database schema
   validates :topic_id, :team_id, presence: true
   scope :by_team_id, ->(team_id) { where("team_id = ?", team_id) }
@@ -52,6 +51,18 @@ class SignedUpTeam < ActiveRecord::Base
                   signed_up_teams.preference_priority_number as preference_priority_number')
                 .where('sign_up_topics.assignment_id = ? and signed_up_teams.team_id = ?', assignment_id, team_id)
   end
+
+  def self.update_is_waitlisted(topic_id, team_id)
+    waitlisted_teams = SignedUpTeam.where(topic_id: topic_id, team_id: team_id)
+
+    waitlisted_teams.each do |team|
+      if(team.is_waitlisted == true)
+        SignedUpTeam.delete(team.id)
+        team.save
+      end
+    end
+  end
+
 
   # If a signup sheet exists then release topics that the given team has selected for the given assignment.
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)

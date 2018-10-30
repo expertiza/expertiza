@@ -366,21 +366,10 @@ class ReviewMappingController < ApplicationController
   end
 
   def response_report
-    # Get the assignment id and set it in an instance variable which will be used in view
-    # Code commented between =begin and =end in order to refactor this function using report_format_helper
-    @id = params[:id]
-    @assignment = Assignment.find(@id)
-    summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, summary_ws_url)
-    @summary = sum.summary
-    @reviewers = sum.reviewers
-    @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
-    @avg_scores_by_round = sum.avg_scores_by_round
-
     # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
-    # Call the respective function of ReportFormatterHelper module
+    # From the ReportFormatterHelper module
     render_report(@type, params, session)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end

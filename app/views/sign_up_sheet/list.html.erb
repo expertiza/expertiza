@@ -18,6 +18,7 @@
     <% for topic in @sign_up_topics %>
       <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
         <% for selected_topic in @selected_topics %>
+          <% p selected_topic %>
           <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
             <tr bgcolor="yellow">
           <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>

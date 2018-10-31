@@ -160,6 +160,15 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
+    @drop_topic_deadline1 = @assignment.due_dates.find_by(deadline_type_id: 6)
+    topic_id1 = SignedUpTeam.where(team_id: team_id).first
+    if @assignment.staggered_deadline?
+      @drop_topic_deadline1 = TopicDueDate.where(parent_id: topic_id1.topic_id, deadline_type_id: 6).first rescue nil
+    end
+    p topic_id1
+    if !topic_id1.nil? and !@drop_topic_deadline1.nil? and Time.now > @drop_topic_deadline1.due_at
+        SignedUpTeam.update_is_waitlisted(topic_id1.topic_id,team_id)
+    end
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
@@ -176,6 +185,9 @@ class SignUpSheetController < ApplicationController
     @num_of_topics = @sign_up_topics.size
     @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
     @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+    if @assignment.staggered_deadline?
+      @drop_topic_deadline = TopicDueDate.where(parent_id: topic_id1.topic_id, deadline_type_id: 6).first rescue nil
+    end
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
@@ -234,6 +246,9 @@ class SignUpSheetController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+    if assignment.staggered_deadline?
+      drop_topic_deadline = TopicDueDate.where(parent_id: topic_id1.topic_id, deadline_type_id: 6).first rescue nil
+    end
     # A student who has already submitted work should not be allowed to drop his/her topic!
     # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
     # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
@@ -259,6 +274,9 @@ class SignUpSheetController < ApplicationController
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+    if assignment.staggered_deadline?
+      drop_topic_deadline = TopicDueDate.where(parent_id: topic_id1.topic_id, deadline_type_id: 6).first rescue nil
+    end
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = "The student has already submitted their work, so you are not allowed to remove them."
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
@@ -313,6 +331,9 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     @assignment_submission_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 1 }
     @assignment_review_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 2 }
+    if !assignment.due_dates.select {|due_date| due_date.deadline_type_id == 6 }.nil?
+      @assignment_drop_topic_due_dates = assignment.due_dates.select {|due_date| due_date.deadline_type_id == 6 }
+    end
     due_dates = params[:due_date]
     topics = SignUpTopic.where(assignment_id: params[:assignment_id])
     review_rounds = assignment.num_review_rounds
@@ -320,13 +341,24 @@ class SignUpSheetController < ApplicationController
       for i in 1..review_rounds
         @topic_submission_due_date = due_dates[topics[index].id.to_s + '_submission_' + i.to_s + '_due_date']
         @topic_review_due_date = due_dates[topics[index].id.to_s + '_review_' + i.to_s + '_due_date']
+        @topic_drop_topic_due_date = due_dates[topics[index].id.to_s + '_drop_topic_' + i.to_s + '_due_date']
         @assignment_submission_due_date = DateTime.parse(@assignment_submission_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
         @assignment_review_due_date = DateTime.parse(@assignment_review_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
-        %w[submission review].each do |deadline_type|
+        if assignment.due_dates.select {|due_date| due_date.deadline_type_id == 6 }.nil?
+          @assignment_drop_topic_due_date = DateTime.parse(@assignment_drop_topic_due_dates[i - 1].due_at.to_s).strftime("%Y-%m-%d %H:%M")
+        end
+        %w[submission review drop_topic].each do |deadline_type|
+          puts deadline_type
           deadline_type_id = DeadlineType.find_by_name(deadline_type).id
+          p deadline_type_id
           next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
+          p "hello"
           topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
+          p "drop-------------------"
+          p topic_due_date
           if topic_due_date.nil? # create a new record
+            p "----%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+            p topic_due_date
             TopicDueDate.create(
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
               deadline_type_id:            deadline_type_id,
@@ -345,6 +377,8 @@ class SignUpSheetController < ApplicationController
               type:                       'TopicDueDate'
             )
           else # update an existed record
+            p "------------------------------"
+            p topic_due_date
             topic_due_date.update_attributes(
               due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
               submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,

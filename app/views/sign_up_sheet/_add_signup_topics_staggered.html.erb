@@ -42,7 +42,7 @@
   </a>
   <%= form_tag :controller => 'sign_up_sheet', :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
     <div id="due_date_myDiv" style="display:none" align="left">
-      <br/><%= render :partial => '/sign_up_sheet/due_dates', :locals => {review_rounds: review_rounds, assignment_submission_due_dates: assignment_submission_due_dates, assignment_review_due_dates: assignment_review_due_dates} %>
+      <br/><%= render :partial => '/sign_up_sheet/due_dates', :locals => {review_rounds: review_rounds, assignment_submission_due_dates: assignment_submission_due_dates, assignment_review_due_dates: assignment_review_due_dates, assignment_drop_topic_due_dates: assignment_drop_topic_due_dates} %>
     </div>
   <% end %>
 <% end %>

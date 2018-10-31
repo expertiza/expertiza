@@ -49,7 +49,7 @@
             <%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
           <br><br>
           <% if @assignment_form.assignment.staggered_deadline == true %>
-              <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>
+              <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates, assignment_drop_topic_due_dates: @assignment_drop_topic_due_dates} %>
           <% else %>
               <%= render '/sign_up_sheet/add_signup_topics' %>
           <% end %>
@@ -87,9 +87,9 @@
           if (bookmark_checkbox.is(':checked')) {
             addQuestionnaireTableRow(
                     'BookmarkRatingQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
+                    null
+                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
                     <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
             );
           }

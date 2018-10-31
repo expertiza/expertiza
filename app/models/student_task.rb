@@ -118,13 +118,29 @@ class StudentTask
     students_teamed
   end
 
-  def self.get_due_date_data(assignment, timeline_list)
-    assignment.due_dates.each do |dd|
-      timeline = {label: (dd.deadline_type.name + ' Deadline').humanize}
-      unless dd.due_at.nil?
-        timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
+  def self.get_due_date_data(assignment, timeline_list, participant)
+    if assignment.staggered_deadline?
+      team_id = participant.team.try(:id)
+      p team_id
+      p"teamid--------------------------"
+      topic_id1 = SignedUpTeam.where(team_id: team_id).first
+      if !topic_id1.nil?
+        p topic_id1
+        topic_due_date = TopicDueDate.where(parent_id: topic_id1.topic_id, deadline_type_id: 6).first rescue nil
+        timeline = {label: ('Drop Topic Deadline').humanize}
+        p topic_due_date
+        timeline[:updated_at] = topic_due_date.due_at.strftime('%a, %d %b %Y %H:%M')
         timeline_list << timeline
       end
+    end
+    assignment.due_dates.each do |dd|
+        timeline = {label: (dd.deadline_type.name + ' Deadline').humanize}
+        unless dd.due_at.nil?
+          p "---------------------------------------"
+          p dd.due_at
+          timeline[:updated_at] = dd.due_at.strftime('%a, %d %b %Y %H:%M')
+          timeline_list << timeline
+        end
     end
   end
 
@@ -168,7 +184,7 @@ class StudentTask
   # static method for the building timeline data
   def self.get_timeline_data(assignment, participant, team)
     timeline_list = []
-    get_due_date_data(assignment, timeline_list)
+    get_due_date_data(assignment, timeline_list,participant)
     get_submission_data(assignment.try(:id), team.try(:id), timeline_list)
     get_peer_review_data(participant.try(:id), timeline_list)
     get_author_feedback_data(participant.try(:id), timeline_list)

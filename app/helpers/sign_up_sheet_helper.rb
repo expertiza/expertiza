@@ -7,12 +7,20 @@ module SignUpSheetHelper
   end
 
   def get_topic_deadline(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
+    p "------------------------------------------"
+    p review_round
+    p deadline_type_id
+    p "----------------------------------------------"
     topic_due_date = TopicDueDate.where(parent_id: topic_id,
                                         deadline_type_id: deadline_type_id,
                                         round: review_round).first rescue nil
     if !topic_due_date.nil?
       topic_due_date.due_at
     else
+      p assignment_due_dates
+      if assignment_due_dates.length == 0
+        assignment_due_dates = @assignment_submission_due_dates
+      end
       assignment_due_dates[review_round - 1].due_at.to_s
     end
   end

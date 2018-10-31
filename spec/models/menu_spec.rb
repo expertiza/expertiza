@@ -32,6 +32,21 @@ describe Menu do
                 end
             end
         end
+        describe "#setup" do
+            context "when item.action_controller is nil" do
+                it "returns /content_page.name" do
+                    allow_any_instance_of(MenuItem).to receive(:controller_action).and_return(nil)
+                    node = Menu::Node.new
+                    expect(node.setup(test1)).to eq("/temp")
+                end
+            end
+            context "when item.action_controller is not nil" do
+                it "returns /controller.name/controller_action.name" do
+                    node = Menu::Node.new
+                    expect(node.setup(test1)).to eq("/controller1/temp")
+                end
+            end
+        end
         describe "#site_controller" do
             context "when @site_controller is nil" do
                 it "updates @site_controller" do
@@ -157,24 +172,28 @@ describe Menu do
         end
     end
     describe "#selected?" do
-        it "should return true if the passed the id of the selected menu item" do
-            menu = Menu.new
-            expect(menu.selected?(1)).to be true
+        context "when id passed is of a selected menu item" do
+            it "returns true" do
+                menu = Menu.new
+                expect(menu.selected?(1)).to be true
+            end
         end
-        it "should return false if the id is not that of the selected item" do
-            menu = Menu.new
-            expect(menu.selected?(3)).to be false
+        context "when id passed is not of a selected menu item" do
+            it "returns false" do
+                menu = Menu.new
+                expect(menu.selected?(3)).to be false
+            end
         end
     end
     describe "#crumbs" do
         context "when root is selected" do
-            it "should return a list of nodes based on the root" do
+            it "returns a list of nodes based on the root" do
                 menu = Menu.new
                 expect(menu.crumbs[0]).to eq(menu.get_item(1))
             end
         end
-        context "when home node is selected" do
-            it "should return a list of nodes based on the selected item" do
+        context "when a node besides root is selected" do
+            it "returns a list of nodes based on the selected item" do
                 menu = Menu.new
                 menu.select("home2")
                 expect(menu.crumbs[1]).to eq(menu.get_item(2))

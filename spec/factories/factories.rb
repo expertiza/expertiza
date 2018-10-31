@@ -296,6 +296,23 @@ FactoryBot.define do
     can_take_quiz true
   end
 
+
+  factory :participantSuper, class: Participant do
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
   factory :course_participant, class: CourseParticipant do
     can_submit true
     can_review true
@@ -353,7 +370,8 @@ FactoryBot.define do
     deadline_name nil
     description_url nil
     quiz_allowed_id 3
-    teammate_review_allowed_id 3
+    teammate_
+_allowed_id 3
     type 'TopicDueDate'
   end
 

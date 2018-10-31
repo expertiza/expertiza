@@ -15,7 +15,7 @@ describe Participant do
 #     team = build(:team, id: 1, name: 'no team') 
 #     participant = build(:participant, user: student) 
 #	   team_user = build(:team_user, id: 1, user:student , team: team)
-#	   #expect(participant.user_id).to eq(1) 
+#	   expect(participant.user_id).to eq(1) 
 #     expect(participant.team).to eq(1) 
      
      #expect(participant.team).to eq(1)

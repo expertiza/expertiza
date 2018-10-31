@@ -1,24 +1,24 @@
 describe Participant do
   let(:student) { build(:student, name: "Student", fullname: "Test, Student") }
   let(:participant) { build(:participant, user: student) }
-  
-  let(:participant2) { build(:participant, id: 8, user: build(:student, name: 'Student Second'))}
+  #let (:team_user1) {TeamsUser.new user_id, team_id}
+  #let (:team_user1) { build(:team_user, student: participant)}
   let(:response_map1) { build(:review_response_map, reviewer: participant2, id: 10) }
   let(:response_map2) { build(:review_response_map, reviewer: participant2, id: 20) }
-  let(:response1) { build( :response, id: 1, map_id: 10, response_map: response_map1) }
-  let(:response2) { build( :response, id: 2, map_id: 20, response_map: response_map2) }
-  
-  let(:questionnaire) { build(:questionnaire) }
-  let(:assignment1) { build(:assignment_questionnaire) }
+  let(:response1) { build(:response, id: 1, map_id: 10, response_map: response_map1) }
+  let(:response2) { build(:response, id: 2, map_id: 20, response_map: response_map2) }
+  let(:participant3) { build(:participant) }
   
   describe "#team" do
    it "returns the team id for the user" do
-	   student= build(:student, id: 1, name: 'no name', fullname: 'no one') 
-     team = build(:team, id: 1, name: 'no team') 
-     participant = build(:participant, user: student) 
-	   team_user = build(:team_user, id: 1, user:student , team: team)
-	   expect(participant.user_id).to eq(1) 
-     #expect(participant.team).to eq(1) 
+#	   student= build(:student, id: 1, name: 'no name', fullname: 'no one') 
+#     team = build(:team, id: 1, name: 'no team') 
+#     participant = build(:participant, user: student) 
+#	   team_user = build(:team_user, id: 1, user:student , team: team)
+#	   #expect(participant.user_id).to eq(1) 
+#     expect(participant.team).to eq(1) 
+     
+     #expect(participant.team).to eq(1)
     end   
   end
   
@@ -42,11 +42,35 @@ describe Participant do
   end
   
    describe '#scores' do
-     it 'returns scores obtained by the participant for given questions' do
-     
-     expect(questionnaire.name).to eql('Test questionnaire')
+     #it 'returns scores obtained by the participant for given questions' do
+     #expect(questionnaire.name).to eql('Test questionnaire')
      #expect(assignment1.assignment).to be_valid
+     #expect(participant2.scores). to eql("ssss")
+   end
+   
+   describe '#topic_name' do     
+     context 'when the participant has an assignment without a topic' do
+       it 'returns error message' do
+         expect(participant.topic_name).to eql('<center>&#8212;</center>')
+       end
      end
+
+     context 'when the participant has an assignment with an unnamed topic' do
+       it 'returns error message' do
+         topic = build(:topic, topic_name: '')
+         allow(participant3).to receive(:topic).and_return(topic)
+         expect(participant3.topic_name).to eql('<center>&#8212;</center>')
+       end
+     end
+     
+     context 'when the participant has an assignment with a named topic' do
+       it 'returns the name of the topic associated to the assignment of the participant' do
+         topic = build(:topic, topic_name: 'Test topic name')
+         allow(participant3).to receive(:topic).and_return(topic)
+         expect(topic.topic_name).to eql('Test topic name')
+         expect(participant3.topic_name).to eql('Test topic name')
+       end
+     end   
    end
    
    describe '.sort_by_name' do

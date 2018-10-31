@@ -254,7 +254,7 @@ describe 'AssignmentTeam' do
       end
     end
 
-    context "when a valid hyperlink not in a certain improper format is submitted" do 
+    context "when a valid hyperlink not in a certain improper format is submitted" do
       it "it is fixed and is saved to the database" do
         allow(team).to receive(:hyperlinks).and_return(["https://expertiza.ncsu.edu"])
         allow(team).to receive(:submitted_hyperlinks=)
@@ -282,7 +282,7 @@ describe 'AssignmentTeam' do
   end
 
   describe "#received_any_peer_review?" do
-    it "checks if the team has received any reviews" do  
+    it "checks if the team has received any reviews" do
       allow(ResponseMap).to receive_message_chain(:where, :any?).with(reviewee_id: team.id, reviewed_object_id: team.parent_id).with(no_args).and_return(true)
       expect(team.received_any_peer_review?).to be true
     end
@@ -344,15 +344,17 @@ describe 'AssignmentTeam' do
     context "when a team has submitted files" do
       it "has submissions" do
         allow(team).to receive_message_chain(:submitted_files, :any?).with(no_args).with(no_args).and_return(true)
-        expect(team.has_submissions?).to be true
       end
     end
 
-    context "when the team has submitted hyperlink" do      
+    context "when the team has submitted hyperlink" do
       it "checks if the team has submissions" do
         allow(team).to receive_message_chain(:submitted_hyperlinks, :present?).with(no_args).with(no_args).and_return(true)
-        expect(team.has_submissions?).to be true
       end
+    end
+
+    after(:each) do
+      expect(team.has_submissions?).to be true
     end
   end
 end

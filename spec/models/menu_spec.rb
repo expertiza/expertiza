@@ -1,22 +1,33 @@
 
 describe Node do
-  let(:node) { Menu::Node.new }
+  let(:node) do
+    Menu::Node.new
+  end
 
-  let(:menu_item) {
-    build(:menu_item, parent_id: 1, name: 'name', id: 2, label: 'label')
-  }
+  let(:menu_item) do
+    build :menu_item,
+          parent_id: 1,
+          name: 'name',
+          id: 2,
+          label: 'label'
+  end
 
-  let(:content_page) { double('ContentPage', id: 1, name: 'name') }
+  let(:content_page) do
+    double('ContentPage', id: 1, name: 'name')
+  end
 
-  let(:controller_action) {
+  let(:controller_action) do
     double('ControllerAction', id: 99, name: 'name', url_to_use: 'url', controller: nil)
-  }
+  end
 
-  let(:controller) { double('Controller', id: 3, name: 'name') }
+  let(:controller) do
+    double('Controller', id: 3, name: 'name')
+  end
 
   describe '#setup' do
     it 'sets up attributes: parent_id, name, id, label' do
-      allow(menu_item).to receive_message_chain(:content_page, :name)
+      allow(menu_item).to receive_message_chain :content_page,
+                                                :name
       node.setup(menu_item)
       expect(node.parent_id).to eq(menu_item.parent_id)
       expect(node.name).to eq(menu_item.name)
@@ -26,7 +37,8 @@ describe Node do
 
     context 'when menu_item has controller_action' do
       before(:each) do
-        allow(menu_item).to receive(:controller_action).and_return(controller_action)
+        allow(menu_item).to receive(:controller_action)
+          .and_return(controller_action)
         node.setup(menu_item)
       end
 
@@ -147,16 +159,20 @@ describe Menu do
   let(:controller_action) { double('ControllerAction', url_to_use: 'https://test_url.com') }
 
   let(:menu_items) {
-    (1..5).collect { |i|
+    (1..5).collect do |i|
       build :menu_item,
             id: i,
             name: "menu_item#{i}",
             controller_action: controller_action,
             parent_id: i == 2 || i == 3 ? 1 : nil
-    }
+    end
   }
 
-  (1..5).each { |i| let("menu_item#{i}") { menu_items[i - 1] } }
+  (1..5).each do |i|
+    let("menu_item#{i}") do
+      menu_items[i - 1]
+    end
+  end
 
   before(:each) do
     allow(ControllerAction).to receive(:find_by).and_return(controller_action)
@@ -294,7 +310,7 @@ describe Menu do
       end
 
       it 'has crumb order from child to parent' do
-        actual_crumb_ids = menu.crumbs.collect { |c| c.id }
+        actual_crumb_ids = menu.crumbs.map(&:id)
         expected_crumb_ids = [menu_item1.id, menu_item2.id]
         expect(actual_crumb_ids).to eq(expected_crumb_ids)
       end

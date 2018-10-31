@@ -66,6 +66,8 @@ development:
         list: true
       institution:
         list: false
+      student_task:
+        list: true
       profile:
         edit: true
       survey_response:
@@ -159,6 +161,7 @@ development:
       participants: true
       reports: true
       institution: false
+      student_task: true
       profile: true
       survey_response: true
       team: true
@@ -377,6 +380,16 @@ development:
         parent_id: 37
         site_controller_id: 35
         url: "/impersonate/start"
+      73: &25 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 45
+        id: 73
+        label: Student View
+        name: student_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/role_switch/open_student_view"
       39: &17 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 62
@@ -447,16 +460,6 @@ development:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_surveys"
-      73: &25 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id:
-        id: 73
-        label: Student View
-        name: student_view
-        parent:
-        parent_id: 37
-        site_controller_id: 10
-        url: "/role_switch/open_student_view"
     by_name:
       home: *1
       manage instructor content: *2
@@ -488,7 +491,6 @@ development:
       - 1
       - 37
       - 35
-      - 26
       - 30
       - 27
       - 2
@@ -556,6 +558,8 @@ test:
         change_handle: true
       institution:
         list: false
+      student_task:
+        list: true
       profile:
         edit: true
       survey_response:
@@ -641,6 +645,7 @@ test:
       participants: false
       reports: true
       institution: false
+      student_task: true
       profile: true
       survey_response: true
       team: false
@@ -683,7 +688,6 @@ test:
       parent:
       children:
       - 1
-      - 5
       - 6
       - 7
     by_id:
@@ -809,6 +813,8 @@ production:
         list: true
       institution:
         list: false
+      student_task:
+        list: true
       profile:
         edit: true
       survey_response:
@@ -902,6 +908,7 @@ production:
       participants: true
       reports: true
       institution: false
+      student_task: true
       profile: true
       survey_response: true
       team: true
@@ -1120,6 +1127,16 @@ production:
         parent_id: 37
         site_controller_id: 35
         url: "/impersonate/start"
+      73: &25 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 45
+        id: 73
+        label: Student View
+        name: student_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/role_switch/open_student_view"
       39: &17 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 62
@@ -1190,16 +1207,6 @@ production:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_surveys"
-      73: &25 !ruby/object:Menu::Node
-        content_page_id:
-        controller_action_id:
-        id: 73
-        label: Student View
-        name: student_view
-        parent:
-        parent_id: 37
-        site_controller_id: 10
-        url: "/role_switch/open_student_view"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1231,7 +1238,6 @@ production:
       - 1
       - 37
       - 35
-      - 26
       - 30
       - 27
       - 2

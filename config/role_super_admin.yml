@@ -266,6 +266,7 @@ development:
         - 45
         - 33
         - 50
+        - 73
       35: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -611,6 +612,17 @@ development:
         parent_id: 46
         site_controller_id: 10
         url: "/users/list_pending_requested"
+      73: &38 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 73
+        label: Student View
+        name: student_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url:  "/role_switch/open_student_view"
+
     by_name:
       home: *1
       admin: *2
@@ -647,6 +659,7 @@ development:
       show/instructors: *35
       anonymized_view: *36
       show/pending requests: *37
+      student_view: *38
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node
@@ -1527,6 +1540,7 @@ production:
         - 45
         - 33
         - 50
+        - 73
       35: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 43
@@ -1872,6 +1886,17 @@ production:
        parent_id: 46
        site_controller_id: 10
        url: "/users/list_pending_requested"
+      73: &38 !ruby/object:Menu::Node
+       content_page_id:
+       controller_action_id: 15
+       id: 73
+       label: Student View
+       name: student_view
+       parent:
+       parent_id: 37
+       site_controller_id: 35
+       url:  "/role_switch/open_student_view"
+
     by_name:
       home: *1
       admin: *2
@@ -1908,6 +1933,7 @@ production:
       show/instructors: *35
       anonymized_view: *36
       show/pending requests: *37
+      student_view: *38
     crumbs:
     - 1
     root: &36 !ruby/object:Menu::Node

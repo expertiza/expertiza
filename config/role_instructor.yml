@@ -1017,8 +1017,6 @@ production:
         list: true
       institution:
         list: false
-      # student_task:
-      #   list: true
       profile:
         edit: true
       survey_response:

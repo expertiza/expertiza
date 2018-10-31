@@ -1,12 +1,13 @@
 describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
+  let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  describe '#copy,  #copy_questionnaire_details and #assign_instructor_id' do
+  describe '#copy' do
     it 'redirects to view page of copied questionnaire' do
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
       allow(Question).to receive(:where).with(questionnaire_id: '1').and_return([question])

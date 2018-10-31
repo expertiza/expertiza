@@ -1,6 +1,5 @@
 describe QuizQuestionnairesController do
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
-  let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
   before(:each) do
@@ -251,61 +250,6 @@ describe QuizQuestionnairesController do
         allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
         post :update_quiz, params
         expect(response).to redirect_to('/submitted_content/view?id=1')
-      end
-    end
-  end
-
-  describe '#valid' do
-    before(:each) do
-      allow(Assignment).to receive_message_chain(:find, :num_quiz_questions).with('1').with(no_args).and_return(1)
-    end
-
-    context 'when user does not specify quiz name' do
-      it 'returns message (Please specify quiz name (please do not use your name or id).)' do
-        controller.params = {
-          aid: 1,
-          questionnaire: {name: ''}
-        }
-        expect(controller.valid_quiz).to eq('Please specify quiz name (please do not use your name or id).')
-      end
-    end
-
-    context 'when user does not specify a type for each question' do
-      it 'returns message (Please select a type for each question)' do
-        controller.params = {
-          aid: 1,
-          questionnaire: {name: 'test questionnaire'}
-        }
-        expect(controller.valid_quiz).to eq('Please select a type for each question')
-      end
-    end
-
-    context 'when user does not specify choice info for one question' do
-      it 'returns mesage (Please select a correct answer for all questions)' do
-        controller.params = {
-          aid: 1,
-          questionnaire: {name: 'test questionnaire'},
-          question_type: {'1' => {type: 'TrueFalse'}},
-          new_question: {'1' => {iscorrect: 'True'}},
-          new_choices: {'1' => {}}
-        }
-        expect(controller.valid_quiz).to eq('Please select a correct answer for all questions')
-      end
-    end
-
-    context 'when user specifies all necessary information' do
-      it 'returns mesage (valid)' do
-        controller.params = {
-          aid: 1,
-          questionnaire: {name: 'test questionnaire'},
-          question_type: {'1' => {type: 'TrueFalse'}},
-          new_question: {'1' => {iscorrect: 'True'}},
-          new_choices: {'1' => {'TrueFalse' => 'sth'}}
-        }
-        question = build(:question, type: 'TrueFalse')
-        allow(TrueFalse).to receive(:create).with(txt: '', type: 'TrueFalse', break_before: true).and_return(question)
-        allow(question).to receive(:isvalid).with('sth').and_return('valid')
-        expect(controller.valid_quiz).to eq('valid')
       end
     end
   end

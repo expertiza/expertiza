@@ -72,6 +72,11 @@ class Team < ActiveRecord::Base
     TeamsUser.where(team_id: team_id).count
   end
 
+  # get Author Feedbacks for this team
+  def feedback
+    FeedbackResponseMap.get_feedback_assessments_for(self)
+  end
+
   # Copy method to copy this team
   def copy_members(new_team)
     members = TeamsUser.where(team_id: self.id)

@@ -184,10 +184,9 @@ class AssignmentForm
 
   # add DelayedJob into queue and return it
   def add_delayed_job(assignment, deadline_type, due_date, min_left)
-    delayed_job = DelayedJob.enqueue(DelayedMailer.new(assignment.id, deadline_type, due_date.due_at.to_s(:db)),
-                                     1, min_left.minutes.from_now)
-    change_item_type(delayed_job.id)
-    delayed_job
+    delayed_job_id = MailWorker.perform_in(min_left*60, due_date.parent_id, due_date.deadline_name, due_date.due_at )
+    change_item_type(delayed_job_id)
+    delayed_job_id
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue

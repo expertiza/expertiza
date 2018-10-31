@@ -32,7 +32,7 @@ describe 'AssignmentTeam' do
         expect(team.includes?(participant1)).to eq true
       end
     end
-    
+
     context "when an assignment team has no users" do
       it "includes no participants" do
         allow(team).to receive(:users).with(no_args).and_return([])
@@ -63,20 +63,20 @@ describe 'AssignmentTeam' do
     end
   end
 
- describe ".remove_team_by_id" do
+  describe ".remove_team_by_id" do
     context "when a team has an id" do
-      it "delete the team by id" do        
-	allow(AssignmentTeam).to receive(:find).with(team.id).and_return(team)
-	expect(AssignmentTeam.remove_team_by_id(team.id)).to eq(team)
+      it "delete the team by id" do
+        allow(AssignmentTeam).to receive(:find).with(team.id).and_return(team)
+        expect(AssignmentTeam.remove_team_by_id(team.id)).to eq(team)
       end
     end
   end
 
   describe ".get_first_member" do
     context "when team id is present" do
-      it "get first member of the  team" do	
-	allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
-	expect(AssignmentTeam.get_first_member(team.id)).to eq(participant1)
+      it "get first member of the  team" do
+        allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
+        expect(AssignmentTeam.get_first_member(team.id)).to eq(participant1)
       end
     end
   end
@@ -97,17 +97,17 @@ describe 'AssignmentTeam' do
   describe "#reviewed_by?" do
     context "when a team has a reviewer" do
       it "has been reviewed by this reviewer" do
-         template = 'reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?'
-         allow(ReviewResponseMap).to receive(:where).with(template, team.id, participant1.id, team.assignment.id).and_return([review_response_map])
-         expect(team.reviewed_by?(participant1)).to eq true
+        template = 'reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?'
+        allow(ReviewResponseMap).to receive(:where).with(template, team.id, participant1.id, team.assignment.id).and_return([review_response_map])
+        expect(team.reviewed_by?(participant1)).to eq true
       end
     end
 
     context "when a team does not have any reviewers" do
       it "has not been reviewed by this reviewer" do
-         template = 'reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?'
-         allow(ReviewResponseMap).to receive(:where).with(template, team.id, participant1.id, team.assignment.id).and_return([])
-         expect(team.reviewed_by?(participant1)).to eq false
+        template = 'reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?'
+        allow(ReviewResponseMap).to receive(:where).with(template, team.id, participant1.id, team.assignment.id).and_return([])
+        expect(team.reviewed_by?(participant1)).to eq false
       end
     end
   end
@@ -121,7 +121,7 @@ describe 'AssignmentTeam' do
         expect(team.participants).to eq [participant1, participant2]
       end
     end
-    
+
     context "when an assignment team has a user but no participants" do
       it "includes no participants" do
         allow(team).to receive(:users).with(no_args).and_return([user1])
@@ -142,9 +142,9 @@ describe 'AssignmentTeam' do
   describe "#copy" do
     context "for given assignment team" do
       it "copies the assignment team to course team" do
-	assignment = team.assignment
-	course = assignment.course
-	expect(team.copy(course.id)).to eq([])
+        assignment = team.assignment
+        course = assignment.course
+        expect(team.copy(course.id)).to eq([])
       end
     end
   end
@@ -152,18 +152,18 @@ describe 'AssignmentTeam' do
   describe "#add_participant" do
     context "when a user is not a part of the team" do
       it "adds the user to the team" do
-	user = build(:student, id: 10)
-	assignment = team.assignment
-	expect(team.add_participant(assignment.id, user)).to be_an_instance_of(AssignmentParticipant)
+        user = build(:student, id: 10)
+        assignment = team.assignment
+        expect(team.add_participant(assignment.id, user)).to be_an_instance_of(AssignmentParticipant)
       end
     end
 
     context "when a user is already a part of the team" do
       it "returns without adding user to the team" do
-	allow(team).to receive(:users).with(no_args).and_return([user1])
+        allow(team).to receive(:users).with(no_args).and_return([user1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-	assignment = team.assignment
-	expect(team.add_participant(assignment.id, user1)).to eq(nil)
+        assignment = team.assignment
+        expect(team.add_participant(assignment.id, user1)).to eq(nil)
       end
     end
   end
@@ -173,8 +173,8 @@ describe 'AssignmentTeam' do
       it "provides the topic id" do
         assignment = team.assignment
         allow(SignUpTopic).to receive(:find_by).with(assignment: assignment).and_return(topic)
-	allow(SignedUpTeam).to receive_message_chain(:find_by, :try).with(team_id: team.id).with(:topic_id).and_return(topic.id)
-	expect(team.topic).to eq(topic.id)
+        allow(SignedUpTeam).to receive_message_chain(:find_by, :try).with(team_id: team.id).with(:topic_id).and_return(topic.id)
+        expect(team.topic).to eq(topic.id)
       end
     end
   end
@@ -182,8 +182,8 @@ describe 'AssignmentTeam' do
   describe "#delete" do
     it "deletes the team" do
       allow(team).to receive(:users).with(no_args).and_return([user1, user2])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user2.id, parent_id: team.parent_id).and_return(participant2)
+      allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
+      allow(AssignmentParticipant).to receive(:find_by).with(user_id: user2.id, parent_id: team.parent_id).and_return(participant2)
       signupteam = build(:signed_up_team, id: 1, team_id: team.id)
       expect(team.delete).to eq(team)
     end
@@ -195,7 +195,7 @@ describe 'AssignmentTeam' do
         assignment_id = 1
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(nil)
         error_message = "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-        expect {AssignmentTeam.import([], assignment_id, [])}.
+        expect { AssignmentTeam.import([], assignment_id, []) }.
           to raise_error(ImportError, error_message)
       end
     end
@@ -214,10 +214,10 @@ describe 'AssignmentTeam' do
   end
 
   describe ".export" do
-     it "redirects to Team.export with a new AssignmentTeam object" do
-    allow(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
-    expect(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
-    AssignmentTeam.export([], 1, [])
+    it "redirects to Team.export with a new AssignmentTeam object" do
+      allow(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
+      expect(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
+      AssignmentTeam.export([], 1, [])
     end
   end
 
@@ -230,10 +230,11 @@ describe 'AssignmentTeam' do
   end
 
   describe "#set_student_directory_num" do
-    it "sets the directory for the team" do      
-      team = build(:assignment_team, id: 1, parent_id: 1,directory_num: -1)
+    it "sets the directory for the team" do
+      team = build(:assignment_team, id: 1, parent_id: 1, directory_num: -1)
       max_num = 0
-      allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)      
+      allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).
+        with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)
       expect(team.set_student_directory_num).to be true
     end
   end
@@ -248,7 +249,6 @@ describe 'AssignmentTeam' do
     context "when a hyperlink is invalid" do
       it "causes an exception to be raised with the proper HTTP status code" do
         invalid_hyperlink = "https://expertiza.ncsu.edu/not_a_valid_path"
-        #allow(URI).to receive(:initialize).with(hyperlink).and_return(hyperlink)
         allow(Net::HTTP).to receive(:get_response).and_return("404")
         expect { team.submit_hyperlink(invalid_hyperlink) }.to raise_error("HTTP status code: 404")
       end
@@ -290,11 +290,11 @@ describe 'AssignmentTeam' do
 
   describe "#submitted_files" do
     context "given a path" do
-      it "returns submitted files" do  
-	files = ["file1.rb"]
-	path = "assignment_path/5"	
-	allow(team).to receive(:path).with(path)
-	allow(team).to receive(:files).with(path).and_return(files)
+      it "returns submitted files" do
+        files = ["file1.rb"]
+        path = "assignment_path/5"
+        allow(team).to receive(:path).with(path)
+        allow(team).to receive(:files).with(path).and_return(files)
         expect(team.submitted_files(path)).to match_array(files)
       end
     end
@@ -303,12 +303,12 @@ describe 'AssignmentTeam' do
   describe ".team" do
     context "when there is a participant" do
       it "provides the team for participant" do
-	teamuser = build(:team_user, id: 1, team_id: team.id, user_id: user1.id)
+        teamuser = build(:team_user, id: 1, team_id: team.id, user_id: user1.id)
         allow(team).to receive(:users).with(no_args).and_return([user1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-	allow(TeamsUser).to receive(:where).with(user_id: participant1.user_id).and_return([teamuser])
-	allow(Team).to receive(:find).with(teamuser.team_id).and_return(team)
-	expect(AssignmentTeam.team(participant1)).to eq(team)
+        allow(TeamsUser).to receive(:where).with(user_id: participant1.user_id).and_return([teamuser])
+        allow(Team).to receive(:find).with(teamuser.team_id).and_return(team)
+        expect(AssignmentTeam.team(participant1)).to eq(team)
       end
     end
   end
@@ -332,26 +332,27 @@ describe 'AssignmentTeam' do
   describe "#assign_reviewer" do
     context "when a reviewer is present" do
       it "assign the reviewer to the team" do
-	allow(Assignment).to receive(:find).with(team.parent_id).and_return(assignment)
-	allow(ReviewResponseMap).to receive(:create).with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id).and_return(review_response_map)	
-	expect(team.assign_reviewer(participant1)).to eq(review_response_map)
+        allow(Assignment).to receive(:find).with(team.parent_id).and_return(assignment)
+        allow(ReviewResponseMap).to receive(:create).
+          with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id).and_return(review_response_map)
+        expect(team.assign_reviewer(participant1)).to eq(review_response_map)
       end
     end
   end
 
   describe "#has_submissions?" do
-    context "when the team has submitted files" do      
-      it "checks if the team has submissions" do
-        allow(team).to receive_message_chain(:submitted_files, :any?).with(no_args).with(no_args).and_return(true)      
+    context "when a team has submitted files" do
+      it "has submissions" do
+        allow(team).to receive_message_chain(:submitted_files, :any?).with(no_args).with(no_args).and_return(true)
         expect(team.has_submissions?).to be true
-      end    
+      end
     end
 
     context "when the team has submitted hyperlink" do      
       it "checks if the team has submissions" do
-        allow(team).to receive_message_chain(:submitted_hyperlinks, :present?).with(no_args).with(no_args).and_return(true)      
+        allow(team).to receive_message_chain(:submitted_hyperlinks, :present?).with(no_args).with(no_args).and_return(true)
         expect(team.has_submissions?).to be true
-      end    
+      end
     end
   end
 end

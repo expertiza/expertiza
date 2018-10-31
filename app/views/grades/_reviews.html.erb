@@ -1,15 +1,15 @@
 <script type="text/javascript">
-  toggle_tag_prompt = function() {
-    $('.tag_prompt_container').toggle();
-  };
-  $( document ).ready(function() {
-    $('#tag_prompt_toggler').click(function () {
-      if ($('#tag_prompt_toggler').text() == "hide tags")
-        $('#tag_prompt_toggler').text("show tags")
-      else
-        $('#tag_prompt_toggler').text("hide tags")
+    toggle_tag_prompt = function() {
+        $('.tag_prompt_container').toggle();
+    };
+    $( document ).ready(function() {
+        $('#tag_prompt_toggler').click(function () {
+            if ($('#tag_prompt_toggler').text() == "hide tags")
+                $('#tag_prompt_toggler').text("show tags")
+            else
+                $('#tag_prompt_toggler').text("hide tags")
+        });
     });
-  });
 </script>
 <% if rscore and rscore[:assessments].length > 0 %>
     <BR/>
@@ -32,7 +32,7 @@
         <%flag_varying_rubrics=true%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review3".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" , :round=>3 }%>
     <%end%>
-    
+
     <%if flag_varying_rubrics==false%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
     <%end%>
@@ -42,7 +42,7 @@
     <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->
     <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
     <!--If another reviewer only finished first-round review and did not do second round, Expertiza will display only first round.-->
-    <!--If this assignment does not support varying rubrics by round, Expertiza will display last round review.--> 
+    <!--If this assignment does not support varying rubrics by round, Expertiza will display last round review.-->
     <% rounds = Array.new %>
     <% rscore[:assessments].uniq{|response| response.round }.each do |response| %>
         <% rounds << response.round %>
@@ -57,8 +57,8 @@
             <span class="spn_qsttog" id="tag_prompt_toggler" title="Click to display/hide tags" onclick="toggle_tag_prompt()">hide tags</span>
         <% end %>
         <table class="table table-striped" id=<%= participant.id.to_s + '_' + round.to_s %> <%= style="display: none;" if controller.action_name != "view_my_scores"%>>
-            <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>
-                <tr><td>
+          <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>
+              <tr><td>
                 <% review_feedback = nil %>
                 <% count = count + 1 %>
                 <% prefix = nil if controller.action_name == "view_my_scores" %>
@@ -81,16 +81,16 @@
                 <%= review.display_as_html(prefix, index + 1, nil, true, @current_user) %><br/>
 
                 <!-- # map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first review_feedbacks = map.try :response  -->
-                  <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: @team_id).first %>
-                  <% review_feedbacks = map.try :response %>
+                <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: @team_id).first %>
+                <% review_feedbacks = map.try :response %>
                 <% if !map.nil? %>
-                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id, :pid => participant.id %> or
-                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :pid => participant.id, :return => "feedback" %> feedback for Review <%= count %>
+                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id, :participant_id => participant.id %> or
+                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :participant_id => participant.id, :return => "feedback" %> feedback for Review <%= count %>
                 <% else %>
-                  <%= link_to "Give Feedback", :controller => 'response', :action => 'new_feedback', :pid => participant.id, :id => review.id  %> for Review <%= count %>
+                    <%= link_to "Give Feedback", :controller => 'response', :action => 'new_feedback', :participant_id => participant.id, :id => review.id  %> for Review <%= count %>
                 <% end %>
-                </td></tr>
-            <% end %>
+              </td></tr>
+          <% end %>
         </table><hr>
     <% end %>
 <% else %>

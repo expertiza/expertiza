@@ -37,18 +37,17 @@ class ResponseMap < ActiveRecord::Base
 
   # return Feedback Response by a team
   def self.get_feedback_assessments_for(team)
-
     responses = []
     if team
-    @array_sort = []
-    @sort_to = []
+      @array_sort = []
+      @sort_to = []
 
-    maps = where(reviewer_id: team.id, type: 'FeedbackResponseMap')
+      maps = where(reviewer_id: team.id, type: 'FeedbackResponseMap')
       maps.each do |map|
         next if map.response.empty?
         @all_resp = Response.where(map_id: map.map_id).last
         @array_sort << @all_resp
-        @sort_to = @array_sort.sort # { |m1, m2| (m1.updated_at and m2.updated_at) ? m2.updated_at <=> m1.updated_at : (m1.version_num ? -1 : 1) }
+        @sort_to = @array_sort.sort
         responses << @sort_to[0] unless @sort_to[0].nil?
         @array_sort.clear
         @sort_to.clear

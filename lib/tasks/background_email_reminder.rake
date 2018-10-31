@@ -92,44 +92,38 @@ end
 
   def review_reminder(assign, due_date)
     allParticipants = assign.participants
-    emails = Array.new
     Rails.logger.info "Inside review_reminder for assignment #{assign.name}"
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
-    #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
-    for participant in allParticipants                
+    assign_name = assign.name
+    email_list = []
+    for participant in allParticipants
       email = participant.user.email
-      #puts "~~~~~~~~~~Email: #{email}\n"                  
-      assign_name = assign.name        
-      #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #check if the participant/reviewer has reviewed the latest version of the resubmitted file, else send him a reminder
       allresponsemaps = participant.review_mappings
-      #puts" ~~~~~number of response maps #{allresponsemaps.size}\n"
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
-            response = eachresponsemap.response.last
-            resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", eachresponsemap.reviewee_id], :order => "resubmitted_at DESC")           
-            #puts" ~~~~~resubmission times: #{resubmission_times.size}\n"
-            if(!response.nil? && resubmission_times.size > 0)#meaning the reviewer has submitted a response for that map_id  
-              if(response.updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
-                  emails << email
+          response = eachresponsemap.response.last
+          resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", eachresponsemap.reviewee_id], :order => "resubmitted_at DESC")
+          if(!response.nil? && resubmission_times.size > 0)#meaning the reviewer has submitted a response for that map_id
+            if(response.updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
+                email_list << { 'email' => email, 'response_id' => response.id }
+            end
+          elsif(response.nil?) #where the reviewee has submitted and reviewer has provided no response
+            if(resubmission_times.size > 0)
+              email_list << { 'email' => email, 'response_id' => response.id }
+            else #if the reviewee has made some sort of submission
+              reviewee = eachresponsemap.reviewee
+              unless (reviewee[0].submitted_at.nil? && reviewee[0].team.hyperlinks.empty?)
+                email_list << { 'email' => email, 'response_id' => response.id }
               end
-            elsif(response.nil?) #where the reviewee has submitted and reviewer has provided no response
-              if(resubmission_times.size > 0)
-                emails << email
-              else #if the reviewee has made some sort of submission
-                reviewee = eachresponsemap.reviewee
-                #puts "~~~~~~~~~~Sending review_reminder if no responses found ... submitted at nil #{(reviewee[0].submitted_at == nil)} .. hyperlink nil #{reviewee[0].submitted_hyperlink == nil} hyperlink empty #{reviewee[0].submitted_hyperlink == ""}\n"
-                unless (reviewee[0].submitted_at.nil? && reviewee[0].team.hyperlinks.empty?)
-                  #puts "~~~~~~~~~~Email: #{email}\n"   
-                  emails << email
-                end
-              end
-           end
+            end
+          end
         end #endof the response maps loop
       end
     end #end of the for loop for all participants of the assignment
-    #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
-    email_remind(emails, assign_name, due_date, assign_type)
+
+    # E1834 Fall 18
+    send_reminder_emails(email_list, assign_name, due_date, assign_type)
     Rails.logger.info "Sent review reminders for assignment #{assign.name}"
   end
 
@@ -164,6 +158,18 @@ end
     Rails.logger.info "Sent metareview reminders for assignment #{assign.name}"
   end
 
+  # E1834 Fall 18
+  def send_reminder_emails(email_list, assign_name, due_date, assign_type)
+    due_date_string = due_date.due_at.to_s
+    subject = "Message regarding #{assign_type} for #{assign_name}"
+    for item in email_list
+      body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. " +
+          "Deadline is #{due_date_string}. " +
+          "Please visit https://expertiza.ncsu.edu/response/edit?id=#{item.response_id}"
+      Mailer.deliver_message({ :bcc => [item.email], :subject => subject, :body => body })
+    end
+  end
+
   def email_remind(emails, assign_name, due_date, assign_type)
       #puts "~~~~~~~~~~~~~inside email reminder email #{emails}"
       due_date_string = due_date.due_at.to_s
@@ -171,9 +177,14 @@ end
       if assign_type == "submission"
         body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
       end
-      if assign_type == "review"
-        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
-      end
+
+      # E1834 Fall 18
+      # for assign_type = review, send_reminder_emails is called, and not this method. Hence the following if predicate is commented.
+      # After testing, the if predicate can be removed and send_reminder_emails can be utilzed for other assign_type as well
+      # if assign_type == "review"
+      #   body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
+      # end
+
       if assign_type == "metareview"
         body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}." 
       end  

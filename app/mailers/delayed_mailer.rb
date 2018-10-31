@@ -111,14 +111,38 @@ class DelayedMailer
     email_reminder(emails, self.deadline_type) unless emails.empty?
   end
 
+  # E1834 Fall 18
   def mail_reviewers
-    emails = []
+    email_list = []
     reviews = ReviewResponseMap.where(reviewed_object_id: self.assignment_id)
     reviews.each do |review|
       participant = Participant.where(parent_id: self.assignment_id, id: review.reviewer_id).first
-      emails << participant.user.email
+      email_list << {'email' => participant.user.email, 'participant_id' => participant.id}
     end
-    email_reminder(emails, self.deadline_type) unless emails.empty?
+    review_reminder_email(email_list, self.deadline_type) unless email_list.empty?
+  end
+
+  # E1834 Fall 18
+  def review_reminder_email(email_list, deadline_type)
+    assignment = Assignment.find(self.assignment_id)
+    subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
+    for item in email_list
+      body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
+              Deadline is #{self.due_at}. Please visit https://expertiza.ncsu.edu/student_review/list?id=#{item.participant_id}\
+              If you have already done the  #{deadline_type}, please ignore this mail."
+      Rails.logger.info item.email
+      @mail = Mailer.delayed_message(bcc: [item.email], subject: subject, body: body)
+      @mail.deliver_now
+    end
+
+    @count += 1
+    if @count % 3 == 0
+      if assignment.instructor.copy_of_emails
+        # if email is sent to instructor, notice that the link in that email will contain the '?id=' field of the last participant
+        @mail = Mailer.delayed_message(bcc: [assignment.instructor.email], subject: subject, body: body)
+        @mail.deliver_now
+      end
+    end
   end
 
   def mail_assignment_participants

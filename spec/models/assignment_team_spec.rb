@@ -167,8 +167,7 @@ describe AssignmentTeam do
     context "when there is no assignment with this assignment id" do
       it "raises an ImportError" do
         allow(Assignment).to receive(:find_by).with(id: 1).and_return(nil)
-        expect { AssignmentTeam.import([], 1,
-                                       has_column_names: 'false') }.to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
+        expect { AssignmentTeam.import([], 1, has_column_names: 'false') }.to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
       end
     end
 

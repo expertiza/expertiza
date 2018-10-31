@@ -243,7 +243,7 @@ describe AssignmentTeam do
 
   describe "#files" do
     it "returns all files in certain directory" do
-      expect(assignment_team.files('./docker')).to eq(["./docker/Dockerfile", "./docker/README.md", "./docker/scrubbed_db/README.md", "./docker/scrubbed_db", "./docker/setup_mac.sh", "./docker/setup_linux.sh", "./docker/docker-compose.yml.example"])
+      expect(assignment_team1.files('./hooks')).to eq(["./hooks/pre-commit"])
     end
   end
 

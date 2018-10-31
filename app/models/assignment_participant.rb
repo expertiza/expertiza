@@ -50,16 +50,16 @@ class AssignmentParticipant < Participant
 
   # Return scores that this participant has been given
   # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
-  def scores(questions)
-    scores = {}
-    scores[:participant] = self
-    compute_assignment_score(questions, scores)
-    scores[:total_score] = self.assignment.compute_total_score(scores)
+ # def scores(questions)
+  #  scores = {}
+   # scores[:participant] = self
+    #compute_assignment_score(questions, scores)
+    #scores[:total_score] = self.assignment.compute_total_score(scores)
     # merge scores[review#] (for each round) to score[review]  -Yang
-    merge_scores(scores) if self.assignment.varying_rubrics_by_round?
+   # merge_scores(scores) if self.assignment.varying_rubrics_by_round?
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
-    topic_total_scores(scores) if self.assignment.microtask?
+    #topic_total_scores(scores) if self.assignment.microtask?
 
     # for all quiz questionnaires (quizzes) taken by the participant
     # quiz_responses = []
@@ -70,11 +70,11 @@ class AssignmentParticipant < Participant
     # scores[:quiz] = Hash.new
     # scores[:quiz][:assessments] = quiz_responses
     # scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
-    scores[:total_score] = assignment.compute_total_score(scores)
+    #scores[:total_score] = assignment.compute_total_score(scores)
     # scores[:total_score] += compute_quiz_scores(scores)
     # move lots of calculation from view(_participant.html.erb) to model
-    calculate_scores(scores)
-  end
+   # calculate_scores(scores)
+ # end
 
   def compute_assignment_score(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|

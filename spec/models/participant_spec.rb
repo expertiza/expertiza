@@ -24,7 +24,7 @@ describe Participant do
   let(:team) {	
 	build(:assignment_team, id: 1, name: 'myTeam')}
   let(:team_user) { 
-	build(:team_user, id: 1, user: user1, team: team)}
+	build(:team_user, id: 1, user: user2, team: team)}
   
   let(:user2) { 
 	build(:student, id: 4, name: 'no name', fullname: 'no two')}
@@ -53,10 +53,12 @@ describe Participant do
   
   let( :question ) { 
 	Criterion.new(id: 1, weight: 2, break_before: true ) }
+ let( :question1 ) {
+        Criterion.new(id: 2, weight: 2, break_before: true ) }
   let( :questionnaire ) { 
 	ReviewQuestionnaire.new(id: 1, questions: [ question ], max_question_score: 5) }
-  
- 
+   let( :questionnaire1 ) {
+        ReviewQuestionnaire.new(id: 2, questions: [question1], max_question_score: 5) }
   after(:each) do
     ActionMailer::Base.deliveries.clear
   end
@@ -64,7 +66,7 @@ describe Participant do
 #  Unable to test method due to method content. Project Mentor said to leave it un-covered.
   describe '#team' do
     it 'returns the team of the participant' do
-      allow(TeamsUser).to receive(:find_by).and_return(team_user)
+      allow(TeamsUser).to receive(:find_by).with({:user=>user2}).and_return(team_user)
       expect( participant4.team ).to eq(team)
     end
   end
@@ -192,36 +194,34 @@ describe Participant do
     
 describe '#score' do
     it 'Get participant score within a round' do
-      questions = {:question=>:question1}
-      test = [questionnaire]
-
+      questions = {:review=>[question1],:review1=> [question]}
+      test = [questionnaire,questionnaire1]
+#test=[questionnaire]
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
-      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(questionnaire)
-      allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(a_value)
-      allow(questionnaire).to receive(:used_in_round).and_return(1)
-      allow(Answer).to receive(:compute_scores).with(any_args).and_return(5)
+#	assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>nil) 
+assessment=double("review")	
+test.each do |q|
+	 assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>nil)
+if q.id==2	
+assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>1)
+   end 
+allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: q.id).and_return(assignment_questionnaire_map)
+p assignment_questionnaire_map.used_in_round
+assessment=double("review")
+      allow(q).to receive(:get_assessments_for).with(participant).and_return(assessment)
+	allow(Answer).to receive(:compute_scores).with(assessment,questions[:review]).and_return(5)
+	allow(Answer).to receive(:compute_scores).with(assessment,questions[:review1]).and_return(6)
+	end
       allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(75)
-
       check = participant.scores(questions)
+	p check
       expect(check).to include(:participant => participant)
-      expect(check).to include(:review1)
+      expect(check[:review1]).to include(:assessments=> assessment,:scores=>6)
+	expect(check[:review].to_s).to eq({:assessments=>assessment,:scores=>5}.to_s)
+#	expect(check[:review]).to include(:scores=> 5)
+#	expect(check[:review1]).to include(:scores=>6)
       expect(check).to include(:total_score => 75)
    end
-    it 'Get participant score without a round' do
-      questions = {:question=>:question1}
-      test = [questionnaire]
-
-      allow(participant.assignment).to receive(:questionnaires).and_return(test)
-      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(questionnaire)
-      allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(a_value)
-      allow(questionnaire).to receive(:used_in_round).and_return(nil)
-      allow(Answer).to receive(:compute_scores).with(any_args).and_return(1)
-      allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(100)
-
-      check = participant.scores(questions)
-      expect(check).to include(:participant => participant)
-      expect(check).to include(:review)
-      expect(check).to include(:total_score => 100)
-    end
+ 
   end
 end

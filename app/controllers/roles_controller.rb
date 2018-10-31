@@ -21,8 +21,8 @@ class RolesController < ApplicationController
   end
 
   def new
-    flash[:notice] = ('New Roles cannot be created.')
-    redirect_to Role
+    flash[:error] = ('New Roles cannot be created.')
+    redirect_to roles_path
   end
 
   def create

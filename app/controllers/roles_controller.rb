@@ -20,7 +20,6 @@ class RolesController < ApplicationController
     foreign
   end
 
-
   def create
     @role = Role.new(params[:role])
     if @role.save

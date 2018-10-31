@@ -1,5 +1,6 @@
 describe QuestionnairesController do
   let(:questionnaire) { build(:questionnaire) }
+  let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
   before(:each) do

@@ -19,38 +19,43 @@ describe Participant do
   # RSpec unit tests examples:
   # https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
   ###
-  let(:user) { 
-	build( :student, id: 1, name: 'no name', fullname: 'no one') }
- let(:user4) { 
-	build( :student, id: 4, name: 'no name', fullname: 'no four') }
+  let(:user1) { 
+	build(:student, id: 1, name: 'no name', fullname: 'no one')}
   let(:team) {	
-	build( :assignment_team, id: 1, name: 'myTeam' ) }
+	build(:assignment_team, id: 1, name: 'myTeam')}
   let(:team_user) { 
-	build( :team_user, id: 1, user: user, team: team) }
-  let(:topic){ build( :topic ) }
+	build(:team_user, id: 1, user: user1, team: team)}
+  
+  let(:user2) { 
+	build(:student, id: 4, name: 'no name', fullname: 'no two')}
+ 
+  let(:topic){build(:topic)}
+  
   let(:participant) {
 	build(:participant,
-	user: build( :student, name: "Jane", fullname: "Doe, Jane", id: 1 ) ) }
+	user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1))}
   let(:participant2) { 
 	build(:participant, 
-	user: build( :student, name: "John", fullname: "Doe, John", id: 2 ) ) }
+	user: build( :student, name: "John", fullname: "Doe, John", id: 2))}
   let(:participant3) { 
 	build(:participant, can_review: false, 
-	user: build(:student, name: "King", fullname: "Titan, King", id: 3 ) ) }
-  let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
-  let( :review_response_map ) {
+	user: build(:student, name: "King", fullname: "Titan, King", id: 3))}
+  let(:participant4) { 
+	build(:participantSuper, can_review: false, user: user2)}
+  
+  let(:assignment) {build(:assignment, id: 1, name: 'no assgt')}
+  let(:review_response_map) {
 	build( :review_response_map, assignment: assignment, reviewer: participant, reviewee: team ) }
-  let( :response ) {
+  let(:response) {
 	build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [ answer ] ) }
   let( :answer ) { 
 	Answer.new( answer: 1, comments: 'Answer text', question_id: 1 ) }
+  
   let( :question ) { 
 	Criterion.new(id: 1, weight: 2, break_before: true ) }
   let( :questionnaire ) { 
 	ReviewQuestionnaire.new(id: 1, questions: [ question ], max_question_score: 5) }
- let(:participant4) { 
-	build(:participantReal, can_review: false, 
-	user: user4 ) }
+  
  
   after(:each) do
     ActionMailer::Base.deliveries.clear
@@ -184,44 +189,39 @@ describe Participant do
       expect(Participant.sort_by_name(unsorted)).to eq(sorted)
     end
   end
-
-
-  describe '#score' do
-    it '???' do
+    
+describe '#score' do
+    it 'Get participant score within a round' do
       questions = {:question=>:question1}
-     test = [questionnaire]
-     assessments = ["test"]
-     scores = {}
+      test = [questionnaire]
 
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(questionnaire)
       allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(a_value)
       allow(questionnaire).to receive(:used_in_round).and_return(1)
-      allow(Answer).to receive(:compute_scores).with(any_args).and_return(100)
-      allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(5)
+      allow(Answer).to receive(:compute_scores).with(any_args).and_return(5)
+      allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(75)
 
-     check = participant.scores(questions)
-     expect(check).to have_key(:participant)
-     #expect(check).to have_key(:questionnaire_symbol)
-     expect(check).to have_key(:total_score)
+      check = participant.scores(questions)
+      expect(check).to include(:participant => participant)
+      expect(check).to include(:review1)
+      expect(check).to include(:total_score => 75)
    end
-    it 'svvfs' do
+    it 'Get participant score without a round' do
       questions = {:question=>:question1}
-     test = [questionnaire]
-     assessments = ["test"]
-     scores = {}
+      test = [questionnaire]
 
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(questionnaire)
       allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(a_value)
       allow(questionnaire).to receive(:used_in_round).and_return(nil)
-      allow(Answer).to receive(:compute_scores).with(any_args).and_return(100)
-      allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(5)
+      allow(Answer).to receive(:compute_scores).with(any_args).and_return(1)
+      allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(100)
 
-     check = participant.scores(questions)
-     expect(check).to include(:participant => participant)
-     expect(check).to include(:review)
-     expect(check).to include(:total_score => 5)
-   end
- end
+      check = participant.scores(questions)
+      expect(check).to include(:participant => participant)
+      expect(check).to include(:review)
+      expect(check).to include(:total_score => 100)
+    end
+  end
 end

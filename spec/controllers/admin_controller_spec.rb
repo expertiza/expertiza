@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe AdminController, type: :controller do
   describe 'Delete Instructor' do
     let(:admin) { build(:admin, id: 3) }
-    let(:super_admin) {build (:superadmin)}
+    let(:super_admin) { build :superadmin }
     let(:instructor) { build(:instructor, id: 2) }
     let(:student1) { build(:student, id: 1, name: :lily) }
     let(:student2) { build(:student) }
@@ -15,7 +15,7 @@ RSpec.describe AdminController, type: :controller do
     let(:institution1) { build(:institution, id: 1) }
     let(:requested_user1) { RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
                                              institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one' }
-    let(:superadmin) { build(:superadmin)}
+    let(:superadmin) { build :superadmin }
     let(:assignment) { build(:assignment, id: 1, name: "test_assignment", instructor_id: 2,
                             participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1) }
     before(:each) do

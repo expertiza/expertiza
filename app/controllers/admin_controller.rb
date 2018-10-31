@@ -28,9 +28,7 @@ class AdminController < ApplicationController
 
   def remove_administrator
     begin
-      name_of_deleted_user = User.find(params[:id]).name
-      UsersController.destroy_helper params
-      flash[:note] = "The administrator \"#{name_of_deleted_user}\" has been successfully deleted."
+      flash[:note] = undo_link(UsersController.destroy_helper(params, 'administrator'))
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -48,9 +46,7 @@ class AdminController < ApplicationController
 
   def remove_instructor
     begin
-      name_of_deleted_user = User.find(params[:id]).name
-      UsersController.destroy_helper params
-      flash[:note] = "The instructor \"#{name_of_deleted_user}\" has been successfully deleted."
+      flash[:note] = undo_link(UsersController.destroy_helper(params, 'instructor'))
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

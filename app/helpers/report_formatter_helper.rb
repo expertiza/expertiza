@@ -1,5 +1,4 @@
 module ReportFormatterHelper
-
   def render_report(type, params, session)
     @id = params[:id]
     @assignment = Assignment.find(@id)
@@ -7,7 +6,7 @@ module ReportFormatterHelper
 
     case type
     when "SummaryByRevieweeAndCriteria"
-        summary_by_reviewee_and_criteria
+      summary_by_reviewee_and_criteria
     when "SummaryByCriteria"
       summary_by_criteria
     when "ReviewResponseMap"
@@ -29,7 +28,6 @@ module ReportFormatterHelper
 
   def summary_by_reviewee_and_criteria
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url)
-
     @summary = sum.summary
     @reviewers = sum.reviewers
     @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
@@ -39,7 +37,6 @@ module ReportFormatterHelper
 
   def summary_by_criteria
     sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, @summary_ws_url)
-
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
@@ -69,9 +66,7 @@ module ReportFormatterHelper
 
   def calibration(user)
     participant = AssignmentParticipant.where(parent_id: @id, user_id: user.id).first rescue nil
-    if participant.nil?
-      AssignmentParticipant.create(parent_id: @id, user_id: user.id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
-    end
+    if participant.nil? then AssignmentParticipant.create(parent_id: @id, user_id: user.id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle') end
 
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
@@ -82,8 +77,8 @@ module ReportFormatterHelper
   end
 
   def plagiarism_checker_report
-    submissionId = PlagiarismCheckerAssignmentSubmission.where(assignment_id: @id).pluck(:id)
-    @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: submissionId)
+    submission_id = PlagiarismCheckerAssignmentSubmission.where(assignment_id: @id).pluck(:id)
+    @plagiarism_checker_comparisons = PlagiarismCheckerComparison.where(plagiarism_checker_assignment_submission_id: submission_id)
   end
 
   def answer_tagging_report
@@ -94,7 +89,6 @@ module ReportFormatterHelper
     tag_prompt_deployments.each do |tag_dep|
       @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
 
-      # generate a summary report per user
       @questionnaire_tagging_report[tag_dep].each do |line|
         user_summary_report(line)
       end
@@ -106,6 +100,7 @@ module ReportFormatterHelper
   end
 
   private
+
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
       @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
@@ -116,7 +111,7 @@ module ReportFormatterHelper
 
       number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
       number_taggable = @user_tagging_report[line.user.name].no_tagable
-      formatted_percentage = format("%.1f",(number_tagged / number_taggable) * 100)
+      formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
       @user_tagging_report[line.user.name].percentage =
         @user_tagging_report[line.user.name].no_tagable.zero ? "-" : formatted_percentage
     end

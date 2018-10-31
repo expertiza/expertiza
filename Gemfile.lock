@@ -97,7 +97,7 @@ GEM
     bind-it (0.2.6)
       rjb
     builder (3.2.3)
-    c21e (1.1.5)
+    c21e (1.1.8)
     capistrano (3.11.0)
       airbrussh (>= 1.0.0)
       i18n

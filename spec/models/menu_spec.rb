@@ -1,16 +1,6 @@
 
 describe Node do
-  let(:node) do
-    Menu::Node.new
-  end
-
-  let(:menu_item) do
-    build :menu_item,
-          parent_id: 1,
-          name: 'name',
-          id: 2,
-          label: 'label'
-  end
+  let(:node) { Menu::Node.new }
 
   let(:content_page) do
     double('ContentPage', id: 1, name: 'name')
@@ -24,11 +14,22 @@ describe Node do
     double('Controller', id: 3, name: 'name')
   end
 
+  let(:menu_item) do
+    build :menu_item,
+          parent_id: 1,
+          name: 'name',
+          id: 2,
+          label: 'label',
+          controller_action: controller_action,
+          content_page: content_page
+  end
+
+  before(:each) do
+    node.setup(menu_item)
+  end
+
   describe '#setup' do
     it 'sets up attributes: parent_id, name, id, label' do
-      allow(menu_item).to receive_message_chain :content_page,
-                                                :name
-      node.setup(menu_item)
       expect(node.parent_id).to eq(menu_item.parent_id)
       expect(node.name).to eq(menu_item.name)
       expect(node.id).to eq(menu_item.id)
@@ -36,12 +37,6 @@ describe Node do
     end
 
     context 'when menu_item has controller_action' do
-      before(:each) do
-        allow(menu_item).to receive(:controller_action)
-          .and_return(controller_action)
-        node.setup(menu_item)
-      end
-
       it 'sets up controller_action_id' do
         expect(node.controller_action_id).to eq(controller_action.id)
       end
@@ -53,10 +48,10 @@ describe Node do
       context 'when controller_action has controller' do
         before(:each) do
           allow(controller_action).to receive(:controller).and_return(controller)
+          node.setup(menu_item)
         end
 
         it 'sets up site_controller_id' do
-          node.setup(menu_item)
           expect(node.site_controller_id).to eq(controller.id)
         end
 
@@ -72,7 +67,7 @@ describe Node do
 
     context 'when menu_item has content_page' do
       before(:each) do
-        allow(menu_item).to receive(:content_page).and_return(content_page)
+        allow(menu_item).to receive(:controller_action)
         node.setup(menu_item)
       end
 
@@ -88,7 +83,6 @@ describe Node do
 
   describe '#site_controller' do
     before(:each) do
-      allow(menu_item).to receive(:controller_action).and_return(controller_action)
       allow(controller_action).to receive(:controller).and_return(controller)
       node.setup(menu_item)
     end
@@ -100,21 +94,14 @@ describe Node do
   end
 
   describe '#controller_action' do
-    before(:each) do
-      allow(menu_item).to receive(:controller_action).and_return(controller_action)
-      node.setup(menu_item)
-    end
     it 'sets @controller_action instance variable ' do
       result = controller_action.id
       expect(ControllerAction).to receive(:find_by).with(id: controller_action.id).and_return(result)
       expect(node.controller_action).to eq(result)
     end
   end
+
   describe '#content_page' do
-    before(:each) do
-      allow(menu_item).to receive(:content_page).and_return(content_page)
-      node.setup(menu_item)
-    end
     it 'sets @content_page instance variable ' do
       result = content_page.id
       expect(ContentPage).to receive(:find_by).with(id: content_page.id).and_return(result)
@@ -125,15 +112,15 @@ describe Node do
   describe '#add_child' do
     let(:child_node) { Menu::Node.new }
 
-    it 'adds one child to node' do
-      allow(menu_item).to receive(:content_page).and_return(content_page)
+    before(:each) do
       child_node.setup(menu_item)
+    end
+
+    it 'adds one child to node' do
       expect(node.add_child(child_node)).to eq(node.children)
     end
 
     it 'adds multiple children to node' do
-      allow(menu_item).to receive(:content_page).and_return(content_page)
-      child_node.setup(menu_item)
       expect(node.add_child(child_node)).to eq(node.children)
       expect(node.add_child(child_node)).to eq(node.children)
       expect(node.add_child(child_node)).to eq(node.children)
@@ -144,7 +131,8 @@ end
 describe Menu do
   # To test menu, a variety of menu_items must exist.
   # role_admin.yml defines the permissionIds for admin as 5,5,6,3,2
-  # we must assign controlleractions and contentpages with permissionIds of those numbers
+  # we must assign controlleractions and contentpages
+  # with permissionIds of those numbers
   # to enable menuitems's items_for_permissions function to succeed.
 
   let(:permission_ids) { [5, 5, 6, 3, 2] }
@@ -158,15 +146,15 @@ describe Menu do
 
   let(:controller_action) { double('ControllerAction', url_to_use: 'https://test_url.com') }
 
-  let(:menu_items) {
+  let(:menu_items) do
     (1..5).collect do |i|
       build :menu_item,
             id: i,
             name: "menu_item#{i}",
             controller_action: controller_action,
-            parent_id: i == 2 || i == 3 ? 1 : nil
+            parent_id: [2, 3].include?(i) ? 1 : nil
     end
-  }
+  end
 
   (1..5).each do |i|
     let("menu_item#{i}") do

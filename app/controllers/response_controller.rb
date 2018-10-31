@@ -3,7 +3,6 @@ class ResponseController < ApplicationController
   helper :file
 
   def action_allowed?
-
     response = user_id = nil
     action = params[:action]
     if %w[edit delete update view].include?(action)
@@ -13,13 +12,11 @@ class ResponseController < ApplicationController
       user_id = Participant.find(params[:participant_id]).user_id if response.map.is_a? FeedbackResponseMap
     end
     case action
-      when 'edit' # If response has been submitted, no further editing allowed
-        if response.is_submitted
-          # Team members can edit a feedback response
-          if !response.map.is_a?(FeedbackResponseMap)
-            return false
-          end
-        end
+    when 'edit' # If response has been submitted, no further editing allowed
+      if response.is_submitted
+        # Team members can edit a feedback response
+        return false unless response.map.is_a?(FeedbackResponseMap)
+      end
       return current_user_id?(user_id)
 
       # Deny access to anyone except reviewer & author's team
@@ -144,7 +141,7 @@ class ResponseController < ApplicationController
     review = Response.find(params[:id]) if !params[:id].nil?
     if review
       # In FeedBack, reviewer is the team
-      reviewer_id = TeamsUser.team_id(review.map.assignment.id,session[:user].id)
+      reviewer_id = TeamsUser.team_id(review.map.assignment.id, session[:user].id)
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer_id).first
 
       if map.nil?
@@ -161,10 +158,7 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     @map = @response.map
-    if (@map.is_a? FeedbackResponseMap) && !(params[:participant_id].nil?)
-      @participant = Participant.find(params[:participant_id])
-    end
-
+    @participant = Participant.find(params[:participant_id]) if @map.is_a?(FeedbackResponseMap) && !params[:participant_id].nil?
     set_content
   end
 
@@ -181,11 +175,11 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     was_submitted = false
-    if @map.is_a? FeedbackResponseMap
-      @response = Response.where(map_id: @map.id).first
-    else
-      @response = Response.where(map_id: @map.id, round: @round.to_i).first
-    end
+    @response = if @map.is_a? FeedbackResponseMap
+                  Response.where(map_id: @map.id).first
+                else
+                  Response.where(map_id: @map.id, round: @round.to_i).first
+                end
 
     if @response.nil?
       @response = Response.create(
@@ -210,9 +204,8 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
       @response.email
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id,
-      return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options],
-      participant_id: params[:participant_id]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg,
+                review: params[:review], save_options: params[:save_options], participant_id: params[:participant_id]
   end
 
   def saving
@@ -310,16 +303,15 @@ class ResponseController < ApplicationController
   # if false: we figure out which questionnaire to display base on @response object
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
-
     @title = @map.get_title
     if @map.survey?
       @survey_parent = @map.survey_parent
     else
       @assignment = @map.assignment
     end
-    if (!@map.is_a? FeedbackResponseMap) || (@participant.nil?)
-     @participant = @map.reviewer
-    end
+
+    @participant = @map.reviewer if !@map.is_a?(FeedbackResponseMap) || @participant.nil?
+
     @contributor = @map.contributor
 
     new_response ? set_questionnaire_for_new_response : set_questionnaire

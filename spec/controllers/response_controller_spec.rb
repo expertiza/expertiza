@@ -10,7 +10,6 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
-  let(:teams_user) {build(team_id: 1, user_id: 6)}
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)

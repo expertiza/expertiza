@@ -1,5 +1,3 @@
-require 'sidekiq'
-
 class AssignmentsController < ApplicationController
   include AssignmentHelper
   autocomplete :user, :name

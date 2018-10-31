@@ -1,6 +1,5 @@
 
 require 'active_support/time_with_zone'
-require 'sidekiq'
 
 class AssignmentForm
   attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
@@ -193,7 +192,7 @@ class AssignmentForm
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
   def delete_from_delayed_queue
-    queue = Sidekiq::Queues["mailers"]
+    queue = Sidekiq::Queue.new("mailers")
     queue.each do |job|
       assignmentId = job.args.first
       job.delete if @assignment.id == assignmentId

@@ -9,13 +9,6 @@ describe Menu do
         allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
     end
 
-    before :all do
-        @student_role = build(:role_of_student, id: 1, name: "Student", description: '', parent_id: nil, default_page_id: nil)
-        @instructor_role = build(:role_of_instructor, id: 2, name: "Instructor", description: '', parent_id: nil, default_page_id: nil)
-        @admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
-        @invalid_role = build(:role_of_student, id: 1, name: nil, description: "", parent_id: nil, default_page_id: nil)
-    end
-
     let!(:test1) { create(:menu_item, name: "home1", parent_id: nil,  seq: 1) }
     let!(:test2) { create(:menu_item, name: "home2", parent_id: 1,    seq: 2) }
     let!(:test3) { create(:menu_item, name: "home3", parent_id: 1,    seq: 3) }
@@ -91,37 +84,61 @@ describe Menu do
                 expect(node.content_page).to eq("test content page")
             end
         end
-
-        #add_children should update children array (test multiple children)
         describe "#add_child" do
             context "when node has no children" do
                 it "adds a child" do
                     node = Menu::Node.new
                     node.add_child(test1)
-                    expect(node.children[0]).to eq(1)
+                    expect(node.children).to eq([1])
+                end
+            end
+            context "when node has no children" do
+                it "can add multiple children" do
+                    node = Menu::Node.new
+                    node.add_child(test1)
+                    node.add_child(test2)
+                    node.add_child(test3)
+                    expect(node.children).to eq([1, 2, 3])
+                end
+            end
+            context "when node has children" do
+                it "adds a child" do
+                    node = Menu::Node.new
+                    node.children = [1];
+                    node.add_child(test2)
+                    expect(node.children).to eq([1, 2])
                 end
             end
         end
     end
-
     describe "#initialize" do
         context "when role is nil" do
             it "creates a new menu" do
-                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
                 menu = Menu.new
                 expect(menu.instance_of?Menu)
             end
         end
-
+        context "when a role is passed as an argument" do
+            it "creates a new menu" do
+                admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
+                menu = Menu.new(admin_role)
+                expect(menu.instance_of?Menu)
+            end
+        end
         context "when menu has items" do
             it "creates a new menu with items" do
                 menu = Menu.new
-                expect(menu.root.children[0]).to eq(1)
+                expect(menu.root.children.length).to eq(1)
             end
         end
-
+        context "when menu has not items" do
+            it "creates a new menu without items" do
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
+                menu = Menu.new
+                expect(menu.root.children).to be_nil
+            end
+        end
     end
-    #Ask for help on how this works
     describe "#select" do
         it "returns a node.id based on the given name" do
             menu = Menu.new
@@ -136,8 +153,7 @@ describe Menu do
                 expect(menu.selected).to eq(test3.name)
             end
         end
-        #how is this even possible????
-        context "when nothing is selected" do
+        context "when a nonexistent node is selected" do
             it "returns nil" do 
                 allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
                 menu = Menu.new
@@ -160,14 +176,31 @@ describe Menu do
                 expect(menu.get_item(2).id).to eq(test2.id)
             end
         end
+        context "when a nonexistent id is passed" do
+            it "returns nil" do
+                menu = Menu.new
+                expect(menu.get_item(17)).to be_nil
+            end
+        end
     end
     describe "#get_menu" do
         context "when a node is selected" do
             it "returns a list of nodes that are the children of the selected node" do
                 menu = Menu.new
                 expect(menu.get_menu(1)).to eq([2,3,4])
-                #this seems like it might be broken
-                #expect(menu.get_menu(2)).to eq([6])
+            end
+        end
+        context "when menu has no items" do
+            it "returns nil" do
+                allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
+                menu = Menu.new
+                expect(menu.get_menu(0)).to be_nil
+            end
+        end
+        context "when called on a nonexistent node" do
+            it "returns nil" do
+                menu = Menu.new
+                expect(menu.get_menu(17)).to be_nil
             end
         end
     end
@@ -182,6 +215,12 @@ describe Menu do
             it "returns false" do
                 menu = Menu.new
                 expect(menu.selected?(3)).to be false
+            end
+        end
+        context "when passed nil as the id" do
+            it "return false" do
+                menu = Menu.new
+                expect(menu.selected?(nil)).to be false
             end
         end
     end

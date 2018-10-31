@@ -1,9 +1,8 @@
 describe AssignmentTeam do
-  
   let(:user) { User.new(id: 1) }
   let(:assignment_team) { build(:assignment_team, id: 2, parent_id: 2, name: "team2", users: [user], submitted_hyperlinks: "https://www.1.ncsu.edu") }
   let(:assignment_team1) { build(:assignment_team, id: 1, parent_id: 1, name: "team1", submitted_hyperlinks: "") }
-  let(:questions) { { QuizQuestionnaire: double(:question) } }
+  let(:questions) { {QuizQuestionnaire: double(:question)} }
   let(:questionnaire) { build(:questionnaire) }
   let(:assignment) { build(:assignment, id: 1, questionnaires: [questionnaire], name: 'Test Assgt') }
   let(:courseTeam) { build(:course_team, id: 1) }
@@ -47,7 +46,7 @@ describe AssignmentTeam do
     end
     context "when there is no assignment with this id" do
       it "raises ActiveRecord::RecordNotFound exception" do
-        expect{ AssignmentTeam.parent_model(1) }.to raise_exception(ActiveRecord::RecordNotFound)
+        expect { AssignmentTeam.parent_model(1) }.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -73,7 +72,7 @@ describe AssignmentTeam do
   describe "#assign_reviewer" do
     context "when the assignment record cannot be found by the parent id of the current assignment team" do
       it "raises a customized exception" do
-        expect{ assignment_team.assign_reviewer(participant2) }.to raise_exception("The assignment cannot be found.")
+        expect { assignment_team.assign_reviewer(participant2) }.to raise_exception("The assignment cannot be found.")
       end
     end
 
@@ -168,7 +167,8 @@ describe AssignmentTeam do
     context "when there is no assignment with this assignment id" do
       it "raises an ImportError" do
         allow(Assignment).to receive(:find_by).with(id: 1).and_return(nil)
-        expect{ AssignmentTeam.import([], 1, {has_column_names: 'false' })}.to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
+        expect { AssignmentTeam.import([], 1,
+                                       has_column_names: 'false') }.to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
       end
     end
 
@@ -186,7 +186,7 @@ describe AssignmentTeam do
     it "exports assignment teams to an array" do
       allow(AssignmentTeam).to receive(:prototype).and_return(assignment_team)
       allow(Team).to receive(:export).with([], 2, {team_name: 'false'}, assignment_team).and_return([["no team"], ["no name"]])
-      expect(AssignmentTeam.export([], 2, {team_name: 'false'})).to eq([["no team"], ["no name"]])
+      expect(AssignmentTeam.export([], 2, team_name: 'false')).to eq([["no team"], ["no name"]])
     end
   end
 
@@ -243,7 +243,7 @@ describe AssignmentTeam do
     context "when the hyperlink is empty" do
       it "raises an exception saying 'The hyperlink cannot be empty'" do
         hyperlink = ''
-        expect{ assignment_team1.submit_hyperlink(hyperlink) }.to raise_exception("The hyperlink cannot be empty!")
+        expect { assignment_team1.submit_hyperlink(hyperlink) }.to raise_exception("The hyperlink cannot be empty!")
       end
     end
 
@@ -296,7 +296,7 @@ describe AssignmentTeam do
 
   describe ".export_fields" do
     it "exports the fields of the csv file" do
-      expect(AssignmentTeam.export_fields({team_name: 'false'})).to eq(["Team Name", "Team members", "Assignment Name"])
+      expect(AssignmentTeam.export_fields(team_name: 'false')).to eq(["Team Name", "Team members", "Assignment Name"])
     end
   end
 

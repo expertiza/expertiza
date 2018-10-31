@@ -18,11 +18,12 @@
 <% @sign_up_topic = SignUpTopic.new %>
 <% @topic = @sign_up_topic %>
 <% @topic.max_choosers=1 %>
+<% puts "yoyoyo"%>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
 <% if @sign_up_topics.size != 0 %>
     <table class="table table-striped sortable" id="topic_table">
-      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+      <tr id="topic_table_header"><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
       <% i=1 %>
       <% for topic in @sign_up_topics %>

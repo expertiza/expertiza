@@ -133,11 +133,12 @@
 <div>
   <table class="table table-striped">
 
-    <tr id="add_topic">
-      <%= form_for :topic, :url => sign_up_sheet_index_path(:id => @assignment_form.assignment.id), :html => { :onsubmit => "return showZeroSlotWarning()" }  do |f| %>
+    <tr id="add_topic" style="display:none;">
+      <%= form_for :topic, :url => sign_up_sheet_index_path(:id => @assignment_form.assignment.id),:html => { :onsubmit => "return showZeroSlotWarning()",autocomplete: "off"  }  do |f| %>
           <td><%= f.text_field :topic_identifier %></td>
           <td><%= f.text_field :topic_name %></td>
-          <td><%= f.text_field :max_choosers %></td>
+          <td><%= f.number_field :max_choosers, min: 0 %></td>
+          <td></td>
           <td></td>
           <td></td>
           <td><%= f.submit %></td>
@@ -145,9 +146,6 @@
     </tr>
 
   </table>
-  <script>
-      $("#add_topic").appendTo("#topic_table");
-  </script>
 </div>
 <script>
     function showZeroSlotWarning(){
@@ -155,6 +153,10 @@
             alert("If you create a topic with 0 slots,  students cannot assign this topic.");
             return false;
         }
+    };
+    function addCreateTopicSection(){
+        $("#topic_table_header").after($("#add_topic"));
+        $("#add_topic").toggle();
     };
 </script>
 

@@ -9,12 +9,12 @@ describe Participant do
 
   # Write your mocked object here!
   let(:topic1) { build(:topic, topic_name: '')}
-  let(:topic2) { build(:topic, topic_name:"topic_name")}
+  let(:topic2) { build(:topic, topic_name: "topic_name")}
   let(:student) { build(:student, name: "John Smith", email: "sjohn@ncsu.edu", fullname: "Mr.John Smith") }
   let(:student1) { build(:student, name: "Alice") }
   let(:student2) { build(:student, name: "Bob") }
   let(:assignment) { build(:assignment, name: "assignment", ) }
-  let(:participant) { build(:participant, user: student, assignment: assignment, can_review:false, handle: "nb") }
+  let(:participant) { build(:participant, user: student, assignment: assignment, can_review: false, handle: "nb") }
   let(:participant1) { build(:participant, user: student1) }
   let(:participant2) { build(:participant, user: student2) }
   let(:assignment_team) { build(:assignment_team, name: "ChinaNo1") }
@@ -23,7 +23,6 @@ describe Participant do
   let(:response_map) { build(:review_response_map, assignment: assignment, reviewer: participant1, reviewee: assignment_team) }
   let(:questions) { build(:question) }
   let(:questionnaire) { build(:questionnaire) }
-
 
   describe "#team" do
     it "returns the first team of current user" do
@@ -84,7 +83,7 @@ describe Participant do
 
   describe ".sort_by_name" do
     it "returns sorted participants based on their user names" do
-      expect(Participant.sort_by_name([participant1, participant2, participant]).collect{|p| p.user.name}).to eq ["Alice", "Bob", "John Smith"]
+      expect(Participant.sort_by_name([participant1, participant2, participant]).collect {|p| p.user.name}).to eq ["Alice", "Bob", "John Smith"]
     end
   end
 
@@ -115,25 +114,25 @@ describe Participant do
   describe ".get_permissions" do
     context "when the current user is a participant" do
       it "returns a hash with value {can_submit: true, can_review: true, can_take_quiz: true}" do
-        expect(Participant.get_permissions("participant")).to eq({:can_submit=>true, :can_review=>true, :can_take_quiz=>true})
+        expect(Participant.get_permissions("participant")).to eq({:can_submit => true, :can_review => true, :can_take_quiz => true})
       end
     end
 
     context "when the current user is a reader" do
       it "returns a hash with value {can_submit: false, can_review: true, can_take_quiz: true}" do
-        expect(Participant.get_permissions("reader")).to eq({:can_submit=>false, :can_review=>true, :can_take_quiz=>true})
+        expect(Participant.get_permissions("reader")).to eq({:can_submit => false, :can_review => true, :can_take_quiz => true})
       end
     end
 
     context "when the current user is a submitter" do
       it "returns a hash with value {can_submit: true, can_review: false, can_take_quiz: false}" do
-        expect(Participant.get_permissions("submitter")).to eq({:can_submit=>true, :can_review=>false, :can_take_quiz=>false})
+        expect(Participant.get_permissions("submitter")).to eq({:can_submit => true, :can_review => false, :can_take_quiz => false})
       end
     end
 
     context "when the current user is a reviewer" do
       it "returns a hash with value {can_submit: false, can_review: true, can_take_quiz: false}" do
-        expect(Participant.get_permissions("reviewer")).to eq({:can_submit=>false, :can_review=>true, :can_take_quiz=>false})
+        expect(Participant.get_permissions("reviewer")).to eq({:can_submit => false, :can_review => true, :can_take_quiz => false})
       end
     end
   end

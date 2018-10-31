@@ -11,15 +11,21 @@ describe MailWorker do
   end
 
   describe 'Tests mailer with sidekiq' do
-    before do
-      Sidekiq::Testing.inline!
-    end
+    
     it "should send email to required email address with proper content" do
+      Sidekiq::Testing.inline!
       MailWorker.perform_async("1", "metareview", "2018-12-31 00:00:01")
       email = ActionMailer::Base.deliveries.first
       expect(email.from[0]).to eq("expertiza.development@gmail.com")
       expect(email.bcc[0]).to eq(user.email)
       expect(email.subject).to eq('Message regarding teammate review for assignment '+ assignment.name)
+    end
+
+    it "should expect the queue size of one" do
+      Sidekiq::Testing.fake!
+      MailWorker.perform_in(3.hours, "1", "metareview", "2018-12-31 00:00:01")
+      queue = Sidekiq::Queues["mailers"]
+      expect(queue.size).to eq(1)
     end
   end
 end

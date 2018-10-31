@@ -181,8 +181,10 @@ class AssignmentsController < ApplicationController
   end
 
   def delete_delayed_mailer
-    @delayed_job = DelayedJob.find(params[:delayed_job_id])
-    @delayed_job.delete
+    queue = Sidekiq::Queue.new("mailers")
+    queue.each do |job|
+      job.delete if job.jid == params[:delayed_job_id]
+    end
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 

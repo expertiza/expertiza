@@ -184,16 +184,18 @@ class AssignmentForm
 
   # add DelayedJob into queue and return it
   def add_delayed_job(assignment, deadline_type, due_date, min_left)
-    delayed_job_id = MailWorker.perform_in(min_left*60, due_date.parent_id, due_date.deadline_name, due_date.due_at )
-    change_item_type(delayed_job_id)
-    delayed_job_id
+    delayed_job = DelayedJob.enqueue(DelayedMailer.new(assignment.id, deadline_type, due_date.due_at.to_s(:db)),
+                                     1, min_left.minutes.from_now)
+    change_item_type(delayed_job.id)
+    delayed_job
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
   def delete_from_delayed_queue
-    djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
-    for dj in djobs
-      dj.delete if !dj.nil? && !dj.id.nil?
+    queue = Sidekiq::Queues["mailers"]
+    queue.each do |job|
+      assignmentId = job.args.first
+      job.delete if @assignment.id == assignmentId
     end
   end
 

@@ -1,7 +1,7 @@
 describe Menu do
   before :example do
-    controller = double("controller", :id => 43, :name => "controller1")
-    temp = double("temp", :id => 33, :controller => controller, :name => "temp", :url_to_use => nil)
+    controller = double("controller", id: 43, name: "controller1")
+    temp = double("temp", id: 33, controller: controller, name: "temp", url_to_use: nil)
     allow_any_instance_of(MenuItem).to receive(:controller_action).and_return(temp)
     allow_any_instance_of(MenuItem).to receive(:content_page).and_return(temp)
     items = [test1, test2, test3, test4, test5, test6]
@@ -14,7 +14,7 @@ describe Menu do
   let!(:test4) { create(:menu_item, name: "home4", parent_id: 1, seq: 4) }
   let!(:test5) { create(:menu_item, name: "home5", parent_id: 2, seq: 2) }
   let!(:test6) { create(:menu_item, name: "home6", parent_id: 3, seq: 5) }
-  
+
   describe Menu::Node do
     describe "#initilize" do
       context "when role is nil" do
@@ -113,14 +113,14 @@ describe Menu do
     context "when role is nil" do
       it "creates a new menu" do
         menu = Menu.new
-        expect(menu.instance_of?Menu)
+        expect(menu.instance_of? Menu)
       end
     end
     context "when a role is passed as an argument" do
       it "creates a new menu" do
         admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
         menu = Menu.new(admin_role)
-        expect(menu.instance_of?Menu)
+        expect(menu.instance_of? Menu)
       end
     end
     context "when menu has items" do
@@ -143,7 +143,7 @@ describe Menu do
       expect(menu.select("home3")).to eq(menu.get_item(3))
     end
   end
-  describe"#selected" do
+  describe "#selected" do
     context "when an item is selected" do
       it "returns the name of the currently selected item" do
         menu = Menu.new
@@ -152,7 +152,7 @@ describe Menu do
       end
     end
     context "when a nonexistent node is selected" do
-      it "returns nil" do 
+      it "returns nil" do
         allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return([])
         menu = Menu.new
         menu.select("DNE")
@@ -185,7 +185,7 @@ describe Menu do
     context "when a node is selected" do
       it "returns a list of nodes that are the children of the selected node" do
         menu = Menu.new
-        expect(menu.get_menu(1)).to eq([2,3,4])
+        expect(menu.get_menu(1)).to eq([2, 3, 4])
       end
     end
     context "when menu has no items" do

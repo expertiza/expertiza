@@ -184,10 +184,9 @@ describe 'AssignmentTeam' do
       allow(team).to receive(:users).with(no_args).and_return([user1, user2])
       allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
       allow(AssignmentParticipant).to receive(:find_by).with(user_id: user2.id, parent_id: team.parent_id).and_return(participant2)
-      signupteam = build(:signed_up_team, id: 1, team_id: team.id)
       expect(team.delete).to eq(team)
     end
-  end 
+  end
 
   describe ".import" do
     context "when an assignment team does not already exist with the same id" do
@@ -369,7 +368,7 @@ describe 'AssignmentTeam' do
     context "when a hash of question is given" do
       it "returns the score received by the team" do
         questionnaire1 = build(:questionnaire, id: 1)
-        questionnaire2 = build(:questionnaire, id: 2)	
+        questionnaire2 = build(:questionnaire, id: 2)
 
         question1 = build(:question, id: 1, questionnaire: questionnaire1)
         question2 = build(:question, id: 2, questionnaire: questionnaire2)

@@ -19,12 +19,12 @@ assign_instructor_id in quiz_questionnaire model (Sam)
 OSS Project to do:
 
 [] Move case statement from create in questionaire_controller.rb into
-a method called set_display_type in questionaire model (Reddy)
+a method called set_display_type in questionaire model (Reddy) - Done
 
 [] Delete create_questionnaire method and replace the call to it in
 create_quiz_questionnaire with the code of create_questionnaire. Also,
 in an Object Oriented system, you should not have to check the type of
-an object. (Reddy)
+an object. (Reddy) - Done
 
 [] Move view_quiz to quiz_questionnaires_controller.rb, and rename it view
 (Abhisu)
@@ -43,15 +43,15 @@ rename it create
 (Abhisu)
 
 [] Move large block of for and if statements into method called
-change_question_types in the quiz_questionnaire model. (Reddy)
+change_question_types in the quiz_questionnaire model. (Reddy) - Done
 
 [] Replace large block of for and if statements in update_quiz with a call
-to the new change_question_types method. (Reddy)
+to the new change_question_types method. (Reddy) - Done
 
-[] Move valid_quiz into quiz_questionnaire model and rename it valid? (Abhisu)
+[] Move valid_quiz into quiz_questionnaire model and rename it valid? (Abhisu) - Done
 
 [] Move export, import, copy_questionnaire_details, and assign_instructor_id
-to questionaire model. (Reddy)
+to questionaire model. (Reddy) - Done - Tested Export.
 
 
 Expertiza

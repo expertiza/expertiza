@@ -1,5 +1,7 @@
 
 require 'active_support/time_with_zone'
+require 'sidekiq'
+
 class AssignmentForm
   attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
   attr_accessor :errors

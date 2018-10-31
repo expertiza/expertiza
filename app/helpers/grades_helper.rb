@@ -61,7 +61,7 @@ module GradesHelper
 
   def view_heatgrid(id, type)
     # get participant, team, questionnaires for assignment.
-    if ! type.eql? "AuthorFeedbackQuestionnaire"
+    if !type.eql? "AuthorFeedbackQuestionnaire"
       @participant = AssignmentParticipant.find(id)
       @team = @participant.team
       @team_id = @team.id

@@ -198,7 +198,7 @@ describe AssignmentParticipant do
 
   describe '#feedback' do
     it 'returns corrsponding author feedback responses given by current participant' do
-      allow(FeedbackResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(FeedbackResponseMap).to receive(:get_feedback_assessments_for).with(participant.team).and_return([response])
       expect(participant.feedback).to eq([response])
     end
   end

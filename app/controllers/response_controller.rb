@@ -164,7 +164,7 @@ class ResponseController < ApplicationController
 
   def create
     map_id = params[:id]
-    map_id = params[:map_id] if !params[:map_id].nil?# pass map_id as a hidden field in the review form
+    map_id = params[:map_id] unless params[:map_id].nil?# pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
     set_all_responses
     if params[:review][:questionnaire_id]

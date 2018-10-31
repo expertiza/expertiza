@@ -10,6 +10,7 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
+  let(:teams_user) {build(team_id: 1, user_id: 6)}
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -161,13 +162,12 @@ describe ResponseController do
     context 'when current response is nil' do
       it 'redirects to response#new page' do
         allow(AssignmentParticipant).to receive(:where).with(user_id: 6, parent_id: 1).and_return([participant])
+        allow(TeamsUser).to receive(:team_id).with(1, 6).and_return(1)
         allow(FeedbackResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([])
-        params = {id: 1}
-        params = {participant_id: 1}
+        params = {id: 1, participant_id: 1}
         session = {user: instructor}
-        request.env["HTTP_REFERER"] = '/response/new?id=2&return=feedback'
         get :new_feedback, params, session
-        expect(response).to redirect_to('/response/new?id=2&return=feedback')
+        expect(response).to redirect_to('/response/new?id=2&participant_id=1&return=feedback')
       end
     end
 

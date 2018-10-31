@@ -2,7 +2,7 @@
 # CSC 517 OODD Fall 2018
 # Project 3 OSS
 #
-# Team Name :
+# Team Name : Hobgoblin
 # Team Members :
 # Carmen Aiken Bentley (cnaiken)
 # Manjunath Gaonkar (mgaonka)
@@ -19,18 +19,14 @@ describe Participant do
   # RSpec unit tests examples:
   # https://github.com/expertiza/expertiza/blob/3ce553a2d0258ea05bced910abae5d209a7f55d6/spec/models/response_spec.rb
   ###
-  let(:user1) { 
-	build(:student, id: 1, name: 'no name', fullname: 'no one')}
+
   let(:team) {	
 	build(:assignment_team, id: 1, name: 'myTeam')}
-  let(:team_user) { 
-	build(:team_user, id: 1, user: user2, team: team)}
-  
   let(:user2) { 
 	build(:student, id: 4, name: 'no name', fullname: 'no two')}
- 
+  let(:team_user) { 
+	build(:team_user, id: 1, user: user2, team: team)} 
   let(:topic){build(:topic)}
-  
   let(:participant) {
 	build(:participant,
 	user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1))}
@@ -42,28 +38,25 @@ describe Participant do
 	user: build(:student, name: "King", fullname: "Titan, King", id: 3))}
   let(:participant4) { 
 	build(:participantSuper, can_review: false, user: user2)}
-  
   let(:assignment) {build(:assignment, id: 1, name: 'no assgt')}
   let(:review_response_map) {
-	build( :review_response_map, assignment: assignment, reviewer: participant, reviewee: team ) }
+	build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team)}
+  let(:answer) { 
+	Answer.new(answer: 1, comments: 'Answer text', question_id: 1)}
   let(:response) {
-	build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [ answer ] ) }
-  let( :answer ) { 
-	Answer.new( answer: 1, comments: 'Answer text', question_id: 1 ) }
-  
-  let( :question ) { 
-	Criterion.new(id: 1, weight: 2, break_before: true ) }
- let( :question1 ) {
-        Criterion.new(id: 2, weight: 2, break_before: true ) }
-  let( :questionnaire ) { 
-	ReviewQuestionnaire.new(id: 1, questions: [ question ], max_question_score: 5) }
-   let( :questionnaire1 ) {
-        ReviewQuestionnaire.new(id: 2, questions: [question1], max_question_score: 5) }
+	build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer])}
+  let(:question) { 
+	Criterion.new(id: 1, weight: 2, break_before: true)}
+  let(:question1) {
+        Criterion.new(id: 2, weight: 2, break_before: true)}
+  let(:questionnaire) { 
+	ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5)}
+  let(:questionnaire1) {
+        ReviewQuestionnaire.new(id: 2, questions: [question1], max_question_score: 5)}
   after(:each) do
     ActionMailer::Base.deliveries.clear
   end
 
-#  Unable to test method due to method content. Project Mentor said to leave it un-covered.
   describe '#team' do
     it 'returns the team of the participant' do
       allow(TeamsUser).to receive(:find_by).with({:user=>user2}).and_return(team_user)
@@ -78,14 +71,12 @@ describe Participant do
     end
   end
 
-  # Test Completed by instructor.
   describe "#name" do
     it "returns the name of the user" do
       expect(participant.name).to eq("Jane")
     end
   end
 
-  # Test Completed by instructor.
   describe "#fullname" do
     it "returns the full name of the user" do
       expect(participant.fullname).to eq("Doe, Jane")
@@ -148,8 +139,6 @@ describe Participant do
     end
   end
 
-
-
   describe '#get_permissions' do
     it 'returns the permissions of participant' do
       expect(Participant.get_permissions('participant')).to contain_exactly(
@@ -170,16 +159,16 @@ describe Participant do
   end
 
   describe '#get_authorization' do
-    it 'returns participant when no arguments are pasted' do
+    it 'returns participant when no arguments are passed' do
       expect(Participant.get_authorization(nil, nil, nil)).to eq('participant')
     end
-    it 'returns reader when no arguments are pasted' do
+    it 'returns reader when no arguments are passed' do
       expect(Participant.get_authorization(false, true, true)).to eq('reader')
     end
-    it 'returns submitter when no arguments are pasted' do
+    it 'returns submitter when no arguments are passed' do
       expect(Participant.get_authorization(true, false, false)).to eq('submitter')
     end
-    it 'returns reviewer when no arguments are pasted' do
+    it 'returns reviewer when no arguments are passed' do
       expect(Participant.get_authorization(false, true, false)).to eq('reviewer')
     end
   end
@@ -192,36 +181,33 @@ describe Participant do
     end
   end
     
-describe '#score' do
+  describe '#score' do
     it 'Get participant score within a round' do
       questions = {:review=>[question1],:review1=> [question]}
       test = [questionnaire,questionnaire1]
-#test=[questionnaire]
+
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
-#	assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>nil) 
-assessment=double("review")	
-test.each do |q|
-	 assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>nil)
-if q.id==2	
-assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>1)
-   end 
-allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: q.id).and_return(assignment_questionnaire_map)
-p assignment_questionnaire_map.used_in_round
-assessment=double("review")
-      allow(q).to receive(:get_assessments_for).with(participant).and_return(assessment)
+      assessment=double("review")	
+      
+      test.each do |q|
+        assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>nil)
+        if q.id==2	
+          assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>1)
+        end 
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: q.id).and_return(assignment_questionnaire_map)
+        assessment=double("review")
+        allow(q).to receive(:get_assessments_for).with(participant).and_return(assessment)
 	allow(Answer).to receive(:compute_scores).with(assessment,questions[:review]).and_return(5)
 	allow(Answer).to receive(:compute_scores).with(assessment,questions[:review1]).and_return(6)
-	end
+      end
+      
       allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(75)
       check = participant.scores(questions)
-	p check
+      
       expect(check).to include(:participant => participant)
-      expect(check[:review1]).to include(:assessments=> assessment,:scores=>6)
-	expect(check[:review].to_s).to eq({:assessments=>assessment,:scores=>5}.to_s)
-#	expect(check[:review]).to include(:scores=> 5)
-#	expect(check[:review1]).to include(:scores=>6)
+      expect(check[:review1].to_s).to include({:assessments=> assessment,:scores=>6}.to_s)
+      expect(check[:review].to_s).to eq({:assessments=>assessment,:scores=>5}.to_s)
       expect(check).to include(:total_score => 75)
-   end
- 
+    end
   end
 end

@@ -62,17 +62,19 @@ class SubmittedContentController < ApplicationController
       # E1834 Fall 18
       # Send email to reviewers to review new submission, if review_round is valid and not last.
       if participant.is_round_valid_for_mail?
-        #reviewers = []
         participant.reviewers.each do |reviewer|
-          #reviewers << User.find(reviewer.user_id).email
-          review_mappings = ResponseMap.where(reviewer_id: reviewer.id)
-          review_mappings.each do |map|
-            reviewed_object_id = ''
-            if map.reviewee_id == @participant.id || map.reviewee_id == @participant.team.id
-              reviewed_object_id = map.reviewed_object_id
-              Mailer.delayed_message(bcc: User.find(reviewer.user_id).email, subject: "You have a new submission to review", body: "Please visit https://expertiza.ncsu.edu/response/edit?id=#{reviewed_object_id} and proceed to peer reviews.").deliver_now
-            end
-          end
+          map = ReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', reviewer.id, @participant.team.id]).first
+          responses = Response.where(:map_id => map.id)
+          responses = responses.sort_by { |obj| obj.updated_at }
+
+          # the latest response will be the last
+          latest_response = responses.last
+
+          # we need to pass the id of lastest_response in the URL mentioned in the mail.
+          # this will open the correct /response/edit?id=#{latest_response.id} page for the reviewer when (s)he clicks on it.
+          Mailer.delayed_message(bcc: [User.find(reviewer.user_id).email],
+                                 subject: "You have a new submission to review",
+                                 body: "Please visit https://expertiza.ncsu.edu/response/edit?id=#{latest_response.id} and proceed to peer reviews.").deliver_now
         end
       end
     end

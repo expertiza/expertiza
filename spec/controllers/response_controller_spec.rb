@@ -163,7 +163,9 @@ describe ResponseController do
         allow(AssignmentParticipant).to receive(:where).with(user_id: 6, parent_id: 1).and_return([participant])
         allow(FeedbackResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([])
         params = {id: 1}
+        params = {participant_id: 1}
         session = {user: instructor}
+        request.env["HTTP_REFERER"] = '/response/new?id=2&return=feedback'
         get :new_feedback, params, session
         expect(response).to redirect_to('/response/new?id=2&return=feedback')
       end
@@ -249,7 +251,7 @@ describe ResponseController do
       it 'redirects to grades#view_my_scores page' do
         @params[:return] = 'feedback'
         get :redirection, @params
-        expect(response).to redirect_to('/grades/view_my_scores?id=1')
+        expect(response).to redirect_to('/response/view?id=1')
       end
     end
 

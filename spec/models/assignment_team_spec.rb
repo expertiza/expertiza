@@ -187,7 +187,7 @@ describe 'AssignmentTeam' do
       signupteam = build(:signed_up_team, id: 1, team_id: team.id)
       expect(team.delete).to eq(team)
     end
-  end
+  end 
 
   describe ".import" do
     context "when an assignment team does not already exist with the same id" do
@@ -352,6 +352,45 @@ describe 'AssignmentTeam' do
         allow(team).to receive_message_chain(:submitted_hyperlinks, :present?).with(no_args).with(no_args).and_return(true)      
         expect(team.has_submissions?).to be true
       end    
+    end
+  end
+
+  describe "#destroy" do
+    it "delete the reviews" do
+      expect(team).to receive_message_chain(:review_response_maps, :each).with(no_args).with(no_args)
+      team.destroy
+    end
+  end
+
+  describe "#scores" do
+    context "when a hash of question is given" do
+      it "returns the score received by the team" do
+        questionnaire1 = build(:questionnaire, id: 1)
+        questionnaire2 = build(:questionnaire, id: 2)	
+
+        question1 = build(:question, id: 1, questionnaire: questionnaire1)
+        question2 = build(:question, id: 2, questionnaire: questionnaire2)
+        questions = {questionnaire1.symbol => [question1], questionnaire2.symbol => [question2]}
+
+        scores = {}
+        scores[:team] = team
+        scores[:questionnaire1] = {}
+        scores[:questionnaire1][:assessments] = review_response_map
+        scores[:questionnaire1][:scores] = 5
+        scores[:questionnaire2] = {}
+        scores[:questionnaire2][:assessments] = review_response_map
+        scores[:questionnaire2][:scores] = 5
+        scores[:total_score] = 10
+
+        allow(team.assignment).to receive(:questionnaires).with(no_args).and_return([questionnaire1, questionnaire2])
+        allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id).and_return(review_response_map)
+        allow(Answer).to receive(:compute_scores).with(scores[:questionnaire1][:assessments], questions[:questionnaire1]).and_return(5)
+        allow(Answer).to receive(:compute_scores).with(scores[:questionnaire2][:assessments], questions[:questionnaire2]).and_return(5)
+        allow(questionnaire1).to receive(:symbol).with(no_args).and_return(:questionnaire1)
+        allow(questionnaire2).to receive(:symbol).with(no_args).and_return(:questionnaire2)
+        allow(team.assignment).to receive(:compute_total_score).with(scores.except(:total_score)).and_return(10)
+        expect(team.scores(questions)).to eq(scores)
+      end
     end
   end
 end

@@ -146,7 +146,7 @@ class AssignmentParticipant < Participant
   end
 
   def feedback
-    FeedbackResponseMap.get_assessments_for(self)
+    FeedbackResponseMap.get_feedback_assessments_for(self.team)
   end
 
   def reviews
@@ -216,15 +216,15 @@ class AssignmentParticipant < Participant
     where(parent_id: parent_id).find_each do |part|
       user = part.user
       csv << [
-        user.name,
-        user.fullname,
-        user.email,
-        user.role.name,
-        user.parent.name,
-        user.email_on_submission,
-        user.email_on_review,
-        user.email_on_review_of_review,
-        part.handle
+          user.name,
+          user.fullname,
+          user.email,
+          user.role.name,
+          user.parent.name,
+          user.email_on_submission,
+          user.email_on_review,
+          user.email_on_review_of_review,
+          part.handle
       ]
     end
   end

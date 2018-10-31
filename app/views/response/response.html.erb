@@ -338,7 +338,6 @@
   <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
   <% if @next_action.eql?'update' %>
     <input name="_method" type="hidden" value="put" />
-
   <%end%>
   <table width="100%">
     <% i = 0 %>
@@ -366,10 +365,10 @@
       <td>
         <label for="review_comments">Additional Comments</label><BR/>
         <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
-      <% if controller.action_name != 'new' and @response.additional_comment != nil %>
-        <%= @response.additional_comment.strip if !@response.nil?%>
-      <% end %>
-     </textarea>
+            <% if controller.action_name != 'new' and @response.additional_comment != nil %>
+                <%= @response.additional_comment.strip if !@response.nil?%>
+            <% end %>
+          </textarea>
       </td>
       <td width="25%">
         <div id="review_comments_analysis"></div>
@@ -414,8 +413,9 @@
     <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
   <% end %>
   <%= hidden_field_tag('return', @return) %>
-  <%= hidden_field_tag "isSubmit", :id=>"isSubmit" %>
+  <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
   <%= hidden_field_tag("participant_id", @participant_id) %>
+
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

@@ -502,4 +502,23 @@ FactoryBot.define do
     created_at '2018-10-24 21:18:19'
     updated_at '2018-10-24 21:18:19'
   end
+
+  factory :participant_review, class: AssignmentParticipant do
+    id '42'
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "AssignmentParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
+
 end

@@ -68,6 +68,7 @@ describe Menu do
                 end
             end
         end
+
         describe "#content_page" do
             it "should update the content_page instance variable" do
                 node = Menu::Node.new
@@ -75,6 +76,7 @@ describe Menu do
                 expect(node.content_page).to eq("test content page")
             end
         end
+
         #add_children should update children array (test multiple children)
         describe "#add_child" do
             context "when node has no children" do
@@ -95,18 +97,20 @@ describe Menu do
                 expect(menu.instance_of?Menu)
             end
         end
+
         context "when menu has items" do
             it "creates a new menu with items" do
                 menu = Menu.new
                 expect(menu.root.children[0]).to eq(1)
             end
         end
+
     end
     #Ask for help on how this works
     describe "#select" do
         it "returns a node.id based on the given name" do
             menu = Menu.new
-            expect(menu.select("home3").id).to eq(test3.id)
+            expect(menu.select("home3")).to eq(menu.get_item(3))
         end
     end
     describe"#selected" do
@@ -166,7 +170,7 @@ describe Menu do
         context "when root is selected" do
             it "should return a list of nodes based on the root" do
                 menu = Menu.new
-                expect(menu.crumbs[0].id).to eq(1)
+                expect(menu.crumbs[0]).to eq(menu.get_item(1))
             end
         end
         context "when home node is selected" do

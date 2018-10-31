@@ -102,7 +102,7 @@ describe Menu do
       context "when node has children" do
         it "adds a child" do
           node = Menu::Node.new
-          node.children = [1];
+          node.children = [1]
           node.add_child(test2)
           expect(node.children).to eq([1, 2])
         end
@@ -113,14 +113,14 @@ describe Menu do
     context "when role is nil" do
       it "creates a new menu" do
         menu = Menu.new
-        expect(menu.instance_of? Menu)
+        expect(menu.instance_of?(Menu))
       end
     end
     context "when a role is passed as an argument" do
       it "creates a new menu" do
         admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
         menu = Menu.new(admin_role)
-        expect(menu.instance_of? Menu)
+        expect(menu.instance_of?(Menu))
       end
     end
     context "when menu has items" do

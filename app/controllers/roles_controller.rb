@@ -20,6 +20,10 @@ class RolesController < ApplicationController
     foreign
   end
 
+  def new
+    flash[:notice] = ('New Roles cannot be created.')
+    redirect_to Role
+  end
 
   def create
     @role = Role.new(params[:role])

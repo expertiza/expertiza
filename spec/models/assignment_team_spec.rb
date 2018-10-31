@@ -1,15 +1,16 @@
 describe AssignmentTeam do
   
   let(:user) { User.new(id: 1) }
-  let(:assignment_team) { build(:assignment_team, id: 2, parent_id: 2, name: "team2", users: [user]) }
-  let(:assignment_team1) {build(:assignment_team, id: 1, parent_id: 1, name: "team1", submitted_hyperlinks: "https://www.1.ncsu.edu")}
+  let(:assignment_team) { build(:assignment_team, id: 2, parent_id: 2, name: "team2", users: [user], submitted_hyperlinks: "https://www.1.ncsu.edu") }
+  let(:assignment_team1) {build(:assignment_team, id: 1, parent_id: 1, name: "team1", submitted_hyperlinks: "")}
   let(:questions) { {QuizQuestionnaire: double(:question) } }
   let(:questionnaire) {build(:questionnaire)}
   let(:assignment) { build(:assignment, id: 1, questionnaires: [questionnaire], name: 'Test Assgt') }
   let(:courseTeam) { build(:course_team, id:1) }
   let(:team) { build(:assignment_team) }
+  let(:team_user) { build(:team_user) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: "") }
-  let(:participant1) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
+  let(:participant1) { build(:participant, id: 1, user: build(:student, id: 1, name: 'no name', fullname: 'no one')) }
   let(:participant2) { build(:participant, id: 2) }
   let(:review_response_map) { build( :review_response_map,id: 1, assignment: assignment, reviewer: participant1, reviewee: assignment_team1) }
   let(:signed_up_team) {build(:signed_up_team, id:1, team_id: 1, is_waitlisted: 0, topic_id:1)}
@@ -102,7 +103,7 @@ describe AssignmentTeam do
     end
   end
 
-  #?
+
   describe "#topic" do
     it "returns the topic id chosen by this team" do
       allow(SignedUpTeam).to receive(:find_by).with(team_id:1, is_waitlisted: 0).and_return(signed_up_team)
@@ -142,7 +143,6 @@ describe AssignmentTeam do
   describe "#delete" do
     context "when the current team is an assignment team" do
       it "deletes topic sign up record, team users, team node and the team itself"
-      # Write your test here!
     end
 
     context "when the current team is not an assignment team" do
@@ -154,7 +154,6 @@ describe AssignmentTeam do
 
   describe "#destroy" do
     it "deletes review response map records"
-    # Write your test here!
   end
 
   describe ".get_first_member" do
@@ -166,7 +165,6 @@ describe AssignmentTeam do
 
   describe "#submitted_files" do
     it "returns the submitted files of current assignment team"
-    # Write your test here!
   end
 
 
@@ -210,7 +208,6 @@ describe AssignmentTeam do
     context "when there is no assignment participant mapping" do
       it "adds this user to the assignment" do
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: user.id).and_return(nil)
-        #allow(AssignmentParticipant).to receive(:create).with(parent_is:1, user_id:user.id, permission_granted: user.master_permission_granted).and_return()
         expect(assignment_team.add_participant(1, user)).to be_instance_of(AssignmentParticipant)
       end
     end
@@ -245,25 +242,31 @@ describe AssignmentTeam do
   end
 
   describe "#files" do
-    it "returns all files in certain directory"
-    # Write your test here!
+    it "returns all files in certain directory" do
+      expect(assignment_team.files('./docker')).to eq(["./docker/Dockerfile", "./docker/README.md", "./docker/scrubbed_db/README.md", "./docker/scrubbed_db", "./docker/setup_mac.sh", "./docker/setup_linux.sh", "./docker/docker-compose.yml.example"])
+    end
   end
 
   describe "#submit_hyperlink" do
     context "when the hyperlink is empty" do
-      it "raises an exception saying 'The hyperlink cannot be empty'"
-      # Write your test here!
+      it "raises an exception saying 'The hyperlink cannot be empty'" do
+        hyperlink = ''
+        expect{assignment_team1.submit_hyperlink(hyperlink)}.to raise_exception("The hyperlink cannot be empty!")
+      end
     end
 
     context "when the hyperlink is not empty" do
       context "when Expertiza is unable to get the response from pinging the hyperlink" do
         it "raises an exception with corresponding HTTP status code"
-        # Write your test here!
       end
 
       context "when Expertiza is able to get the response from the hyperlink" do
-        it "saves the hyperlink to submitted_hyperlinks field"
-        # Write your test here!
+        it "saves the hyperlink to submitted_hyperlinks field" do
+          allow(Net::HTTP).to receive(:get_response).with(URI("https://www.expertiza.ncsu.edu"))
+          allow(assignment_team1).to receive(:hyperlink).and_return([])
+          expect(assignment_team1.submit_hyperlink("https://www.expertiza.ncsu.edu")).to eq(true)
+          expect(assignment_team1.hyperlinks).to eq(["https://www.expertiza.ncsu.edu"])
+        end
       end
     end
   end
@@ -278,52 +281,72 @@ describe AssignmentTeam do
 
   describe ".team" do
     context "when the participant is nil" do
-      it "returns nil"
-      # Write your test here!
+      it "returns nil" do
+        expect(AssignmentTeam.team(participant1)).to eq(nil)
+      end
     end
 
     context "when there are not team users records" do
-      it "returns nil"
-      # Write your test here!
+      it "returns nil" do
+        allow(TeamsUser).to receive(:where).with(user_id: 1).and_return(nil)
+        expect(AssignmentTeam.team(participant1)).to eq(nil)
+      end
     end
 
     context "when the participant is not nil and there exist team users records" do
-      it "returns the team given the participant"
-      # Write your test here!
+      it "returns the team given the participant" do
+        allow(TeamsUser).to receive(:where).with(user_id: 1).and_return([team_user])
+        allow(Team).to receive(:find).with(1).and_return(team)
+        expect(AssignmentTeam.team(participant1)).to eq(team)
+      end
     end
   end
 
   describe ".export_fields" do
-    it "exports the fields of the csv file"
-    # Write your test here!
+    it "exports the fields of the csv file" do
+      expect(AssignmentTeam.export_fields({team_name: 'false'})).to eq(["Team Name", "Team members", "Assignment Name"])
+    end
   end
+
 
   describe ".remove_team_by_id" do
-    it "deletes a team geiven the team id"
-    # Write your test here!
+    it "deletes a team geiven the team id" do
+      allow(AssignmentTeam).to receive(:find).with(1).and_return(assignment_team1)
+      allow(assignment_team1).to receive(:destroy).and_return(assignment_team1)
+      expect(AssignmentTeam.remove_team_by_id(1)).to eq(assignment_team1)
+    end
   end
 
+
   describe "#path" do
-    it "returns the directory path of the assignment team"
-    # Write your test here!
+    it "returns the directory path of the assignment team" do
+      expect(assignment_team1.path).to match('pg_data/instructor6/csc517/test/final_test/0')
+    end
   end
 
   describe "#set_student_directory_num" do
     context "when there is no directory number for the assignment team" do
-      it "sets a directory number for the assignment team"
-      # Write your test here!
+      it "sets a directory number for the assignment team" do
+        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return(4)
+        allow(AssignmentTeam).to receive(:update_attributes).with(directory_num: 5)
+        expect(assignment_team1.set_student_directory_num).to eq(nil)
+      end
     end
   end
 
   describe "#received_any_peer_review?" do
     context "when there exist corresponding response maps" do
-      it "returns true"
-      # Write your test here!
+      it "returns true" do
+        allow(ResponseMap).to receive(:where).with(reviewee_id: 1, reviewed_object_id: 1).and_return([double(:ResponseMap)])
+        expect(assignment_team1.received_any_peer_review?).to be true
+      end
     end
 
     context "when there does not exist corresponding response maps" do
-      it "returns false"
-      # Write your test here!
+      it "returns false" do
+        allow(ResponseMap).to receive(:where).with(reviewee_id: 1, reviewed_object_id: 1).and_return([])
+        expect(assignment_team1.received_any_peer_review?).to be false
+      end
     end
   end
 end

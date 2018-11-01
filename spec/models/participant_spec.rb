@@ -25,8 +25,8 @@ describe Participant do
 
   describe "#team" do
     it "returns the first team of current user" do
-      allow(TeamsUser).to receive(:find_by).with(user: student).and_return(assignment_team)
-      expect(participant.team).to eq nil
+      allow(TeamsUser).to receive(:find_by).with(user: student).and_return(team_user)
+      expect(participant.team.name).to eq "ChinaNo1"
     end
   end
 
@@ -89,30 +89,24 @@ describe Participant do
   describe "#scores" do
     context "when the round is nil" do
       it "uses questionnaire symbol as a hash key and populates the score hash" do
-        allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(nil)
+        allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2)\
+        .with(no_args).and_return(nil)
         allow(assignment).to receive(:questionnaires).and_return([questionnaire])
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)
         allow(assignment).to receive(:compute_total_score).with(any_args).and_return(10)
-        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil,
-        parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\",
-        time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review=>{:assessments=>#<Response id: nil,
-        map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>, :scores=>{:max=>10,
-        :min=>10, :avg=>10}}, :total_score=>10}")
+        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review=>{:assessments=>#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
       end
     end
 
     context "when the round is not nil" do
       it "uses questionnaire symbol with round as hash key and populates the score hash" do
-        allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(3)
+        allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2)\
+        .with(no_args).and_return(3)
         allow(assignment).to receive(:questionnaires).and_return([questionnaire])
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)
-        allow(assignment).to receive(:compute_total_score).with(any_args).and_return(10)
-        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil,
-        parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\",
-        time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review3=>{:assessments=>nil,
-        :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
+        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review3=>{:assessments=>#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
       end
     end
   end

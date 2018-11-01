@@ -72,7 +72,7 @@ class Participant < ActiveRecord::Base
 
   def email(pw, home_page)
     user = User.find_by(id: self.user_id)
-    assignment = Assignment.find_by(id: self.assignment_id)
+    assignment = Assignment.find_by(id: self.assignment.id)
 
     Mailer.sync_message(
       recipients: user.email,

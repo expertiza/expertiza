@@ -199,6 +199,16 @@ class AssignmentForm
       assignmentId = job.args.first
       job.delete if @assignment.id == assignmentId
     end
+
+    queue = Sidekiq::ScheduledSet.new("mailers")
+    
+    puts "ScheduledSet"
+    queue.each do |job|
+      puts job.args.inspect
+      assignmentId = job.args.first
+      job.delete if @assignment.id == assignmentId
+    end
+
   end
 
   # Change the item_type displayed in the log

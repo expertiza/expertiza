@@ -1,4 +1,7 @@
 describe QuestionnairesController do
+  let(:questionnaire) do
+    build(id: 1,name: 'questionnaire',ta_id: 8, course_id: 1, private: false,min_question_score: 0,max_question_score: 5,type: 'ReviewQuestionnaire')
+  end
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
@@ -8,60 +11,68 @@ describe QuestionnairesController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   before(:each) do
+    allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     stub_current_user(instructor, instructor.role.name, instructor.role)
+
+  end
+
+  def check_access username
+    stub_current_user(username,username.role.name,username.role)
+    expect(controller.send(:action_allowed?))
   end
 
   describe '#action_allowed?' do
+    let(:questionnaire) { build(:questionnaire, id: 1) }
+    let(:instructor) { build(:instructor, id: 1) }
+    let(:ta) { build(:teaching_assistant, id: 10, parent_id: 66) }
     context 'when params action is edit or update' do
       before(:each) do
         controller.params = {id: '1', action: 'edit'}
+        controller.request.session[:user] = instructor
       end
 
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
-          stub_current_user(admin, admin.role.name, admin.role)
-          expect(controller.send(:action_allowed?)).to be true
+          check_access(admin).to be true
         end
       end
 
       context 'when current user is the instructor of current questionnaires' do
         it 'allows certain action' do
-          expect(controller.send(:action_allowed?)).to be true
+          check_access(instructor).to be true
         end
       end
 
       context 'when current user is the ta of the course which current questionnaires belongs to' do
         it 'allows certain action' do
-          stub_current_user(ta, ta.role.name, ta.role)
           allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
-          expect(controller.send(:action_allowed?)).to be true
+          check_access(ta).to be true
         end
       end
-
       context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do
         it 'does not allow certain action' do
-          stub_current_user(ta, ta.role.name, ta.role)
-          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(false)
-          expect(controller.send(:action_allowed?)).to be true
+          allow(TaMapping).to receive(:exists?).with(ta_id: 10, course_id: 1).and_return(false)
+          controller.request.session[:user] = instructor2
+          check_access(ta).to be false
         end
       end
 
       context 'when current user is the instructor of the course which current questionnaires belongs to' do
         it 'allows certain action' do
-          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
-          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
-          expect(controller.send(:action_allowed?)).to be true
+          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 6))
+          check_access(instructor).to be true
         end
       end
 
       context 'when current user is an instructor but not the instructor of current course or current questionnaires' do
         it 'does not allow certain action' do
-          stub_current_user(instructor2, instructor2.role.name, instructor2.role)
-          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 666))
-          expect(controller.send(:action_allowed?)).to be true
+          allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
+          check_access(instructor2).to be false
+
         end
       end
     end
+
 
     context 'when params action is not edit and update' do
       before(:each) do
@@ -70,11 +81,12 @@ describe QuestionnairesController do
 
       context 'when the role current user is super admin/admin/instructor/ta' do
         it 'allows certain action except edit and update' do
-          expect(controller.send(:action_allowed?)).to be true
+          check_access(admin).to be true
         end
       end
     end
   end
+
 
   describe '#copy,  #copy_questionnaire_details and #assign_instructor_id' do
     it 'redirects to view page of copied questionnaire' do
@@ -527,17 +539,17 @@ describe QuestionnairesController do
                              '2' => {txt: 'Q2'},
                              '3' => {txt: 'Q3'}},
                   quiz_question_choices: {'1' => {MultipleChoiceRadio:
-                                                {:correctindex => 1,
-                                                 '1' => {txt: 'a11'},
-                                                 '2' => {txt: 'a12'},
-                                                 '3' => {txt: 'a13'},
-                                                 '4' => {txt: 'a14'}}},
+                                                      {:correctindex => 1,
+                                                       '1' => {txt: 'a11'},
+                                                       '2' => {txt: 'a12'},
+                                                       '3' => {txt: 'a13'},
+                                                       '4' => {txt: 'a14'}}},
                                           '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
                                           '3' => {MultipleChoiceCheckbox:
-                                                {'1' => {iscorrect: '1', txt: 'a31'},
-                                                 '2' => {iscorrect: '0', txt: 'a32'},
-                                                 '3' => {iscorrect: '1', txt: 'a33'},
-                                                 '4' => {iscorrect: '0', txt: 'a34'}}}}}
+                                                      {'1' => {iscorrect: '1', txt: 'a31'},
+                                                       '2' => {iscorrect: '0', txt: 'a32'},
+                                                       '3' => {iscorrect: '1', txt: 'a33'},
+                                                       '4' => {iscorrect: '0', txt: 'a34'}}}}}
         questionnaire = double('Questionnaire')
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(questionnaire).to receive(:update_attributes).with(any_args).and_return(true)

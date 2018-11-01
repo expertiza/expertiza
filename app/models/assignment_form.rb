@@ -202,7 +202,7 @@ class AssignmentForm
   # Change the item_type displayed in the log
   def change_item_type(delayed_job_id)
     log = Version.find_by(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: delayed_job_id)
-    log.update_attribute(:item_type, "DelayedMailer") # Change the item type in the log
+    log.update_attribute(:item_type, "DelayedMailer") unless log.nil? # Change the item type in the log
   end
 
   def delete(force = nil)

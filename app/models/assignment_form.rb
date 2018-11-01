@@ -200,7 +200,7 @@ class AssignmentForm
       job.delete if @assignment.id == assignmentId
     end
 
-    queue = Sidekiq::ScheduledSet.new("mailers")
+    queue = Sidekiq::ScheduledSet.new
     
     puts "ScheduledSet"
     queue.each do |job|

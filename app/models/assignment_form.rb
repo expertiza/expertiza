@@ -184,8 +184,8 @@ class AssignmentForm
   end
 
   # add DelayedJob into queue and return it
-  def add_delayed_job(assignment, deadline_type, due_date, min_left)
-    delayed_job_id = MailWorker.perform_in(min_left*60, due_date.parent_id, due_date.deadline_name, due_date.due_at )
+  def add_delayed_job(assignment, deadline_type, due_date, min_left) 
+    delayed_job_id = MailWorker.perform_in(min_left*60, due_date.parent_id, deadline_type, due_date.due_at )
     change_item_type(delayed_job_id)
     delayed_job_id
   end

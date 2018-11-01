@@ -1,10 +1,8 @@
 require 'csv'
 describe 'AssignmentTeam' do
-
   # let(:assignment) { build(:assignment) }
   # let(:team) { build(:assignment_team) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team) }
-
   let(:assignment_team) {build(:assignment_team, id: 1, parent_id: 1, name: "full name")}
   let(:assignment_team2)  {build(:assignment_team, id: 2, parent_id: 2)}
   let(:assignment) { build(:assignment, id: 1)}
@@ -71,7 +69,6 @@ describe 'AssignmentTeam' do
     it "returns an new instance of AssignmentTeam" do
       expect(AssignmentTeam.prototype).to be_instance_of(AssignmentTeam)
     end
-
   end
 
   describe "#assign_reviewer" do
@@ -86,7 +83,6 @@ describe 'AssignmentTeam' do
         expect{assignment_team2.assign_reviewer(reviewer)}.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
-
   end
 
   describe "#reviewd_by?" do
@@ -110,16 +106,13 @@ describe 'AssignmentTeam' do
         expect(assignment_team.has_submissions?).to be true
       end
     end
-
   end
 end
-
 
 describe 'AssignmentTeam' do
   let(:assignment) { build(:assignment) }
   let(:team) { build(:assignment_team) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: "") }
-
   let(:ass1) { build(:assignment, id: 1, name: 'test assignment_team') }
   let(:student1) { build(:student, id: 1, name: 'johns', fullname: 'johns franklin') }
   let(:student2) { build(:student, id: 2, name: 'kate', fullname: 'kate moss') }
@@ -133,8 +126,6 @@ describe 'AssignmentTeam' do
   let(:reviews2) { build(:review_response_map, assignment_id: 1, reviewer_id: 2, reviewee_id: 1) }
   let(:questionnary1) { build(:questionnaire, id: 1) } 
   let(:question1) { build(:question, id: 1) } 
-
-
   describe "#submission" do
     context "when current teams submitted hyperlinks" do
       it "submitted hyperlinks" do
@@ -197,9 +188,9 @@ describe 'AssignmentTeam' do
   describe "#members" do
     context "get_first_member" do
       it '#get_first_member' do
-  allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
-  allow(team1).to receive(:participants).and_return([par1, par2])
-  expect(AssignmentTeam.get_first_member(team1.id)).to eq(par1)
+        allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
+        allow(team1).to receive(:participants).and_return([par1, par2])
+        expect(AssignmentTeam.get_first_member(team1.id)).to eq(par1)
       end
       it '#switch_order' do
   allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
@@ -212,20 +203,20 @@ describe 'AssignmentTeam' do
   describe "#import and export" do
     context "import" do
       it '#import an nonexisting assignment id' do
-  row = {
-    :teamname => "hello_world",
-      :teammembers => ["johns", "kate"]
-  }
-  options = {:has_teamname => "true_first"}
-      expect{AssignmentTeam.import(row, 99999, options)}.to raise_error(ImportError)
+        row = {
+          :teamname => "hello_world",
+          :teammembers => ["johns", "kate"]
+        }
+        options = {:has_teamname => "true_first"}
+        expect{AssignmentTeam.import(row, 99999, options)}.to raise_error(ImportError)
       end
       it '#export' do
-  options = {}
-  csv = CSV.open("assignment_team_export.csv", "w")
-  assignment_id = ass1.id
-  allow(AssignmentTeam).to receive(:where).with(parent_id: assignment_id).and_return([team1, team2, team3])
-  allow(TeamsUser).to receive(:where).and_return([par1, par2])
-      expect(AssignmentTeam.export(csv, assignment_id, options)).to be_instance_of(CSV)
+        options = {}
+        csv = CSV.open("assignment_team_export.csv", "w")
+        assignment_id = ass1.id
+        allow(AssignmentTeam).to receive(:where).with(parent_id: assignment_id).and_return([team1, team2, team3])
+        allow(TeamsUser).to receive(:where).and_return([par1, par2])
+        expect(AssignmentTeam.export(csv, assignment_id, options)).to be_instance_of(CSV)
       end
     end
   end
@@ -233,7 +224,7 @@ describe 'AssignmentTeam' do
   describe "#copy" do
     context "copy" do
       it '#copy' do
-  allow(TeamsUser).to receive(:where).with(team_id: team1.id).and_return([par1])
+        allow(TeamsUser).to receive(:where).with(team_id: team1.id).and_return([par1])
         expect(team1.copy(course1.id)).to eq([par1])
       end
     end
@@ -242,17 +233,14 @@ describe 'AssignmentTeam' do
   describe "#scores" do
     context "getting scores" do
       it '#scores' do
-  allow(ass1).to receive(:questionnaires).and_return([questionnary1])
+        allow(ass1).to receive(:questionnaires).and_return([questionnary1])
         expect(team1.scores(question1)[:total_score]).to eq(0)
       end
     end
   end
-
 end
 
-
 describe AssignmentTeam do
-
   let(:assignment) { build(:assignment) }
   let(:assignment_team) { build(:assignment_team) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: "") }
@@ -264,15 +252,15 @@ describe AssignmentTeam do
   describe "#hyperlinks" do
     context "when current teams submitted hyperlinks" do
       it "returns the hyperlinks submitted by the team" do
-      expect(assignment_team.hyperlinks).to eq(["https://www.expertiza.ncsu.edu"])
+        expect(assignment_team.hyperlinks).to eq(["https://www.expertiza.ncsu.edu"])
+      end
     end
-  end
 
-  context "when current teams did not submit hyperlinks" do
-    it "returns an empty array" do
-      expect(team_without_submitted_hyperlinks.hyperlinks).to eq([])
+    context "when current teams did not submit hyperlinks" do
+      it "returns an empty array" do
+        expect(team_without_submitted_hyperlinks.hyperlinks).to eq([])
+      end
     end
-  end
   end
 
   describe '#files' do
@@ -308,7 +296,6 @@ describe AssignmentTeam do
         end
       end
     end
-
   end
 
   describe '#remove_hyperlink' do
@@ -316,15 +303,9 @@ describe AssignmentTeam do
       @hyperlink = "http://a.com"
     end
     it 'call the hyperlinks method' do
-
       expect(assignment_team).to receive(:hyperlinks).and_return(["https://www.expertiza.ncsu.edu"])
       assignment_team.remove_hyperlink(@hyperlink)
     end
-    #it 'send call the delete method on array' do
-     # allow(assignment_team).to receive(:hyperlinks).and_return(["https://www.expertiza.ncsu.edu"])
-      #expect(:hyperlinks).to receive(:delete).with(@hyperlink)
-      #assignment_team.remove_hyperlink(@hyperlink)
-    #end
   end
 
   describe '.team' do
@@ -333,7 +314,6 @@ describe AssignmentTeam do
         expect(AssignmentTeam.team(nil)).to eq(nil)
       end
     end
-
     context 'can find the participant' do
       it 'send the correct user_id to the TeamsUser.where method' do
         expect(TeamsUser).to receive(:where).with(user_id: participant.user_id).and_return([team_user])
@@ -344,13 +324,6 @@ describe AssignmentTeam do
           allow(TeamsUser).to receive(:where).with(user_id: 1).and_return([team_user])
           AssignmentTeam.team(participant)
         end
-        #it 'team id is sent to find in Team' do
-         # team_user.each do |teamuser|
-          #  expect(Team).to receive(:find).with(user_id: teamuser.team_id)
-          #end
-
-        #end
-
       end
     end
   end
@@ -364,7 +337,6 @@ describe AssignmentTeam do
       options = {:team_name =>"true"}
       expect(AssignmentTeam.export_fields(options)).to eq(["Team Name", "Assignment Name"])
     end
-
   end
 
   describe '#remove_team_by_id' do
@@ -379,7 +351,6 @@ describe AssignmentTeam do
       expect(assignment_team.path).to eq(Rails.root.to_s+'/pg_data/instructor6/csc517/test/final_test/0')
       assignment_team.path
     end
-
   end
 
   describe '#set_student_directory_num' do
@@ -399,8 +370,6 @@ describe AssignmentTeam do
         assignment_team1.set_student_directory_num
       end
     end
-
-
   end
 
   describe '#received_any_peer_review?' do
@@ -409,6 +378,5 @@ describe AssignmentTeam do
       assignment_team.received_any_peer_review?
     end
   end
-
 end
 

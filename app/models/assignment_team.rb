@@ -131,8 +131,8 @@ class AssignmentTeam < Team
   def add_participant(assignment_id, user)
     return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
     AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id)
-    #return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
-    #AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
+    # return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
+    # AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
   end
 
   # return a hash of scores that the team has received for the questions

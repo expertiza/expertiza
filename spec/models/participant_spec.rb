@@ -90,7 +90,7 @@ describe Participant do
     context "when the round is nil" do
       it "uses questionnaire symbol as a hash key and populates the score hash" do
         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2)\
-        .with(no_args).and_return(nil)
+          .with(no_args).and_return(nil)
         allow(assignment).to receive(:questionnaires).and_return([questionnaire])
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)
@@ -106,7 +106,7 @@ describe Participant do
     context "when the round is not nil" do
       it "uses questionnaire symbol with round as hash key and populates the score hash" do
         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2)\
-        .with(no_args).and_return(3)
+          .with(no_args).and_return(3)
         allow(assignment).to receive(:questionnaires).and_return([questionnaire])
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)

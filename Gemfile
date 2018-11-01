@@ -69,8 +69,7 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
-heroku_java_home = '/usr/lib/jvm/java-7-openjdk-amd64'
-ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)
+
 group :development do
   gem 'daemons'
   gem 'pry'
@@ -79,6 +78,27 @@ group :development do
   gem 'quiet_assets'
   gem 'rubocop'
   gem 'selenium-webdriver'
+end
+
+group :test do
+  gem 'database_cleaner'
+  gem "factory_bot_rails"
+  gem 'gherkin'
+  gem 'guard-rails'
+  gem 'guard-rspec'
+  gem 'launchy'
+  gem 'mutant-rspec'
+  gem 'rspec-rails'
+  gem 'shoulda'
+end
+
+group :assets do
+  gem 'coffee-rails'
+end
+
+group :development, :test do
+  gem 'capybara'
+  gem 'simplecov', require: false
 end
 
 group :test do

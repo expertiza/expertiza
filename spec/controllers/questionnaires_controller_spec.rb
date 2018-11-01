@@ -16,7 +16,7 @@ describe QuestionnairesController do
   end
 
   def check_access username
-    stub_current_user(username,username.role.name,username.role)
+    stub_current_user(username, username.role.name, username.role)
     expect(controller.send(:action_allowed?))
   end
 

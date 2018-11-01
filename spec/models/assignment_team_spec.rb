@@ -2,6 +2,7 @@ describe AssignmentTeam do
   let(:user) { User.new(id: 1) }
   let(:assignment_team) { build(:assignment_team, id: 2, parent_id: 2, name: "team2", users: [user], submitted_hyperlinks: "https://www.1.ncsu.edu") }
   let(:assignment_team1) { build(:assignment_team, id: 1, parent_id: 1, name: "team1", submitted_hyperlinks: "") }
+  let(:assignment_team2) { build(:assignment_team, id: 3, parent_id: 3, directory_num: -1) }
   let(:questions) { {QuizQuestionnaire: double(:question)} }
   let(:questionnaire) { build(:questionnaire) }
   let(:assignment) { build(:assignment, id: 1, questionnaires: [questionnaire], name: 'Test Assgt') }
@@ -312,9 +313,9 @@ describe AssignmentTeam do
   describe "#set_student_directory_num" do
     context "when there is no directory number for the assignment team" do
       it "sets a directory number for the assignment team" do
-        allow(assignment_team1).to receive(:try).with(:directory).and_return(-1)
+        # allow(assignment_team1).to receive(:try).with(:directory).and_return(-1)
         allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).and_return(4)
-        expect(assignment_team1.set_student_directory_num).to eq(true)
+        expect(assignment_team2.set_student_directory_num).to eq(true)
       end
     end
   end

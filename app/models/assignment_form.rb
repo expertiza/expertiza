@@ -164,8 +164,8 @@ class AssignmentForm
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
       diff_btw_time_left_and_threshold, min_left = get_time_diff_btw_due_date_and_now(due_date)
       next unless diff_btw_time_left_and_threshold > 0
-      delayed_job = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
-      due_date.update_attribute(:delayed_job_id, delayed_job.id)
+      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
+      due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
       add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left) if deadline_type == "review"
       # If the deadline type is team_formation, add a delayed job to drop one member team

@@ -48,7 +48,7 @@ describe 'AssignmentTeam' do
 
     context "when it has wrong id" do
       it "raises an exception" do
-        expect{AssignmentTeam.parent_model 2 }.to raise_exception(ActiveRecord::RecordNotFound)
+        expect {AssignmentTeam.parent_model 2 }.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -74,27 +74,28 @@ describe 'AssignmentTeam' do
   describe "#assign_reviewer" do
     context "when the team has assignment" do
       it "returns an instance of ReviewResponseMap" do
-        expect(assignment_team.assign_reviewer reviewer).to be_instance_of(ReviewResponseMap)
+        expect(assignment_team.assign_reviewer (reviewer)).to be_instance_of(ReviewResponseMap)
       end
     end
 
     context "when the assignment record can not be found" do
       it "returns an exception" do
-        expect{ assignment_team2.assign_reviewer reviewer }.to raise_exception(ActiveRecord::RecordNotFound) 
+        expect {assignment_team2.assign_reviewer (reviewer)}.to raise_exception(ActiveRecord::RecordNotFound) 
       end
     end
   end
 
   describe "#reviewd_by?" do
     it "returns true" do
-      allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', 1, 1, 1).and_return([review_response_map])
+      allow(ReviewResponseMap).to receive(:where).with(
+        'reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', 1, 1, 1).and_return([review_response_map])
       expect(assignment_team.reviewed_by? reviewer).to be true
     end
   end
 
   describe "#topic" do
     it "returns a topic id" do
-      allow(SignedUpTeam).to receive(:find_by).with(team_id:1, is_waitlisted: 0).and_return(signed_up_team)
+      allow(SignedUpTeam).to receive(:find_by).with(team_id: 1, is_waitlisted: 0).and_return(signed_up_team)
       expect(assignment_team.topic).to eq(1)
     end
   end
@@ -125,7 +126,7 @@ describe 'AssignmentTeam' do
   let(:reviews1) { build(:review_response_map, assignment_id: 1, reviewer_id: 1, reviewee_id: 2) }
   let(:reviews2) { build(:review_response_map, assignment_id: 1, reviewer_id: 2, reviewee_id: 1) }
   let(:questionnary1) { build(:questionnaire, id: 1) } 
-  let(:question1) { build(:question, id: 1) } 
+  let(:question1) { build(:question, id: 1) }
   describe "#submission" do
     context "when current teams submitted hyperlinks" do
       it "submitted hyperlinks" do
@@ -169,7 +170,7 @@ describe 'AssignmentTeam' do
         allow(AssignmentTeam).to receive(:users).with(id: team1.id).and_return([par1, par2])
         expect(team1.participants).to eq([])
       end
-    end 
+    end
   end
 
   describe "#delete and destroy" do
@@ -193,8 +194,8 @@ describe 'AssignmentTeam' do
         expect(AssignmentTeam.get_first_member(team1.id)).to eq(par1)
       end
       it '#switch_order' do
-        allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
-        allow(team1).to receive(:participants).and_return([par2, par1])
+        # allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
+        # allow(team1).to receive(:participants).and_return([par2, par1])
         expect(AssignmentTeam.get_first_member(team1.id)).to eq(par2)
       end
     end
@@ -203,12 +204,9 @@ describe 'AssignmentTeam' do
   describe "#import and export" do
     context "import" do
       it '#import an nonexisting assignment id' do
-        row = {
-          :teamname => "hello_world",
-          :teammembers => ["johns", "kate"]
-        }
-        options = { :has_teamname => "true_first" }
-        expect{ AssignmentTeam.import(row, 99999, options) }.to raise_error(ImportError)
+        row = {teamname: "hello_world", teammembers: ["johns", "kate"]}
+        options = {has_teamname: "true_first" }
+        expect{ AssignmentTeam.import(row, 99_999, options) }.to raise_error(ImportError)
       end
       it '#export' do
         options = {}
@@ -247,7 +245,6 @@ describe AssignmentTeam do
   let(:assignment_team1) {build(:assignment_team, directory_num: nil)}
   let(:participant) { build(:participant) }
   let(:team_user) { build(:team_user) }
-  
 
   describe "#hyperlinks" do
     context "when current teams submitted hyperlinks" do
@@ -292,7 +289,7 @@ describe AssignmentTeam do
         end
         it "raise error" do
           allow(Net::HTTP).to receive(:get_response).with(URI(@link + 'http://')).and_return("402")
-          expect{(assignment_team.submit_hyperlink @link )}.to raise_error('HTTP status code: 402')
+          expect {(assignment_team.submit_hyperlink @link )}.to raise_error('HTTP status code: 402')
         end
       end
     end
@@ -330,11 +327,11 @@ describe AssignmentTeam do
 
   describe '#export_fields' do
     it 'the team_name equals false' do
-      options = {:team_name => "false"}
+      options = {team_name: "false"}
       expect(AssignmentTeam.export_fields(options)).to eq(["Team Name", "Team members", "Assignment Name"])
     end
     it 'the team_name equals true' do
-      options = {:team_name => "true"}
+      options = {team_name: "true"}
       expect(AssignmentTeam.export_fields(options)).to eq(["Team Name", "Assignment Name"])
     end
   end
@@ -361,11 +358,13 @@ describe AssignmentTeam do
     end
     context 'the directory_num does not exist' do
       it 'get max num' do
-        expect(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
+        expect(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).with(
+          parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
         assignment_team1.set_student_directory_num
       end
       it 'update attribute' do
-        allow(AssignmentTeam).to receive_message_chain(:where,:order,:first,:directory_num).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
+        allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).with(
+          parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
         expect(assignment_team1).to receive(:update_attributes).with(directory_num: 2)
         assignment_team1.set_student_directory_num
       end

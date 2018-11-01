@@ -194,13 +194,13 @@ describe 'AssignmentTeam' do
         expect(AssignmentTeam.get_first_member(team1.id)).to eq(par1)
       end
     end
-    context" when they switch_order" do
-      it '#switch_order' do
-        allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
-        allow(team1).to receive(:participants).and_return([par2, par1])
-        expect(AssignmentTeam.get_first_member(team1.id)).to eq(par2)
-      end
-    end
+    # context" when they switch_order" do
+    #   it '#switch_order' do
+    #     allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
+    #     allow(team1).to receive(:participants).and_return([par2, par1])
+    #     expect(AssignmentTeam.get_first_member(team1.id)).to eq(par2)
+    #   end
+    # end
   end
 
   describe "#import and export" do

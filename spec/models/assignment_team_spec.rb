@@ -380,4 +380,3 @@ describe AssignmentTeam do
     end
   end
 end
-

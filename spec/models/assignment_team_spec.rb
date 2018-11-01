@@ -48,7 +48,7 @@ describe 'AssignmentTeam' do
 
     context "when it has wrong id" do
       it "raises an exception" do
-        expect{AssignmentTeam.parent_model(2)}.to raise_exception(ActiveRecord::RecordNotFound)}
+        expect{AssignmentTeam.parent_model 2 }.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -74,13 +74,13 @@ describe 'AssignmentTeam' do
   describe "#assign_reviewer" do
     context "when the team has assignment" do
       it "returns an instance of ReviewResponseMap" do
-        expect(assignment_team.assign_reviewer(reviewer)).to be_instance_of(ReviewResponseMap)
+        expect(assignment_team.assign_reviewer reviewer).to be_instance_of(ReviewResponseMap)
       end
     end
 
     context "when the assignment record can not be found" do
       it "returns an exception" do
-        expect{ assignment_team2.assign_reviewer(reviewer)}.to raise_exception(ActiveRecord::RecordNotFound) }
+        expect{ assignment_team2.assign_reviewer reviewer }.to raise_exception(ActiveRecord::RecordNotFound) 
       end
     end
   end
@@ -208,7 +208,7 @@ describe 'AssignmentTeam' do
           :teammembers => ["johns", "kate"]
         }
         options = { :has_teamname => "true_first" }
-        expect{AssignmentTeam.import(row, 99999, options)}.to raise_error(ImportError)}
+        expect{ AssignmentTeam.import(row, 99999, options) }.to raise_error(ImportError)
       end
       it '#export' do
         options = {}
@@ -278,7 +278,7 @@ describe AssignmentTeam do
   describe '#submit_hyperlink' do
     context "when the hyperlink is empty" do
       it "raise excpetion" do
-        expect{(assignment_team.submit_hyperlink "")}.to raise_error('The hyperlink cannot be empty!')}
+        expect{ (assignment_team.submit_hyperlink "") }.to raise_error('The hyperlink cannot be empty!')
       end
     end
     context "the link does not start with http:// or https://" do
@@ -292,7 +292,7 @@ describe AssignmentTeam do
         end
         it "raise error" do
           allow(Net::HTTP).to receive(:get_response).with(URI(@link + 'http://')).and_return("402")
-          expect{(assignment_team.submit_hyperlink @link)}.to raise_error('HTTP status code: 402')}
+          expect{(assignment_team.submit_hyperlink @link )}.to raise_error('HTTP status code: 402')
         end
       end
     end

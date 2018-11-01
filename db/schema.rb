@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180427030840) do
+ActiveRecord::Schema.define(version: 20181101013729) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(version: 20180427030840) do
     t.integer  "round",                       limit: 4
     t.boolean  "flag",                                    default: false
     t.integer  "threshold",                   limit: 4,   default: 1
-    t.integer  "delayed_job_id",              limit: 4
+    t.string   "delayed_job_id",              limit: 255
     t.string   "deadline_name",               limit: 255
     t.string   "description_url",             limit: 255
     t.integer  "quiz_allowed_id",             limit: 4,   default: 1

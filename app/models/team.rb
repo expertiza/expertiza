@@ -122,7 +122,7 @@ class Team < ActiveRecord::Base
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
     for i in (1..num_of_teams).to_a
-      team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
+      team = Object.const_get(team_type + 'Team').create(name: "Team" + "_" + i.to_s, parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: team.id)
       min_team_size.times do
         break if next_team_member_index >= users.length

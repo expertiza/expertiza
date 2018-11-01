@@ -12,23 +12,8 @@ describe Participant do
   
   describe "#team" do
    it "returns the team id for the user" do
-	   user= build(:student, name: 'no name', fullname: 'no one') 
-#     team = build(:team, id: 1, name: 'no team') 
-     p1 = build(:participant) 
-#	   team_user = build(:team_user, id: 1, user:student , team: team)
- 
-
-     #allow(participant).to receive(:team_user)
-     #expect(participant.team).to eq(1)
-     
-#     team_user = build(:team_user, user: user)
-#     allow(TeamsUser).to receive(:find_by).with(user: user).and_return(user)
-#     allow(user).to receive(:try).with(team: team).and_return(team_user.team)
-#     allow(p1).to receive(:team_user)
-#     expect(participant.team).to eq(1)
-     #expect(team_user.user).to eq(1)
-     
-    end   
+     expect(participant.team).to eq(nil)
+   end   
   end
   
    describe '#responses' do
@@ -158,4 +143,10 @@ describe Participant do
        expect(ids).to match_array([2, 3, 1]) 
      end  
    end
+   
+   describe "#delete" do
+    it " should remove a participant if there is no pre-existing association" do
+      expect(participant.delete(true)).to eq(participant)
+    end
+  end
 end

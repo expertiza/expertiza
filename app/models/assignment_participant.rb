@@ -189,9 +189,9 @@ class AssignmentParticipant < Participant
     files
   end
 
-  #def team
+  # def team
   #  AssignmentTeam.team(self)
-  #end
+  # end
 
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment

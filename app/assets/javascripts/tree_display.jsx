@@ -475,8 +475,20 @@ jQuery(document).ready(function() {
         expanded: false
       }
     },
+    componentDidMount: function() {
+      selectedMenuItem = document.getElementById("tree_display").getAttribute("data-menu-item");
+      rubricArray = ["Review", "Metareview", "Author Feedback", "Teammate Review", "Course Survey", "Assignment Survey", "Global Survey"];
+      selectedMenuItemIndex = rubricArray.indexOf(selectedMenuItem);
+
+      if(selectedMenuItemIndex !== -1 && rubricArray[selectedMenuItemIndex] === this.props.name) {
+          this.setState({
+              expanded: true
+          }, function() {
+              this.props.rowClicked(this.props.id, true,this.props.newParams)
+          })
+      }
+    },
     handleClick: function(event) {
-        //alert('click');
 
       if (event.target.type != 'button') {
         this.setState({

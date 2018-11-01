@@ -7,10 +7,11 @@ class TreeDisplayController < ApplicationController
   end
 
   # refactored method to provide direct access to parameters
-  def goto_controller(name_parameter)
+  def goto_controller(name_parameter, last_open_tab)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    session[:last_open_tab] = last_open_tab unless last_open_tab.nil?
+    redirect_to controller: 'tree_display', action: 'list', current_controller: name_parameter
   end
 
   def confirm
@@ -20,61 +21,63 @@ class TreeDisplayController < ApplicationController
 
   # direct access to questionnaires
   def goto_questionnaires
-    goto_controller('Questionnaires')
+    goto_controller('Questionnaires','3')
   end
 
   # direct access to review rubrics
   def goto_review_rubrics
-    goto_controller('Review')
+    goto_controller('Review', '3')
   end
 
   # direct access to metareview rubrics
   def goto_metareview_rubrics
-    goto_controller('Metareview')
+    goto_controller('Metareview', '3')
   end
 
   # direct access to teammate review rubrics
   def goto_teammatereview_rubrics
-    goto_controller('Teammate Review')
+    goto_controller('Teammate Review', '3')
   end
 
   # direct access to author feedbacks
   def goto_author_feedbacks
-    goto_controller('Author Feedback')
+    goto_controller('Author Feedback', '3')
   end
 
   # direct access to global survey
   def goto_global_survey
-    goto_controller('Global Survey')
+    goto_controller('Global Survey', '3')
   end
 
   # direct access to surveys
   def goto_surveys
-    goto_controller('Assignment Survey')
+    goto_controller('Assignment Survey', '3')
   end
 
   # direct access to course surveys
   def goto_course_surveys
-    goto_controller('Course Survey')
+    # Course surveys aren't properly mapped right now from the navigation menu, leading them to redirect to assignment surveys.
+    goto_controller('Course Survey', '3')
+  end
+
+  def goto_bookmarkrating_rubrics
+    goto_controller('Bookmarkrating', '3')
   end
 
   # direct access to courses
   def goto_courses
-    goto_controller('Courses')
-  end
-
-  def goto_bookmarkrating_rubrics
-    goto_controller('Bookmarkrating')
+    goto_controller('Courses', '1')
   end
 
   # direct access to assignments
   def goto_assignments
-    goto_controller('Assignments')
+    goto_controller('Assignments', '2')
   end
 
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
+    @current_controller = params[:current_controller]
     redirect_to controller: :content_pages, action: :view if current_user.nil?
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end

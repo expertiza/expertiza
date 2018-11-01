@@ -3,16 +3,16 @@ describe 'AssignmentTeam' do
   # let(:assignment) { build(:assignment) }
   # let(:team) { build(:assignment_team) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team) }
-  let(:assignment_team) {build(:assignment_team, id: 1, parent_id: 1, name: "full name")}
-  let(:assignment_team2)  {build(:assignment_team, id: 2, parent_id: 2)}
-  let(:assignment) { build(:assignment, id: 1)}
+  let(:assignment_team) { build(:assignment_team, id: 1, parent_id: 1, name: "full name") }
+  let(:assignment_team2) { build(:assignment_team, id: 2, parent_id: 2) }
+  let(:assignment) { build(:assignment, id: 1) }
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: "") }
-  let(:reviewer) {build(:participant, id: 1)}
-  let(:signed_up_team) {build(:signed_up_team, id:1, team_id: 1, is_waitlisted: 0, topic_id:1)}
-  let(:review_response_map) {build(:review_response_map, id: 1, assignment: assignment, reviewer: reviewer, reviewee: assignment_team) }
-  let(:user) {build(:student, id: 1, master_permission_granted: 0)}
-  let(:participant1) {build(:participant, id: 2, user: user) }
-  let(:participant2) {build(:participant, id: 3)}
+  let(:reviewer) { build(:participant, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, id: 1, team_id: 1, is_waitlisted: 0, topic_id: 1) }
+  let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: reviewer, reviewee: assignment_team) }
+  let(:user) { build(:student, id: 1, master_permission_granted: 0) }
+  let(:participant1) { build(:participant, id: 2, user: user) }
+  let(:participant2) { build(:participant, id: 3) }
 
   describe "#include" do
     context "when it contains a given participant" do
@@ -48,7 +48,7 @@ describe 'AssignmentTeam' do
 
     context "when it has wrong id" do
       it "raises an exception" do
-        expect{AssignmentTeam.parent_model(2)}.to raise_exception(ActiveRecord::RecordNotFound)
+        expect{AssignmentTeam.parent_model(2)}.to raise_exception(ActiveRecord::RecordNotFound)}
       end
     end
   end
@@ -80,7 +80,7 @@ describe 'AssignmentTeam' do
 
     context "when the assignment record can not be found" do
       it "returns an exception" do
-        expect{assignment_team2.assign_reviewer(reviewer)}.to raise_exception(ActiveRecord::RecordNotFound)
+        expect{ assignment_team2.assign_reviewer(reviewer)}.to raise_exception(ActiveRecord::RecordNotFound) }
       end
     end
   end
@@ -88,7 +88,7 @@ describe 'AssignmentTeam' do
   describe "#reviewd_by?" do
     it "returns true" do
       allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', 1, 1, 1).and_return([review_response_map])
-      expect(assignment_team.reviewed_by? (reviewer)).to be true
+      expect(assignment_team.reviewed_by? reviewer).to be true
     end
   end
 
@@ -129,28 +129,28 @@ describe 'AssignmentTeam' do
   describe "#submission" do
     context "when current teams submitted hyperlinks" do
       it "submitted hyperlinks" do
-      expect(team1.has_submissions?).to eq(true)
+        expect(team1.has_submissions?).to eq(true)
       end
       it "didn't submit hyperlinks" do
-      expect(team2.has_submissions?).to eq(false)
+        expect(team2.has_submissions?).to eq(false)
       end
     end
     context "when current teams submitted files" do
       it "returns false" do
-      expect(team2.has_submissions?).to eq(false)
+        expect(team2.has_submissions?).to eq(false)
       end
       it "returns true" do
-  allow(team2).to receive(:submitted_files).and_return([double(:File)])
+        allow(team2).to receive(:submitted_files).and_return([double(:File)])
         expect(team2.has_submissions?).to be true
       end
     end
     context "submitted files" do
       it '#not submitted_files' do
-        expect(team3.submitted_files()).to eq([])
+        expect(team3.submitted_files).to eq([])
       end
       it '#has submitted_files' do
-  allow(AssignmentTeam).to receive(:directory_num).and_return(1)
-        expect(team3.submitted_files("public/team3/")).to eq([]) #????
+        allow(AssignmentTeam).to receive(:directory_num).and_return(1)
+        expect(team3.submitted_files("public/team3/")).to eq([])
       end
     end
   end
@@ -166,8 +166,8 @@ describe 'AssignmentTeam' do
         expect(team1.add_participant(ass1.id, par1)).to be_instance_of(AssignmentParticipant) 
       end
       it '#1 participant' do
-          allow(AssignmentTeam).to receive(:users).with(id: team1.id).and_return([par1, par2])
-          expect(team1.participants).to eq([])
+        allow(AssignmentTeam).to receive(:users).with(id: team1.id).and_return([par1, par2])
+        expect(team1.participants).to eq([])
       end
     end 
   end
@@ -193,9 +193,9 @@ describe 'AssignmentTeam' do
         expect(AssignmentTeam.get_first_member(team1.id)).to eq(par1)
       end
       it '#switch_order' do
-  allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
-  allow(team1).to receive(:participants).and_return([par2, par1])
-  expect(AssignmentTeam.get_first_member(team1.id)).to eq(par2)
+        allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)
+        allow(team1).to receive(:participants).and_return([par2, par1])
+        expect(AssignmentTeam.get_first_member(team1.id)).to eq(par2)
       end
     end
   end
@@ -207,8 +207,8 @@ describe 'AssignmentTeam' do
           :teamname => "hello_world",
           :teammembers => ["johns", "kate"]
         }
-        options = {:has_teamname => "true_first"}
-        expect{AssignmentTeam.import(row, 99999, options)}.to raise_error(ImportError)
+        options = { :has_teamname => "true_first" }
+        expect{AssignmentTeam.import(row, 99999, options)}.to raise_error(ImportError)}
       end
       it '#export' do
         options = {}
@@ -278,7 +278,7 @@ describe AssignmentTeam do
   describe '#submit_hyperlink' do
     context "when the hyperlink is empty" do
       it "raise excpetion" do
-        expect{(assignment_team.submit_hyperlink(""))}.to raise_error('The hyperlink cannot be empty!')
+        expect{(assignment_team.submit_hyperlink "")}.to raise_error('The hyperlink cannot be empty!')}
       end
     end
     context "the link does not start with http:// or https://" do
@@ -287,12 +287,12 @@ describe AssignmentTeam do
           @link = "htp.aa/.."
         end
         it "call the method on NET::HTTP" do
-          expect(Net::HTTP).to receive(:get_response).with(URI(@link+'http://'))
+          expect(Net::HTTP).to receive(:get_response).with(URI(@link + 'http://'))
           assignment_team.submit_hyperlink(@link)
         end
         it "raise error" do
-          allow(Net::HTTP).to receive(:get_response).with(URI(@link+'http://')).and_return("402")
-          expect{(assignment_team.submit_hyperlink(@link))}.to raise_error('HTTP status code: 402')
+          allow(Net::HTTP).to receive(:get_response).with(URI(@link + 'http://')).and_return("402")
+          expect{(assignment_team.submit_hyperlink @link)}.to raise_error('HTTP status code: 402')}
         end
       end
     end
@@ -317,7 +317,7 @@ describe AssignmentTeam do
     context 'can find the participant' do
       it 'send the correct user_id to the TeamsUser.where method' do
         expect(TeamsUser).to receive(:where).with(user_id: participant.user_id).and_return([team_user])
-          AssignmentTeam.team(participant)
+        AssignmentTeam.team(participant)
       end
       context 'the team user exists' do
         before :each do
@@ -330,11 +330,11 @@ describe AssignmentTeam do
 
   describe '#export_fields' do
     it 'the team_name equals false' do
-      options = {:team_name =>"false"}
-      expect(AssignmentTeam.export_fields(options)).to eq(["Team Name", "Team members","Assignment Name"])
+      options = {:team_name => "false"}
+      expect(AssignmentTeam.export_fields(options)).to eq(["Team Name", "Team members", "Assignment Name"])
     end
     it 'the team_name equals true' do
-      options = {:team_name =>"true"}
+      options = {:team_name => "true"}
       expect(AssignmentTeam.export_fields(options)).to eq(["Team Name", "Assignment Name"])
     end
   end
@@ -348,7 +348,7 @@ describe AssignmentTeam do
 
   describe '#path' do
     it 'can get the path' do
-      expect(assignment_team.path).to eq(Rails.root.to_s+'/pg_data/instructor6/csc517/test/final_test/0')
+      expect(assignment_team.path).to eq(Rails.root.to_s + '/pg_data/instructor6/csc517/test/final_test/0')
       assignment_team.path
     end
   end
@@ -361,7 +361,7 @@ describe AssignmentTeam do
     end
     context 'the directory_num does not exist' do
       it 'get max num' do
-        expect(AssignmentTeam).to receive_message_chain(:where,:order,:first,:directory_num).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
+        expect(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
         assignment_team1.set_student_directory_num
       end
       it 'update attribute' do

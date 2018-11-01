@@ -75,7 +75,6 @@ describe AssignmentTeam do
         expect { assignment_team.assign_reviewer(participant2) }.to raise_exception("The assignment cannot be found.")
       end
     end
-
     context "when the assignment record can be found by the parent id of the current assignment team" do
       it "create a new ReviewResponseMap" do
         expect(assignment_team1.assign_reviewer(participant1)).to be_instance_of(ReviewResponseMap)
@@ -91,7 +90,6 @@ describe AssignmentTeam do
         expect(assignment_team1.reviewed_by?(participant1)).to be true
       end
     end
-
     context "when no submission of this assignment team was reviewed by this reviewer" do
       it "returns false" do
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
@@ -115,7 +113,6 @@ describe AssignmentTeam do
         expect(assignment_team1.has_submissions?).to be true
       end
     end
-
     context "when current assignment team did not submit files but submitted hyperlinks" do
       it "returns true" do
         allow(assignment_team1).to receive(:submitted_hyperlinks).and_return([double(:Hyperlink)])
@@ -140,7 +137,6 @@ describe AssignmentTeam do
     context "when the current team is an assignment team" do
       it "deletes topic sign up record, team users, team node and the team itself"
     end
-
     context "when the current team is not an assignment team" do
       it "deletes team users, team node and the team itself" do
         expect(assignment_team.delete).to eq(assignment_team)
@@ -167,10 +163,10 @@ describe AssignmentTeam do
     context "when there is no assignment with this assignment id" do
       it "raises an ImportError" do
         allow(Assignment).to receive(:find_by).with(id: 1).and_return(nil)
-        expect { AssignmentTeam.import([], 1, has_column_names: 'false') }.to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
+        expect { AssignmentTeam.import([], 1, has_column_names: 'false') }
+            .to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
       end
     end
-
     context "when there exists an assignment with this assignment id" do
       it "imports a csv file to form assignment teams" do
         allow(Assignment).to receive(:find_by).with(id: 2).and_return(double("Assignment", id: 2))
@@ -224,7 +220,6 @@ describe AssignmentTeam do
         expect(team.hyperlinks).to eq(["https://www.expertiza.ncsu.edu"])
       end
     end
-
     context "when current teams did not submit hyperlinks" do
       it "returns an empty array" do
         expect(team_without_submitted_hyperlinks.hyperlinks).to eq([])
@@ -234,7 +229,12 @@ describe AssignmentTeam do
 
   describe "#files" do
     it "returns all files in certain directory" do
-      expect(assignment_team1.files('./hooks')).to eq(["./hooks/pre-commit"])
+      expect(assignment_team1.files('./lib').count).to eq(10)
+      expect(assignment_team1.files('./lib')).to match_array(["./lib/assets","./lib/hamer.rb",
+                                                              "./lib/tasks", "./lib/tasks/background_email_reminder.rake",
+                                                              "./lib/tasks/data_migrate.rake", "./lib/tasks/db_diagram.rake",
+                                                              "./lib/tasks/gc4r_tasks.rake", "./lib/tasks/line_endings.rake",
+                                                              "./lib/tasks/rbeautify.rake", "./lib/tasks/scrub_database.rake"])
     end
   end
 
@@ -245,12 +245,10 @@ describe AssignmentTeam do
         expect { assignment_team1.submit_hyperlink(hyperlink) }.to raise_exception("The hyperlink cannot be empty!")
       end
     end
-
     context "when the hyperlink is not empty" do
       context "when Expertiza is unable to get the response from pinging the hyperlink" do
         it "raises an exception with corresponding HTTP status code"
       end
-
       context "when Expertiza is able to get the response from the hyperlink" do
         it "saves the hyperlink to submitted_hyperlinks field" do
           allow(Net::HTTP).to receive(:get_response).with(URI("https://www.expertiza.ncsu.edu"))
@@ -276,14 +274,12 @@ describe AssignmentTeam do
         expect(AssignmentTeam.team(participant1)).to eq(nil)
       end
     end
-
     context "when there are not team users records" do
       it "returns nil" do
         allow(TeamsUser).to receive(:where).with(user_id: 1).and_return(nil)
         expect(AssignmentTeam.team(participant1)).to eq(nil)
       end
     end
-
     context "when the participant is not nil and there exist team users records" do
       it "returns the team given the participant" do
         allow(TeamsUser).to receive(:where).with(user_id: 1).and_return([team_user])
@@ -316,9 +312,9 @@ describe AssignmentTeam do
   describe "#set_student_directory_num" do
     context "when there is no directory number for the assignment team" do
       it "sets a directory number for the assignment team" do
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return(4)
-        allow(AssignmentTeam).to receive(:update_attributes).with(directory_num: 5)
-        expect(assignment_team1.set_student_directory_num).to eq(nil)
+        allow(assignment_team1).to receive(:try).with(:directory).and_return(-1)
+        allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).and_return(4)
+        expect(assignment_team1.set_student_directory_num).to eq(true)
       end
     end
   end
@@ -330,7 +326,6 @@ describe AssignmentTeam do
         expect(assignment_team1.received_any_peer_review?).to be true
       end
     end
-
     context "when there does not exist corresponding response maps" do
       it "returns false" do
         allow(ResponseMap).to receive(:where).with(reviewee_id: 1, reviewed_object_id: 1).and_return([])

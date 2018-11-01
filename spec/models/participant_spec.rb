@@ -95,11 +95,11 @@ describe Participant do
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)
         allow(assignment).to receive(:compute_total_score).with(any_args).and_return(10)
-        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true,
-        can_review: false, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil,
-        type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0,
-        Lauw: 0.0>, :review=>{:assessments=>#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil,
-        round: 1, is_submitted: false>, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
+        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, "\
+        "can_review: false, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
+        "type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, "\
+        "Lauw: 0.0>, :review=>{:assessments=>#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, "\
+        "round: 1, is_submitted: false>, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
       end
     end
 
@@ -111,11 +111,11 @@ describe Participant do
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)
         allow(assignment).to receive(:compute_total_score).with(any_args).and_return(10)
-        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true,
-        can_review: false, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil,
-        type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0,
-        Lauw: 0.0>, :review3=>{:assessments=>#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil,
-        round: 1, is_submitted: false>, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
+        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, "\
+        "can_review: false, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
+        "type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, "\
+        "Lauw: 0.0>, :review3=>{:assessments=>#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, "\
+        "round: 1, is_submitted: false>, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
       end
     end
   end

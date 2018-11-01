@@ -36,8 +36,7 @@ class SubmittedContentController < ApplicationController
   end
 
   def submit_hyperlink
-    # @participant = AssignmentParticipant.find(params[:id])
-    participant = AssignmentParticipant.find(params[:id])
+    @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     team = @participant.team
     team_hyperlinks = team.hyperlinks
@@ -60,9 +59,9 @@ class SubmittedContentController < ApplicationController
       undo_link("The link has been successfully submitted.")
 
       # E1834 Fall 18
-      # Send email to reviewers to review new submission, if review_round is valid and not last.
-      if participant.is_round_valid_for_mail?
-        participant.reviewers.each do |reviewer|
+      # Send email to reviewers to review new submission, if the participant is not in the last round.
+      if !@participant.is_in_final_round?
+        @participant.reviewers.each do |reviewer|
           map = ReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', reviewer.id, @participant.team.id]).first
           responses = Response.where(:map_id => map.id)
           responses = responses.sort_by { |obj| obj.updated_at }

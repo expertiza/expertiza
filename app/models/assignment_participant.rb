@@ -292,14 +292,11 @@ class AssignmentParticipant < Participant
   end
 
   # E1834 Fall 18
-  def is_round_valid_for_mail?
+  def is_in_final_round?
     topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
-    return assignment.review_deadline(topic_id, assignment.num_review_rounds)
+    return false if topic_id.nil? and self.staggered_deadline?
+    next_due_date = DueDate.get_next_due_date(self.parent_id, topic_id)
+    return !!(next_due_date.round == assignment.num_review_rounds && next_due_date.deadline_type_id == 2)
   end
 
-  # #E1834 Fall 18
-  # def number_of_current_round
-  #   topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
-  #   assignment.number_of_current_round(topic_id)
-  # end
 end

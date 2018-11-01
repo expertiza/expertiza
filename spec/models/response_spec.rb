@@ -17,6 +17,7 @@ describe Response do
     allow(response).to receive(:map).and_return(review_response_map)
   end
 
+
   describe '#response_id' do
     it 'returns the id of current response' do
       expect(response.response_id).to eq(1)

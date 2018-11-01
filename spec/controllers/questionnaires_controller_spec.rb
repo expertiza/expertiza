@@ -1,6 +1,6 @@
 describe QuestionnairesController do
   let(:questionnaire) do
-    build(id: 1,name: 'questionnaire',ta_id: 8, course_id: 1, private: false,min_question_score: 0,max_question_score: 5,type: 'ReviewQuestionnaire')
+    build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
   end
   let(:questionnaire) { build(:questionnaire) }
   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
@@ -13,7 +13,6 @@ describe QuestionnairesController do
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     stub_current_user(instructor, instructor.role.name, instructor.role)
-
   end
 
   def check_access username
@@ -68,12 +67,9 @@ describe QuestionnairesController do
         it 'does not allow certain action' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
           check_access(instructor2).to be false
-
         end
       end
     end
-
-
     context 'when params action is not edit and update' do
       before(:each) do
         controller.params = {id: '1', action: 'new'}
@@ -86,8 +82,6 @@ describe QuestionnairesController do
       end
     end
   end
-
-
   describe '#copy,  #copy_questionnaire_details and #assign_instructor_id' do
     it 'redirects to view page of copied questionnaire' do
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)

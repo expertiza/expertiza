@@ -120,25 +120,25 @@ describe Participant do
   describe ".get_permissions" do
     context "when the current user is a participant" do
       it "returns a hash with value {can_submit: true, can_review: true, can_take_quiz: true}" do
-        expect(Participant.get_permissions("participant")).to eq(:can_submit => true, :can_review => true, :can_take_quiz => true)
+        expect(Participant.get_permissions("participant")).to eq(can_submit: true, can_review: true, can_take_quiz: true)
       end
     end
 
     context "when the current user is a reader" do
       it "returns a hash with value {can_submit: false, can_review: true, can_take_quiz: true}" do
-        expect(Participant.get_permissions("reader")).to eq(:can_submit => false, :can_review => true, :can_take_quiz => true)
+        expect(Participant.get_permissions("reader")).to eq(can_submit: false, can_review: true, can_take_quiz: true)
       end
     end
 
     context "when the current user is a submitter" do
       it "returns a hash with value {can_submit: true, can_review: false, can_take_quiz: false}" do
-        expect(Participant.get_permissions("submitter")).to eq(:can_submit => true, :can_review => false, :can_take_quiz => false)
+        expect(Participant.get_permissions("submitter")).to eq(can_submit: true, can_review: false, can_take_quiz: false)
       end
     end
 
     context "when the current user is a reviewer" do
       it "returns a hash with value {can_submit: false, can_review: true, can_take_quiz: false}" do
-        expect(Participant.get_permissions("reviewer")).to eq(:can_submit => false, :can_review => true, :can_take_quiz => false)
+        expect(Participant.get_permissions("reviewer")).to eq(can_submit: false, can_review: true, can_take_quiz: false)
       end
     end
   end

@@ -80,7 +80,7 @@ describe 'AssignmentTeam' do
 
     context "when the assignment record can not be found" do
       it "returns an exception" do
-        expect { (assignment_team2.assign_reviewer(reviewer)) }.to raise_exception(ActiveRecord::RecordNotFound)
+        expect { assignment_team2.assign_reviewer(reviewer) }.to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -207,7 +207,7 @@ describe 'AssignmentTeam' do
   describe "#import and export" do
     context "import" do
       it '#import an nonexisting assignment id' do
-        row = {teamname: "hello_world", teammembers: %w(johns kate)}
+        row = {teamname: "hello_world", teammembers: %w[johns kate]}
         options = {has_teamname: "true_first"}
         expect { AssignmentTeam.import(row, 99_999, options) }.to raise_error(ImportError)
       end

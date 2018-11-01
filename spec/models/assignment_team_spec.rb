@@ -74,13 +74,13 @@ describe 'AssignmentTeam' do
   describe "#assign_reviewer" do
     context "when the team has assignment" do
       it "returns an instance of ReviewResponseMap" do
-        expect(assignment_team.assign_reviewer reviewer).to be_instance_of(ReviewResponseMap)
+        expect(assignment_team.assign_reviewer(reviewer)).to be_instance_of(ReviewResponseMap)
       end
     end
 
     context "when the assignment record can not be found" do
       it "returns an exception" do
-        expect(assignment_team2.assign_reviewer reviewer).to raise_exception(ActiveRecord::RecordNotFound)
+        expect(assignment_team2.assign_reviewer(reviewer)).to raise_exception(ActiveRecord::RecordNotFound)
       end
     end
   end
@@ -89,11 +89,11 @@ describe 'AssignmentTeam' do
     it "returns true" do
       allow(ReviewResponseMap).to receive(:where).with(
         'reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', 
-        1, 
-        1, 
+        1,
+        1,
         1
-        ).and_return([review_response_map])
-      expect { (assignment_team.reviewed_by? reviewer) }.to be true
+                                                      ).and_return([review_response_map])
+      expect(assignment_team.reviewed_by? reviewer).to be true
     end
   end
 
@@ -208,7 +208,7 @@ describe 'AssignmentTeam' do
   describe "#import and export" do
     context "import" do
       it '#import an nonexisting assignment id' do
-        row = {teamname: "hello_world", teammembers: %w(johns, kate)}
+        row = {teamname: "hello_world", teammembers: %w(johns kate)}
         options = {has_teamname: "true_first"}
         expect { AssignmentTeam.import(row, 99_999, options) }.to raise_error(ImportError)
       end
@@ -279,7 +279,7 @@ describe AssignmentTeam do
   describe '#submit_hyperlink' do
     context "when the hyperlink is empty" do
       it "raise excpetion" do
-        expect{ (assignment_team.submit_hyperlink "") }.to raise_error('The hyperlink cannot be empty!')
+        expect { (assignment_team.submit_hyperlink "") }.to raise_error('The hyperlink cannot be empty!')
       end
     end
     context "the link does not start with http:// or https://" do
@@ -363,19 +363,19 @@ describe AssignmentTeam do
     context 'the directory_num does not exist' do
       it 'get max num' do
         expect(AssignmentTeam).to receive_message_chain(
-          :where, 
-          :order, 
-          :first, 
-          :directory_num
-          ).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
+        :where,
+        :order,
+        :first,
+        :directory_num
+                                                       ).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
         assignment_team1.set_student_directory_num
       end
       it 'update attribute' do
         allow(AssignmentTeam).to receive_message_chain(:where, 
-          :order, 
-          :first, 
-          :directory_num
-          ).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
+        :order, 
+        :first, 
+        :directory_num
+                                                      ).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
         expect(assignment_team1).to receive(:update_attributes).with(directory_num: 2)
         assignment_team1.set_student_directory_num
       end

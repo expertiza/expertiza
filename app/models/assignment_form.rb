@@ -193,7 +193,9 @@ class AssignmentForm
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
   def delete_from_delayed_queue
     queue = Sidekiq::Queue.new("mailers")
+    puts "delete_from_delayed_queue"
     queue.each do |job|
+      puts job.args.inspect
       assignmentId = job.args.first
       job.delete if @assignment.id == assignmentId
     end

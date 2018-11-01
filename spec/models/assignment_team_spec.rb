@@ -360,17 +360,13 @@ describe AssignmentTeam do
     end
     context 'the directory_num does not exist' do
       it 'get max num' do
-        expect(AssignmentTeam).to receive_message_chain(:where,
-          :order,
-          :first,
-          :directory_num).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
+        expect(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).\
+          with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
         assignment_team1.set_student_directory_num
       end
       it 'update attribute' do
-        allow(AssignmentTeam).to receive_message_chain(:where,
-          :order,
-          :first,
-          :directory_num).with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
+        allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num).\
+          with(parent_id: assignment_team1.parent_id).with('directory_num desc').with(no_args).with(no_args).and_return(1)
         expect(assignment_team1).to receive(:update_attributes).with(directory_num: 2)
         assignment_team1.set_student_directory_num
       end

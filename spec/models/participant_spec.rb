@@ -82,7 +82,7 @@ describe Participant do
 
   describe ".sort_by_name" do
     it "returns sorted participants based on their user names" do
-      expect(Participant.sort_by_name([participant1, participant2, participant]).collect { |p| p.user.name }).to eq ["Alice", "Bob", "John Smith"]
+      expect(Participant.sort_by_name([participant1, participant2, participant]).collect {|p| p.user.name }).to eq ["Alice", "Bob", "John Smith"]
     end
   end
 
@@ -94,9 +94,11 @@ describe Participant do
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)
         allow(assignment).to receive(:compute_total_score).with(any_args).and_return(10)
-        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil,
-        penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review=>{:assessments=>#<Response id: nil,
-        map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
+        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil,
+        parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\",
+        time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review=>{:assessments=>#<Response id: nil,
+        map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>, :scores=>{:max=>10,
+        :min=>10, :avg=>10}}, :total_score=>10}")
       end
     end
 
@@ -107,9 +109,10 @@ describe Participant do
         allow(questionnaire).to receive(:get_assessments_for).with(participant).and_return(response)
         allow(Answer).to receive(:compute_scores).and_return(max: 10, min: 10, avg: 10)
         allow(assignment).to receive(:compute_total_score).with(any_args).and_return(10)
-        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil, parent_id: nil, submitted_at: nil,
-        permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>,
-        :review3=>{:assessments=>nil, :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
+        expect(participant.scores(questions).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: false, user_id: nil,
+        parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"nb\",
+        time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review3=>{:assessments=>nil,
+        :scores=>{:max=>10, :min=>10, :avg=>10}}, :total_score=>10}")
       end
     end
   end
@@ -117,25 +120,25 @@ describe Participant do
   describe ".get_permissions" do
     context "when the current user is a participant" do
       it "returns a hash with value {can_submit: true, can_review: true, can_take_quiz: true}" do
-        expect(Participant.get_permissions("participant")).to eq({:can_submit => true, :can_review => true, :can_take_quiz => true})
+        expect(Participant.get_permissions("participant")).to eq(:can_submit => true, :can_review => true, :can_take_quiz => true)
       end
     end
 
     context "when the current user is a reader" do
       it "returns a hash with value {can_submit: false, can_review: true, can_take_quiz: true}" do
-        expect(Participant.get_permissions("reader")).to eq({:can_submit => false, :can_review => true, :can_take_quiz => true})
+        expect(Participant.get_permissions("reader")).to eq(:can_submit => false, :can_review => true, :can_take_quiz => true)
       end
     end
 
     context "when the current user is a submitter" do
       it "returns a hash with value {can_submit: true, can_review: false, can_take_quiz: false}" do
-        expect(Participant.get_permissions("submitter")).to eq({:can_submit => true, :can_review => false, :can_take_quiz => false})
+        expect(Participant.get_permissions("submitter")).to eq(:can_submit => true, :can_review => false, :can_take_quiz => false)
       end
     end
 
     context "when the current user is a reviewer" do
       it "returns a hash with value {can_submit: false, can_review: true, can_take_quiz: false}" do
-        expect(Participant.get_permissions("reviewer")).to eq({:can_submit => false, :can_review => true, :can_take_quiz => false})
+        expect(Participant.get_permissions("reviewer")).to eq(:can_submit => false, :can_review => true, :can_take_quiz => false)
       end
     end
   end
@@ -143,25 +146,25 @@ describe Participant do
   describe ".get_authorization" do
     context " when the current user is able to submit work, review others' work and take quizzes" do
       it "indicates the current user is a participant" do
-        expect(Participant.get_authorization(can_submit = true, can_review = true, can_take_quiz = true)).to eq "participant"
+        expect(Participant.get_authorization(true, true, true)).to eq "participant"
       end
     end
 
     context " when the current user is unable to submit work but is able to review others' work and take quizzes" do
       it "indicates the current user is a reader" do
-        expect(Participant.get_authorization(can_submit = false, can_review = true, can_take_quiz = true)).to eq "reader"
+        expect(Participant.get_authorization(false, true, true)).to eq "reader"
       end
     end
 
     context " when the current user is able to submit work but is unable to review others' work and take quizzes" do
       it "indicates the current user is a submitter" do
-        expect(Participant.get_authorization(can_submit = true, can_review = false, can_take_quiz = false)).to eq "submitter"
+        expect(Participant.get_authorization(true, false, false)).to eq "submitter"
       end
     end
 
     context " when the current user is unable to submit work and take quizzes but is able to review others' work" do
       it "indicates the current user is a reviewer" do
-        expect(Participant.get_authorization(can_submit = false, can_review = true, can_take_quiz = false)).to eq "reviewer"
+        expect(Participant.get_authorization(false, true, false)).to eq "reviewer"
       end
     end
   end

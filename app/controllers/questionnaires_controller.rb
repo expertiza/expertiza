@@ -7,7 +7,7 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if action_name == "edit"
+    if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
        'Administrator'

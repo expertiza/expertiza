@@ -142,6 +142,8 @@ describe "airbrake-1517247902792549741" do
     visit '/tree_display/list'
     expect(page).to have_current_path('/student_task/list')
     expect(page).to have_content('Assignments')
+    expect(page).to have_content('Current Assignments')
+    expect(page).to have_content('Past Assignments')
     expect(page).to have_content('Tasks not yet started')
     expect(page).to have_content('Students who have teamed with you')
     expect(page).to have_content('Review Grade')

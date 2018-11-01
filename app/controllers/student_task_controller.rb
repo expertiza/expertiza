@@ -8,30 +8,70 @@ class StudentTaskController < ApplicationController
   def list
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
-    @student_tasks = StudentTask.from_user current_user
-    @student_tasks.select! {|t| t.assignment.availability_flag }
-
+    list_student_tasks
+    list_tasks_and_notifications
+    list_students_teamed_with
+  end
+  def list_student_tasks
+    # Get list of student tasks that are available
+    @all_tasks = StudentTask.from_user current_user
+    @student_tasks = @all_tasks.select {|t| t.assignment.availability_flag }
+    # Of the available tasks, now get a list of those that are currently due and past due
+    list_current_student_tasks
+    list_past_due_student_tasks
+  end
+  # This method creates a list of currently due tasks from all assignments that are available. This list will be sorted
+  # from assignments that are due the soonest to assignments that aren't due soon.
+  def list_current_student_tasks
+    @current_student_tasks = @student_tasks.select {|t| t.stage_deadline.to_date > Time.now }
+    unless @current_student_tasks.nil?
+      # If the list isn't empty, sort by deadline
+      @current_student_tasks = @current_student_tasks.sort_by!(&:stage_deadline)
+      @current_student_tasks = @current_student_tasks.paginate(page: params[:student_task_page], per_page: 10)
+    end
+  end
+  # This method creates a list of past due assignments from all assignments that are available. This list will be sorted
+  # from most recent assignment to older assignments
+  def list_past_due_student_tasks
+    @past_student_tasks = @student_tasks.select {|t| t.stage_deadline.to_date < Time.now }
+    unless @past_student_tasks.nil?
+      # If the list isn't empty, sort by deadline
+      @past_student_tasks.sort_by! {|k| k.stage_deadline }.reverse!
+      @past_student_tasks = @past_student_tasks.paginate(page: params[:past_assignment_page], per_page: 10)
+    end
+  end
+  def list_tasks_and_notifications
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
     @taskrevisions = @student_tasks.select(&:revision?)
-
+  end
+  def list_students_teamed_with
     ######## Students Teamed With###################
     @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip])
   end
 
   def view
     StudentTask.from_participant_id params[:id]
+    init_participant
+    denied unless current_user_id?(@participant.user_id)
+    init_assignment
+    init_timeline
+  end
+  def init_participant
     @participant = AssignmentParticipant.find(params[:id])
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz
     @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
     @team = @participant.team
-    denied unless current_user_id?(@participant.user_id)
+  end
+  def init_assignment
     @assignment = @participant.assignment
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+  end
+  def init_timeline
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end

@@ -166,6 +166,4 @@ class ReviewResponseMap < ResponseMap
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
-
-  private_class_method :prepare_final_review_versions, :prepare_review_response
 end

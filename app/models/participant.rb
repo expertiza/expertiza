@@ -49,13 +49,11 @@ class Participant < ActiveRecord::Base
   end
 
   def force_delete(maps)
-    return unless maps
-    maps.each(&:destroy)
-    return unless self.team
-    if self.team.teams_users.length == 1
+    maps and maps.each(&:destroy)
+    if self.team and self.team.teams_users.length == 1
       self.team.delete
-    else
-      self.team.teams_users.each {|teams_user| teams_user.delete if teams_user.user_id == self.id }
+    elsif self.team
+      self.team.teams_users.each {|teams_user| teams_user.destroy if teams_user.user_id == self.id }
     end
     self.destroy
   end

@@ -41,6 +41,11 @@ class AssignmentsController < ApplicationController
           existAssignment = Assignment.find_by_name(@assignment_form.assignment.name)
           assignment_form_params[:assignment][:id] = existAssignment.id.to_s
           quesparams = assignment_form_params
+          if quesparams[:assignment][:directory_path] == ""
+            quesparams[:assignment][:directory_path] = "#{quesparams[:assignment][:name]}_#{quesparams[
+                :assignment][:id]}_#{quesparams[:assignment][:course_id]}"
+          end
+          puts("Quest Params; #{quesparams}, #{quesparams[:directory_path]}")
           questArray = quesparams[:assignment_questionnaire]
           dueArray = quesparams[:due_date]
           questArray.each do |curquestionnaire|

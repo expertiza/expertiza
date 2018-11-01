@@ -87,10 +87,8 @@ describe 'AssignmentTeam' do
 
   describe "#reviewd_by?" do
     it "returns true" do
-      allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?',
-        1,
-        1,
-        1).and_return([review_response_map])
+      allow(ReviewResponseMap).to receive(:where).\
+        with('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', 1, 1, 1).and_return([review_response_map])
       expect(assignment_team.reviewed_by?(reviewer)).to be true
     end
   end
@@ -196,7 +194,6 @@ describe 'AssignmentTeam' do
         expect(AssignmentTeam.get_first_member(team1.id)).to eq(par1)
       end
     end
-    
     context" when they switch_order" do
       it '#switch_order' do
         allow(AssignmentTeam).to receive(:find_by).with(id: team1.id).and_return(team1)

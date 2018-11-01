@@ -1,8 +1,6 @@
 module ReportFormatterHelper
   def render_report(type, params, session)
-    @id = params[:id]
-    @assignment = Assignment.find(@id)
-    @summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
+    assign_basics(params)
 
     case type
     when "SummaryByRevieweeAndCriteria"
@@ -66,8 +64,7 @@ module ReportFormatterHelper
 
   def calibration(user)
     participant = AssignmentParticipant.where(parent_id: @id, user_id: user.id).first rescue nil
-    if participant.nil? then AssignmentParticipant.create(parent_id: @id, user_id: user.id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle') end
-
+    create_participant(@id, user.id) if participant.nil?
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.retrieve_questionnaire_for_assignment(@id).first
     @questions = @assignment_questionnaire.questionnaire.questions.select {|q| q.type == 'Criterion' or q.type == 'Scale' }
@@ -85,10 +82,8 @@ module ReportFormatterHelper
     tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @id)
     @questionnaire_tagging_report = {}
     @user_tagging_report = {}
-
     tag_prompt_deployments.each do |tag_dep|
       @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
-
       @questionnaire_tagging_report[tag_dep].each do |line|
         user_summary_report(line)
       end
@@ -101,6 +96,16 @@ module ReportFormatterHelper
 
   private
 
+  def assign_basics(params)
+    @id = params[:id]
+    @assignment = Assignment.find(@id)
+    @summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
+  end
+
+  def create_participant(parent_id, user_id)
+    AssignmentParticipant.create(parent_id: parent_id, user_id: user_id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
+  end
+
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
       @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
@@ -108,12 +113,14 @@ module ReportFormatterHelper
       @user_tagging_report[line.user.name].no_tagged += line.no_tagged
       @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
       @user_tagging_report[line.user.name].no_tagable += line.no_tagable
-
-      number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
-      number_taggable = @user_tagging_report[line.user.name].no_tagable
-      formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
-      @user_tagging_report[line.user.name].percentage =
-        @user_tagging_report[line.user.name].no_tagable.zero ? "-" : formatted_percentage
+      @user_tagging_report[line.user.name].percentage = calculate_formatted_percentage(line)
     end
+  end
+
+  def calculate_formatted_percentage(line)
+    number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
+    number_taggable = @user_tagging_report[line.user.name].no_tagable
+    formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
+    @user_tagging_report[line.user.name].no_tagable.zero ? '-' : formatted_percentage
   end
 end

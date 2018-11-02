@@ -2,6 +2,8 @@
 # represents each table in the view_team view.
 # the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
+  attr_reader :name, :rounds, :round, :questionnaire_type, :questionnaire_display_type,
+              :list_of_reviews, :list_of_rows, :list_of_reviewers, :max_score
   @questionnaire = nil
   @assignment = nil
 
@@ -9,11 +11,11 @@ class VmQuestionResponse
     @assignment = assignment
     @questionnaire = questionnaire
     if questionnaire.type == "ReviewQuestionnaire"
-      @round = round ? round : AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      @round = round ? round : AssignmentQuestionnaire.find_by(assignment_id: @assignment.id,
+               questionnaire_id: questionnaire.id).used_in_round
     end
 
     @rounds = @assignment.rounds_of_reviews
-
     @list_of_rows = []
     @list_of_reviewers = []
     @list_of_reviews = []
@@ -26,8 +28,6 @@ class VmQuestionResponse
     @name  = questionnaire.name
   end
 
-  attr_reader :name
-
   def add_questions(questions)
     questions.each do |question|
       # Get the maximum score for this question. For some unknown, godforsaken reason, the max
@@ -36,7 +36,8 @@ class VmQuestionResponse
       question_max_score = corresponding_questionnaire.max_question_score
       # if this question is a header (table header, section header, column header), ignore this question
       unless question.is_a? QuestionnaireHeader
-        row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score, question.seq)
+        row = VmQuestionResponseRow.new(question.txt, question.id, question.weight,
+                 question_max_score, question.seq)
         @list_of_rows << row
       end
     end
@@ -114,29 +115,9 @@ class VmQuestionResponse
     @list_of_team_participants
   end
 
-  attr_reader :max_score
-
   def max_score_for_questionnaire
     @max_score * @list_of_rows.length
   end
-
-  def max_score_for_questionnaire
-    @max_score * @list_of_rows.length
-  end
-
-  attr_reader :rounds
-
-  attr_reader :round
-
-  attr_reader :questionnaire_type
-
-  attr_reader :questionnaire_display_type
-
-  attr_reader :list_of_reviews
-
-  attr_reader :list_of_rows
-
-  attr_reader :list_of_reviewers
 
   def add_answer(answer)
     # We want to add each response score from this review (answer) to its corresponding

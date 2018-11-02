@@ -13,11 +13,12 @@ describe VmQuestionResponse do
   end
 
   context 'when initialized with a valid assignment questionnaire' do
-    let(:rq) { create(:questionnaire) }
-    let(:aq) { create(:assignment_questionnaire) }
-    let(:asmt) { create(:assignment) }
+    let(:rq) { build(:questionnaire) }
+    # let(:afq) { build(:afq, )}
+    let(:aq) { build(:assignment_questionnaire) }
+    let(:asmt) { build(:assignment) }
     let(:rsp) { VmQuestionResponse.new(rq, asmt, 7) }
-    let(:q0) { create(:question) }
+    let(:q0) { build(:question) }
     
 
     it 'has a round value of the questionnaire given' do
@@ -34,8 +35,14 @@ describe VmQuestionResponse do
     end
     
     context 'when given a participant, team, and vary' do
-      let(:teem) { create(:team) }
+      let(:teem) { create(:assignment_team) }
       let(:ppnt) { create(:participant) }
+
+
+      it 'adds reviews from a team' do
+        rsp.add_reviews(ppnt, teem, true)
+        expect(rsp.list_of_reviewers.size).to eq(1)
+      end
 
       it 'displays the members of the team' do
         rsp.display_team_members

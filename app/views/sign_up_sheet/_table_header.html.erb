@@ -1,18 +1,18 @@
 <th class="sorter-true" width="5%">Topic #</th>
-<th width="50%">Topic name(s)</th>
+<th class="sorter-false" width="50%">Topic name(s)</th>
 <% if @assignment.microtask? %>
-  <th width="5%">Micro- payment</th>
+  <th class="sorter-false" width="5%">Micro- payment</th>
 <% end %>
 <% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
-  <th width="5%">Num. of slots</th>
-  <th width="5%">Available slots</th>
-  <th width="5%">Num. on waitlist</th>
-  <th width="7%">Bookmarks</th>
+  <th class="sorter-false" width="5%">Num. of slots</th>
+  <th class="sorter-false" width="5%">Available slots</th>
+  <th class="sorter-false" width="5%">Num. on waitlist</th>
+  <th class="sorter-false" width="7%">Bookmarks</th>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
-      <th width="10%">Actions</th>
-      <th width="5%">Advertise- ment(s)</th>
+      <th class="sorter-false" width="10%">Actions</th>
+      <th class="sorter-false" width="5%">Advertise- ment(s)</th>
   <% end %>
-  <th width="3%" align="center"><a id="myLink" title="Add"
+  <th class="sorter-false" width="3%" align="center"><a id="myLink" title="Add"
          href="#" style="color: #00aa00; font-size: 26px;" onclick="addCreateTopicSection();return false;">+</a></th>
 
 <% end %>

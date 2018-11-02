@@ -15,6 +15,7 @@ gem "capistrano-db-tasks", require: false
 gem 'capistrano-passenger'
 gem 'capistrano-rails'
 gem 'capistrano-rvm'
+gem 'coffee-rails'
 gem 'coveralls', require: false
 gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '24a88bd', require: false
 gem 'delayed_job_active_record'
@@ -77,7 +78,6 @@ group :development do
   gem 'pry-remote'
   gem 'quiet_assets'
   gem 'rubocop'
-  gem 'selenium-webdriver'
 end
 
 group :test do
@@ -92,11 +92,9 @@ group :test do
   gem 'shoulda'
 end
 
-group :assets do
-  gem 'coffee-rails'
-end
-
 group :development, :test do
   gem 'capybara'
+  gem 'parallel_tests'
+  gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end

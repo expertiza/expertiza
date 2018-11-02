@@ -8,7 +8,6 @@ env:
     - CI_NODE_INDEX=2
     - CI_NODE_INDEX=3
     - CI_NODE_INDEX=4
-    - CI_NODE_INDEX=5
 language: ruby
 dist: trusty
 cache:

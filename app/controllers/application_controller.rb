@@ -15,17 +15,17 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :set_time_zone
   before_action :authorize
-  before_action :filter_ascii
+  before_action :filter_utf8
 
-  def filter_ascii
-    remove_ascii(params)
+  def filter_utf8
+    remove_non_utf8(params)
   end
 
-  def remove_ascii(hash)
-    # remove non-ascii chars from
+  def remove_non_utf8(hash)
+    # remove non-utf8 chars from hash
     hash.each_pair do |key, value|
       if value.is_a?(Hash)
-        remove_ascii(value)
+        remove_non_utf8(value)
       else
         if value.is_a?(String)
           encode_opts = {
@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
               :undef => :replace,
               :replace => ''
           }
-          value.encode!(Encoding.find('ASCII'), encode_opts)
+          value.encode!(Encoding.find('UTF-8'), encode_opts)
         end
       end
     end

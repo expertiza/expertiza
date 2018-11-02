@@ -252,6 +252,8 @@ GEM
       railties (>= 3.1.0)
     json (1.8.6)
     jwt (1.5.6)
+    knapsack (1.16.0)
+      rake
     kramdown (1.17.0)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -345,8 +347,6 @@ GEM
       activerecord (>= 4.2, < 5.2)
       request_store (~> 1.1)
     parallel (1.12.1)
-    parallel_tests (2.26.2)
-      parallel
     parser (2.4.0.2)
       ast (~> 2.3)
     powerpack (0.1.1)
@@ -610,6 +610,7 @@ DEPENDENCIES
   jquery-tablesorter
   jquery-ui-sass-rails
   json
+  knapsack
   launchy
   lingua
   mutant-rspec
@@ -618,7 +619,6 @@ DEPENDENCIES
   omniauth-google-oauth2
   open-uri-cached
   paper_trail
-  parallel_tests
   pragmatic_segmenter
   protected_attributes
   pry

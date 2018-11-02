@@ -1,11 +1,28 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
+    - CI_NODE_TOTAL=20
   matrix:
-    - TESTFOLDER=spec/helpers
-    - TESTFOLDER=spec/models
-    - TESTFOLDER=spec/controllers
-    - TESTFOLDER=spec/features
+    - CI_NODE_INDEX=0
+    - CI_NODE_INDEX=1
+    - CI_NODE_INDEX=2
+    - CI_NODE_INDEX=3
+    - CI_NODE_INDEX=4
+    - CI_NODE_INDEX=5
+    - CI_NODE_INDEX=6
+    - CI_NODE_INDEX=7
+    - CI_NODE_INDEX=8
+    - CI_NODE_INDEX=9
+    - CI_NODE_INDEX=10
+    - CI_NODE_INDEX=11
+    - CI_NODE_INDEX=12
+    - CI_NODE_INDEX=13
+    - CI_NODE_INDEX=14
+    - CI_NODE_INDEX=15
+    - CI_NODE_INDEX=16
+    - CI_NODE_INDEX=17
+    - CI_NODE_INDEX=18
+    - CI_NODE_INDEX=19
 language: ruby
 dist: trusty
 cache:
@@ -39,8 +56,6 @@ before_script:
   - bundle install
   - bundle exec danger
   - bundle exec rake db:setup
-  - bundle exec rake parallel:create
-  - bundle exec rake parallel:prepare
   # Test coverage offered by Code Climate
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
@@ -50,7 +65,7 @@ before_script:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
   - sleep 3 # give xvfb some time to start
 script:
-  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec parallel_rspec $TESTFOLDER 2> /dev/null"
+  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake knapsack:rspec 2> /dev/null"
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 services:

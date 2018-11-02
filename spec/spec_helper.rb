@@ -5,6 +5,7 @@ Coveralls.wear! 'rails'
 require 'capybara'
 require 'capybara/dsl'
 require 'selenium-webdriver'
+require 'knapsack'
 
 # Record code coverage with simplecov locally
 require 'simplecov'
@@ -100,4 +101,6 @@ RSpec.configure do |config|
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")
   end
+
+  Knapsack::Adapters::RSpecAdapter.bind
 end

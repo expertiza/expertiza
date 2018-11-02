@@ -153,11 +153,11 @@ describe ReviewResponseMap do
         allow(map).to receive_message_chain(:response, :any?) { true }
         allow(map).to receive_message_chain(:response, :last).and_return(response)
         expect(review_response_map.show_feedback(response)).to \
-        eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>&nbsp;&nbsp;&nbsp; 
-          <a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false; 
-          \">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr> 
-          </table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional  
-          Comment: </b></td></tr></table>")
+          eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>
+            &nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');
+            return false;\">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span>
+            </td></tr></table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr>
+            <td><b>Additional Comment: </b></td></tr></table>")
       end
     end
   end

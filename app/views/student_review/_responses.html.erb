@@ -75,7 +75,7 @@
                 <td style="color:#ff000d;"><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id}, {:style=>'color:ff000d;'} %></td>
                 <td>&nbsp;&nbsp;</td>
             <% else %>
-                <td style="color:saddlebrown">Begin</td>
+                <td style="color:red">Begin</td>
                 <td> (Work has not yet been submitted) for
                 <% review_no += 1 %></td>
             <% end %>

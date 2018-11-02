@@ -38,6 +38,7 @@ describe VmQuestionResponse do
       let(:ppnt) { create(:participant) }
 
       it 'displays the members of the team' do
+        rsp.add_team_members(teem)
         rsp.display_team_members
       end
 

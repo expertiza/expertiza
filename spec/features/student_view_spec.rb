@@ -7,7 +7,6 @@ describe 'My behaviour' do
     visit '/tree_display/list'
     expect(page).to have_current_path('/tree_display/list')
     expect(page).to have_content('Open Student View')
-    expect(page).not_to have_content('Assignments')
     click_button "Manage..."
     expect(page).to have_content('Student View')
   end

@@ -2,9 +2,9 @@
 <% unless flash[:error] %>
 $("#table_list").find("tbody").append(
 	"<%= j render :partial => 'participant', :locals => {participant: @participant, :userid => @participant.user_id, :controller => 'participants'} %>");
-   $('#'.concat(participant.toString())).change(function(){¬
-                 $('#button'.concat(participant.toString())).css("opacity",1);¬
-             });¬
+   $('#'.concat(participant.toString())).change(function(){
+                 $('#button'.concat(participant.toString())).css("opacity",1);
+             });
 
 <% end %>
-+$("#flash_message").html("<%= j render partial: "shared/flash_messages" %>");
+$("#flash_message").html("<%= j render partial: "shared/flash_messages" %>");

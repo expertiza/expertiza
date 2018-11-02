@@ -122,6 +122,7 @@ class AuthController < ApplicationController
     session[:clear] = true
     session[:assignment_id] = nil
     session[:original_user] = nil
+    session[:impersonate] = nil
   end
 
   # clears any identifying info from session
@@ -137,5 +138,6 @@ class AuthController < ApplicationController
     session[:clear] = true
     session[:assignment_id] = assignment_id
     session[:original_user] = nil
+    session[:impersonate] = nil
   end
 end

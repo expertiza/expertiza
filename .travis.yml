@@ -2,10 +2,10 @@ env:
   global:
     - CC_TEST_REPORTER_ID=d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
   matrix:
-    - TESTFOLDER=helpers
+    - TESTFOLDER=features
     - TESTFOLDER=models
     - TESTFOLDER=controllers
-    - TESTFOLDER=features
+    - TESTFOLDER=helpers
 language: ruby
 dist: trusty
 cache:
@@ -46,7 +46,7 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
   # Using xvfb to Run Tests That Require a GUI (https://docs.travis-ci.com/user/gui-and-headless-browsers/)
-  - "export DISPLAY=:99.0"
+  - "export DISPLAY=:99.0" # Display number for xvfb (for headless browser testing)
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
   - sleep 3 # give xvfb some time to start
 script:
@@ -54,7 +54,8 @@ script:
 # Pipe the coverage data to Code Climate
 after_script:
   - ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$TESTFOLDER.json"
-  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -p 4                  # Sum four coverage parts into coverage/codeclimate.json
+  - ls coverage/
+  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json                       # Sum coverage parts into coverage/codeclimate.json
   - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi  # Upload coverage/codeclimate.json
 services:
   - mysql

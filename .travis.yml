@@ -1,6 +1,11 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
+  matrix:
+    - TESTFOLDER=spec/helpers
+    - TESTFOLDER=spec/models
+    - TESTFOLDER=spec/controllers
+    - TESTFOLDER=spec/features
 language: ruby
 dist: trusty
 cache:
@@ -43,7 +48,7 @@ before_script:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
   - sleep 3 # give xvfb some time to start
 script:
-  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rake 2> /dev/null"
+  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rspec $TESTFOLDER 2> /dev/null"
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 services:

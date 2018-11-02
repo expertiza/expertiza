@@ -16,11 +16,11 @@ describe ReviewResponseMap do
   let(:empty_response) { build(:response, id: nil, map_id: nil, response_map: nil, scores: [answer]) }
   let(:feed_back_response_map) { double('feed_back_response_map', reviewed_object_id: 1, response: empty_response) }
   let(:metareview_response_map) { double('somemap') }
-  
+
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
   end
-  
+
   describe "#questionnaire" do
     context "when round is not nil" do
       it "returns the questionnaire in a certain round" do
@@ -44,7 +44,7 @@ describe ReviewResponseMap do
 
   describe "#delete" do
     it "deletes author feedback response records, metareview response records, and review response records" do
-      #response_map = double("ResponseMap", reviewed_object_id: 1)
+      # response_map = double("ResponseMap", reviewed_object_id: 1)
       allow(review_response_map).to receive(:response).and_return(response)
       # allow(ResponseMap).to receive(:where).and_return([review_response_map])
       # allow(response_map).to receive(:reviewed_object_id).and_return(1)
@@ -75,7 +75,7 @@ describe ReviewResponseMap do
       # allow(response_map).to receive(:reviewed_object_id).and_return(1)
       # allow(team1).to receive(:name).and_return('team1')
       # allow(response_map).to receive(:reviewed_object_id).and_return(1)
-      expect(ReviewResponseMap.export([],1,'_options')).to eq([])
+      expect(ReviewResponseMap.export([], 1, '_options')).to eq([])
     end
   end
 
@@ -83,7 +83,7 @@ describe ReviewResponseMap do
     context "when the user of the reviewee is nil" do
       it "raises an ArgumentError saying 'cannot find reviewee user'" do
         allow(User).to receive(:find_by).and_return(nil)
-        expect {ReviewResponseMap.import(review_response_map,'_session',1)}.to raise_error(ArgumentError)
+        expect { ReviewResponseMap.import(review_response_map, '_session', 1) }.to raise_error(ArgumentError)
       end
     end
 
@@ -91,10 +91,9 @@ describe ReviewResponseMap do
       context "when the participant of the reviewee is nil" do
         it "raises an ArgumentError saying 'Reviewee user is not a participant in this assignment'" do
           allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
-          expect {ReviewResponseMap.import(review_response_map,'_session',1)}.to raise_error(ArgumentError)
+          expect { ReviewResponseMap.import(review_response_map, '_session', 1) }.to raise_error(ArgumentError)
         end
       end
-
 
       # context "when the participant of the reviewee is not nil" do
       #   context "when reviewee does not have a team" do
@@ -107,7 +106,6 @@ describe ReviewResponseMap do
       #       allow(AssignmentParticipant).to receive(:find_by).and_return(participant2)
       #       #allow(AssignmentTeam).to receive(:find_by).and_return(nil)
       #       t_user = double("TeamUser", team_id: 1, user_id: 5)
-      #
       #       #allow(ResponseMap).to receive(:where).and_return([review_response_map])
       #       expect(ReviewResponseMap.import([],'_session',1)).to eq(review_response_map)
       #     end
@@ -138,10 +136,10 @@ describe ReviewResponseMap do
     context "when there exist review responses or the response parameter is not nil" do
       context "when author feedback response map record does not exist or there aren't corresponding responses" do
         it "returns the map variable" do
-          allow(review_response_map).to receive_message_chain(:response, :any?) {true}
+          allow(review_response_map).to receive_message_chain(:response, :any?) { true }
           allow(FeedbackResponseMap).to receive(:find_by).and_return(feed_back_response_map)
           map = feed_back_response_map
-          allow(map).to receive_message_chain(:response, :any?) {false}
+          allow(map).to receive_message_chain(:response, :any?) { false }
           expect(review_response_map.show_feedback(response)).to eq(nil)
         end
       end
@@ -149,12 +147,17 @@ describe ReviewResponseMap do
 
     context "when author feedback response map record exists and there exist corresponding responses" do
       it "returns the HTML code which displays the lastest author feedback response" do
-        allow(review_response_map).to receive_message_chain(:response, :any?) {true}
+        allow(review_response_map).to receive_message_chain(:response, :any?) { true }
         allow(FeedbackResponseMap).to receive(:find_by).and_return(feed_back_response_map)
         map = feed_back_response_map
-        allow(map).to receive_message_chain(:response, :any?) {true}
+        allow(map).to receive_message_chain(:response, :any?) { true }
         allow(map).to receive_message_chain(:response, :last).and_return(response)
-        expect(review_response_map.show_feedback(response)).to eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false;\">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional Comment: </b></td></tr></table>")
+        expect(review_response_map.show_feedback(response)).to \
+        eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>&nbsp;&nbsp;&nbsp; \
+          <a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false; \
+          \">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr> \
+          </table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional  \
+          Comment: </b></td></tr></table>")
       end
     end
   end
@@ -221,7 +224,7 @@ describe ReviewResponseMap do
       allow(ReviewResponseMap).to receive(:where).and_return(maps)
       allow(Assignment).to receive(:find).and_return(assignment)
       allow(Participant).to receive_message_chain(:find, :parent_id).and_return(participant)
-      expect(ReviewResponseMap.final_versions_from_reviewer(review_id)).to eq(ReviewResponseMap.prepare_final_review_versions(assignment,maps))
+      expect(ReviewResponseMap.final_versions_from_reviewer(review_id)).to eq(ReviewResponseMap.prepare_final_review_versions(assignment, maps))
     end
   end
 
@@ -272,7 +275,7 @@ describe ReviewResponseMap do
         review_final_versions = {}
         round = 2
         allow(assignment).to receive(:rounds_of_reviews).and_return(round)
-        expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to 
+        expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
         eq(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, round))
       end
     end
@@ -282,10 +285,10 @@ describe ReviewResponseMap do
         review_final_versions = {}
         round = nil
         # round_of_reviews = nil
-        review_questionnaire_id = nil
+        # review_questionnaire_id = nil
         assignment = double('assignment', round_of_reviews: 3, review_questionnaire_id: 1)
         allow(assignment).to receive(:rounds_of_reviews).and_return(round)
-        expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to 
+        expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
         eq(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, nil))
       end
     end
@@ -294,7 +297,7 @@ describe ReviewResponseMap do
   describe ".prepare_review_response" do
     context "when the round is nil" do
       it "uses :review as hash key and populate the hash with review questionnaire id and response ids" do
-        symbol = :review
+        # symbol = :review
         # review_final_versions = {symbol: {questionnaire_id: 1, response_ids: 1}}
         # where_map = {}
         # responses = 1
@@ -305,7 +308,7 @@ describe ReviewResponseMap do
     context "when the round is not nil" do
       it "uses review round number as hash key and populate the hash with review questionnaire id, round, and response ids" do
         round = 1
-        symbol = ("review round" + round.to_s).to_sym
+        # symbol = ("review round" + round.to_s).to_sym
         # review_final_versions = {symbol: {questionnaire_id: 1, response_ids: 1}}
         # where_map = {}
         # responses = 1
@@ -314,5 +317,4 @@ describe ReviewResponseMap do
       end
     end
   end
-
 end

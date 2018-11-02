@@ -13,12 +13,12 @@ describe VmQuestionResponse do
   end
 
   context 'when initialized with a valid assignment questionnaire' do
-    let(:rq) { build(:questionnaire) }
+    let(:rq) { create(:questionnaire) }
     # let(:afq) { build(:afq, )}
-    let(:aq) { build(:assignment_questionnaire) }
-    let(:asmt) { build(:assignment) }
+    let(:aq) { create(:assignment_questionnaire) }
+    let(:asmt) { create(:assignment) }
     let(:rsp) { VmQuestionResponse.new(rq, asmt, 7) }
-    let(:q0) { build(:question) }
+    let(:q0) { create(:question) }
     
 
     it 'has a round value of the questionnaire given' do
@@ -28,9 +28,9 @@ describe VmQuestionResponse do
     context 'when given a list of valid questions' do
       it 'adds valid questions' do
         qs = Array.new(1) { q0 }
-        expect(rsp.list_of_rows.size).to eq(0)
+        expect(rsp.rows.size).to eq(0)
         rsp.add_questions qs
-        expect(rsp.list_of_rows.size).to eq(1)
+        expect(rsp.rows.size).to eq(1)
       end
     end
     
@@ -41,12 +41,17 @@ describe VmQuestionResponse do
 
       it 'adds reviews from a team' do
         rsp.add_reviews(ppnt, teem, true)
-        expect(rsp.list_of_reviewers.size).to eq(1)
+        expect(rsp.reviewers.size).to eq(1)
       end
 
-      it 'displays the members of the team' do
+      it 'adds team participants to team members, and can display them' do
+        rsp.add_team_members(teem)
         rsp.display_team_members
       end
+
+      # it 'displays the members of the team' do
+        
+      # end
 
 
     end

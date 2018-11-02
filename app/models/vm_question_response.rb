@@ -3,7 +3,7 @@
 # the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
   attr_reader :name, :rounds, :round, :questionnaire_type, :questionnaire_display_type,
-              :list_of_reviews, :list_of_rows, :list_of_reviewers, :max_score
+              :reviews, :rows, :reviewers, :max_score, :team_participants
   @questionnaire = nil
   @assignment = nil
 
@@ -16,10 +16,10 @@ class VmQuestionResponse
     end
 
     @rounds = @assignment.rounds_of_reviews
-    @list_of_rows = []
-    @list_of_reviewers = []
-    @list_of_reviews = []
-    @list_of_team_participants = []
+    @rows = []
+    @reviewers = []
+    @reviews = []
+    @team_participants = []
     @max_score = questionnaire.max_question_score
     @questionnaire_type = questionnaire.type
     @questionnaire_display_type = questionnaire.display_type
@@ -38,7 +38,7 @@ class VmQuestionResponse
       unless question.is_a? QuestionnaireHeader
         row = VmQuestionResponseRow.new(question.txt, question.id, question.weight,
                  question_max_score, question.seq)
-        @list_of_rows << row
+        @rows << row
       end
     end
   end
@@ -54,17 +54,17 @@ class VmQuestionResponse
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
-          @list_of_reviewers << participant
+          @reviewers << participant
         end
       end
-      @list_of_reviews = reviews
+      @reviews = reviews
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
         review_mapping = FeedbackResponseMap.where(id: review.map_id).first
         participant = Participant.find(review_mapping.reviewer_id)
-        @list_of_reviewers << participant
-        @list_of_reviews << review
+        @reviewers << participant
+        @reviews << review
       end
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"
       reviews = participant.teammate_reviews
@@ -73,16 +73,16 @@ class VmQuestionResponse
         participant = Participant.find(review_mapping.reviewer_id)
         # commenting out teamreviews. I just realized that teammate reviews are hidden during the current semester,
         # and I don't know how to implement the logic, so I'm being safe.
-        @list_of_reviewers << participant
-        @list_of_reviews << review
+        @reviewers << participant
+        @reviews << review
       end
     elsif @questionnaire_type == "MetareviewQuestionnaire"
       reviews = participant.metareviews
       reviews.each do |review|
         review_mapping = MetareviewResponseMap.where(id: review.map_id).first
         participant = Participant.find(review_mapping.reviewer_id)
-        @list_of_reviewers << participant
-        @list_of_reviews << review
+        @reviewers << participant
+        @reviews << review
       end
     end
 
@@ -98,7 +98,7 @@ class VmQuestionResponse
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"
-      @list_of_team_participants.each do |participant|
+      @team_participants.each do |participant|
         @output = @output + " (" + participant.fullname + ") "
       end
 
@@ -108,21 +108,21 @@ class VmQuestionResponse
   end
 
   def add_team_members(team)
-    @list_of_team_participants = team.participants
+    @team_participants = team.participants
   end
 
-  def listofteamparticipants
-    @list_of_team_participants
-  end
+  # def listofteamparticipants
+  #   @team_participants
+  # end
 
   def max_score_for_questionnaire
-    @max_score * @list_of_rows.length
+    @max_score * @rows.length
   end
 
   def add_answer(answer)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
-    @list_of_rows.each do |row|
+    @rows.each do |row|
       next unless row.question_id == answer.question_id
       # Go ahead and calculate what the color code for this score should be.
       question_max_score = row.question_max_score
@@ -159,12 +159,10 @@ class VmQuestionResponse
   end
 
   def get_number_of_comments_greater_than_10_words
-    first_time = true
-
-    @list_of_reviews.each do |review|
+    @reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-        @list_of_rows.each do |row|
+        @rows.each do |row|
           row.countofcomments = row.countofcomments + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
         end
       end

@@ -1,7 +1,7 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
-    - CI_NODE_TOTAL=20
+    - CI_NODE_TOTAL=5
   matrix:
     - CI_NODE_INDEX=0
     - CI_NODE_INDEX=1
@@ -9,20 +9,6 @@ env:
     - CI_NODE_INDEX=3
     - CI_NODE_INDEX=4
     - CI_NODE_INDEX=5
-    - CI_NODE_INDEX=6
-    - CI_NODE_INDEX=7
-    - CI_NODE_INDEX=8
-    - CI_NODE_INDEX=9
-    - CI_NODE_INDEX=10
-    - CI_NODE_INDEX=11
-    - CI_NODE_INDEX=12
-    - CI_NODE_INDEX=13
-    - CI_NODE_INDEX=14
-    - CI_NODE_INDEX=15
-    - CI_NODE_INDEX=16
-    - CI_NODE_INDEX=17
-    - CI_NODE_INDEX=18
-    - CI_NODE_INDEX=19
 language: ruby
 dist: trusty
 cache:

@@ -1,9 +1,12 @@
 // E1721: Adding AJAX for adding participants to assignment
 <% unless flash[:error] %>
+var student_id = "<%= params[:user][:name] %>";
+student_id = student_id.replace("student","");
+
 $("#table_list").find("tbody").append(
 	"<%= j render :partial => 'participant', :locals => {participant: @participant, :userid => @participant.user_id, :controller => 'participants'} %>");
-   $('#'.concat(participant.toString())).change(function(){
-                 $('#button'.concat(participant.toString())).css("opacity",1);
+   $('#'.concat(student_id.toString())).change(function(){
+                 $('#button'.concat(student_id.toString())).css("opacity",1);
              });
 
 <% end %>

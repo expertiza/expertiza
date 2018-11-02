@@ -154,10 +154,10 @@ describe ReviewResponseMap do
         allow(map).to receive_message_chain(:response, :last).and_return(response)
         expect(review_response_map.show_feedback(response)).to \
         eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>&nbsp;&nbsp;&nbsp; \
-          <a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false; \
-          \">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr> \
-          </table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional  \
-          Comment: </b></td></tr></table>")
+            <a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false; \
+            \">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr> \
+            </table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional  \
+            Comment: </b></td></tr></table>")
       end
     end
   end
@@ -276,7 +276,7 @@ describe ReviewResponseMap do
         round = 2
         allow(assignment).to receive(:rounds_of_reviews).and_return(round)
         expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
-        eq(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, round))
+            eq(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, round))
       end
     end
     context "when round number is nil or is smaller than or equal to 1" do
@@ -289,7 +289,7 @@ describe ReviewResponseMap do
         assignment = double('assignment', round_of_reviews: 3, review_questionnaire_id: 1)
         allow(assignment).to receive(:rounds_of_reviews).and_return(round)
         expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
-        eq(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, nil))
+            eq(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, nil))
       end
     end
   end
@@ -307,7 +307,7 @@ describe ReviewResponseMap do
     end
     context "when the round is not nil" do
       it "uses review round number as hash key and populate the hash with review questionnaire id, round, and response ids" do
-        round = 1
+        # round = 1
         # symbol = ("review round" + round.to_s).to_sym
         # review_final_versions = {symbol: {questionnaire_id: 1, response_ids: 1}}
         # where_map = {}

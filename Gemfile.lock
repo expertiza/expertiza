@@ -345,6 +345,8 @@ GEM
       activerecord (>= 4.2, < 5.2)
       request_store (~> 1.1)
     parallel (1.12.1)
+    parallel_tests (2.26.2)
+      parallel
     parser (2.4.0.2)
       ast (~> 2.3)
     powerpack (0.1.1)
@@ -616,6 +618,7 @@ DEPENDENCIES
   omniauth-google-oauth2
   open-uri-cached
   paper_trail
+  parallel_tests
   pragmatic_segmenter
   protected_attributes
   pry

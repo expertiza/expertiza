@@ -98,5 +98,6 @@ end
 
 group :development, :test do
   gem 'capybara'
+  gem 'parallel_tests'
   gem 'simplecov', require: false
 end

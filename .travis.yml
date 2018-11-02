@@ -39,6 +39,8 @@ before_script:
   - bundle install
   - bundle exec danger
   - bundle exec rake db:setup
+  - bundle exec rake parallel:create
+  - bundle exec rake parallel:prepare
   # Test coverage offered by Code Climate
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
@@ -48,7 +50,7 @@ before_script:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1920x1080x16"
   - sleep 3 # give xvfb some time to start
 script:
-  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec rspec $TESTFOLDER 2> /dev/null"
+  - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec parallel_rspec $TESTFOLDER 2> /dev/null"
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 services:

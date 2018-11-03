@@ -54,6 +54,7 @@ script:
 # Pipe the coverage data to Code Climate
 after_script:
   - ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$TESTFOLDER.json"
+  - hostname
   - ls -lah coverage/
   - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json                       # Sum coverage parts into coverage/codeclimate.json
   - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi  # Upload coverage/codeclimate.json

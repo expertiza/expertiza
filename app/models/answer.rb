@@ -25,7 +25,7 @@ class Answer < ActiveRecord::Base
         # Check if the review is invalid. If is not valid do not include in score calculation
         if @invalid == 1 or curr_score == -1
           length_of_assessments -= 1
-          curr_score = 0
+          curr_score = 1
         end
         total_score += curr_score
       end

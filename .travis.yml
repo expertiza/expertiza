@@ -1,6 +1,7 @@
 env:
   global:
     - CC_TEST_REPORTER_ID=d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
+    - REPORT_REPO_NAME=Travis-ci-code-coverage-reports
   matrix:
     - TESTFOLDER=features
     - TESTFOLDER=models
@@ -51,13 +52,22 @@ before_script:
   - sleep 3 # give xvfb some time to start
 script:
   - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec parallel_rspec spec/$TESTFOLDER 2> /dev/null"
-# Pipe the coverage data to Code Climate
 after_script:
   - ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$TESTFOLDER.json"
-  - printenv
+  # https://docs.travis-ci.com/user/environment-variables#convenience-variables
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export TRAVIS_PULL_REQUEST=master; fi
   - ls -lah coverage/
-  - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json                       # Sum coverage parts into coverage/codeclimate.json
-  - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi  # Upload coverage/codeclimate.json
+  - cd $HOME
+  - git config --global user.email "zhu6@ncsu.edu"
+  - git config --global user.name "Winbobob"
+  - git clone --quiet https://github.com/expertiza/$REPORT_REPO_NAME.git
+  - cd $REPORT_REPO_NAME
+  - if [ ! -d "./$TRAVIS_PULL_REQUEST" ]; then mkdir $TRAVIS_PULL_REQUEST; fi
+  - cp -Rf $HOME/build/expertiza/expertiza/coverage/codeclimate.$TESTFOLDER.json $HOME/$REPORT_REPO_NAME/$TRAVIS_PULL_REQUEST/codeclimate.$TESTFOLDER.json
+  - git commit -am "Add code climate coverage report"
+  - git push origin master
+  # Sum coverage parts into coverage/codeclimate.json and upload coverage/codeclimate.json
+  - if [ "$TESTFOLDER" == "features" ] && [ "$TRAVIS_TEST_RESULT" == 0 ]; then ./cc-test-reporter sum-coverage coverage/codeclimate.*.json && ./cc-test-reporter upload-coverage; fi
 services:
   - mysql
 addons:

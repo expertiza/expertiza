@@ -21,7 +21,7 @@ class TreeDisplayController < ApplicationController
 
   # direct access to questionnaires
   def goto_questionnaires
-    goto_controller('Questionnaires','3')
+    goto_controller('Questionnaires', '3')
   end
 
   # direct access to review rubrics

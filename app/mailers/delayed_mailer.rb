@@ -28,6 +28,7 @@ class DelayedMailer
         email_reminder(team_mails, "teammate review") unless team_mails.empty?
       end
       if self.deadline_type == "review"
+
         mail_reviewers # to all reviewers
       end
       if self.deadline_type == "submission"

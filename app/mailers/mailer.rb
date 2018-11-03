@@ -82,4 +82,13 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to])
   end
+
+  def notify_reviewers_on_review_reset(mail_details)
+
+    @assignment_name = mail_details[:assignment_name]
+
+    ExpertizaLogger.info(mail(subject: "Review rubric reset for your reviews on #{@assignment_name}",
+                              content_type: "text/html",
+                              bcc: mail_details[:bcc]).encoded.to_s)
+  end
 end

@@ -20,7 +20,7 @@
         }
         //Rubric options
         html +=     '<td align="center">' +
-        '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
+        '<select id="questionnaire_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px" class="form-control rubric-options">' +
         '<option value="">--None--</option>';
         for (i = 0; i < questionnaire_options.length; i++) {
             html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
@@ -382,6 +382,23 @@
                     <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
             );
           }
+          <% if @current_action == "edit" %>
+            // Store selected values for every rubric dropdown in a currentValue data field.
+            // Whenever users changes valu from drop down, update the data field to reflect new value.
+            // This is being done so as to revert a dropdown selection if user clicks "Cancel" in the confirm bor.
+            jQuery( "#assignment_questionnaire_table tbody" ).on( "change", "select.rubric-options", function(event) {
+                  if(confirm("Changing of rubric will result in deletion of any in-progress or finished reviews for this round." +
+                      "Reviewers will be notified and asked to redo the reviews. Are you sure?")) {
+                      $(event.target).trigger('update');
+                  } else {
+                      $(event.target).val( $(event.target).data('currentValue') );
+                  }
+            }).on('update', function(){
+                jQuery(this).find(".rubric-options").each(function(s){
+                    jQuery(this).data('currentValue', jQuery(this).val());
+                });
+            }).trigger('update');
+          <% end %>
       });
   </script>
 </table>

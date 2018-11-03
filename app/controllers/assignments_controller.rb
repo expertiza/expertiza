@@ -71,6 +71,14 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
+
+    # Store rubrics before user edits the assignments, so that we can determine if rubric was changed for any round.
+    session[:rubrics_by_round] = get_rubrics_before_edit
+    # For use in update action.
+    session[:assignment] = @assignment
+    # We use this variable to show alert warning for pending reviews, in _rubrics.html.erb.
+    @current_action = "edit"
+
     assignment_form_assignment_staggered_deadline?
     @due_date_all.each do |dd|
       check_due_date_nameurl_notempty(dd)
@@ -95,6 +103,9 @@ class AssignmentsController < ApplicationController
       return
     end
     retrieve_assignment_form
+
+    handle_rubric_modification
+
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
@@ -388,5 +399,67 @@ class AssignmentsController < ApplicationController
 
   def assignment_form_params
     params.require(:assignment_form).permit!
+  end
+
+  # This method returns an array of hashes which are mappings of round numbers to corresponding questionnaire ids
+  # @return [Array]
+  def get_rubrics_before_edit
+    @assignment_questionnaires.inject({}) do |rubric, questionnaire|
+      current_round = questionnaire.used_in_round
+      rubric[current_round.to_s] = questionnaire.questionnaire_id.to_s unless current_round.nil?
+      rubric
+    end
+  end
+
+  # This method is used to handle rubric changes by an instructor to an assignment.
+  def handle_rubric_modification
+    responses = get_responses_for_modified_rounds(get_rubric_modified_rounds)
+    notify_reviewers_about_rubric_change(responses)
+    delete_responses(responses)
+  end
+
+  # This method gets all rounds for which an instructor changed a rubric when updating an assignment.
+  def get_rubric_modified_rounds
+    params[:assignment_form][:assignment_questionnaire].inject([]) do |rubric_modified_rounds, questionnaire|
+      current_round = questionnaire["used_in_round"]
+      if current_round != " " && session[:rubrics_by_round][current_round] != questionnaire["questionnaire_id"]
+        rubric_modified_rounds << current_round
+      end
+      rubric_modified_rounds
+    end
+  end
+
+  # This method retrieves all responses to reviews whose rubric was changed by an instructor when updating an assignment.
+  # @param [Array] rubric_modified_rounds
+  def get_responses_for_modified_rounds(rubric_modified_rounds)
+    # Get responses for the current assignment.
+    ResponseMap.where(reviewed_object_id: session[:assignment].id).inject([]) do |responses, review|
+      # For each review, get the responses that have been started(reviewer has clicked "begin") or finished.
+      # Select only those responses which correspond to the rounds for which the rubric was updated.
+      responses.concat(Response.where(map_id: review.id).select do |response|
+        rubric_modified_rounds.include? response.round.to_s
+      end)
+      responses
+    end
+  end
+
+  # This method is used to notify(mail) reviewers that their review responses have been deleted.
+  # @param [Array] responses
+  def notify_reviewers_about_rubric_change(responses)
+    @reviewer_emails = []
+    responses.each do |response|
+      ResponseMap.where(id: response.map_id).collect do |review|
+        @reviewer_emails << Participant.find(review.reviewer_id).user.email
+      end
+    end
+    Mailer.notify_reviewers_on_review_reset(bcc: @reviewer_emails.uniq, assignment_name: session[:assignment].name).deliver_now unless @reviewer_emails.empty?
+  end
+
+  # This method deletes all responses passed in.
+  # @param [Array] responses
+  def delete_responses(responses)
+    responses.each do |response|
+      response.destroy
+    end
   end
 end

@@ -55,21 +55,21 @@ script:
 after_script:
   - ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$TESTFOLDER.json"
   - echo $TRAVIS
-  - $JAVA_HOME
-	- $TRAVIS
-	- $CI
-	- $DEBIAN_FRONTEND
-	- $XAUTHORIZATION
-	- $XAUTHORITY
-	- $PS2
-	- $PS1
-	- $PATH
-	- $LS_COLORS
-	- $KRB5CCNAME
-	- $HOSTNAME
-	- $HOME
-	- $DISPLAY
-	- $COLORS
+  - echo $JAVA_HOME
+	- echo $TRAVIS
+	- echo $CI
+	- echo $DEBIAN_FRONTEND
+	- echo $XAUTHORIZATION
+	- echo $XAUTHORITY
+	- echo $PS2
+	- echo $PS1
+	- echo $PATH
+	- echo $LS_COLORS
+	- echo $KRB5CCNAME
+	- echo $HOSTNAME
+	- echo $HOME
+	- echo $DISPLAY
+	- echo $COLORS
   - ls -lah coverage/
   - ./cc-test-reporter sum-coverage coverage/codeclimate.*.json                       # Sum coverage parts into coverage/codeclimate.json
   - if [[ "$TRAVIS_TEST_RESULT" == 0 ]]; then ./cc-test-reporter upload-coverage; fi  # Upload coverage/codeclimate.json

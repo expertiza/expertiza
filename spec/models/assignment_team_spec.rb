@@ -165,7 +165,7 @@ describe AssignmentTeam do
       it "raises an ImportError" do
         allow(Assignment).to receive(:find_by).with(id: 1).and_return(nil)
         expect { AssignmentTeam.import([], 1, has_column_names: 'false') }
-            .to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
+          .to raise_error(ImportError, "The assignment with the id \"1\" was not found. <a href='/assignment/new'>Create</a> this assignment?")
       end
     end
     context "when there exists an assignment with this assignment id" do
@@ -231,7 +231,7 @@ describe AssignmentTeam do
   describe "#files" do
     it "returns all files in certain directory" do
       expect(assignment_team1.files('./lib').count).to eq(10)
-      expect(assignment_team1.files('./lib')).to match_array(["./lib/assets","./lib/hamer.rb",
+      expect(assignment_team1.files('./lib')).to match_array(["./lib/assets", "./lib/hamer.rb",
                                                               "./lib/tasks", "./lib/tasks/background_email_reminder.rake",
                                                               "./lib/tasks/data_migrate.rake", "./lib/tasks/db_diagram.rake",
                                                               "./lib/tasks/gc4r_tasks.rake", "./lib/tasks/line_endings.rake",
@@ -335,7 +335,5 @@ describe AssignmentTeam do
     end
   end
 end
-
-
 
 

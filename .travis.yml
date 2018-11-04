@@ -65,7 +65,8 @@ after_script:
   - cd $REPORT_REPO_NAME
   - if [ ! -d "./$TRAVIS_PULL_REQUEST" ]; then mkdir $TRAVIS_PULL_REQUEST; fi
   - cp -Rf $HOME/build/expertiza/expertiza/coverage/codeclimate.$TESTFOLDER.json $HOME/$REPORT_REPO_NAME/$TRAVIS_PULL_REQUEST/codeclimate.$TESTFOLDER.json
-  - git commit -am "Add code climate coverage report"
+  - git add --all
+  - git commit -m "Add code climate coverage report"
   - git push origin master
   # Sum coverage parts into coverage/codeclimate.json and upload coverage/codeclimate.json
   - if [ "$TESTFOLDER" == "features" ] && [ "$TRAVIS_TEST_RESULT" == 0 ]; then ./cc-test-reporter sum-coverage coverage/codeclimate.*.json && ./cc-test-reporter upload-coverage; fi

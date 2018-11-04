@@ -11,10 +11,11 @@ env:
 language: ruby
 dist: trusty
 cache:
+  bundler: true
   directories:
-    - ~/.nvm
+    - vendor/assets/components
 rvm:
-  - 2.4.1
+  - 2.2.7
 branches:
   only:
     - master
@@ -81,7 +82,3 @@ notifications:
     on_success: change
     on_failure: always
   slack: expertiza-support:DS8GtpbAybxHVwwYNRvvbb39
-  webhooks:
-    urls:
-      - https://www.travisbuddy.com/?insertMode=update
-    on_success: never

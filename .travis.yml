@@ -2,6 +2,7 @@ env:
   global:
     - CC_TEST_REPORTER_ID=d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
     - REPORT_REPO_NAME=Travis-ci-code-coverage-reports
+    - secure: fpBhnY1Y4U0qx/BOFyO8OaS5gBPlF9Y8mFONF7WkphqbEJytlfIunbLFpQ1CX/9rDo1+96g0TDJUMx3bs4AnsgGEt16oSLOiRhKfyMcdsVRJry8a0PZMtYaEpBReyPv0Va0V7VTy1hFzLKTkmxKoIoYgNY0msocRypl/K6CF7l8=
   matrix:
     - TESTFOLDER=features
     - TESTFOLDER=models
@@ -60,7 +61,7 @@ after_script:
   - cd $HOME
   - git config --global user.email "zhu6@ncsu.edu"
   - git config --global user.name "Winbobob"
-  - git clone --quiet https://github.com/expertiza/$REPORT_REPO_NAME.git
+  - git clone --quiet https://$TOKEN@github.com/expertiza/$REPORT_REPO_NAME.git
   - cd $REPORT_REPO_NAME
   - if [ ! -d "./$TRAVIS_PULL_REQUEST" ]; then mkdir $TRAVIS_PULL_REQUEST; fi
   - cp -Rf $HOME/build/expertiza/expertiza/coverage/codeclimate.$TESTFOLDER.json $HOME/$REPORT_REPO_NAME/$TRAVIS_PULL_REQUEST/codeclimate.$TESTFOLDER.json

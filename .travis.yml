@@ -13,7 +13,7 @@ dist: trusty
 cache:
   bundler: true
   directories:
-    - vendor/assets/components
+    - ~/.nvm
 rvm:
   - 2.2.7
 branches:

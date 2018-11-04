@@ -54,6 +54,7 @@ before_script:
 script:
   - "export DISPLAY=:99.0 && RUBYOPT=W0 bundle exec parallel_rspec spec/$TESTFOLDER 2> /dev/null"
 after_script:
+  - 
   - ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$TESTFOLDER.json"
   # https://docs.travis-ci.com/user/environment-variables#convenience-variables
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then export TRAVIS_PULL_REQUEST=master; fi
@@ -69,7 +70,7 @@ after_script:
   - git commit -m "Add code climate coverage report"
   - git push origin master
   # Sum coverage parts into coverage/codeclimate.json and upload coverage/codeclimate.json
-  - if [ "$TESTFOLDER" == "features" ] && [ "$TRAVIS_TEST_RESULT" == 0 ]; then ./cc-test-reporter sum-coverage coverage/codeclimate.*.json && ./cc-test-reporter upload-coverage; fi
+  - if [ "$TESTFOLDER" == "features" ] && [ "$TRAVIS_TEST_RESULT" == 0 ]; then ./cc-test-reporter sum-coverage coverage/codeclimate.*.json && $HOME/build/expertiza/expertiza/cc-test-reporter upload-coverage; fi
 services:
   - mysql
 addons:

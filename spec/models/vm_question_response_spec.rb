@@ -1,30 +1,54 @@
 describe VmQuestionResponse do
+  let(:review) do
+    review = double('review')
+    allow(review).to receive_messages(:map_id => 1, :response_id => 1)
+    review
+  end
+
+  let(:mapping) do
+    mapping = double('mapping')
+    allow(mapping).to receive_messages(:first => mapping, :reviewer_id => 7)
+    mapping
+  end
+
+  let(:ans) do
+    ans = double('answer')
+    allow(ans).to receive_messages(:question_id => 2, :answer => 3,
+                                   :comments => 'this is longer than 10 chars')
+    ans
+  end
+
+  let(:ppnt0) do
+    ppnt0 = double('ppnt0')
+    allow(ppnt0).to receive_messages(:fullname => 'Julia', :teammate_reviews => [review],
+                                     :metareviews => [review],
+                                     :feedback => [review])
+    ppnt0
+  end
+
+  let(:ppnt1) do
+    ppnt1 = double('ppnt1')
+    allow(ppnt1).to receive_messages(:fullname => 'Python', :reviewer_id => 7)
+    ppnt1
+  end
+
+  let(:participant) { build(:participant, id: 3, grade: 100) }
+  let(:assignment) { build(:assignment) }
+  let(:team_assignment) { build(:assignment, id: 1, name: 'no assignment',
+                                participants: [participant], teams: [team]) }
+  let(:team) { build(:assignment_team, id: 1, name: 'no team') }
 
   context 'when initialized with a valid assignment questionnaire' do
-    let(:rq) { create(:questionnaire) }
-    let(:aq) { create(:assignment_questionnaire) }
-    let(:asmt) { create(:assignment) }
-    let(:vm_rsp) { VmQuestionResponse.new(rq, asmt, 1) }
-    let(:q0) { create(:question) }
-    let(:header_q) { QuestionnaireHeader(q0) }
-    let(:rvw_rsp_map) { create(:review_response_map) }
-    let(:team) { double('team') }
+    let(:rq) { create(:questionnaire, name: "ReviewQuestionnaire",
+                        type: 'ReviewQuestionnaire') }
+    let(:vm_rsp) { VmQuestionResponse.new(rq, assignment, 1) }
+    let(:question2) { create(:question, questionnaire: rq, weight: 2, id: 2, type: 'good') }
+    let(:qs) { qs = Array.new(1) { question2 } }
+
 
     it 'adds reviews' do
-
-      review = double('review1')
-      allow(review).to receive_messages(:map_id => 1, :response_id => 1)
-      ppnt0 = double('ppnt0') 
-      allow(ppnt0).to receive_messages(:teammate_reviews => [review])
-      reviewer = double('reviewer')
-      allow(reviewer).to receive_messages(:fullname => 'Python', :reviewer_id => 7)
-      mapping = double
-      allow(mapping).to receive_messages(:reviewer_id => 7)
-      
       allow(ReviewResponseMap).to receive_messages(:get_assessments_for => [review], :find => mapping)
-      allow(Participant).to receive_messages(:find => reviewer)
-
-      # vm_rsp.add_questions qs
+      allow(Participant).to receive_messages(:find => ppnt1)
       vm_rsp.add_reviews(ppnt0, team, false)
       expect(vm_rsp.list_of_reviews.size).to eq 1
       expect(vm_rsp.list_of_reviewers.size).to eq 1
@@ -34,11 +58,7 @@ describe VmQuestionResponse do
     context 'when given a team' do
       it 'displays the members of the team' do
         team = double('team')
-        ppnt0 = double('ppnt0')
-        allow(ppnt0).to receive_messages :fullname => 'Julia'
-        ppnt1 = double('ppnt0')
-        allow(ppnt1).to receive_messages :fullname => 'Python'
-        ppnt2 = double('ppnt0')
+        ppnt2 = double('ppnt2')
         allow(ppnt2).to receive_messages :fullname => 'R'
         team_member_names = [ppnt0, ppnt1, ppnt2]
         allow(team).to receive_messages(:participants => team_member_names)
@@ -52,7 +72,7 @@ describe VmQuestionResponse do
     end
 
     context 'when given a list of valid questions' do
-      let(:qs) { qs = Array.new(1) { q0 } }
+      let(:qs) { qs = Array.new(1) { question2 } }
 
       it 'can calculate the max score for the questionnaire' do
         vm_rsp.add_questions qs
@@ -68,31 +88,18 @@ describe VmQuestionResponse do
   end
 
   context 'is initialized with an AuthorFeedbackQuestionnaire' do
-
-    let(:response) { build(:response) }
-    let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
-    let(:instructor) { build(:instructor, id: 6) }
-    let(:student) { build(:student, id: 3, name: 'no one') }
-    let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
-    let(:participant) { build(:participant, id: 3) }
-    let(:participant1) { build(:participant, id: 1, assignment: assignment) }
-    let(:participant2) { build(:participant, id: 2, grade: 100) }
-    let(:question) { double('Question') }
-    let(:team) { build(:assignment_team, id: 1, name: 'no team') }
-    let(:response) { build(:response) }
-    
-    # allow(FeedbackResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
-
-    let(:rq) { create(:questionnaire) }
-    
     let(:vm_rsp) { VmQuestionResponse.new( aufq, assignment, 1 ) }
-    # let(:ans) { create(:answer, question_id: 1, answer: 3, comments: 'best music', response_id: 1) }
-    let(:ans) { double('answer') }
-    let(:aufq) { create(:questionnaire, name: "AuthorFeedbackQuestionnaire", type: 'AuthorFeedbackQuestionnaire') }
+    let(:aufq) { create(:questionnaire, name: "AuthorFeedbackQuestionnaire",
+                        type: 'AuthorFeedbackQuestionnaire') }
     let(:question2) { create(:question, questionnaire: aufq, weight: 2, id: 2, type: 'good') }
     let(:qs) { qs = Array.new(1) { question2 } }
-    
-
+    let(:tag_dep) do
+      tag_dep = double('tag_dep')
+      allow(tag_dep).to receive_messages(:question_type => question2.type,
+                                         :answer_length_threshold => 4,
+                                         :tag_prompt_id => 1)
+      tag_dep
+    end
 
     it 'adds reviews' do
       # review = double('review1')
@@ -115,19 +122,6 @@ describe VmQuestionResponse do
     end
 
     it 'adds answers' do
-      review = double('review')
-      allow(review).to receive_messages(:map_id => 1, :response_id => 1)
-      ppnt0 = double('ppnt0') 
-      allow(ppnt0).to receive_messages(:feedback => [review])
-      ppnt1 = double('ppnt1')
-      allow(ppnt1).to receive_messages(:fullname => 'Python')
-      mapping = double
-      allow(mapping).to receive_messages(:first => mapping, :reviewer_id => 2)
-      tag_dep = double('tag_dep')
-      allow(tag_dep).to receive_messages(:question_type => question2.type, :answer_length_threshold => 4,
-        :tag_prompt_id => 1)
-      allow(ans).to receive_messages(:question_id => 2, :answer => 3, 
-        :comments => 'this is longer than 10 chars')
       allow(FeedbackResponseMap).to receive_messages(:where => mapping)
       allow(Participant).to receive_messages(:find => ppnt1)
       allow(Answer).to receive_messages(:where => [ans])
@@ -136,7 +130,6 @@ describe VmQuestionResponse do
       allow(TagPrompt).to receive_messages(:find => true)
       allow(VmTagPromptAnswer).to receive_messages(:new => '')
       allow(VmQuestionResponseScoreCell).to receive_messages(:new => '')
-      
 
       vm_rsp.add_questions qs
       vm_rsp.add_reviews(ppnt0, '', false)
@@ -144,19 +137,6 @@ describe VmQuestionResponse do
     end
 
     it 'gets the number of comments greater than 10 words' do
-      review = double('review')
-      allow(review).to receive_messages(:map_id => 1, :response_id => 1)
-      ppnt0 = double('ppnt0') 
-      allow(ppnt0).to receive_messages(:feedback => [review])
-      ppnt1 = double('ppnt1')
-      allow(ppnt1).to receive_messages(:fullname => 'Python')
-      mapping = double
-      allow(mapping).to receive_messages(:first => mapping, :reviewer_id => 2)
-      tag_dep = double('tag_dep')
-      allow(tag_dep).to receive_messages(:question_type => question2.type, :answer_length_threshold => 4,
-        :tag_prompt_id => 1)
-      allow(ans).to receive_messages(:question_id => 2, :answer => 3, 
-        :comments => 'this is longer than 10 chars')
       allow(FeedbackResponseMap).to receive_messages(:where => mapping)
       allow(Participant).to receive_messages(:find => ppnt1)
       allow(Answer).to receive_messages(:where => [ans])
@@ -180,36 +160,13 @@ describe VmQuestionResponse do
   end
 
   context 'is initialized with an TeammateReviewQuestionnaire' do
-    let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
-    let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
-    let(:participant) { build(:participant, id: 3) }
-    let(:participant1) { build(:participant, id: 1, assignment: assignment) }
-    let(:participant2) { build(:participant, id: 2, grade: 100) }
-    let(:question) { double('Question') }
-    let(:team) { build(:assignment_team, id: 1, name: 'no team') }    
-    # allow(FeedbackResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
-
-    let(:rq) { create(:questionnaire) }
-    
-    let(:vm_rsp) { VmQuestionResponse.new( aufq, assignment, 1 ) }
-    # let(:ans) { create(:answer, question_id: 1, answer: 3, comments: 'best music', response_id: 1) }
-    let(:ans) { double('answer') }
-    let(:aufq) { create(:questionnaire, name: "TeammateReviewQuestionnaire", type: 'TeammateReviewQuestionnaire') }
-    let(:question2) { create(:question, questionnaire: aufq, weight: 2, id: 2, type: 'good') }
+    let(:tmrq) { create(:questionnaire, name: "TeammateReviewQuestionnaire",
+                        type: 'TeammateReviewQuestionnaire') }
+    let(:vm_rsp) { VmQuestionResponse.new( tmrq, assignment, 1 ) }
+    let(:question2) { create(:question, questionnaire: tmrq, weight: 2, id: 2, type: 'good') }
     let(:qs) { qs = Array.new(1) { question2 } }
-    
-
 
     it 'adds reviews' do
-      review = double('review1')
-      allow(review).to receive_messages(:map_id => 1, :response_id => 1)
-      ppnt0 = double('ppnt0') 
-      allow(ppnt0).to receive_messages(:teammate_reviews => [review])
-      ppnt1 = double('ppnt1')
-      allow(ppnt1).to receive_messages(:fullname => 'Python')
-      mapping = double
-      allow(mapping).to receive_messages(:first => mapping, :reviewer_id => 2)
-      
       allow(TeammateReviewResponseMap).to receive_messages(:where => mapping)
       allow(Participant).to receive_messages(:find => ppnt1)
 
@@ -222,36 +179,13 @@ describe VmQuestionResponse do
   end
 
   context 'is initialized with an MetareviewQuestionnaire' do
-    let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
-    let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
-    let(:participant) { build(:participant, id: 3) }
-    let(:participant1) { build(:participant, id: 1, assignment: assignment) }
-    let(:participant2) { build(:participant, id: 2, grade: 100) }
-    let(:question) { double('Question') }
-    let(:team) { build(:assignment_team, id: 1, name: 'no team') }    
-    # allow(FeedbackResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
-
-    let(:rq) { create(:questionnaire) }
-    
-    let(:vm_rsp) { VmQuestionResponse.new( aufq, assignment, 1 ) }
-    # let(:ans) { create(:answer, question_id: 1, answer: 3, comments: 'best music', response_id: 1) }
-    let(:ans) { double('answer') }
-    let(:aufq) { create(:questionnaire, name: "MetareviewQuestionnaire", type: 'MetareviewQuestionnaire') }
-    let(:question2) { create(:question, questionnaire: aufq, weight: 2, id: 2, type: 'good') }
+    let(:mrq) { create(:questionnaire, name: "MetareviewQuestionnaire", type: 'MetareviewQuestionnaire') }
+    let(:question2) { create(:question, questionnaire: mrq, weight: 2, id: 2, type: 'good') }
     let(:qs) { qs = Array.new(1) { question2 } }
-    
+    let(:vm_rsp) { VmQuestionResponse.new( mrq, assignment, 1 ) }
 
 
     it 'adds reviews' do
-      review = double('review1')
-      allow(review).to receive_messages(:map_id => 1, :response_id => 1)
-      ppnt0 = double('ppnt0') 
-      allow(ppnt0).to receive_messages(:metareviews => [review])
-      ppnt1 = double('ppnt1')
-      allow(ppnt1).to receive_messages(:fullname => 'Python')
-      mapping = double
-      allow(mapping).to receive_messages(:first => mapping, :reviewer_id => 2)
-      
       allow(MetareviewResponseMap).to receive_messages(:where => mapping)
       allow(Participant).to receive_messages(:find => ppnt1)
 
@@ -261,14 +195,6 @@ describe VmQuestionResponse do
       expect(vm_rsp.list_of_reviewers.size).to eq 1
       expect(vm_rsp.list_of_reviews).to eq [review]
     end
-
-
-    
-        # create(:questionnaire, name: "ReviewQuestionnaire#{i}")
-        # let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
-        # create(:questionnaire, name: "TeammateReviewQuestionnaire#{i}", type: 'TeammateReviewQuestionnaire')
-
-
 
   end
 

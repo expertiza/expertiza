@@ -1,15 +1,19 @@
 describe Participant do
-  let(:student) { build(:student, name: "Student", fullname: "Test, Student") }
-  let(:student2) { build(:student, name: "Student2") }
-  let(:participant) { build(:participant, user: student) }
+  let(:student) { build(:student, name: 'Student', fullname: 'Test, Student') }
+  let(:student2) { build(:student, name: 'Student2') }
+  let(:student3) { build(:student, name: 'Student3') }
   let(:assignment) { build(:assignment) }
-  let(:participant2) { build(:participant, assignment: assignment) }
   let(:assignment_team) { build(:assignment_team) }
-  let(:team_user) { build(:team_user, user: student, team: assignment_team)}
-  let(:response) { build(:response, response_map: response_map)}
-  let(:response_map) { build(:review_response_map, assignment: assignment, reviewer: participant2, reviewee: assignment_team)}
+  let(:participant) { build(:participant, user: student) }
+  let(:participant2) { build(:participant, assignment: assignment, user: student2) }
+  let(:participant3) { build(:participant, user: student3) }
+  let(:team_user) { build(:team_user, user: student, team: assignment_team) }
+  let(:response) { build(:response, response_map: response_map) }
+  let(:response_map) { build(:review_response_map, assignment: assignment, reviewer: participant2, reviewee: assignment_team) }
   let(:question) { build(:question) }
   let(:review_questionnaire) { build(:questionnaire, id: 2) }
+  let(:topic1) { build(:topic, topic_name: '') }
+  let(:topic2) { build(:topic, topic_name: 'Test topic name') }
   #let(:response_map1) { build(:review_response_map, reviewer: participant2, id: 10) }
   #et(:response_map2) { build(:review_response_map, reviewer: participant2, id: 20) }
   #let(:response1) { build(:response, id: 1, map_id: 10, response_map: response_map1) }
@@ -43,16 +47,30 @@ describe Participant do
   end
   
    describe '#scores' do
-    it 'returns scores obtained by the participant for given questions' do
-      allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
-      allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2)\
-          .with(no_args).and_return(2)
-       allow(review_questionnaire).to receive(:get_assessments_for).with(participant2).and_return([response])
-       allow(Answer).to receive(:compute_scores).and_return(max: 95, min: 88, avg: 90)
-       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
-       expect(participant2.assignment.compute_total_score(:test)).to eql(100)
-       puts participant2.scores(question)
-       expect(participant2.scores(question).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: true, user_id: 2, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review2=>{:assessments=>nil, :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100}")
+     context 'when the round is nil' do
+       it 'returns scores obtained by the participant for given questions' do
+         allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
+         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(nil)
+         allow(review_questionnaire).to receive(:get_assessments_for).with(participant2).and_return([response])
+         allow(Answer).to receive(:compute_scores).and_return(max: 95, min: 88, avg: 90)
+         allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+         expect(participant2.assignment.compute_total_score(:test)).to eql(100)
+         #puts participant2.scores(question)
+         expect(participant2.scores(question).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: true, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review=>{:assessments=>[#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100}")
+       end
+     end
+     
+     context 'when the round is not nil' do
+       it 'returns scores obtained by the participant for given questions' do
+         allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
+         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(2)
+         allow(review_questionnaire).to receive(:get_assessments_for).with(participant2).and_return([response])
+         allow(Answer).to receive(:compute_scores).and_return(max: 95, min: 88, avg: 90)
+         allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+         expect(participant2.assignment.compute_total_score(:test)).to eql(100)
+         #puts participant2.scores(question)
+         expect(participant2.scores(question).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: true, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review2=>{:assessments=>[#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100}")
+       end
      end
    end
    
@@ -65,17 +83,15 @@ describe Participant do
      
      context 'when the participant has an assignment with an unnamed topic' do
        it 'returns error message' do
-         topic = build(:topic, topic_name: '')
-         allow(participant2).to receive(:topic).and_return(topic)
+         allow(participant2).to receive(:topic).and_return(topic1)
          expect(participant2.topic_name).to eql('<center>&#8212;</center>')
        end
      end
      
      context 'when the participant has an assignment with a named topic' do
        it 'returns the name of the topic associated to the assignment of the participant' do
-         topic = build(:topic, topic_name: 'Test topic name')
-         allow(participant2).to receive(:topic).and_return(topic)
-         expect(topic.topic_name).to eql('Test topic name')
+         allow(participant2).to receive(:topic).and_return(topic2)
+         expect(topic2.topic_name).to eql('Test topic name')
          expect(participant2.topic_name).to eql('Test topic name')
        end
      end   
@@ -139,23 +155,15 @@ describe Participant do
    
    describe '.sort_by_name' do
      it 'sorts a set of participants based on their user names' do
-       stu1 = build(:student, name: "Student1")
-       stu2 = build(:student, name: "Student2")
-       stu3 = build(:student, name: "Student3")
-       p1 = build(:participant, user: stu1, id: 2) 
-       p2 = build(:participant, user: stu2, id: 3)
-       p3 = build(:participant, user: stu3, id: 1)
-       participants = [ p2, p1, p3]
+       expect(Participant.sort_by_name([participant, participant3, participant2])).to match_array([participant, participant2, participant3])
        
-       sorted_participants = Participant.sort_by_name(participants)
-       expect(Participant.sort_by_name(participants)).to match_array([p1, p2, p3])
+       names = []
+       sorted_participants = Participant.sort_by_name([participant, participant3, participant2])
        expect(sorted_participants.length).to eql(3)
-       
-       ids = []
        sorted_participants.each do |p|
-         ids << p.id
+         names << p.user.name
        end
-       expect(ids).to match_array([2, 3, 1]) 
+       expect(names).to match_array(["Student", "Student2", "Student3"]) 
      end  
    end
    

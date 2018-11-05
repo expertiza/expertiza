@@ -14,11 +14,6 @@ describe Participant do
   let(:review_questionnaire) { build(:questionnaire, id: 2) }
   let(:topic1) { build(:topic, topic_name: '') }
   let(:topic2) { build(:topic, topic_name: 'Test topic name') }
-  #let(:response_map1) { build(:review_response_map, reviewer: participant2, id: 10) }
-  #et(:response_map2) { build(:review_response_map, reviewer: participant2, id: 20) }
-  #let(:response1) { build(:response, id: 1, map_id: 10, response_map: response_map1) }
-  #let(:response2) { build(:response, id: 2, map_id: 20, response_map: response_map2) }
-  #let(:team_user1) {TeamsUser.new user_id, team_id}
   
   describe "#team" do
    it "returns the team id for the user" do
@@ -50,26 +45,39 @@ describe Participant do
      context 'when the round is nil' do
        it 'returns scores obtained by the participant for given questions' do
          allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
-         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(nil)
+         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round)\
+         .with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(nil)
          allow(review_questionnaire).to receive(:get_assessments_for).with(participant2).and_return([response])
          allow(Answer).to receive(:compute_scores).and_return(max: 95, min: 88, avg: 90)
          allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
          expect(participant2.assignment.compute_total_score(:test)).to eql(100)
          #puts participant2.scores(question)
-         expect(participant2.scores(question).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: true, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review=>{:assessments=>[#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100}")
+         expect(participant2.scores(question)).to include(:total_score=>100)
+         expect(participant2.scores(question).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, "\
+         "can_review: true, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, "\
+         "grade: nil, type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
+         "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review=>{:assessments=>[#<Response id: nil, map_id: nil, additional_comment: nil,"\
+         " created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}}, "\
+         ":total_score=>100}")
        end
      end
      
      context 'when the round is not nil' do
        it 'returns scores obtained by the participant for given questions' do
          allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
-         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round).with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(2)
+         allow(AssignmentQuestionnaire).to receive_message_chain(:find_by, :used_in_round)\
+         .with(assignment_id: 1, questionnaire_id: 2).with(no_args).and_return(2)
          allow(review_questionnaire).to receive(:get_assessments_for).with(participant2).and_return([response])
          allow(Answer).to receive(:compute_scores).and_return(max: 95, min: 88, avg: 90)
          allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
          expect(participant2.assignment.compute_total_score(:test)).to eql(100)
          #puts participant2.scores(question)
-         expect(participant2.scores(question).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, can_review: true, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review2=>{:assessments=>[#<Response id: nil, map_id: nil, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100}")
+         expect(participant2.scores(question).inspect).to eq("{:participant=>#<AssignmentParticipant id: nil, can_submit: true, "\
+         "can_review: true, user_id: nil, parent_id: nil, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, "\
+         "grade: nil, type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
+         "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review2=>{:assessments=>[#<Response id: nil, map_id: nil, additional_comment: nil,"\
+         " created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}},"\
+         " :total_score=>100}")
        end
      end
    end

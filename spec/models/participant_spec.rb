@@ -228,7 +228,7 @@ describe Participant do
         it "removes the current participant from that team and deletes current participant" do
           allow(participant).to receive(:team).and_return(assignment_team)
           allow(participant).to receive_message_chain(:team, :teams_users, :length).and_return(3)
-          allow(participant).to receive_message_chain(:team, :teams_users).and_return([student])
+          allow(participant).to receive_message_chain(:team, :teams_users).and_return([participant, participant1, participant2])
           expect(participant.force_delete([response_map]).handle).to eq 'nb'
         end
       end

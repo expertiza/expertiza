@@ -36,9 +36,7 @@ describe ReviewResponseMap do
   let(:assignment_questionnaire){ AssignmentQuestionnaire.new(assignment_id: 1, used_in_round: 1, questionnaire_id: 1) }
   let(:assignment_questionnaire1){ AssignmentQuestionnaire.new(assignment_id: 1, used_in_round: 2, questionnaire_id: 1) }
   let(:questionnaire1) { Questionnaire.new(id: 1, type: 'ReviewQuestionnaire') }
-  let(:response_map) do  ResponseMap.new(id: 1, reviewed_object_id: 1, reviewee_id: 1, reviewer_id: 1,
-                                         type: "ReviewResponseMap", response: [response], calibrate_to: 0)
-  end
+  let(:response_map) {ResponseMap.new(id: 1, reviewed_object_id: 1, reviewee_id: 1, reviewer_id: 1, type: "ReviewResponseMap", response: [response], calibrate_to: 0)}
   let(:user) {User.new(id:1 , name: "name", fullname: 'fullname') }
   let(:user1) { User.new(id: 2, name: "name1", fullname: 'fullname') }
   let(:assignment_participant) { AssignmentParticipant.new(user_id: 1, parent_id: 1) }
@@ -94,21 +92,17 @@ describe ReviewResponseMap do
     allow(AssignmentTeam).to receive(:team).with(assignment_participant).and_return(team)
     allow(User).to receive(:find_by).with(name: "name1").and_return(user1)
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(assignment_participant1)
-    allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1,
-                                                                 calibrate_to: false).and_return(review_response_map)
+    allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1, calibrate_to: false).and_return(review_response_map)
     expect(ReviewResponseMap.import(row_hash, _session, 1)).to eq(["name1"])
     # when reviewee_team = nil
     allow(AssignmentTeam).to receive(:team).with(assignment_participant).and_return(nil)
     allow(AssignmentTeam).to receive(:create).and_return(double('team', id: 1))
     allow(TeamsUser).to receive(:create).with(team_id: 1, user_id: 1).and_return(double('teams_users', id: 1, team_id: 1, user_id: 1))
-    allow(TeamNode).to receive(:create).with(parent_id: assignment_id, node_object_id: 1).and_return(double('team_node',
-                                                                                                            id: 1, parent_id: 1, node_object_id: 1))
-    allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('team_user_node',
-                                                                                                    id: 1, parent_id: 1, node_object_id: 1))
+    allow(TeamNode).to receive(:create).with(parent_id: assignment_id, node_object_id: 1).and_return(double('team_node', id: 1, parent_id: 1, node_object_id: 1))
+    allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('team_user_node', id: 1, parent_id: 1, node_object_id: 1))
     allow(User).to receive(:find_by).with(name: "name1").and_return(user1)
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(assignment_participant1)
-    allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewed_object_id: 1, reviewer_id: 1,
-                                                                 reviewee_id: 1, calibrate_to: false).and_return(review_response_map)
+    allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1, calibrate_to: false).and_return(review_response_map)
     expect(ReviewResponseMap.import(row_hash, _session, 1)).to eq(["name1"])
   end
 
@@ -199,8 +193,7 @@ describe ReviewResponseMap do
     allow(assignment).to receive(:review_questionnaire_id).with(1).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1, round: 2).and_return([response1])
     allow(assignment).to receive(:review_questionnaire_id).with(2).and_return(1)
-    expect(ReviewResponseMap.prepare_final_review_versions(Assignment.find(Participant.find(reviewer_id).parent_id),
-                                                           MetareviewResponseMap.where(reviewed_object_id: 1))).to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
+    expect(ReviewResponseMap.prepare_final_review_versions(Assignment.find(Participant.find(reviewer_id).parent_id), MetareviewResponseMap.where(reviewed_object_id: 1))).to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
     # when round = nil
     reviewer_id = 2
     allow(Participant).to receive(:find).with(2).and_return(participant1)
@@ -209,9 +202,7 @@ describe ReviewResponseMap do
 
     allow(assignment).to receive(:review_questionnaire_id).with(nil).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1).and_return([response2])
-    expect(ReviewResponseMap.prepare_final_review_versions(Assignment.find(Participant.find(reviewer_id).parent_id),
-                                                           MetareviewResponseMap.where(reviewed_object_id: 1))).to eq(review:{questionnaire_id: nil,
-                                                                                                                              response_ids: [3]})
+    expect(ReviewResponseMap.prepare_final_review_versions(Assignment.find(Participant.find(reviewer_id).parent_id), MetareviewResponseMap.where(reviewed_object_id: 1))).to eq(review:{questionnaire_id: nil, response_ids: [3]})
 
   end
 

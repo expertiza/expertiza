@@ -56,7 +56,6 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    puts "response/edit"
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]

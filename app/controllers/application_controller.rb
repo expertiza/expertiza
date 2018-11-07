@@ -23,25 +23,21 @@ class ApplicationController < ActionController::Base
 
   def remove_non_utf8(hash)
     # remove non-utf8 chars from hash
-    hash.each_pair do |key, value|
+    hash.each_pair do |_key, value|
       if value.is_a?(Hash)
         remove_non_utf8(value)
-      else
-        if value.is_a?(String)
-          encode_opts = {
-              :invalid => :replace,
-              :undef => :replace,
-              :replace => ''
-          }
-          value.encode!(Encoding.find('UTF-8'), encode_opts)
-        end
+      elsif value.is_a?(String)
+        encode_opts = {
+          :invalid => :replace,
+          :undef => :replace,
+          :replace => ''
+        }
+        value.encode!(Encoding.find('UTF-8'), encode_opts)
       end
     end
   end
 
-  def self.verify(_args)
-    ;
-  end
+  def self.verify(_args); end
 
   def current_user_role?
     current_user.role.name

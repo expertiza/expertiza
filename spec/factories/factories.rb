@@ -296,7 +296,6 @@ FactoryBot.define do
     can_take_quiz true
   end
 
-
   factory :participantSuper, class: Participant do
     can_submit true
     can_review true
@@ -371,7 +370,7 @@ FactoryBot.define do
     description_url nil
     quiz_allowed_id 3
     teammate_
-_allowed_id 3
+    _allowed_id 3
     type 'TopicDueDate'
   end
 

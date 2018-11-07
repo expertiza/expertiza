@@ -61,7 +61,7 @@ describe ReviewResponseMap do
   describe ".export" do
     it "exports reviewer names and reviewee names to an array" do
       allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([review_response_map])
-      expect(ReviewResponseMap.export([], 1, '_options')).to eq([review_response_map])
+      expect(ReviewResponseMap.export([],1,'_options')).to eq([review_response_map])
     end
   end
 
@@ -70,58 +70,56 @@ describe ReviewResponseMap do
       it "raises an ArgumentError saying 'cannot find reviewee user'" do
         hash = {reviewee: 'person1', reviewers: ['person2']}
         allow(User).to receive(:find_by).and_return(nil)
-        expect{ ReviewResponseMap.import(hash, '_session', 1) }.to raise_error(ArgumentError)
+        expect {ReviewResponseMap.import(hash,'_session',1)}.to raise_error(ArgumentError)
       end
     end
-
     context "when the user of the reviewee is not nil" do
       context "when the participant of the reviewee is nil" do
         it "raises an ArgumentError saying 'Reviewee user is not a participant in this assignment'" do
           hash = {reviewee: 'person1', reviewers: ['person2']}
-          reviewee_user = double('User', id: 5, name: 'person1')
+          reviewee_user = double("User", :id => 5, :name => 'person1')
           allow(User).to receive(:find_by).with(name: 'person1').and_return(reviewee_user)
           allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
-          expect{ ReviewResponseMap.import(hash, '_session', 1) }.to raise_error(ArgumentError)
+          expect {ReviewResponseMap.import(hash,'_session',1)}.to raise_error(ArgumentError)
         end
       end
-
       context "when the participant of the reviewee is not nil" do
         before(:each) do
-          reviewee_user = double('User', id: 5, name: 'person1')
+          reviewee_user = double("User", :id => 5, :name => 'person1')
           allow(User).to receive(:find_by).with(name: 'person1').and_return(reviewee_user)
-          reviewee_participant = double('AssignmentParticipant', user_id: 5, parent_id: 1, id: 3)
+          reviewee_participant = double("AssignmentPraticipant", :user_id => 5, :parent_id => 1, :id => 3)
           allow(AssignmentParticipant).to receive(:find_by).and_return(reviewee_participant)
-          reviewer_user = double('User', id: 6, name: 'person2')
+          reviewer_user = double("User", :id => 6, :name => 'person2')
           allow(User).to receive(:find_by).with(name: 'person2').and_return(reviewer_user)
-          reviewer_participant = double('AssignmentParticipant', user_id: 6, parent_id: 1, id: 4)
+          reviewer_participant = double("AssignmentPraticipant", :user_id => 6, :parent_id => 1, :id => 4)
           allow(AssignmentParticipant).to receive(:where).and_return(reviewer_participant)
+          
         end
         context "when reviewee does not have a team" do
           it "creates a team for reviewee and finds/creates a review response map record" do
             hash = {reviewee: 'person1', reviewers: ['person2']}
             allow(AssignmentTeam).to receive(:team).and_return(nil)
-            reviewee_team = double('AssignmentTeam', name: 'Team_1', parent_id: 1, id: 2)
+            reviewee_team = double("AssignmentTeam", :name => 'Team_1', :parent_id => 1, :id => 2)
             allow(AssignmentTeam).to receive(:create).and_return(reviewee_team)
-            t_user = double('TeamUser', team_id: 2, user_id: 5, id: 7)
+            t_user = double("TeamUser", :team_id =>2, :user_id =>5, :id => 7)
             allow(TeamsUser).to receive(:create).and_return(t_user)
-            team_node = double('TeamNode', parent_id: 1, node_object_id: 2, id: 4)
+            team_node = double("TeamNode", :parent_id =>1, :node_object_id => 2, :id => 4)
             allow(TeamNode).to receive(:create).and_return(team_node)
-            team_user_node = double('TeamUserNode', parent_id: 4, node_object_id: 7)
+            team_user_node = double("TeamUserNode", :parent_id => 4, :node_object_id => 7)
             allow(TeamUserNode).to receive(:create).and_return(team_user_node)
-            review_response_map1 = double('ReviewResponseMap', reviewed_object_id: 1, reviewer_id: 4, reviewee_id: 2, calibrate_to: false)
+            review_response_map1 = double("ReviewResponseMap", :reviewed_object_id => 1, :reviewer_id => 4, :reviewee_id => 2, :calibrate_to => false)
             allow(ReviewResponseMap).to receive(:find_by).and_return(review_response_map1)
-            expect(ReviewResponseMap.import(hash, '_session', 1)).to eq(['person2'])
+            expect(ReviewResponseMap.import(hash,'_session',1)).to eq(['person2'])
           end
         end
-
         context "when reviewee has a team" do
           it "finds/creates a review response map record" do
             hash = {reviewee: 'person1', reviewers: ['person2']}
-            reviewee_team = double('AssignmentTeam', parent_id: 1, id: 2)
+            reviewee_team = double("AssignmentTeam", :parent_id => 1, :id => 2)
             allow(AssignmentTeam).to receive(:team).and_return(reviewee_team)
-            review_response_map1 = double('ReviewResponseMap', reviewed_object_id: 1, reviewer_id: 4, reviewee_id: 2, calibrate_to: false)
+            review_response_map1 = double("ReviewResponseMap", :reviewed_object_id => 1, :reviewer_id => 4, :reviewee_id => 2, :calibrate_to => false)
             allow(ReviewResponseMap).to receive(:find_by).and_return(review_response_map1)
-            expect(ReviewResponseMap.import(hash, '_session', 1)).to eq(['person2'])
+            expect(ReviewResponseMap.import(hash,'_session',1)).to eq(['person2'])
           end
         end
       end
@@ -155,13 +153,7 @@ describe ReviewResponseMap do
         map = feed_back_response_map
         allow(map).to receive_message_chain(:response, :any?) { true }
         allow(map).to receive_message_chain(:response, :last).and_return(response)
-        expect(review_response_map.show_feedback(response)).to eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\">" \
-        														  "<b>Review </b>&nbsp;&nbsp;&nbsp;" \
-        														  "<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');" \
-        														  "return false;\">show review</a></td><td align=\"left\"><b>Last Reviewed:</b>" \
-        														  "<span>Not available</span></td></tr></table>" \
-        														  "<table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\">" \
-        														  "<tr><td><b>Additional Comment: </b></td></tr></table>")
+        expect(review_response_map.show_feedback(response)).to eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false;\">show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td><b>Additional Comment: </b></td></tr></table>")
       end
     end
   end
@@ -230,34 +222,38 @@ describe ReviewResponseMap do
       allow(Participant).to receive_message_chain(:find, :parent_id).and_return(participant)
       expect(ReviewResponseMap.final_versions_from_reviewer(review_id)).to eq(ReviewResponseMap.prepare_final_review_versions(assignment, maps))
       maps = []
-      # review_final_versions = {}
+      review_final_versions = {}
       round = 2
       allow(assignment).to receive(:rounds_of_reviews).and_return(round)
       expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
-        eq(:"review round1" => {:questionnaire_id => nil, :response_ids => []}, :"review round2" => {:questionnaire_id => nil, :response_ids => []})
+        eq({:"review round1"=>{:questionnaire_id=>nil, :response_ids=>[]}, :"review round2"=>{:questionnaire_id=>nil, :response_ids=>[]}})
       round = nil
       assignment = double('assignment', round_of_reviews: 3, review_questionnaire_id: 1)
       allow(assignment).to receive(:rounds_of_reviews).and_return(round)
       expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
-        eq(:review => {:questionnaire_id => 1, :response_ids => []})
+        eq({:review=>{:questionnaire_id=>1, :response_ids=>[]}})
       allow(assignment).to receive(:review_questionnaire_id).and_return(1)
-      # where_map = {map_id: 1, round: 1}
+      map = double('map', id: 1)
+      maps = [map]
+      where_map = {map_id: 1, round: 1}
       responses = []
+      round = 1
       allow(Response).to receive(:where).and_return([])
       allow(responses).to receive_message_chain(:last, :id).and_return([])
+      expect(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, round)).to eq([])
     end
   end
 
   describe ".review_response_report" do
     context "when the review user is nil" do
-      xit "returns sorted reviewers of a certain type of response map" do
-        # response_maps_with_distinct_participant_id = []
+      it "returns sorted reviewers of a certain type of response map" do
+        response_maps_with_distinct_participant_id = []
         id = double('id', id: 1)
         type = double('type', type: 'type')
         reviewers = double('reviewers')
-        allow(ResponseMap).to receive_message_chain(:select, :where).and_return(1)
-        allow(ResponseMap).to receive(:each).and_return(1)
-        allow(AssignmentParticipant).to receive(:find).and_return(1)
+        allow(ResponseMap).to receive_message_chain(:select, :where).and_return([review_response_map])
+        # allow(ResponseMap).to receive(:each).and_return(1)
+        allow(AssignmentParticipant).to receive(:find).and_return([reviewers])
         allow(Participant).to receive(:sort_by_name).and_return([reviewers])
         expect(ReviewResponseMap.review_response_report(id, assignment, type, nil)).to eq([reviewers])
       end
@@ -265,13 +261,14 @@ describe ReviewResponseMap do
 
     context "when the review user is not nil" do
       it "return reviewers users' full name" do
+        review_user = double('user', :[] => '1')
         user_ids = double('user_ids')
         id = double('id', id: 1)
         type = double('type', type: 'type')
         reviewers = double('reviewers', fullname: 'zhaoke')
         allow(User).to receive_message_chain(:select, :where).and_return([user_ids])
         allow(AssignmentParticipant).to receive(:where).and_return([reviewers])
-        expect(ReviewResponseMap.review_response_report(id, assignment, type, nil)).to eq([])
+        expect(ReviewResponseMap.review_response_report(id, assignment, type, review_user)).to eq([reviewers])
       end
     end
   end
@@ -288,14 +285,16 @@ describe ReviewResponseMap do
       expect(review_response_map.email(defn, participant, assignment)).to eq([user])
     end
   end
-
+# Write the following two describes in "final_versions_from_reviewer"
   describe ".prepare_final_review_versions" do
     context "when round number is not nil and is bigger than 1" do
       xit "returns the final version of responses in each round" do
+
       end
     end
     context "when round number is nil or is smaller than or equal to 1" do
       xit "returns the final version of responses" do
+        
       end
     end
   end
@@ -303,10 +302,22 @@ describe ReviewResponseMap do
   describe ".prepare_review_response" do
     context "when the round is nil" do
       xit "uses :review as hash key and populate the hash with review questionnaire id and response ids" do
+        # symbol = :review
+        # review_final_versions = {symbol: {questionnaire_id: 1, response_ids: 1}}
+        # where_map = {}
+        # responses = 1
+
       end
     end
     context "when the round is not nil" do
       xit "uses review round number as hash key and populate the hash with review questionnaire id, round, and response ids" do
+        # round = 1
+        # symbol = ("review round" + round.to_s).to_sym
+        # review_final_versions = {symbol: {questionnaire_id: 1, response_ids: 1}}
+        # where_map = {}
+        # responses = 1
+        # allow(assignment).to receive(:review_questionnaire_id).and_return(1)
+        # allow(Response).to receive(:where).and_return(1)
       end
     end
   end

@@ -10,7 +10,7 @@
 ##
 describe Participant do
   ###
-  # Note from Project Mentor:  
+  # Note from Project Mentor:
   # Please do not share this file with other teams.
   # Use factories to `build` necessary objects.
   # Please avoid duplicated code as much as you can by
@@ -27,31 +27,31 @@ describe Participant do
   # comment out the scores function of AssignmentParticipant.
   ##
 
-  let(:team) {build(:assignment_team, id: 1, name: 'myTeam')}
-  let(:user) {build(:student, id: 4, name: 'no name', fullname: 'no two')}
-  let(:team_user) {build(:team_user, id: 1, user: user, team: team)} 
-  let(:topic){build(:topic)}
-  let(:participant) {build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1))}
-  let(:participant2) {build(:participant, user: build( :student, name: "John", fullname: "Doe, John", id: 2))}
-  let(:participant3) {build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3))}
-  let(:participant4) {build(:participantSuper, can_review: false, user: user)}
-  let(:assignment) {build(:assignment, id: 1, name: 'no assgt')}
-  let(:review_response_map) {build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team)}
-  let(:answer) {Answer.new(answer: 1, comments: 'Answer text', question_id: 1)}
-  let(:response) {build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer])}
-  let(:question1) {Criterion.new(id: 1, weight: 2, break_before: true)}
-  let(:question2) {Criterion.new(id: 2, weight: 2, break_before: true)}
-  let(:questionnaire1) {ReviewQuestionnaire.new(id: 1, questions: [question1], max_question_score: 5)}
-  let(:questionnaire2) {ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5)}
-  
+  let(:team) { build(:assignment_team, id: 1, name: 'myTeam') }
+  let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
+  let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
+  let(:topic) { build(:topic) }
+  let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
+  let(:participant2) { build(:participant, user: build( :student, name: "John", fullname: "Doe, John", id: 2)) }
+  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3)) }
+  let(:participant4) { build(:participantSuper, can_review: false, user: user) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
+  let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
+  let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
+  let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
+  let(:question1) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:question2) { Criterion.new(id: 2, weight: 2, break_before: true) }
+  let(:questionnaire1) { ReviewQuestionnaire.new(id: 1, questions: [question1], max_question_score: 5) }
+  let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+
   after(:each) do
     ActionMailer::Base.deliveries.clear
   end
 
   describe '#team' do
     it 'returns the team of the participant' do
-      allow(TeamsUser).to receive(:find_by).with({:user=>user}).and_return(team_user)
-      expect( participant4.team ).to eq(team)
+      allow(TeamsUser).to receive(:find_by).with(:user => user).and_return(team_user)
+      expect(participant4.team).to eq(team)
     end
   end
 
@@ -98,7 +98,7 @@ describe Participant do
     end
     it 'raises error, delete participant with associations and force is nil' do
       allow(participant).to receive(:team).and_return(team)
-      expect{participant.delete(nil)}.to raise_error.with_message("Associations exist for this participant.")
+      expect { participant.delete(nil) }.to raise_error.with_message("Associations exist for this participant.")
     end
   end
 
@@ -125,27 +125,22 @@ describe Participant do
 
   describe '#email' do
     it 'sends an email to the participant' do
-      expect {participant.email("Missing 'pw'", "Missing 'home_page'")}.to change{
-        ActionMailer::Base.deliveries.count}.by(1)
+      expect { participant.email("Missing 'pw'", "Missing 'home_page'") }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
 
   describe '#get_permissions' do
     it 'returns the permissions of participant' do
-      expect(Participant.get_permissions('participant')).to contain_exactly(
-        [:can_submit, true], [:can_review, true], [:can_take_quiz, true])
+      expect(Participant.get_permissions('participant')).to contain_exactly([:can_submit, true], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reader' do
-      expect(Participant.get_permissions('reader')).to contain_exactly(
-        [:can_submit, false], [:can_review, true], [:can_take_quiz, true])
+      expect(Participant.get_permissions('reader')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reviewer' do
-      expect( Participant.get_permissions('reviewer')).to contain_exactly(
-        [:can_submit, false], [:can_review, true], [:can_take_quiz, false])
+      expect( Participant.get_permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
     end
     it 'returns the permissions of submitter' do
-      expect(Participant.get_permissions('submitter')).to contain_exactly(
-        [:can_submit, true], [:can_review, false], [:can_take_quiz, false])
+      expect(Participant.get_permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])
     end
   end
 
@@ -171,34 +166,34 @@ describe Participant do
       expect(Participant.sort_by_name(unsorted)).to eq(sorted)
     end
   end
-    
+
   describe '#score' do
     it 'Get participant score within a round' do
-      questions = {:review=>[question2],:review1=> [question1]}
-      test = [questionnaire1,questionnaire2]
+      questions = { :review => [question2],:review1 => [question1] }
+      test = [questionnaire1, questionnaire2]
 
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
       assessment = double("review")
-      
+  
       test.each do |q|
-        assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>nil)
-        if q.id==2
-          assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>1)
+        assignment_questionnaire_map = double("assignment_questionnaire", :used_in_round => nil)
+        if q.id == 2
+          assignment_questionnaire_map = double("assignment_questionnaire", :used_in_round => 1)
         end
-      
+  
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: q.id).and_return(assignment_questionnaire_map)
-        assessment=double("review")
+        assessment = double("review")
         allow(q).to receive(:get_assessments_for).with(participant).and_return(assessment)
-        allow(Answer).to receive(:compute_scores).with(assessment,questions[:review]).and_return(5)
-        allow(Answer).to receive(:compute_scores).with(assessment,questions[:review1]).and_return(6)
+        allow(Answer).to receive(:compute_scores).with(assessment, questions[:review]).and_return(5)
+        allow(Answer).to receive(:compute_scores).with(assessment, questions[:review1]).and_return(6)
       end
-      
+  
       allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(75)
       check = participant.scores(questions)
-      
+  
       expect(check).to include(:participant => participant)
-      expect(check[:review1].to_s).to include({:assessments=> assessment,:scores=>6}.to_s)
-      expect(check[:review].to_s).to eq({:assessments=>assessment,:scores=>5}.to_s)
+      expect(check[:review1].to_s).to include( { :assessments => assessment, :scores => 6 }.to_s)
+      expect(check[:review].to_s).to eq( { :assessments => assessment, :scores => 5 }.to_s)
       expect(check).to include(:total_score => 75)
     end
   end

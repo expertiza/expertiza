@@ -59,7 +59,7 @@ describe ReviewResponseMap do
   end
 
   it '#export_fields' do
-    expect(ReviewResponseMap.export_fields('Missing "_options"')).to eq(["contributor", "reviewed by"])
+    expect(ReviewResponseMap.export_fields('options')).to eq(["contributor", "reviewed by"])
   end
 
   it '#export' do
@@ -194,7 +194,6 @@ describe ReviewResponseMap do
     allow(Participant).to receive(:find).with(2).and_return(participant1)
     allow(Assignment).to receive(:find).with(2).and_return(assignment1)
     allow(MetareviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([metareview_response_map])
-
     allow(assignment).to receive(:review_questionnaire_id).with(nil).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1).and_return([response2])
     expect(ReviewResponseMap.prepare_final_review_versions(Assignment.find(Participant.find(reviewer_id).parent_id), MetareviewResponseMap.where(reviewed_object_id: 1))).to eq(review: {questionnaire_id: nil, response_ids: [3]})

@@ -32,7 +32,7 @@ describe Participant do
   let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
   let(:topic) { build(:topic) }
   let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
-  let(:participant2) { build(:participant, user: build( :student, name: "John", fullname: "Doe, John", id: 2)) }
+  let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
   let(:participant3) { build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3)) }
   let(:participant4) { build(:participantSuper, can_review: false, user: user) }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
@@ -137,7 +137,7 @@ describe Participant do
       expect(Participant.get_permissions('reader')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, true])
     end
     it 'returns the permissions of reviewer' do
-      expect( Participant.get_permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
+      expect(Participant.get_permissions('reviewer')).to contain_exactly([:can_submit, false], [:can_review, true], [:can_take_quiz, false])
     end
     it 'returns the permissions of submitter' do
       expect(Participant.get_permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])
@@ -169,31 +169,31 @@ describe Participant do
 
   describe '#score' do
     it 'Get participant score within a round' do
-      questions = { :review => [question2],:review1 => [question1] }
+      questions = {:review => [question2], :review1 => [question1]}
       test = [questionnaire1, questionnaire2]
 
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
       assessment = double("review")
-  
+ 
       test.each do |q|
         assignment_questionnaire_map = double("assignment_questionnaire", :used_in_round => nil)
         if q.id == 2
           assignment_questionnaire_map = double("assignment_questionnaire", :used_in_round => 1)
         end
-  
+ 
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: q.id).and_return(assignment_questionnaire_map)
         assessment = double("review")
         allow(q).to receive(:get_assessments_for).with(participant).and_return(assessment)
         allow(Answer).to receive(:compute_scores).with(assessment, questions[:review]).and_return(5)
         allow(Answer).to receive(:compute_scores).with(assessment, questions[:review1]).and_return(6)
       end
-  
+ 
       allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(75)
       check = participant.scores(questions)
-  
+ 
       expect(check).to include(:participant => participant)
-      expect(check[:review1].to_s).to include( { :assessments => assessment, :scores => 6 }.to_s)
-      expect(check[:review].to_s).to eq( { :assessments => assessment, :scores => 5 }.to_s)
+      expect(check[:review1].to_s).to include({:assessments => assessment, :scores => 6}.to_s)
+      expect(check[:review].to_s).to eq({:assessments => assessment, :scores => 5}.to_s)
       expect(check).to include(:total_score => 75)
     end
   end

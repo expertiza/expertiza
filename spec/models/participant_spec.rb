@@ -50,7 +50,7 @@ describe Participant do
 
   describe '#team' do
     it 'returns the team of the participant' do
-      allow(TeamsUser).to receive(:find_by).with(:user => user).and_return(team_user)
+      allow(TeamsUser).to receive(:find_by).with(user: user).and_return(team_user)
       expect(participant4.team).to eq(team)
     end
   end
@@ -169,32 +169,32 @@ describe Participant do
 
   describe '#score' do
     it 'Get participant score within a round' do
-      questions = {:review => [question2], :review1 => [question1]}
+      questions = {review: [question2], review1: [question1]}
       test = [questionnaire1, questionnaire2]
 
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
       assessment = double("review")
- 
+
       test.each do |q|
-        assignment_questionnaire_map = double("assignment_questionnaire", :used_in_round => nil)
+        assignment_questionnaire_map = double("assignment_questionnaire", used_in_round: nil)
         if q.id == 2
-          assignment_questionnaire_map = double("assignment_questionnaire", :used_in_round => 1)
+          assignment_questionnaire_map = double("assignment_questionnaire", used_in_round: 1)
         end
- 
+
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: q.id).and_return(assignment_questionnaire_map)
         assessment = double("review")
         allow(q).to receive(:get_assessments_for).with(participant).and_return(assessment)
         allow(Answer).to receive(:compute_scores).with(assessment, questions[:review]).and_return(5)
         allow(Answer).to receive(:compute_scores).with(assessment, questions[:review1]).and_return(6)
       end
- 
+
       allow(participant.assignment).to receive(:compute_total_score).with(any_args).and_return(75)
       check = participant.scores(questions)
- 
-      expect(check).to include(:participant => participant)
-      expect(check[:review1].to_s).to include({:assessments => assessment, :scores => 6}.to_s)
-      expect(check[:review].to_s).to eq({:assessments => assessment, :scores => 5}.to_s)
-      expect(check).to include(:total_score => 75)
+
+      expect(check).to include(participant: participant)
+      expect(check[:review1].to_s).to include({assessments: assessment, scores: 6}.to_s)
+      expect(check[:review].to_s).to eq({assessments: assessment, scores: 5}.to_s)
+      expect(check).to include(total_score: 75)
     end
   end
 end

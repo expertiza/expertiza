@@ -1,12 +1,11 @@
 import React, { Component, Fragment } from 'react'
-import {FormGroup, Radio} from 'react-bootstrap'
+import {FormGroup, Radio, RadioButton} from 'react-bootstrap'
 import request from "superagent";
 import { connect } from 'react-redux'
 import ReactDropzone from 'react-dropzone'
 import Aux from '../../hoc/Aux/Aux'
 import { Loading } from '../UI/spinner/LoadingComponent';
-//import  from '../../redux/actions/StudentTeamView'
-import { SubmitURL } from '../../redux/actions/StudentUploadTask'
+import { SubmitURL, DeleteURL } from '../../redux/actions/StudentUploadTask'
 import Hyperlinks from '../gradesViewTeam/Hyperlinks';
 
 class StudentTaskUpload extends Component {
@@ -16,11 +15,14 @@ class StudentTaskUpload extends Component {
         super(props);
         this.state={files:[],
       input_value: 'http://',
-      urls:[], current_url:''};
+      urls:[], current_url:'',
+      deleteURL_i: 0};
       this.handleChange = this.handleChange.bind(this);
       this.submittedURL = this.submittedURL.bind(this);
       this.onDrop = this.onDrop.bind(this);
       this.onPreviewDrop = this.onPreviewDrop.bind(this);
+      this.handleOptionChange = this.handleOptionChange.bind(this);
+      this.deleteURL = this.deleteURL.bind(this);
     }
 
     onDrop = () => {
@@ -42,14 +44,25 @@ class StudentTaskUpload extends Component {
     handleChange(event) {
         this.setState({current_url: event.target.value});
       }
+    
+    handleOptionChange(index, event) {
+        this.setState({
+            deleteURL_i: index - 1
+        });
+      }
 
     submittedURL(event) {
-        //alert('A name was submitted: ' + this.state.current_url);
-        console.log(this.state.current_url);
         this.props.SubmitURL(this.props.participant.id, this.state.current_url);
-        console.log("hehehehe")
         event.preventDefault();
       }
+
+    deleteURL(event)
+    {
+        alert('idex '+ this.state.deleteURL_i)
+        console.log(this.state.deleteURL_i);
+        this.props.DeleteURL(this.props.participant.id, this.state.deleteURL_i)
+        event.preventDefault();
+    }
 
       onPreviewDrop = (files) => {
         this.setState({
@@ -65,12 +78,13 @@ class StudentTaskUpload extends Component {
           let loading;
           let previewStyle;
           let hyperLinkActions;
+          let submittedFiles;
 
           if(this.props.loaded){
             submit_url = <div style={{marginTop: '10px', padding: '5px'}}>
                 <form onSubmit={this.submittedURL}>
                 <label>
-                <ul><li><h5>Submit a Hyperlink</h5></li></ul>
+                <ul><li><h5>Submit Hyperlink's</h5></li></ul>
                 <input type="text" defaultValue={this.state.input_value} onChange={this.handleChange}/>
                 <input type="submit" value="Upload Link" />
                 </label>
@@ -79,23 +93,34 @@ class StudentTaskUpload extends Component {
 
             previewStyle = {
                 display: 'inline',
-                width: 100,
-                height: 100,
+                width: 50,
+                height: 50,
             };
 
             hyperLinkActions = 
                 <div style={{marginTop: '10px', padding: '5px'}}>
-                        <form onSubmit={this.handleDelete}>
-                        <input type="submit" value="Delete selected Hyperlink" />
-                        <Hyperlinks />
-                        <FormGroup>
-                        </FormGroup>
+                        <form onSubmit={this.deleteURL}>
+                        <input type="submit" value="Delete Hyperlink" />
+                        <div style={{marginTop: '10px', padding: '5px'}}>
+                        <div className="radio" style={{paddingLeft:20}}>
+                            {this.props.team.submitted_hyperlinks.split("\n").map((element, index) =>
+                            (index !== 0 && element.substring(1) !== "")?
+                            <div>
+                                <label>
+                                <input type="radio" value={element.substring(1)} key={index} onChange={(e) => this.handleOptionChange(index, e)} />
+                                {element.substring(1)}
+                                </label>
+                                </div>: <div> </div>
+                            )
+                        }
+                        </div>
+                        </div>
                     </form>
                 </div>
           
 
             drag_drop = <div style={{marginTop: '10px', padding: '5px'}}>
-            <ul><li><h5>Drag Drop your files here</h5></li></ul>
+            <ul><li><h5>Drag & Drop</h5></li></ul>
               <ReactDropzone onDrop={this.onPreviewDrop}></ReactDropzone>
               {this.state.files.length > 0 &&
                     <Fragment>
@@ -117,6 +142,11 @@ class StudentTaskUpload extends Component {
                     }
                     
               </div>
+        
+            submittedFiles = <div style={{marginTop: '10px', padding: '5px'}}>
+            
+            
+            </div>
 
             assign_name = (this.props.assignment.name !== null|| this.props.assignment.name.length!==0) ?
                 <div style={{marginTop: '10px', padding: '5px'}}>
@@ -168,7 +198,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => (
 {
-    SubmitURL:  (id, submission) => {dispatch(SubmitURL(id,submission))}
+    SubmitURL:  (id, submission) => {dispatch(SubmitURL(id,submission))},
+    DeleteURL: (id, chk_links) => {dispatch(DeleteURL(id, chk_links))}
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StudentTaskUpload);

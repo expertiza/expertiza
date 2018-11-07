@@ -176,10 +176,8 @@ describe Participant do
       assessment = double("review")
 
       test.each do |q|
-        assignment_questionnaire_map = double("assignment_questionnaire", used_in_round: nil)
-        if q.id == 2
-          assignment_questionnaire_map = double("assignment_questionnaire", used_in_round: 1)
-        end
+        q.id == 2 ? assignment_questionnaire_map = double("assignment_questionnaire", used_in_round: 1) : 
+                    assignment_questionnaire_map = double("assignment_questionnaire", used_in_round: nil)
 
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: q.id).and_return(assignment_questionnaire_map)
         assessment = double("review")

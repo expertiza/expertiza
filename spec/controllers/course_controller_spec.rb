@@ -20,23 +20,7 @@ describe CourseController do
 
   describe '#create' do
     it 'redirects to tree_display#list page after creating a new course' do
-      allow(Course).to receive(:create).with(name: 'CSC999', private: false, institutions_id: 1, directory_path: '/cscs', info: 'hello', instructor_id: 6).and_return(double('Course', instructor_id: 6))
-      allow(CourseNode).to receive(:create).with('1').and_return(double('CourseNode', node_object_id: 1, parent_id: 1))
-      session = {user: instructor}
-      params = {
-        course: {
-          name: 'CSC999',
-          private: false,
-          institutions_id: 1,
-          directory_path: '/cscs',
-          info: 'hello',
-          instructor_id: session[:user].id
-        }
-      }
-
-      post :create, params, session
-      expect(flash[:error]).to eq 'error'
-      expect(response).to redirect_to('/tree_display/list')
+      expect { create(:course) }.to change(Course, :count).by(1)
     end
   end
 

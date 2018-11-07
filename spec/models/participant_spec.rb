@@ -27,39 +27,22 @@ describe Participant do
   # comment out the scores function of AssignmentParticipant.
   ##
 
-  let(:team) {
-    build(:assignment_team, id: 1, name: 'myTeam')}
-  let(:user) { 
-    build(:student, id: 4, name: 'no name', fullname: 'no two')}
-  let(:team_user) { 
-    build(:team_user, id: 1, user: user, team: team)} 
+  let(:team) {build(:assignment_team, id: 1, name: 'myTeam')}
+  let(:user) {build(:student, id: 4, name: 'no name', fullname: 'no two')}
+  let(:team_user) {build(:team_user, id: 1, user: user, team: team)} 
   let(:topic){build(:topic)}
-  let(:participant) {
-    build(:participant,
-    user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1))}
-  let(:participant2) { 
-    build(:participant, 
-    user: build( :student, name: "John", fullname: "Doe, John", id: 2))}
-  let(:participant3) { 
-    build(:participant, can_review: false, 
-    user: build(:student, name: "King", fullname: "Titan, King", id: 3))}
-  let(:participant4) { 
-    build(:participantSuper, can_review: false, user: user)}
+  let(:participant) {build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1))}
+  let(:participant2) {build(:participant, user: build( :student, name: "John", fullname: "Doe, John", id: 2))}
+  let(:participant3) {build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3))}
+  let(:participant4) {build(:participantSuper, can_review: false, user: user)}
   let(:assignment) {build(:assignment, id: 1, name: 'no assgt')}
-  let(:review_response_map) {
-    build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team)}
-  let(:answer) { 
-    Answer.new(answer: 1, comments: 'Answer text', question_id: 1)}
-  let(:response) {
-    build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer])}
-  let(:question1) { 
-    Criterion.new(id: 1, weight: 2, break_before: true)}
-  let(:question2) {
-    Criterion.new(id: 2, weight: 2, break_before: true)}
-  let(:questionnaire1) { 
-    ReviewQuestionnaire.new(id: 1, questions: [question1], max_question_score: 5)}
-  let(:questionnaire2) {
-    ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5)}
+  let(:review_response_map) {build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team)}
+  let(:answer) {Answer.new(answer: 1, comments: 'Answer text', question_id: 1)}
+  let(:response) {build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer])}
+  let(:question1) {Criterion.new(id: 1, weight: 2, break_before: true)}
+  let(:question2) {Criterion.new(id: 2, weight: 2, break_before: true)}
+  let(:questionnaire1) {ReviewQuestionnaire.new(id: 1, questions: [question1], max_question_score: 5)}
+  let(:questionnaire2) {ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5)}
   
   after(:each) do
     ActionMailer::Base.deliveries.clear
@@ -119,7 +102,7 @@ describe Participant do
     end
   end
 
-#  method --> force_delete is tested via the testing of method --> delete
+  #  method --> force_delete is tested via the testing of method --> delete
 
   describe '#topic_name' do
     it 'returns the participant topic name when nil' do
@@ -127,7 +110,7 @@ describe Participant do
     end
     it 'returns the participant topic name when not nil' do
       allow(participant).to receive(:topic).and_return(topic)
-      expect(participant.topic_name).to eq("Hello world!")   
+      expect(participant.topic_name).to eq("Hello world!")
     end
   end
 
@@ -184,7 +167,7 @@ describe Participant do
   describe '#sort_by_name' do
     it 'returns a sorted list of participants alphabetical by name' do
       unsorted = [participant3, participant, participant2]
-      sorted = [participant, participant2, participant3 ]
+      sorted = [participant, participant2, participant3]
       expect(Participant.sort_by_name(unsorted)).to eq(sorted)
     end
   end
@@ -195,7 +178,7 @@ describe Participant do
       test = [questionnaire1,questionnaire2]
 
       allow(participant.assignment).to receive(:questionnaires).and_return(test)
-      assessment=double("review")
+      assessment = double("review")
       
       test.each do |q|
         assignment_questionnaire_map=double("assignment_questionnaire",:used_in_round=>nil)

@@ -6,7 +6,7 @@
 
 describe "Assignment Topic Suggestion Test" do
   before(:each) do
-    create(:assignment, name: 'Assignment_suggest_topic', allow_suggestions: true, instructor_id:6)
+    create(:assignment, name: 'Assignment_suggest_topic', allow_suggestions: true)
     create_list(:participant, 3)
     create(:assignment_node)
     create(:deadline_type, name: "submission")

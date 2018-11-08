@@ -123,7 +123,7 @@ FactoryBot.define do
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     # copy_of_emails false
-	copy_of_all_emails false
+	  copy_of_all_emails false
   end
 
   factory :teaching_assistant, class: Ta do
@@ -487,5 +487,10 @@ FactoryBot.define do
     seq 1
     controller_action_id nil
     content_page_id nil
+  end
+
+  factory :suggestion, class:Suggestion do
+    assignment { Assignment.first || association(:assignment) }
+
   end
 end

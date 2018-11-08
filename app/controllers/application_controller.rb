@@ -28,9 +28,9 @@ class ApplicationController < ActionController::Base
         remove_non_utf8(value)
       elsif value.is_a?(String)
         encode_opts = {
-          invalid: :replace,
-          undef: :replace,
-          replace: ''
+          :invalid => :replace,
+          :undef => :replace,
+          :replace => ''
         }
         value.encode!(Encoding.find('UTF-8'), encode_opts)
       end

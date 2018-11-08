@@ -109,7 +109,9 @@ class CourseBadgesController < ApplicationController
       # del_cb[3] contains the id of the badge
       badge = Badge.find(del_cb[3])
       awarded = AwardedBadge.where(:participant => participant, :badge => badge).first
-      awarded.destroy
+      if !awarded.nil?
+        awarded.destroy
+      end
 
       # retract badges in credly
       form_data = {member_badge_id: awarded.external_id,
@@ -163,14 +165,15 @@ class CourseBadgesController < ApplicationController
         url = CREDLY_CONFIG["credly_api_url"] + "member_badges?access_token=" + tokens.access_token
         begin
           response = RestClient.post(url, form_data, headers=headers)
+
+          ext_id = JSON.parse(response.to_str)['data']['ids'][0]
+
+          # store awarded badges in local db
+          awarded = AwardedBadge.find_or_create_by(:participant => participant, :badge => badge, :external_id => ext_id)
         rescue StandardError => e
           flash[:error] = e.message
+          break
         end
-        ext_id = JSON.parse(response.to_str)['data']['ids'][0]
-
-        # store awarded badges in local db
-        awarded = AwardedBadge.find_or_create_by(:participant => participant, :badge => badge, :external_id => ext_id)
-
       end
 
     end

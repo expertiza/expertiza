@@ -134,7 +134,7 @@
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= sanitize score.comment%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>

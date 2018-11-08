@@ -109,7 +109,9 @@ class CourseBadgesController < ApplicationController
       # del_cb[3] contains the id of the badge
       badge = Badge.find(del_cb[3])
       awarded = AwardedBadge.where(:participant => participant, :badge => badge).first
-      awarded.destroy
+      if !awarded.nil?
+        awarded.destroy
+      end
 
       # retract badges in credly
       form_data = {member_badge_id: awarded.external_id,

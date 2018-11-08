@@ -65,12 +65,12 @@ describe ReviewResponseMap do
     end
   end
 
- describe ".import" do
+  describe ".import" do
     context "when the user of the reviewee is nil" do
       it "raises an ArgumentError saying 'cannot find reviewee user'" do
         hash = {reviewee: 'person1', reviewers: ['person2']}
         allow(User).to receive(:find_by).and_return(nil)
-        expect{ReviewResponseMap.import(hash, '_session', 1)}.to raise_error(ArgumentError)
+        expect{ ReviewResponseMap.import(hash, '_session', 1) }.to raise_error(ArgumentError)
       end
     end
 
@@ -81,7 +81,7 @@ describe ReviewResponseMap do
           reviewee_user = double('User', id: 5, name: 'person1')
           allow(User).to receive(:find_by).with(name: 'person1').and_return(reviewee_user)
           allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
-          expect{ReviewResponseMap.import(hash, '_session', 1)}.to raise_error(ArgumentError)
+          expect{ ReviewResponseMap.import(hash, '_session', 1) }.to raise_error(ArgumentError)
         end
       end
 
@@ -94,7 +94,7 @@ describe ReviewResponseMap do
           reviewer_user = double('User', id: 6, name: 'person2')
           allow(User).to receive(:find_by).with(name: 'person2').and_return(reviewer_user)
           reviewer_participant = double('AssignmentParticipant', user_id: 6, parent_id: 1, id: 4)
-          allow(AssignmentParticipant).to receive(:where).and_return(reviewer_participant) 
+          allow(AssignmentParticipant).to receive(:where).and_return(reviewer_participant)
         end
         context "when reviewee does not have a team" do
           it "creates a team for reviewee and finds/creates a review response map record" do
@@ -157,7 +157,8 @@ describe ReviewResponseMap do
         allow(map).to receive_message_chain(:response, :last).and_return(response)
         expect(review_response_map.show_feedback(response)).to eq("<table width=\"100%\"><tr>" \
                                                                   "<td align=\"left\" width=\"70%\"><b>Review </b>" \
-                                                                  "&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');" \
+                                                                  "&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" " \
+                                                                  "onClick=\"toggleElement('review_1','review');" \
                                                                   "return false;\">show review</a></td><td align=\"left\"><b>Last Reviewed:</b>" \
                                                                   "<span>Not available</span></td></tr></table>" \
                                                                   "<table id=\"review_1\" style=\"display: none;\" class=\"table table-bordered\"><tr><td>" \

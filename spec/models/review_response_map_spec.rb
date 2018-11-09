@@ -70,7 +70,7 @@ describe ReviewResponseMap do
       it "raises an ArgumentError saying 'cannot find reviewee user'" do
         hash = {reviewee: 'person1', reviewers: ['person2']}
         allow(User).to receive(:find_by).and_return(nil)
-        expect{ReviewResponseMap.import(hash, '_session', 1)}.to raise_error(ArgumentError)
+        expect{ ReviewResponseMap.import(hash, '_session', 1) }.to raise_error(ArgumentError)
       end
     end
 
@@ -81,7 +81,7 @@ describe ReviewResponseMap do
           reviewee_user = double('User', id: 5, name: 'person1')
           allow(User).to receive(:find_by).with(name: 'person1').and_return(reviewee_user)
           allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
-          expect{ReviewResponseMap.import(hash, '_session', 1)}.to raise_error(ArgumentError)
+          expect{ ReviewResponseMap.import(hash, '_session', 1) }.to raise_error(ArgumentError)
         end
       end
 
@@ -235,12 +235,12 @@ describe ReviewResponseMap do
       round = 2
       allow(assignment).to receive(:rounds_of_reviews).and_return(round)
       expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
-        eq({:"review round1"=>{:questionnaire_id=>nil, :response_ids=>[]}, :"review round2"=>{:questionnaire_id=>nil, :response_ids=>[]}})
+        eq("review round1": {questionnaire_id: nil, response_ids: []}, "review round2": {questionnaire_id: nil, response_ids: []})
       round = nil
       assignment = double('assignment', round_of_reviews: 3, review_questionnaire_id: 1)
       allow(assignment).to receive(:rounds_of_reviews).and_return(round)
       expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
-        eq({:review=>{:questionnaire_id=>1, :response_ids=>[]}})
+        eq(review: {questionnaire_id: 1, response_ids: []})
       allow(assignment).to receive(:review_questionnaire_id).and_return(1)
       map = double('map', id: 1)
       maps = [map]

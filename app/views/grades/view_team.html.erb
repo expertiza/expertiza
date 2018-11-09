@@ -158,7 +158,7 @@
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
                   <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
-                    <div style="padding-top: 10px; padding-bottom: 10px;"><%= row.question_text %></div>
+                    <div style="padding-top: 10px; padding-bottom: 10px;"><%=  sanitize row.question_text %></div>
                     <div>
                       <table class="table tbl_questlist">
                         <thead>

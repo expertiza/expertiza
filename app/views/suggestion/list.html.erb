@@ -10,12 +10,15 @@
       <th>Status</th>
       <th>Submitter's user name</th>
       <th>Action</th>
+      <!-- New Headers -->
       <th>Feedback</th>
       <th>Save</th>
     </tr>
 
     <% for suggestion in @suggestions %>
       <tr class="listingRow">
+	<!-- Creating form to have an action on the new submit feedback button -->
+	<!-- Adding id and type in the params object which is required to reload the same page again -->
 	<%= form_for :suggestion, :url => update_feedback_suggestion_index_path(:suggestion_id => suggestion.id, :id => params[:id], :type => params[:type])   	do |f| %>
         <td style="max-width: 200px"><%=h suggestion.title %></td>
         <td align="center"><%=h suggestion.status %></td>

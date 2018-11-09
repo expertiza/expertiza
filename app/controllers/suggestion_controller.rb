@@ -181,6 +181,8 @@ class SuggestionController < ApplicationController
     redirect_to action: 'show', id: @suggestion
   end
 
+  # Method to save/update feedback given by the instructor in the suggestions table in feedback column
+  # After saving the data we redirect the user to the same page
   def update_feedback
     Suggestion.find(params[:suggestion_id]).update_attributes(feedback: params[:suggestion][:feedback])
     redirect_to list_suggestion_index_path(:id => params[:id], :type => params[:type])

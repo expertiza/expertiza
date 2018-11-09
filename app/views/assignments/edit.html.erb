@@ -148,13 +148,15 @@
   </table>
 </div>
 <script>
+  // function for showing warning when number of slots is set as zero
     function showZeroSlotWarning(){
         if ($('#topic_max_choosers').val() == 0){
             alert("If you create a topic with 0 slots,  students cannot assign this topic.");
             return false;
         }
     };
-    function addCreateTopicSection(){
+    // function to toggle and append the editable row for creating new topics
+    function appendCreateTopicSection(){
         $("#topic_table_header").after($("#add_topic"));
         $("#add_topic").toggle();
     };

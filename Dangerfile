@@ -219,8 +219,8 @@ end
 # ------------------------------------------------------------------------------
 # The PR should avoid keeping debugging code.
 # ------------------------------------------------------------------------------
-if github.pr_diff.include? "puts" or
-   github.pr_diff.include? "print" or
+if github.pr_diff.include? "puts " or
+   github.pr_diff.include? "print " or
    github.pr_diff.include? "binding.pry" or
    github.pr_diff.include? "debugger;" or
    github.pr_diff.include? "console.log"

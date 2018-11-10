@@ -284,6 +284,7 @@ describe AssignmentsController do
   end
 
   describe '#copy' do
+
     let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment') }
     before(:each) do
       allow(assignment).to receive(:dup).and_return(new_assignment)
@@ -307,6 +308,24 @@ describe AssignmentsController do
         expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
         expect(response).to redirect_to('/tree_display/list')
       end
+    end
+
+    context 'when new assignment directory is same as old' do
+      it 'should show an error and redirect to assignments#edit page' do
+        allow(new_assignment).to receive(:save).and_return(true)
+        allow(Assignment).to receive(:find).with(2).and_return(new_assignment)
+        params = {id: 1}
+        # params = {directory_path: assignment[:directory_path]}
+        get :copy, params
+
+        expect(flash[:note]).to eq("Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
+          "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
+          "If you do not want this to happen, change the submission directory in the new copy of the assignment.")
+        expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
+        expect(response).to redirect_to('/tree_display/list')
+
+      end
+
     end
   end
 

@@ -175,7 +175,9 @@ end
       due_date_string = due_date.due_at.to_s
       subject = "Message regarding #{assign_type} for #{assign_name}"
       if assign_type == "submission"
-        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. Deadline is #{due_date_string}."
+        body = "This is a reminder to complete #{assign_type} for assignment #{assign_name}. " +
+          "Deadline is #{due_date_string}. " +
+          "Please visit https://expertiza.ncsu.edu/submitted_content/#{assign.id}/edit" 
       end
 
       # E1834 Fall 18

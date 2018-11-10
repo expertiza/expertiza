@@ -62,14 +62,29 @@ class DelayedMailer
              else
                find_team_members_email_for_all_topics(sign_up_topics)
              end
-    email_reminder(emails, self.deadline_type) if emails.present?
+    #email_reminder(emails, self.deadline_type) if emails.present?
+    submission_reminder_email(emails, self.deadline_type) if emails.present?
   end
+
+  def submission_reminder_email(emails, deadline_type)
+   assignment = Assignment.find(self.assignment_id)
+    subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
+    for item in emails
+      body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
+              Deadline is #{self.due_at}. Please visit https://expertiza.ncsu.edu/submitted_content/#{emails.id}/edit\
+              If you have already done the  #{deadline_type}, please ignore this mail."
+      Rails.logger.info item.email
+      @mail = Mailer.delayed_message(bcc: [item.email], subject: subject, body: body)
+      @mail.deliver_now
+    end
+  end
+
 
   def find_team_members_email
     emails = []
     teams = Team.where(parent_id: self.assignment_id)
     teams.each do |team|
-      team.users.each {|team_member| emails << team_member.email }
+      team.users.each {|team_member| emails << {'email' => team_member.email, 'id' => team_member.id} }
     end
     emails
   end

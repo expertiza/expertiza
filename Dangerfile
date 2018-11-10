@@ -160,16 +160,16 @@ end
 # ------------------------------------------------------------------------------
 MODIFIED_FILES.each do |file|
   next unless file =~ /.*_spec\.rb$/
-  diff = git.diff_for_file(file)
-  if diff.patch.include? "xdescribe" or
-     diff.patch.include? "xspecify" or
-     diff.patch.include? "xexample" or
-     diff.patch.include? "xit" or
-     diff.patch.include? "skip(" or
-     diff.patch.include? "skip " or
-     diff.patch.include? "pending(" or
-     diff.patch.include? "fdescribe" or
-     diff.patch.include? "fit"
+  diff = git.diff_for_file(file).patch
+  if diff.include? "xdescribe" or
+     diff.include? "xspecify" or
+     diff.include? "xexample" or
+     diff.include? "xit" or
+     diff.include? "skip(" or
+     diff.include? "skip " or
+     diff.include? "pending(" or
+     diff.include? "fdescribe" or
+     diff.include? "fit"
     TEST_SKIPPED_MESSAGE =
       markdown <<-MARKDOWN
 There are one or more skipped/pending/focused test cases in your pull request. Please fix them.
@@ -313,7 +313,8 @@ end
 # ------------------------------------------------------------------------------
 MODIFIED_FILES.each do |file|
   next unless file =~ /spec\/models/ or file =~ /spec\/controllers/
-  if git.diff_for_file(file).patch.include? "create"
+  diff = git.diff_for_file(file).patch
+  if diff.include? " create(" or diff.include? "{create("
     CREATE_MOCK_UP_OBJ_MESSAGE =
       markdown <<-MARKDOWN
 Using `create` in unit tests or integration tests may be overkill. Try to use `build` or `double` instead.
@@ -329,7 +330,7 @@ end
 # ------------------------------------------------------------------------------
 MODIFIED_FILES.each do |file|
   next unless file =~ /.*_spec\.rb$/
-  if git.diff_for_file(file).patch.include? "should"
+  if git.diff_for_file(file).patch.include? ".should"
     NO_SHOULD_SYNTAX_MESSAGE =
       markdown <<-MARKDOWN
 The `should` syntax is deprecated in RSpec 3. Please use `expect` syntax instead.

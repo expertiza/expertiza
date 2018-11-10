@@ -192,5 +192,3 @@ describe VmQuestionResponse do
     end
   end
 end
-vm_question_response_spec.rb
-Displaying vm_question_response_spec.rb.

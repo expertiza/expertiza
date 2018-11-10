@@ -9,7 +9,6 @@ describe 'My behaviour' do
     expect(page).to have_current_path('/tree_display/list')
     expect(page).to have_content('Manage content')
     expect(page).to have_content('Open Student View')
-
   end
 
   it "can display relevant menu items when in student view", js: true do

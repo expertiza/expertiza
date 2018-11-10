@@ -6,20 +6,20 @@ class QuestionnairesController < ApplicationController
 
   before_action :authorize
 
+  # Check role access for edit questionnaire
   def action_allowed?
     if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
-       'Administrator'
-       ].include? current_role_name) ||
+        'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
           ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
 
     else
-        ['Super-Administrator',
-         'Administrator',
-         'Instructor',
-         'Teaching Assistant', 'Student'].include? current_role_name
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant', 'Student'].include? current_role_name
    end
  end
 

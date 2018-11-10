@@ -6,6 +6,7 @@ class ExportFileController < ApplicationController
      'Super-Administrator'].include? current_role_name
   end
 
+  # Assign titles to model for display
   def start
     @model = params[:model]
     titles = {"Assignment" => "Grades", "CourseParticipant" => "Course Participants", "AssignmentTeam" => "Teams",
@@ -77,6 +78,7 @@ class ExportFileController < ApplicationController
               disposition: "attachment; filename=#{filename}"
   end
 
+  # Export question advice data to CSV file
   def export_advices
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])

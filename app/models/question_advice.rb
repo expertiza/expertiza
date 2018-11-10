@@ -1,6 +1,7 @@
 class QuestionAdvice < ActiveRecord::Base
   belongs_to :question
 
+  # This method returns an array of fields present in question advice model
   def self.export_fields(_options)
     fields = []
     QuestionAdvice.columns.each do |column|
@@ -9,6 +10,7 @@ class QuestionAdvice < ActiveRecord::Base
     fields
   end
 
+  # This method adds the question advice data to CSV for the respective questionnaire
   def self.export(csv, parent_id, _options)
     questionnaire = Questionnaire.find(parent_id)
     questions = questionnaire.questions

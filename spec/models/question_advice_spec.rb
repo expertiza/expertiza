@@ -23,4 +23,3 @@ describe QuestionAdvice do
     end
   end
 end
-

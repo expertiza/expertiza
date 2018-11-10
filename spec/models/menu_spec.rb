@@ -1,9 +1,9 @@
 describe Menu do
   before :example do
     controller = double("controller", id: 43, name: "controller1")
-    temp = double("temp", id: 33, controller: controller, name: "temp", url_to_use: nil)
-    allow_any_instance_of(MenuItem).to receive(:controller_action).and_return(temp)
-    allow_any_instance_of(MenuItem).to receive(:content_page).and_return(temp)
+    test_return_val = double("test_return_val", id: 33, controller: controller, name: "test_return_val", url_to_use: nil)
+    allow_any_instance_of(MenuItem).to receive(:controller_action).and_return(test_return_val)
+    allow_any_instance_of(MenuItem).to receive(:content_page).and_return(test_return_val)
     items = [test1, test2, test3, test4, test5, test6]
     allow(MenuItem).to receive(:items_for_permissions).with(anything).and_return(items)
   end
@@ -29,13 +29,13 @@ describe Menu do
         it "returns /content_page.name" do
           allow_any_instance_of(MenuItem).to receive(:controller_action).and_return(nil)
           node = Menu::Node.new
-          expect(node.setup(test1)).to eq("/temp")
+          expect(node.setup(test1)).to eq("/test_return_val")
         end
       end
       context "when item.action_controller is not nil" do
         it "returns /controller.name/controller_action.name" do
           node = Menu::Node.new
-          expect(node.setup(test1)).to eq("/controller1/temp")
+          expect(node.setup(test1)).to eq("/controller1/test_return_val")
         end
       end
     end

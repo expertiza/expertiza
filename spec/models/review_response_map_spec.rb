@@ -235,7 +235,7 @@ describe ReviewResponseMap do
       round = 2
       allow(assignment).to receive(:rounds_of_reviews).and_return(round)
       expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
-        eq("review round1" => {questionnaire_id: nil, response_ids: []}, "review round2" => {questionnaire_id: nil, response_ids: []})
+        eq(:"review round1" => {questionnaire_id: nil, response_ids: []}, :"review round2" => {questionnaire_id: nil, response_ids: []})
       round = nil
       assignment = double('assignment', round_of_reviews: 3, review_questionnaire_id: 1)
       allow(assignment).to receive(:rounds_of_reviews).and_return(round)

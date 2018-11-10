@@ -1,7 +1,4 @@
 describe VmQuestionResponse do
-  before(:all) do
-  end
-
   let(:review_questionnaire) {build(:questionnaire, name: "ReviewQuestionnaire",
                         type: 'ReviewQuestionnaire')}
   let(:author_feedback_questionnaire) {create(:questionnaire, type: "AuthorFeedbackQuestionnaire")}

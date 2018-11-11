@@ -66,7 +66,7 @@ class BadgesController < ApplicationController
     directory = get_icon_directory_path
     IO.copy_stream(image_file, directory + file_name) unless File.file?(directory + file_name)
     # convert image to
-    image_icon = Base64.encode64(image_file.read)
+    image_icon = Base64.encode64(File.read(directory + file_name))
     form_data = {:title => params['badge']['name'],
                  :attachment => image_icon,
                  :short_description => params['badge']['description'],

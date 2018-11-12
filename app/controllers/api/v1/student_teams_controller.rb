@@ -133,6 +133,17 @@ module Api::V1
       end
     end
 
+    def update_submitted_hyperlinks
+      @team = Team.find params[:team][:id]
+      team_params = params.require(:team).permit(:submitted_hyperlinks)
+      if @team.update_attributes(team_params)
+        render json: {status: :ok, team: @team}
+        flash[:success] = 'Your hyperlinks was successfully updated.'
+      else
+        flash[:error] = 'An error occurred and your hyperlinks could not updated.'
+      end
+    end
+
     def advertise_for_partners
       Team.update_all advertise_for_partner: true, id: params[:team_id]
     end

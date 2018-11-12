@@ -42,6 +42,7 @@ Expertiza::Application.routes.draw do
         post :getTeamUsers
         post :getCurrentTeam
         post :getUserNameFromParticipant
+        post :update_submitted_hyperlinks
       end
     end
 

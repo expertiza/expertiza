@@ -185,9 +185,11 @@ describe 'ReviewResponseMap' do
     context 'when rounds_of_reviews <=1' do
       xit 'calls prepare_review_response with round=nil' do
         maps = [feedback_response_map]
-        allow(ReviewResponseMap).to receive(:prepare_review_response).with(any_args).and_return({something: "testing"})
-        expect(ReviewResponseMap).to receive(:prepare_review_response).with(any_args).once
-        expect(ReviewResponseMap.prepare_final_review_versions assignment, maps).to eql("test")
+        review_final_versions = {}
+        allow(ReviewResponseMap).to receive(:prepare_review_response).with(assignment, maps, review_final_versions, nil).once
+        get :prepare_review_response
+        allow(:review_final_versions).to eq({'test' => 'test'})
+        expect(ReviewResponseMap.prepare_final_review_versions assignment, maps).to eql({'test' => 'test'})
       end
     end
   end

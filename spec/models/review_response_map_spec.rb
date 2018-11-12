@@ -131,6 +131,34 @@ describe 'ReviewResponseMap' do
     end
   end
 
+  describe ".review_response_report" do
+    context "when the user is nil" do
+      it "gives participants with unique IDs in a sorted order" do
+        temp_id = double('id', id: 1)
+        temp_type = double('type', type: 'type')
+        temp_reviewers = double('reviewers')
+        #Stubbing call to the database source: https://relishapp.com/rspec/rspec-mocks/docs/working-with-legacy-code/message-chains
+        allow(ResponseMap).to receive_message_chain(:select, :where).and_return([response_map])
+        allow(AssignmentParticipant).to receive(:find).and_return([temp_reviewers])
+        allow(Participant).to receive(:sort_by_name).and_return([temp_reviewers])
+        expect(ReviewResponseMap.review_response_report(temp_id, assignment, temp_type, nil)).to eq([temp_reviewers])
+      end
+    end
+    context "when the user is not nil" do
+      it "gives reviewers users' full name" do
+        temp_user = double('user', :[] => '1')
+        #Mocking user ids
+        temp_user_ids = double('user_ids')
+        temp_id = double('id', id: 1)
+        temp_type = double('type', type: 'type')
+        temp_reviewers = double('reviewers', fullname: 'testName')
+        allow(User).to receive_message_chain(:select, :where).and_return([temp_user_ids])
+        allow(AssignmentParticipant).to receive(:where).and_return([temp_reviewers])
+        expect(ReviewResponseMap.review_response_report(temp_id, assignment, temp_type, temp_user)).to eq([temp_reviewers])
+      end
+    end
+  end
+
   xdescribe '.prepare_final_review_versions' do
     before(:each) do
       @Test_final_version = {}

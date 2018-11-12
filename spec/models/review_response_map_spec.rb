@@ -14,15 +14,16 @@ describe 'ReviewResponseMap' do
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
-  let(:response) { build(:response, id: 1, round: 1, is_submitted: true,map_id: 1, scores: [answer]) }
+  let(:response) { build(:response,  id: 1, map_id: 1, response_map: review_response_map, round: 1, is_submitted: true, scores: [answer]) }
   let(:null_response){double(:response)}
   let(:response2) { build(:response, id: 2, round: 1, is_submitted: true, map_id: 1, scores: [answer]) }
   let(:response3) { build(:response, id: 3, round: 1, is_submitted: false, map_id: 1, scores: [answer]) }
-  let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
+  let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map2) { build(:review_response_map, assignment: assignment2, reviewer: participant2, reviewee: team) }
-  let(:meta_review_response_map) { build(:meta_review_response_map, review_mapping: review_response_map, reviewee: participant)}
+  let(:meta_review_response_map) { build(:meta_review_response_map, id: 1, reviewed_object_id: 1, review_mapping: review_response_map, reviewee: participant)}
   let(:feedback_response_map){ build(:review_response_map, response:[response2, response3], type:'FeedbackResponseMap')}
-  
+  let(:metareview_response_map) {double('somemap')}
+
   describe '#get_title' do
     it 'returns the title' do
       expect(review_response_map.get_title).to eql("Review")
@@ -80,12 +81,20 @@ describe 'ReviewResponseMap' do
       expect(ReviewResponseMap.export([], 1, 'test')).to eql([review_response_map])
     end
   end
-  
+
+  describe '#metareview_response_maps' do
+    it 'returns metareview responses for which id is caller id' do
+    allow(Response).to receive(:where).with(map_id: 1).and_return([response])
+    allow(MetareviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([metareview_response_map])
+    expect(review_response_map.metareview_response_maps).to eq([metareview_response_map])
+    end
+  end
+
   describe '#show_feedback' do
     context 'when no response is present or response is nil' do
       it 'returns nil' do  
         allow(review_response_map).to receive(:response).and_return([])     
-        expect(review_response_map.show_feedback null_response).to be(nil)        
+        expect(review_response_map.show_feedback null_response).to be(nil)
       end
     end
 
@@ -120,3 +129,4 @@ describe 'ReviewResponseMap' do
     end
   end
 end
+666

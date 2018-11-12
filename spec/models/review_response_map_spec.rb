@@ -105,8 +105,40 @@ describe 'ReviewResponseMap' do
   end
 
   describe '.import' do
-    {reviews: 'name'}
-    allow(user).to_receive(:find_by).with(name: 'name').and_return(user)
-    expect(ReviewResponseMap.import())
+    context 'when reviewee is nil' do
+      testHash = {reviewee: 'user1', reviewers: ['user2']}
+      it 'raises an ArgumentError' do
+        allow(User).to receive(:find_by).and_return(nil)
+        expect{ReviewResponseMap.import(testHash, '_session', 1)}.to raise_error(ArgumentError)
+      end
+    end
+
+    context 'when the reviewee is not nil' do
+      context 'when participant is nil' do
+        testHash = {reviewee: 'user1', reviewers: ['user2']}
+        it "Raises another ArgumentError" do
+          reviewee = double('User', :id => 2, :name => 'user1')
+          allow(User).to receive(:find_by).with(name: 'user1').and_return(reviewee)
+          # reviewee_participant = double('AssignmentParticipant', user_id: 2, parent_id: 1, id: 3)
+          allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
+          # reviewer = double('User', id = 4, name: 'user2')
+          # allow(User).to receive(:find_by).with(name: 'user2').and_return(reviewer)
+          # reviewer_participant = double('AssignmentParticipant', user_id: 4, parent_id: 1, id: 5)
+          # allow(AssignmentParticipant).to receive(:find_by).and_return(reviewer_participant)
+          expect{ReviewResponseMap.import(testHash, '_session', 1)}.to raise_error(ArgumentError)
+        end
+      end
+    end
+  end
+
+  xdescribe '.prepare_final_review_versions' do
+    before(:each) do
+      @Test_final_version = {}
+    end
+    context 'when round_of_reviews <= 1' do
+      it 'calls prepare_review_response with round=nil' do
+        allow(ReviewResponseMap).to_receive(:prepare_review_response).with
+      end
+    end
   end
 end

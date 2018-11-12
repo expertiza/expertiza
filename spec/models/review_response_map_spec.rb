@@ -19,8 +19,6 @@ describe 'ReviewResponseMap' do
   let(:response3) { build(:response, id: 3, round: 1, is_submitted: false, map_id: 1, scores: [answer]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map2) { build(:review_response_map, assignment: assignment2, reviewer: participant2, reviewee: team) }
-  # let(:user){build(:student)}
-  # let(:user2){double(:user)}
   let(:meta_review_response_map) { build(:meta_review_response_map, id: 1, reviewed_object_id: 1, review_mapping: review_response_map, reviewee: participant)}
   let(:feedback_response_map){ build(:review_response_map, response:[response2, response3], type:'FeedbackResponseMap')}
   let(:metareview_response_map) {double('somemap')}
@@ -222,14 +220,40 @@ describe 'ReviewResponseMap' do
     end
   end
 
-  xdescribe '.prepare_final_review_versions' do
-    before(:each) do
-      @Test_final_version = {}
-    end
-    context 'when round_of_reviews <= 1' do
-      it 'calls prepare_review_response with round=nil' do
-        allow(ReviewResponseMap).to_receive(:prepare_review_response).with
+  describe '.prepare_final_review_versions' do
+    context 'if the round number is greater than 1' do
+      it "returns updated version of review" do
+        maps = []
+        review_final_versions = {}
+        round_num = 2
+        allow(assignment).to receive(:rounds_of_reviews).and_return(round_num)
+        #Mocking reviews for two rounds
+        expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to eql(:"review round1" => {questionnaire_id: nil, response_ids: []}, :"review round2" => {questionnaire_id: nil, response_ids: []})
       end
     end
+    context 'if the round number is not greater than 1' do
+      it "returns latest version of review" do
+        maps = []
+        round_num = nil
+        temp_assignment = double(:assignment, round_of_reviews: 5, review_questionnaire_id: 2)
+        allow(temp_assignment).to receive(:rounds_of_reviews).and_return(round_num)
+        expect(ReviewResponseMap.prepare_final_review_versions(temp_assignment, maps)).to eql(review: {questionnaire_id: 2, response_ids: []})
+      end
+    end
+      # round = nil
+      # assignment = double('assignment', round_of_reviews: 3, review_questionnaire_id: 1)
+      # allow(assignment).to receive(:rounds_of_reviews).and_return(round)
+      # expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to \
+      #   eq(review: {questionnaire_id: 1, response_ids: []})
+      # allow(assignment).to receive(:review_questionnaire_id).and_return(1)
+      # map = double('map', id: 1)
+      # maps = [map]
+      # responses = []
+      # round = 1
+      # allow(Response).to receive(:where).and_return([])
+      # allow(responses).to receive_message_chain(:last, :id).and_return([])
+      # expect(ReviewResponseMap.prepare_review_response(assignment, maps, review_final_versions, round)).to eq([])
+    # end
+
   end
 end

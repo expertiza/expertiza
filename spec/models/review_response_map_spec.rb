@@ -117,15 +117,51 @@ describe 'ReviewResponseMap' do
       context 'when participant is nil' do
         testHash = {reviewee: 'user1', reviewers: ['user2']}
         it "Raises another ArgumentError" do
+          reviewee = double('User', :id => 1, :name => 'user1')
+          allow(User).to receive(:find_by).with(name: 'user1').and_return(reviewee)
+          allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
+          expect{ReviewResponseMap.import(testHash, '_session', 1)}.to raise_error(ArgumentError)
+        end
+      end
+
+      context 'when the participant is not nil' do
+        before(:each) do
           reviewee = double('User', :id => 2, :name => 'user1')
           allow(User).to receive(:find_by).with(name: 'user1').and_return(reviewee)
-          # reviewee_participant = double('AssignmentParticipant', user_id: 2, parent_id: 1, id: 3)
-          allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
-          # reviewer = double('User', id = 4, name: 'user2')
-          # allow(User).to receive(:find_by).with(name: 'user2').and_return(reviewer)
-          # reviewer_participant = double('AssignmentParticipant', user_id: 4, parent_id: 1, id: 5)
-          # allow(AssignmentParticipant).to receive(:find_by).and_return(reviewer_participant)
-          expect{ReviewResponseMap.import(testHash, '_session', 1)}.to raise_error(ArgumentError)
+          reviewee_participant = double('AssignmentParticipant', :user_id=>2, :parent_id=>1, :id=>3)
+          allow(AssignmentParticipant).to receive(:find_by).and_return(reviewee_participant)
+          reviewer = double('User', :id=>4, :name=>'user2')
+          allow(User).to receive(:find_by).with(name: 'user2').and_return(reviewer)
+          reviewer_participant = double('AssignmentParticipant', :user_id=>4, :parent_id=>1, :id=>5)
+          allow(AssignmentParticipant).to receive(:where).and_return(reviewer_participant)
+        end
+        context 'when reviewee has no team' do
+          it "creates a team for reviewee via lazy team creation" do
+            testHash = {reviewee: 'user1', reviewers: ['user2']}
+            allow(AssignmentTeam).to receive(:team).and_return(nil)
+            reviewee_team = double('AssignmentTeam', name: 'Team_1', parent_id: 1, id: 2)
+            allow(AssignmentTeam).to receive(:create).and_return(reviewee_team)
+            team_user = double('TeamUser', team_id: 2, user_id: 2, id: 10)
+            allow(TeamsUser).to receive(:create).and_return(team_user)
+            team_node = double('TeamNode', parent_id: 1, node_object_id: 2, id: 6)
+            allow(TeamNode).to receive(:create).and_return(team_node)
+            team_user_node = double('TeamUserNode', parent_id: 4, node_object_id: 10)
+            allow(TeamUserNode).to receive(:create).and_return(team_user_node)
+            map1 = double('ReviewResponseMap', reviewed_object_id: 1, reviewer_id: 4, reviewee_id: 2, calibrate_to: false)
+            allow(ReviewResponseMap).to receive(:find_by).and_return(map1)
+            expect(ReviewResponseMap.import(testHash, '_session', 1)).to eq(['user2'])
+          end
+        end
+
+        context 'when reviewee has a team' do
+          it "creates a review response map" do
+            testHash = {reviewee: 'user1', reviewers: ['user2']}
+            reviewee_team = double('AssignmentTeam', parent_id: 1, id: 2)
+            allow(AssignmentTeam).to receive(:team).and_return(reviewee_team)
+            map1 = double('ReviewResponseMap', reviewed_object_id: 1, reviewer_id: 4, reviewee_id: 2, calibrate_to: false)
+            allow(ReviewResponseMap).to receive(:find_by).and_return(map1)
+            expect(ReviewResponseMap.import(testHash, '_session', 1)).to eq(['user2'])
+          end
         end
       end
     end

@@ -161,7 +161,7 @@ describe Menu do
   describe "#select" do
     context "when by_name hash does not contain the given node name" do
       it "returns nil" do
-        expect(menu.select("hi")).to be_nil
+        expect(menu.select("hello")).to be_nil
       end
     end
 

@@ -79,7 +79,6 @@ describe "Global Survey questionnaire tests for instructor interface" do
     click_button "Save course survey questionnaire"
     expect(page).to have_content('All questions has been successfully saved!')
     question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire.id.to_s)
-    print question
     click_link('Remove')
     expect(page).to have_content("You have successfully deleted the question!")
   end

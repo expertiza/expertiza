@@ -9,30 +9,22 @@ class Participant < ActiveRecord::Base
   has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
   has_many :awarded_badges, dependent: :destroy
   has_many :badges, through: :awarded_badges
-  has_one :review_grade
+  has_one :review_grade, dependent: :destroy
+
+  validates :grade, numericality: {allow_nil: true}
+  has_paper_trail
+  delegate :course, to: :assignment
+  delegate :get_current_stage, to: :assignment
+  delegate :stage_deadline, to: :assignment
 
   PARTICIPANT_TYPES = %w[Course Assignment].freeze
 
   def team
-    TeamsUser.where(user: user).first.try :team
+    TeamsUser.find_by(user: user).try(:team)
   end
 
   def responses
     response_maps.map(&:response)
-  end
-
-  validates :grade, numericality: {allow_nil: true}
-
-  delegate :course, to: :assignment
-
-  has_paper_trail
-
-  def get_current_stage
-    assignment.try :get_current_stage, topic_id
-  end
-
-  def stage_deadline
-    assignment.stage_deadline topic_id
   end
 
   def name(ip_address = nil)
@@ -49,8 +41,7 @@ class Participant < ActiveRecord::Base
 
   def delete(force = nil)
     maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', self.id, self.id)
-    if force or (maps.blank? and
-                 self.team.nil?)
+    if force or (maps.blank? and self.team.nil?)
       force_delete(maps)
     else
       raise "Associations exist for this participant."
@@ -58,34 +49,30 @@ class Participant < ActiveRecord::Base
   end
 
   def force_delete(maps)
-    maps.each {|map| map.delete(true) } if maps
-
-    if self.team
-      if self.team.teams_users.length == 1
-        self.team.delete
-      else
-        self.team.teams_users.each do |tuser|
-          tuser.delete if tuser.user_id == self.id
-        end
-      end
+    maps and maps.each(&:destroy)
+    if self.team and self.team.teams_users.length == 1
+      self.team.delete
+    elsif self.team
+      self.team.teams_users.each {|teams_user| teams_user.destroy if teams_user.user_id == self.id }
     end
     self.destroy
   end
 
   def topic_name
-    return "<center>&#8212;</center>" if topic.nil? or topic.topic_name.empty?
-    topic.topic_name
+    if topic.nil? or topic.topic_name.empty?
+      "<center>&#8212;</center>" # em dash
+    else
+      topic.topic_name
+    end
   end
 
   def able_to_review
-    return true if can_review
-    false
+    can_review
   end
 
-  # email does not work. It should be made to work in the future
   def email(pw, home_page)
-    user = User.find(self.user_id)
-    assignment = Assignment.find(self.assignment_id)
+    user = User.find_by(id: self.user_id)
+    assignment = Assignment.find_by(id: self.assignment_id)
 
     Mailer.sync_message(
       recipients: user.email,
@@ -104,31 +91,18 @@ class Participant < ActiveRecord::Base
   def scores(questions)
     scores = {}
     scores[:participant] = self
-
-    if self.assignment.varying_rubrics_by_round? # for "vary rubric by rounds" feature -Yang
-      self.assignment.questionnaires.each do |questionnaire|
-        round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
-        questionnaire_symbol = if !round.nil?
-                                 (questionnaire.symbol.to_s + round.to_s).to_sym
-                               else
-                                 questionnaire.symbol
-                               end
-        scores[questionnaire_symbol] = {}
-        scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
-        scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
-      end
-
-    else # not using "vary rubric by rounds" feature
-      self.assignment.questionnaires.each do |questionnaire|
-        scores[questionnaire.symbol] = {}
-        scores[questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(self)
-
-        scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
-      end
+    self.assignment.questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      questionnaire_symbol = if round
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             else
+                               questionnaire.symbol
+                             end
+      scores[questionnaire_symbol] = {}
+      scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
+      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
-
     scores[:total_score] = assignment.compute_total_score(scores)
-
     scores
   end
 
@@ -166,15 +140,8 @@ class Participant < ActiveRecord::Base
   # There should be a more beautiful way to handle this, though.  -Yang
   def self.sort_by_name(participants)
     users = []
-    participants.each do |participant|
-      user = User.find(participant.user_id)
-      users << user
-    end
+    participants.each {|p| users << p.user }
     users.sort! {|a, b| a.name.downcase <=> b.name.downcase } # Sort the users based on the name
-
-    sorted_user_ids = users.map(&:id)
-    sorted_participants = participants.sort_by {|x| sorted_user_ids.index x.user_id }
-
-    sorted_participants
+    participants.sort_by {|p| users.map(&:id).index(p.user_id) }
   end
 end

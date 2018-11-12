@@ -92,7 +92,7 @@ class TreeDisplayController < ApplicationController
 
   # finding out child_nodes from params
   def child_nodes_from_params(child_nodes)
-    if child_nodes.is_a? String
+    if child_nodes.is_a? String and !child_nodes.empty?
       JSON.parse(child_nodes)
     else
       child_nodes

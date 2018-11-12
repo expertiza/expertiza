@@ -21,7 +21,8 @@ describe 'ReviewResponseMap' do
   let(:meta_review_response_map) { build(:meta_review_response_map, review_mapping: review_response_map, reviewee: participant)}
   let(:feedback_response_map){ build(:review_response_map, response:[response], type:'FeedbackResponseMap')}
   let(:feedback_response_map1){ build(:review_response_map, response:[response], type:'FeedbackResponseMap')}
-
+  let(:user){build(:student)}
+  let(:user2){double(:user)}
   describe '#get_title' do
     it 'returns the title' do
       expect(review_response_map.get_title).to eql("Review")
@@ -96,6 +97,12 @@ describe 'ReviewResponseMap' do
      allow(Assignment).to receive(:find).with(1).and_return(assignment)
      expect(ReviewResponseMap.final_versions_from_reviewer 1).to receive(:prepare_final_review_versions).with(assignment, [review_response_map])
     end
+  end
+
+  describe '.import' do
+    {reviews: 'name'}
+    allow(user).to_receive(:find_by).with(name: 'name').and_return(user)
+    expect(ReviewResponseMap.import())
   end
 end
 

@@ -6,7 +6,7 @@ describe GradesHelper, type: :helper do
     end
     it 'should render is_first:false if last_topic is not equal to next_topic' do
       get_accordion_title('last question', 'next question')
-      expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'nexxxt question', is_first: false})
+      expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'next question', is_first: false})
     end
     it 'should render nothing if last_topic is equal to next_topic' do
       get_accordion_title('question', 'question')

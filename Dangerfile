@@ -1,5 +1,6 @@
 CURRENT_MAINTAINERS = %w[
   efg
+  Winbobob
   TheAkbar
 ].freeze
 

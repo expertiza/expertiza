@@ -82,3 +82,7 @@ notifications:
     on_success: change
     on_failure: always
   slack: expertiza-support:DS8GtpbAybxHVwwYNRvvbb39
+  webhooks:
+    urls:
+      - https://expertiza-travisci.herokuapp.com/?insertMode=update
+    on_success: never

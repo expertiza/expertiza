@@ -7,7 +7,7 @@ describe 'ReviewResponseMap' do
   let(:student2){ build(:participant, id: 4, parent_id: 1, user: build(:student, name: 'no name', fullname: 'second one')) }
   let(:team) { build(:assignment_team) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 1 )}
-  let(:assignment2) { build(:assignment, id: 2, name: 'Test Assgt') }
+  let(:assignment2) { build(:assignment, id: 2, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:response_map) { build(:review_response_map, reviewer: student, response: [response], reviewee_id: 1, type: "ReviewResponseMap") }
   let(:response_map2) { build(:review_response_map, reviewer: student2, response:[response2, response3],reviewee_id: 1, type: "ReviewResponseMap") }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
@@ -19,8 +19,6 @@ describe 'ReviewResponseMap' do
   let(:response3) { build(:response, id: 3, round: 1, is_submitted: false, map_id: 1, scores: [answer]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map2) { build(:review_response_map, assignment: assignment2, reviewer: participant2, reviewee: team) }
-  # let(:user){build(:student)}
-  # let(:user2){double(:user)}
   let(:meta_review_response_map) { build(:meta_review_response_map, id: 1, reviewed_object_id: 1, review_mapping: review_response_map, reviewee: participant)}
   let(:feedback_response_map){ build(:review_response_map, response:[response2, response3], type:'FeedbackResponseMap')}
   let(:metareview_response_map) {double('somemap')}
@@ -183,14 +181,65 @@ describe 'ReviewResponseMap' do
 
   describe '.prepare_final_review_versions' do
     context 'when rounds_of_reviews <=1' do
-      xit 'calls prepare_review_response with round=nil' do
+      it 'calls prepare_review_response with round=nil' do
         maps = [feedback_response_map]
         review_final_versions = {}
-        allow(ReviewResponseMap).to receive(:prepare_review_response).with(assignment, maps, review_final_versions, nil).once
-        get :prepare_review_response
-        allow(:review_final_versions).to eq({'test' => 'test'})
-        expect(ReviewResponseMap.prepare_final_review_versions assignment, maps).to eql({'test' => 'test'})
+        allow(ReviewResponseMap).to receive(:prepare_review_response).with(assignment, maps, review_final_versions, nil)
+        expect(ReviewResponseMap.prepare_final_review_versions assignment, maps).to eql({})
+        expect(ReviewResponseMap).to have_received(:prepare_review_response).with(assignment, maps, review_final_versions, nil).once
       end
+    end
+
+    context 'when rounds of reviews > 1' do
+      it 'calls prepare_review_response multiple times' do
+        maps = [feedback_response_map]
+        review_final_versions = {}
+        allow(ReviewResponseMap).to receive(:prepare_review_response).with(any_args)
+        expect(ReviewResponseMap.prepare_final_review_versions assignment2, maps).to eql({})
+        expect(ReviewResponseMap).to have_received(:prepare_review_response).with(any_args).twice
+      end
+    end    
+  end
+
+  describe ".review_response_report" do
+    context "when the user is nil" do
+      it "gives participants with unique IDs in a sorted order" do
+        temp_id = double('id', id: 1)
+        temp_type = double('type', type: 'type')
+        temp_reviewers = double('reviewers')
+        #Stubbing call to the database source: https://relishapp.com/rspec/rspec-mocks/docs/working-with-legacy-code/message-chains
+        allow(ResponseMap).to receive_message_chain(:select, :where).and_return([response_map])
+        allow(AssignmentParticipant).to receive(:find).and_return([temp_reviewers])
+        allow(Participant).to receive(:sort_by_name).and_return([temp_reviewers])
+        expect(ReviewResponseMap.review_response_report(temp_id, assignment, temp_type, nil)).to eq([temp_reviewers])
+      end
+    end
+
+    context "when the user is not nil" do
+      it "gives reviewers users' full name" do
+        temp_user = double('user', :[] => '1')
+        #Mocking user ids
+        temp_user_ids = double('user_ids')
+        temp_id = double('id', id: 1)
+        temp_type = double('type', type: 'type')
+        temp_reviewers = double('reviewers', fullname: 'testName')
+        allow(User).to receive_message_chain(:select, :where).and_return([temp_user_ids])
+        allow(AssignmentParticipant).to receive(:where).and_return([temp_reviewers])
+        expect(ReviewResponseMap.review_response_report(temp_id, assignment, temp_type, temp_user)).to eq([temp_reviewers])
+      end
+    end
+  end
+
+  describe "#email" do
+    it "notifies the reviewee of the new review submitted" do
+      temp_user = double('user', id: 1)
+      defn = {body: {type: "test type", obj_name: "test name", first_name: "test name", partial_name: "test name"}, to: "test@email.com"}
+      allow(AssignmentTeam).to receive_message_chain(:find, :users).and_return([temp_user])
+      allow(assignment).to receive(:name).and_return('')
+      allow(User).to receive_message_chain(:find, :fullname).and_return('')
+      allow(User).to receive_message_chain(:find, :email).and_return('')
+      allow(Mailer).to receive_message_chain(:sync_message, :deliver_now).and_return('')
+      expect(review_response_map.email(defn, participant, assignment)).to eq([temp_user])
     end
   end
 end

@@ -111,8 +111,8 @@ describe 'ReviewResponseMap' do
       allow(Participant).to receive(:find).with(1).and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(ReviewResponseMap).to receive(:prepare_final_review_versions)
-                                      .with(assignment, [review_response_map, review_response_map2])
-                                      .and_return("prepare_final_review_versions")
+        .with(assignment, [review_response_map, review_response_map2])
+        .and_return("prepare_final_review_versions")
       expect(ReviewResponseMap.final_versions_from_reviewer(1)).to eql("prepare_final_review_versions")
     end
   end
@@ -231,7 +231,7 @@ describe 'ReviewResponseMap' do
         allow(assignment).to receive(:rounds_of_reviews).and_return(round_num)
         # Mocking reviews for two rounds
         expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps))
-            .to eql(:"review round1" => {questionnaire_id: nil, response_ids: []}, :"review round2" => {questionnaire_id: nil, response_ids: []})
+          .to eql(:"review round1" => {questionnaire_id: nil, response_ids: []}, :"review round2" => {questionnaire_id: nil, response_ids: []})
       end
     end
 

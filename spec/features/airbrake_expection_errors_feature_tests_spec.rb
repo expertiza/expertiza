@@ -31,7 +31,7 @@ describe "Airbrake expection errors" do
     login_as 'student2066'
     visit '/sign_up_sheet/list?id=1'
     expect(page).to have_content('Signup sheet for')
-    expect(page).to have_content('Hello world!')
+    expect(page).to have_content('Hello world!!!!!')
     expect(page).to have_content('TestReview')
   end
 

@@ -22,7 +22,7 @@ describe User do
 
   describe '#fullname' do
     it 'returns the full name of the user' do
-      expect(user.fullname).to eq('abc xyzzzz')
+      expect(user.fullname).to eq('abc xyz')
     end
   end
 

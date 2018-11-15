@@ -12,7 +12,7 @@ describe TeamsController do
       allow(Team).to receive(:find).with(any_args).and_return(nil)
       allow(Team).to receive(:find_by).with(any_args).and_return(nil)
       post :delete, id: 1
-      expect(response).to redirect_to 'www.google.com666'
+      expect(response).to redirect_to 'www.google.com'
     end
 
     it 'will delete the team if current team did not involve in any other reviews' do

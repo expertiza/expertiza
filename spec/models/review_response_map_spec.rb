@@ -11,15 +11,15 @@ describe 'ReviewResponseMap' do
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
-  let(:response) { build(:response,  id: 1, map_id: 1, response_map: review_response_map, round: 1, is_submitted: true, scores: [answer]) }
+  let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, round: 1, is_submitted: true, scores: [answer]) }
   let(:null_response) { double(:response) }
   let(:response2) { build(:response, id: 2, round: 1, is_submitted: true, map_id: 1, scores: [answer]) }
   let(:response3) { build(:response, id: 3, round: 1, is_submitted: false, map_id: 1, scores: [answer]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map2) { build(:review_response_map, assignment: assignment2, reviewer: participant2, reviewee: team) }
   let(:meta_review_response_map) { build(:meta_review_response_map, id: 1, reviewed_object_id: 1, review_mapping: review_response_map, reviewee: participant) }
-  let(:feedback_response_map){ build(:review_response_map, response: [response2, response3], type:'FeedbackResponseMap') }
-  let(:metareview_response_map) {double('somemap') }
+  let(:feedback_response_map) { build(:review_response_map, response: [response2, response3], type: 'FeedbackResponseMap') }
+  let(:metareview_response_map) { double('somemap') }
 
   describe '#get_title' do
     it 'returns the title' do
@@ -81,9 +81,9 @@ describe 'ReviewResponseMap' do
 
   describe '#metareview_response_maps' do
     it 'returns metareview responses for which id is caller id' do
-    allow(Response).to receive(:where).with(map_id: 1).and_return([response])
-    allow(MetareviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([metareview_response_map])
-    expect(review_response_map.metareview_response_maps).to eq([metareview_response_map])
+      allow(Response).to receive(:where).with(map_id: 1).and_return([response])
+      allow(MetareviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([metareview_response_map])
+      expect(review_response_map.metareview_response_maps).to eq([metareview_response_map])
     end
   end
 
@@ -91,7 +91,7 @@ describe 'ReviewResponseMap' do
     context 'when no response is present or response is nil' do
       it 'returns nil' do
         allow(review_response_map).to receive(:response).and_return([])
-        expect(review_response_map.show_feedback null_response).to be(nil)
+        expect(review_response_map.show_feedback(null_response)).to be(nil)
       end
     end
 
@@ -100,20 +100,20 @@ describe 'ReviewResponseMap' do
         allow(review_response_map).to receive(:response).and_return([response2, response3])
         allow(FeedbackResponseMap).to receive(:find_by).with(reviewed_object_id: 1).and_return(feedback_response_map)
         allow(response3).to receive(:display_as_html).and_return("display_as_html")
-        expect(review_response_map.show_feedback response).to eql("display_as_html")
+        expect(review_response_map.show_feedback(response)).to eql("display_as_html")
       end
     end
   end
 
   describe '.final_versions_from_reviewer' do
     it 'returns final versions from reviewer' do
-        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1).and_return([review_response_map, review_response_map2])
-        allow(Participant).to receive(:find).with(1).and_return(participant)
-        allow(Assignment).to receive(:find).with(1).and_return(assignment)
-        allow(ReviewResponseMap).to receive(:prepare_final_review_versions).with(assignment,
-                                                                                 [review_response_map,
-                                                                                 review_response_map2]).and_return("prepare_final_review_versions")
-        expect(ReviewResponseMap.final_versions_from_reviewer 1).to eql("prepare_final_review_versions")
+      allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1).and_return([review_response_map, review_response_map2])
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(ReviewResponseMap).to receive(:prepare_final_review_versions).with(assignment,
+                                                                               [review_response_map,
+                                                                               review_response_map2]).and_return("prepare_final_review_versions")
+      expect(ReviewResponseMap.final_versions_from_reviewer (1)).to eql("prepare_final_review_versions")
     end
   end
 
@@ -122,7 +122,7 @@ describe 'ReviewResponseMap' do
       test_hash = {reviewee: 'user1', reviewers: ['user2']}
       it 'raises an ArgumentError' do
         allow(User).to receive(:find_by).and_return(nil)
-        expect{ ReviewResponseMap.import(test_hash, '_session', 1) }.to raise_error(ArgumentError)
+        expect { ReviewResponseMap.import(test_hash, '_session', 1) }.to raise_error(ArgumentError)
       end
     end
 
@@ -133,7 +133,7 @@ describe 'ReviewResponseMap' do
           reviewee = double('User', id: 1, name: 'user1')
           allow(User).to receive(:find_by).with(name: 'user1').and_return(reviewee)
           allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
-          expect{ ReviewResponseMap.import(test_hash, '_session', 1) }.to raise_error(ArgumentError)
+          expect { ReviewResponseMap.import(test_hash, '_session', 1) }.to raise_error(ArgumentError)
         end
       end
 
@@ -230,7 +230,8 @@ describe 'ReviewResponseMap' do
         round_num = 2
         allow(assignment).to receive(:rounds_of_reviews).and_return(round_num)
         # Mocking reviews for two rounds
-        expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps)).to eql(:"review round1" => {questionnaire_id: nil, response_ids: []}, :"review round2" => {questionnaire_id: nil, response_ids: []})
+        expect(ReviewResponseMap.prepare_final_review_versions(assignment, maps))
+            .to eql(:"review round1" => {questionnaire_id: nil, response_ids: []}, :"review round2" => {questionnaire_id: nil, response_ids: []})
       end
     end
 

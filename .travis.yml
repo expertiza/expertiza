@@ -85,4 +85,3 @@ notifications:
   webhooks:
     urls:
       - https://expertiza-travisci.herokuapp.com/?insertMode=update
-    on_success: never

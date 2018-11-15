@@ -1,6 +1,12 @@
 class Assessment360Controller < ApplicationController
   # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
 
+  @topics = {}
+  @assignment_grades = {}
+  @peer_review_scores = {}
+  @final_grades = {}
+  @final_peer_review_scores = {}
+
   def action_allowed?
     ['Super-Administrator',
      'Administrator',

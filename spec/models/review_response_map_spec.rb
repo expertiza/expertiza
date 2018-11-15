@@ -110,10 +110,10 @@ describe 'ReviewResponseMap' do
       allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1).and_return([review_response_map, review_response_map2])
       allow(Participant).to receive(:find).with(1).and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(ReviewResponseMap).to receive(:prepare_final_review_versions).with(assignment,
-                                                                               [review_response_map,
-                                                                               review_response_map2]).and_return("prepare_final_review_versions")
-      expect(ReviewResponseMap.final_versions_from_reviewer (1)).to eql("prepare_final_review_versions")
+      allow(ReviewResponseMap).to receive(:prepare_final_review_versions)
+                                      .with(assignment, [review_response_map, review_response_map2])
+                                      .and_return("prepare_final_review_versions")
+      expect(ReviewResponseMap.final_versions_from_reviewer(1)).to eql("prepare_final_review_versions")
     end
   end
 

@@ -8,7 +8,7 @@
     $(function() {
         /*Function for sorting the table */
         $(".sortable").tablesorter({
-            sortList: [0,0] // sort by Student name
+            sortList: [[0,0]] // sort by Student name
         });
     });
 </script>
@@ -18,19 +18,19 @@
     <tr>
       <th rowspan=2 width="320" class="sorter-true">Students</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=4> <%= assignment.name %> </th>
+        <th colspan=4 class="sorter-false"> <%= assignment.name %> </th>
       <% end %>
-      <th colspan=2 class="sorter-true">Final Grades</th>
+      <th colspan=2>Final Grades</th>
     </tr>
     <tr>
       <% (1..@assignments.size).each do %>
-        <td><b>Topic Name</b></td>
-        <td><b>Topic ID</b></td>
-        <td><b>Assignment Grade</b></td>
-        <td><b>Peer Review Score</b></td>
+        <th><b>Topic Name</b></th>
+        <th><b>Topic ID</b></th>
+        <th><b>Assignment Grade</b></th>
+        <th><b>Peer Review Score</b></th>
       <% end %>
-      <td><b>Final Assignment Grade</b></td>
-      <td><b>Final Peer Review Score</b></td>
+      <th class="sorter-true"><b>Final Assignment Grade</b></th>
+      <th class="sorter-true"><b>Final Peer Review Score</b></th>
     </tr>
   </thead>
 
@@ -38,13 +38,13 @@
       <tr>
           <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <% @assignments.each do |assignment|%>
-              <td>Topic</td>
-              <td>Topic ID</td>
-              <td>98</td>
-              <td>75</td>
+              <td><%= @topics[assignment.id].nil? ? '-' : @topics[assignment.id].name %></td>
+              <td><%= @topics[assignment.id].nil? ? '-' : @topics[assignment.id].id %></td>
+              <td><%= @assignment_grades[cp.id][assignment.id] %></td>
+              <td><%= @peer_review_scores[cp.id][assignment.id] %></td>
           <% end %>
-          <td>100</td>
-          <td>99</td>
+          <td><%= @final_grades[cp.id] %></td>
+          <td><%= @final_peer_review_scores[cp.id] %></td>
       </tr>
   <% end %>
 </table>

@@ -18,8 +18,6 @@ describe BookmarksController do
   let(:bookmarkrating) { build(:bookmarkrating) }
   let(:participant) { build(:participant) }
   let(:participant_review) { build(:participant_review) }
-
-
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
@@ -84,7 +82,7 @@ describe BookmarksController do
           controller.params = {id: '1', action: 'destroy'}
           expect(controller.send(:action_allowed?)).to be true
         end
-        end
+      end
     end
   end
   context "#create" do
@@ -102,7 +100,7 @@ describe BookmarksController do
       session = {user: student}
       params = {url: 'https://google.com', title: 'Google Test', description: 'Use Google', user_id: student.id, topic_id: bookmark.topic_id}
       post :create, params, session
-      expect(lambda{ expect_any_instance_of(Bookmark).to receive(:create).and_return( raise StandardError )}).to redirect_to('http://test.host/bookmarks/list?id=' + params[:topic_id].to_s)
+      expect(lambda { expect_any_instance_of(Bookmark).to receive(:create).and_return(raise StandardError) }).to redirect_to('http://test.host/bookmarks/list?id=' + params[:topic_id].to_s)
     end
   end
 

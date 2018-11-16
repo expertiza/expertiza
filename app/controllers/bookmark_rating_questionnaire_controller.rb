@@ -2,22 +2,6 @@
 # Email: rsiyer2@ncsu.edu
 
 class BookmarkRatingQuestionnaireController < ApplicationController
-  # delete all AssignmentQuestionnaire entry that's associated with an assignment
-#   def delete_all
-#     assignment = Assignment.find(params[:assignment_id])
-#     if assignment.nil?
-#       flash[:error] = "Assignment #" + assignment.id + " does not currently exist."
-#       return
-#     end
-
-#     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:assignment_id])
-#     @assignment_questionnaires.each(&:delete)
-
-#     respond_to do |format|
-#       format.json { render json: @assignment_questionnaires }
-#     end
-#   end
-
   def create
     if params[:assignment_id].nil?
       flash[:error] = "Missing Assignment:" + params[:topic_id]

@@ -1,3 +1,6 @@
+# Author: Ramkumaar Kovil Kanthadai
+# Email: rkovilk@ncsu.edu
+
 describe Bookmark do
   let(:bookmark) { Bookmark.new url: 'test.com', title: 'test bookmark', description: 'this is a test bookmark' }
   let(:bookmark1) { Bookmark.new url: 'test1.com', title: 'test1 bookmark', description: 'this is test1 bookmark' }

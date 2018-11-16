@@ -102,8 +102,7 @@ describe BookmarksController do
       session = {user: student}
       params = {url: 'https://google.com', title: 'Google Test', description: 'Use Google', user_id: student.id, topic_id: bookmark.topic_id}
       post :create, params, session
-      expect(lambda{ expect_any_instance_of(Bookmark).to receive(:create).and_return( raise StandardError )}).to
-      redirect_to('http://test.host/bookmarks/list?id=' + params[:topic_id].to_s)
+      expect(lambda{ expect_any_instance_of(Bookmark).to receive(:create).and_return( raise StandardError )}).to redirect_to('http://test.host/bookmarks/list?id=' + params[:topic_id].to_s)
     end
   end
 

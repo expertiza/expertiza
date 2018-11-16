@@ -84,5 +84,5 @@ notifications:
   slack: expertiza-support:DS8GtpbAybxHVwwYNRvvbb39
   webhooks:
     urls:
-      - https://www.travisbuddy.com/?insertMode=update
+      - https://expertiza-travisci.herokuapp.com/?insertMode=update
     on_success: never

@@ -32,21 +32,6 @@ describe BookmarksController do
     @request.session[:user] = student
   end
 
-  describe '#list' do
-    context 'when student requests for bookmarks' do
-      it 'should show bookmarks' do
-        params = {id: '1'}
-        get :list, params, @session
-        expect(controller.instance_variable_get(:@bookmarks).size).to eq(1)
-        expect(controller.instance_variable_get(:@topic).topic_name).to eq('Hello world!')
-        expect(response.body).to include '<td>This is a test topic</td>'
-        expect(response.body).to include '<td><a href=http://test.com target=\'_blank\'>Test</td>'
-        expect(response.body.match(%r{<td>\s+-\s+<\/td>}m)).to be_truthy
-      end
-    end
-  end
-
-
   describe '#action_allowed?' do
     context 'when params action is list, new, create for student' do
       context 'when the role name of current user is student' do

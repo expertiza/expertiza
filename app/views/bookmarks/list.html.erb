@@ -35,7 +35,7 @@
             <% end %>
           <% else %>
             <!-- Compute average rating based on rubrics -->
-            <% avg = average_based_on_rubric(bookmark) %>
+            <% avg = bookmark.average_based_on_rubric %>
             <%= avg == 0 ? '-' : avg %>
           <% end %>
         </td>

@@ -93,9 +93,13 @@ class Assessment360Controller < ApplicationController
       redirect_to(:back)
     end
     # hashes for view
-    @meta_review = {}
-    @teammate_review = {}
-    @teamed_count = {}
+    @topic_id = Hash.new()
+    @topic_name = Hash.new()
+    @assignment_grades = Hash.new()
+    @peer_review_scores = Hash.new()
+    @final_grades = Hash.new()
+    @final_peer_review_scores = Hash.new()
+
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
@@ -104,49 +108,51 @@ class Assessment360Controller < ApplicationController
       instance_variable_set("@overall_#{type}_review_count", {})
     end
     @course_participants.each do |cp|
-      # for each assignment
-      # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-      %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
-      students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
+      @topic_id[cp.id] = Hash.new()
+      @topic_name[cp.id] = Hash.new()
+      @assignment_grades[cp.id] = Hash.new()
+      @peer_review_scores[cp.id] = Hash.new()
+      @final_grades[cp.id] = 0
+      @final_peer_review_scores[cp.id] = 0
+
       @assignments.each do |assignment|
-        @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
-        @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
         next if assignment_participant.nil?
-        teammate_reviews = assignment_participant.teammate_reviews
-        meta_reviews = assignment_participant.metareviews
-        populate_hash_for_all_students_all_reviews(assignment,
-                                                   cp,
-                                                   teammate_reviews,
-                                                   @teammate_review,
-                                                   @overall_teammate_review_grades,
-                                                   @overall_teammate_review_count,
-                                                   @teammate_review_info_per_stu)
-        populate_hash_for_all_students_all_reviews(assignment,
-                                                   cp,
-                                                   meta_reviews,
-                                                   @meta_review,
-                                                   @overall_meta_review_grades,
-                                                   @overall_meta_review_count,
-                                                   @meta_review_info_per_stu)
-      end
-      # calculate average grade for each student on all assignments in this course
-      if @teammate_review_info_per_stu[1] > 0
-        temp_avg_grade = @teammate_review_info_per_stu[0] * 1.0 / @teammate_review_info_per_stu[1]
-        @teammate_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
-      end
-      if @meta_review_info_per_stu[1] > 0
-        temp_avg_grade = @meta_review_info_per_stu[0] * 1.0 / @meta_review_info_per_stu[1]
-        @meta_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
+
+        topic_id = SignedUpTeam.topic_id(assignment_participant.parent_id, assignment_participant.user_id)
+        @topic_id[cp.id][assignment.id] = topic_id
+
+        if SignUpTopic.exists?(topic_id)
+          @topic_name[cp.id][assignment.id] = SignUpTopic.find(topic_id).try :topic_name
+        else
+          @topic_name[cp.id][assignment.id] = "NA"
+        end
+
+        @assignment = assignment_participant.assignment
+        @team = assignment_participant.team
+        @assignment_grades[cp.id][assignment.id] = 10
+        @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
+
+        # @questions = {}
+        # questionnaires = @assignment.questionnaires
+        # retrieve_questions(questionnaires)
+        # @pscore = assignment_participant.scores(@questions)
+        @peer_review_scores[cp.id][assignment.id] = 1
+        @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
+
       end
     end
-    # avoid divide by zero error
-    @assignments.each do |assignment|
-      temp_count = @overall_teammate_review_count[assignment.id]
-      @overall_teammate_review_count[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
-      temp_count = @overall_meta_review_count[assignment.id]
-      @overall_meta_review_count[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
+  end
+
+  def retrieve_questions(questionnaires)
+    questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
+      questionnaire_symbol = if !round.nil?
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             else
+                               questionnaire.symbol
+                             end
+      @questions[questionnaire_symbol] = questionnaire.questions
     end
   end
 

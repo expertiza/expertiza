@@ -38,8 +38,8 @@
       <tr>
           <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <% @assignments.each do |assignment|%>
-              <td><%= @topics[assignment.id].nil? ? '-' : @topics[assignment.id].name %></td>
-              <td><%= @topics[assignment.id].nil? ? '-' : @topics[assignment.id].id %></td>
+              <td><%= @topic_name[cp.id][assignment.id] %></td>
+              <td><%= @topic_id[cp.id][assignment.id] %></td>
               <td><%= @assignment_grades[cp.id][assignment.id] %></td>
               <td><%= @peer_review_scores[cp.id][assignment.id] %></td>
           <% end %>

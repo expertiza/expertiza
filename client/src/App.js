@@ -3,6 +3,7 @@ import './App.css';
 import './assets/stylesheets/flash_messages.css';
 import './assets/stylesheets/grades.css';
 import './assets/stylesheets/table_sorter.css';
+import 'react-tabs/style/react-tabs.css';
 import Main from './components/MainComponent';
 import {BrowserRouter } from 'react-router-dom';
 

@@ -77,7 +77,7 @@ module Api::V1
       end
       @questionnaire = set_questionnaire
       # render action: 'response'
-      render json: {status: :ok, data: "yet to decide which data to send"}
+      render json: {status: :ok, questions: @questions, review_scores: @review_scores}
     end
 
     # Update the response and answers when student "edit" existing response
@@ -143,41 +143,46 @@ module Api::V1
     end
 
     # view response
-  def view
-    @response = Response.find(params[:id])
-    @map = @response.map #find map with reviewed object id id equal to this ID. // Authorfeedbackresponse
-    @ans = []
-    set_content
-    # content needed for view in react app
-    @questions.each do |question|
-      curr_ans= Answer.where(question_id: question.id, response_id: @response.id).first
-      @ans << curr_ans
-    end
-    @feedbackmap = FeedbackResponseMap.find_by(reviewed_object_id: @response.id)
-    @author_response_map = Response.where(map_id: @feedbackmap.id)
-    @author_answers = Answer.where(response_id: @author_response_map.first.response_id)
+    def view
+      @response = Response.find(params[:id])
+      puts @response.id
+      @map = @response.map #find map with reviewed object id id equal to this ID. // Authorfeedbackresponse
+      @ans = []
+      set_content
+      # content needed for view in react app
+      @questions.each do |question|
+        curr_ans= Answer.where(question_id: question.id, response_id: @response.id).first
+        @ans << curr_ans
+      end
 
-    @author_questions=[]
+      @feedbackmap = FeedbackResponseMap.find_by(reviewed_object_id: @response.id)
 
-    @author_answers.each do | answer| 
-      @author_questions << Question.find(answer.question_id)
+      if @feedbackmap.present? 
+          @author_response_map = Response.where(map_id: @feedbackmap.id)
+          @author_answers = Answer.where(response_id: @author_response_map.first.response_id)
+
+          @author_questions=[]
+
+          @author_answers.each do | answer| 
+            @author_questions << Question.find(answer.question_id)
+          end
+      end
+      survey = @map.survey?
+      render json: {
+                    status: :ok, 
+                    title: @title, 
+                    response: @response,
+                    assignment: @assignment,
+                    questions: @questions,
+                    contributor: @contributor,
+                    ans: @ans,
+                    author_answers: @author_answers,
+                    author_questions: @author_questions,
+                    map: @map,
+                    feedbackmap: @feedbackmap,
+                    author_response_map: @author_response_map
+                  }
     end
-    
-    survey = @map.survey?
-    render json: {
-                  status: :ok, 
-                  title: @title, 
-                  response: @response,
-                  assignment: @assignment,
-                  questions: @questions,
-                  contributor: @contributor,
-                  ans: @ans,
-                  author_answers: @author_answers,
-                  author_questions: @author_questions,
-                  map: @map,
-                  author_response_map: @author_response_map
-                }
-  end
 
     def create
       map_id = params[:id]

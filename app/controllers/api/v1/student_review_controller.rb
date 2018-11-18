@@ -46,7 +46,13 @@ module Api::V1
         @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
         @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
         
-        render json: {status: :ok, data: "need to descide what data is needed"}
+        render json: {
+                      status: :ok,
+                      assignment: @assignment,
+                      topic_id: @topic_id,
+                      review_mappings: @review_mappings,
+                      
+                    }
       else 
         render json: {status: :ok, data: 'access denied'}
       end

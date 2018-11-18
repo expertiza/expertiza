@@ -74,11 +74,11 @@ module Api::V1
     def view_my_scores
       @participant = AssignmentParticipant.find(params[:id])
       @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-      skip = false
-      if redirect_when_disallowed
-        skip = true
-      end
-      if !skip
+      # skip = false
+      # if redirect_when_disallowed
+      #   skip = true
+      # end
+      # if !skip
         @assignment = @participant.assignment
         @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
         questionnaires = @assignment.questionnaires
@@ -95,10 +95,12 @@ module Api::V1
         @summary = sum.summary
         @avg_scores_by_round = sum.avg_scores_by_round
         @avg_scores_by_criterion = sum.avg_scores_by_criterion
-        render json: {status: :ok, data: 'need to decide what to pass'}
-      else
-        render json: {status: :ok, data: 'access denied'}
-      end
+        render json: {
+                      status: :ok,
+                      questionnaires: questionnaires,
+                      summary: @summary
+                }
+      # end
     end
 
     # method for alternative view

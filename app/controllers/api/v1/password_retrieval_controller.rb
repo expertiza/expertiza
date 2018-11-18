@@ -5,6 +5,7 @@ module Api::V1
     include MailerHelper
 
     def forgottenPasswordSendLink 
+      puts params
       flag = false
       if (!params[:user][:email].nil? )
         if(params[:user][:email].strip.empty?)
@@ -31,6 +32,7 @@ module Api::V1
           puts token
           PasswordReset.save_token(user, token)
           url = self.request.base_url + url_format + token
+          puts url
           MailerHelper.send_mail_to_user(user, "Expertiza password reset", "send_password", url).deliver_now
           # ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'A link to reset your password has been sent to users e-mail address.', request)
           render json: { status: :ok , token: token}

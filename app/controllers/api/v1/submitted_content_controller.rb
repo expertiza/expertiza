@@ -53,7 +53,7 @@ module Api::V1
       if team_hyperlinks.include?(params['submission'])
         ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
         flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
-        render json: {status: :ok, assignment: @assignment}
+        render json: {status: :error, assignment: @assignment}
       else
           team.submit_hyperlink(params['submission'])
           SubmissionRecord.create(team_id: team.id,
@@ -62,7 +62,7 @@ module Api::V1
                                   assignment_id: @participant.assignment.id,
                                   operation: "Submit Hyperlink")
           
-          render json: {status: :ok, assignment: @assignment}
+          render json: {status: :ok, team: @participant.team}
         #ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
         #undo_link("The link has been successfully submitted.")
       end
@@ -71,13 +71,13 @@ module Api::V1
 
     # Note: This is not used yet in the view until we all decide to do so
     def remove_hyperlink
-      @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
+      @participant = AssignmentParticipant.find(params[:id])
       return unless current_user_id?(@participant.user_id)
       team = @participant.team
       hyperlink_to_delete = team.hyperlinks[params['chk_links'].to_i]
       team.remove_hyperlink(hyperlink_to_delete)
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully removed.', request)
-      undo_link("The link has been successfully removed.")
+      #undo_link("The link has been successfully removed.")
       # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
       topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
       assignment = Assignment.find(@participant.parent_id)
@@ -86,8 +86,9 @@ module Api::V1
                               user: @participant.name,
                               assignment_id: assignment.id,
                               operation: "Remove Hyperlink")
-      action = (assignment.submission_allowed(topic_id) ? 'edit' : 'view')
-      redirect_to action: action, id: @participant.id
+      #action = (assignment.submission_allowed(topic_id) ? 'edit' : 'view')
+      render json: {status: :ok, team: @participant.team}
+      #redirect_to action: action, id: @participant.id
     end
 
     def submit_file

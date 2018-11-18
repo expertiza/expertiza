@@ -180,4 +180,13 @@ class Assessment360Controller < ApplicationController
       overall_review_count_hash[assignment.id] += 1
     end
   end
+
+  def format_topic(topic_id, topic_name)
+    topic_display = ''
+    topic_display += topic_id.to_s + ' - ' unless topic_id.nil?
+    topic_display += topic_name unless topic_name.nil?
+    topic_display
+  end
+
+  helper_method :format_topic
 end

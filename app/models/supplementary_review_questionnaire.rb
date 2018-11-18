@@ -2,3 +2,4 @@
 # derives from Questionnaire.
 class SupplementaryReviewQuestionnaire < Questionnaire
   # Make me better.
+end

@@ -15,6 +15,7 @@ class Questionnaire < ActiveRecord::Base
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
   DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
   QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
+                         'SupplementaryReviewQuestionnaire',
                          'MetareviewQuestionnaire',
                          'Author FeedbackQuestionnaire',
                          'AuthorFeedbackQuestionnaire',

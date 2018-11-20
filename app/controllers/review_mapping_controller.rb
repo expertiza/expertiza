@@ -1,5 +1,4 @@
 class ReviewMappingController < ApplicationController
-  # include GC4R
   autocomplete :user, :name
   # use_google_charts
   require 'gchart'

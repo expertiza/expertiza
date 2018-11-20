@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  instructor_id: 1
+  assignment_id: 1
+  grade_type: MyString
+  student_id: 1
+  grade: 
+  comment: MyText
+  timestamp: 2018-11-20 14:23:18
+
+two:
+  instructor_id: 1
+  assignment_id: 1
+  grade_type: MyString
+  student_id: 1
+  grade: 
+  comment: MyText
+  timestamp: 2018-11-20 14:23:18

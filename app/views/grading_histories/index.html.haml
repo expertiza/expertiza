@@ -1,0 +1,33 @@
+%h1 Listing grading_histories
+
+%table
+  %thead
+    %tr
+      %th Instructor
+      %th Assignment
+      %th Grade type
+      %th Student
+      %th Grade
+      %th Comment
+      %th Timestamp
+      %th
+      %th
+      %th
+
+  %tbody
+    - @grading_histories.each do |grading_history|
+      %tr
+        %td= grading_history.instructor_id
+        %td= grading_history.assignment_id
+        %td= grading_history.grade_type
+        %td= grading_history.student_id
+        %td= grading_history.grade
+        %td= grading_history.comment
+        %td= grading_history.timestamp
+        %td= link_to 'Show', grading_history
+        %td= link_to 'Edit', edit_grading_history_path(grading_history)
+        %td= link_to 'Destroy', grading_history, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Grading history', new_grading_history_path

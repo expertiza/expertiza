@@ -1,0 +1,31 @@
+= form_for @grading_history do |f|
+  - if @grading_history.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@grading_history.errors.count, "error")} prohibited this grading_history from being saved:"
+      %ul
+        - @grading_history.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :instructor_id
+    = f.number_field :instructor_id
+  .field
+    = f.label :assignment_id
+    = f.number_field :assignment_id
+  .field
+    = f.label :grade_type
+    = f.text_field :grade_type
+  .field
+    = f.label :student_id
+    = f.number_field :student_id
+  .field
+    = f.label :grade
+    = f.text_field :grade
+  .field
+    = f.label :comment
+    = f.text_area :comment
+  .field
+    = f.label :timestamp
+    = f.datetime_select :timestamp
+  .actions
+    = f.submit 'Save'

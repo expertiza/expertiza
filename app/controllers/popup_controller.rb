@@ -36,7 +36,6 @@ class PopupController < ApplicationController
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
     @team_users = TeamsUser.where(team_id: params[:id])
-
     # id2 is a response_map id
     unless params[:id2].nil?
       participant_id = ResponseMap.find(params[:id2]).reviewer_id
@@ -55,6 +54,22 @@ class PopupController < ApplicationController
         instance_variable_set('@total_percentage_round_' + round.to_s, total_percentage)
         instance_variable_set('@sum_round_' + round.to_s, response.total_score)
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
+        # E-1867 changes start here
+        review_round = round.to_s
+        # write 0,1,2,3 as an enum in a separate class and use that here
+        #response_visibility = response.visibility
+        response_visibility = 2
+        instance_variable_set('@sample_button_'+review_round,response_visibility != 0)
+        mark_as_sample = " hide"
+        remove_as_sample = " hide"
+        if response_visibility == 1 || response_visibility == 3
+          mark_as_sample = ""
+        elsif response_visibility == 2
+          remove_as_sample = ""
+        end
+        instance_variable_set('@mark_as_sample_'+review_round,mark_as_sample)
+        instance_variable_set('@remove_as_sample_'+review_round,remove_as_sample)
+        # E-1867 changes end here
       end
     end
   end

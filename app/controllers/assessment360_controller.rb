@@ -100,13 +100,7 @@ class Assessment360Controller < ApplicationController
     @final_grades = Hash.new()
     @final_peer_review_scores = Hash.new()
 
-    # for course
-    # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
-    # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-    %w[teammate meta].each do |type|
-      instance_variable_set("@overall_#{type}_review_grades", {})
-      instance_variable_set("@overall_#{type}_review_count", {})
-    end
+
     @course_participants.each do |cp|
       @topic_id[cp.id] = Hash.new()
       @topic_name[cp.id] = Hash.new()
@@ -128,16 +122,28 @@ class Assessment360Controller < ApplicationController
           @topic_name[cp.id][assignment.id] = "NA"
         end
 
-        @assignment = assignment_participant.assignment
-        @team = assignment_participant.team
-        @assignment_grades[cp.id][assignment.id] = 10
+        team = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
+        @participant = AssignmentParticipant.find(assignment_participant.user_id)
+        @assignment = @participant.assignment
+        @team = @participant.team
+        @team_id = @team.id
+        @questions = {}
+        questionnaires = @assignment.questionnaires
+        retrieve_questions questionnaires
+        @pscore = @participant.scores(@questions)
+
+        if (@team[:grade_for_submission] != nil)
+          @assignment_grades[cp.id][assignment.id] = @team[:grade_for_submission]
+        else
+          @assignment_grades[cp.id][assignment.id] = 0
+        end
         @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
 
-        # @questions = {}
-        # questionnaires = @assignment.questionnaires
-        # retrieve_questions(questionnaires)
-        # @pscore = assignment_participant.scores(@questions)
-        @peer_review_scores[cp.id][assignment.id] = 1
+        if(@pscore[:review][:scores][:avg] != nil)
+          @peer_review_scores[cp.id][assignment.id] = @pscore[:review][:scores][:avg]
+        else
+          @peer_review_scores[cp.id][assignment.id] = 0
+        end
         @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
 
       end

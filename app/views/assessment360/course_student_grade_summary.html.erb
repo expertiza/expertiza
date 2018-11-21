@@ -57,8 +57,9 @@
                 <%= topic %>
               </td>
               <td><%= @peer_review_scores[cp.id][assignment.id] %></td>
-              <td><%= @assignment_grades[cp.id][assignment.id] %></td>
+              <td><%= @assignment_grades[cp.id][assignment.id] %> </td>
           <% end %>
+
           <td><%= @final_peer_review_scores[cp.id] %></td>
           <td><%= @final_grades[cp.id] %></td>
       </tr>

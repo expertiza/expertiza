@@ -56,21 +56,25 @@ class PopupController < ApplicationController
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
         # E-1867 changes start here
         review_round = round.to_s
+        
         # write 0,1,2,3 as an enum in a separate class and use that here
-        #response_visibility = response.visibility
-        response_visibility = 2
+        if response.visibility == nil
+          response.visibility = 0
+        end
+        response_visibility = response.visibility
         instance_variable_set('@sample_button_'+review_round,response_visibility != 0)
         mark_as_sample = " hide"
         remove_as_sample = " hide"
-        if response_visibility == 1 || response_visibility == 3
-          mark_as_sample = ""
-        elsif response_visibility == 2
+        if response_visibility == 2
           remove_as_sample = ""
+        else
+          mark_as_sample = ""
         end
         instance_variable_set('@mark_as_sample_'+review_round,mark_as_sample)
         instance_variable_set('@remove_as_sample_'+review_round,remove_as_sample)
         # E-1867 changes end here
       end
+      instance_variable_set('@assignment_id',@assignment.id)
     end
   end
 

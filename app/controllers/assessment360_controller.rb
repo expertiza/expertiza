@@ -122,29 +122,51 @@ class Assessment360Controller < ApplicationController
           @topic_name[cp.id][assignment.id] = "NA"
         end
 
-        team = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
-        @participant = AssignmentParticipant.find(assignment_participant.user_id)
-        @assignment = @participant.assignment
-        @team = @participant.team
-        @team_id = @team.id
-        @questions = {}
-        questionnaires = @assignment.questionnaires
-        retrieve_questions questionnaires
-        @pscore = @participant.scores(@questions)
+        team_id = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
+        if team_id != nil
+          @team = Team.find(team_id)
 
-        if (@team[:grade_for_submission] != nil)
-          @assignment_grades[cp.id][assignment.id] = @team[:grade_for_submission]
-        else
-          @assignment_grades[cp.id][assignment.id] = 0
-        end
-        @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
+          @participant = AssignmentParticipant.find_by(user_id: assignment_participant.user_id, parent_id: assignment_participant.parent_id)
+          @assignment = @participant.assignment
+          @questions = {}
+          questionnaires = @assignment.questionnaires
+          retrieve_questions questionnaires
+          @pscore = @participant.scores(@questions)
 
-        if(@pscore[:review][:scores][:avg] != nil)
-          @peer_review_scores[cp.id][assignment.id] = @pscore[:review][:scores][:avg]
-        else
-          @peer_review_scores[cp.id][assignment.id] = 0
+
+          if (@team[:grade_for_submission] != nil)
+            @assignment_grades[cp.id][assignment.id] = @team[:grade_for_submission]
+          else
+            @assignment_grades[cp.id][assignment.id] = 0
+          end
+          @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
+
+          if(@pscore[:review][:scores][:avg] != nil)
+            @peer_review_scores[cp.id][assignment.id] = (@pscore[:review][:scores][:avg]).round(2)
+          else
+            @peer_review_scores[cp.id][assignment.id] = 0
+          end
+          @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
+
         end
-        @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
+        # @participant = AssignmentParticipant.find(assignment_participant.user_id)
+        # @assignment = @participant.assignment
+        # @team = @participant.team
+        # @team_id = @team.id
+        # @questions = {}
+        # questionnaires = @assignment.questionnaires
+        # retrieve_questions questionnaires
+        # @pscore = @participant.scores(@questions)
+
+
+
+        # if(@pscore[:review][:scores][:avg] != nil)
+        #   # @peer_review_scores[cp.id][assignment.id] = @pscore[:review][:scores][:avg]
+        #   @peer_review_scores[cp.id][assignment.id] = assignment_participant.user_id
+        # else
+        #   @peer_review_scores[cp.id][assignment.id] = 0
+        # end
+        # @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
 
       end
     end

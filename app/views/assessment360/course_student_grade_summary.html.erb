@@ -1,7 +1,22 @@
 <style>
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
   th, td {
     text-align: center;
-}
+  }
+
+  td.topic {
+    display:inline-block;
+    margin-top: -1px;
+    white-space:nowrap;
+    position:relative; /* must be relative */
+    width:250px; /* fit to table cell width */
+    overflow:hidden;
+  }
 </style>
 
 <script>
@@ -18,19 +33,18 @@
     <tr>
       <th rowspan=2 width="320" class="sorter-true">Students</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=4 class="sorter-false"> <%= assignment.name %> </th>
+        <th colspan=3 class="sorter-false"> <%= assignment.name %> </th>
       <% end %>
       <th colspan=2>Final Grades</th>
     </tr>
     <tr>
       <% (1..@assignments.size).each do %>
-        <th><b>Topic Name</b></th>
-        <th><b>Topic ID</b></th>
-        <th><b>Assignment Grade</b></th>
-        <th><b>Peer Review Score</b></th>
-      <% end %>
-      <th class="sorter-true"><b>Final Assignment Grade</b></th>
-      <th class="sorter-true"><b>Final Peer Review Score</b></th>
+        <th><b>Topic</b></th>
+        <th><b>Peer Score</b></th>
+        <th><b>Instructor Grade</b></th>
+    <% end %>
+      <th class="sorter-true"><b>Final Average Peer Score</b></th>
+      <th class="sorter-true"><b>Final Average Instructor Grade</b></th>
     </tr>
   </thead>
 
@@ -38,13 +52,16 @@
       <tr>
           <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <% @assignments.each do |assignment|%>
-              <td><%= @topic_name[cp.id][assignment.id] %></td>
-              <td><%= @topic_id[cp.id][assignment.id] %></td>
-              <td><%= @assignment_grades[cp.id][assignment.id] %></td>
+              <% topic = format_topic(@topic_id[cp.id][assignment.id], @topic_name[cp.id][assignment.id]) %>
+              <td title="<%= topic %>" class="topic topic-tooltip">
+                <%= topic %>
+              </td>
               <td><%= @peer_review_scores[cp.id][assignment.id] %></td>
+              <td><%= @assignment_grades[cp.id][assignment.id] %> </td>
           <% end %>
-          <td><%= @final_grades[cp.id] %></td>
+
           <td><%= @final_peer_review_scores[cp.id] %></td>
+          <td><%= @final_grades[cp.id] %></td>
       </tr>
   <% end %>
 </table>

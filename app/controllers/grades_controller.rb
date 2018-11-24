@@ -194,6 +194,13 @@ class GradesController < ApplicationController
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
   end
 
+  def view_github_metrics
+    @participant = AssignmentParticipant.find(params[:id])
+    @assignment = @participant.assignment
+    @team = @participant.team
+    @team_id = @team.id
+  end
+
   private
 
   def redirect_when_disallowed

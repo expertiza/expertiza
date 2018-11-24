@@ -4,9 +4,6 @@
 # If you are a student writing that functionality, feel free to remove this comment!
 
 describe Assessment360Controller do
-  # course_student_grade_summary
-  # Inputs: course_id
-  # Returns: doesn't matter
   describe '#course_student_grade_summary' do
 
     context 'when course does not have participants' do
@@ -31,11 +28,18 @@ describe Assessment360Controller do
         stub_current_user(instructor, instructor.role.name, instructor.role)
         @course = create(:course, name: 'test course')
         @assignment = create(:assignment, course: @course)
+        @questionnaire = create(:questionnaire)
+        @question = create(:question, questionnaire: @questionnaire)
+        @assignment_questionnaire = create(:assignment_questionnaire, questionnaire: @questionnaire,
+                                           assignment: @assignment)
+        @review_grade = create(:review_grade)
         @topic = create(:topic, assignment: @assignment)
         @student = create(:student)
         @course.add_participant(@student.name)
-        @assignment_participant = create(:participant)
-        @signed_up_team = create(:signed_up_team)
+        @assignment_participant = create(:participant, user: @student, assignment: @assignment)
+        @signed_up_team = create(:signed_up_team, topic: @topic)
+        @assignment_team = create(:assignment_team, assignment: @assignment)
+        @team_user = create(:team_user, user: @student)
         params = {course_id: @course.id}
         get "course_student_grade_summary", params
       end
@@ -46,28 +50,28 @@ describe Assessment360Controller do
         expect(assigns(:course_participants)).to include CourseParticipant.first
       end
 
-      it 'puts the assignment\'s topic id in :topic_id{}' do
-        expect(assigns(:topic_id)).to include @topic.id
+      it 'makes assignment\'s topic id not empty' do
+        expect(assigns(:topic_id)).to_not be_empty
       end
 
-      it 'puts the assignment\'s topic name in :topic_name{}' do
-        # expect(assigns(:topic_name)).to include @topic.topic_name
+      it 'makes assignment\'s topic name not empty' do
+        expect(assigns(:topic_name)).to_not be_empty
       end
 
       it 'makes assignment grades not empty' do
-
+        expect(assigns(:assignment_grades)).to_not be_empty
       end
 
       it 'makes peer review scores not empty' do
-
+        expect(assigns(:peer_review_scores)).to_not be_empty
       end
 
       it 'makes final grades not empty' do
-
+        expect(assigns(:final_grades)).to_not be_empty
       end
 
       it 'makes final peer review scores not empty' do
-
+        expect(assigns(:final_peer_review_scores)).to_not be_empty
       end
 
     end

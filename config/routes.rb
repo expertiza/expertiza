@@ -477,6 +477,7 @@ resources :institution, except: [:destroy] do
   get ':page_name', controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
+  post '/sample_reviews/mark_unmark/:id' => 'sample_reviews#update_visibility'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'

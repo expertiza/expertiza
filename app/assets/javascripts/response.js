@@ -40,6 +40,7 @@
 				jQuery("#mark_unmark_success_"+round).addClass("hide");
 			}
 
+			// this function is never called and will be removed
 			var showSimilarAssignments = function(){
 				// before show:
 				// fetch assignments . if fails, show error message, hide success
@@ -117,7 +118,7 @@
 								self.onFetchFail(result.error);
 							}
 						},
-						"failure":self.onFetchSuccess(
+						"failure":self.onFetchSuccess( // should be self.onFetchFail , this is a mocked response.. use result.map
 							[{
 								"title": "assignment title",
 								"checked": true,
@@ -192,12 +193,11 @@
 						"visibility":updatedVisibility
 					},
 					"beforeSend":hideMarkUnmarkResultMessage(round),
-					"error":function(result){
+					"error":function(result){	// this should be success.. kept like this for mock
 						rand = Math.random();
 						rand = rand < 0.5;
 						if(rand || result.success == true){
 							toggleMarkUnmark(round,updatingToMark,false,resultMessage);
-							AssignmentsPopup.fetchAssignments();
 						}else{
 							resultMessage = "Not authorized";
 							resultMessage = "An error occurred";
@@ -241,7 +241,7 @@ return json {"success":true, "similarAssignmentsMap":
 
 
 
-POST request to similar_assignments/create/:id
+POST request to similar_assignments/create/772
 id is assignment_id X
 params[:intent] = "review",
 params[:similar] = {
@@ -249,6 +249,8 @@ params[:similar] = {
 	"checked":[11,12]	// read these and insert into similar assignments (if not present!!)
 }
 params[:similar] will send those rows that the user has changed
+
+params[:similar] = {"checked":[350,80,290],"unchecked":[20,340,10]}
 
 response: json as {"success":true/false, "error":"Something went wrong"}
 or {"succes":true}

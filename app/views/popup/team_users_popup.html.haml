@@ -1,6 +1,12 @@
+%span{:class => "hide",:id=>"sampleReviewHold",:data=>{"marked":instance_variable_get('@marked')}}
 %div
-  %h3
-    Members of #{@team.name}
+  %div
+    %h3{:class=>"col-md-9"} Members of #{@team.name}
+    %div{:class=>"col-md-3",:style=>"text-align:right;"}
+      %h5{:id=>"link_assignments", :style=>"top: 20px; color:#986633; cursor:pointer;"}Use as Samples for More Assignments
+      %span{:id=>"link_assignments_error",:style=>"text-color: red",:class=>"hide"}
+      %span{:id=>"link_assignments_success",:style=>"text-color:green",:class=>"hide"}
+    %br
   %table{:width => "100%"}
     - if @team_users.empty?
       %tr No team members
@@ -22,11 +28,13 @@
       %br/
     - else
       - if instance_variable_get('@sample_button_'+round.to_s)
-        %div{:class=>'col-md-12 mark-delete-sample'}
-          %h3{:class=>'col-md-8'} "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
-          %button{:class=>'col-md-4'+instance_variable_get('@mark_as_sample_'+round.to_s), :style=>'margin-top:25px;', :data=>{'visibility':2, 'response_id':instance_variable_get('@response_id_round_' + round.to_s)} } Mark as Sample
-          %button{:class=>'col-md-4'+instance_variable_get('@remove_as_sample_'+round.to_s), :style=>'margin-top:25px;', :data=>{'visibility':3, 'response_id':instance_variable_get('@response_id_round_' + round.to_s)} } Remove as Sample
-          %span{:class=>"hide col-md-4",:style=>"text-align:center;color:red", :id=>"mark_unmark_fail"}
+        %div{:class=>'col-md-12 mark-delete-sample '+'round'+round.to_s}
+          %h3{:class=>'col-md-10'} "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
+          %div{:class=>'col-md-2'}
+            %button{:class=>'col-md-12'+instance_variable_get('@mark_as_sample_'+round.to_s), :style=>'margin-top:25px;', :data=>{'visibility':2, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Mark as Sample
+            %button{:class=>'col-md-12'+instance_variable_get('@remove_as_sample_'+round.to_s), :style=>'margin-top:25px;', :data=>{'visibility':3, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Remove as Sample
+            %span{:class=>"hide col-md-12",:style=>"text-align:center;color:red", :id=>"mark_unmark_fail_"+round.to_s}
+            %span{:class=>"hide col-md-12",:style=>"text-align:center;color:green", :id=>"mark_unmark_success_"+round.to_s}
       - else
         %h3 "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
       %table{:border => "1px solid #ccc"}
@@ -64,35 +72,23 @@
   %br/
 
 
-  %div{:style=>"text-align:center;position: fixed;top: 150px;",:class=>"col-md-12"}
+  %div{:style=>"text-align:center;position: fixed;top: 150px;",:class=>"col-md-12 hide"}
     %div{:class=>"col-md-3"}
     %div{:class=>"col-md-6",:id=>"similar_assignments_popup",:style=>"border-style: solid; background-color: rgb(170, 10, 10); color: rgb(255, 255, 255);",:data=>{"assignment-id":instance_variable_get("@assignment_id")}}
       
       %div{:class=>"col-md-12"}
         %h5{:class=>"col-md-11"}
-          %strong Make this assignment's reviews as samples for the following assignments -
+          %strong{:style=>"font-size: 13.4px;"} Select the assignments for which you want to mark these reviews as samples:
         %h5{:class=>"col-md-1"}
-          %a{:style=>"color:white;",:href=>"javascript:void(0);"}X
+          %a{:style=>"color:white;",:href=>"javascript:void(0);", :class=>"closer"}X
       %div{:class=>"col-md-12", :style=>"background-color: white; color: black; text-align: left; margin-bottom: 10px; max-height: 200px; overflow-x: hidden; overflow-y: scroll;"}
         %ul{:style=>"list-style-type:none;"}
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
-          %li{:style=>"border-bottom:dotted;"}
-            %input{:type=>"checkbox"}Design and Review of Final Project
+          %li{:style=>"border-bottom:dotted;",:id=>"popup_list_template",:class=>"hide"}
+            %input{:type=>"checkbox"}
+            %span
+          
       %button{:class=>"col-md-6", :style=>"margin-bottom: 5px; background-color: rgb(170, 10, 10); color: rgb(255, 255, 255);"}Submit
-      %button{:class=>"col-md-6", :style=>"margin-bottom: 5px; background-color: rgb(170, 10, 10); color: rgb(255, 255, 255);"}Cancel
+      %button{:class=>"col-md-6 closer", :style=>"margin-bottom: 5px; background-color: rgb(170, 10, 10); color: rgb(255, 255, 255);"}Cancel
     
     %div{:class=>"col-md-3"}
 

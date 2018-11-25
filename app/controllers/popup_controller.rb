@@ -76,6 +76,7 @@ class PopupController < ApplicationController
       end
       instance_variable_set('@assignment_id',@assignment.id)
     end
+    instance_variable_set('@marked',2)
   end
 
   def participants_popup

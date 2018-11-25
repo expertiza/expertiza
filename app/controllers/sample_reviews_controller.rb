@@ -1,25 +1,6 @@
 class SampleReviewsController < ApplicationController
 	skip_before_action :authorize, only: [:update_visibility]
 
-	private
-	def update_similar_assignment(assignment_id, visibility)
-		if visibility == 2 
-			ids = SimilarAssignment.where(:is_similar_for => assignment_id, :association_intent => 'Review', 
-				:assignment_id => assignment_id).ids
-			if not ids
-				SimilarAssignment.create({:is_similar_for => assignment_id, :association_intent => 'Review', 
-				:assignment_id => assignment_id})
-			end
-		end
-		if visibility == 3 or visibility == 0
-			response_map_ids = ResponseMap.where(:reviewed_object_id => assignment_id).ids
-			response_ids = Response.where(:map_id => response_map_ids, :visibility => 2)
-			if not response_ids
-				SimilarAssignment.where(:assignment_id => assignment_id).destroy
-			end
-		end
-	end
-
 	def update_visibility
 		begin
 			@@response_id = params[:id]
@@ -45,6 +26,25 @@ class SampleReviewsController < ApplicationController
 			render json:{"success":false,"error":"Something went wrong"}
 		else
 			render json:{"success":true}
+		end
+	end
+
+	private
+	def update_similar_assignment(assignment_id, visibility)
+		if visibility == 2 
+			ids = SimilarAssignment.where(:is_similar_for => assignment_id, :association_intent => 'Review', 
+				:assignment_id => assignment_id).ids
+			if not ids
+				SimilarAssignment.create({:is_similar_for => assignment_id, :association_intent => 'Review', 
+				:assignment_id => assignment_id})
+			end
+		end
+		if visibility == 3 or visibility == 0
+			response_map_ids = ResponseMap.where(:reviewed_object_id => assignment_id).ids
+			response_ids = Response.where(:map_id => response_map_ids, :visibility => 2)
+			if not response_ids
+				SimilarAssignment.where(:assignment_id => assignment_id).destroy
+			end
 		end
 	end
 end

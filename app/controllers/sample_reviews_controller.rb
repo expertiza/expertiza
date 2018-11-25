@@ -42,8 +42,8 @@ class SampleReviewsController < ApplicationController
 		if visibility == 3 or visibility == 0
 			response_map_ids = ResponseMap.where(:reviewed_object_id => assignment_id).ids
 			response_ids = Response.where(:map_id => response_map_ids, :visibility => 2)
-			if not response_ids.empty?
-				SimilarAssignment.where(:assignment_id => assignment_id).destroy
+			if response_ids.empty?
+				SimilarAssignment.where(:assignment_id => assignment_id).destroy_all
 			end
 		end
 	end

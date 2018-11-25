@@ -166,6 +166,9 @@
 				},
 				resetList:function(){
 					this.list.html("").append(this.template);
+				},
+				submit:function(){
+
 				}
 			};
 
@@ -193,19 +196,15 @@
 						"visibility":updatedVisibility
 					},
 					"beforeSend":hideMarkUnmarkResultMessage(round),
-					"error":function(result){	// this should be success.. kept like this for mock
-						rand = Math.random();
-						rand = rand < 0.5;
-						if(rand || result.success == true){
+					"success":function(result){
+						if(result.success){
 							toggleMarkUnmark(round,updatingToMark,false,resultMessage);
 						}else{
-							resultMessage = "Not authorized";
-							resultMessage = "An error occurred";
-							toggleMarkUnmarkResultMessage(round,true,resultMessage);
+							toggleMarkUnmarkResultMessage(round,true,result.error);
 						}
 					},
-					"failure":markUnmarkFail//,
-					//"error":markUnmarkFail
+					"failure":markUnmarkFail,
+					"error":markUnmarkFail
 				});
 			});
 

@@ -3,12 +3,11 @@ class CreateGradingHistories < ActiveRecord::Migration
     create_table :grading_histories do |t|
       t.integer :instructor_id
       t.integer :assignment_id
-      t.string :grade_type
-      t.integer :student_id
+      t.string :type
+      t.integer :grade_receiver_id
       t.double :grade
       t.text :comment
-      t.timestamp :timestamp
-
+      t.timestamp :graded_at
       t.timestamps null: false
     end
   end

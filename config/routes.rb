@@ -2,6 +2,9 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+  
+
+
   resources :admin, only: [] do
     collection do
       get :list_super_administrators
@@ -261,6 +264,8 @@ resources :institution, except: [:destroy] do
 
   resources :response, only: %i[new create edit update] do
     collection do
+      post :sample_review
+     # get :sample_review #debug
       get :new_feedback
       get :view
       get :remove_hyperlink
@@ -478,6 +483,7 @@ resources :institution, except: [:destroy] do
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
+
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url

@@ -1,6 +1,18 @@
 class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
+  #for modifying the checkbox in data base
+  #params.require(:staff).permit(:is_public)
+
+  #debug
+  def sample_review
+    render(
+      html: "<script>alert('No users!')</script>".html_safe,
+      layout: 'application')
+    end
+
+  
+
 
   def action_allowed?
     response = user_id = nil
@@ -140,9 +152,13 @@ class ResponseController < ApplicationController
     end
   end
 
+
+  
   # view response
   def view
+
     @response = Response.find(params[:id])
+    
     @map = @response.map
     set_content
   end
@@ -226,7 +242,7 @@ class ResponseController < ApplicationController
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
-  end
+  end 
 
   def show_calibration_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])

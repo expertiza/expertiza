@@ -100,7 +100,9 @@ class ResponseController < ApplicationController
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, save_options: params[:save_options]
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id,
+      return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
   def new
@@ -176,26 +178,32 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-    #only notify if is_submitted changes from false to true
+    # only notify if is_submitted changes from false to true
     if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id, return: params[:return], msg: msg, error_msg: error_msg, save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'saving', id: @map.map_id,
+      return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
   def saving
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    # Award Good Teammate Badge
-    if @map.assignment.has_badge? and @map.is_a? TeammateReviewResponseMap
-      participant = Participant.find_by(id: @map.reviewee_id)
-      teammate_review_score = AwardedBadge.get_teammate_review_score(participant)
-      badge_id = Badge.get_id_from_name('Good Teammate')
-      assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: @map.assignment.id)
-      AwardedBadge.award(participant.id, teammate_review_score, assignment_badge.try(:threshold), badge_id)
+    participant = Participant.find_by(id: @map.reviewee_id)
+    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
+    if @map.assignment.has_badge?
+      if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Teammate')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
+      if @map.is_a? FeedbackResponseMap and params[:review][:good_reviewer_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Reviewer')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
     end
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
@@ -216,11 +224,7 @@ class ResponseController < ApplicationController
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
     else
-      if @map.response_map.assignment.course.is_ta_or_instructor?(current_user.id)
-        redirect_to controller: 'assignments', action: 'list_submissions', id:@map.response_map.assignment.id
-      else
-        redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
-      end
+      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
   end
 
@@ -296,12 +300,7 @@ class ResponseController < ApplicationController
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-      if @assignment.course.is_ta_or_instructor?(current_user.id)
-        @current_round = @assignment.number_of_current_round_for_instructor(reviewees_topic)
-      else
-        @current_round = @assignment.number_of_current_round(reviewees_topic)
-      end
-
+      @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
     when
       "MetareviewResponseMap",

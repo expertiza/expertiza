@@ -100,21 +100,15 @@
               <th class="sorter-true">Criterion<span></span></th>
             
               <% i = 1 %>
-              <% j = 1 %>
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <% if @assignment.course.is_ta_or_instructor?(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id) %>
-                          <th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Instructor review " + j.to_s %></a>  </th>
-                          <% j += 1 %>
-                      <% else %>
-                          <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
-                          <% i += 1 %>
-                      <% end %>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
                   <% end %>
+                  <% i += 1 %>
               <% end %>
 
               <th class="sorter-true" align="right" >
@@ -132,7 +126,7 @@
             <% j = 1 %>
             <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
             <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
-            <% vm.list_of_rows.each_with_index do |row, index| %>
+            <% vm.list_of_rows.each do |row| %>
 
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                 <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
@@ -140,25 +134,9 @@
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <!-- Highlight cell if instructor's review-->
-                      <% if score.is_instructor_review%>
-
-                        <!-- Check if this is the last row-->
-                        <% if index == vm.list_of_rows.size - 1 %>
-                          <td class="<%= score.color_code %> instructor-review-last-row" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-                            <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
-                          </td>
-                        <% else %>
-                          <td class="<%= score.color_code %> instructor-review-row" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-                            <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
-                          </td>
-                        <% end %>
-
-                      <% else %>
-                        <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-                          <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
-                        </td>
-                      <% end %>
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+                        <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
+                      </td>
                   <% end %>
 
 
@@ -193,7 +171,7 @@
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <td>
-                                <%= row.score_row[index].comment %>
+                                <%= row.score_row[index].comment.html_safe unless row.score_row[index].comment.nil?  %>
                                 <% if row.score_row[index].vm_prompts.count > 0 %>
                                     <div class="tag_prompt_container">
                                       <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>

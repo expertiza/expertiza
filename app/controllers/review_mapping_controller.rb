@@ -1,5 +1,4 @@
 class ReviewMappingController < ApplicationController
-  # include GC4R
   autocomplete :user, :name
   # use_google_charts
   require 'gchart'
@@ -115,30 +114,9 @@ class ReviewMappingController < ApplicationController
     # rescue Exception => e
     #   flash[:error] = (e.nil?) ? $! : e
     # end
-    #if current_user_role ==2 or current_user_role ==6
-    #  redirect_to controller: 'response', action: 'new', id: reviewer.id
-    #else
+
     redirect_to controller: 'student_review', action: 'list', id: reviewer.id
-    #end
-
   end
-
-  # Adds an instructor as a participant in a team so that he/she can add a review.
-  def add_instructor_as_reviewer
-    assignment_team = AssignmentTeam.find(params[:team_id])
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment_team.parent_id).first
-    if reviewer.nil?
-      reviewer = AssignmentParticipant.create(parent_id: assignment_team.parent_id, user_id: session[:user].id, can_submit: false, can_review: true,
-                                              can_take_quiz: false, handle: 'handle')
-
-    end
-    @review_map_id=ReviewResponseMap.where(reviewee_id: assignment_team.id, reviewer_id: reviewer.id,
-                             reviewed_object_id: params[:assignment_id]).first
-    @review_map_id=assignment_team.assign_reviewer(reviewer) if @review_map_id.nil?
-    redirect_to controller: 'response', action: 'new', id: @review_map_id.map_id
-  end
-
-
 
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
@@ -438,8 +416,20 @@ class ReviewMappingController < ApplicationController
     when "AnswerTaggingReport"
       tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
       @questionnaire_tagging_report = {}
+      @user_tagging_report = {}
       tag_prompt_deployments.each do |tag_dep|
         @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
+        #generate a summary report per user
+        @questionnaire_tagging_report[tag_dep].each do |line|
+          if @user_tagging_report[line.user.name].nil?
+            @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
+          else
+            @user_tagging_report[line.user.name].no_tagged += line.no_tagged
+            @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
+            @user_tagging_report[line.user.name].no_tagable += line.no_tagable
+            @user_tagging_report[line.user.name].percentage = @user_tagging_report[line.user.name].no_tagable == 0 ? "-" : format("%.1f", @user_tagging_report[line.user.name].no_tagged.to_f / @user_tagging_report[line.user.name].no_tagable * 100)
+          end
+        end
       end
     when "SelfReview"
       @self_review_response_maps = SelfReviewResponseMap.where(reviewed_object_id: @id)
@@ -455,14 +445,7 @@ class ReviewMappingController < ApplicationController
     review_grade.review_graded_at = Time.now
     review_grade.reviewer_id = session[:user].id
     begin
-      review_grade.save
-      # Award Good Reviewer Badge
-      assignment = Assignment.find_by(id: params[:assignment_id])
-      if assignment.has_badge?
-        badge_id = Badge.get_id_from_name('Good Reviewer')
-        assignment_badge = AssignmentBadge.find_by(badge_id: badge_id, assignment_id: params[:assignment_id])
-        AwardedBadge.award(params[:participant_id], params[:grade_for_reviewer], assignment_badge.try(:threshold), badge_id)
-      end
+      review_grade.save!
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

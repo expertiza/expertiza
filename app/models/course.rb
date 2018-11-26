@@ -65,13 +65,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # for checking if a given user is a ta or instructor for this course
-  def is_ta_or_instructor?(user_id)
-    instructors = TaMapping.where(course_id: self.id).collect { |x| x.ta_id}
-    instructors.push(self.instructor_id)
-    return user_id.in?(instructors)
-  end
-
   require 'analytic/course_analytic'
   include CourseAnalytic
 end

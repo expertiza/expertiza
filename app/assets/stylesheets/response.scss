@@ -70,3 +70,73 @@
   font-size: 25px;
   color: forestgreen;
 }
+.mark-unmark-sample-button{
+  margin-top:25px;
+}
+.mark-unmark-sample-result{
+  text-align:center;
+  color:red;
+  font-size:13px;
+}
+.mark-unmark-sample-result.success{
+  color:green
+}
+.link-assignments-head{
+  text-align:right;
+}
+#link_assignments{
+  top: 20px;
+  color:#986633;
+  cursor:pointer;
+}
+#link_assignments_error{
+  color: red;
+  overflow:hidden;
+  display:inline-block;
+}
+#link_assignments_success{
+  color: green;
+  overflow:hidden;
+  display:inline-block;
+}
+.popup-container{
+  text-align:center;
+  position: fixed;
+  top: 150px;
+}
+#similar_assignments_popup{
+  border-style: solid;
+  background-color: rgb(170, 10, 10);
+  color: rgb(255, 255, 255);
+}
+#similar_assignments_popup strong{
+  font-size: 13.4px;
+}
+#similar_assignments_popup a{
+  color:white;
+}
+.popup-list-container{
+  background-color: white;
+  color: black;
+  text-align: left;
+  margin-bottom: 10px;
+  max-height: 200px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.popup-list-container ul{
+  list-style-type:none;
+}
+.popup-list-container li{
+  border-bottom:solid;
+  cursor:pointer;
+}
+.popup-list-container span{
+  display: inline-block;
+  width: 90%;
+}
+#similar_assignments_popup button{
+  margin-bottom: 5px;
+  background-color: rgb(170, 10, 10);
+  color: rgb(255, 255, 255);
+}

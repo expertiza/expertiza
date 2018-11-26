@@ -40,25 +40,12 @@
 				jQuery("#mark_unmark_success_"+round).addClass("hide");
 			}
 
-			// this function is never called and will be removed
-			var showSimilarAssignments = function(){
-				// before show:
-				// fetch assignments . if fails, show error message, hide success
-				//		if succeeds: hide error message, hide earlier success, open popup
-				// on submit:
-				// function to find delta from fetch result
-				// if no delta, then call close, clear success and error messages
-				// on delta:
-				//		on success: close, clear error message, show success message
-				//		on fail: close, clear success message, show error message
-				// on just close: close, hide success and error messages
-			};
-
 			var AssignmentsPopup = {
 				init:function(){
 					this._target = jQuery("#similar_assignments_popup");
 					this.opener = jQuery("#link_assignments");
 					this.closer = this._target.find(".closer");
+					this.submitter = this._target.find(".submitter");
 					this.successMessageSpan = jQuery("#link_assignments_success");
 					this.errorMessageSpan = jQuery("#link_assignments_error");
 					this.assignmentsMap = [];
@@ -72,9 +59,10 @@
 					var checked = assignment.checked;
 					var newRow = this.template.clone();
 					newRow.removeClass("hide").find("input").attr("data-id",assignmentId).attr("checked",checked);
-					newRow.find("span").html(title);
-					newRow.removeAttr("id");
-					this.list.append(newRow);
+					newRow.find("span").html(title).on("click",function(){
+						newRow.find("input").click();
+					});
+					this.list.append(newRow.removeAttr("id"));
 				},
 				open:function(){
 					// using map template, build the HTML
@@ -82,10 +70,6 @@
 					for(var i in this.assignmentsMap){
 						this.addToList(this.assignmentsMap[i]);
 					}
-					// this.assignmentsMap.forEach(function(assignment){
-					// 	self.addToList(assignment);
-					// });
-					this.delta = {"checked":[],"unchecked":[]};
 					this._target.parent().removeClass("hide");
 				},
 				showError:function(message){
@@ -155,6 +139,7 @@
 					this.resetList();
 				},
 				closeAfterSubmit:function(success,message){
+					this.close();
 					if(success){
 						this.showSuccess(message);
 						this.hideError();
@@ -162,14 +147,87 @@
 						this.showError(message);
 						this.hideSuccess();
 					}
-					this.resetList();
 				},
 				resetList:function(){
 					this.list.html("").append(this.template);
 				},
+				findDelta:function(){
+					var existingChecked = [], existingUnchecked = [];
+					// Current
+					for(var i in this.assignmentsMap){
+						var assignment = this.assignmentsMap[i];
+						if(assignment.checked){
+							existingChecked.push(assignment.id);
+						}else{
+							existingUnchecked.push(assignment.id);
+						}
+					}
+					var existingCheckedSet = new Set(existingChecked);
+					var existingUncheckedSet = new Set(existingUnchecked);
+					// Changed
+					var newChecked = [];
+					var newUnchecked = [];
+					var formLi = this.list.find("li").not("#popup_list_template");
+					formLi.each(function(index,li){
+						li = $(li);
+						var liCheckbox = li.find("input");
+						var isChecked = liCheckbox.is(":checked");
+						var aId = parseInt(liCheckbox.attr("data-id"));
+						if(isChecked){
+							newChecked.push(aId);
+						}else{
+							newUnchecked.push(aId);
+						}
+					});
+					var newCheckedSet = new Set(newChecked);
+					var newUncheckedSet = new Set(newUnchecked);
+					var differenceCheckedSet = new Set([...newCheckedSet].filter(setElement => !existingCheckedSet.has(setElement)));
+					var differenceUncheckedSet = new Set([...newUncheckedSet].filter(setElement => !existingUncheckedSet.has(setElement)));
+					var differenceChecked = Array.from(differenceCheckedSet);
+					var differenceUnchecked = Array.from(differenceUncheckedSet);
+					return {
+						"checked":differenceChecked,
+						"unchecked":differenceUnchecked
+					};
+				},
 				submit:function(){
+					// on submit:
+					// function to find delta from fetch result
+					var delta = this.findDelta();
+					if(!delta.checked.length && !delta.unchecked.length){
+						this.close();
+					}else{
+						// make Ajax call
+						var self = this;
+						jQuery.ajax({
+							"url":"/similar_assignments/create/"+assignmentId,
+							"type":"POST",
+							"dataType":"json",
+							"responseType":"json",
+							"data":{
+								"similar":delta
+							},
+							"error":function(result){	// should be success.. used for mocking
+								result = {success:false,error:"An error occurred"};
+								if(result.success){
+									self.closeAfterSubmit(true,"Done!");
+								}else{
+									self.onSubmitFail(result.error);
+								}
+							}//,
+							//"failure":self.onSubmitFail,
+							//"error":self.onSubmitFail
+						});
+						// on success: close, clear error message, show success message
 
+						// on fail: close, clear success message, show error message
+					}
+				},
+				onSubmitFail:function(message){
+					message = (typeof message != "udefined" && message.length)?message:"An error occurred";
+					this.closeAfterSubmit(false,message);
 				}
+
 			};
 
 			AssignmentsPopup.init();
@@ -214,6 +272,10 @@
 
 			AssignmentsPopup.closer.on("click",function(event){
 				AssignmentsPopup.close();
+			});
+
+			AssignmentsPopup.submitter.on("click",function(event){
+				AssignmentsPopup.submit();
 			});
 		});
 		

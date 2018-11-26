@@ -1,6 +1,12 @@
+%span{:class => "hide",:id=>"sampleReviewHold",:data=>{"marked":instance_variable_get('@marked')}}
 %div
-  %h3
-    Members of #{@team.name}
+  %div
+    %h3{:class=>"col-md-9"} Members of #{@team.name}
+    %div{:class=>"col-md-3 link-assignments-head"}
+      %h5{:id=>"link_assignments"}Use as Samples for More Assignments
+      %span{:id=>"link_assignments_error", :class=>"hide"}
+      %span{:id=>"link_assignments_success" ,:class=>"hide"}
+    %br
   %table{:width => "100%"}
     - if @team_users.empty?
       %tr No team members
@@ -22,10 +28,13 @@
       %br/
     - else
       - if instance_variable_get('@sample_button_'+round.to_s)
-        %div{:class=>'col-md-12 mark-delete-sample'}
-          %h3{:class=>'col-md-8'} "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
-          %button{:class=>'col-md-4'+instance_variable_get('@mark_as_sample_'+round.to_s), :style=>'margin-top:25px;', :data=>{'visibility':2, 'response_id':instance_variable_get('@response_id_round_' + round.to_s)} } Mark as Sample
-          %button{:class=>'col-md-4'+instance_variable_get('@remove_as_sample_'+round.to_s), :style=>'margin-top:25px;', :data=>{'visibility':3, 'response_id':instance_variable_get('@response_id_round_' + round.to_s)} } Remove as Sample
+        %div{:class=>'col-md-12 mark-delete-sample '+'round'+round.to_s}
+          %h3{:class=>'col-md-10'} "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
+          %div{:class=>'col-md-2'}
+            %button{:class=>'col-md-12 mark-unmark-sample-button '+instance_variable_get('@mark_as_sample_'+round.to_s), :data=>{'visibility':2, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Mark as Sample
+            %button{:class=>'col-md-12 mark-unmark-sample-button '+instance_variable_get('@remove_as_sample_'+round.to_s), :data=>{'visibility':3, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Remove as Sample
+            %span{:class=>"hide col-md-12 mark-unmark-sample-result", :id=>"mark_unmark_fail_"+round.to_s}
+            %span{:class=>"hide col-md-12 mark-unmark-sample-result success", :id=>"mark_unmark_success_"+round.to_s}
       - else
         %h3 "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
       %table{:border => "1px solid #ccc"}
@@ -61,5 +70,27 @@
           %td= additional_comment.nil? ? 'No Comments' : additional_comment.html_safe
       %hr/
   %br/
+
+
+  %div{:class=>"col-md-12 hide popup-container"}
+    %div{:class=>"col-md-3"}
+    %div{:class=>"col-md-6",:id=>"similar_assignments_popup",:data=>{"assignment-id":instance_variable_get("@assignment_id")}}
+      
+      %div{:class=>"col-md-12"}
+        %h5{:class=>"col-md-11"}
+          %strong Select the assignments for which you want to mark these reviews as samples:
+        %h5{:class=>"col-md-1"}
+          %a{:href=>"javascript:void(0);", :class=>"closer"}X
+      %div{:class=>"col-md-12 popup-list-container"}
+        %ul
+          %li{:id=>"popup_list_template",:class=>"hide"}
+            %input{:type=>"checkbox"}
+            %span
+          
+      %button{:class=>"col-md-6 submitter"}Submit
+      %button{:class=>"col-md-6 closer"}Cancel
+    
+    %div{:class=>"col-md-3"}
+
   .footer
     = link_to 'Back', :controller=> 'review_mapping', :action=>'response_report', :id=>params[:assignment_id]

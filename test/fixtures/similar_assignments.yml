@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  is_similar_for: 1
+  assignments_id: 
+  association_intent: MyString
+
+two:
+  is_similar_for: 1
+  assignments_id: 
+  association_intent: MyString

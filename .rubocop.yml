@@ -1,5 +1,6 @@
 AllCops:
   # Include common Ruby source files.
+  TargetRubyVersion: 2.2.7
   Exclude:
     - 'bin/**/*'
     - 'config/**/*'
@@ -60,6 +61,10 @@ Style/HashSyntax:
 # A specialized exception class will take one or more arguments and construct the message from it.
 # So both variants make sense. 
 Style/RaiseArgs:
+  Enabled: false
+
+# This cop checks the indentation of the here document bodies.
+Layout/IndentHeredoc:
   Enabled: false
 
 # This cop checks the indentation of the right hand side operand in binary operations that span more than one line.

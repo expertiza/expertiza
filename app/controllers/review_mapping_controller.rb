@@ -6,7 +6,7 @@ class ReviewMappingController < ApplicationController
   # helper :dynamic_review_assignment
   helper :submitted_content
   # including the following helper to refactor the code in response_report function
-  include ReportFormatterHelper
+  # include ReportFormatterHelper
 
   @@time_create_last_review_mapping_record = nil
 
@@ -365,14 +365,14 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
-  def response_report
+  # def response_report
     # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
+    # @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
     # From the ReportFormatterHelper module
-    render_report(@type, params, session)
-    @user_pastebins = UserPastebin.get_current_user_pastebin current_user
-  end
+    # render_report(@type, params, session)
+    # @user_pastebins = UserPastebin.get_current_user_pastebin current_user
+  # end
 
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
@@ -386,7 +386,8 @@ class ReviewMappingController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'review_mapping', action: 'response_report', id: params[:assignment_id]
+    # redirect_to controller: 'review_mapping', action: 'response_report', id: params[:assignment_id]
+    redirect_to controller: 'reports', action: 'response_report', id: params[:assignment_id]
   end
 
   # E1600

@@ -24,10 +24,6 @@
         %td= grading_history.grade
         %td= grading_history.comment
         %td= grading_history.timestamp
-        %td= link_to 'Show', grading_history
-        %td= link_to 'Edit', edit_grading_history_path(grading_history)
-        %td= link_to 'Destroy', grading_history, method: :delete, data: { confirm: 'Are you sure?' }
+
 
 %br
-
-= link_to 'New Grading history', new_grading_history_path

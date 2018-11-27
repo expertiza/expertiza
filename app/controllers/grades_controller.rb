@@ -103,7 +103,8 @@ class GradesController < ApplicationController
     retrieve_questions questionnaires
     @pscore = @participant.scores(@questions)
     @vmlist = []
-
+    @boxplot_info = []
+    
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
     counter_for_same_rubric = 0
@@ -125,6 +126,26 @@ class GradesController < ApplicationController
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.get_number_of_comments_greater_than_10_words
+      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        rubric = {round: @round, criteria: {}}
+        @assignment.teams.each do |team|
+          n_vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+          n_vmquestions = questionnaire.questions
+          n_vm.add_questions(n_vmquestions)
+          # Only passing in participant object here since I'm not sure what the use of this value is in the method
+          n_vm.add_reviews(@participant, team, @assignment.varying_rubrics_by_round?)
+          n_vm.list_of_rows.each do |row|
+            if !rubric[:criteria].has_key?(row.question_id)
+              rubric[:criteria][row.question_id] = {max_score: row.question_max_score, raw_data: [], title: row.question_text}
+            end
+            label = "Your Team"
+            label = "" unless team.id == @team_id
+            rubric[:criteria][row.question_id][:raw_data] << {label: label, scores: row.score_row.map{|score| score.score_value}}
+          end
+        end
+        @boxplot_info << rubric
+      end
+
       @vmlist << vm
     end
     @current_role_name = current_role_name

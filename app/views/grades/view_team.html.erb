@@ -17,7 +17,30 @@
     } else {
         target.style.display = 'none';
     }
-}
+  }
+
+  function sendPostRequest(data, round, qid){
+    var xhr = new XMLHttpRequest();
+      var url = "http://peerlogic.csc.ncsu.edu/boxplot/temp_config";
+      xhr.open("POST", url);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+          if (xhr.status == 200) {
+              var url = JSON.parse(xhr.responseText).url;
+              var id = round + "," + qid;
+              row = document.getElementById(id);
+              row.setAttribute("onclick", "window.open('" + url + "', '" + id + "', 'height=400,width=1200');");
+          }
+      };
+      xhr.send(JSON.stringify(data));
+  }
+  function getBoxPlots(){
+    <% @boxplot_info.each do |rubric| %>
+      <% rubric[:criteria].keys.each do |question_id| %>
+        sendPostRequest(<%= rubric[:criteria][question_id].to_json.html_safe %>, <%= rubric[:round] %>, <%= question_id %>);
+      <% end %>
+    <% end %>
+  }
 </script>
 <h2>Summary Report for assignment: <%= @assignment.name %></h2>
 <h4>Team: <%= @team.name %></h4>
@@ -57,9 +80,9 @@
               <% count = 0 %>
               <% vm.list_of_rows.each do |row| %>
                   <% if row.score_row.count > 0  %>
-                      <tr style="background-color: #ffffff;">
+                      <tr id="<%= vm.round.to_s + ',' + row.question_id.to_s %>" onclick="" style="background-color: #ffffff;">
                         <td><%= count += 1 %></td>
-                        <td><%= row.question_text %></td>
+                        <td ><%= row.question_text %></td>
                       </tr>
                   <% end %>
               <% end %>
@@ -229,6 +252,9 @@
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->
+<script>
+  getBoxPlots();
+</script>
 
 <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
 <% if ['Student'].include? current_user.role.name %>

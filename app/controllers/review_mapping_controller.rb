@@ -360,6 +360,42 @@ class ReviewMappingController < ApplicationController
     @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
 
+    @boxplot_info = []
+    counter_for_same_rubric = 0
+    questionnaires = @assignment.questionnaires
+    questionnaires.each do |questionnaire|
+      round = nil
+      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      end
+
+      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        rubric = {round: round, criteria: {}}
+        @assignment.teams.each do |team|
+          n_vm = VmQuestionResponse.new(questionnaire, @assignment, round)
+          n_vmquestions = questionnaire.questions
+          n_vm.add_questions(n_vmquestions)
+          # Only passing in participant object here since I'm not sure what the use of this value is in the method
+          n_vm.add_reviews(@participant, team, @assignment.varying_rubrics_by_round?)
+          n_vm.list_of_rows.each do |row|
+            if !rubric[:criteria].has_key?(row.question_id)
+              rubric[:criteria][row.question_id] = {max_score: row.question_max_score, raw_data: [], title: row.question_text}
+            end
+            label = team.trunc_name()
+            rubric[:criteria][row.question_id][:raw_data] << {label: label, scores: row.score_row.map{|score| score.score_value}}
+          end
+        end
+        @boxplot_info << rubric
+      end
+    end
+
     case @type
       # this summarizes the reviews of each reviewee by each rubric criterion
     when "SummaryByRevieweeAndCriteria"

@@ -3,6 +3,7 @@
 .reviewreport
   %table{:class => "table table-striped"}
     - for i in 0..@assignment.rounds_of_reviews-1
+      - question_num = 0
       %tr.header_class{:bgcolor => "", "data-target" => "#round_#{(i+1).to_s}", "data-toggle" => "collapse"}
         %td{:style => "padding: 10px;"}
           %img#icon_header_team.arrow_icon{:src => "/assets/expand.png"}>/
@@ -25,3 +26,29 @@
                         - concat sentence
                     - else
                       - safe_concat "&nbsp;"
+                %tr
+                  %td
+                    -q_id = @boxplot_info[i][:criteria].keys[question_num]
+                    %iframe{:id => "#{i},#{q_id}", :width => "1200", :height => "400"}
+                -question_num = question_num + 1
+:javascript
+  function sendPostRequest(data, round, qid){
+    var xhr = new XMLHttpRequest();
+    var url = "http://peerlogic.csc.ncsu.edu/boxplot/temp_config";
+    xhr.open("POST", url);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+      if (xhr.status == 200) {
+          var url = JSON.parse(xhr.responseText).url;
+          var id = round + "," + qid;
+          row = document.getElementById(id);
+          row.src = url;
+      }
+    };
+    xhr.send(JSON.stringify(data));
+  } 
+-for i in 0..@boxplot_info.length-1
+  -@boxplot_info[i][:criteria].keys.each do |question_id|
+    :javascript
+      rubric_data = #{@boxplot_info[i][:criteria][question_id].to_json.html_safe};
+      sendPostRequest(rubric_data, '#{@boxplot_info[i][:round]-1}', '#{question_id}');  

@@ -714,14 +714,14 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "notification_id", limit: 4, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -774,15 +774,6 @@ ActiveRecord::Schema.define(version: 20180427030840) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
-  add_foreign_key "answer_tags", "answers"
-  add_foreign_key "answer_tags", "tag_prompt_deployments"
-  add_foreign_key "answer_tags", "users"
-  add_foreign_key "answers", "questions", name: "fk_score_questions"
-  add_foreign_key "answers", "responses", name: "fk_score_response"
-  add_foreign_key "assignment_badges", "assignments"
-  add_foreign_key "assignment_badges", "badges"
-  add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
-  add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
@@ -815,4 +806,6 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "track_notifications", "notifications"
+  add_foreign_key "track_notifications", "users"
 end

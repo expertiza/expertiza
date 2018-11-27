@@ -1,23 +1,53 @@
-FROM ubuntu:16.04
+FROM ruby:2.3
 
-# Prepare to install Java for 'rjb' gem
-RUN apt-get update && apt-get -y install software-properties-common && add-apt-repository ppa:webupd8team/java -y && apt-get update 
+# Install OpenJDK-8
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get install -y ant && \
+    apt-get clean;
 
-# Install Java 8 and accept the license by default (https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-get-on-ubuntu-16-04)
-RUN echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections && apt-get -y install oracle-java8-installer && java -version 
+# Fix certificate assues
+RUN apt-get update && \
+    apt-get install ca-certificates-java && \
+    apt-get clean && \
+    update-ca-certificates -f;
 
-# Set JAVA_HOME (should add in the docker startup script)
-RUN echo 'export JAVA_HOME="/usr/lib/jvm/java-8-oracle"' >> /etc/environment && . /etc/environment && echo $JAVA_HOME 
+# Setup JAVA_HOME -- useful for docker commandline
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+RUN export JAVA_HOME
+ 
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+RUN bundle config --global frozen 1
 
-# Install curl, rvm, ruby 2.1.5p273, rails 4.2.6
-RUN apt-get -y update && apt-get -y install build-essential zlib1g-dev libssl-dev libreadline6-dev libyaml-dev && apt-get -y install wget && apt-get install -y ruby-full && ruby -v && gem install rails -v 4.2.6 && rails -v
+# Install apt based dependencies required to run Rails as 
+# well as RubyGems. As the Ruby image itself is based on a 
+# Debian image, we use apt-get to install those.
+RUN apt-get update && apt-get install -y \ 
+  build-essential \ 
+  nodejs \
+  git \
+  ruby-dev \
+  gcc \
+  libffi-dev \
+  make \
+  zlib1g-dev \
+  libssl-dev \
+  libreadline6-dev \
+  libyaml-dev \
+  libpq-dev
 
-# Install bundler, git
-RUN gem install bundler && apt-get -y install git
+# Configure the main working directory. This is the base 
+# directory used in any further RUN, COPY, and ENTRYPOINT 
+# commands.
+RUN mkdir -p /app 
+WORKDIR /app
 
-ENV DEBIAN_FRONTEND noninteractive   
+# Copy the Gemfile as well as the Gemfile.lock and install 
+# the RubyGems. This is a separate step so the dependencies 
+# will be cached unless changes to one of those two files 
+# are made.
+COPY Gemfile Gemfile.lock ./ 
+RUN gem install bundler && bundle install 
 
-# Make sure 'bundle install' run successfully and set the git pre-commit hooks
-RUN ["/bin/bash", "-c", "cd home && mkdir expertiza_developer && cd expertiza_developer && git clone https://github.com/expertiza/expertiza.git && cd expertiza && apt-get -y install ruby-dev && apt-get -y install make && apt-get install -y gcc make && apt-get install -y libmysqlclient-dev && apt-get install -y libpq-dev && bundle install && debconf-set-selections <<< 'mysql-server mysql-server/root_password password ' && debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password ' && apt-get -y install mysql-server && /etc/init.d/mysql start && cp config/database.yml.example config/database.yml && cp config/secrets.yml.example config/secrets.yml && mv ./hooks/pre-commit ./.git/hooks/pre-commit && chmod 755 ./.git/hooks/pre-commit"]
+# Copy the main application.
+COPY . ./

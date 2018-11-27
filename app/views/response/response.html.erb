@@ -53,6 +53,22 @@
     //threshold to turn off the autosave
     var maxIdleTime = 30;
 
+
+//    $('#sample_cbx').on("click",function(e){
+//        e.preventDefault();
+//        debugger;
+//        if ( this.checked ) {
+//            // if checked ...
+//            //update the visibility of @response object to 1
+            <!--<% @response.update_attributes(:visibility => 1) %>-->
+//        } else {
+//            // if not checked ...
+//            //update the visibility of @response object to 0
+            <!--<% @response.update_attributes(:visibility => 0) %>-->
+//        }
+//   });
+
+
     $('#autosave_cbx_lbl').html("&nbsp;Auto save your responds every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
 
     //if it's was in the background, don't auto save to avoid conflict
@@ -339,6 +355,12 @@
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
+    <% if (@response.visibility == 0) %>
+        <input type="checkbox" id="sample_cbx" name="review[visibility]" unchecked>
+    <% else %>
+        <input type="checkbox" id="sample_cbx" name="review[visibility]" checked>
+    <% end %>
+    <label id="sample_cbx_lbl">I agree to make my review available as sample for others</label>
     <table width="100%">
       <% i = 0 %>
       <% @questions.each do |question| %>

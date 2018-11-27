@@ -24,6 +24,16 @@ class AssignmentTeam < Team
     self.name
   end
 
+  def trunc_name
+    assign_name = Assignment.find(self.parent_id).name
+    name_len = assign_name.length
+    if self.name[0,name_len-1] == assign_name
+      self.name[name_len+1, self.name.length-1]
+    else
+      self.name[0, [self.name.length, 7].min]
+    end
+  end
+
   # Get the review response map
   def review_map_type
     'ReviewResponseMap'

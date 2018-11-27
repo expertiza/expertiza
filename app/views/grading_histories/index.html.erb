@@ -1,0 +1,27 @@
+<h1 class="center">Grading Record</h1>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>Instructor</th>
+    <th>Assignment</th>
+    <th>Grade Receiver</th>
+    <th>Grade</th>
+    <th>Comment</th>
+    <th>Graded At</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
+  <% @grading_histories.each do |record| %>
+      <tr>
+        <td><%= record.instructor_id %></td>
+        <td><%= record.assignment_id %></td>
+        <td><%= record.grade_receiver_id %></td>
+        <td><%= record.grade %></td>
+        <td><%= record.comment %></td>
+        <td><%= record.graded_at %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

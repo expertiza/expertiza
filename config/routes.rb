@@ -1,5 +1,4 @@
 Expertiza::Application.routes.draw do
-  resources :grading_histories
   ###
   # Please insert new routes alphabetically!
   ###
@@ -125,6 +124,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :grading_histories, only: [:index]
+  
   resources :impersonate, only: [] do
     collection do
       get :start

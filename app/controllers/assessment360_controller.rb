@@ -83,7 +83,7 @@ class Assessment360Controller < ApplicationController
   end
 
   # Find the list of all students and assignments pertaining to the course.
-  # This data is used to compute the metareview and teammate review scores.
+  # This data is used to compute the instructor assigned grade and peer review scores.
   def course_student_grade_summary
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
@@ -93,19 +93,18 @@ class Assessment360Controller < ApplicationController
       redirect_to(:back)
     end
     # hashes for view
-    @topic_id = Hash.new()
-    @topic_name = Hash.new()
-    @assignment_grades = Hash.new()
-    @peer_review_scores = Hash.new()
-    @final_grades = Hash.new()
-    @final_peer_review_scores = Hash.new()
-
+    @topic_id = {}
+    @topic_name = {}
+    @assignment_grades = {}
+    @peer_review_scores = {}
+    @final_grades = {}
+    @final_peer_review_scores = {}
 
     @course_participants.each do |cp|
-      @topic_id[cp.id] = Hash.new()
-      @topic_name[cp.id] = Hash.new()
-      @assignment_grades[cp.id] = Hash.new()
-      @peer_review_scores[cp.id] = Hash.new()
+      @topic_id[cp.id] = {}
+      @topic_name[cp.id] = {}
+      @assignment_grades[cp.id] = {}
+      @peer_review_scores[cp.id] = {}
       @final_grades[cp.id] = 0
       @final_peer_review_scores[cp.id] = 0
 
@@ -116,16 +115,14 @@ class Assessment360Controller < ApplicationController
         topic_id = SignedUpTeam.topic_id(assignment_participant.parent_id, assignment_participant.user_id)
         @topic_id[cp.id][assignment.id] = topic_id
 
-        if SignUpTopic.exists?(topic_id)
-          @topic_name[cp.id][assignment.id] = SignUpTopic.find(topic_id).try :topic_name
-        else
-          @topic_name[cp.id][assignment.id] = "NA"
-        end
-
+        @topic_name[cp.id][assignment.id] = if SignUpTopic.exists?(topic_id)
+                                              SignUpTopic.find(topic_id).try :topic_name
+                                            else
+                                              "NA"
+                                            end
         team_id = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
-        if team_id != nil
+        if !team_id.nil?
           @team = Team.find(team_id)
-
           @participant = AssignmentParticipant.find_by(user_id: assignment_participant.user_id, parent_id: assignment_participant.parent_id)
           @assignment = @participant.assignment
           @questions = {}
@@ -133,41 +130,20 @@ class Assessment360Controller < ApplicationController
           retrieve_questions questionnaires
           @pscore = @participant.scores(@questions)
 
-
-          if (@team[:grade_for_submission] != nil)
-            @assignment_grades[cp.id][assignment.id] = @team[:grade_for_submission]
-          else
-            @assignment_grades[cp.id][assignment.id] = 0
-          end
+          @assignment_grades[cp.id][assignment.id] = if !@team[:grade_for_submission].nil?
+                                                        @team[:grade_for_submission]
+                                                     else
+                                                        0
+                                                     end
           @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
 
-          if(@pscore[:review][:scores][:avg] != nil)
-            @peer_review_scores[cp.id][assignment.id] = (@pscore[:review][:scores][:avg]).round(2)
-          else
-            @peer_review_scores[cp.id][assignment.id] = 0
-          end
+          @peer_review_scores[cp.id][assignment.id] = if !@pscore[:review][:scores][:avg].nil?
+                                                        (@pscore[:review][:scores][:avg]).round(2)
+                                                      else
+                                                        0
+                                                      end
           @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
-
         end
-        # @participant = AssignmentParticipant.find(assignment_participant.user_id)
-        # @assignment = @participant.assignment
-        # @team = @participant.team
-        # @team_id = @team.id
-        # @questions = {}
-        # questionnaires = @assignment.questionnaires
-        # retrieve_questions questionnaires
-        # @pscore = @participant.scores(@questions)
-
-
-
-        # if(@pscore[:review][:scores][:avg] != nil)
-        #   # @peer_review_scores[cp.id][assignment.id] = @pscore[:review][:scores][:avg]
-        #   @peer_review_scores[cp.id][assignment.id] = assignment_participant.user_id
-        # else
-        #   @peer_review_scores[cp.id][assignment.id] = 0
-        # end
-        # @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
-
       end
     end
   end

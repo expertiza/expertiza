@@ -57,19 +57,6 @@ class GradesController < ApplicationController
     @show_reputation = false
   end
 
-  # This method is used to retrieve questions for different review rounds
-  def retrieve_questions(questionnaires)
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if !round.nil?
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             else
-                               questionnaire.symbol
-                             end
-      @questions[questionnaire_symbol] = questionnaire.questions
-    end
-  end
-
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)

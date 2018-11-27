@@ -93,11 +93,20 @@ class Assessment360Controller < ApplicationController
       redirect_to(:back)
     end
     # hashes for view
-    @topic_id, @topic_name, @assignment_grades, @peer_review_scores, @final_grades, @final_peer_review_scores = {}, {}, {}, {}, {}, {}
+    @topic_id = {}
+    @topic_name = {}
+    @assignment_grades = {}
+    @peer_review_scores = {}
+    @final_grades = {}
+    @final_peer_review_scores = {}
 
     @course_participants.each do |cp|
-      @topic_id[cp.id], @topic_name[cp.id], @assignment_grades[cp.id], @peer_review_scores[cp.id] = {}, {}, {}, {}
-      @final_grades[cp.id], @final_peer_review_scores[cp.id] = 0, 0
+      @topic_id[cp.id] = {}
+      @topic_name[cp.id] = {}
+      @assignment_grades[cp.id] = {}
+      @peer_review_scores[cp.id] = {}
+      @final_grades[cp.id] = 0
+      @final_peer_review_scores[cp.id] = 0
 
       @assignments.each do |assignment|
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)

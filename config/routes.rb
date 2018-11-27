@@ -478,6 +478,8 @@ resources :institution, except: [:destroy] do
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   post '/sample_reviews/mark_unmark/:id' => 'sample_reviews#update_visibility'
+  get '/similar_assignments/:id' => 'similar_assignments#get'
+  post '/similar_assignments/create/:id' => 'similar_assignments#update'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'

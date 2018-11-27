@@ -13,7 +13,7 @@ class SampleReviewsController < ApplicationController
 				ta_ids = TaMapping.where(course_id).ids # do this query only if current user is ta
 			end
 			if not ([instructor_id] + ta_ids).include? current_user.id
-			 	render json:{"success":false,"error":"Unathorized"}
+			 	render json:{"success" => false,"error" => "Unathorized"}
 			 	return
 			end
 			visibility = params[:visibility].to_i #response object consists of visibility in string format
@@ -23,9 +23,9 @@ class SampleReviewsController < ApplicationController
 			Response.update(@@response_id.to_i, :visibility => visibility)
 			update_similar_assignment(assignment_id, visibility)
 		rescue StandardError
-			render json:{"success":false,"error":"Something went wrong"}
+			render json:{"success" => false,"error" => "Something went wrong"}
 		else
-			render json:{"success":true}
+			render json:{"success" => true}
 		end
 	end
 

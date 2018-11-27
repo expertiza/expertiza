@@ -97,26 +97,28 @@
 						},
 						"success":function(result){
 							if(result.success){
-								self.onFetchSuccess(result.assignmentsMap);
+								self.onFetchSuccess(result.values);
 							}else{
 								self.onFetchFail(result.error);
 							}
 						},
-						"failure":self.onFetchSuccess( // should be self.onFetchFail , this is a mocked response.. use result.map
-							[{
-								"title": "assignment title",
-								"checked": true,
-								"id": 29
-							},
-							{
-								"title": "assignment title 2",
-								"checked": false,
-								"id": 350
-							}
-						])
+						"failure": self.onFetchFail,
+
+                         //    self.onFetchSuccess( // should be self.onFetchFail , this is a mocked response.. use result.map
+						// 	[{
+						// 		"title": "assignment title",
+						// 		"checked": true,
+						// 		"id": 29
+						// 	},
+						// 	{
+						// 		"title": "assignment title 2",
+						// 		"checked": false,
+						// 		"id": 350
+						// 	}
+						// ])
 						// "error":self.onFetchSuccess([{29:{title:"assignment title","checked":true},{90:{title:"tTitle 2","checked":false}}])
 
-						//"error":self.onFetchFail
+						"error":self.onFetchFail
 					});
 				},
 				onFetchSuccess:function(assignmentsMap){
@@ -207,16 +209,16 @@
 							"data":{
 								"similar":delta
 							},
-							"error":function(result){	// should be success.. used for mocking
-								result = {success:false,error:"An error occurred"};
+							"success":function(result){	// should be success.. used for mocking
+
 								if(result.success){
 									self.closeAfterSubmit(true,"Done!");
 								}else{
 									self.onSubmitFail(result.error);
 								}
-							}//,
-							//"failure":self.onSubmitFail,
-							//"error":self.onSubmitFail
+							},
+							"failure":self.onSubmitFail,
+							"error":self.onSubmitFail
 						});
 						// on success: close, clear error message, show success message
 

@@ -93,20 +93,11 @@ class Assessment360Controller < ApplicationController
       redirect_to(:back)
     end
     # hashes for view
-    @topic_id = {}
-    @topic_name = {}
-    @assignment_grades = {}
-    @peer_review_scores = {}
-    @final_grades = {}
-    @final_peer_review_scores = {}
+    @topic_id, @topic_name, @assignment_grades, @peer_review_scores, @final_grades, @final_peer_review_scores = {}, {}, {}, {}, {}, {}
 
     @course_participants.each do |cp|
-      @topic_id[cp.id] = {}
-      @topic_name[cp.id] = {}
-      @assignment_grades[cp.id] = {}
-      @peer_review_scores[cp.id] = {}
-      @final_grades[cp.id] = 0
-      @final_peer_review_scores[cp.id] = 0
+      @topic_id[cp.id], @topic_name[cp.id], @assignment_grades[cp.id], @peer_review_scores[cp.id] = {}, {}, {}, {}
+      @final_grades[cp.id], @final_peer_review_scores[cp.id] = 0, 0
 
       @assignments.each do |assignment|
         assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
@@ -121,7 +112,7 @@ class Assessment360Controller < ApplicationController
                                               "NA"
                                             end
         team_id = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
-        if !team_id.nil?
+        unless team_id.nil?
           @team = Team.find(team_id)
           @participant = AssignmentParticipant.find_by(user_id: assignment_participant.user_id, parent_id: assignment_participant.parent_id)
           @assignment = @participant.assignment
@@ -131,9 +122,9 @@ class Assessment360Controller < ApplicationController
           @pscore = @participant.scores(@questions)
 
           @assignment_grades[cp.id][assignment.id] = if !@team[:grade_for_submission].nil?
-                                                        @team[:grade_for_submission]
+                                                       @team[:grade_for_submission]
                                                      else
-                                                        0
+                                                       0
                                                      end
           @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
 
@@ -145,18 +136,6 @@ class Assessment360Controller < ApplicationController
           @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
         end
       end
-    end
-  end
-
-  def retrieve_questions(questionnaires)
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if !round.nil?
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             else
-                               questionnaire.symbol
-                             end
-      @questions[questionnaire_symbol] = questionnaire.questions
     end
   end
 

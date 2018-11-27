@@ -15,6 +15,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :set_time_zone
   before_action :authorize
+  before_action :set_locale
 
   def self.verify(_args); end
 
@@ -56,6 +57,14 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+  end
+
+  def default_url_options(options={})
+    {locale: I18n.locale}.merge options
+  end
 
   def current_user
     @current_user ||= session[:user]

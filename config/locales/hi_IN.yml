@@ -1,1 +1,6 @@
+hi_IN:
 
+#  hello: "Hello world"
+  course:
+    edit:
+      course_title: "Hindi!"

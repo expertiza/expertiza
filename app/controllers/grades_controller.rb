@@ -188,6 +188,13 @@ class GradesController < ApplicationController
     @team.comment_for_submission = params[:comment_for_submission]
     begin
       @team.save
+      GradingHistory.create(instructor_id: session[:user].id,
+                            assignment_id: @assignment.assignment.id,
+                            type: "submission",
+                            grade_receiver_id: @team.id,
+                            grade: @team.grade_for_submission,
+                            comment: @team.comment_for_submission,
+                            graded_at: Time.now)
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

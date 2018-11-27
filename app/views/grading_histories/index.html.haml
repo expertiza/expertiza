@@ -5,8 +5,8 @@
     %tr
       %th Instructor
       %th Assignment
-      %th Grade type
-      %th Student
+      %th Assignment Type
+      %th Group/Student
       %th Grade
       %th Comment
       %th Timestamp
@@ -19,11 +19,11 @@
       %tr
         %td= grading_history.instructor_id
         %td= grading_history.assignment_id
-        %td= grading_history.grade_type
-        %td= grading_history.student_id
+        %td= grading_history.type
+        %td= grading_history.grade_receiver_id
         %td= grading_history.grade
         %td= grading_history.comment
-        %td= grading_history.timestamp
+        %td= grading_history.graded_at
 
 
 %br

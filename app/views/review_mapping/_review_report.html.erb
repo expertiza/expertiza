@@ -36,6 +36,7 @@ $(window).load(function(){
       <th width = "13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
       <th width = "13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
+      <th width = "10%" >Grading History <span></span></th>
     </tr>
     </thead>
 <tbody>
@@ -130,7 +131,7 @@ $(window).load(function(){
                 </table>
             <% end %>
           </td>
-          <td width="10%">
+          <td align = 'left'>
             <%= link_to "Grading History", grading_histories_path(grade_receiver_id: r.id) %>
           </td>
         <%end %>  

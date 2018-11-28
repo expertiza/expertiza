@@ -15,9 +15,13 @@
   <tbody>
   <% @grading_histories.each do |record| %>
       <tr>
-        <td><%= record.instructor_id %></td>
-        <td><%= record.assignment_id %></td>
-        <td><%= record.grade_receiver_id %></td>
+        <td><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
+        <td><%= Assignment.where(id: record.assignment_id).pluck(:name).first %></td>
+        <% if record.grading_type == "Submission" %>
+            <td><%= Team.where(id: record.grade_receiver_id).pluck(:name).first %></td>
+        <% else %>
+            <td><%= User.where(id: record.grade_receiver_id).pluck(:fullname).first %></td>
+        <% end %>
         <td><%= record.grade %></td>
         <td><%= record.comment %></td>
         <td><%= record.graded_at %></td>

@@ -7,6 +7,6 @@ class GradingHistoriesController < ApplicationController
 
   # GET /grading_histories
   def index
-    @grading_histories = GradingHistory.all
+    @grading_histories = GradingHistory.where(grade_receiver_id: params[:grade_receiver_id])
   end
 end

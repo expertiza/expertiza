@@ -2,7 +2,7 @@ default: &default
   adapter: mysql2
   host: localhost
   username: root
-  password: 
+  password:
 
 development:
   <<: *default
@@ -18,7 +18,7 @@ test:
 production:
   <<: *default
   database: expertiza_production
-  
+
 staging:
   <<: *default
   database: expertiza_staging

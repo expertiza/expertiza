@@ -112,6 +112,8 @@ export {
     hasBadges
 } 
 from './actions/StudentTaskList';
+
+
 export { fetchStudentsTeamView,
     fetchStudentsTeamViewSuccess,
     updateTeamName,
@@ -120,15 +122,16 @@ export { fetchStudentsTeamView,
     acceptInvitationToAssignment,
     declineInvitationToAssignment,
     getAdContent,
-    comments_for_advertisement,
     updateCommentForAdvertisement,
     updateCommentSuccess,
     updateCommentFailure,
-    AdContentSuccess
+    AdContentSuccess,
+    retractInvitation
 }
 from './actions/StudentTeamView';
+
+
 export  { fetchReviewData,
     fetchReviewDataSuccess,
     fetchReviewDataFailure,
-    retractInvitation
 } from './actions/Response'

@@ -87,3 +87,9 @@ table.general td {
 .table_info{
   background-color:#d9edf7;
 }
+.table_summary_header{ 
+  border-right: 1px solid black;
+}
+.table_summary{
+  width: 80%
+}

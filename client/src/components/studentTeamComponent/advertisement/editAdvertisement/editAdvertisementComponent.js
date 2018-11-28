@@ -23,7 +23,7 @@ class EditAdvertisementComponent extends Component {
     render () {
         return  (
             <div>
-             <h1>Edit Teammate Advertisement</h1>sendInvitaion = (
+             {/* <h1>Edit Teammate Advertisement</h1>sendInvitaion = (
               <form onSubmit={this.submitCommentForAdvertisement}>
                 <h3>Name team </h3>
                 <div className="form-group">
@@ -37,7 +37,7 @@ class EditAdvertisementComponent extends Component {
                     </p>
                 </div>
                 <button type="submit" className="btn btn-primary"> Update </button>
-              </form>
+              </form> */}
             </div>
         )
     }

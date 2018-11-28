@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { fetchScore } from '../../redux/actions/Grade';
 import  Scoretable  from './ScoreTable';
 import { Button } from 'react-bootstrap';
-
+import Summary from './Summary';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 import Hyperlinks from './Hyperlinks';
@@ -37,6 +37,7 @@ class GradesViewTeamComponent extends Component {
                             <Button onClick={this.togglelinks}> Show Submission </Button>                
                             <Hyperlinks show = {this.state.showlinks} team = {this.props.team} /> 
                             <br/>
+                            <Summary vm = {this.props.vm} />
                             <Tabs selectedIndex={this.state.tabindex} onSelect={tabindex => this.setState({ tabindex})} >
                                 <TabList>
                                     <Tab>Reviews</Tab>

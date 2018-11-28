@@ -635,7 +635,7 @@ DEPENDENCIES
   redis-rails
   rest-client
   rgl
-  rjb
+  rjb (~> 1.4.9)
   rspec-rails
   rubocop
   rubyzip
@@ -658,4 +658,4 @@ DEPENDENCIES
   zip-zip
 
 BUNDLED WITH
-   1.16.2
+   1.17.1

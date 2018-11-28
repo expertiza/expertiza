@@ -1,8 +1,10 @@
-<html>
-  <head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-    google.charts.load('current', {packages: ['corechart', 'bar']});
+/* 
+  Google charts  for displaying the chart data on the grades view page.
+  These functions are called by _team_chart.html.erb file.
+  File path : expertiza/app/views/grades/_team_charts.html.erb  
+*/
+
+google.charts.load('current', {packages: ['corechart', 'bar']});
 google.charts.setOnLoadCallback(drawBasic);
 
 var chart;
@@ -151,60 +153,3 @@ function checkboxUpdate(checkid) {
   criteriaSelected[currentRound][checkid] = check.checked;
   renderChart();
 }
-</script>
-</head>
-
-<body>
-<h3>Class Average on Criterions</h3>
-<br>
-<div id="chart_div"></div>
-<form id="chartOptions" name="chartOptions">
-<select id="chartRounds" name="rounds" onChange="updateChart(document.chartOptions.chartRounds.options[document.chartOptions.chartRounds.options.selectedIndex].value)" style = "display: none">
-</select>
-</form>
-<form id="chartCriteria" name="chartCriteria">
-</form>
-</body>
-
-</html>
-
-<br> <br>
-
-<a href="#" name='team-chartLink' onClick="toggleElement('team-chart', 'stats');return false;">Hide stats</a>
-<br>
-<TR style ="background-color: white;" class="team" id="team-chart">
-	<th>
-
-	<div class="circle" id="average-score">          
-  			
-  	</div>
-  	Class Average
-	</th>
-	<TH COLSPAN="8">
-		<img src="<%= @average_chart  %>" ><br>
-		Class Distribution
-		<br>
-	</th>
-	<TH WIDTH="9">&nbsp;</th>
-</TR>
-
-<script type="text/javascript">
-  var myCircle = Circles.create({
-    id:           'average-score',
-    radius:       50,
-    value:        <%= @avg_of_avg.to_i %>,
-    maxValue:     100,
-    width:        15,
-    text:         '<%=@avg_of_avg.to_i%>',
-    colors:       ['#FFEB99', '#FFCC00'],
-    duration:       700,
-    textClass:      'circles-final'  
-  });
-
-</script>
-
-<style> 
- .circles-final{
-    font-size: 16px !important;    
-  }
-</style> 

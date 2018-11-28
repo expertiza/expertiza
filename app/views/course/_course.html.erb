@@ -1,18 +1,18 @@
 <!--[form:course]-->
-<p><label for="institution_name">Institution Name</label><br/>
+<p><label for="institution_name"><%=t ".institute_name" %></label><br/>
 <%= select("course", "institutions_id", Institution.all.collect{ |c| [ c.name, c.id] }) %></p>
 
-<p><label for="course_name">Course Name</label><br/>
+<p><label for="course_name"><%=t ".course_name" %></label><br/>
 <%= text_field 'course', 'name'  %></p>
 
-<p><label for="course_directory_path">Course Directory</label> (Mandatory field. No space or special chars.)
+<p><label for="course_directory_path"><%=t ".course_directory" %></label> <%=t ".directory_warning" %>
   <img src="/assets/info.png" title='- DO NOT change this filed for an on-going course. This may cause lost of student submitted file.'>
 <br/>
 <%= text_field 'course', 'directory_path'  %></p>
-<p><label for="course_info">Course Information</label><br/>
+<p><label for="course_info"><%=t ".course_info" %></label><br/>
 <%= text_field 'course', 'info'  %></p>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Select language<b class="caret"></b></a>
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=t ".language" %><b class="caret"></b></a>
   <ul class="dropdown-menu">
     <li><%=link_to_unless_current "English", locale: "en" %></li>
     <li><%=link_to_unless_current "Hindi", locale: "hi_IN" %></li>

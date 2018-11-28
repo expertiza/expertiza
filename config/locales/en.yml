@@ -6,3 +6,11 @@ en:
   course:
     edit:
       course_title: "Edit course"
+
+    course:
+      institute_name: "Institution Name"
+      course_name: "Course Name"
+      course_directory: "Course Directory"
+      directory_warning: "(Mandatory field. No space or special chars.)"
+      course_info: "Course Information"
+      language: "Select language"

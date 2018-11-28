@@ -3,4 +3,12 @@ hi_IN:
 #  hello: "Hello world"
   course:
     edit:
-      course_title: "Hindi!"
+      course_title: "एडिट कोर्स"
+
+    course:
+      institute_name: "इन्स्टिट्यूशन का नाम"
+      course_name: "कोर्स का नाम"
+      course_directory: "कोर्स डाइरेक्टरी"
+      directory_warning: "(आवश्यक स्थान। कोई जगह या विशेष वर्ण नहीं।)"
+      course_info: "कोर्स संबंधी जानकारी"
+      language: "भाषा चुनिए"

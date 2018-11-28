@@ -16,10 +16,18 @@ class Answer < ActiveRecord::Base
       scores[:min] = 999_999_999
       total_score = 0
       length_of_assessments = assessments.length.to_f
+number_of_instructor_reviews = 0
       assessments.each do |assessment|
-        curr_score = get_total_score(response: [assessment], questions: questions)
+curr_score = 0
 
-        scores[:max] = curr_score if curr_score > scores[:max]
+participant = Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id)
+course = participant.assignment.course
+if course.is_ta_or_instructor?(participant.user_id)
+number_of_instructor_reviews = number_of_instructor_reviews + 1
+else
+curr_score = get_total_score(response: [assessment], questions: questions)
+end        
+scores[:max] = curr_score if curr_score > scores[:max]
         scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
 
         # Check if the review is invalid. If is not valid do not include in score calculation
@@ -29,12 +37,14 @@ class Answer < ActiveRecord::Base
         end
         total_score += curr_score
       end
+student_review_count = length_of_assessments - number_of_instructor_reviews.to_f
       scores[:avg] = if length_of_assessments != 0
                        total_score.to_f / length_of_assessments
                      else
                        0
                      end
     else
+scores[:student_review_count] = student_review_count
       scores[:max] = nil
       scores[:min] = nil
       scores[:avg] = nil

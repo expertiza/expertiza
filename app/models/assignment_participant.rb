@@ -103,11 +103,13 @@ class AssignmentParticipant < Participant
     scores[review_sym][:assessments] = []
     scores[review_sym][:scores] = {max: -999_999_999, min: 999_999_999, avg: 0}
     total_score = 0
+total_reviews = 0
     for i in 1..self.assignment.num_review_rounds
       round_sym = ("review" + i.to_s).to_sym
       next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
-      length_of_assessments = scores[round_sym][:assessments].length.to_f
-      scores[review_sym][:assessments] += scores[round_sym][:assessments]
+      length_of_assessments = scores[round_sym][:scores][:student_review_count]#[:assessments].length.to_f
+total_reviews += length_of_assessments
+scores[review_sym][:assessments] += scores[round_sym][:assessments]
       if !scores[round_sym][:scores][:max].nil? && scores[review_sym][:scores][:max] < scores[round_sym][:scores][:max]
         scores[review_sym][:scores][:max] = scores[round_sym][:scores][:max]
       end
@@ -120,7 +122,7 @@ class AssignmentParticipant < Participant
       scores[review_sym][:scores][:max] = 0
       scores[review_sym][:scores][:min] = 0
     end
-    scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
+    scores[review_sym][:scores][:avg] = total_score / total_reviews#scores[review_sym][:assessments].length.to_f
   end
 
   def topic_total_scores(scores)

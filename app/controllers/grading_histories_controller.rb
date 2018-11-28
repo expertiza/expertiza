@@ -1,5 +1,5 @@
 class GradingHistoriesController < ApplicationController
-  before_action :set_grading_history, only: [:show, :edit, :update, :destroy]
+  before_action :set_grading_history, only: %i[show edit update destroy]
 
   def action_allowed?
     true

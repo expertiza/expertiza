@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180427030840) do
+ActiveRecord::Schema.define(version: 20181123004154) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -416,17 +416,20 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
   create_table "questionnaires", force: :cascade do |t|
-    t.string   "name",               limit: 64
-    t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
-    t.boolean  "private",                          default: false, null: false
-    t.integer  "min_question_score", limit: 4,     default: 0,     null: false
-    t.integer  "max_question_score", limit: 4
+    t.string   "name",                 limit: 64
+    t.integer  "instructor_id",        limit: 4,     default: 0,     null: false
+    t.boolean  "private",                            default: false, null: false
+    t.integer  "min_question_score",   limit: 4,     default: 0,     null: false
+    t.integer  "max_question_score",   limit: 4
     t.datetime "created_at"
-    t.datetime "updated_at",                                       null: false
-    t.string   "type",               limit: 255
-    t.string   "display_type",       limit: 255
-    t.text     "instruction_loc",    limit: 65535
+    t.datetime "updated_at",                                         null: false
+    t.string   "type",                 limit: 255
+    t.string   "display_type",         limit: 255
+    t.text     "instruction_loc",      limit: 65535
+    t.integer  "submission_models_id", limit: 4
   end
+
+  add_index "questionnaires", ["submission_models_id"], name: "index_questionnaires_on_submission_models_id", using: :btree
 
   create_table "questions", force: :cascade do |t|
     t.text    "txt",              limit: 65535

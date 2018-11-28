@@ -1,12 +1,7 @@
 class Assessment360Controller < ApplicationController
-  # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
+  include GradesHelper
 
-  @topics = {}
-  @assignment_grades = {}
-  @peer_review_scores = {}
-  @final_grades = {}
-  @final_peer_review_scores = {}
-
+  # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -85,6 +80,12 @@ class Assessment360Controller < ApplicationController
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the instructor assigned grade and peer review scores.
   def course_student_grade_summary
+    @topics = {}
+    @assignment_grades = {}
+    @peer_review_scores = {}
+    @final_grades = {}
+    @final_peer_review_scores = {}
+
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
@@ -92,17 +93,9 @@ class Assessment360Controller < ApplicationController
       flash[:error] = "There is no course participant in course #{course.name}"
       redirect_to(:back)
     end
-    # hashes for view
-    @topic_id = {}
-    @topic_name = {}
-    @assignment_grades = {}
-    @peer_review_scores = {}
-    @final_grades = {}
-    @final_peer_review_scores = {}
 
     @course_participants.each do |cp|
-      @topic_id[cp.id] = {}
-      @topic_name[cp.id] = {}
+      @topics[cp.id] = {}
       @assignment_grades[cp.id] = {}
       @peer_review_scores[cp.id] = {}
       @final_grades[cp.id] = 0
@@ -113,32 +106,26 @@ class Assessment360Controller < ApplicationController
         next if assignment_participant.nil?
 
         topic_id = SignedUpTeam.topic_id(assignment_participant.parent_id, assignment_participant.user_id)
-        @topic_id[cp.id][assignment.id] = topic_id
+        @topics[cp.id][assignment.id] = SignUpTopic.find_by_id(topic_id)
 
-        @topic_name[cp.id][assignment.id] = if SignUpTopic.exists?(topic_id)
-                                              SignUpTopic.find(topic_id).try :topic_name
-                                            else
-                                              "NA"
-                                            end
         team_id = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
         unless team_id.nil?
-          @team = Team.find(team_id)
-          @participant = AssignmentParticipant.find_by(user_id: assignment_participant.user_id, parent_id: assignment_participant.parent_id)
-          @assignment = @participant.assignment
-          @questions = {}
-          questionnaires = @assignment.questionnaires
-          retrieve_questions questionnaires
-          @pscore = @participant.scores(@questions)
+          team = Team.find(team_id)
+          participant = AssignmentParticipant.find_by(user_id: assignment_participant.user_id, parent_id: assignment_participant.parent_id)
+          assignment = participant.assignment
+          questions = retrieve_questions assignment.questionnaires, assignment.id
 
-          @assignment_grades[cp.id][assignment.id] = if !@team[:grade_for_submission].nil?
-                                                       @team[:grade_for_submission]
+          pscore = participant.scores(questions)
+
+          @assignment_grades[cp.id][assignment.id] = if !team[:grade_for_submission].nil?
+                                                       team[:grade_for_submission]
                                                      else
                                                        0
                                                      end
           @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
 
-          @peer_review_scores[cp.id][assignment.id] = if !@pscore[:review][:scores][:avg].nil?
-                                                        (@pscore[:review][:scores][:avg]).round(2)
+          @peer_review_scores[cp.id][assignment.id] = if !pscore[:review][:scores][:avg].nil?
+                                                        (pscore[:review][:scores][:avg]).round(2)
                                                       else
                                                         0
                                                       end
@@ -173,11 +160,9 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  def format_topic(topic_id, topic_name)
+  def format_topic(topic)
     topic_display = ''
-    topic_display += topic_id.to_s + ' - ' unless topic_id.nil?
-    topic_display += topic_name unless topic_name.nil?
-    topic_display
+    topic_display = topic.format_for_display unless topic.nil?
   end
 
   helper_method :format_topic

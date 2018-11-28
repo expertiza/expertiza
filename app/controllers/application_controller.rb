@@ -124,16 +124,4 @@ class ApplicationController < ActionController::Base
       redirect_to "/denied"
     end
   end
-
-  def retrieve_questions(questionnaires)
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if !round.nil?
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             else
-                               questionnaire.symbol
-                             end
-      @questions[questionnaire_symbol] = questionnaire.questions
-    end
-  end
 end

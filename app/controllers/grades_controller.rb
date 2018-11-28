@@ -5,6 +5,7 @@ class GradesController < ApplicationController
   include PenaltyHelper
   include StudentTaskHelper
   include AssignmentHelper
+  include GradesHelper
 
   def action_allowed?
     case params[:action]
@@ -37,12 +38,12 @@ class GradesController < ApplicationController
   # in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
-    @questions = {}
     questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?
-      retrieve_questions questionnaires
+      @questions = retrieve_questions questionnaires,@assignment.id
     else # if this assignment does not have "varying rubric by rounds" feature
+      @questions = {}
       questionnaires.each do |questionnaire|
         @questions[questionnaire.symbol] = questionnaire.questions
       end
@@ -62,9 +63,8 @@ class GradesController < ApplicationController
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
     @assignment = @participant.assignment
-    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
-    retrieve_questions questionnaires
+    @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
@@ -85,9 +85,8 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    @questions = {}
     questionnaires = @assignment.questionnaires
-    retrieve_questions questionnaires
+    @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
     @vmlist = []
 

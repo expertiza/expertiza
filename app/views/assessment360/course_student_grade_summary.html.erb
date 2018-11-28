@@ -52,7 +52,7 @@
       <tr>
           <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <% @assignments.each do |assignment|%>
-              <% topic = format_topic(@topic_id[cp.id][assignment.id], @topic_name[cp.id][assignment.id]) %>
+              <% topic = format_topic(@topics[cp.id][assignment.id]) %>
               <td title="<%= topic %>" class="topic topic-tooltip">
                 <%= topic %>
               </td>

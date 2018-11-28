@@ -50,12 +50,8 @@ describe Assessment360Controller do
         expect(assigns(:course_participants)).to include CourseParticipant.first
       end
 
-      it 'makes assignment\'s topic id not empty' do
-        expect(assigns(:topic_id)).to_not be_empty
-      end
-
-      it 'makes assignment\'s topic name not empty' do
-        expect(assigns(:topic_name)).to_not be_empty
+      it 'makes assignment\'s topic not empty' do
+        expect(assigns(:topics)).to_not be_empty
       end
 
       it 'makes assignment grades not empty' do

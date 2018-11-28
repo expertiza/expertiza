@@ -132,7 +132,7 @@ $(window).load(function(){
             <% end %>
           </td>
           <td align = 'left'>
-            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: r.id) %>
+            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first) %>
           </td>
         <%end %>  
         </tr>

@@ -130,6 +130,9 @@ $(window).load(function(){
                 </table>
             <% end %>
           </td>
+          <td width="10%">
+            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: r.id) %>
+          </td>
         <%end %>  
         </tr>
       <%end %>

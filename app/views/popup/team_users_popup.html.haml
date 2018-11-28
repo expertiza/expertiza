@@ -1,4 +1,5 @@
 %span{:class => "hide",:id=>"sampleReviewHold",:data=>{"marked":instance_variable_get('@marked')}}
+%span{:class => "hide",:id=>"pageSizeHold"} #{@page_size}
 %div
   %div
     %h3{:class=>"col-md-9"} Members of #{@team.name}
@@ -86,6 +87,7 @@
           %li{:id=>"popup_list_template",:class=>"hide"}
             %input{:type=>"checkbox"}
             %span
+        %span{:class=>"popup_more"} More +
           
       %button{:class=>"col-md-6 submitter"}Submit
       %button{:class=>"col-md-6 closer"}Cancel

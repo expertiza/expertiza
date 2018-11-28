@@ -1,4 +1,6 @@
 class PopupController < ApplicationController
+  include ResponseConstants
+  include SimilarAssignmentsConstants
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -59,13 +61,13 @@ class PopupController < ApplicationController
         
         # write 0,1,2,3 as an enum in a separate class and use that here
         if response.visibility == nil
-          response.visibility = 0
+          response.visibility = _private
         end
         response_visibility = response.visibility
-        instance_variable_set('@sample_button_'+review_round,response_visibility != 0)
+        instance_variable_set('@sample_button_'+review_round,response_visibility != _private)
         mark_as_sample = " hide"
         remove_as_sample = " hide"
-        if response_visibility == 2
+        if response_visibility == approved_as_sample
           remove_as_sample = ""
         else
           mark_as_sample = ""
@@ -76,7 +78,8 @@ class PopupController < ApplicationController
       end
       instance_variable_set('@assignment_id',@assignment.id)
     end
-    instance_variable_set('@marked',2)
+    instance_variable_set('@marked',approved_as_sample)
+    @page_size = popup_page_size
   end
 
   def participants_popup

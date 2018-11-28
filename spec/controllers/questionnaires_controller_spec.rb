@@ -181,9 +181,9 @@ describe QuestionnairesController do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do
         allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6))
-        # session = {user: instructor}
+        session = {user: instructor}
         params = {id: 1}
-        get :edit, params
+        get :edit, params, session
         expect(response).to render_template(:edit)
       end
     end
@@ -191,9 +191,9 @@ describe QuestionnairesController do
     context 'when @questionnaire is nil' do
       it 'redirects to root page' do
         allow(Questionnaire).to receive(:find).with('666').and_return(nil)
-        # session = {user: instructor}
+        session = {user: instructor}
         params = {id: 666}
-        get :edit, params
+        get :edit, params, session
         expect(response).to redirect_to('/')
       end
     end

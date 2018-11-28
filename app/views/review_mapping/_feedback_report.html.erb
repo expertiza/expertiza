@@ -1,7 +1,7 @@
 <%= create_report_table_header("Rejoinder" => "16%",
                                "# author feedbacks done" => "14%",
-                               "Review response rejoined" => "20%",
-                               "Last rejoined at" => "20%") %>
+                               "Review responded to" => "20%",
+                               "Last responded at" => "20%") %>
     <%@l = -1 %>
 
     <% @authors.each do |r| %>
@@ -13,6 +13,7 @@
       <% end %>
 
       <% @first_col_identifier = true %>
+    <tr>
       <% if @assignment.varying_rubrics_by_round? %>
           <!--data prepare-->
           <% @count_round_one, @count_round_two, @count_round_three = 0, 0, 0 %>
@@ -34,7 +35,7 @@
         <% ['one', 'two', 'three'].each do |round| %>
           <% if @first_col_identifier == true %>
             <% @reviewer_name = r.user.fullname(session[:ip]) %>
-            <tr><td rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+            <td rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
             </td>
             <% @first_col_identifier = false %>
@@ -62,7 +63,7 @@
                 (<%= Participant.find(rr.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
@@ -75,7 +76,7 @@
                 <!--Last rejoined at-->
                 <td bgcolor=<%= @bgcolor %> align='left'>
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr>
+                </td>
               <% else %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
@@ -94,7 +95,7 @@
           <% @l = @l+1 %>
           <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
           <!--Rejoinder-->
-          <tr><td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+          <td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
             <% @reviewer_name = r.user.fullname(session[:ip]) %>
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
           </td>
@@ -116,7 +117,7 @@
                 (<%= reviewee_name = Participant.find(rr.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></>
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
@@ -129,7 +130,7 @@
                 <!--Last rejoined at-->
                 <td bgcolor=<%= @bgcolor %> align='left'>
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr>
+                </td>
               <% else %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
@@ -137,11 +138,52 @@
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
               <% end %>
             <% end %>
           <% end %>
       <% end %>
+    </tr>
     <% end %>
   </table>
 </div>
+
+
+<script>
+    $(function () {
+        /*Function for sorting the table */
+        $("table").tablesorter({
+            textSorter : {
+                1: function (a, b) {
+                    if (a === b) {
+                        return 0;
+                    }
+                    var res1 = a.split("/");
+                    var res2 = b.split("/");
+                    res1[1] = res1[1].split(" ")[0];
+                    res2[1] = res2[1].split(" ")[0];
+                    if(parseInt(res1[0])>parseInt(res2[0])){
+                        return 1;
+                    }
+                    else if(parseInt(res1[0])<parseInt(res2[0])){
+                        return -1;
+                    }
+                    else{
+                        if(parseInt(res1[1])>parseInt(res2[1])){
+                            return 1;
+                        }
+                        else if(parseInt(res1[1])<parseInt(res2[1])){
+                            return -1;
+                        }
+                        else{
+                            return 0;
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+
+</script>
+

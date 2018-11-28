@@ -25,7 +25,7 @@ $(window).load(function(){
     <tr>
   <!-- class value decides whether the column should be sortable or not  -->
       <th width = "16%" class="sorter-true">Reviewer <span></span></th>
-      <th width = "10%" class="sorter-false">Reviews done<span></span></th>
+      <th width = "10%" class="sorter-true">Reviews done<span></span></th>
       <!--Dr.Kidd's course
       <% if @assignment.instructor_id == 2026 %>
         <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
@@ -33,7 +33,7 @@ $(window).load(function(){
       <% else %>-->
         <th width = "24%" class="sorter-false">Team reviewed <span></span></th>
       <!--<% end %>-->
-      <th width = "13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
+      <th width = "13%" class="sorter-true">Score awarded / Avg. score <span></span></th>
       <th width = "13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
@@ -145,6 +145,61 @@ $(function () {
   /*Function for sorting the table */
 		 $("#myTable").tablesorter({
 		sortList: [[0,0]], //sort First Column by default when page loads
+         textSorter : {
+             1: function (a, b) {
+                 if (a === b) {
+                     return 0;
+                 }
+                 var res1 = a.split("/");
+                 var res2 = b.split("/");
+                 res1[1] = res1[1].split(" ")[0];
+                 res2[1] = res2[1].split(" ")[0];
+                 if(parseInt(res1[0])>parseInt(res2[0])){
+                     return 1;
+                 }
+                 else if(parseInt(res1[0])<parseInt(res2[0])){
+                     return -1;
+                 }
+                 else{
+                     if(parseInt(res1[1])>parseInt(res2[1])){
+                         return 1;
+                     }
+                     else if(parseInt(res1[1])<parseInt(res2[1])){
+                         return -1;
+                     }
+                     else{
+                         return 0;
+                     }
+                 }
+             },
+             3: function (a, b) {
+                 if (a === b) {
+                     return 0;
+                 }
+                 var res1 = a.split("/");
+                 var res2 = b.split("/");
+                 res1[1] = res1[1].split("%")[0].replace(/\s/g, '');
+                 res2[1] = res2[1].split("%")[0].replace(/\s/g, '');
+
+                 if(parseInt(res1[0].slice(0, -1))>parseInt(res2[0].slice(0, -1))){
+                     return 1;
+                 }
+                 else if(parseInt(res1[0].slice(0, -1))<parseInt(res2[0].slice(0, -1))){
+                     return -1;
+                 }
+                 else{
+                     if(parseInt(res1[1])>parseInt(res2[1])){
+                         return 1;
+                     }
+                     else if(parseInt(res1[1])<parseInt(res2[1])){
+                         return -1;
+                     }
+                     else{
+                         return 0;
+                     }
+                 }
+             }
+         },
 		headers: {
      		   4: {
       			  sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser

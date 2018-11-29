@@ -1,0 +1,21 @@
+<% if !@qa_table.empty? %>
+<h2>Sample Review for <%=@course_assignment_name%></h2>
+	<table class="table">
+		<thead style="border:solid medium;">
+			<tr>
+				<th scope="col">Question</th>
+				<th scope="col">Answer</th>
+			</tr>
+		</thead>
+		<tbody style="border:solid medium;">
+			<%@qa_table.each do |row| %>
+				<tr>
+				<td><%=row[:question]%></th>
+				<td><%=row[:answer]%></td>
+				</tr>
+			<%end%>
+		</tbody>
+	</table>
+<%else%>
+	<h2>No data Available for <%=@course_assignment_name%></h2>
+<%end%>

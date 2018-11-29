@@ -1,6 +1,27 @@
 class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
+  #for modifying the checkbox in data base
+  #params.require(:staff).permit(:is_public)
+
+  #debug
+  def sample_review
+    render(
+      html: "<script>alert('No users!')</script>".html_safe,
+      layout: 'application')
+    end
+
+    #debug
+    def checkbox_form 
+      @response = Response.find(params[:id])
+      if params[:response]
+      render(
+        html: "<script>alert('No users!')</script>".html_safe,
+        layout: 'application')
+    
+      end
+      
+    end 
 
   def action_allowed?
     response = user_id = nil
@@ -79,7 +100,9 @@ class ResponseController < ApplicationController
   end
 
   # Update the response and answers when student "edit" existing response
-  def update
+  def update 
+
+
     render :nothing => true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
@@ -142,8 +165,9 @@ class ResponseController < ApplicationController
 
   # view response
   def view
-    @response = Response.find(params[:id])
+    @response = Response.find(params[:id])  
     @map = @response.map
+
     set_content
   end
 
@@ -226,7 +250,7 @@ class ResponseController < ApplicationController
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
-  end
+  end 
 
   def show_calibration_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])

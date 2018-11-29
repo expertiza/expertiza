@@ -14,18 +14,7 @@
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
 <% end %>
 
-<% form_for @response  do |f| %>
-    <%= f.check_box :is_public %>
-  <% end %>
 
-  
-  <%=check_box(:response, :is_public, {checked: true} )%> I agree to allow my review to be public 
-
-
-
-<% if (@response.is_public) %>
-<%=  "helloooooo"%>
-<%end%>
 
 <% @review_versions = @map.get_all_versions() %> 
 <% if !@review_versions.empty? %>

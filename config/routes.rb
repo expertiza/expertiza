@@ -252,6 +252,13 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :reports, only: [] do
+    collection do
+      post :response_report
+      get :response_report
+    end
+  end
+
   resources :reputation_web_service, only: [] do
     collection do
       get :client
@@ -288,8 +295,8 @@ resources :institution, except: [:destroy] do
       get :delete_reviewer
       get :distribution
       get :list_mappings
-      post :response_report
-      get :response_report
+      # post :response_report
+      # get :response_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping

@@ -11,8 +11,17 @@ class ResponseController < ApplicationController
       layout: 'application')
     end
 
-  
-
+    #debug
+    def checkbox_form 
+      @response = Response.find(params[:id])
+      if params[:response]
+      render(
+        html: "<script>alert('No users!')</script>".html_safe,
+        layout: 'application')
+    
+      
+      
+    end 
 
   def action_allowed?
     response = user_id = nil
@@ -91,7 +100,9 @@ class ResponseController < ApplicationController
   end
 
   # Update the response and answers when student "edit" existing response
-  def update
+  def update 
+
+
     render :nothing => true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
@@ -152,14 +163,11 @@ class ResponseController < ApplicationController
     end
   end
 
-
-  
   # view response
   def view
-
-    @response = Response.find(params[:id])
-    
+    @response = Response.find(params[:id])  
     @map = @response.map
+
     set_content
   end
 

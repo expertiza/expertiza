@@ -14,6 +14,7 @@
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
 <% end %>
 
+<%=render :partial=>"checkbox_form"%>
 
 
 <% @review_versions = @map.get_all_versions() %> 

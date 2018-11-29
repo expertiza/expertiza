@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181125002057) do
+ActiveRecord::Schema.define(version: 20181125075001) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -482,6 +482,7 @@ ActiveRecord::Schema.define(version: 20181125002057) do
     t.integer  "round",              limit: 4
     t.boolean  "is_submitted",                     default: false
     t.boolean  "is_public"
+    t.integer  "visibility",         limit: 4
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
@@ -595,6 +596,16 @@ ActiveRecord::Schema.define(version: 20181125002057) do
   end
 
   add_index "signed_up_teams", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
+
+  create_table "similar_assignments", force: :cascade do |t|
+    t.integer  "is_similar_for",     limit: 4
+    t.string   "association_intent", limit: 255
+    t.integer  "assignment_id",      limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "similar_assignments", ["assignment_id"], name: "index_similar_assignments_on_assignment_id", using: :btree
 
   create_table "site_controllers", force: :cascade do |t|
     t.string  "name",          limit: 255, default: "", null: false
@@ -808,6 +819,7 @@ ActiveRecord::Schema.define(version: 20181125002057) do
   add_foreign_key "review_grades", "participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
+  add_foreign_key "similar_assignments", "assignments"
   add_foreign_key "survey_deployments", "questionnaires"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"
   add_foreign_key "ta_mappings", "users", column: "ta_id", name: "fk_ta_mappings_ta_id"

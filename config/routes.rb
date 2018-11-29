@@ -266,6 +266,7 @@ resources :institution, except: [:destroy] do
     collection do
       post :sample_review
      # get :sample_review #debug
+      post :checkbox_form 
       get :new_feedback
       get :view
       get :remove_hyperlink

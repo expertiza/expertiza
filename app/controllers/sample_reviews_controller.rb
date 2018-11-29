@@ -5,9 +5,13 @@ class SampleReviewsController < ApplicationController
 
 	def update_visibility
 		begin
-			visibility = params[:visibility].to_i #response object consists of visibility in string format
+			visibility = params[:visibility] #response object consists of visibility in string format
+			if(visibility.nil?)
+				raise StandardError.new("Missing parameter 'visibility'")
+			end
+			visibility = visibility.to_i
 			if not (_private..rejected_as_sample).include? visibility
-				raise StandardError.new('Invalid visibility')
+				raise StandardError.new("Invalid value for parameter 'visibility'")
 			end
 			@@response_id = params[:id]
 			response_map_id = Response.find(@@response_id).map_id
@@ -23,7 +27,7 @@ class SampleReviewsController < ApplicationController
 				# and that visiblity is 0 or 1 and nothing else.
 				# if anything fails, return failure
 				if visibility > in_review
-					render json:{"success" => false, "error"=>"Invalid visibility"}
+					render json:{"success" => false, "error"=>"Invalid value for parameter 'visibility'"}
 					return
 				end
 				reviewer_user_id = AssignmentParticipant.find(response_map.reviewer_id).user_id
@@ -37,8 +41,8 @@ class SampleReviewsController < ApplicationController
 			end
 			Response.update(@@response_id.to_i, :visibility => visibility)
 			update_similar_assignment(assignment_id, visibility)
-		rescue StandardError
-			render json:{"success" => false,"error" => "Something went wrong"}
+		rescue StandardError => e
+			render json:{"success" => false,"error" => e.message}
 		else
 			render json:{"success" => true}
 		end

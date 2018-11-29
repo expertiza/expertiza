@@ -310,56 +310,12 @@
 })();
 
 /*
-In /sample_reviews/mark_unmark/:id
-
-params[:id] is responseId
-params[:visiblility] is the updated
-
-fetch Course from response id (Response -> responseMap -> Assignment -> Course)
-check if current_user has access to Course
-if no access: return json { "success":false, "error":"Unauthorized" }
-if access, update (DB) Response.visiblity to param value, and insert 1 row (self-loop) to similar_assignments
-
-if DB operations fail, return json {"success":false, "error":"Something went wrong"}
-fetch similar assignments SA to this assignment from similar_assignments (in response, these must have checked = true)
-fetch all assignments (except this U SA) by course, in order of most recently created assignment first (in response, these must have checked = false)
-return json {"success":true, "similarAssignmentsMap":
-[{29:{title:"assignment title","checked":true},{90:{title:"tTitle 2","checked":false}}]
-
-
-
-
-POST request to similar_assignments/create/772
-id is assignment_id X
-params[:intent] = "review",
-params[:similar] = {
-	"unchecked":[90,20], // read these and delete from similar_assignments
-	"checked":[11,12]	// read these and insert into similar assignments (if not present!!)
-}
-params[:similar] will send those rows that the user has changed
-
-params[:similar] = {"checked":[350,80,290],"unchecked":[20,340,10]}
-
-response: json as {"success":true/false, "error":"Something went wrong"}
-or {"succes":true}
-
-in method:
-fetch course from param assignment id and check if current_user has access to Course
-if no access: return json { "success":false, "error":"Unauthorized" }
-if access, db deletes and inserts (to similar_assignments)
-if db updates fail, return json {"success":false, "error":"Something went wrong"}
-if succeed: return json {"succes":true}
-
-*/
-
-/*
 Todos: 
 Popup opener button only if there's at least one sample review for this assignment
 	- Query and set a flag for this
 	- use the flag to write if flag then HTML1 else HTML2 (the older way)
 Move Consent checkbox into form and check why not submitting
 Pagination for sample reviews view
-Pagination for assignment popup list
 in sample_reviews controller, update_visibility: allow for student (right now it returns unauth)
 	- validate param visiblity as 0 or 1 ONLY
 	- match response reviewer id with current user id

@@ -1,13 +1,18 @@
 %span{:class => "hide",:id=>"sampleReviewHold",:data=>{"marked":instance_variable_get('@marked')}}
 %span{:class => "hide",:id=>"pageSizeHold"} #{@page_size}
 %div
-  %div
-    %h3{:class=>"col-md-9"} Members of #{@team.name}
-    %div{:class=>"col-md-3 link-assignments-head"}
-      %h5{:id=>"link_assignments"}Use as Samples for More Assignments
-      %span{:id=>"link_assignments_error", :class=>"hide"}
-      %span{:id=>"link_assignments_success" ,:class=>"hide"}
-    %br
+  - if instance_variable_get("@popup_show")
+    %div
+      %h3{:class=>"col-md-9"} Members of #{@team.name}
+      %div{:class=>"col-md-3 link-assignments-head"}
+        %h5{:id=>"link_assignments"}Use as Samples for More Assignments
+        %span{:id=>"link_assignments_error", :class=>"hide"}
+        %span{:id=>"link_assignments_success" ,:class=>"hide"}
+      %br
+  - else
+    %h3 Members of #{@team.name}
+  
+  
   %table{:width => "100%"}
     - if @team_users.empty?
       %tr No team members

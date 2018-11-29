@@ -3,8 +3,11 @@ class SampleReviewsController < ApplicationController
 	
 	include ResponseConstants
 	include SimilarAssignmentsConstants
-
+	include SimilarAssignmentsHelper
+	include SampleReviewsHelper
+	
 	def show
+		redirect_anonymous_user
 		response_id = params[:id]
 		q_and_a_data = Answer.joins("INNER JOIN questions ON question_id = questions.id WHERE answers.response_id=#{response_id.to_s}")
 		
@@ -28,17 +31,31 @@ class SampleReviewsController < ApplicationController
 	end
 
 	def index
-		assignment_participant_id = params[:id]
-		assignment_id = AssignmentParticipant.find(assignment_participant_id).parent_id
-		similar_assignment_ids = SimilarAssignment.where(:assignment_id => assignment_id).pluck(:is_similar_for)
+		redirect_anonymous_user
+		@assignment_id = params[:id].to_i
+		page_number = params[:page].to_i
+		if page_number.nil?
+			page_number = 0
+		end
+		@page_size = 8
+		similar_assignment_ids = get_similar_assignment_ids(@assignment_id)
 		@response_ids = []
 		similar_assignment_ids.each do |id|
-			ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+id.to_s ).ids
+			_offset = page_number * @page_size
+			puts "querying : "
+			puts "INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+id.to_s+
+			" ORDER BY responses.created_at DESC LIMIT "+@page_size.to_s+" OFFSET "+_offset.to_s
+
+			ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+id.to_s+
+			" ORDER BY responses.created_at LIMIT "+@page_size.to_s+" OFFSET "+_offset.to_s ).ids
 			@response_ids += ids
 		end
 		@links = generate_links(@response_ids)
-
-		@course_assignment_name = get_course_assignment_name(assignment_id)
+		if page_number == 0
+			@course_assignment_name = get_course_assignment_name(@assignment_id)
+		else
+			render json: {"success" => true, "sampleReviews" => @links}
+		end
 	end
 
 	def update_visibility
@@ -55,6 +72,13 @@ class SampleReviewsController < ApplicationController
 			response_map_id = Response.find(@@response_id).map_id
 			response_map = ResponseMap.find(response_map_id)
 			assignment_id = response_map.reviewed_object_id
+			is_admin = [Role.administrator.id,Role.superadministrator.id].include? current_user.role.id
+			if is_admin
+				Response.update(@@response_id.to_i, :visibility => visibility)
+				update_similar_assignment(assignment_id, visibility)
+				render json:{"success" => true}
+				return
+			end
 			course_id = Assignment.find(assignment_id).course_id
 			instructor_id = Course.find(course_id).instructor_id
 			ta_ids = []
@@ -65,7 +89,7 @@ class SampleReviewsController < ApplicationController
 				# and that visiblity is 0 or 1 and nothing else.
 				# if anything fails, return failure
 				if visibility > in_review
-					render json:{"success" => false, "error"=>"Invalid value for parameter 'visibility'"}
+					render json:{"success" => false, "error"=>"Not allowed"}
 					return
 				end
 				reviewer_user_id = AssignmentParticipant.find(response_map.reviewer_id).user_id

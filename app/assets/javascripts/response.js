@@ -8,9 +8,8 @@
 		jQuery(document).on("ready",function(){
 			var markedAsSample = jQuery("#sampleReviewHold").attr("data-marked");
 			jQuery("#sampleReviewHold").remove();
-			console.log(jQuery("#pageSizeHold").html());
 			var pageSize = parseInt(jQuery("#pageSizeHold").html());
-			//jQuery("#pageSizeHold").remove();
+			jQuery("#pageSizeHold").remove();
 			var assignmentId = jQuery("#similar_assignments_popup").attr("data-assignment-id");
 			var buttons = jQuery(".mark-delete-sample").find("div").find("button");
 
@@ -132,14 +131,7 @@
 					});
 				},
 				onFetchSuccess:function(assignmentsMap){
-					debugger;
-					// merge with existing data rather than replace!!!
 					AssignmentsPopup.assignmentsMap = AssignmentsPopup.assignmentsMap.concat(assignmentsMap);
-					if(AssignmentsPopup.currentPageNumber == 0){
-						
-					}else{
-						// append
-					}
 					AssignmentsPopup.hideSuccess();
 					AssignmentsPopup.hideError();
 					AssignmentsPopup.open(assignmentsMap);
@@ -311,13 +303,26 @@
 
 /*
 Todos: 
-Popup opener button only if there's at least one sample review for this assignment
-	- Query and set a flag for this
-	- use the flag to write if flag then HTML1 else HTML2 (the older way)
 Move Consent checkbox into form and check why not submitting
-Pagination for sample reviews view
-in sample_reviews controller, update_visibility: allow for student (right now it returns unauth)
-	- validate param visiblity as 0 or 1 ONLY
-	- match response reviewer id with current user id
-	- handle case where no visibility
+TESTS!!
+DOCUMENT!
+More migrates for default 0 and null false
+TA:
+
+After submitting review, should we allow to edit consent??
+	- If not, can we improve the language in submit warning to talk about consent?
+
+For instructor to view samples, point of entry = assignment all options icons +1 more
+
+URLs redirect to home page if not logged in: Reqd???
+
+View all samples: http://localhost:3000/sample_reviews/index/30791
+   -Should we disallow access for unrelated user?? (other instructor and non-TA)
+
+Admin Todos ?? all courses, all assignments - similar_assignments_helper????
+
+inform as "null" course name in some cases
+
+Page sizes how much? Popup, similar reviews show page
+
 */

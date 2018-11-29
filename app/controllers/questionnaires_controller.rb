@@ -8,14 +8,7 @@ class QuestionnairesController < ApplicationController
 
   def action_allowed?
     if action_name == "edit"
-      @questionnaire = Questionnaire.find(params[:id])
-      if @questionnaire.submission_record.nil?
-        (['Super-Administrator',
-          'Administrator'].include? current_role_name) ||
-            ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
-      else
-        !AssignmentTeam.find(@questionnaire.submission_record.team_id).participants.find {|p| p.user_id == current_user.id }.nil?
-      end
+      edit_action_allowed?
     else
       ['Super-Administrator',
        'Administrator',
@@ -514,6 +507,32 @@ class QuestionnairesController < ApplicationController
   def question_params
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
                                      :alternatives, :break_before, :max_label, :min_label)
+  end
+
+  # action_allowed? helper methods
+  # determines if "edit" action is allowed
+  def edit_action_allowed?
+    @questionnaire = Questionnaire.find(params[:id])
+    if @questionnaire.submission_record.nil?
+      is_admin? || instructor_for_questionnaire?(@questionnaire)
+    else
+      questionnaire_by_user?(@questionnire)
+    end
+  end
+
+  # check if the current_role_name is of an admin
+  def admin?
+    ['Super-Administrator', 'Administrator'].include? current_role_name
+  end
+
+  # check if the the current_user is an Instructor for the given questionnaire
+  def instructor_for_questionnaire?(questionnaire)
+    current_role_name == 'Instructor' && current_user_id?(questionnaire.try(:instructor_id))
+  end
+
+  # checks if the provided questionnaire is created by the current user
+  def questionnaire_by_user?(questionnaire)
+    AssignmentTeam.find(questionnaire.submission_record.team_id).participants.any? {|p| p.user_id == current_user.id }
   end
 
   # FIXME: These private methods belong in the Questionnaire model

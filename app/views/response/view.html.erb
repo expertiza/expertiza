@@ -1,14 +1,23 @@
+  
+
+  <%=button_to "view sample reviews", action: "sample_review"%>
+
+
+  
   <% if @map.survey? %>
     <h1><%= @title %> for <%= @survey_parent.name %></h1>
 <% else %>
     <h1><%= @title %> for <%= @assignment.name %></h1>
-<% end %>
-
+<% end %>  
 <% if !(@map.instance_of? TeammateReviewResponseMap) && !@map.survey? %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
 <% end %>
-<% @review_versions = @map.get_all_versions() %>
+
+<%=render :partial=>"checkbox_form"%>
+
+
+<% @review_versions = @map.get_all_versions() %> 
 <% if !@review_versions.empty? %>
     <%= @review_versions.each do |response| %>
     	<%= response.display_as_html() %>
@@ -39,3 +48,5 @@
 <%= @map.show_feedback(@response) %>
 <br/>
 <a href="javascript:window.history.back()">Back</a>
+
+

@@ -2,156 +2,152 @@
   <head>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-    google.charts.load('current', {packages: ['corechart', 'bar']});
-google.charts.setOnLoadCallback(drawBasic);
+      google.charts.load('current', {packages: ['corechart', 'bar']});
+      google.charts.setOnLoadCallback(drawBasic);
 
-var chart;
-var chartOptions;
+      var chart;
+      var chartOptions;
 
-var chartData = [];
-var currentRound = 0;
-var criteriaSelected = [];
+      var chartData = [];					//Stores all data for the chart to display
+      var currentRound = 0;				//Stores the current displayed round
+      var criteriaSelected = [];	//Stores selected criteria to display
 
-function generateData() {
-	var rounds = 3;
+      function generateData() {	//Generates random data for testing
+        var rounds = 3;
 
-	for(var i = 0; i < rounds; i++) {
-    var criteriaNum = Math.floor(Math.random() * 5 + 5);
-  	
-		var round = [];
-    var criteria = [];
-    for(var j = 0; j < criteriaNum; j++) {
-    	round.push(Math.floor(Math.random() * 101));
-      criteria.push(true);
-    }
- 		chartData.push(round);
-    criteriaSelected.push(criteria);
-  }
-}
+        for(var i = 0; i < rounds; i++) {
+          var criteriaNum = Math.floor(Math.random() * 5 + 5);
 
-function drawBasic() {
-	generateData();
-  
-  chartOptions = {		//Render options for the chart
-  	title: 'Average Scores',
-    titleTextStyle: {
-      fontName: 'arial',	//Fonts to be changed to Helvetica when implemented
-      fontSize: 18,
-      italic: false,
-      bold: true
-    },
-    legend: 'none',
-    bar: {
-    	groupWidth: 'default'
-    },
-    hAxis: {
-    	title: 'Criterion',
-      titleTextStyle: {
-      	fontName: 'arial',
-        fontSize: 14,
-      	italic: false,
-        bold: false
-      },
-      viewWindow: {
-      	min: 0,
-     		max: 10
+          var round = [];
+          var criteria = [];
+          for(var j = 0; j < criteriaNum; j++) {
+            round.push(Math.floor(Math.random() * 101));
+            criteria.push(true);
+          }
+          chartData.push(round);
+          criteriaSelected.push(criteria);
+        }
       }
-    },
-    vAxis: {
-    	title: 'Average Score',
-      titleTextStyle: {
-      	fontName: 'arial',
-        fontSize: 14,
-      	italic: false,
-        bold: false
-      },
-      viewWindow: {
-      	min: 0,
-        max: 100
+
+      function drawBasic() {	//Initializes all google chart information
+        generateData();
+
+        chartOptions = {		//Render options for the chart
+          title: 'Average Scores',
+          titleTextStyle: {
+            fontName: 'arial',	//Fonts to be changed to Helvetica when implemented
+            fontSize: 18,
+            italic: false,
+            bold: true
+          },
+          legend: 'none',
+          bar: {
+            groupWidth: 'default'
+          },
+          hAxis: {
+            title: 'Criterion',
+            titleTextStyle: {
+              fontName: 'arial',
+              fontSize: 14,
+              italic: false,
+              bold: false,
+            },
+            viewWindow: {
+              min: 0.5
+            }
+          },
+          vAxis: {
+            title: 'Average Score',
+            titleTextStyle: {
+              fontName: 'arial',
+              fontSize: 14,
+              italic: false,
+              bold: false
+            },
+            viewWindow: {
+              min: 0,
+              max: 100
+            }
+          }
+        };
+
+        chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        updateChart(currentRound);
+        loadRounds();
       }
-    }
-  };
-  
-  chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-  updateChart(currentRound);
-	loadOptions();
-}
 
-function updateChart(roundNum) {
-  currentRound = roundNum;
-  renderChart();
-  loadCriteria();
-}
+      function updateChart(roundNum) {	//Updates the chart with a new round number
+        currentRound = roundNum;
+        renderChart();
+        loadCriteria();
+      }
 
-function renderChart() {
-	var data = loadData();
-  chart.draw(data, chartOptions);
-}
+      function renderChart() {	//Renders the chart if changes have been made
+        var data = loadData();
+        chart.draw(data, chartOptions);
+      }
 
 
-function loadData() {
-	var data = new google.visualization.DataTable();
-  data.addColumn('number', 'Criterion');
-	data.addColumn('number', 'Average Score');
-  data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
+      function loadData() {	//Pulls data from the page and renders the chart with it
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Criterion');
+        data.addColumn('number', 'Average Score');
+        data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
+        data.addColumn({type: 'number', role: 'annotation'});
 
-  for(var i = 0; i < chartData[currentRound].length; i++) {
-  	if (criteriaSelected[currentRound][i])
-  		data.addRow([i+1, chartData[currentRound][i], '#a90201']);
-  }
-  
-  return data;
-	
-}
+        var rowCount = 1;
+        for(var i = 0; i < chartData[currentRound].length; i++) {
+          if (criteriaSelected[currentRound][i]) {
+            data.addRow([rowCount++, chartData[currentRound][i], '#a90201', i+1]);
+          }
+        }
 
-function loadOptions() {
-	var rounds = document.getElementById("chartRounds");
-  for(var i = 0; i < chartData.length; i++) {
-  	var option = document.createElement('option');
-  	option.value = i;
-    option.text = "Round " + (i+1);
-    rounds.add(option);
-  }
-  rounds.style.display = "inline";
-}
-function loadCriteria() {
-	var form = document.getElementById("chartCriteria");
-  while (form.firstChild)
-    form.removeChild(form.firstChild);
-    
-  for(let i = 0; i < chartData[currentRound].length; i++) {
- 		var checkbox = document.createElement('input');
-    checkbox.type = "checkbox";
-    checkbox.name = "name";
-    checkbox.value = "value";
-    checkbox.id = "checkboxoption" + i;
-    checkbox.onclick = function() {
-    	checkboxUpdate(i);
-    }
+        return data;
 
-    var label = document.createElement('label')
-    label.htmlFor = "id";
-    label.appendChild(document.createTextNode(i+1));
-    label.appendChild(document.createElement("BR"));
+      }
 
-    form.appendChild(checkbox);
-    form.appendChild(label);
-    checkbox.checked = criteriaSelected[currentRound][i];
-  }
-}
+      function loadRounds() {	//Creates the Rounds in the dropdown menu
+        var rounds = document.getElementById("chartRounds");
+        for(var i = 0; i < chartData.length; i++) {
+          var option = document.createElement('option');
+          option.value = i;
+          option.text = "Round " + (i+1);
+          rounds.add(option);
+        }
+        rounds.style.display = "inline";
+      }
+      function loadCriteria() {	//Creates the criteria check boxes
+        var form = document.getElementById("chartCriteria");
+        while (form.firstChild)
+          form.removeChild(form.firstChild);
 
-function funtFactory(id) {
-	return function() {
-  	checkboxUpdate(id);
-  }
-}
+        chartData[currentRound].forEach(function(dat, i) {
+          var checkbox = document.createElement('input');
+          checkbox.type = "checkbox";
+          checkbox.name = "name";
+          checkbox.value = "value";
+          checkbox.id = "checkboxoption" + i;
+          checkbox.onclick = function() {
+            checkboxUpdate(i);
+          }
 
-function checkboxUpdate(checkid) {
-	var check = document.getElementById("checkboxoption" + checkid);
-  criteriaSelected[currentRound][checkid] = check.checked;
-  renderChart();
-}
-</script>
+          var label = document.createElement('label')
+          label.htmlFor = checkbox.id;
+          label.appendChild(document.createTextNode("Criteria " + (i+1)));
+
+          form.appendChild(checkbox);
+          form.appendChild(label);
+          form.appendChild(document.createElement("BR"));
+          checkbox.checked = criteriaSelected[currentRound][i];
+        });
+      }
+
+      function checkboxUpdate(checkid) {	//Update function to change the displayed criteria
+        var check = document.getElementById("checkboxoption" + checkid);
+        criteriaSelected[currentRound][checkid] = check.checked;
+        renderChart();
+      }
+    </script>
 </head>
 
 <body>
@@ -162,8 +158,8 @@ function checkboxUpdate(checkid) {
 <select id="chartRounds" name="rounds" onChange="updateChart(document.chartOptions.chartRounds.options[document.chartOptions.chartRounds.options.selectedIndex].value)" style = "display: none">
 </select>
 </form>
-<form id="chartCriteria" name="chartCriteria">
-</form>
+<div id="chartCriteria" name="chartCriteria">
+</div>
 </body>
 
 </html>

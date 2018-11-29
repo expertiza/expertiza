@@ -63,6 +63,8 @@
                         <td>
                           <% if (!@latest_response.is_submitted) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+                          <%else%>
+                              <%= link_to "Update", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
                           <%end%>
                         </td>
                       <% else %>

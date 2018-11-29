@@ -19,7 +19,7 @@ class ResponseController < ApplicationController
         html: "<script>alert('No users!')</script>".html_safe,
         layout: 'application')
     
-      
+      end
       
     end 
 

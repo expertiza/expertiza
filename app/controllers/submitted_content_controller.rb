@@ -20,7 +20,15 @@ class SubmittedContentController < ApplicationController
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    @stage = @assignment.get_current_stage(topic_id)
+    # Find the round of the current assignment
+    @round = @assignment.number_of_current_round(topic_id)
+    @record = SubmissionRecord.find_by(team_id: @participant.team.id,
+                                       user: @participant.name,
+                                       assignment_id: @participant.assignment.id,
+                                       operation: "Revision Review")
+    @questionnaire = Questionnaire.find_by(submission_record_id: @record.id, type: "RevisionReviewQuestionnaire") unless @record.nil?
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false
@@ -153,6 +161,17 @@ class SubmittedContentController < ApplicationController
     rescue StandardError => e
       flash[:error] = e.message
     end
+  end
+
+  def begin_planning
+    participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(participant.user_id)
+    record = SubmissionRecord.create(team_id: participant.team.id,
+                                     user: participant.name,
+                                     assignment_id: participant.assignment.id,
+                                     content: "Revision Review Questionnaire",
+                                     operation: "Revision Review")
+    redirect_to new_questionnaire_path(model: "RevisionReviewQuestionnaire", private: 0, submission_record_id: record.id)
   end
 
   private

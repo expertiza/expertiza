@@ -5,22 +5,25 @@ class QuestionnairesController < ApplicationController
   # Generally a questionnaire is associated with an assignment (Assignment)
 
   before_action :authorize
-  
+
   def action_allowed?
     if action_name == "edit"
       @questionnaire = Questionnaire.find(params[:id])
-      (['Super-Administrator',
-       'Administrator'
-       ].include? current_role_name)  ||
-          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
-
+      if @questionnaire.submission_record.nil?
+        (['Super-Administrator',
+          'Administrator'].include? current_role_name) ||
+            ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
+      else
+        !AssignmentTeam.find(@questionnaire.submission_record.team_id).participants.find {|p| p.user_id == current_user.id }.nil?
+      end
     else
-        ['Super-Administrator',
-         'Administrator',
-         'Instructor',
-         'Teaching Assistant', 'Student'].include? current_role_name
-   end
- end
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant',
+       'Student'].include? current_role_name
+    end
+  end
 
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
@@ -67,6 +70,8 @@ class QuestionnairesController < ApplicationController
       end
       @questionnaire.display_type = display_type
       @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+      # save submission record id
+      @questionnaire.submission_record_id = params[:questionnaire][:submission_record_id]
       @questionnaire.save
       # Create node
       tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
@@ -503,7 +508,7 @@ class QuestionnairesController < ApplicationController
 
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
-                                          :max_question_score, :type, :display_type, :instruction_loc)
+                                          :max_question_score, :type, :display_type, :instruction_loc, :submission_record_id)
   end
 
   def question_params

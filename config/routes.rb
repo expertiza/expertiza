@@ -245,6 +245,7 @@ resources :institution, except: [:destroy] do
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_survey_questionnaires, controller: :questionnaires
   resources :bookmarkrating_questionnaires, controller: :questionnaires
+  resources :revision_review_questionnaires, controller: :questionnaires
 
   resources :questions do
     collection do
@@ -386,6 +387,8 @@ resources :institution, except: [:destroy] do
       post :submit_hyperlink
       get :submit_hyperlink
       get :view
+      # Revision Planning
+      post :begin_planning
     end
   end
 

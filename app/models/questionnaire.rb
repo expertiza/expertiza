@@ -6,6 +6,7 @@ class Questionnaire < ActiveRecord::Base
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :assignments, through: :assignment_questionnaires
   has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy
+  belongs_to :submission_record
 
   validate :validate_questionnaire
   validates :name, presence: true
@@ -28,7 +29,8 @@ class Questionnaire < ActiveRecord::Base
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
                          'BookmarkratingQuestionnaire',
-                         'QuizQuestionnaire'].freeze
+                         'QuizQuestionnaire',
+                         'RevisionReviewQuestionnaire'].freeze
   # zhewei: for some historical reasons, some question types have white space, others are not
   # need fix them in the future.
   has_paper_trail

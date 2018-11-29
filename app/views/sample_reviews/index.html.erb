@@ -1,0 +1,10 @@
+<%if !@links.empty? %>
+	<h2>Below are the Sample Reviews for <%= @course_assignment_name %></h2>
+	<ul class="list-group">
+		<%@links.each_with_index do |link, index|%>
+	  		<li class="list-group-item"><%=link_to("Sample Review " + (index+1).to_s, link)%></li>
+	  	<%end%>
+	</ul>
+<%else%>
+	<h3>There are no sample reviews available for this assignment</h3>
+<%end%>

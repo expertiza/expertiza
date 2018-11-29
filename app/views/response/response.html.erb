@@ -276,6 +276,25 @@
       });
     });
 
+    $(".review_form").on("submit",function(e){
+      var _d = $(this);
+      var visibility = $("#sample_cbx").is(":checked")?1:0;
+      $.ajax({
+        "url":"/sample_reviews/mark_unmark/"+location.search.split("=")[1],
+        "type":"POST",
+        "data":{
+          "visibility":visibility
+        },
+        "dataType":"json",
+        "responseType":"json",
+        "success":function(result){
+          if(result.success){
+            alert("updated!");
+          }
+        }
+      });
+    });
+
   });
 </script>
 
@@ -340,9 +359,9 @@
         <input name="_method" type="hidden" value="put" />
     <%end%>
     <% if (@response.visibility == 0) %>
-        <input type="checkbox" id="sample_cbx" name="review[visibility]" unchecked>
+        <input type="checkbox" id="sample_cbx" value="0">
     <% else %>
-        <input type="checkbox" id="sample_cbx" name="review[visibility]" checked>
+        <input type="checkbox" id="sample_cbx" value="1" checked="checked">
     <% end %>
     <label id="sample_cbx_lbl">I agree to make my review available as sample for others</label>
     <table width="100%">

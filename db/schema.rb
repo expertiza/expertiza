@@ -426,10 +426,10 @@ ActiveRecord::Schema.define(version: 20181123004154) do
     t.string   "type",                 limit: 255
     t.string   "display_type",         limit: 255
     t.text     "instruction_loc",      limit: 65535
-    t.integer  "submission_models_id", limit: 4
+    t.integer  "submission_record_id", limit: 4
   end
 
-  add_index "questionnaires", ["submission_models_id"], name: "index_questionnaires_on_submission_models_id", using: :btree
+  add_index "questionnaires", ["submission_record_id"], name: "index_questionnaires_on_submission_record_id", using: :btree
 
   create_table "questions", force: :cascade do |t|
     t.text    "txt",              limit: 65535

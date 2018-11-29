@@ -20,6 +20,7 @@ class Assignment < ActiveRecord::Base
   has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy
   has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :users, through: :participants
+  has_many :similar_assignments, dependent: :destroy
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy
   has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy
   has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy

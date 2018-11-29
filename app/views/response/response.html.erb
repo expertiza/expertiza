@@ -339,6 +339,12 @@
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
+    <% if (@response.visibility == 0) %>
+        <input type="checkbox" id="sample_cbx" name="review[visibility]" unchecked>
+    <% else %>
+        <input type="checkbox" id="sample_cbx" name="review[visibility]" checked>
+    <% end %>
+    <label id="sample_cbx_lbl">I agree to make my review available as sample for others</label>
     <table width="100%">
       <% i = 0 %>
       <% @questions.each do |question| %>

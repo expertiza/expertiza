@@ -8,7 +8,9 @@
 		jQuery(document).on("ready",function(){
 			var markedAsSample = jQuery("#sampleReviewHold").attr("data-marked");
 			jQuery("#sampleReviewHold").remove();
-
+			console.log(jQuery("#pageSizeHold").html());
+			var pageSize = parseInt(jQuery("#pageSizeHold").html());
+			//jQuery("#pageSizeHold").remove();
 			var assignmentId = jQuery("#similar_assignments_popup").attr("data-assignment-id");
 			var buttons = jQuery(".mark-delete-sample").find("div").find("button");
 
@@ -52,25 +54,39 @@
 					this.list = this._target.find("ul");
 					this.template = jQuery("#popup_list_template");
 					this.template.remove();
+					this.morePages = true;
+					this.moreButton = jQuery(".popup_more");
+					this.recordsFetched = 0;
+					this.currentPageNumber = 0;
+					var self = this;
+					this.moreButton.on("click",function(){
+						if(self.morePages){
+							self.fetchAssignments();
+						}
+					});
 				},
 				addToList:function(assignment){
 					var assignmentId = assignment.id;
 					var title = assignment.title;
+					var course = assignment.course_name;
+					var displayText = "<strong>"+course+": </strong>" +title;
 					var checked = assignment.checked;
 					var newRow = this.template.clone();
 					newRow.removeClass("hide").find("input").attr("data-id",assignmentId).attr("checked",checked);
-					newRow.find("span").html(title).on("click",function(){
+					newRow.find("span").html(displayText).on("click",function(){
 						newRow.find("input").click();
 					});
 					this.list.append(newRow.removeAttr("id"));
 				},
-				open:function(){
+				open:function(assignmentsMap){
 					// using map template, build the HTML
 					var self = this;
-					for(var i in this.assignmentsMap){
-						this.addToList(this.assignmentsMap[i]);
+					for(var i in assignmentsMap){
+						this.addToList(assignmentsMap[i]);
 					}
-					this._target.parent().removeClass("hide");
+					if(this.currentPageNumber == 0){
+						this._target.parent().removeClass("hide");
+					}
 				},
 				showError:function(message){
 					this.errorMessageSpan.html(message).removeClass("hide");
@@ -86,8 +102,12 @@
 				},
 				fetchAssignments:function(){
 					var self = this;
+					var ajaxUrl = "/similar_assignments/"+assignmentId;
+					if(this.currentPageNumber > 0){
+						ajaxUrl += "?page="+this.currentPageNumber;
+					}
 					jQuery.ajax({
-						"url":"/similar_assignments/"+assignmentId,
+						"url":ajaxUrl,
 						"type":"GET",
 						"dataType":"json",
 						"responseType":"json",
@@ -96,34 +116,38 @@
 							self.hideError();
 						},
 						"success":function(result){
-							if(result.success){
-								self.onFetchSuccess(result.assignmentsMap);
-							}else{
+							if(result.success && result.values.length){
+								self.onFetchSuccess(result.values);
+							}else if(result.success && self.currentPageNumber == 0){
+								self.onFetchFail("Cannot link this to any assignment!");
+							}else if(result.success){
+								self.onFetchSuccess(result.values);
+							}
+							else{
 								self.onFetchFail(result.error);
 							}
 						},
-						"failure":self.onFetchSuccess( // should be self.onFetchFail , this is a mocked response.. use result.map
-							[{
-								"title": "assignment title",
-								"checked": true,
-								"id": 29
-							},
-							{
-								"title": "assignment title 2",
-								"checked": false,
-								"id": 350
-							}
-						])
-						// "error":self.onFetchSuccess([{29:{title:"assignment title","checked":true},{90:{title:"tTitle 2","checked":false}}])
-
-						//"error":self.onFetchFail
+						"failure": self.onFetchFail,
+						"error":self.onFetchFail
 					});
 				},
 				onFetchSuccess:function(assignmentsMap){
-					AssignmentsPopup.assignmentsMap = assignmentsMap;
+					debugger;
+					// merge with existing data rather than replace!!!
+					AssignmentsPopup.assignmentsMap = AssignmentsPopup.assignmentsMap.concat(assignmentsMap);
+					if(AssignmentsPopup.currentPageNumber == 0){
+						
+					}else{
+						// append
+					}
 					AssignmentsPopup.hideSuccess();
 					AssignmentsPopup.hideError();
-					AssignmentsPopup.open();
+					AssignmentsPopup.open(assignmentsMap);
+					AssignmentsPopup.currentPageNumber++;
+					if(assignmentsMap.length < pageSize){
+						this.moreButton.html("No more results!").off();
+						this.morePages = false;
+					}
 				},
 				onFetchFail:function(message){
 					message = (typeof message != "undefined" && message.length)?message:"An error occurred";
@@ -137,6 +161,13 @@
 					this.hideError();
 					this._target.parent().addClass("hide");
 					this.resetList();
+					this.recordsFetched = 0;
+					this.morePages = true;
+					this.currentPageNumber = 0;
+					var self = this;
+					this.moreButton.on("click",function(){
+						self.fetchAssignments();
+					}).html("More +");
 				},
 				closeAfterSubmit:function(success,message){
 					this.close();
@@ -207,20 +238,16 @@
 							"data":{
 								"similar":delta
 							},
-							"error":function(result){	// should be success.. used for mocking
-								result = {success:false,error:"An error occurred"};
+							"success":function(result){
 								if(result.success){
 									self.closeAfterSubmit(true,"Done!");
 								}else{
 									self.onSubmitFail(result.error);
 								}
-							}//,
-							//"failure":self.onSubmitFail,
-							//"error":self.onSubmitFail
+							},
+							"failure":self.onSubmitFail,
+							"error":self.onSubmitFail
 						});
-						// on success: close, clear error message, show success message
-
-						// on fail: close, clear success message, show error message
 					}
 				},
 				onSubmitFail:function(message){
@@ -323,4 +350,18 @@ if access, db deletes and inserts (to similar_assignments)
 if db updates fail, return json {"success":false, "error":"Something went wrong"}
 if succeed: return json {"succes":true}
 
+*/
+
+/*
+Todos: 
+Popup opener button only if there's at least one sample review for this assignment
+	- Query and set a flag for this
+	- use the flag to write if flag then HTML1 else HTML2 (the older way)
+Move Consent checkbox into form and check why not submitting
+Pagination for sample reviews view
+Pagination for assignment popup list
+in sample_reviews controller, update_visibility: allow for student (right now it returns unauth)
+	- validate param visiblity as 0 or 1 ONLY
+	- match response reviewer id with current user id
+	- handle case where no visibility
 */

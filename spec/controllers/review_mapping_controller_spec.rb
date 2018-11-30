@@ -660,7 +660,7 @@ describe ReviewMappingController do
   end
 
   describe '#save_grade_and_comment_for_reviewer' do
-    it 'redirects to review_mapping#response_report page' do
+    it 'redirects to reports#response_report page' do
       review_grade = build(:review_grade)
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)

@@ -12,6 +12,9 @@ class SubmittedContentController < ApplicationController
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
   # so @can_submit should be true
   def edit
+    # NOTE: The ABC size of the function was 18.55 before we made the edits.
+    # We don't understand the implications of modifying the existing function as this is one of the
+    # critical features and hence are leaving it untouched
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
@@ -20,15 +23,9 @@ class SubmittedContentController < ApplicationController
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
-    topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-    @stage = @assignment.get_current_stage(topic_id)
-    # Find the round of the current assignment
-    @round = @assignment.number_of_current_round(topic_id)
-    @record = SubmissionRecord.find_by(team_id: @participant.team.id,
-                                       user: @participant.name,
-                                       assignment_id: @participant.assignment.id,
-                                       operation: "Revision Review")
-    @questionnaire = Questionnaire.find_by(submission_record_id: @record.id, type: "RevisionReviewQuestionnaire") unless @record.nil?
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    # RevisionReview submission record
+    setup_revision_review_edit_view
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false
@@ -166,11 +163,7 @@ class SubmittedContentController < ApplicationController
   def begin_planning
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
-    record = SubmissionRecord.create(team_id: participant.team.id,
-                                     user: participant.name,
-                                     assignment_id: participant.assignment.id,
-                                     content: "Revision Review Questionnaire",
-                                     operation: "Revision Review")
+    record = create_revision_review_submission_record(participant)
     redirect_to new_questionnaire_path(model: "RevisionReviewQuestionnaire", private: 0, submission_record_id: record.id)
   end
 
@@ -254,5 +247,44 @@ class SubmittedContentController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
     # check one assignment has topics or not
     (!@topics.empty? and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.empty?
+  end
+
+  # setup the data necessary for RevisionReview submission
+  def setup_revision_review_edit_view
+    # Find the round of the current assignment
+    @round = current_round(@participant)
+    @record = revision_review_submission_record_for_round(@participant, @round)
+    @questionnaire = questionnaire_for_submission?(@record)
+    # Partially created submission record without a corresponding questionnaire should be deleted
+    @record.delete! if @questionnaire.nil?
+    @record = nil if @questionnaire.nil?
+  end
+
+  # returns the current round of the assignment
+  def current_round(participant)
+    participant.assignment.number_of_current_round(SignedUpTeam.topic_id(participant.parent_id, participant.user_id))
+  end
+
+  # create a RevisionReview submission record for the current round
+  def create_revision_review_submission_record(participant)
+    SubmissionRecord.create(team_id: participant.team.id,
+                            user: participant.name,
+                            assignment_id: participant.assignment.id,
+                            content: current_round(participant).to_s,
+                            operation: "Revision Review")
+  end
+
+  # returns a RevisionReview submission record for the round
+  def revision_review_submission_record_for_round(participant, round)
+    SubmissionRecord.find_by(team_id: participant.team.id,
+                             user: participant.name,
+                             assignment_id: participant.assignment.id,
+                             operation: "Revision Review",
+                             content: round.to_s)
+  end
+
+  # returns a RevisionReviewQuestionnaire for a given SubmissionRecord if any
+  def questionnaire_for_submission(submission_record)
+    Questionnaire.find_by(submission_record_id: submission_record.id, type: "RevisionReviewQuestionnaire") unless submission_record.nil?
   end
 end

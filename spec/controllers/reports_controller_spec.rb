@@ -6,10 +6,6 @@ describe ReportsController do
                                 reviewer: double('Participant', id: 1, name: 'reviewer'),
                                 reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
-  let(:metareview_response_map) do
-    double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                    reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
-  end
   let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
   let(:user) { double('User', id: 3) }
@@ -60,10 +56,13 @@ describe ReportsController do
 
     context 'when type is ReviewResponseMap' do
       it 'renders response_report page with corresponding data' do
-        allow(ReviewResponseMap).to receive(:review_response_report).with('1', assignment, 'ReviewResponseMap', 'no one')
+        allow(ReviewResponseMap).to receive(:review_response_report)
+          .with('1', assignment, 'ReviewResponseMap', 'no one')
           .and_return([participant, participant1])
-        allow(assignment).to receive(:compute_reviews_hash).and_return('1' => 'good')
-        allow(assignment).to receive(:compute_avg_and_ranges_hash).and_return(avg: 94, range: [90, 99])
+        allow(assignment).to receive(:compute_reviews_hash)
+          .and_return('1' => 'good')
+        allow(assignment).to receive(:compute_avg_and_ranges_hash)
+          .and_return(avg: 94, range: [90, 99])
         params = {
           id: 1,
           report: {type: 'ReviewResponseMap'},
@@ -78,7 +77,8 @@ describe ReportsController do
       context 'when assignment has varying_rubrics_by_round feature' do
         it 'renders response_report page with corresponding data' do
           allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-          allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap')
+          allow(FeedbackResponseMap).to receive(:feedback_response_report)
+            .with('1', 'FeedbackResponseMap')
             .and_return([participant, participant1], [1, 2], [3, 4], [])
           params = {
             id: 1,
@@ -92,7 +92,8 @@ describe ReportsController do
       context 'when assignment does not have varying_rubrics_by_round feature' do
         it 'renders response_report page with corresponding data' do
           allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
-          allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap')
+          allow(FeedbackResponseMap).to receive(:feedback_response_report)
+            .with('1', 'FeedbackResponseMap')
             .and_return([participant, participant1], [1, 2, 3, 4])
           params = {
             id: 1,
@@ -132,7 +133,9 @@ describe ReportsController do
           .with('id')
           .with(reviewed_object_id: '1', calibrate_to: 0)
           .and_return([1, 2])
-        allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
+        allow(Response).to receive(:where)
+          .with(map_id: [1, 2])
+          .and_return([double('response')])
         params = {
           id: 1,
           report: {type: 'Calibration'}
@@ -145,9 +148,12 @@ describe ReportsController do
 
     context 'when type is PlagiarismCheckerReport' do
       it 'renders response_report page with corresponding data' do
-        allow(PlagiarismCheckerAssignmentSubmission).to receive_message_chain(:where, :pluck).with(assignment_id: '1').with(:id)
+        allow(PlagiarismCheckerAssignmentSubmission).to receive_message_chain(:where, :pluck)
+          .with(assignment_id: '1')
+          .with(:id)
           .and_return([double('PlagiarismCheckerAssignmentSubmission', id: 1)])
-        allow(PlagiarismCheckerAssignmentSubmission).to receive(:where).with(plagiarism_checker_assignment_submission_id: 1)
+        allow(PlagiarismCheckerAssignmentSubmission).to receive(:where)
+          .with(plagiarism_checker_assignment_submission_id: 1)
           .and_return([double('PlagiarismCheckerAssignmentSubmission')])
         params = {
           id: 1,

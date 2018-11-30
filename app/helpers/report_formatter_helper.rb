@@ -3,23 +3,23 @@ module ReportFormatterHelper
     assign_basics(params)
 
     case type
-    when "SummaryByRevieweeAndCriteria"
+    when 'SummaryByRevieweeAndCriteria'
       summary_by_reviewee_and_criteria
-    when "SummaryByCriteria"
+    when 'SummaryByCriteria'
       summary_by_criteria
-    when "ReviewResponseMap"
+    when 'ReviewResponseMap'
       review_response_map(params[:user])
-    when "FeedbackResponseMap"
+    when 'FeedbackResponseMap'
       feedback_response_map
-    when "TeammateReviewResponseMap"
+    when 'TeammateReviewResponseMap'
       teammate_review_response_map
-    when "Calibration"
+    when 'Calibration'
       calibration(session[:user])
-    when "PlagiarismCheckerReport"
+    when 'PlagiarismCheckerReport'
       plagiarism_checker_report
-    when "AnswerTaggingReport"
+    when 'AnswerTaggingReport'
       answer_tagging_report
-    when "SelfReview"
+    when 'SelfReview'
       self_review
     end
   end

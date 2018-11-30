@@ -26,5 +26,4 @@ class ReportsController < ApplicationController
     render_report(@type, params, session)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
-
 end

@@ -28,7 +28,7 @@
 <% end %>
 <!--Obtain only review scores-->
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
-<h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span><%=image_tag("info.png", title:"Instructor score not included in average")%></h4>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
@@ -105,7 +105,7 @@
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                        <% if @assignment.course.is_ta_or_instructor?(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id) %>
-<th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Instructor review " + j.to_s %></a> </th>
+<th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Instructor review " %></a><%=image_tag("Instructor.jpg", title:"Instructor/TA")%> </th>
 <% j += 1 %>
 <% else %>
 <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a> </th>

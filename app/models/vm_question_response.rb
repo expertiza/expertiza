@@ -138,7 +138,7 @@ add_answer(answer, review.response_id)
 
   attr_reader :list_of_reviewers
 
-  def add_answer(answer, review.response_id)
+  def add_answer(answer, response_id)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
     @list_of_rows.each do |row|

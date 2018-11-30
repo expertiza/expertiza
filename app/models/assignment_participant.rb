@@ -108,6 +108,9 @@ total_reviews = 0
       round_sym = ("review" + i.to_s).to_sym
       next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
       length_of_assessments = scores[round_sym][:scores][:student_review_count]#[:assessments].length.to_f
+	if (length_of_assessments==nil)
+	  length_of_assessments=1
+	end
 total_reviews += length_of_assessments
 scores[review_sym][:assessments] += scores[round_sym][:assessments]
       if !scores[round_sym][:scores][:max].nil? && scores[review_sym][:scores][:max] < scores[round_sym][:scores][:max]

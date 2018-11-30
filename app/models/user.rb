@@ -289,6 +289,7 @@ class User < ActiveRecord::Base
   end
 
   def self.search_users(role, user_id, letter, search_by)
+   #some change here 
     key_word = {'1' => 'name', '2' => 'fullname', '3' => 'email'}
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by

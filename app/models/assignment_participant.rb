@@ -103,7 +103,7 @@ class AssignmentParticipant < Participant
     scores[review_sym][:assessments] = []
     scores[review_sym][:scores] = {max: -999_999_999, min: 999_999_999, avg: 0}
     total_score = 0
-    for i in 1..self.assignment.num_review_rounds
+    (1..self.assignment.num_review_rounds).each do |i|
       round_sym = ("review" + i.to_s).to_sym
       next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
       length_of_assessments = scores[round_sym][:assessments].length.to_f
@@ -125,10 +125,9 @@ class AssignmentParticipant < Participant
 
   def topic_total_scores(scores)
     topic = SignUpTopic.find_by(assignment_id: self.assignment.id)
-    unless topic.nil?
-      scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
-      scores[:max_pts_available] = topic.micropayment
-    end
+    return if topic.nil?
+    scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
+    scores[:max_pts_available] = topic.micropayment
   end
 
   def calculate_scores(scores)
@@ -199,16 +198,15 @@ class AssignmentParticipant < Participant
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, "No user id has been specified." if row_hash.empty?
     user = User.find_by(name: row_hash[:name])
-    if user.nil?
-      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-      attributes = ImportFileHelper.define_attributes(row_hash)
-      user = ImportFileHelper.create_new_user(attributes, session)
-    end
-    raise ImportError, "The assignment with id \"#{id.to_s}\" was not found." if Assignment.find(id).nil?
-    unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
-      new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
-      new_part.set_handle
-    end
+    return unless user.nil?
+    raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+    attributes = ImportFileHelper.define_attributes(row_hash)
+    user = ImportFileHelper.create_new_user(attributes, session)
+
+    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
+    return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
+    new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
+    new_part.set_handle
   end
 
   # provide export functionality for Assignment Participants

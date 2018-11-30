@@ -71,6 +71,14 @@ function microtaskChanged() {
   </tr>
 
   <tr>
+    <td style='padding:5px' id='assignment_access'>
+      <p><input name="assignment_form[assignment][private]" type="hidden" value="false"/>
+        <%= check_box_tag('assignment_form[assignment][private]', 'true', @assignment_form.assignment.private? || !params[:private].to_i.zero?) %>
+        <%= label_tag('assignment_form[assignment][private]', 'Private assignment') %></p>
+    </td>
+  </tr>
+
+  <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">
@@ -218,7 +226,7 @@ function microtaskChanged() {
           team_formation_due_date_checkbox.removeAttr('hidden')
           jQuery('#assignment_form_assignment_max_team_size').val('2');
           teammate_reviews_field.removeAttr('hidden');
-          addDueDateTableElement(<%= @due_date_nameurl_notempty==nil ? false:@due_date_nameurl_notempty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
           addQuestionnaireTableRow(
                   'TeammateReviewQuestionnaire',
                   null,

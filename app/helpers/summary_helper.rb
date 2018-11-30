@@ -53,7 +53,7 @@ module SummaryHelper
       threads = []
       rubric = get_questions_by_assignment(assignment)
 
-      for round in 0..nround - 1
+      (0..nround - 1).each do |round|
         self.avg_scores_by_round[round] = 0.0
         self.summary[round] = {}
         self.avg_scores_by_criterion[round] = {}
@@ -113,7 +113,7 @@ module SummaryHelper
         self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
 
         # get answers of each reviewer by rubric
-        for round in 0..assignment.rounds_of_reviews - 1
+        (0..assignment.rounds_of_reviews - 1).each do |round|
           self.summary[reviewee.name][round] = {}
           self.avg_scores_by_round[reviewee.name][round] = 0.0
           self.avg_scores_by_criterion[reviewee.name][round] = {}
@@ -191,7 +191,7 @@ module SummaryHelper
 
     def get_questions_by_assignment(assignment)
       rubric = []
-      for round in 0..assignment.rounds_of_reviews - 1
+      (0..assignment.rounds_of_reviews - 1).each do |round|
         rubric[round] = nil
         if assignment.varying_rubrics_by_round?
           # get rubric id in each round

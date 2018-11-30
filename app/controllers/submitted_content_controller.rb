@@ -277,7 +277,6 @@ class SubmittedContentController < ApplicationController
   # returns a RevisionReview submission record for the round
   def revision_review_submission_record_for_round(participant, round)
     SubmissionRecord.find_by(team_id: participant.team.id,
-                             user: participant.name,
                              assignment_id: participant.assignment.id,
                              operation: "Revision Review",
                              content: round.to_s)

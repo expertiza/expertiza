@@ -231,24 +231,12 @@ class Response < ActiveRecord::Base
 						 '</tr></table>'
   end
 
-  def construct_review_response code, self_id, show_tags = nil, current_user = nil
-    code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
-    answers = Answer.where(response_id: self.response_id)
-    unless answers.empty?
-      questionnaire = self.questionnaire_by_answer(answers.first)
-      questionnaire_max = questionnaire.max_question_score
-      questions = questionnaire.questions.sort_by(&:seq)
-      # get the tag settings this questionnaire
-      tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
-      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
-    end
-    comment = if !self.additional_comment.nil?
-                self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
-              else
-                ''
-              end
-    code += '<tr><td><b>Additional Comment: </b>' + comment + '</td></tr>'
-    code += '</table>'
+  def construct_review_response(code, self_id, show_tags = nil, current_user = nil)
+    code += "<table id=\"review_#{self_id}\" style=\"display: none;\" class=\"table table-bordered\">"
+    code = add_questionnaires_to_code(code, Answer.where(response_id: self.response_id), show_tags, current_user)
+    comment = (self.additional_comment || '').gsub('^p', '').gsub(/\n/, '<BR/>')
+    code += "<tr><td><b>Additional Comment: </b>#{comment}</td></tr>"
+    code + '</table>'
   end
 
   def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil
@@ -273,5 +261,28 @@ class Response < ActiveRecord::Base
       code += '</td></tr>'
     end
     code
+  end
+
+  # Add html code to display questions
+  def add_questionnaires_to_code(code, answers, show_tags, current_user)
+    return code if answers.empty?
+    # It may have a RevisionReviewQuestionnaire hence need to extract all the questionnaires
+    questionnaires = answers.map {|ans| self.questionnaire_by_answer(ans) }.uniq(&:id)
+    questionnaires.each do |questionnaire|
+      code = add_table_rows(questionnaire.max_question_score,
+                            questionnaire.questions.sort_by(&:seq),
+                            answers,
+                            code,
+                            tag_prompt_deployments(show_tags, questionnaire.id, self.map.assignment.id),
+                            current_user)
+    end
+    code
+  end
+
+  # returns TagPromptDeployment if show_tags is set
+  # else returns nil
+  def tag_prompt_deployments(show_tags, questionnaire_id, assignment_id)
+    return nil unless show_tags
+    TagPromptDeployment.where(questionnaire_id: questionnaire_id, assignment_id: assignment_id)
   end
 end

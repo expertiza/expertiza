@@ -74,7 +74,8 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @questionnaire = set_questionnaire
+    # @questionnaire = set_questionnaire
+    # handled inside set_content
     render action: 'response'
   end
 
@@ -89,6 +90,7 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
+      questions += sort_questions(@revision_review_questionnaire.questions) unless @revision_review_questionnaire.nil?
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
@@ -120,8 +122,9 @@ class ResponseController < ApplicationController
     # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
     @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
-    questions = sort_questions(@questionnaire.questions)
-    init_answers(questions)
+    # questions = sort_questions(@questionnaire.questions)
+    # @questions is initialized inside `set_content` method
+    init_answers(@questions)
     render action: 'response'
   end
 
@@ -174,7 +177,9 @@ class ResponseController < ApplicationController
 
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
+    set_revision_review_questionnaire
     questions = sort_questions(@questionnaire.questions)
+    questions += sort_questions(@revision_review_questionnaire.questions) unless @revision_review_questionnaire.nil?
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
@@ -294,6 +299,7 @@ class ResponseController < ApplicationController
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
+    set_revision_review_content
   end
 
   def set_questionnaire_for_new_response
@@ -311,6 +317,7 @@ class ResponseController < ApplicationController
       "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
+    set_revision_review_questionnaire
   end
 
   def scores
@@ -326,8 +333,24 @@ class ResponseController < ApplicationController
   def set_questionnaire
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
+    set_revision_review_questionnaire
     answer = @response.scores.first
     @questionnaire = @response.questionnaire_by_answer(answer)
+  end
+
+  def set_revision_review_questionnaire
+    round = @response.nil? ? @current_round.to_s : @response.round.to_s
+    submission_record = SubmissionRecord.find_by(assignment_id: @map.contributor.assignment.id, team_id: @map.contributor.id,
+                                                 operation: 'Revision Review', content: round)
+    @revision_review_questionnaire = nil
+    @revision_review_questionnaire = Questionnaire.find_by(submission_record_id: submission_record.id) unless submission_record.nil?
+  end
+
+  def set_revision_review_content
+    return if @revision_review_questionnaire.nil?
+    @min = [@min, @revision_review_questionnaire.min_question_score].min
+    @max = [@max, @revision_review_questionnaire.max_question_score].max
+    @questions += sort_questions(@revision_review_questionnaire.questions)
   end
 
   def set_dropdown_or_scale

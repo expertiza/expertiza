@@ -53,7 +53,7 @@ module OnTheFlyCalc
     @author_feedback_scores = {}
     if self.varying_rubrics_by_round? 
     else
-
+      # Rubrics are not varying.
 
     end
   end

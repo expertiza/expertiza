@@ -254,10 +254,10 @@ class SubmittedContentController < ApplicationController
     # Find the round of the current assignment
     @round = current_round(@participant)
     @record = revision_review_submission_record_for_round(@participant, @round)
-    @questionnaire = questionnaire_for_submission?(@record)
+    @questionnaire = questionnaire_for_submission(@record)
     # Partially created submission record without a corresponding questionnaire should be deleted
-    @record.delete! if @questionnaire.nil?
-    @record = nil if @questionnaire.nil?
+    @record.delete! if @record && @questionnaire.nil?
+    @record = nil if @record && @questionnaire.nil?
   end
 
   # returns the current round of the assignment

@@ -516,7 +516,7 @@ class QuestionnairesController < ApplicationController
     if @questionnaire.submission_record.nil?
       is_admin? || instructor_for_questionnaire?(@questionnaire)
     else
-      questionnaire_by_user?(@questionnire)
+      questionnaire_by_user?(@questionnaire)
     end
   end
 

@@ -48,6 +48,15 @@ module OnTheFlyCalc
     end
     scores
   end
+
+  def get_author_feedback_scores 
+    @author_feedback_scores = {}
+    if self.varying_rubrics_by_round? 
+    else
+
+
+    end
+  end
 end
 
 private

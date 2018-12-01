@@ -160,8 +160,8 @@ class SignUpTopic < ActiveRecord::Base
   end
 
   def format_for_display
-      topic_display = ''
-      topic_display += self.id.to_s + ' - '
-      topic_display += self.topic_name
+    topic_display = ''
+    topic_display += self.id.to_s + ' - '
+    topic_display + self.topic_name
   end
 end

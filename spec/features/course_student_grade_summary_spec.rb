@@ -4,8 +4,7 @@ describe "Get All Grades For All Students in a Course" do
     @assignment = create(:assignment, course: @course)
     @questionnaire = create(:questionnaire)
     @question = create(:question, questionnaire: @questionnaire)
-    @assignment_questionnaire = create(:assignment_questionnaire, questionnaire: @questionnaire,
-                                       assignment: @assignment)
+    @assignment_questionnaire = create(:assignment_questionnaire, questionnaire: @questionnaire, assignment: @assignment)
     @review_grade = create(:review_grade)
     @topic = create(:topic, assignment: @assignment)
     @student = create(:student)
@@ -39,11 +38,10 @@ describe "Get All Grades For All Students in a Course" do
   end
 
   it 'displays student name' do
-    expect(page).to have_content("#{@student.name}")
+    expect(page).to have_content((@student.name).to_s)
   end
 
   it 'displays topic name' do
-    expect(page).to have_content("#{@topic.topic_name}")
+    expect(page).to have_content((@topic.topic_name).to_s)
   end
-
 end

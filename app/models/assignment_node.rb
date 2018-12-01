@@ -36,6 +36,8 @@ class AssignmentNode < Node
     end
     conditions += " and course_id = #{parent_id}" if parent_id
     sortvar ||= 'created_at'
+    puts '>>>>> assignment_node.get _search', _search
+    conditions += " and name like '%#{_search[:name]}%'" if !_search[:name].to_s.strip.empty?
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
     self.includes(:assignment).where(find_conditions).order("assignments.#{sortvar} #{sortorder}")

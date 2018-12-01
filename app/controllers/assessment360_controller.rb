@@ -106,31 +106,31 @@ class Assessment360Controller < ApplicationController
         next if assignment_participant.nil?
 
         topic_id = SignedUpTeam.topic_id(assignment_participant.parent_id, assignment_participant.user_id)
-        @topics[cp.id][assignment.id] = SignUpTopic.find_by_id(topic_id)
+        @topics[cp.id][assignment.id] = SignUpTopic.find_by(topic_id)
 
         team_id = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
-        unless team_id.nil?
-          team = Team.find(team_id)
-          participant = AssignmentParticipant.find_by(user_id: assignment_participant.user_id, parent_id: assignment_participant.parent_id)
-          assignment = participant.assignment
-          questions = retrieve_questions assignment.questionnaires, assignment.id
+        next if team_id.nil?
 
-          pscore = participant.scores(questions)
+        team = Team.find(team_id)
+        participant = AssignmentParticipant.find_by(user_id: assignment_participant.user_id, parent_id: assignment_participant.parent_id)
+        assignment = participant.assignment
+        questions = retrieve_questions assignment.questionnaires, assignment.id
 
-          @assignment_grades[cp.id][assignment.id] = if !team[:grade_for_submission].nil?
-                                                       team[:grade_for_submission]
-                                                     else
-                                                       0
-                                                     end
-          @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
+        pscore = participant.scores(questions)
 
-          @peer_review_scores[cp.id][assignment.id] = if !pscore[:review][:scores][:avg].nil?
-                                                        (pscore[:review][:scores][:avg]).round(2)
-                                                      else
-                                                        0
-                                                      end
-          @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
-        end
+        @assignment_grades[cp.id][assignment.id] = if !team[:grade_for_submission].nil?
+                                                     team[:grade_for_submission]
+                                                   else
+                                                     0
+                                                   end
+        @final_grades[cp.id] += @assignment_grades[cp.id][assignment.id]
+
+        @peer_review_scores[cp.id][assignment.id] = if !pscore[:review][:scores][:avg].nil?
+                                                      (pscore[:review][:scores][:avg]).round(2)
+                                                    else
+                                                      0
+                                                    end
+        @final_peer_review_scores[cp.id] += @peer_review_scores[cp.id][assignment.id]
       end
     end
   end
@@ -161,8 +161,7 @@ class Assessment360Controller < ApplicationController
   end
 
   def format_topic(topic)
-    topic_display = ''
-    topic_display = topic.format_for_display unless topic.nil?
+    topic.format_for_display unless topic.nil?
   end
 
   helper_method :format_topic

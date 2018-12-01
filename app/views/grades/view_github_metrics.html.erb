@@ -1,0 +1,84 @@
+<script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#tag_prompt_toggler').click(function () {
+            if ($('#tag_prompt_toggler').text() == "hide tags")
+                $('#tag_prompt_toggler').text("show tags")
+            else
+                $('#tag_prompt_toggler').text("hide tags")
+            $('.tag_prompt_container').toggle();
+        });
+    });
+
+    function toggleFunction(elementId) {
+        var target = document.getElementById(elementId);
+        if (target.style.display === 'none') {
+            target.style.display = 'block';
+        } else {
+            target.style.display = 'none';
+        }
+    }
+
+    function githubAPICall(pull_request_url) {
+        dataArray = pull_request_url.split('/');
+        pullRequestCode = dataArray.pop();
+        dataArray.pop();
+        repositoryName = dataArray.pop();
+        ownerName = dataArray.pop();
+
+        $.ajax({
+            url: "https://api.github.com/repos/" + ownerName + "/" + repositoryName + "/pulls/" + pullRequestCode + "/files",
+            dataType: "json",
+            success: function (returndata) {
+                $(".result").html(returndata["url"]);
+                console.log(returndata)
+            }
+        });
+    }
+</script>
+<h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>
+<h4>Team: <%= @team.name %></h4>
+
+<!--Obtain topic name from assignment helper-->
+<% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
+<% if @assignment.topics? %>
+  <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
+<% end %>
+
+<!--Toggle submission-->
+<button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
+<div id="<%= @participant.id.to_s %>" style="display:none;">
+  <% if @participant.team.hyperlinks.try(:length) %>
+    <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
+  <% else %>
+    <b>No Submission</b>
+  <% end %>
+</div><br><br>
+
+<!-- Fetch the hyperlink for the pull request and proceed with getting the GitHub data from the API -->
+<% @participant.team.hyperlinks.each do |hyperlink| %>
+  <% if hyperlink.match(/pull/) %>
+    <% @pull_request_hyperlink = hyperlink %>
+  <% end %>
+<% end %>
+
+<script>
+    pullRequestHyperlink = '<%=@pull_request_hyperlink %>';
+    githubAPICall(pullRequestHyperlink)
+</script>
+
+
+<h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
+<% if ['Student'].include? current_user.role.name %>
+  Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+  Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
+<% else %>
+  <%= form_tag 'save_grade_and_comment_for_submission', remote: true do %>
+    <%= hidden_field_tag :participant_id, params[:id] %>
+    <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission), min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: 'Grade' %>
+    <br/>
+    <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment', class: "form-control width-500" %>
+    <br>
+    <%= submit_tag 'Save', class: "btn btn-default" %>
+  <% end %>
+<% end %>

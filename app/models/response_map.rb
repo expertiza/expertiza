@@ -17,7 +17,8 @@ class ResponseMap < ActiveRecord::Base
       maps.each do |map|
         next if map.response.empty?
         @all_resp = Response.where(map_id: map.map_id).last
-        if map.type.eql?('ReviewResponseMap')
+        #if map.type.eql?('ReviewResponseMap')
+        if map.type.eql?('ReviewResponseMap') || map.type.eql?('SelfReviewResponseMap') #New Addition
           # If its ReviewResponseMap then only consider those response which are submitted.
           @array_sort << @all_resp if @all_resp.is_submitted
         else

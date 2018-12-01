@@ -99,7 +99,7 @@ module ReportFormatterHelper
   def assign_basics(params)
     @id = params[:id]
     @assignment = Assignment.find(@id)
-    @summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
+    @summary_ws_url = WEBSERVICE_CONFIG['summary_webservice_url']
   end
 
   def create_participant(parent_id, user_id)

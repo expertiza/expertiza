@@ -253,7 +253,7 @@ class SubmittedContentController < ApplicationController
   # setup the data necessary for RevisionReview submission
   def setup_revision_review_edit_view
     # Find the round of the current assignment
-    @round = participant.assignment.number_of_current_round(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    @round = @participant.assignment.number_of_current_round(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     @record = revision_review_submission_record_for_round(@participant, @round)
     @questionnaire = questionnaire_for_submission(@record)
     # Partially created submission record without a corresponding questionnaire should be deleted

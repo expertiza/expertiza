@@ -39,10 +39,7 @@
               <span id="impersonate-user-info"><%=link_to_unless_current "Switch to English", locale: "en" %></span>
 
            </li>
-            <!--<br>-->
-            <!--<li><!--%=link_to_unless_current "English", locale: "en" %></li>-->
-          <!--<br>-->
-          <!--<li><!--%=link_to_unless_current "Hindi", locale: "hi_IN" %></li>-->
+
             <li class="divider-vertical"></li>
             <li class="right-most logout-box">
               <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>

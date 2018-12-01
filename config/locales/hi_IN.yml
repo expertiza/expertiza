@@ -12,3 +12,5 @@ hi_IN:
       directory_warning: "(आवश्यक स्थान। कोई जगह या विशेष वर्ण नहीं।)"
       course_info: "कोर्स संबंधी जानकारी"
       language: "भाषा चुनिए"
+      assignment_name: "De-Assignment Name"
+

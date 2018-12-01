@@ -4,6 +4,7 @@
 en:
 #  hello: "Hello world"
   course:
+
     edit:
       course_title: "Edit course"
 
@@ -14,3 +15,156 @@ en:
       directory_warning: "(Mandatory field. No space or special chars.)"
       course_info: "Course Information"
       language: "Select language"
+      assignment_name: "Assignment Name"
+
+    view_teaching_assistants:
+      teaching_assistants: "Teaching Assistants"
+      course: "Course"
+      teaching_assistant_name: "Teaching Assistant Name"
+
+    add_individual:
+      enter_user_login: "Enter a user login:"
+      add_ta: "Add TA"
+
+  participant:
+    list:
+      participants: "Participants:"
+
+  shared_scripts:
+    user_list:
+      email: "E-mail on ..."
+      permissions: "Permissions ..."
+      name: "Name"
+      full_name: "Full Name"
+      email_address: "Email Address"
+      role: "Role"
+      parent: "Parent"
+      badges: "Badges"
+      review: "Review"
+      submissions: "Submissions"
+      metareview: "Metareview"
+      submit: "Submit"
+      take_quiz: "Take quiz"
+      handle: "Handle"
+      action: "Action"
+
+    add_individual:
+      enter_login: "Enter a user login:"
+      add: "Add"
+      participant: "participant"
+      reader: "reader"
+      reviewer: "reviewer"
+      submitter: "submitter"
+
+  teams:
+    list:
+      teams_for: "Teams for"
+      teams: "Teams"
+      students_without_team: "Students without teams"
+      name: "name"
+      show_members: "Show all team members"
+
+    new:
+      create_teams_for: "Create Teams for"
+      automatically: "Automatically"
+      uses_insofar: "Uses, insofar as possible, the number of members specified when the assignment was created."
+      team_size: "Team Size:"
+      create_teams: "Create Teams"
+      manually: "Manually"
+      specify_team_them: "Specify Team name, then add members to team, one by one."
+      inherit_teams: "Inherent Teams From Course"
+      use_the_teams: "Use the teams that are currently defined for the course."
+      team_name: "Team Name"
+
+  assignment:
+    new:
+      create_new: "Create New"
+      public: "Public"
+      private: "Private"
+      assignment: "Assignment"
+      general: "General"
+      rubrics: "Rubrics"
+      review_strategy: "Review strategy"
+      due_date: "Due date"
+      create_button: "Create"
+
+
+    edit:
+      general:
+        assignment_name: "Assignment name:"
+        course: "Course"
+        submission_directory: "Submission directory"
+        mandatory_field: "(Mandatory field. No space or special char.)"
+        description_url: "Description URL"
+        calibration: "Calibration"
+        has_team: "Has teams?"
+        has_quiz: "Has quiz?"
+        has_badge: "Has badge?"
+        staggered_deadline: "Staggered deadline assignment?"
+        mico_task: "Micro Task Assignment?"
+        review_reviewers: "Reviews visible to all other reviewers?"
+        calibrate_training: "Calibration for training?"
+        reputation_algorithm: "Reputation Alogorithm?"
+        use_simicheck: "Use simicheck?"
+        allow_feedback: "Allow feedback comments to be tagged by the author?"
+        available: "Available to students?"
+
+      rubrics:
+        review_varies: "Review varies by round?"
+        questionaire: "Questionaire"
+        use_dropdown: "Use dropdown"
+        instead: "instead?"
+        scored_question: "Scored-question"
+        display_style: "display style"
+        weight: "Weight"
+        notification_limit: "Notification Limit"
+        author_feedback: "Author Feedback"
+        review: "Review"
+
+      review_strategy:
+        review_strategy: "Review Strategy:"
+        review_topic: "Review topic Threshold (k):"
+        max_num_reviews: "Maximum number of reviews per submission:"
+        max_review_limit: "Has Max Review Limit?"
+        set_num_reviews: "Set Allowed Number of Reviews per reviewer"
+        set req_reviews: "Set Required Number of Reviews per reviewer"
+        meta_review: "Has Meta Review Limit?"
+        set_num_meta: "Set Allowed Number of MetaReviews per reviewer"
+        set_req_meta: "Set Required Number of MetaReviews per reviewer"
+        anon_review: "Is Anonymous Review?"
+        self_review: "Allow self reviews?"
+
+      due_dates:
+        num_review_rounds: "Number of review rounds:"
+        timezone: "Timezone : "
+        meta_deadline: "Use metareview deadline"
+        show_hide: "Show/Hide Date Updater"
+        deadline_type: "Deadline Type"
+        date_time: "Date & Time"
+        use_updater: "Use Date Updater"
+        submission_allowed: "Submission allowed"
+        review_allowed: "Review allowed"
+        teammate_review: "Teammate review allowed"
+        meta_allowed: "Meta-review allowed"
+        has_quiz: "Has quiz"
+        reminder: "Reminder(hrs)"
+        due_date_names: "Due date name"
+        description_url: "Description URL"
+        round: "Round"
+
+      late_policy:
+        apply_penalty: "Apply penalty policy:"
+        late_policty: "New late policty"
+
+      calibration:
+        particpant_name: "Participant name"
+        action: "Action"
+        submitted_item: "Submitted item(s)"
+        submit_calibration: "Submit reviews for calibrations"
+
+
+
+
+
+
+

@@ -1,5 +1,5 @@
 <!--[form:course]-->
-<p><label for="institution_name"><%=t ".institute_name" %></label><br/>
+<p><label for="institution_name"><%=t('.institute_name') %></label><br/>
 <%= select("course", "institutions_id", Institution.all.collect{ |c| [ c.name, c.id] }) %></p>
 
 <p><label for="course_name"><%=t ".course_name" %></label><br/>
@@ -11,15 +11,7 @@
 <%= text_field 'course', 'directory_path'  %></p>
 <p><label for="course_info"><%=t ".course_info" %></label><br/>
 <%= text_field 'course', 'info'  %></p>
-<!--<li class="dropdown">-->
-  <!--<a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=t ".language" %><b class="caret"></b></a>-->
-  <!--<ul class="dropdown-menu">-->
-    <!--<li><!--%=link_to_unless_current "English", locale: "en" %></li>-->
-    <!--<li><!--%=link_to_unless_current "Hindi", locale: "hi_IN" %></li>-->
-  <!--</ul>-->
 
-<!--</li>-->
 <br/>
 
-<!--[eoform:user]-->
 <br/>

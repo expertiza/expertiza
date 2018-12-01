@@ -101,6 +101,7 @@ class GradesController < ApplicationController
     @questions = {}
     questionnaires = @assignment.questionnaires
     retrieve_questions questionnaires
+    setup_revision_review_questionnaire
     @pscore = @participant.scores(@questions)
     @vmlist = []
 
@@ -109,7 +110,8 @@ class GradesController < ApplicationController
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       @round = nil
-      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+      is_review_questionnaire = questionnaire.type == "ReviewQuestionnaire"
+      if @assignment.varying_rubrics_by_round? && is_review_questionnaire
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
         if questionnaires.count > 1
           @round = questionnaires[counter_for_same_rubric].used_in_round
@@ -121,6 +123,7 @@ class GradesController < ApplicationController
       end
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
       vmquestions = questionnaire.questions
+      vmquestions += revision_review_questions(@round) if is_review_questionnaire
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
@@ -322,5 +325,27 @@ class GradesController < ApplicationController
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
+  end
+
+  def setup_revision_review_questionnaire
+    submission_records = SubmissionRecord.where(team_id: @participant.team.id,
+                                                assignment_id: @assignment.id,
+                                                operation: "Revision Review")
+    submission_records.each do |record|
+      key = "review#{record.content}".to_sym
+      questions = RevisionReviewQuestionnaire.where(submission_record_id: record.id).flat_map(&:questions)
+      @questions[key] += questions if @questions.key?(key)
+      @questions[key] = questions unless @questions.key?(key)
+    end
+  end
+
+  # return the questions in the RevisionReviewQuestionnaire for the given round
+  # an empty array is returned if nothing is present
+  def revision_review_questions(round)
+    submission_records = SubmissionRecord.where(team_id: @participant.team.id,
+                                                assignment_id: @assignment.id,
+                                                content: round.to_s,
+                                                operation: "Revision Review")
+    submission_records.flat_map {|record| RevisionReviewQuestionnaire.where(submission_record_id: record.id).flat_map(&:questions) }
   end
 end

@@ -58,11 +58,11 @@ describe ResponseController do
   end
 
   describe '#delete' do
-    it 'deletes current response and redirects to response#redirection page' do
+    it 'deletes current response and redirects to response#redirect page' do
       allow(review_response).to receive(:delete).and_return(review_response)
       params = {id: 1}
       post :delete, params
-      expect(response).to redirect_to('/response/redirection?id=1&msg=The+response+was+deleted.')
+      expect(response).to redirect_to('/response/redirect?id=1&msg=The+response+was+deleted.')
     end
   end
 
@@ -88,7 +88,7 @@ describe ResponseController do
 
   describe '#update' do
     context 'when something is wrong during response updating' do
-      it 'raise an error and redirects to response#saving page' do
+      it 'raise an error and redirects to response#save page' do
         allow(review_response).to receive(:update_attribute).with('additional_comment', 'some comments').and_raise('ERROR!')
         params = {
           id: 1,
@@ -98,12 +98,12 @@ describe ResponseController do
         }
         session = {user: instructor}
         post :update, params, session
-        expect(response).to redirect_to('/response/saving?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
+        expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
       end
     end
 
     context 'when response is updated successfully' do
-      it 'redirects to response#saving page' do
+      it 'redirects to response#save page' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
         allow(review_response_map).to receive(:reviewer_id).and_return(1)
         allow(Participant).to receive(:find).with(1).and_return(participant)
@@ -123,7 +123,7 @@ describe ResponseController do
         }
         session = {user: instructor}
         post :update, params, session
-        expect(response).to redirect_to('/response/saving?id=1&msg=&review%5Bcomments%5D=some+comments')
+        expect(response).to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
       end
     end
   end
@@ -201,7 +201,7 @@ describe ResponseController do
   end
 
   describe '#create' do
-    it 'creates a new response and redirects to response#saving page' do
+    it 'creates a new response and redirects to response#save page' do
       allow(Response).to receive(:where).with(map_id: 1).and_return([review_response])
       allow(Response).to receive(:where).with(map_id: 1, round: 1).and_return([review_response_round1])
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
@@ -221,12 +221,12 @@ describe ResponseController do
         isSubmit: 'No'
       }
       post :create, params
-      expect(response).to redirect_to('/response/saving?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
+      expect(response).to redirect_to('/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
     end
   end
 
-  describe '#saving' do
-    it 'save current response map and redirects to response#redirection page' do
+  describe '#save' do
+    it 'save current response map and redirects to response#redirect page' do
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
       allow(review_response_map).to receive(:save).and_return(review_response_map)
       params = {
@@ -234,12 +234,12 @@ describe ResponseController do
         return: ''
       }
       session = {user: instructor}
-      post :saving, params, session
-      expect(response).to redirect_to('/response/redirection?id=1&return=')
+      post :save, params, session
+      expect(response).to redirect_to('/response/redirect?id=1&return=')
     end
   end
 
-  describe '#redirection' do
+  describe '#redirect' do
     before(:each) do
       allow(Response).to receive(:find_by).with(map_id: '1').and_return(review_response)
       @params = {id: 1}
@@ -248,7 +248,7 @@ describe ResponseController do
     context 'when params[:return] is feedback' do
       it 'redirects to grades#view_my_scores page' do
         @params[:return] = 'feedback'
-        get :redirection, @params
+        get :redirect, @params
         expect(response).to redirect_to('/grades/view_my_scores?id=1')
       end
     end
@@ -256,7 +256,7 @@ describe ResponseController do
     context 'when params[:return] is teammate' do
       it 'redirects to student_teams#view page' do
         @params[:return] = 'teammate'
-        get :redirection, @params
+        get :redirect, @params
         expect(response).to redirect_to('/student_teams/view?student_id=1')
       end
     end
@@ -264,7 +264,7 @@ describe ResponseController do
     context 'when params[:return] is instructor' do
       it 'redirects to grades#view page' do
         @params[:return] = 'instructor'
-        get :redirection, @params
+        get :redirect, @params
         expect(response).to redirect_to('/grades/view?id=1')
       end
     end
@@ -272,7 +272,7 @@ describe ResponseController do
     context 'when params[:return] is assignment_edit' do
       it 'redirects to assignment#edit page' do
         @params[:return] = 'assignment_edit'
-        get :redirection, @params
+        get :redirect, @params
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
@@ -280,7 +280,7 @@ describe ResponseController do
     context 'when params[:return] is selfreview' do
       it 'redirects to submitted_content#edit page' do
         @params[:return] = 'selfreview'
-        get :redirection, @params
+        get :redirect, @params
         expect(response).to redirect_to('/submitted_content/1/edit')
       end
     end
@@ -288,7 +288,7 @@ describe ResponseController do
     context 'when params[:return] is survey' do
       it 'redirects to response#pending_surveys page' do
         @params[:return] = 'survey'
-        get :redirection, @params
+        get :redirect, @params
         expect(response).to redirect_to('/response/pending_surveys')
       end
     end
@@ -296,7 +296,7 @@ describe ResponseController do
     context 'when params[:return] is other content' do
       it 'redirects to student_review#list page' do
         @params[:return] = 'other'
-        get :redirection, @params
+        get :redirect, @params
         expect(response).to redirect_to('/student_review/list?id=1')
       end
     end

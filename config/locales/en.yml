@@ -3,6 +3,8 @@
 
 en:
 #  hello: "Hello world"
+
+# This section of keys are for the pages related to Courses
   course:
 
     edit:
@@ -161,6 +163,95 @@ en:
         action: "Action"
         submitted_item: "Submitted item(s)"
         submit_calibration: "Submit reviews for calibrations"
+
+# end of keys for pages related to Courses
+
+# keys for pages Student Views
+  student_task:
+    list:
+      assignments: "Assignments"
+      tasks_not_started: "Tasks not yet started"
+      revisions: "Revisions"
+      student_team: "Students who have teamed with you"
+      assignment_name: "Assignment"
+      course: "Course"
+      topic: "Topic"
+      current_stage: "Current Stage"
+      review_grade: "Review Grade"
+      badges: "Badges"
+      stage_deadline: "Stage Deadline"
+      publishing: "Publishing Rights"
+
+    view:
+      submit_review: "Submit or Review work for"
+      next_click: "Next: Click the activity you wish to perform on the assignment titled:"
+      signup_topic: "(Sign up for a topic)"
+      view_team: "(View and manage your team)"
+      submit_work: "(Submit and view your work)"
+      your_work: "Your work"
+      choose_topic: "(You have to choose a topic first)"
+      not_allowed: "(You are not allowed to submit you work right now)"
+      give_feedback: "(Give feedback to others on their work)"
+      take_quizzes: "Take quizzes"
+      quizzes_read: "(Take quizzes over the work you have read)"
+      view_feedback: "(View feedback on your work)"
+      self_review: "(You have to submit self-review under 'Your work' before checking 'Your scores'.)"
+      log_you_out: "(This will log you out)"
+      different_handle: "(Provide a different handle for this assignment)"
+
+  sign_up_sheet:
+    list:
+      signup_sheet: "Signup sheet for"
+      assignment_lower: "assignment"
+      your_topics: "You topic(s):"
+      waitlisted: "(waitlisted)"
+      back: "Back"
+
+    table_header:
+      topic_num: "Topic #"
+      topic_name: "Topic name(s)"
+      micro_payment: "Micro- payment"
+      num_slots: "Num. of slots"
+      available_slots: "Available slots"
+      num_waitlist: "Num. on waitlist"
+      bookmarks: "Bookmarks"
+      actions: "Actions"
+      advertise: "Advertise- ment(s)"
+
+    suggested_topic:
+      approved_suggestion: "Your approved suggested topic"
+
+  student_teams:
+    edit:
+      team_name: "Team Name:"
+
+    view:
+      team_info: "Team Information for"
+      no_team: "You no longer have a team!"
+      name_team: "Name team"
+      team_name: "Team name:"
+      team_members: "Team members"
+      username: "Username"
+      fullname: "Full name"
+      email_address: "Email address"
+      review_action: "Review action"
+      send_invite: "Send invitations"
+      status: "Status"
+      accepted: "Accepted"
+      declined: "Declined"
+      wait_reply: "Waiting for replay"
+      invite_people: "Invite people"
+      enter_user: "Enter user login: "
+      user_waiting: "User waiting for this topic:"
+      email: "Email"
+      received_invitation: "Received Invitations"
+      from: "From"
+      team_name_nc: "Team Name"
+      reply: "Reply"
+      ad_for_team: "Advertisement for teammates"
+      back: "Back"
+
+# end of Student Views
 
 
 

@@ -16,9 +16,17 @@
             <%= render :partial => 'menu_items/suckerfish',
                        :locals => { items: session[:menu].get_menu(0), level: 0 } %>
         <% end %>
+
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Select language<b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><%=link_to_unless_current "English", locale: "en" %></li>
+            <li><%=link_to_unless_current "Hindi", locale: "hi_IN" %></li>
+          </ul>
+        </li>
         <% if current_user %>
             <li class="impersonate-box">
               <span id="impersonate-user-info">User: <%= current_user.name(session[:ip]) %></span>
@@ -33,10 +41,10 @@
                       </div>
                   <% end %>
               <% end %>
-              <br>
-              <span id="impersonate-user-info"><%=link_to_unless_current "Switch to Hindi", locale: "hi_IN" %></span>
-              <br>
-              <span id="impersonate-user-info"><%=link_to_unless_current "Switch to English", locale: "en" %></span>
+              <!--<br>-->
+              <!--<span id="impersonate-user-info"><%=link_to_unless_current "Switch to Hindi", locale: "hi_IN" %></span>-->
+              <!--<br>-->
+              <!--<span id="impersonate-user-info"><%=link_to_unless_current "Switch to English", locale: "en" %></span>-->
 
            </li>
 

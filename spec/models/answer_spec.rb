@@ -12,7 +12,11 @@ describe Answer do
   describe "#test get total score" do
     it "returns total score when required conditions are met" do
       # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
+      score_view = double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)
+      allow(ScoreView).to receive(:find_by_sql).and_return([score_view])
+      allow(score_view).to receive(:sum_of_weights=).with(any_args).and_return(score_view.sum_of_weights)
+      allow(score_view).to receive(:weighted_score=).with(any_args).and_return(score_view.weighted_score)
+      allow(score_view).to receive(:q1_max_question_score=).with(any_args).and_return(score_view.q1_max_question_score)
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq 100.0
       # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
@@ -20,19 +24,31 @@ describe Answer do
     end
 
     it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
+      score_view = double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)
+      allow(ScoreView).to receive(:find_by_sql).and_return([score_view])
+      allow(score_view).to receive(:sum_of_weights=).with(any_args).and_return(score_view.sum_of_weights)
+      allow(score_view).to receive(:weighted_score=).with(any_args).and_return(score_view.weighted_score)
+      allow(score_view).to receive(:q1_max_question_score=).with(any_args).and_return(score_view.q1_max_question_score)
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
     end
 
     it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5)])
+      score_view = double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5)
+      allow(ScoreView).to receive(:find_by_sql).and_return([score_view])
+      allow(score_view).to receive(:sum_of_weights=).with(any_args).and_return(score_view.sum_of_weights)
+      allow(score_view).to receive(:weighted_score=).with(any_args).and_return(score_view.weighted_score)
+      allow(score_view).to receive(:q1_max_question_score=).with(any_args).and_return(score_view.q1_max_question_score)
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
     end
 
     it "returns -1 when weighted_score of questionnaireData is nil" do
-      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
+      score_view = double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)
+      allow(ScoreView).to receive(:find_by_sql).and_return([score_view])
+      allow(score_view).to receive(:sum_of_weights=).with(any_args).and_return(score_view.sum_of_weights)
+      allow(score_view).to receive(:weighted_score=).with(any_args).and_return(score_view.weighted_score)
+      allow(score_view).to receive(:q1_max_question_score=).with(any_args).and_return(score_view.q1_max_question_score)
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
     end

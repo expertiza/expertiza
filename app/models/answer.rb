@@ -142,10 +142,21 @@ class Answer < ActiveRecord::Base
               AND q1_id = ?
               AND s_response_id = ?", id, response_id]
     end
+    [self.get_score_view(score_views)]
+  end
+
+  def self.get_score_view(score_views)
     score_view = score_views[0]
-    score_view.sum_of_weights = score_views.map(&:sum_of_weights).inject(0, :+)
-    score_view.weighted_score = score_views.map(&:weighted_score).inject(0, :+)
+    sum_of_weights = score_views.map(&:sum_of_weights)
+    weighted_scores = score_views.map(&:weighted_score)
+
+    score_view.sum_of_weights = nil if sum_of_weights.include? nil
+    score_view.sum_of_weights = sum_of_weights.inject(0, :+) unless sum_of_weights.include? nil
+
+    score_view.weighted_score = nil if weighted_scores.include? nil
+    score_view.weighted_score = score_views.map(&:weighted_score).inject(0, :+) unless weighted_scores.include? nil
+
     score_view.q1_max_question_score = score_views.map(&:q1_max_question_score).max
-    [score_view]
+    score_view
   end
 end

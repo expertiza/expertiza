@@ -1,4 +1,6 @@
 class RevisionReviewQuestionnaire < Questionnaire
+  attr_accessor :id, :name, :instructor_id, :private, :min_question_score, :max_question_score, :type, :display_type, :instruction_loc, :submission_record_id
+
   after_initialize :post_initialization
 
   def post_initialization

@@ -180,7 +180,9 @@ describe QuestionnairesController do
   describe '#edit' do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6))
+        questionnaire = double('Questionnaire', instructor_id: 6)
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(questionnaire).to receive(:submission_record).with(no_args).and_return(nil)
         session = {user: instructor}
         params = {id: 1}
         get :edit, params, session
@@ -191,6 +193,7 @@ describe QuestionnairesController do
     context 'when @questionnaire is nil' do
       it 'redirects to root page' do
         allow(Questionnaire).to receive(:find).with('666').and_return(nil)
+        allow(Questionnaire).to receive(:submission_record).with(no_args).and_return(nil)
         session = {user: instructor}
         params = {id: 666}
         get :edit, params, session

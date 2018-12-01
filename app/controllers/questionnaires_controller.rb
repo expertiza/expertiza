@@ -507,8 +507,8 @@ class QuestionnairesController < ApplicationController
   # determines if "edit" action is allowed
   def edit_action_allowed?
     @questionnaire = Questionnaire.find(params[:id])
-    if @questionnaire.submission_record.nil?
-      is_admin? || instructor_for_questionnaire?(@questionnaire)
+    if @questionnaire.nil? || @questionnaire.submission_record.nil?
+      admin? || instructor_for_questionnaire?(@questionnaire)
     else
       questionnaire_by_user?(@questionnaire)
     end

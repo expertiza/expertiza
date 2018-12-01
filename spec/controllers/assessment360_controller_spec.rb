@@ -5,7 +5,6 @@
 
 describe Assessment360Controller do
   describe '#course_student_grade_summary' do
-
     context 'when course does not have participants' do
       before(:each) do
         request.env['HTTP_REFERER'] = 'http://example.com'
@@ -30,8 +29,7 @@ describe Assessment360Controller do
         @assignment = create(:assignment, course: @course)
         @questionnaire = create(:questionnaire)
         @question = create(:question, questionnaire: @questionnaire)
-        @assignment_questionnaire = create(:assignment_questionnaire, questionnaire: @questionnaire,
-                                           assignment: @assignment)
+        @assignment_questionnaire = create(:assignment_questionnaire, questionnaire: @questionnaire, assignment: @assignment)
         @review_grade = create(:review_grade)
         @topic = create(:topic, assignment: @assignment)
         @student = create(:student)
@@ -69,8 +67,6 @@ describe Assessment360Controller do
       it 'makes final peer review scores not empty' do
         expect(assigns(:final_peer_review_scores)).to_not be_empty
       end
-
     end
   end
 end
-

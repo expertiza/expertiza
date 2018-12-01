@@ -57,9 +57,10 @@ class Answer < ActiveRecord::Base
       sum_of_weights = 0
       max_question_score = 0
 
-      @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
+      # rahuliyer95: The functionality is the same, only change is that the questions may also contain
+      # RevisionReviewQuestionnaire's questions submitted by the user. So need to compute that as well
+      questionnaireData = self.get_questionnaire_data(@questions, @response.id)
 
-      questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?", @questions[0].questionnaire_id, @response.id]
       # zhewei: we should check whether weighted_score is nil,
       # which means student did not assign any score before save the peer review.
       # If we do not check here, to_f method will convert nil to 0, at that time, we cannot figure out the reason behind 0 point,
@@ -129,4 +130,22 @@ class Answer < ActiveRecord::Base
     map.reviewee_id
   end
   # end added by ferry for answer tagging
+
+  # returns scores computed from ScoreView used in computing `total_score`
+  def self.get_questionnaire_data(questions, response_id)
+    questionnaire_ids = questions.map(&:questionnaire_id).uniq
+    score_views = questionnaire_ids.flat_map do |id|
+      ScoreView.find_by_sql ["
+        SELECT q1_max_question_score, SUM(question_weight) AS sum_of_weights, SUM(question_weight * s_score) AS weighted_score
+        FROM score_views
+        WHERE type in('Criterion', 'Scale')
+              AND q1_id = ?
+              AND s_response_id = ?", id, response_id]
+    end
+    score_view = score_views[0]
+    score_view.sum_of_weights = score_views.map(&:sum_of_weights).inject(0, :+)
+    score_view.weighted_score = score_views.map(&:weighted_score).inject(0, :+)
+    score_view.q1_max_question_score = score_views.map(&:q1_max_question_score).max
+    [score_view]
+  end
 end

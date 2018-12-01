@@ -22,6 +22,7 @@
         <% if current_user %>
             <li class="impersonate-box">
               <span id="impersonate-user-info">User: <%= current_user.name(session[:ip]) %></span>
+              <!--<li>-->
               <% if session[:super_user] %>
                   <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
                       <div class="input-group">
@@ -32,7 +33,16 @@
                       </div>
                   <% end %>
               <% end %>
-            </li>
+              <br>
+              <span id="impersonate-user-info"><%=link_to_unless_current "Switch to Hindi", locale: "hi_IN" %></span>
+              <br>
+              <span id="impersonate-user-info"><%=link_to_unless_current "Switch to English", locale: "en" %></span>
+
+           </li>
+            <!--<br>-->
+            <!--<li><!--%=link_to_unless_current "English", locale: "en" %></li>-->
+          <!--<br>-->
+          <!--<li><!--%=link_to_unless_current "Hindi", locale: "hi_IN" %></li>-->
             <li class="divider-vertical"></li>
             <li class="right-most logout-box">
               <%= link_to "Logout", {controller: "auth", action: "logout"}, method: :post %>

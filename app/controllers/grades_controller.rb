@@ -41,7 +41,7 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?
-      @questions = retrieve_questions questionnaires,@assignment.id
+      @questions = retrieve_questions questionnaires, @assignment.id
     else # if this assignment does not have "varying rubric by rounds" feature
       @questions = {}
       questionnaires.each do |questionnaire|

@@ -38,10 +38,10 @@ describe "Get All Grades For All Students in a Course" do
   end
 
   it 'displays student name' do
-    expect(page).to have_content((@student.name).to_s)
+    expect(page).to have_content(@student.name.to_s)
   end
 
   it 'displays topic name' do
-    expect(page).to have_content((@topic.topic_name).to_s)
+    expect(page).to have_content(@topic.topic_name.to_s)
   end
 end

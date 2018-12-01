@@ -78,6 +78,7 @@ class GradesController < ApplicationController
     @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
     retrieve_questions questionnaires
+    setup_revision_review_questionnaire
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart

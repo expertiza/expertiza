@@ -145,16 +145,14 @@ class Answer < ActiveRecord::Base
     [self.get_score_view(score_views)]
   end
 
+  # Aggregate multiple ScoreView into a single ScoreView
   def self.get_score_view(score_views)
     score_view = score_views[0]
     sum_of_weights = score_views.map(&:sum_of_weights)
+    score_view.sum_of_weights = sum_of_weights.include?(nil) ? nil : sum_of_weights.inject(0, :+)
+
     weighted_scores = score_views.map(&:weighted_score)
-
-    score_view.sum_of_weights = nil if sum_of_weights.include? nil
-    score_view.sum_of_weights = sum_of_weights.inject(0, :+) unless sum_of_weights.include? nil
-
-    score_view.weighted_score = nil if weighted_scores.include? nil
-    score_view.weighted_score = score_views.map(&:weighted_score).inject(0, :+) unless weighted_scores.include? nil
+    score_view.weighted_score = weighted_scores.include?(nil) ? nil : weighted_scores.inject(0, :+)
 
     score_view.q1_max_question_score = score_views.map(&:q1_max_question_score).max
     score_view

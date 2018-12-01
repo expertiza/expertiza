@@ -163,6 +163,7 @@ class SubmittedContentController < ApplicationController
   def begin_planning
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
+
     record = create_revision_review_submission_record(participant)
     redirect_to new_questionnaire_path(model: "RevisionReviewQuestionnaire", private: 0, submission_record_id: record.id)
   end
@@ -252,7 +253,7 @@ class SubmittedContentController < ApplicationController
   # setup the data necessary for RevisionReview submission
   def setup_revision_review_edit_view
     # Find the round of the current assignment
-    @round = current_round(@participant)
+    @round = participant.assignment.number_of_current_round(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     @record = revision_review_submission_record_for_round(@participant, @round)
     @questionnaire = questionnaire_for_submission(@record)
     # Partially created submission record without a corresponding questionnaire should be deleted
@@ -260,17 +261,12 @@ class SubmittedContentController < ApplicationController
     @record = nil if @record && @questionnaire.nil?
   end
 
-  # returns the current round of the assignment
-  def current_round(participant)
-    participant.assignment.number_of_current_round(SignedUpTeam.topic_id(participant.parent_id, participant.user_id))
-  end
-
   # create a RevisionReview submission record for the current round
   def create_revision_review_submission_record(participant)
     SubmissionRecord.create(team_id: participant.team.id,
                             user: participant.name,
                             assignment_id: participant.assignment.id,
-                            content: current_round(participant).to_s,
+                            content: participant.assignment.number_of_current_round(SignedUpTeam.topic_id(participant.parent_id, participant.user_id)).to_s,
                             operation: "Revision Review")
   end
 

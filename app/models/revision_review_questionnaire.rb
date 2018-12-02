@@ -1,5 +1,6 @@
 class RevisionReviewQuestionnaire < Questionnaire
-  attr_accessible :id, :name, :instructor_id, :private, :min_question_score, :max_question_score, :type, :display_type, :instruction_loc, :submission_record_id
+  attr_accessible :id, :name, :instructor_id, :private, :min_question_score, :max_question_score,
+                  :type, :display_type, :instruction_loc, :submission_record_id, :created_at, :updated_at
 
   after_initialize :post_initialization
 
@@ -17,7 +18,7 @@ class RevisionReviewQuestionnaire < Questionnaire
     return nil unless team
     return [] if participant.nil?
 
-    maps = ResponseMap.where(reviewee_id: team.id, type: "RevisionReviewResponseMap")
+    maps = ResponseMap.where(reviewee_id: team.id, type: "ReviewResponseMap")
     responses = maps.reject {|r| r.response.empty? }.flat_map(&:response)
     responses.select(&:is_submitted).sort_by {|r| r.map.reviewer.fullname }
   end

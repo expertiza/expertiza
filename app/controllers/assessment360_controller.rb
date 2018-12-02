@@ -106,7 +106,7 @@ class Assessment360Controller < ApplicationController
         next if assignment_participant.nil?
 
         topic_id = SignedUpTeam.topic_id(assignment_participant.parent_id, assignment_participant.user_id)
-        @topics[cp.id][assignment.id] = SignUpTopic.find_by(topic_id)
+        @topics[cp.id][assignment.id] = SignUpTopic.find_by(id: topic_id)
 
         team_id = TeamsUser.team_id(assignment_participant.parent_id, assignment_participant.user_id)
         next if team_id.nil?

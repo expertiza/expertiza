@@ -962,6 +962,95 @@ jQuery(document).ready(function () {
     }
   })
 
+  var QuestionnairesAdvancedSearchBar = React.createClass({
+    componentDidMount() {
+      $('.datepick').each(function () {
+        $(this).datetimepicker({
+          dateFormat: 'yy/mm/dd',
+          timeFormat: 'HH:mm:ss z',
+          controlType: 'select',
+          timezoneList: [
+            { value: -000, label: 'GMT' },
+            { value: -300, label: 'Eastern' },
+            { value: -360, label: 'Central' },
+            { value: -420, label: 'Mountain' },
+            { value: -480, label: 'Pacific' }
+          ]
+        });
+      });
+    },
+    getInputValues: function () {
+      return {
+        words: this.refs.words.getDOMNode().value,
+        course: this.refs.course.getDOMNode().value,
+        assignment: this.refs.assignment.getDOMNode().value,
+      };
+    },
+    render: function () {
+      return (
+        <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px' }}>
+          <input
+            ref="words"
+            type="text"
+            className="form-control"
+            placeholder="Words" />
+          <input
+            ref="course"
+            type="text"
+            className="form-control"
+            placeholder="Course" />
+          <input
+            ref="assignment"
+            type="text"
+            className="form-control"
+            placeholder="Assignment" />
+        </div>
+      );
+    }
+  })
+
+  var QuestionnairesSearchBar = React.createClass({
+    getInitialState: () => {
+      return {
+        // advancedSearchVisible: false,
+        advancedSearchVisible: true,
+      }
+    },
+    toggleAdvancedSearch() {
+      this.setState({
+        advancedSearchVisible: !this.state.advancedSearchVisible
+      });
+    },
+    handleSearch: function () {
+      this.props.onSearchClick({
+        name: this.refs.nameInput.getDOMNode().value,
+        ...this.state.advancedSearchVisible ? this.child.getInputValues() : null,
+      });
+    },
+    render: function () {
+      return (
+        <div>
+          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'end' }}>
+            <input
+              ref="nameInput"
+              type="text"
+              className="form-control"
+              placeholder="Name" />
+            <button type="button"
+              className="btn btn-primary"
+              onClick={this.handleSearch}>
+              Search
+            </button>
+            <a onClick={this.toggleAdvancedSearch}>
+              {this.state.advancedSearchVisible ? 'Hide Advanced Search' : 'Advanced Search'}
+            </a>
+          </div>
+          {this.state.advancedSearchVisible ? <QuestionnairesAdvancedSearchBar ref={instance => { this.child = instance; }} /> : null}
+        </div>
+      );
+    }
+  })
+
   var AssignmentAdvancedSearchBar = React.createClass({
     componentDidMount() {
       $('.datepick').each(function () {
@@ -992,14 +1081,16 @@ jQuery(document).ready(function () {
     },
     render: function () {
       return (
-        <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
+        <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(7, auto) 1fr', gridGap: '8px' }}>
           <input
+            data-toggle="tooltip" title="User ID of the person who participated in the assignment"
             value="student7575"
             ref="participantName"
             type="text"
             className="form-control"
             placeholder="Assignee (User ID)" />
           <input
+            data-toggle="tooltip" title="Full name of the person who participated in the assignment"
             ref="participantFullname"
             type="text"
             className="form-control"
@@ -1154,7 +1245,9 @@ jQuery(document).ready(function () {
             dataType={this.props.dataType} />
           break;
         case 'questionnaire':
-          searchBar = ''
+          searchBar = <QuestionnairesSearchBar
+            onSearchClick={this.handleSearchClick}
+            dataType={this.props.dataType} />
           break;
       }
 

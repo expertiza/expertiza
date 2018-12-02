@@ -18,7 +18,7 @@ class AssignmentNode < Node
   #   parent_id: course_id if subset
 
   # returns: list of AssignmentNodes based on query
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = {})
     if show
       conditions = if User.find(user_id).role.name != "Teaching Assistant"
                      'assignments.instructor_id = ?'
@@ -46,19 +46,31 @@ class AssignmentNode < Node
     name = _search[:name].to_s.strip
     participant_name = _search[:participant_name].to_s.strip
     participant_fullname = _search[:participant_fullname].to_s.strip
+    due_since = _search[:due_since].to_s.strip
+    due_until = _search[:due_until].to_s.strip
     created_since = _search[:created_since].to_s.strip
     created_until = _search[:created_until].to_s.strip
-    updated_since = _search[:updated_since].to_s.strip
-    updated_until = _search[:updated_until].to_s.strip
 
-    search_by_participant = participant_name.present? || participant_fullname.present?
+    associations = { assignment: [:due_dates] }
 
-    associations = search_by_participant ? { assignment: { participants: :user } } : :assignment
+    if participant_name.present? || participant_fullname.present?
+      associations[:assignment] << { participants: :user }
+    end
 
     query = self.includes(associations).where(find_conditions)
 
     if name.present?
       query = query.where('name LIKE ?', "%#{name}%")
+    end
+
+    if due_since.present?
+      due_since = due_since.to_time.utc
+      query = query.where('due_dates.due_at >= ?', due_since)
+    end
+
+    if due_until.present?
+      due_until = due_until.to_time.utc
+      query = query.where('due_dates.due_at <= ?', due_until)
     end
 
     if created_since.present?
@@ -69,16 +81,6 @@ class AssignmentNode < Node
     if created_until.present?
       created_until = created_until.to_time.utc
       query = query.where('created_at <= ?', created_until)
-    end
-
-    if updated_since.present?
-      updated_since = updated_since.to_time.utc
-      query = query.where('updated_at >= ?', updated_since)
-    end
-
-    if updated_until.present?
-      updated_until = updated_until.to_time.utc
-      query = query.where('updated_at <= ?', updated_until)
     end
 
     if participant_name.present?

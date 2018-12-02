@@ -1072,16 +1072,15 @@ jQuery(document).ready(function () {
       return {
         participant_name: this.refs.participantName.getDOMNode().value,
         participant_fullname: this.refs.participantFullname.getDOMNode().value,
-        creator_name: this.refs.creatorName.getDOMNode().value,
+        due_since: this.refs.dueSince.getDOMNode().value,
+        due_until: this.refs.dueUntil.getDOMNode().value,
         created_since: this.refs.createdSince.getDOMNode().value,
         created_until: this.refs.createdUntil.getDOMNode().value,
-        updated_since: this.refs.updatedSince.getDOMNode().value,
-        updated_until: this.refs.updatedUntil.getDOMNode().value,
       };
     },
     render: function () {
       return (
-        <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(7, auto) 1fr', gridGap: '8px' }}>
+        <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
           <input
             data-toggle="tooltip" title="User ID of the person who participated in the assignment"
             ref="participantName"
@@ -1095,10 +1094,15 @@ jQuery(document).ready(function () {
             className="form-control"
             placeholder="Assignee (Full name)" />
           <input
-            ref="creatorName"
+            ref="dueSince"
             type="text"
-            className="form-control"
-            placeholder="Creator (User ID)" />
+            className="form-control datepick"
+            placeholder="Due Date Since" />
+          <input
+            ref="dueUntil"
+            type="text"
+            className="form-control datepick"
+            placeholder="Due Date Until" />
           <input
             ref="createdSince"
             type="text"
@@ -1109,16 +1113,6 @@ jQuery(document).ready(function () {
             type="text"
             className="form-control datepick"
             placeholder="Created Until" />
-          <input
-            ref="updatedSince"
-            type="text"
-            className="form-control datepick"
-            placeholder="Updated Since" />
-          <input
-            ref="updatedUntil"
-            type="text"
-            className="form-control datepick"
-            placeholder="Updated Until" />
         </div>
       );
     }
@@ -1283,7 +1277,7 @@ jQuery(document).ready(function () {
           Assignments: {},
           Questionnaires: {}
         },
-        search: { name: '' },
+        search: {},
         activeTab: "1"
       }
     },

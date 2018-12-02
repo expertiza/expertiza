@@ -4,6 +4,7 @@ describe QuestionnairesController do
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:student) {build(:student, id: 7)}
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -200,6 +201,22 @@ describe QuestionnairesController do
         expect(response).to redirect_to('/')
       end
     end
+
+    context 'when @user is a student on the project team' do
+      it 'renders the questionnaires#edit page' do
+      	stub_current_user(student, student.role.name, student.role)
+      	participant = double('student', user_id: 7)
+      	submission_record = double('submission_record', team_id: 3, participants: [participant])
+        questionnaire = double('Questionnaire', submission_record: submission_record)
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(AssignmentTeam).to receive(:find).with(anything).and_return(submission_record)
+        session = {user: student}
+        params = {id: 1}
+        get :edit, params, session
+        expect(response).to render_template(:edit)
+      end
+    end
+
   end
 
   describe '#update' do

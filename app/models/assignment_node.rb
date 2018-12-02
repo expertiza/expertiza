@@ -36,34 +36,62 @@ class AssignmentNode < Node
     end
     conditions += " and course_id = #{parent_id}" if parent_id
     sortvar ||= 'created_at'
-    puts '>>>>> assignment_node.get _search', _search
-
-    if !_search[:name].to_s.strip.empty?
-      conditions += " and name like '%#{_search[:name]}%'"
-    end
-    if !_search[:created_since].to_s.strip.empty?
-      created_since = _search[:created_since].to_time.utc
-      conditions += " and created_at > '#{created_since}'"
-    end
-    if !_search[:created_until].to_s.strip.empty?
-      created_until = _search[:created_until].to_time.utc
-      conditions += " and created_at <= '#{created_until}'"
-    end
-    if !_search[:updated_since].to_s.strip.empty?
-      updated_since = _search[:updated_since].to_time.utc
-      conditions += " and updated_at > '#{updated_since}'"
-    end
-    if !_search[:updated_until].to_s.strip.empty?
-      updated_until = _search[:updated_until].to_time.utc
-      conditions += " and updated_at < '#{updated_until}'"
-    end
-    # conditions += " and participants.grade like '%#{_search[:participantName]}%'" if !_search[:participantName].to_s.strip.empty?
-
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
-    self.includes(:assignment)
-      .where(find_conditions)
-      .order("assignments.#{sortvar} #{sortorder}")
+
+    puts '>>>>> assignment_node.get _search', _search
+
+    name = _search[:name].to_s.strip
+    participant_name = _search[:participant_name].to_s.strip
+    participant_fullname = _search[:participant_fullname].to_s.strip
+    created_since = _search[:created_since].to_s.strip
+    created_until = _search[:created_until].to_s.strip
+    updated_since = _search[:updated_since].to_s.strip
+    updated_until = _search[:updated_until].to_s.strip
+
+    query_includes_user = !participant_name.empty? || !participant_fullname.empty?
+
+    associations = query_includes_user ? { assignment: { participants: :user } } : :assignment
+
+    query = self.includes(associations).where(find_conditions)
+
+    if !name.empty?
+      query = query.where('name LIKE ?', "%#{name}%")
+    end
+
+    if !participant_name.empty?
+      query = query.where('users.name LIKE ?', "%#{participant_name}%")
+    end
+
+    if !participant_fullname.empty?
+      query = query.where('users.fullname LIKE ?', "%#{participant_fullname}%")
+    end
+
+    if !participant_fullname.empty?
+      query = query.where('users.fullname LIKE ?', "%#{participant_fullname}%")
+    end
+
+    if !created_since.empty?
+      created_since = created_since.to_time.utc
+      query = query.where('created_at >= ?', created_since)
+    end
+
+    if !created_until.empty?
+      created_until = created_until.to_time.utc
+      query = query.where('created_at <= ?', created_until)
+    end
+
+    if !updated_since.empty?
+      updated_since = updated_since.to_time.utc
+      query = query.where('updated_at >= ?', updated_since)
+    end
+
+    if !updated_until.empty?
+      updated_until = updated_until.to_time.utc
+      query = query.where('updated_at <= ?', updated_until)
+    end
+
+    query.order("assignments.#{sortvar} #{sortorder}")
   end
 
   # Indicates that this object is always a leaf

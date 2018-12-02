@@ -1084,7 +1084,6 @@ jQuery(document).ready(function () {
         <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(7, auto) 1fr', gridGap: '8px' }}>
           <input
             data-toggle="tooltip" title="User ID of the person who participated in the assignment"
-            value="student7575"
             ref="participantName"
             type="text"
             className="form-control"

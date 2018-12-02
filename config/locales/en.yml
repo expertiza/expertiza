@@ -173,6 +173,7 @@ en:
       tasks_not_started: "Tasks not yet started"
       revisions: "Revisions"
       student_team: "Students who have teamed with you"
+      not_associated: "assignments not associated with any course"
       assignment_name: "Assignment"
       course: "Course"
       topic: "Topic"
@@ -180,11 +181,12 @@ en:
       review_grade: "Review Grade"
       badges: "Badges"
       stage_deadline: "Stage Deadline"
-      publishing: "Publishing Rights"
+      publishing_rights: "Publishing Rights"
 
     view:
       submit_review: "Submit or Review work for"
       next_click: "Next: Click the activity you wish to perform on the assignment titled:"
+      assignment_description: "Assignment Description"
       signup_topic: "(Sign up for a topic)"
       view_team: "(View and manage your team)"
       submit_work: "(Submit and view your work)"
@@ -194,6 +196,7 @@ en:
       give_feedback: "(Give feedback to others on their work)"
       take_quizzes: "Take quizzes"
       quizzes_read: "(Take quizzes over the work you have read)"
+      your_scores: "Your scores"
       view_feedback: "(View feedback on your work)"
       self_review: "(You have to submit self-review under 'Your work' before checking 'Your scores'.)"
       log_you_out: "(This will log you out)"
@@ -223,6 +226,7 @@ en:
 
   student_teams:
     edit:
+      edit_team: "Edit Team"
       team_name: "Team Name:"
 
     view:
@@ -230,6 +234,7 @@ en:
       no_team: "You no longer have a team!"
       name_team: "Name team"
       team_name: "Team name:"
+      team_name_up: "Team Name:"
       team_members: "Team members"
       username: "Username"
       fullname: "Full name"
@@ -242,11 +247,12 @@ en:
       wait_reply: "Waiting for replay"
       invite_people: "Invite people"
       enter_user: "Enter user login: "
-      user_waiting: "User waiting for this topic:"
+      users_waiting: "Users waiting for this topic:"
+      user_id: "User id"
       email: "Email"
       received_invitation: "Received Invitations"
       from: "From"
-      team_name_nc: "Team Name"
+      team_name_no_colon: "Team Name"
       reply: "Reply"
       ad_for_team: "Advertisement for teammates"
       back: "Back"

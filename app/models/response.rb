@@ -159,9 +159,9 @@ class Response < ActiveRecord::Base
   def significant_difference?
     map_class = self.map.class
     existing_responses = map_class.get_assessments_for(self.map.reviewee)
-    average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    #average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     # if this response is the first on this artifact, there's no grade conflict
-    return false if count == 0
+    #return false if count == 0
     # This score has already skipped the unfilled scorable question(s)
     score = total_score.to_f / maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
@@ -169,18 +169,51 @@ class Response < ActiveRecord::Base
     assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
     # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
     allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
+    p '***********'
+    existing_response_data, count = Response.scores_and_count_for_prev_reviews(existing_responses, self, score, allowed_difference_percentage)
+    p '***********'
+    return false if count == 0
+    p existing_response_data
     # the range of average_score_on_same_artifact_from_others and score is [0,1]
     # the range of allowed_difference_percentage is [0, 100]
-    (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
+    #(average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
+  end
+
+  def self.scores_and_count_for_prev_reviews(existing_responses, current_response, score, allowed_difference_percentage)
+    #score = total_score.to_f / maximum_score
+    #questionnaire = questionnaire_by_answer(self.scores.first)
+    #assignment = self.map.assignment
+    #assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
+    # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
+    #allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
+    score_assigned = 0
+    existing_response_id = []
+    existing_response_score = []
+    count = 0
+    existing_responses.each do |existing_response|
+      if existing_response.id != current_response.id # the current_response is also in existing_responses array
+        count += 1
+        score_assigned = existing_response.total_score.to_f / existing_response.maximum_score
+        if (score_assigned - score).abs * 100 > allowed_difference_percentage
+          p (score_assigned - score).abs * 100
+          p '-----------------------------'
+          p allowed_difference_percentage
+          existing_response_id << existing_response.id
+        end
+      end
+    end
+    [existing_response_id, count]
   end
 
   def self.avg_scores_and_count_for_prev_reviews(existing_responses, current_response)
     scores_assigned = []
+    #existing_response_id = []
     count = 0
     existing_responses.each do |existing_response|
       if existing_response.id != current_response.id # the current_response is also in existing_responses array
         count += 1
         scores_assigned << existing_response.total_score.to_f / existing_response.maximum_score
+        #existing_response_id << existing_response.id
       end
     end
     [scores_assigned.sum / scores_assigned.size.to_f, count]
@@ -195,6 +228,7 @@ class Response < ActiveRecord::Base
     reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
     reviewee_name = User.find(reviewee_participant.user_id).fullname
     assignment = Assignment.find(reviewer_participant.parent_id)
+    p assignment.instructor.email
     Mailer.notify_grade_conflict_message(
       to: assignment.instructor.email,
       subject: 'Expertiza Notification: A review score is outside the acceptable range',

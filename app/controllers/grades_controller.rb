@@ -38,15 +38,23 @@ class GradesController < ApplicationController
   def view
     @assignment = Assignment.find(params[:id])
     @questions = {}
-    questionnaires = @assignment.questionnaires
+    @questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?
-      retrieve_questions questionnaires
+      retrieve_questions @questionnaires
     else # if this assignment does not have "varying rubric by rounds" feature
-      questionnaires.each do |questionnaire|
-        @questions[questionnaire.symbol] = questionnaire.questions
+      @questionnaires.each do |questionnaire|
+        @questions[questionnaire.symbol] = @questionnaire.questions
+        # @questionnaire.id
       end
     end
+    i = 0
+    @questionnaireids = []
+    questionnaires_array = (0..(@questionnaires.length-1)).to_a
+    questionnaires_array.each do |q|
+      @questionnaireids[q] = @questionnaires[q].id
+    end
+
 
     @scores = @assignment.scores(@questions)
     averages = calculate_average_vector(@assignment.scores(@questions))
@@ -55,6 +63,51 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
 
     @show_reputation = false
+    @rounds = @assignment.num_review_rounds
+
+    # @participants = AssignmentParticipant.where(parent_id:@assignment.id)
+    #
+    # # @teams = Assignment.teams
+    # i = 0
+    # @test = []
+    # @participants.each do |participant|
+    #   @test[i] = @participant.id
+    #   i = i +1
+    # end
+    @teams = AssignmentTeam.where(parent_id:@assignment.id)
+    i = 0
+    @teamids = []
+    @result = []
+    @responseids = []
+    @scoreviews = []
+    team_array = (0..(@teams.length-1)).to_a
+    team_array.each do |t|
+      @teamids[t] = @teams[t].id
+      # i = i + 1;
+      @result[t] = ResponseMap.find_by_sql ["SELECT id FROM response_maps
+        WHERE type = 'ReviewResponseMap' AND reviewee_id = ?", @teamids[t]]
+      @responseids[t] = []
+      @scoreviews[t] = []
+
+        result_array = (0..(@result[t].length-1)).to_a
+        result_array.each do |r|
+          @responseids[t][r] = Response.find_by_sql ["SELECT id FROM responses
+            WHERE round = 1 AND map_id = ?", @result[t][r]]
+            if @responseids[t][r].length > 0
+              # responseids_array = (0..(@responseids[t][r].length-1)).to_a
+              # responseids_array.each do |s|
+                @scoreviews[t][r] = Answer.where(response_id: @responseids[t][r][0])
+
+              # end
+            end
+
+        end
+
+
+
+
+    end
+
   end
 
   # This method is used to retrieve questions for different review rounds

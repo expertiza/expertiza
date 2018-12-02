@@ -39,7 +39,9 @@ class AssignmentNode < Node
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
 
-    puts '>>>>> assignment_node.get _search', _search
+    puts _search
+
+    me = User.find(user_id)
 
     name = _search[:name].to_s.strip
     participant_name = _search[:participant_name].to_s.strip
@@ -49,46 +51,54 @@ class AssignmentNode < Node
     updated_since = _search[:updated_since].to_s.strip
     updated_until = _search[:updated_until].to_s.strip
 
-    query_includes_user = !participant_name.empty? || !participant_fullname.empty?
+    search_by_participant = participant_name.present? || participant_fullname.present?
 
-    associations = query_includes_user ? { assignment: { participants: :user } } : :assignment
+    associations = search_by_participant ? { assignment: { participants: :user } } : :assignment
 
     query = self.includes(associations).where(find_conditions)
 
-    if !name.empty?
+    if name.present?
       query = query.where('name LIKE ?', "%#{name}%")
     end
 
-    if !participant_name.empty?
-      query = query.where('users.name LIKE ?', "%#{participant_name}%")
-    end
-
-    if !participant_fullname.empty?
-      query = query.where('users.fullname LIKE ?', "%#{participant_fullname}%")
-    end
-
-    if !participant_fullname.empty?
-      query = query.where('users.fullname LIKE ?', "%#{participant_fullname}%")
-    end
-
-    if !created_since.empty?
+    if created_since.present?
       created_since = created_since.to_time.utc
       query = query.where('created_at >= ?', created_since)
     end
 
-    if !created_until.empty?
+    if created_until.present?
       created_until = created_until.to_time.utc
       query = query.where('created_at <= ?', created_until)
     end
 
-    if !updated_since.empty?
+    if updated_since.present?
       updated_since = updated_since.to_time.utc
       query = query.where('updated_at >= ?', updated_since)
     end
 
-    if !updated_until.empty?
+    if updated_until.present?
       updated_until = updated_until.to_time.utc
       query = query.where('updated_at <= ?', updated_until)
+    end
+
+    if participant_name.present?
+      participant_names = User.where('name LIKE ?', "%#{participant_name}%")
+        .select { |user| me.can_impersonate? user }
+        .map(&:name)
+      if participant_names.empty?
+        return []
+      end
+      query = query.where(users: { name: participant_names })
+    end
+
+    if participant_fullname.present?
+      participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
+        .select { |user| me.can_impersonate? user }
+        .map(&:name)
+      if participant_names.empty?
+        return []
+      end
+      query = query.where(users: { name: participant_names })
     end
 
     query.order("assignments.#{sortvar} #{sortorder}")

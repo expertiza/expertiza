@@ -111,13 +111,17 @@
 
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details">
-                      <% if review_type == 'SelfReviewResponseMap' %>
-                        <%= "Self Review "%>
-                      <%else%>
-                        <%= "Review " +   i.to_s %>
+                      <% if review_type == 'ReviewResponseMap' %>
+                          <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details">
+                          <%= "Review " +   i.to_s %>
+                          </a></th>
                       <%end%>
-                      </a>  </th>
+                      <% if review_type == 'SelfReviewResponseMap' %>
+                        <th class="sorter-false", bgcolor="aqua"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details">
+                        <%= "Self-Review"%>
+                        </a></th>
+                      <%end%>
+
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>

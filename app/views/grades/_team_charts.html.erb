@@ -1,207 +1,40 @@
-<html>
-  <head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <%= render :partial => 'criteria_charts' %>
+    <br> <br>
+
+    <a href="#" name='team-chartLink' onClick="toggleElement('team-chart', 'stats');return false;">Hide stats</a>
+    <br>
+    <TR style ="background-color: white;" class="team" id="team-chart">
+    	<th>
+
+    	<div class="circle" id="average-score">
+
+      	</div>
+      	Class Average
+    	</th>
+    	<TH COLSPAN="8">
+    		<img src="<%= @average_chart  %>" ><br>
+    		Class Distribution
+    		<br>
+    	</th>
+    	<TH WIDTH="9">&nbsp;</th>
+    </TR>
+
     <script type="text/javascript">
-      google.charts.load('current', {packages: ['corechart', 'bar']});
-      google.charts.setOnLoadCallback(drawBasic);
-
-      var chart;
-      var chartOptions;
-
-      var chartData = [];					//Stores all data for the chart to display
-      var currentRound = 0;				//Stores the current displayed round
-      var criteriaSelected = [];	//Stores selected criteria to display
-
-      function generateData() {	//Generates random data for testing
-        var rounds = 3;
-
-        for(var i = 0; i < rounds; i++) {
-          var criteriaNum = Math.floor(Math.random() * 5 + 5);
-
-          var round = [];
-          var criteria = [];
-          for(var j = 0; j < criteriaNum; j++) {
-            round.push(Math.floor(Math.random() * 101));
-            criteria.push(true);
-          }
-          chartData.push(round);
-          criteriaSelected.push(criteria);
-        }
-      }
-
-      function drawBasic() {	//Initializes all google chart information
-        generateData();
-
-        chartOptions = {		//Render options for the chart
-          title: 'Average Scores',
-          titleTextStyle: {
-            fontName: 'arial',	//Fonts to be changed to Helvetica when implemented
-            fontSize: 18,
-            italic: false,
-            bold: true
-          },
-          legend: 'none',
-          bar: {
-            groupWidth: 'default'
-          },
-          hAxis: {
-            title: 'Criterion',
-            titleTextStyle: {
-              fontName: 'arial',
-              fontSize: 14,
-              italic: false,
-              bold: false,
-            },
-            viewWindow: {
-              min: 0.5
-            },
-            textPosition: 'none'
-          },
-          vAxis: {
-            title: 'Average Score',
-            titleTextStyle: {
-              fontName: 'arial',
-              fontSize: 14,
-              italic: false,
-              bold: false
-            },
-            viewWindow: {
-              min: 0,
-              max: 100
-            }
-          }
-        };
-
-        chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-        updateChart(currentRound);
-        loadRounds();
-      }
-
-      function updateChart(roundNum) {	//Updates the chart with a new round number
-        currentRound = roundNum;
-        renderChart();
-        loadCriteria();
-      }
-
-      function renderChart() {	//Renders the chart if changes have been made
-        var data = loadData();
-        chart.draw(data, chartOptions);
-      }
-
-
-      function loadData() {	//Pulls data from the page and renders the chart with it
-        var data = new google.visualization.DataTable();
-        data.addColumn('number', 'Criterion');
-        data.addColumn('number', 'Average Score');
-        data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
-        data.addColumn({type: 'number', role: 'annotation'});
-
-        var rowCount = 1;
-        for(var i = 0; i < chartData[currentRound].length; i++) {
-          if (criteriaSelected[currentRound][i]) {
-            data.addRow([rowCount++, chartData[currentRound][i], '#a90201', i+1]);
-          }
-        }
-
-        return data;
-
-      }
-
-      function loadRounds() {	//Creates the Rounds in the dropdown menu
-        var rounds = document.getElementById("chartRounds");
-        for(var i = 0; i < chartData.length; i++) {
-          var option = document.createElement('option');
-          option.value = i;
-          option.text = "Round " + (i+1);
-          rounds.add(option);
-        }
-        rounds.style.display = "inline";
-      }
-      function loadCriteria() {	//Creates the criteria check boxes
-        var form = document.getElementById("chartCriteria");
-        while (form.firstChild)
-          form.removeChild(form.firstChild);
-
-        chartData[currentRound].forEach(function(dat, i) {
-          var checkbox = document.createElement('input');
-          checkbox.type = "checkbox";
-          checkbox.name = "name";
-          checkbox.value = "value";
-          checkbox.id = "checkboxoption" + i;
-          checkbox.onclick = function() {
-            checkboxUpdate(i);
-          }
-
-          var label = document.createElement('label')
-          label.htmlFor = checkbox.id;
-          label.appendChild(document.createTextNode("Criteria " + (i+1)));
-
-          form.appendChild(checkbox);
-          form.appendChild(label);
-          form.appendChild(document.createElement("BR"));
-          checkbox.checked = criteriaSelected[currentRound][i];
-        });
-      }
-
-      function checkboxUpdate(checkid) {	//Update function to change the displayed criteria
-        var check = document.getElementById("checkboxoption" + checkid);
-        criteriaSelected[currentRound][checkid] = check.checked;
-        renderChart();
-      }
+      var myCircle = Circles.create({
+        id:           'average-score',
+        radius:       50,
+        value:        <%= @avg_of_avg.to_i %>,
+        maxValue:     100,
+        width:        15,
+        text:         '<%=@avg_of_avg.to_i%>',
+        colors:       ['#FFEB99', '#FFCC00'],
+        duration:       700,
+        textClass:      'circles-final'
+      });
     </script>
-</head>
 
-<body>
-<h3>Class Average on Criterions</h3>
-<br>
-<div id="chart_div"></div>
-<form id="chartOptions" name="chartOptions">
-<select id="chartRounds" name="rounds" onChange="updateChart(document.chartOptions.chartRounds.options[document.chartOptions.chartRounds.options.selectedIndex].value)" style = "display: none">
-</select>
-</form>
-<div id="chartCriteria" name="chartCriteria">
-</div>
-</body>
-
-</html>
-
-<br> <br>
-
-<a href="#" name='team-chartLink' onClick="toggleElement('team-chart', 'stats');return false;">Hide stats</a>
-<br>
-<TR style ="background-color: white;" class="team" id="team-chart">
-	<th>
-
-	<div class="circle" id="average-score">          
-  			
-  	</div>
-  	Class Average
-	</th>
-	<TH COLSPAN="8">
-		<img src="<%= @average_chart  %>" ><br>
-		Class Distribution
-		<br>
-	</th>
-	<TH WIDTH="9">&nbsp;</th>
-</TR>
-
-<script type="text/javascript">
-  var myCircle = Circles.create({
-    id:           'average-score',
-    radius:       50,
-    value:        <%= @avg_of_avg.to_i %>,
-    maxValue:     100,
-    width:        15,
-    text:         '<%=@avg_of_avg.to_i%>',
-    colors:       ['#FFEB99', '#FFCC00'],
-    duration:       700,
-    textClass:      'circles-final'  
-  });
-
-</script>
-
-<style> 
- .circles-final{
-    font-size: 16px !important;    
-  }
-</style> 
+    <style>
+     .circles-final{
+        font-size: 16px !important;
+      }
+    </style>

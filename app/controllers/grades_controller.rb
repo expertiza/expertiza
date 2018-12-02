@@ -48,12 +48,7 @@ class GradesController < ApplicationController
         # @questionnaire.id
       end
     end
-    i = 0
-    @questionnaireids = []
-    questionnaires_array = (0..(@questionnaires.length-1)).to_a
-    questionnaires_array.each do |q|
-      @questionnaireids[q] = @questionnaires[q].id
-    end
+
 
 
     @scores = @assignment.scores(@questions)
@@ -63,50 +58,62 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
 
     @show_reputation = false
+
+    # pa4 code starts Here
     @rounds = @assignment.num_review_rounds
+    @chartdata = []
+    for round in (1..@rounds) do
 
-    # @participants = AssignmentParticipant.where(parent_id:@assignment.id)
-    #
-    # # @teams = Assignment.teams
-    # i = 0
-    # @test = []
-    # @participants.each do |participant|
-    #   @test[i] = @participant.id
-    #   i = i +1
-    # end
-    @teams = AssignmentTeam.where(parent_id:@assignment.id)
-    i = 0
-    @teamids = []
-    @result = []
-    @responseids = []
-    @scoreviews = []
-    team_array = (0..(@teams.length-1)).to_a
-    team_array.each do |t|
-      @teamids[t] = @teams[t].id
-      # i = i + 1;
-      @result[t] = ResponseMap.find_by_sql ["SELECT id FROM response_maps
-        WHERE type = 'ReviewResponseMap' AND reviewee_id = ?", @teamids[t]]
-      @responseids[t] = []
-      @scoreviews[t] = []
+      @teams = AssignmentTeam.where(parent_id:@assignment.id)
+      # i = 0
+      @teamids = []
+      @result = []
+      @responseids = []
+      @scoreviews = []
+      team_array = (0..(@teams.length-1)).to_a
+      team_array.each do |t|
+        @teamids[t] = @teams[t].id
+        # i = i + 1;
+        @result[t] = ResponseMap.find_by_sql ["SELECT id FROM response_maps
+          WHERE type = 'ReviewResponseMap' AND reviewee_id = ?", @teamids[t]]
+        @responseids[t] = []
+        @scoreviews[t] = []
 
-        result_array = (0..(@result[t].length-1)).to_a
-        result_array.each do |r|
-          @responseids[t][r] = Response.find_by_sql ["SELECT id FROM responses
-            WHERE round = 1 AND map_id = ?", @result[t][r]]
-            if @responseids[t][r].length > 0
-              # responseids_array = (0..(@responseids[t][r].length-1)).to_a
-              # responseids_array.each do |s|
-                @scoreviews[t][r] = Answer.where(response_id: @responseids[t][r][0])
+          result_array = (0..(@result[t].length-1)).to_a
+          result_array.each do |r|
+            @responseids[t][r] = Response.find_by_sql ["SELECT id FROM responses
+              WHERE round = ? AND map_id = ?",round, @result[t][r]]
+              if @responseids[t][r].length > 0
+                # responseids_array = (0..(@responseids[t][r].length-1)).to_a
+                # responseids_array.each do |s|
+                  @scoreviews[t][r] = Answer.where(response_id: @responseids[t][r][0])
+              end
 
-              # end
+          end
+      end
+
+      @chartdata[round-1] = []
+      round1questions = (0..(@scoreviews[0][0].length-1)).to_a
+      # @chardata = []
+      round1questions.each do |q|
+        sum = 0
+        counter = 0
+        team_total = @scoreviews.length
+        for i in 0..(team_total-1) do
+          for j in 0..(@scoreviews[i].length-1) do
+              if @scoreviews[i]!=nil and @scoreviews[i][j]!=nil and @scoreviews[i][j][q]!=nil and @scoreviews[i][j][q].answer!=nil then
+                 # puts "#{i},#{j},#{q}"
+              # else
+              sum += @scoreviews[i][j][q].answer
+              counter +=1
             end
-
+          end
         end
-
-
-
-
+        @chartdata[round-1][q] = sum/counter.to_f
+      end
     end
+
+
 
   end
 

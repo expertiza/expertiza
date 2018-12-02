@@ -37,10 +37,33 @@ class AssignmentNode < Node
     conditions += " and course_id = #{parent_id}" if parent_id
     sortvar ||= 'created_at'
     puts '>>>>> assignment_node.get _search', _search
-    conditions += " and name like '%#{_search[:name]}%'" if !_search[:name].to_s.strip.empty?
+
+    if !_search[:name].to_s.strip.empty?
+      conditions += " and name like '%#{_search[:name]}%'"
+    end
+    if !_search[:created_since].to_s.strip.empty?
+      created_since = _search[:created_since].to_time.utc
+      conditions += " and created_at > '#{created_since}'"
+    end
+    if !_search[:created_until].to_s.strip.empty?
+      created_until = _search[:created_until].to_time.utc
+      conditions += " and created_at <= '#{created_until}'"
+    end
+    if !_search[:updated_since].to_s.strip.empty?
+      updated_since = _search[:updated_since].to_time.utc
+      conditions += " and updated_at > '#{updated_since}'"
+    end
+    if !_search[:updated_until].to_s.strip.empty?
+      updated_until = _search[:updated_until].to_time.utc
+      conditions += " and updated_at < '#{updated_until}'"
+    end
+    # conditions += " and participants.grade like '%#{_search[:participantName]}%'" if !_search[:participantName].to_s.strip.empty?
+
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
-    self.includes(:assignment).where(find_conditions).order("assignments.#{sortvar} #{sortorder}")
+    self.includes(:assignment)
+      .where(find_conditions)
+      .order("assignments.#{sortvar} #{sortorder}")
   end
 
   # Indicates that this object is always a leaf

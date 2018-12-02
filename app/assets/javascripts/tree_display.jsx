@@ -981,44 +981,51 @@ jQuery(document).ready(function () {
     },
     getInputValues: function () {
       return {
-        participant: this.refs.participantInput.getDOMNode().value,
-        creator: this.refs.creatorInput.getDOMNode().value,
-        createdFrom: this.refs.createdFromInput.getDOMNode().value,
-        createdTo: this.refs.createdToInput.getDOMNode().value,
-        updatedFrom: this.refs.updatedFromInput.getDOMNode().value,
-        updatedTo: this.refs.updatedToInput.getDOMNode().value,
+        participant_name: this.refs.participantName.getDOMNode().value,
+        participant_fullname: this.refs.participantFullname.getDOMNode().value,
+        creator_name: this.refs.creatorName.getDOMNode().value,
+        created_since: this.refs.createdSince.getDOMNode().value,
+        created_until: this.refs.createdUntil.getDOMNode().value,
+        updated_since: this.refs.updatedSince.getDOMNode().value,
+        updated_until: this.refs.updatedUntil.getDOMNode().value,
       };
     },
     render: function () {
       return (
         <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
           <input
-            ref="participantInput"
+            value="student7575"
+            ref="participantName"
             type="text"
             className="form-control"
-            placeholder="Participant (User ID)" />
+            placeholder="Assignee (User ID)" />
           <input
-            ref="creatorInput"
+            ref="participantFullname"
             type="text"
             className="form-control"
-            placeholder="Creator" />
+            placeholder="Assignee (Full name)" />
           <input
-            ref="createdFromInput"
+            ref="creatorName"
+            type="text"
+            className="form-control"
+            placeholder="Creator (User ID)" />
+          <input
+            ref="createdSince"
             type="text"
             className="form-control datepick"
             placeholder="Created Since" />
           <input
-            ref="createdToInput"
+            ref="createdUntil"
             type="text"
             className="form-control datepick"
             placeholder="Created Until" />
           <input
-            ref="updatedFromInput"
+            ref="updatedSince"
             type="text"
             className="form-control datepick"
             placeholder="Updated Since" />
           <input
-            ref="updatedToInput"
+            ref="updatedUntil"
             type="text"
             className="form-control datepick"
             placeholder="Updated Until" />
@@ -1053,7 +1060,7 @@ jQuery(document).ready(function () {
               ref="nameInput"
               type="text"
               className="form-control"
-              placeholder="Search..." />
+              placeholder="Name" />
             <button type="button"
               className="btn btn-primary"
               onClick={this.handleSearch}>

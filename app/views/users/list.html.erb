@@ -7,8 +7,12 @@
 <% end %>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
-  <%= label_tag :letter, 'Search users: ' %><%= text_field_tag(:letter,params[:letter]) %>
-<%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
+    <%= label_tag :search_name, 'Search users by name : ' %><%= text_field_tag(:search_name,params[:search_name]) %>
+    <%= label_tag :search_id, 'Search users by id: ' %><%= text_field_tag(:search_id,params[:search_id]) %>
+    <%= label_tag :search_full_name, 'Search users by full name: ' %><%= text_field_tag(:search_fname,params[:search_fname]) %>
+    <%= label_tag :search_email, 'Search users by email: ' %><%= text_field_tag(:search_email,params[:search_email]) %>
+
+    <%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
 <%= submit_tag("Search") %>
 <% end %>
 

@@ -59,7 +59,39 @@ class UsersController < ApplicationController
   # for displaying the list of users
   def list
     user = session[:user]
-    @users = user.get_user_list
+    puts "Hello2"
+
+    puts "search param is name **#{params[:search_name]}** "
+    puts "search param is id **#{params[:search_id]}** "
+    puts "search param is full_name **#{params[:search_fname]}** "
+    puts "search param is email **#{params[:search_email]}** "
+    search_name = ".*"
+    search_fname = ".*"
+    search_id = ".*"
+    search_email = ".*"
+    if params[:search_name].present?
+
+      search_name = ".*" + params[:search_name] + ".*"
+    end
+
+    if params[:search_id].present?
+
+      search_id = ".*" + params[:search_id] + ".*"
+    end
+
+    if params[:search_fname].present?
+
+      search_fname = ".*" + params[:search_fname] + ".*"
+    end
+
+    if params[:search_email].present?
+
+      search_email = ".*" + params[:search_email] + ".*"
+    end
+
+    puts "#{search_name}, #{search_id}, #{search_fname}, #{search_email}"
+
+    @users = user.get_user_list search_name, search_id, search_fname, search_email
   end
 
   def list_pending_requested

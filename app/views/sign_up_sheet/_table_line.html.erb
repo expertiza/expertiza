@@ -1,3 +1,40 @@
+<script type="text/javascript">
+    function addQuestionnaireTableRow1(questionnaire_type,round_no,questionnaire, assignment_questionnaire, questionnaire_options) {
+        var questionnaire_table = jQuery('#topic_questionnaire_table>tbody>tr');
+        var row_id = 'questionnaire_table_' + questionnaire_type;
+        var i = 0;
+        var html;
+
+        /*html += '<tr id="' + row_id + '">' +
+            '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="';
+        html += '<%= @assignment_form.assignment.id %>';
+        html += '">';*/
+        html += '<tr>';
+
+
+        //Rubric name
+        if (round_no ==null) {
+            html += '<td><label for="questionnaire1_id">' + questionnaire.display_type + ':</label></td>';
+        }
+        else {
+            html += '<td><label for="questionnaire1_id">' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>';
+        }
+        //Rubric options
+        html +=     '<td align="center">' +
+            '<select id="questionnaire1_id" name="assignment_form[assignment_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
+            '<option value="">--none--</option>';
+        for (i = 0; i < questionnaire_options.length; i++) {
+            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
+        }
+        html += '</select></td>';
+
+        questionnaire_table.last().after(html);
+        jQuery('#questionnaire1_id').val(questionnaire.id).attr('id', '');
+    }
+
+</script>
+
+
 <td><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
@@ -5,6 +42,30 @@
   <% if @assignment.microtask? %>
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
+  <td>
+  <table id="topic_questionnaire_table">
+    <tr>
+    <script>
+            <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
+            addQuestionnaireTableRow1(
+                'ReviewQuestionnaire',
+                <%=i%>,
+                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
+                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
+                <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>
+            );
+            <% end %>
+    </script>
+    </tr>
+
+  </table>
+
+
+
+  </td>
+
+
+
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
@@ -18,3 +79,5 @@
   <% end %>
   </td>
 <% end %>
+
+

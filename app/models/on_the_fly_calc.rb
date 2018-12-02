@@ -49,9 +49,9 @@ module OnTheFlyCalc
     scores
   end
 
-  def get_author_feedback_scores 
+  def get_author_feedback_scores
     @author_feedback_scores = {}
-    if self.varying_rubrics_by_round? 
+    if self.varying_rubrics_by_round?
       # Rubrics are varying.
     else
       # Rubrics are not varying.

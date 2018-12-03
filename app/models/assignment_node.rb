@@ -39,7 +39,6 @@ class AssignmentNode < Node
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
 
-    puts _search
 
     me = User.find(user_id)
 

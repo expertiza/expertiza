@@ -18,7 +18,7 @@ class AssignmentNode < Node
   #   parent_id: course_id if subset
 
   # returns: list of AssignmentNodes based on query
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = {})
     if show
       conditions = if User.find(user_id).role.name != "Teaching Assistant"
                      'assignments.instructor_id = ?'
@@ -36,34 +36,74 @@ class AssignmentNode < Node
     end
     conditions += " and course_id = #{parent_id}" if parent_id
     sortvar ||= 'created_at'
-    puts '>>>>> assignment_node.get _search', _search
-
-    if !_search[:name].to_s.strip.empty?
-      conditions += " and name like '%#{_search[:name]}%'"
-    end
-    if !_search[:created_since].to_s.strip.empty?
-      created_since = _search[:created_since].to_time.utc
-      conditions += " and created_at > '#{created_since}'"
-    end
-    if !_search[:created_until].to_s.strip.empty?
-      created_until = _search[:created_until].to_time.utc
-      conditions += " and created_at <= '#{created_until}'"
-    end
-    if !_search[:updated_since].to_s.strip.empty?
-      updated_since = _search[:updated_since].to_time.utc
-      conditions += " and updated_at > '#{updated_since}'"
-    end
-    if !_search[:updated_until].to_s.strip.empty?
-      updated_until = _search[:updated_until].to_time.utc
-      conditions += " and updated_at < '#{updated_until}'"
-    end
-    # conditions += " and participants.grade like '%#{_search[:participantName]}%'" if !_search[:participantName].to_s.strip.empty?
-
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
-    self.includes(:assignment)
-      .where(find_conditions)
-      .order("assignments.#{sortvar} #{sortorder}")
+
+    puts _search
+
+    me = User.find(user_id)
+
+    name = _search[:name].to_s.strip
+    participant_name = _search[:participant_name].to_s.strip
+    participant_fullname = _search[:participant_fullname].to_s.strip
+    due_since = _search[:due_since].to_s.strip
+    due_until = _search[:due_until].to_s.strip
+    created_since = _search[:created_since].to_s.strip
+    created_until = _search[:created_until].to_s.strip
+
+    associations = { assignment: [:due_dates] }
+
+    if participant_name.present? || participant_fullname.present?
+      associations[:assignment] << { participants: :user }
+    end
+
+    query = self.includes(associations).where(find_conditions)
+
+    if name.present?
+      query = query.where('name LIKE ?', "%#{name}%")
+    end
+
+    if due_since.present?
+      due_since = due_since.to_time.utc
+      query = query.where('due_dates.due_at >= ?', due_since)
+    end
+
+    if due_until.present?
+      due_until = due_until.to_time.utc
+      query = query.where('due_dates.due_at <= ?', due_until)
+    end
+
+    if created_since.present?
+      created_since = created_since.to_time.utc
+      query = query.where('created_at >= ?', created_since)
+    end
+
+    if created_until.present?
+      created_until = created_until.to_time.utc
+      query = query.where('created_at <= ?', created_until)
+    end
+
+    if participant_name.present?
+      participant_names = User.where('name LIKE ?', "%#{participant_name}%")
+        .select { |user| me.can_impersonate? user }
+        .map(&:name)
+      if participant_names.empty?
+        return []
+      end
+      query = query.where(users: { name: participant_names })
+    end
+
+    if participant_fullname.present?
+      participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
+        .select { |user| me.can_impersonate? user }
+        .map(&:name)
+      if participant_names.empty?
+        return []
+      end
+      query = query.where(users: { name: participant_names })
+    end
+
+    query.order("assignments.#{sortvar} #{sortorder}")
   end
 
   # Indicates that this object is always a leaf

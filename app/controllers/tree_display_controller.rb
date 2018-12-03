@@ -195,7 +195,7 @@ class TreeDisplayController < ApplicationController
   # initialize parent node and update child nodes for it
   def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
-    search = params[:reactParams][:search]
+    search = params[:reactParams][:search] || {}
     node.each do |a|
       fnode[a[0]] = a[1]
     end

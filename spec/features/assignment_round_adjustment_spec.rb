@@ -53,7 +53,7 @@ describe "assignment function" do
     end
 
     it "verfies decrement in number of review rounds saves correctly" do
-      #update assignment by decreasing the number of rounds
+      # update assignment by decreasing the number of rounds
       fill_in 'assignment_form_assignment_rounds_of_reviews', with: '2'
       click_button 'set_rounds'
       click_button 'Save'

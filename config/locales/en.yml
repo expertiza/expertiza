@@ -257,6 +257,29 @@ en:
       ad_for_team: "Advertisement for teammates"
       back: "Back"
 
+  submitted_content:
+    edit:
+      back: "Back"
+
+    title:
+      submit_work: "Submit work for"
+
+    self_review:
+      self_review: "Self Review:"
+      work_not_submitted: "(Work has not yet been submitted)"
+
+    hyperlink:
+      hyperlink_action: "Hyperlink Actions:"
+      hide_link: "hide links"
+
+    main:
+      submit_hyperlink: "Submit a hyperlink:"
+      quiz: "Quiz:"
+
+    submitted_files:
+      submit_file: "Submit a file:"
+      or: "or"
+
 # end of Student Views
 
 

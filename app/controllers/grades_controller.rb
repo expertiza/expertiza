@@ -66,10 +66,11 @@ class GradesController < ApplicationController
     for round in (1..rounds) do
       question = @questions[('review' + round.to_s).to_sym]
       @text[round-1] = []
-
+      if question != nil then
       for q in (0..(question.length-1)) do
           @text[round-1][q] = question[q].txt
       end
+    end
     end
   end
 

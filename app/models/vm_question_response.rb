@@ -49,29 +49,26 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
+
+      @store_needed_self_review = nil
       self_reviews = SelfReviewResponseMap.get_assessments_for(team) #New Addition
       self_reviews.each do |review|
-        self_review_mapping = SelfReviewResponseMap.find_by(review.map_id) #New addition
-        #if self_review_mapping.present?
-
-        if self_review_mapping && self_review_mapping.present? #New addition
+        self_review_mapping = SelfReviewResponseMap.find(review.map_id) #New addition
+        if self_review_mapping && self_review_mapping.present? and participant.id == self_review_mapping.reviewer_id#New addition
           participant = Participant.find(self_review_mapping.reviewer_id) #New addition
           @list_of_reviewers << participant #New addition
+          @store_needed_self_review = review #New addition
         end
       end
 
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
-        #self_review_mapping = SelfReviewResponseMap.find_by(review.map_id) #New addition
-        #if review_mapping.present?
         if review_mapping && review_mapping.present?  #new addition
           participant = Participant.find(review_mapping.reviewer_id)
           @list_of_reviewers << participant
         end
-
       end
-      #@list_of_reviews = reviews
-      @list_of_reviews = reviews + self_reviews
+      @list_of_reviews = reviews + [@store_needed_self_review]
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
@@ -108,7 +105,8 @@ class VmQuestionResponse
     end
     #New Addition
     if self_reviews
-      answers = Answer.where(response_id: self_reviews[0].response_id)
+
+      answers = Answer.where(response_id: @store_needed_self_review.response_id)
       answers.each do |answer|
         add_answer(answer)
       end

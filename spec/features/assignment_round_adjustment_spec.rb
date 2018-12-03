@@ -32,7 +32,6 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_rounds_of_reviews', with: '3'
       click_button 'set_rounds'
       click_button 'Create'
-      assignment = Assignment.where(name: 'multiround_Assignment').first
       visit current_path
       click_link 'Due date'
       sleep 2

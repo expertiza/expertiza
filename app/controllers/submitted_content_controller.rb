@@ -257,7 +257,7 @@ class SubmittedContentController < ApplicationController
     @record = revision_review_submission_record_for_round(@participant, @round)
     @questionnaire = questionnaire_for_submission(@record)
     # Partially created submission record without a corresponding questionnaire should be deleted
-    @record.delete! if @record && @questionnaire.nil?
+    @record.delete if @record && @questionnaire.nil?
     @record = nil if @record && @questionnaire.nil?
   end
 

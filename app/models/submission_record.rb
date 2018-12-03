@@ -4,4 +4,6 @@ class SubmissionRecord < ActiveRecord::Base
   validates :team_id, presence: true
   validates :user, presence: true
   validates :assignment_id, presence: true
+
+  belongs_to :questionnaire
 end

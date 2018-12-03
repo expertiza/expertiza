@@ -1,8 +1,14 @@
 class RevisionReviewQuestionnaire < Questionnaire
   attr_accessible :id, :name, :instructor_id, :private, :min_question_score, :max_question_score,
-                  :type, :display_type, :instruction_loc, :submission_record_id, :created_at, :updated_at
+                  :type, :display_type, :instruction_loc, :submission_record_id, :created_at, :updated_at,
+                  :print_name
 
   after_initialize :post_initialization
+  @print_name = 'Revision Review Rubric'
+
+  class << self
+    attr_reader :print_name
+  end
 
   def post_initialization
     self.display_type = "Review"

@@ -101,7 +101,7 @@
       }, 5000);
     });
     $('#Submit').click(function(e){
-      if(!confirm('Once a review has been submitted, you cannot edit it again')){
+      if(!confirm('Are you sure you would like to Submit?')){
         e.preventDefault();
         e.stopPropagation();
         return;

@@ -82,7 +82,7 @@ class GradesController < ApplicationController
       if round!=nil then
         @minmax[round-1] = []
         if questionnaire.symbol == :review then
-          if questionnaire.min_question_score!=nil then
+          if questionnaire.min_question_score!=nil and questionnaire.min_question_score<0  then
             @minmax[round-1][0] = questionnaire.min_question_score
           else
             @minmax[round-1][0] = 0

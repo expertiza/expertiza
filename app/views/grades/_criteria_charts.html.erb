@@ -34,6 +34,10 @@
     <% end %>
     <%= content_tag :div, class: "responseids_information", data: {responseids: @responseids} do %>
     <% end %>
+    <%= content_tag :div, class: "text_information", data: {text: @text} do %>
+    <% end %>
+    <%= content_tag :div, class: "minmax_information", data: {minmax: @minmax} do %>
+    <% end %>
     <!-- <%= content_tag :div, class: "avg_scores_by_criterion_information", data: {avg_scores_by_criterion: @avg_scores_by_criterion} do %>
     <% end %>
     <%= content_tag :div, class: "avg_scores_by_round_information", data: {avg_scores_by_round: @avg_scores_by_round} do %>
@@ -49,7 +53,9 @@
           var chartOptions;
           var chartData = [];					//Stores all data for the chart to display
           var currentRound = 0;				//Stores the current displayed round
-          var criteriaSelected = [];	//Stores selected criteria to display
+          var criteriaSelected = [];
+          var chartText = [];
+          var chartRange = [];	//Stores selected criteria to display
 // var rounds = $('.rounds_information').data('rounds');
 
 
@@ -63,6 +69,8 @@
             //     criteria.push(true);
             //   }
             chartData = $('.chartdata_information').data('chartdata');
+            chartText = $('.text_information').data('text');
+            chartRange = $('.minmax_information').data('minmax');
             // chartData.push(round);
             for (var i = 0; i < chartData.length; i++){
               var criteria = [];
@@ -145,6 +153,8 @@
           }
           function renderChart() {	//Renders the chart if changes have been made
             var data = loadData();
+            chartOptions.vAxis.viewWindow.max = chartRange[currentRound][1];
+            chartOptions.vAxis.viewWindow.min = chartRange[currentRound][0];
             chart.draw(data, chartOptions);
           }
           function loadData() {	//Pulls data from the page and renders the chart with it
@@ -187,7 +197,7 @@
               }
               var label = document.createElement('label')
               label.htmlFor = checkbox.id;
-              label.appendChild(document.createTextNode("Criteria " + (i+1)));
+              label.appendChild(document.createTextNode("Criteria " + (i+1) +": "+ chartText[currentRound][i]));
               form.appendChild(checkbox);
               form.appendChild(label);
               form.appendChild(document.createElement("BR"));

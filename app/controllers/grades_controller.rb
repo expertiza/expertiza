@@ -56,7 +56,49 @@ class GradesController < ApplicationController
 
     @show_reputation = false
     get_chart_data
+    get_chart_text
+    get_minmax(questionnaires)
   end
+
+  def get_chart_text
+    @text= []
+    rounds = @assignment.num_review_rounds
+    for round in (1..rounds) do
+      question = @questions[('review' + round.to_s).to_sym]
+      @text[round-1] = []
+
+      for q in (0..(question.length-1)) do
+          @text[round-1][q] = question[q].txt
+      end
+    end
+  end
+
+
+  def get_minmax(questionnaires)
+    @minmax = []
+    questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
+      if round!=nil then
+        @minmax[round-1] = []
+        if questionnaire.symbol == :review then
+          if questionnaire.min_question_score!=nil then
+            @minmax[round-1][0] = questionnaire.min_question_score
+          else
+            @minmax[round-1][0] = 0
+          end
+
+          # minmax[round-1][0] = question.min_question_score if !question.min_question_score.nil?
+          if questionnaire.max_question_score!=nil then
+            @minmax[round-1][1] = questionnaire.max_question_score
+          else
+            @minmax[round-1][1] = 5
+          end
+        end
+      end
+    end
+  end
+
+
 
   def get_chart_data
     # pa4 code starts Here

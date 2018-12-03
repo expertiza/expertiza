@@ -4,39 +4,39 @@
   <table>
     <tr>
       <td><select name='report[type]' style="width: 15em" class="form-control">
-    <option value='ReviewResponseMap' selected>
+    <option value='ReviewResponseMap' <%= @type== 'ReviewResponseMap' ? 'selected' : '' %>>
       Review report
     </option>
-    <option value='FeedbackResponseMap' >
+    <option value='FeedbackResponseMap' <%= @type== 'FeedbackResponseMap' ? 'selected' : '' %>>
       Author feedback report
     </option>
-    <option value='TeammateReviewResponseMap' >
+    <option value='TeammateReviewResponseMap' <%= @type== 'TeammateReviewResponseMap' ? 'selected' : '' %>>
       Teammate review report
     </option>
     <% if @assignment.calibrated? %>
-      <option value='Calibration' >
+      <option value='Calibration' <%= @type== 'Calibration' ? 'selected' : '' %>>
         Calibration report
       </option>
     <% end %>
     <% if @assignment.is_selfreview_enabled %>
-      <option value='SelfReview' >
+      <option value='SelfReview' <%= @type== 'SelfReview' ? 'selected' : '' %>>
         Self review report
       </option>
     <% end %>
-    <option value='SummaryByCriteria' >
+    <option value='SummaryByCriteria' <%= @type== 'SummaryByCriteria' ? 'selected' : '' %>>
       Aggregated comments by rubric question
     </option>
-    <option value='SummaryByRevieweeAndCriteria' >
+    <option value='SummaryByRevieweeAndCriteria' <%= @type== 'SummaryByRevieweeAndCriteria' ? 'selected' : '' %>>
       Comment summary by reviewee (team)
     </option>
-    <option value='Collusion' >
+    <option value='Collusion' <%= @type== 'Collusion' ? 'selected' : '' %>>
       Potential collusion report
     </option>
-    <option value='AnswerTaggingReport' >
+    <option value='AnswerTaggingReport' <%= @type== 'AnswerTaggingReport' ? 'selected' : '' %>>
       Answer tagging report
     </option>
     <% if @assignment.simicheck > -1 %>
-        <option value='PlagiarismCheckerReport' >
+        <option value='PlagiarismCheckerReport' <%= @type== 'PlagiarismCheckerReport' ? 'selected' : '' %>>
           Plagiarism checker report
         </option>
     <% end %>
@@ -45,8 +45,36 @@
     </tr>
 
   </table>
-  
-  
+
+  <% if @type == "SummaryByRevieweeAndCriteria" %>
+    <div style="margin: 10px auto; display: grid; grid-template-columns: repeat(4, auto) 1fr; grid-gap: 8px">
+      <input
+        type="text"
+        value="<%=@search[:team]%>"
+        name="report[search][team]"
+        class="form-control"
+        placeholder="Team" />
+      <input
+        type="text"
+        value="<%=@search[:text]%>"
+        name="report[search][text]"
+        class="form-control"
+        placeholder="Keywords" />
+      <input
+        type="number"
+        value="<%=@search[:min_score]%>"
+        name="report[search][min_score]"
+        class="form-control"
+        placeholder="Min Score" />
+      <input
+        type="number"
+        value="<%=@search[:max_score]%>"
+        name="report[search][max_score]"
+        class="form-control"
+        placeholder="Max Score" />
+    </div>
+  <% end %>
+
 <% end %>
 
 <% if @type == "ReviewResponseMap" %>

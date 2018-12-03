@@ -103,6 +103,15 @@ $(window).load(function(){
             <%end %>
           <%end %>
           </td>
+          <!--Feedback Score received-->
+          <td align = 'left' >
+          <% @response_maps.each_with_index do |ri, index| %>
+            <% if Team.where(id: ri.reviewee_id).length > 0 %>
+                <%@team = Team.find(ri.reviewee_id) %>
+                <%= render partial: 'team_feedback_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+            <%end %>
+          <%end %>
+          </td>
           <!--Metrics-->
           <td align = 'left'>
             <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>

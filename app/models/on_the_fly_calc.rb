@@ -51,11 +51,57 @@ module OnTheFlyCalc
 
   def compute_author_feedback_scores
     @author_feedback_scores = {}
+    @response_type = 'ReviewResponseMap'
+    @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
     if self.varying_rubrics_by_round?
       # Rubrics are varying.
+      rounds = self.rounds_of_reviews
+      (1..rounds).each do |round|
+        author_feedback_questionnaire_id = author_feedback_questionnaire_id(round) # FIXME: get proper id
+        @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
+        @response_maps.each do |response_map|
+
+          # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
+          reviewer = @author_feedback_scores[response_map.reviewer_id]
+          # The author feedback response maps for the teammates reviewing the reviewer.
+          author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response_map.id, "FeedbackResponseMap")
+         
+          author_feedback_response_maps.each do |author_feedback_response_map| 
+            @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+            @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
+            @respective_scores = {}
+            @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
+            
+            if !@corresponding_response.empty?
+              @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
+              if @this_review_score_raw
+                @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
+              end
+            else
+              @this_review_score = -1.0
+            end
+            
+            # Compute the sum of the author feedbacks for this review. 
+            @respective_scores[response_map.reviewee_id] = 0 if @respective_scores[response_map.reviewee_id] 
+            @respective_scores[response_map.reviewee_id] += @this_review_score
+            reviewer = {} if reviewer.nil?
+            reviewer[round] = {} if reviewer[round].nil?
+            reviewer[round] = @respective_scores
+          end 
+
+          # Divide the sum of the author feedback scores for this review by their number to get the
+          # average.
+          if !author_feedback_response_maps.empty?
+            reviewer[round][response_map.id] /= author_feedback_response_maps.count
+          end 
+        end
+
+        
+      end
+
     else
       # Rubrics are not varying.
-
+      
     end
   end
 end

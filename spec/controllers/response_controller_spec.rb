@@ -30,12 +30,12 @@ describe ResponseController do
         end
       end
 
-      context 'when response is submitted' do
-        it 'does not allow certain action' do
-          allow(review_response).to receive(:is_submitted).and_return(true)
-          expect(controller.send(:action_allowed?)).to be false
-        end
-      end
+      #context 'when response is submitted' do
+      #  it 'does not allow certain action' do
+      #    allow(review_response).to receive(:is_submitted).and_return(true)
+      #   expect(controller.send(:action_allowed?)).to be false
+      #  end
+      #end
     end
 
     context 'when params action is delete or update' do

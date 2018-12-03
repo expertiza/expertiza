@@ -11,7 +11,7 @@ class ResponseController < ApplicationController
     end
     case action
     when 'edit' # If response has been submitted, no further editing allowed
-      #return false if response.is_submitted
+      # return false if response.is_submitted
       return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'

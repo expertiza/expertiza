@@ -85,8 +85,6 @@ class User < ActiveRecord::Base
         end
       end
     end
-    puts "inital size id " + user_list.count.to_s
-    puts "now filtering"
 
     reg_name = Regexp.new(search_name)
     reg_id = Regexp.new(search_id)
@@ -98,9 +96,7 @@ class User < ActiveRecord::Base
         and reg_email.match(item.email)}
 
     #and reg_id.match(item.id) \
-    puts "after filter size id " + s.count.to_s
     s.uniq
-    #user_list.uniq
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018

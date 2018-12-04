@@ -197,10 +197,16 @@ class GradesController < ApplicationController
   end
 
   def view_github_metrics
+    @token = session["github_access_token"]
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
+  end
+
+  def authorize_github
+    session["participant_id"] = params[:id]
+    redirect_to "https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813"
   end
 
   private

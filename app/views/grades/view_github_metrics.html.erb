@@ -1,5 +1,6 @@
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <script type="text/javascript">
+    github_token = '<%= @token %>';
     $(document).ready(function () {
         $('#tag_prompt_toggler').click(function () {
             if ($('#tag_prompt_toggler').text() == "hide tags")
@@ -19,13 +20,19 @@
         }
     }
 
-    function parseGitHubData(data) {
+    function parseGitHubData(response) {
         parsedData = {};
+        totalNumberOfLinesAdded = response.data.repository.pullRequest.additions;
+        totalNumberOfLinesDeleted = response.data.repository.pullRequest.deletions;
+        totalNumberOfFilesChanged = response.data.repository.pullRequest.changedFiles;
+        totalNumberOfCommits = response.data.repository.pullRequest.commits.totalCount;
 
-        data.forEach(function (column) {
-            var authorName = column['commit']['author']['name'];
-            var commitDate = column['commit']['author']['date'];
-            var dateTime = new Date(commitDate);
+        commitObject = response.data.repository.pullRequest.commits.edges;
+
+        commitObject.forEach(function (column) {
+            var authorName = column.node.commit.author.name;
+            var committedDate = column.node.commit.committedDate;
+            var dateTime = new Date(committedDate);
             var date = dateTime.toLocaleDateString();
 
             if (!parsedData[date]) {
@@ -47,14 +54,55 @@
         repositoryName = dataArray.pop();
         ownerName = dataArray.pop();
 
-        $.ajax({
-            url: "https://api.github.com/repos/" + ownerName + "/" + repositoryName + "/pulls/" + pullRequestCode + "/commits",
-            dataType: "json",
-            success: function (returndata) {
-                parseGitHubData(returndata)
-                $(".result").html(returndata["url"]);
-            }
-        });
+        if (github_token) {
+            $.ajax({
+                type: "POST",
+                url: "https://api.github.com/graphql",
+                headers: {
+                    'Authorization': 'Bearer' + ' ' + github_token,
+                },
+                data: JSON.stringify({
+                    query: `query {
+                          repository(owner: ${ownerName}, name: ${repositoryName}) {
+                            pullRequest(number: ${pullRequestCode}) {
+                              additions
+                              deletions
+                              changedFiles
+                              commits(first:200){
+                                totalCount
+                                edges{
+                                  node{
+                                    id
+                                    commit{
+                                      author{
+                                        name
+                                      }
+                                      additions
+                                      deletions
+                                      changedFiles
+                                      committedDate
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }`
+                }),
+                success: function (response) {
+                    parseGitHubData(response)
+                },
+                error: function (httpObject, textStatus) {
+                    if (httpObject.status === 401) {
+                        // If token has expired, get a new one.
+                        // status 401: unauthorized
+                        window.location.replace("https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813");
+                    }
+                }
+            });
+        } else {
+            window.location.replace("https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813");
+        }
     }
 </script>
 <h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>

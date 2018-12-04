@@ -26,7 +26,7 @@
     <% @teams.each do |team| %>
       <% @l = @l+1 %>
       <tr>
-        <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+        <% topic_identifier, topic_name, topic_due_date, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
         <!--Topic name-->
         <% if @assignment.topics? %>
@@ -35,8 +35,8 @@
 
         <!--Team name-->
         <% if @assignment.max_team_size > 1 %>
-          <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
+          <% team_name_color = get_team_name_color_in_list_submission(team,topic_due_date) %>
+          <td><p id = <%=team_name_color%>> <%= team.name %></p>
           <% unless participants.empty? %>
             <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
@@ -75,5 +75,5 @@
       </tr>
     <% end %>
   </table>
-  <p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
+  <p> **In "Team name" column,text in<i id = "red"> red</i> indicates that the review is not yet completed; text in <i id = "blue">blue</i> indicates that the submission grade is not assigned; text in <i id = "brown">brown</i> indicates that the submission grade has been assigned.</p>
 </div>

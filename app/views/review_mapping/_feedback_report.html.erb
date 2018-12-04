@@ -117,7 +117,7 @@
                 (<%= reviewee_name = Participant.find(rr.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></>
+              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>

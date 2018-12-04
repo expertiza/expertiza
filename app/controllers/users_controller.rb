@@ -66,22 +66,22 @@ class UsersController < ApplicationController
     search_email = ".*"
     if params[:search_name].present?
 
-      search_name = ".*" + params[:search_name] + ".*"
+      search_name = ".*" + params[:search_name].strip + ".*"
     end
 
     if params[:search_id].present?
 
-      search_id = ".*" + params[:search_id] + ".*"
+      search_id = ".*" + params[:search_id].strip + ".*"
     end
 
     if params[:search_fname].present?
 
-      search_fname = ".*" + params[:search_fname] + ".*"
+      search_fname = ".*" + params[:search_fname].strip + ".*"
     end
 
     if params[:search_email].present?
 
-      search_email = ".*" + params[:search_email] + ".*"
+      search_email = ".*" + params[:search_email].strip + ".*"
     end
 
 

@@ -51,14 +51,15 @@
       var criteriaSelected = [];
       var chartText = [];
       var chartRange = [];	//Stores selected criteria to display
-
       window.onresize = function(){renderChart()};
+
+      //Display Options
+      var showLabels = true;
 
       function getData(){
         chartData = $('.chartdata_information').data('chartdata');
         chartText = $('.text_information').data('text');
         chartRange = $('.minmax_information').data('minmax');
-        // chartData.push(round);
         for (var i = 0; i < chartData.length; i++){
           var criteria = [];
           for (var j = 0; j < chartData[i].length; j++){
@@ -122,12 +123,13 @@
             viewWindow: {
               min: 0,
               max: 5
-            }
+            },
+            targetAxisIndex: 0
           }
         };
         chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-//        var displayDiv = document.getElementById("criteria_charts");
-//        displayDiv.style.display = "none";
+        var checkBox = document.getElementById("labelCheck");
+        checkBox.checked = true;
         updateChart(currentRound);
         loadRounds();
 
@@ -146,57 +148,126 @@
         chart.draw(data, chartOptions);
       }
 
-      function loadData() {	//Pulls data from the page and renders the chart with it
-        var data = new google.visualization.DataTable();
-        data.addColumn('number', 'Criterion');
-        data.addColumn('number', 'Average Score');
-        data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
-        data.addColumn({type: 'string', role: 'annotation'});
-
-        chartOptions.hAxis.ticks = [];
-        var rowCount = 1;
-        for(var i = 0; i < chartData[currentRound].length; i++) {
-          if (criteriaSelected[currentRound][i] && chartData[currentRound][i]) {
-            data.addRow([rowCount, chartData[currentRound][i], '#a90201', chartData[currentRound][i].toFixed(1).toString()]);
-            chartOptions.hAxis.ticks.push({v: rowCount++, f: (i+1).toString()});
+      function renderChart() {	//Renders the chart if changes have been made
+          var data = loadData();
+          if (chartRange[currentRound]) {
+              if (chartRange[currentRound][1])
+                  chartOptions.vAxis.viewWindow.max = chartRange[currentRound][1];
+              else
+                  chartOptions.vAxis.viewWindow.max = 5;
+              if (chartRange[currentRound][0])
+                  chartOptions.vAxis.viewWindow.min = chartRange[currentRound][0];
+              else
+                  chartOptions.vAxis.viewWindow.min = 0;
+          } else {
+              chartOptions.vAxis.viewWindow.max = 5;
+              chartOptions.vAxis.viewWindow.min = 0;
           }
-        }
-        chartOptions.hAxis.viewWindow.max = rowCount - 0.5;
-        return data;
+          chart.draw(data, chartOptions);
+      }
+
+      function loadData() {	//Pulls data from the page and renders the chart with it
+          if (currentRound == -1)	//Load all rounds for comparison
+              return loadAllData();
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Criterion');
+          data.addColumn('number', 'Average Score');
+          data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
+          data.addColumn({type: 'string', role: 'annotation'});
+
+          chartOptions.hAxis.ticks = [];
+          var rowCount = 1;
+          for(var i = 0; i < chartData[currentRound].length; i++) {
+              if (criteriaSelected[currentRound][i] && chartData[currentRound][i]) {
+                  data.addRow([rowCount, chartData[currentRound][i], '#a90201', (showLabels) ? chartData[currentRound][i].toFixed(1).toString() : ""]);
+                  chartOptions.hAxis.ticks.push({v: rowCount++, f: (i+1).toString()});
+              }
+          }
+          chartOptions.hAxis.viewWindow.max = rowCount - 0.5;
+          return data;
+      }
+      function loadAllData() {
+          var roundNum = chartData.length;
+          var maxCriteria = 0;
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', 'Criterion');
+          var i;
+          for(i = 0; i < roundNum; i++) {
+              data.addColumn('number', 'Average Score' + i.toString());
+              data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
+              data.addColumn({type: 'string', role: 'annotation'});
+
+              if (chartData[i].length > maxCriteria)
+                  maxCriteria = chartData[i].length;
+          }
+
+          chartOptions.hAxis.ticks = [];
+          chartOptions.series = {};
+          var rowCount = 1;
+          for(i = 0; i < maxCriteria; i++) {
+              var newRow = [];
+              var elementsAdded = false;
+              newRow.push(rowCount);
+              for(var j = 0; j < roundNum; j++) {
+                  if (chartData[j][i]) {
+                      newRow.push(chartData[j][i]);
+                      elementsAdded = true;
+                  } else {
+                      newRow.push(null);
+                  }
+                  newRow.push('#a90201');
+                  if (chartData[j] && chartData[j][i] && showLabels)
+                      newRow.push(chartData[j][i].toFixed(1).toString());
+                  else
+                      newRow.push("");
+              }
+              if (elementsAdded) {
+                  data.addRow(newRow);
+                  chartOptions.hAxis.ticks.push({v: rowCount++, f: (i+1).toString()});
+                  chartOptions.series[i] = {targetAxisIndex: 0};
+              }
+          }
+          chartOptions.hAxis.viewWindow.max = rowCount - 0.5;
+          return data;
+
       }
 
       function loadRounds() {	//Creates the Rounds in the dropdown menu
-        var rounds = document.getElementById("chartRounds");
-        for(var i = 0; i < chartData.length; i++) {
-          var option = document.createElement('option');
-          option.value = i;
-          option.text = "Round " + (i+1);
-          rounds.add(option);
-        }
-        rounds.style.display = "inline";
+          var rounds = document.getElementById("chartRounds");
+          for(var i = 0; i < chartData.length; i++) {
+              var option = document.createElement('option');
+              option.value = i;
+              option.text = "Round " + (i+1);
+              rounds.add(option);
+          }
+          var optionAll = document.createElement('option');
+          optionAll.value = -1;
+          optionAll.text = "All Rounds";
+          rounds.add(optionAll);
+          rounds.style.display = "inline";
       }
 
       function loadCriteria() {	//Creates the criteria check boxes
-        var form = document.getElementById("chartCriteria");
-        while (form.firstChild)
-          form.removeChild(form.firstChild);
-        chartData[currentRound].forEach(function(dat, i) {
-          var checkbox = document.createElement('input');
-          checkbox.type = "checkbox";
-          checkbox.name = "name";
-          checkbox.value = "value";
-          checkbox.id = "checkboxoption" + i;
-          checkbox.onclick = function() {
-            checkboxUpdate(i);
-          }
-          var label = document.createElement('label')
-          label.htmlFor = checkbox.id;
-          label.appendChild(document.createTextNode("Criterion " + (i+1) +": "+ chartText[currentRound][i]));
-          form.appendChild(checkbox);
-          form.appendChild(label);
-          form.appendChild(document.createElement("BR"));
-          checkbox.checked = criteriaSelected[currentRound][i];
-        });
+          var form = document.getElementById("chartCriteria");
+          while (form.firstChild)
+              form.removeChild(form.firstChild);
+          if (currentRound == -1)
+              return;
+          chartData[currentRound].forEach(function(dat, i) {
+              var checkbox = document.createElement('input');
+              checkbox.type = "checkbox";
+              checkbox.id = "checkboxoption" + i;
+              checkbox.onclick = function() {
+                  checkboxUpdate(i);
+              }
+              var label = document.createElement('label')
+              label.htmlFor = checkbox.id;
+              label.appendChild(document.createTextNode("Criterion " + (i+1) +": "+ chartText[currentRound][i]));
+              form.appendChild(checkbox);
+              form.appendChild(label);
+              form.appendChild(document.createElement("BR"));
+              checkbox.checked = criteriaSelected[currentRound][i];
+          });
       }
 
       function checkboxUpdate(checkid) {	//Update function to change the displayed criteria
@@ -214,6 +285,7 @@
     <form id="chartOptions" name="chartOptions">
       <select id="chartRounds" name="rounds" onChange="updateChart(document.chartOptions.chartRounds.options[document.chartOptions.chartRounds.options.selectedIndex].value)" style = "display: none">
       </select>
+      <input type="checkbox" id = "labelCheck" checked="checked" onclick="showLabels = !showLabels; renderChart();">Show Labels
     </form>
     <div id="chartCriteria" name="chartCriteria">
     </div>

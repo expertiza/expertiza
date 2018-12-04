@@ -40,7 +40,11 @@ class AuthController < ApplicationController
 
   def oauth_login
     session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
-    redirect_to view_grades_path(id: session["id"], github_code: params[:code])
+    if session["github_view_type"] = "view_submissions"
+      redirect_to controller:'grades', action: 'view_github_metrics', id: session["participant_id"]
+    else
+      redirect_to view_grades_path(id: session["id"], github_code: params[:code])
+    end
   end
 
   # Login functionality for google login feature using omniAuth2

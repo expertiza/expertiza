@@ -197,6 +197,7 @@ class GradesController < ApplicationController
   end
 
   def view_github_metrics
+    session["github_view_type"] = "view_submissions"
     @token = session["github_access_token"]
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment

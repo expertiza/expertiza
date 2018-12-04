@@ -355,6 +355,7 @@ resources :institution, except: [:destroy] do
   resources :student_review, only: [] do
     collection do
       get :list
+      get :sign_up_list
       post :set_priority
     end
   end

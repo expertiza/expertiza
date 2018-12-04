@@ -43,6 +43,52 @@ class StudentReviewController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
   end
   # expertiza project: E1856. Allow reviewers to bid on what to review
+
+# the method remove_nullteam_topics remove the topics that are not signed up by any teams
+  def remove_nullteam_topics(old_array)
+    new_array = []
+    for j in (0..(old_array.length-1)) do
+      @signupteam = SignedUpTeam.where(topic_id = old_array[j].id).first
+      if (@signupteam != [] and @signupteam.team_id != 0) then
+        new_array.insert(-1, old_array[j])
+      else
+      end
+    end
+    return new_array
+  end
+
+# this method gives the following global variables: @topics, that are the topics that are unchosen for the reviewer;
+# @selectedtopics, topics that are selected by the reviewer that he wants to review;
+# @unselectedtopics, topics that remains at the left of the view, that are not yet chosen by the reviewer.
+  def sign_up_list
+    # get the participant that's the reviewer for the assignment
+      @participant = AssignmentParticipant.find(params[:id])
+      # The assignment that should be reviewed is here
+      @assignment = @participant.assignment
+      # get the original topics that are under the assignment.
+      @rawtopics = SignUpTopic.where(assignment_id: @assignment.id)
+      @topics = remove_nullteam_topics(@rawtopics)
+      # Here are the selected topics that are sorted by priority
+      @reviewbids = @participant.id.nil? ? [] : ReviewBid.where(participant_id: @participant.id).order(:priority)
+      # extract topic ids from the @reviewbids
+      selected_topicids = []
+      for i in (0..(@reviewbids.length-1)) do
+        selected_topicids[i] = @reviewbids[i].topic_id
+      end
+
+      @selectedtopics= []
+      @unselectedtopics = []
+      # according to the topic id list, create the topic list of selected topics.
+      # those that are not selected from the @topics list are unselected topics
+      for j in (0..(@topics.length-1)) do
+        if selected_topicids.include?(@topics[j].id) then
+          @selectedtopics.insert(-1, @topics[j])
+        else
+          @unselectedtopics.insert(-1, @topics[j])
+        end
+      end
+  end
+
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     if params[:topic].nil?

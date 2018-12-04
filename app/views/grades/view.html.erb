@@ -95,18 +95,18 @@
                         if(httpObject.status === 401) {
                             // If token has expired, get a new one.
                             // status 401: unauthorized
-                            window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
+                            window.location.replace("https://github.com/login/oauth/authorize?client_id=2ab15e0bd05464b85a53");
                         }
                     }
                 });
             } else {
-                window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
+                window.location.replace("https://github.com/login/oauth/authorize?client_id=2ab15e0bd05464b85a53");
             }
 
         });
     });
 </script>
-<h1>Summary report for <%= @assignment.name %></h1>
+<h1>Summary report for <%= @assignment.name %></h1>`
 
 <BR/>
 <% if @scores[:teams] %>

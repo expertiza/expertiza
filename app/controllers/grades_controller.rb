@@ -207,7 +207,7 @@ class GradesController < ApplicationController
 
   def authorize_github
     session["participant_id"] = params[:id]
-    redirect_to "https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813"
+    redirect_to "https://github.com/login/oauth/authorize?client_id=2ab15e0bd05464b85a53"
   end
 
   private

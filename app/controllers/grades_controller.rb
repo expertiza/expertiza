@@ -36,10 +36,12 @@ class GradesController < ApplicationController
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
   def view
+    @github_code = params[:code].presence
+    @github_access_token = session["github_access_token"]
+    session["id"] = params[:id]
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires
-
     if @assignment.varying_rubrics_by_round?
       retrieve_questions questionnaires
     else # if this assignment does not have "varying rubric by rounds" feature
@@ -195,10 +197,17 @@ class GradesController < ApplicationController
   end
 
   def view_github_metrics
+    session["github_view_type"] = "view_submissions"
+    @token = session["github_access_token"]
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
+  end
+
+  def authorize_github
+    session["participant_id"] = params[:id]
+    redirect_to "https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813"
   end
 
   private

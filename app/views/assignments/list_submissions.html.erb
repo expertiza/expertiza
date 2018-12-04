@@ -40,7 +40,7 @@
           <% unless participants.empty? %>
             <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %>
               <br>
-            <%= link_to 'GitHub Metrics', { controller: 'grades', action: 'view_github_metrics', id: participants.first.id }, target: '_blank' %></td>
+            <%= link_to 'GitHub Metrics', { controller: 'grades', action: 'authorize_github', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
         <% end %>
 

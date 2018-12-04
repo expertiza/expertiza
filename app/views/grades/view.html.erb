@@ -1,23 +1,135 @@
+<script>
+    accessToken = '<%= @github_access_token %>'
+    $(document).ready(function () {
+        $("#tmr tr ul").on("click", "li.tmr_tab", function (e, s) {
+            pull_links = $(e.delegateTarget).siblings(".tmr_tab_content").find("table.participants tr div#url a[href*='/pull/']")
+            pull_request_url = ""
+            if(pull_links.length) {
+                pull_request_url = $(pull_links[0]).attr("href")
+            }
+            if(!pull_request_url) {
+                // Show that info in div
+                return;
+            }
+            var dataArray = pull_request_url.split('/');
+            var pullRequestNumber = dataArray.pop();
+            dataArray.pop();
+            var repositoryName = dataArray.pop();
+            var ownerName = dataArray.pop();
+
+            debugger;
+            if (accessToken){
+                $.ajax({
+                    type: "POST",
+                    url: "https://api.github.com/graphql",
+                    headers: {
+                        'Authorization': 'Bearer' + ' ' + accessToken
+                    },
+                    data: JSON.stringify({
+                        query: `query {
+                          repository(owner: ${ownerName}, name: ${repositoryName}) {
+                            pullRequest(number: ${pullRequestNumber}) {
+                              id
+                              number
+                              title
+                              commits(first:10) {
+                                edges {
+                                  node {
+                                    id
+                                    commit{
+                                      author{
+                                        name
+                                        email
+                                        user {
+                                          name
+                                        }
+                                      }
+                                      additions
+                                      deletions
+                                      committedDate
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }`
+                    }),
+                    success: function (response) {
+                        if(!response.data.repository.pullRequest.commits.edges.length) {
+                            $(e.delegateTarget).siblings(".tmr_tab_content").find("div.github").html("");
+                            return;
+                        }
+                        var userData = response.data.repository.pullRequest.commits.edges.reduce(function(accumulator, edge) {
+
+                            var commit  = edge.node.commit;
+                            var author = commit.author.name;
+                            if (accumulator.hasOwnProperty(author)){
+                                accumulator[author].additions += commit.additions;
+                                accumulator[author].deletions += commit.deletions;
+                                accumulator[author].totalCommits += 1;
+                            }
+                            else {
+                                accumulator[author] = {
+                                    additions: commit.additions,
+                                    deletions: commit.deletions,
+                                    totalCommits: 1,
+                                    email: commit.author.email
+                                }
+                            }
+                            return accumulator;
+                        }, {});
+                        var content = "<table id='myTable' class='table table-bordered tablesorter'><caption>GitHub Metrics</caption><colgroup><col><col class='c5'><col class='c1'><col class='c5'></colgroup><thead><th>Student</th><th>Lines of Code added</th><th>Lines of code deleted</th><th>Total Commits</th></thead><tbody>";
+                        for(var author in userData) {
+                            if (userData.hasOwnProperty(author)) {
+                                var authorData = userData[author];
+                                content += `<tr><td>${author}(${userData[author].email})</td><td>${authorData.additions}</td><td>${authorData.deletions}</td><td>${authorData.totalCommits}</td></tr>`
+                            }
+                        }
+                        content += "</tbody></table>"
+                        $(e.delegateTarget).siblings(".tmr_tab_content").find("div.github").html(content);
+                        $("#myTable").tablesorter().trigger("update");
+
+                    },
+                    error: function (httpObject, textStatus) {
+                        if(httpObject.status === 401) {
+                            // If token has expired, get a new one.
+                            // status 401: unauthorized
+                            window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
+                        }
+                    }
+                });
+            } else {
+                window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
+            }
+
+        });
+    });
+</script>
 <h1>Summary report for <%= @assignment.name %></h1>
+
 <BR/>
 <% if @scores[:teams] %>
-    <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
-    <BR/><BR/>
+  <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all
+    teams</a>
+  <BR/><BR/>
 <% end %>
 <!-- If there are 1-member teams, the Teammate Review column should not appear in the score report.
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
-<table class="table table-striped grades" width="100%">
+<table id="tmr" class="table table-striped grades" width="100%">
   <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
-<% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
-  <%= render :partial => 'teams' %>
-<% else %>
-  <tr><td>No teams are defined for this assignment</td></tr>
-<% end %>
+  <% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
+    <%= render :partial => 'teams' %>
+  <% else %>
+    <tr>
+      <td>No teams are defined for this assignment</td>
+    </tr>
+  <% end %>
 </table>
 <BR/><BR/>
-<%= link_to 'Export '+'Grades',
-            :controller=>'export_file',
-            :action=>'start',
-            :model=>'Assignment',
-            :id=>@assignment.id %> <BR/><BR/>
+<%= link_to 'Export ' + 'Grades',
+            :controller => 'export_file',
+            :action => 'start',
+            :model => 'Assignment',
+            :id => @assignment.id %> <BR/><BR/>
 <a href="javascript:window.history.back()">Back</a>

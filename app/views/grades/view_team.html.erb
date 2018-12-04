@@ -98,7 +98,7 @@
             <thead>
             <tr>
               <th class="sorter-true">Criterion<span></span></th>
-            
+
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
               <%
@@ -135,6 +135,9 @@
               <th class="sorter-false">
                 <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
               </th>
+              <th class="sorter-true" align="right" >
+              Composite Score<span></span>
+              </th>
 
             </tr>
             </thead>
@@ -145,7 +148,6 @@
             <!-- here, starts a series of nested loops. loops for the rows, and for the cells of the rows.-->
             <!-- additionally, there are hidden rows (expandable) which are also generated via iteration. -->
             <% vm.list_of_rows.each do |row| %>
-
                 <!-- notice the data-target. because we're toggling via looped code, we need to dynamically generate the identifier. -->
                 <tr data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= row.question_id.to_s + vm.round.to_s %>">
                   <td class = 'cf' data-toggle="tooltip" title="<%= row.question_text %>"> <div style='float: left'><%= j.to_s %></div><div style='float: right'> &#<%= type_and_max(row) %>;</div>  </td>
@@ -171,6 +173,9 @@
                   </td>
                   <td  class = 'cf' align="center">
                     <%= row.countofcomments.to_s %>
+                  </td>
+                  <td  class = 'cf' align="center">
+                    <%= row.composite_score_for_row.to_s %>
                   </td>
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->

@@ -54,10 +54,12 @@ class VmQuestionResponse
       self_reviews = SelfReviewResponseMap.get_assessments_for(team) #New Addition
       self_reviews.each do |review|
         self_review_mapping = SelfReviewResponseMap.find(review.map_id) #New addition
-        if self_review_mapping && self_review_mapping.present? and participant.id == self_review_mapping.reviewer_id#New addition
-          participant = Participant.find(self_review_mapping.reviewer_id) #New addition
-          @list_of_reviewers << participant #New addition
-          @store_needed_self_review = review #New addition
+        if self_review_mapping && self_review_mapping.present?
+          if participant.id == self_review_mapping.reviewer_id#New addition
+            participant = Participant.find(self_review_mapping.reviewer_id) #New addition
+            @list_of_reviewers << participant #New addition
+            @store_needed_self_review = review #New addition
+          end
         end
       end
 
@@ -68,7 +70,15 @@ class VmQuestionResponse
           @list_of_reviewers << participant
         end
       end
-      @list_of_reviews = reviews + [@store_needed_self_review]
+
+      unless @store_needed_self_review.nil?
+        @list_of_reviews = reviews + [@store_needed_self_review]
+      else
+        @list_of_reviews = reviews
+      end
+
+
+
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
@@ -104,8 +114,7 @@ class VmQuestionResponse
       end
     end
     #New Addition
-    if self_reviews
-
+    unless @store_needed_self_review == nil
       answers = Answer.where(response_id: @store_needed_self_review.response_id)
       answers.each do |answer|
         add_answer(answer)

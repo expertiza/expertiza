@@ -199,20 +199,6 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    #@github_metrics_chart = Gchart.bar(
-     #   :data => [[2,2,3,2],[4,1,2,3],[1,3,3,3],[3,4,4,2]],
-     #   :bar_colors => ['FFE5CC','FFB266','FF9933','FF8000'],
-     #   :orientation => 'vertical',
-     #   :bar_width_and_spacing => '40,30',
-     #   :size => '800x350',
-     #   :title => 'Commits per day',
-     #   :max_value => 20,
-     #   :min_value => 0,
-     #	:axis_with_labels => [['x'],['y']],
-     #   :axis_labels => [["11/14/18 | 11/15/18 | 11/16/18 | 11/17/18"]],
-     #   :legend => ['TeamMember1','TeamMember2','TeamMember3','TeamMember4'],
-     #    )
-
   end
 
   private
@@ -343,13 +329,5 @@ class GradesController < ApplicationController
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
-  end
-
-  def construct_github_metrics_chart
-    Gchart.bar(
-	:data => [10,20,30,40,50],
-        :orientation => 'vertical',
-        :title => 'Number of commits per day',
-	 )        
   end
 end

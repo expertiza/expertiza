@@ -268,15 +268,14 @@ class Response < ActiveRecord::Base
     return code if answers.empty?
     # It may have a RevisionReviewQuestionnaire hence need to extract all the questionnaires
     questionnaires = answers.map {|ans| self.questionnaire_by_answer(ans) }.uniq(&:id)
-    questionnaires.each do |questionnaire|
-      code = add_table_rows(questionnaire.max_question_score,
-                            questionnaire.questions.sort_by(&:seq),
-                            answers,
-                            code,
-                            tag_prompt_deployments(show_tags, questionnaire.id, self.map.assignment.id),
-                            current_user)
-    end
-    code
+    max_question_score = questionnaires.map(&:max_question_score).max
+    questions = questionnaires.flat_map(&:questions)
+    add_table_rows(max_question_score,
+                   questions,
+                   answers,
+                   code,
+                   tag_prompt_deployments(show_tags, questionnaires[0].id, self.map.assignment.id),
+                   current_user)
   end
 
   # returns TagPromptDeployment if show_tags is set

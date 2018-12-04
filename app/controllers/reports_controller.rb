@@ -7,14 +7,14 @@ class ReportsController < ApplicationController
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
     case params[:action]
-      when 'add_dynamic_reviewer',
+    when 'add_dynamic_reviewer',
           'show_available_submissions',
           'assign_reviewer_dynamically',
           'assign_metareviewer_dynamically',
           'assign_quiz_dynamically',
           'start_self_review'
-        true
-      else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
+      true
+    else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
   end
 
@@ -26,5 +26,4 @@ class ReportsController < ApplicationController
     render_report(@type, params, session)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
-
 end

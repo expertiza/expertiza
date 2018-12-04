@@ -365,15 +365,6 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
-  # def response_report
-    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    # @type = params.key?(:report) ? params[:report][:type] : "ReviewResponseMap"
-    # From the ReportFormatterHelper module
-    # render_report(@type, params, session)
-    # @user_pastebins = UserPastebin.get_current_user_pastebin current_user
-  # end
-
   def save_grade_and_comment_for_reviewer
     review_grade = ReviewGrade.find_by(participant_id: params[:participant_id])
     review_grade = ReviewGrade.create(participant_id: params[:participant_id]) if review_grade.nil?

@@ -174,10 +174,20 @@ class Response < ActiveRecord::Base
     p '***********'
     return false if count == 0
     p existing_response_data
+    existing_response_data.each do |id|
+      @response = Response.find(id)
+      @map = @response.map
+      #set_content
+      p @response
+      p 'in loop 1'
+      file_url = nil
+      @response.display_as_html(nil, nil, file_url)
+    end
     # the range of average_score_on_same_artifact_from_others and score is [0,1]
     # the range of allowed_difference_percentage is [0, 100]
     #(average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
   end
+
 
   def self.scores_and_count_for_prev_reviews(existing_responses, current_response, score, allowed_difference_percentage)
     #score = total_score.to_f / maximum_score
@@ -218,6 +228,7 @@ class Response < ActiveRecord::Base
     end
     [scores_assigned.sum / scores_assigned.size.to_f, count]
   end
+
 
   def notify_instructor_on_difference
     response_map = self.map

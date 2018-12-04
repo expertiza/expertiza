@@ -2,6 +2,7 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
+
   def action_allowed?
     response = user_id = nil
     action = params[:action]
@@ -42,6 +43,7 @@ class ResponseController < ApplicationController
   end
 
   def get_conflicting_response_details()
+<<<<<<< HEAD
     @response = Response.find(params[:id])
     p '@@@@@@@@@@@@@@@@'
     p @response
@@ -63,6 +65,14 @@ class ResponseController < ApplicationController
     p 'out'
   end
 
+=======
+    conflicting_ids=@response.significant_difference?
+    @conflicting_responses = []
+    conflicting_ids.each do |id|
+      @conflicting_responses << get_response_details(id)
+    end
+  end
+>>>>>>> 3f29ced9760bc7c5046be4143c38f296f547f5df
   # GET /response/json?response_id=xx
   def json
     response_id = params[:response_id] if params.key?(:response_id)

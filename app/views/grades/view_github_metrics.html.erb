@@ -19,6 +19,27 @@
         }
     }
 
+    function parseGitHubData(data) {
+        parsedData = {};
+
+        data.forEach(function (column) {
+            var authorName = column['commit']['author']['name'];
+            var commitDate = column['commit']['author']['date'];
+            var dateTime = new Date(commitDate);
+            var date = dateTime.toLocaleDateString();
+
+            if (!parsedData[date]) {
+                parsedData[date] = {};
+            }
+            if (!parsedData[date][JSON.stringify(authorName)]) {
+                parsedData[date][JSON.stringify(authorName)] = 1;
+            } else {
+                parsedData[date][JSON.stringify(authorName)]++;
+            }
+        });
+        console.log(parsedData);
+    }
+
     function githubAPICall(pull_request_url) {
         dataArray = pull_request_url.split('/');
         pullRequestCode = dataArray.pop();
@@ -27,11 +48,11 @@
         ownerName = dataArray.pop();
 
         $.ajax({
-            url: "https://api.github.com/repos/" + ownerName + "/" + repositoryName + "/pulls/" + pullRequestCode + "/files",
+            url: "https://api.github.com/repos/" + ownerName + "/" + repositoryName + "/pulls/" + pullRequestCode + "/commits",
             dataType: "json",
             success: function (returndata) {
+                parseGitHubData(returndata)
                 $(".result").html(returndata["url"]);
-                console.log(returndata);
             }
         });
     }

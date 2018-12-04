@@ -7,7 +7,7 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed', 'google_login'
+    when 'login', 'logout', 'login_failed', 'google_login', 'oauth_login'
       true
     else
       current_role_name.eql?("Super-Administrator")
@@ -36,6 +36,11 @@ class AuthController < ApplicationController
     AuthController.set_current_role(user.role_id, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
+  end
+
+  def oauth_login
+    session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
+    redirect_to view_grades_path(id: session["id"], github_code: params[:code])
   end
 
   # Login functionality for google login feature using omniAuth2

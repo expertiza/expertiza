@@ -470,7 +470,7 @@ resources :institution, except: [:destroy] do
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
-  get 'auth/:provider/callback', to: 'auth#google_login'
+  get 'auth/:provider/callback', to: 'auth#oauth_login'
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')
   get '/menu/*name', controller: :menu_items, action: :link

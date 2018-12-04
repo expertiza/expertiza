@@ -193,7 +193,7 @@
           data.addColumn('number', 'Criterion');
           var i;
           for(i = 0; i < roundNum; i++) {
-              data.addColumn('number', 'Average Score' + i.toString());
+              data.addColumn('number', 'Round ' + (i+1).toString());
               data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
               data.addColumn({type: 'string', role: 'annotation'});
 

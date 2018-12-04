@@ -42,7 +42,6 @@ class StudentReviewController < ApplicationController
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
   end
-  # expertiza project: E1856. Allow reviewers to bid on what to review
 
 # the method remove_nullteam_topics remove the topics that are not signed up by any teams
   def remove_nullteam_topics(old_array)
@@ -89,6 +88,7 @@ class StudentReviewController < ApplicationController
       end
   end
 
+  # set the priority of review
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     if params[:topic].nil?

@@ -60,8 +60,7 @@
 	var atag = document.getElementById(elementId+'Link');	
         var header = document.getElementById(elementId+'_header');
 	
-  	while (obj != null){ 
-
+  	while (obj != null){
       header.style.backgroundColor = 'white';
       header.style.color = "#000000";
   	  var bExpand = obj.style.display.length == 0;	  	   	  
@@ -70,6 +69,8 @@
   	  }
   	  else {
   	    obj.style.display = '';
+          var offsets = obj.getBoundingClientRect();
+          obj.style.width="calc(100vw - 103px)";
   	  	atag.innerHTML = '<img src="/assets/collapse.png">';
             header.style.backgroundColor = '#a90201';
             header.style.color = "#ffffff";

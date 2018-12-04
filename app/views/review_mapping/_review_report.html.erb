@@ -1,87 +1,89 @@
- <%@l = -1 %>
-      <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
-      <div class = 'reviewreport'>
+<% @l = -1 %>
+<!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
+<div class='reviewreport'>
   <!-- Added headers for tablesorter -->
-  
-<script type='text/javascript'>
-$(window).load(function(){
-  $("#myTable tbody").sortable().disableSelection();
 
-  <% sort_reviewer_by_review_volume_desc.each do |r| %>
-    td_height = $("#assign_grade" + <%= r.id.to_s %> ).height()
-    form_height = $("#assign_grade" + <%= r.id.to_s %> + " form").height()
+  <script type='text/javascript'>
+      $(window).load(function () {
+          $("#reviewReportTable tbody").sortable().disableSelection();
 
-    if(td_height > form_height){
-      difference = td_height - form_height
-      new_height = 40 + difference
-      $("#assign_grade" + <%= r.id.to_s %> + " form textarea").height(new_height)
-    }
-  <%end %>
-});
-</script>
+          <% sort_reviewer_by_review_volume_desc.each do |r| %>
+          td_height = $("#assign_grade" + <%= r.id.to_s %>).height()
+          form_height = $("#assign_grade" + <%= r.id.to_s %> +" form").height()
 
-  <table id="myTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0' style="font-size: 15px">
+          if (td_height > form_height) {
+              difference = td_height - form_height
+              new_height = 40 + difference
+              $("#assign_grade" + <%= r.id.to_s %> +" form textarea").height(new_height)
+          }
+          <%end %>
+      });
+  </script>
+
+  <table id="reviewReportTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0' style="font-size: 15px">
     <thead>
     <tr>
-  <!-- class value decides whether the column should be sortable or not  -->
-      <th width = "16%" class="sorter-true">Reviewer <span></span></th>
-      <th width = "10%" class="sorter-true">Reviews done<span></span></th>
+      <!-- class value decides whether the column should be sortable or not  -->
+      <th width="16%" class="sorter-true">Reviewer <span></span></th>
+      <th width="10%" class="sorter-true">Reviews done<span></span></th>
       <!--Dr.Kidd's course
       <% if @assignment.instructor_id == 2026 %>
         <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
         <th width = "14%" class="sorter-false">Author feedback <span></span></th>
       <% else %>-->
-        <th width = "24%" class="sorter-false">Team reviewed <span></span></th>
-      <!--<% end %>-->
-      <th width = "13%" class="sorter-true">Score awarded / Avg. score <span></span></th>
-      <th width = "13%" class="sorter-true">Metrics <span></span></th>
+        <th width="24%" class="sorter-false">Team reviewed <span></span></th>
+        <!--
+      <% end %>-->
+      <th width="13%" class="sorter-true">Score awarded / Avg. score <span></span></th>
+      <th width="13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
-<tbody>
+    <tbody>
 
-      <% sort_reviewer_by_review_volume_desc.each do |r| %>
-        <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
-        <tr>
-        <%if r.id != -1 %>
+    <% sort_reviewer_by_review_volume_desc.each do |r| %>
+      <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
+      <tr>
+        <% if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
-            <!--reviewer-->
-            <td>
-              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)
-            </td>
-            <!--# reviews done-->
-            <td align = 'left'>
-              <% (1..@assignment.num_review_rounds).each do |round| %>
-                <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
-                <%= ', ' unless round == @assignment.num_review_rounds %>
-              <% end %>
-              <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
-            </td>
+          <!--reviewer-->
+          <td>
+            <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
+            (<%= user.fullname(session[:ip]) %>)
+          </td>
+          <!--# reviews done-->
+          <td align='left'>
+            <% (1..@assignment.num_review_rounds).each do |round| %>
+              <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
+              <%= ', ' unless round == @assignment.num_review_rounds %>
+            <% end %>
+            <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id => @id}, target: :_blank %>
+          </td>
           <!--Team reviewed / Author feedback-->
-          <td align = 'left'>
-          <% @response_maps.each_with_index do |ri, index| %>
-            <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_name_color_in_review_report(ri) %>
-            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
+          <td align='left'>
+            <% @response_maps.each_with_index do |ri, index| %>
+              <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
+              <% team_name_color = get_team_name_color_in_review_report(ri) %>
+              <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
-                  <div id = <%= team_name_color %>>
+                  <div id= <%= team_name_color %>>
                 <% else %>
-                  <div id = <%= team_name_color %> >
+                  <div id=<%= team_name_color %>>
                 <% end %>
-                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
-                    <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
-                    <!--Hard-coded Dr.Kidd's question in order to display link.-->
-                    <!--later we can create a hyperlink question type to deal with this situation.-->
-                    <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
-                  </div>
+                <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id => @id %>
+                <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
+                <!--Hard-coded Dr.Kidd's question in order to display link.-->
+                <!--later we can create a hyperlink question type to deal with this situation.-->
+                <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                </div>
 
                 <!--Author feedback-->
                 <!--Dr.Kidd required to add a "autor feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
                 <!--Dr.Kidd's course-->
-                <!--<% if @assignment.instructor_id == 2026 %>
+                <!--
+                <% if @assignment.instructor_id == 2026 %>
                   <% if index == 0 %>
                   <div>
                   <% else %>
@@ -90,136 +92,125 @@ $(window).load(function(){
                     <%= calcutate_average_author_feedback_score(@assignment.id, @assignment.max_team_size, ri.id, ri.reviewee_id) %>
                   </div>
                 <% end %>-->
-              <%end%>
-          <%end %>
+              <% end %>
+            <% end %>
           </td>
           <!--Score awarded / Avg. score-->
-          <td align = 'left' >
-          <% @response_maps.each_with_index do |ri, index| %>
-            <% if Team.where(id: ri.reviewee_id).length > 0 %>
-                <%@team = Team.find(ri.reviewee_id) %>
-                <%= render partial: 'team_score',  locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
-            <%end %>
-          <%end %>
+          <td align='left'>
+            <% @response_maps.each_with_index do |ri, index| %>
+              <% if Team.where(id: ri.reviewee_id).length > 0 %>
+                <% @team = Team.find(ri.reviewee_id) %>
+                <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+              <% end %>
+            <% end %>
           </td>
           <!--Metrics-->
-          <td align = 'left'>
+          <td align='left'>
             <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
             <p>
-            <%= link_to "tone analysis chart", {:controller => 'popup', :action => 'tone_analysis_chart_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
+              <%= link_to "tone analysis chart", {:controller => 'popup', :action => 'tone_analysis_chart_popup', :reviewer_id => r.id, :assignment_id => @id}, target: :_blank %>
             </p>
           </td>
           <!--Assign grade and write comments-->
-          <td align = 'left' style="" id=<%= "assign_grade" + r.id.to_s %>>
-            <%= form_tag 'save_grade_and_comment_for_reviewer', :style => "height:100%; width:100%; position:relative;", remote: true do%>
+          <td align='left' style="" id=<%= "assign_grade" + r.id.to_s %>>
+            <%= form_tag 'save_grade_and_comment_for_reviewer', :style => "height:100%; width:100%; position:relative;", remote: true do %>
               <%= hidden_field_tag :participant_id, r.id %>
               <%= hidden_field_tag :assignment_id, @id %>
-              <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer) ,min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade', :class => "form-control", :style => "width: 100px;"%>
-              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "form-control", 'data-multiple' => '',  'data-minchars' => "1", :style => "width: 100%;"  %>
-                <table class="" style="width: 100%">
-                  <tbody width="100%">
-                    <tr>
-                      <td>
-                        <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()'%>
-                      </td>
-                      <td style="text-align: right">
-                        <%= submit_tag 'Save', :class => "btn btn-sm btn-default" %>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade', :class => "form-control", :style => "width: 100px;" %>
+              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "form-control", 'data-multiple' => '', 'data-minchars' => "1", :style => "width: 100%;" %>
+              <table class="" style="width: 100%">
+                <tbody width="100%">
+                <tr>
+                  <td>
+                    <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()' %>
+                  </td>
+                  <td style="text-align: right">
+                    <%= submit_tag 'Save', :class => "btn btn-sm btn-default" %>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
             <% end %>
           </td>
-        <%end %>  
-        </tr>
-      <%end %>
-</table>
+        <% end %>
+      </tr>
+    <% end %>
+    </table>
 
-  <p> **In "Team reviewed" column, text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:blue">blue</i> indicates that the review grade is not assigned or updated; text in <i style = "color: #986633">brown</i> indicates that the review grade has been assigned.</p>
+  <p> **In "Team reviewed" column, text in <i style="color:red">red</i> indicates that the review is not yet completed;
+    text in <i style="color:blue">blue</i> indicates that the review grade is not assigned or updated; text in
+    <i style="color: #986633">brown</i> indicates that the review grade has been assigned.</p>
 </div>
-  <!--Partial for text macro form-->
- <%= render :partial => '/user_pastebins/save_text_macros'%>
+<!--Partial for text macro form-->
+<%= render :partial => '/user_pastebins/save_text_macros' %>
 
 <script>
-$(function () {
-  /*Function for sorting the table */
-		 $("#myTable").tablesorter({
-		sortList: [[0,0]], //sort First Column by default when page loads
-         textSorter : {
-             1: function (a, b) {
-                 if (a === b) {
-                     return 0;
-                 }
-                 var res1 = a.split("/");
-                 var res2 = b.split("/");
-                 res1[1] = res1[1].split(" ")[0];
-                 res2[1] = res2[1].split(" ")[0];
-                 if(parseInt(res1[0])>parseInt(res2[0])){
-                     return 1;
-                 }
-                 else if(parseInt(res1[0])<parseInt(res2[0])){
-                     return -1;
-                 }
-                 else{
-                     if(parseInt(res1[1])>parseInt(res2[1])){
-                         return 1;
-                     }
-                     else if(parseInt(res1[1])<parseInt(res2[1])){
-                         return -1;
-                     }
-                     else{
-                         return 0;
-                     }
-                 }
-             },
-             3: function (a, b) {
-                 if (a === b) {
-                     return 0;
-                 }
-                 var res1 = a.split("/");
-                 var res2 = b.split("/");
-                 res1[1] = res1[1].split("%")[0].replace(/\s/g, '');
-                 res2[1] = res2[1].split("%")[0].replace(/\s/g, '');
+    $(function () {
+        /*Function for sorting the table */
+        $("#reviewReportTable").tablesorter({
+            sortList: [[0, 0]], //sort First Column by default when page loads
+            textSorter: {
+                1: function (value1, value2) {
+                    if (value1 === value2) {
+                        return 0;
+                    }
+                    var result1 = value1.split("/");
+                    var result2 = value2.split("/");
+                    result1[1] = result1[1].split(" ")[0];
+                    result2[1] = result2[1].split(" ")[0];
+                    if (parseInt(result1[0]) > parseInt(result2[0])) {
+                        return 1;
+                    }
+                    else if (parseInt(result1[0]) < parseInt(result2[0])) {
+                        return -1;
+                    }
+                    else {
+                        if (parseInt(result1[1]) > parseInt(result2[1])) {
+                            return 1;
+                        }
+                        else if (parseInt(result1[1]) < parseInt(result2[1])) {
+                            return -1;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+                },
+                3: function (value1, value2) {
+                    var result1 = value1.split("%");
+                    var result2 = value2.split("%");
 
-                 if(parseInt(res1[0].slice(0, -1))>parseInt(res2[0].slice(0, -1))){
-                     return 1;
-                 }
-                 else if(parseInt(res1[0].slice(0, -1))<parseInt(res2[0].slice(0, -1))){
-                     return -1;
-                 }
-                 else{
-                     if(parseInt(res1[1])>parseInt(res2[1])){
-                         return 1;
-                     }
-                     else if(parseInt(res1[1])<parseInt(res2[1])){
-                         return -1;
-                     }
-                     else{
-                         return 0;
-                     }
-                 }
-             }
-         },
-		headers: {
-     		   4: {
-      			  sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
-     		      }
-   		 }
-		});
-	});
+                    if (parseInt(result1[0]) > parseInt(result2[0])) {
+                        return 1;
+                    }
+                    else if (parseInt(result1[0]) < parseInt(result2[0])) {
+                        return -1;
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+            },
+            headers: {
+                4: {
+                    sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
+                }
+            }
+        });
+    });
 
 
-$.tablesorter.addParser({
-  id: "customParser",                                       //customParser for sorting by volume
-  is: function (stringValue) {
-    return false;
-  },
-  format: function (stringValue) {
-    var stringNumericPart = stringValue.split(" ");         //split the data by spaces
-    var numericValue = parseInt(stringNumericPart[2],10);   //extract the numeric data
-    return numericValue ;
-  },
-  type: 'numeric'
-});
+    $.tablesorter.addParser({
+        id: "customParser",                                       //customParser for sorting by volume
+        is: function (stringValue) {
+            return false;
+        },
+        format: function (stringValue) {
+            var stringNumericPart = stringValue.split(" ");         //split the data by spaces
+            var numericValue = parseInt(stringNumericPart[2], 10);   //extract the numeric data
+            return numericValue;
+        },
+        type: 'numeric'
+    });
 </script>
 

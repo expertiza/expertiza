@@ -6,7 +6,7 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if action_name == "edit"
+    if action_name == "edit" || action_name == "delete"
       edit_action_allowed?
     else
       ['Super-Administrator',

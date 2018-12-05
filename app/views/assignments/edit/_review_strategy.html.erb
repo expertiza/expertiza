@@ -12,7 +12,8 @@
       </script>
 
       <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom
-- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
+- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.
+- Bidding: Allow student to "bid" for reviews.'>
     </td>
   </tr>
 
@@ -56,6 +57,7 @@
       <%= text_field_tag('assignment_form[assignment][num_metareviews_required]', @assignment_form.assignment.num_metareviews_required ||= @assignment_form.assignment.num_metareviews_allowed, size: 1, class: "form-control width-70") %>
     </td>
   </tr>
+
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
     <td>
       <%= form_tag :controller => 'review_mapping', :action => 'automatic_review_mapping', :id => @assignment_form.assignment.id do %>
@@ -84,6 +86,12 @@
           <%= submit_tag 'Assign both calibrated and uncalibrated artifacts', :id => 'third_submit_tag' %>
         </span><br/>
       <% end %>
+    </td>
+  </tr>
+
+  <tr id="bidding_opinion" hidden='hidden'>
+    <td>
+      <!-- TODO: Opinions with bidding strategy. -->
     </td>
   </tr>
 

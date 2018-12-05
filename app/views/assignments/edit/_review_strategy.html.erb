@@ -107,14 +107,14 @@
 
   <!--#E1870-->
   <tr>
-    <td style='padding:5px' id='assignment_allow_join_late'>
-      <input name="assignment_form[assignment][allow_join_late]" type="hidden" value="false"/>
+    <td style='padding:5px' id='assignment_allow_doing_subsequent_review_without_first_round'>
+      <input name="assignment_form[assignment][allow_doing_subsequent_review_without_first_round]" type="hidden" value="false"/>
       <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
-        <%= check_box_tag('assignment_form[assignment][allow_join_late]', 'true', @assignment_form.assignment.allow_join_late) %>
+        <%= check_box_tag('assignment_form[assignment][allow_doing_subsequent_review_without_first_round]', 'true', @assignment_form.assignment.allow_doing_subsequent_review_without_first_round) %>
       <% else %>
-        <%= check_box_tag('assignment_form[assignment][allow_join_late]', 'true', @assignment_form.assignment.allow_join_late, disabled: true) %>
+        <%= check_box_tag('assignment_form[assignment][allow_doing_subsequent_review_without_first_round]', 'true', @assignment_form.assignment.allow_doing_subsequent_review_without_first_round, disabled: true) %>
       <% end %>
-      <%= label_tag('assignment_form[assignment][allow_join_late]', 'Allow students to join reviews late') %>
+      <%= label_tag('assignment_form[assignment][allow_doing_subsequent_review_without_first_round]', 'Allow students to join reviews late') %>
       <img src="/assets/info.png" title='Should a student who does not do a first-round review be allowed to review this work in subsequent rounds?'>
     </td>
   </tr>

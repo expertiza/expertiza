@@ -249,7 +249,7 @@ function microtaskChanged() {
             if (<%= @assignment_form.assignment.max_team_size == 1%>){
               team_count_field.attr('hidden', true);
             }
-          } 
+          }
     }
 
     function staggeredDeadlineChanged() {
@@ -266,15 +266,15 @@ function microtaskChanged() {
         if (val == 'Auto-Selected') {
           jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
           jQuery('#instructor_selected_review_mapping_mechanism').attr('hidden', true);
-          jQuery('#bidding_opinions').attr('hidden', true)
+          jQuery('#bidding_options').attr('hidden', true)
         } else if (val == 'Instructor-Selected') {
           jQuery('#instructor_selected_review_mapping_mechanism').removeAttr('hidden');
           jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-          jQuery('#bidding_opinions').attr('hidden', true)
+          jQuery('#bidding_options').attr('hidden', true)
         } else {
             jQuery('#instructor_selected_review_mapping_mechanism').attr('hidden', true);
           jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
-          jQuery('#bidding_opinions').removeAttr('hidden')
+          jQuery('#bidding_options').removeAttr('hidden')
         }
    }
 

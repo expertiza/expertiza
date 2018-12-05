@@ -89,9 +89,25 @@
     </td>
   </tr>
 
-  <tr id="bidding_opinion" hidden='hidden'>
-    <td>
-      <!-- TODO: Opinions with bidding strategy. -->
+  <tr id="bidding_options" hidden='hidden'>
+    <td class="form-inline">
+      <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
+      <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 2, class: "form-control width-70") %>
+      <br/>
+      <%= check_box_tag('reviewBidding', 'true', true, {:onChange => 'hasReviewChangedInBidding()'}) %>
+      <%= label_tag('reviewBidding', 'Has Max Review Limit?') %>&emsp;&emsp;
+      <span id="reviews_allowed_in_bidding" <%= 'hidden' if @assignment_form.assignment.num_reviews_allowed.nil?%>>
+     <br/>
+        <%= label_tag('assignment_form[assignment][num_reviews_allowed]', ' Set Allowed Number of Reviews per reviewer') %>
+        <%if @assignment_form.assignment.num_reviews_allowed && @assignment_form.assignment.num_reviews_allowed >= 0 %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]', @assignment_form.assignment.num_reviews_allowed, size: 1, class: "form-control width-70") %>
+        <%else%>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]',  3, size: 1, class: "form-control width-70") %>
+        <%end%>
+      </span>
+      <br/>
+      <%= label_tag('assignment_form[assignment][num_reviews_required]', 'Set Required Number of Reviews per reviewer') %>
+      <%= text_field_tag('assignment_form[assignment][num_reviews_required]', @assignment_form.assignment.num_reviews_required ||= @assignment_form.assignment.num_reviews, size: 1, class: "form-control width-70") %>
     </td>
   </tr>
 
@@ -126,10 +142,20 @@
         } else {
                 reviews_allowed_field.attr('hidden', true);
                 jQuery('#assignment_form_assignment_num_reviews_allowed').val('-1');
-
-
         }
     }
+    function hasReviewChangedInBidding() {
+        var checkbox = jQuery('#reviewBidding');
+        var reviews_allowed_field = jQuery('#reviews_allowed_in_bidding');
+        if (checkbox.is(':checked')) {
+            reviews_allowed_field.removeAttr('hidden');
+            jQuery('#assignment_form_assignment_num_reviews_allowed').val('<%=@assignment_form.assignment.num_reviews_allowed ||= 3%>');
+        } else {
+            reviews_allowed_field.attr('hidden', true);
+            jQuery('#assignment_form_assignment_num_reviews_allowed').val('-1');
+        }
+    }
+
     function hasMetaReviewChanged() {
         var checkbox = jQuery('#meta_review');
         var meta_reviews_allowed_field = jQuery('#meta_reviews_allowed');

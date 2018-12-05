@@ -90,6 +90,10 @@ class AssignmentNode < Node
     Assignment.find_by(id: self.node_object_id).try(:is_intelligent)
   end
 
+  def get_is_bidding_review
+    Assignment.find_by(id: self.node_object_id).try(:bidding)
+  end
+
   def get_require_quiz
     Assignment.find_by(id: self.node_object_id).try(:require_quiz)
   end

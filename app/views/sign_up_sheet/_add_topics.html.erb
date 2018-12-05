@@ -56,4 +56,11 @@
                     '&nbsp&nbsp|&nbsp&nbsp' +
                     'Topic Link <em>(optional)</em>' %> |
 
+    <%= link_to 'Import sign up sheet',
+                :controller=>'import_file',
+                :action=>'start',
+                :model => 'SignUpSheet',
+                :id => params[:id],
+                :expected_fields => 'Topic identifier, User Name1, User Name2, ...' %>|
+
 <% end %>

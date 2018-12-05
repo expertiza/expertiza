@@ -15,6 +15,7 @@ gem "capistrano-db-tasks", require: false
 gem 'capistrano-passenger'
 gem 'capistrano-rails'
 gem 'capistrano-rvm'
+gem 'chartjs-ror'
 gem 'coffee-rails'
 gem 'coveralls', require: false
 gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '6df469a', require: false

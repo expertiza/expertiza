@@ -104,4 +104,48 @@ module GradesHelper
   def underlined?(score)
     return "underlined" if score.comment.present?
   end
+
+  def display_github_metrics(parsed_data, authors, dates)
+
+    dataArray = []
+    color = 255
+    authors.each do |author|
+      dataobject = {}
+      dataobject['label'] = author
+      dataobject['data'] = parsed_data[author].values
+      dataobject['backgroundColor'] = "rgba("+ color.to_s + ",99,175,0.8)"
+      dataobject['borderWidth'] = 1
+      dataArray.push(dataobject)
+      color = color - 90
+    end
+
+    data = {
+        labels: dates,
+        datasets: dataArray
+    }
+    options = {
+        responsive:true,
+        maintainAspectRatio: false,
+        width: 100,
+        height:100,
+        scales: {
+            yAxes: [{
+                        stacked: true,
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        barThickness: 30
+                    }],
+            xAxes: [{
+                        stacked: true,
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        barThickness: 30
+                    }]
+
+        }
+    }
+    horizontal_bar_chart data, options
+  end
 end

@@ -19,91 +19,6 @@
             target.style.display = 'none';
         }
     }
-
-    function parseGitHubData(response) {
-        parsedData = {};
-        totalNumberOfLinesAdded = response.data.repository.pullRequest.additions;
-        totalNumberOfLinesDeleted = response.data.repository.pullRequest.deletions;
-        totalNumberOfFilesChanged = response.data.repository.pullRequest.changedFiles;
-        totalNumberOfCommits = response.data.repository.pullRequest.commits.totalCount;
-
-        commitObject = response.data.repository.pullRequest.commits.edges;
-
-        commitObject.forEach(function (column) {
-            var authorName = column.node.commit.author.name;
-            var committedDate = column.node.commit.committedDate;
-            var dateTime = new Date(committedDate);
-            var date = dateTime.toLocaleDateString();
-
-            if (!parsedData[date]) {
-                parsedData[date] = {};
-            }
-            if (!parsedData[date][JSON.stringify(authorName)]) {
-                parsedData[date][JSON.stringify(authorName)] = 1;
-            } else {
-                parsedData[date][JSON.stringify(authorName)]++;
-            }
-        });
-        console.log(parsedData);
-    }
-
-    function githubAPICall(pull_request_url) {
-        dataArray = pull_request_url.split('/');
-        pullRequestCode = dataArray.pop();
-        dataArray.pop();
-        repositoryName = dataArray.pop();
-        ownerName = dataArray.pop();
-
-        if (github_token) {
-            $.ajax({
-                type: "POST",
-                url: "https://api.github.com/graphql",
-                headers: {
-                    'Authorization': 'Bearer' + ' ' + github_token,
-                },
-                data: JSON.stringify({
-                    query: `query {
-                          repository(owner: ${ownerName}, name: ${repositoryName}) {
-                            pullRequest(number: ${pullRequestCode}) {
-                              additions
-                              deletions
-                              changedFiles
-                              commits(first:200){
-                                totalCount
-                                edges{
-                                  node{
-                                    id
-                                    commit{
-                                      author{
-                                        name
-                                      }
-                                      additions
-                                      deletions
-                                      changedFiles
-                                      committedDate
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }`
-                }),
-                success: function (response) {
-                    parseGitHubData(response)
-                },
-                error: function (httpObject, textStatus) {
-                    if (httpObject.status === 401) {
-                        // If token has expired, get a new one.
-                        // status 401: unauthorized
-                        window.location.replace("https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813");
-                    }
-                }
-            });
-        } else {
-            window.location.replace("https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813");
-        }
-    }
 </script>
 <h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>
 <h4>Team: <%= @team.name %></h4>
@@ -124,35 +39,12 @@
   <% end %>
 </div><br><br>
 
-<!-- Fetch the hyperlink for the pull request and proceed with getting the GitHub data from the API -->
-<% @participant.team.hyperlinks.each do |hyperlink| %>
-  <% if hyperlink.match(/pull/) %>
-    <% @pull_request_hyperlink = hyperlink %>
-  <% end %>
-<% end %>
 
-<script>
-    pullRequestHyperlink = '<%=@pull_request_hyperlink %>';
-    githubAPICall(pullRequestHyperlink)
-</script>
-
-<br></br>
-<br><%= image_tag(@github_metrics_chart = Gchart.bar(
-        :data => [[2,2,3,2],[4,1,2,3],[1,3,3,3],[3,4,4,2]],
-        :bar_colors => ['FFE5CC','FFB266','FF9933','FF8000'],
-        :orientation => 'vertical',
-        :bar_width_and_spacing => '40,30',
-        :size => '800x350',
-        :title => 'No. of Commits per day',
-        :max_value => 20,
-        :min_value => 0,
-        :axis_with_labels => [['x'],['y']],
-        :axis_labels => [["11/14/18 | 11/15/18 | 11/16/18 | 11/17/18"]],
-        :legend => ['TeamMember1','TeamMember2','TeamMember3','TeamMember4'],
-         )
-)%></br>
-<br></br>
-
+<br>
+<div class="chart-container" style="width: 1000px; height:600px;">
+  <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+</div>
+<br>
 
 <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
 <% if ['Student'].include? current_user.role.name %>

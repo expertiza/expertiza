@@ -199,16 +199,138 @@ class GradesController < ApplicationController
   def view_github_metrics
     session["github_view_type"] = "view_submissions"
     @token = session["github_access_token"]
+
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
+
+    submission_hyperlink = nil
+    @participant.team.hyperlinks.each do |hyperlink|
+      if hyperlink.match(/pull/)
+        submission_hyperlink = hyperlink
+      end
+    end
+
+    submission_hyperlink_tokens = submission_hyperlink.split('/')
+    hyperlink_data = {}
+    hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
+    submission_hyperlink_tokens.pop
+    hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
+    hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
+
+    github_data = get_github_data(hyperlink_data)
+    @parsed_data, @authors, @dates = parse_github_data(github_data)
+
   end
 
   def authorize_github
     session["participant_id"] = params[:id]
-    redirect_to "https://github.com/login/oauth/authorize?client_id=2ab15e0bd05464b85a53"
+    if session["github_access_token"]
+      redirect_to controller:'grades', action: 'view_github_metrics', id: session["participant_id"]
+    else
+      redirect_to "https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813"
+    end
   end
+
+  def get_github_data(hyperlink_data)
+    header = {'Authorization': 'Bearer' + ' ' + session["github_access_token"]}
+    data = {
+        query: "query {
+                          repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
+                            pullRequest(number: "+ hyperlink_data["pull_request_number"] +") {
+                              additions
+                              deletions
+                              changedFiles
+                              commits(first:200){
+                                totalCount
+                                edges{
+                                  node{
+                                    id
+                                    commit{
+                                      author{
+                                        name
+                                      }
+                                      additions
+                                      deletions
+                                      changedFiles
+                                      committedDate
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }"}
+
+    url = "https://api.github.com/graphql"
+    uri = URI.parse(url)
+
+    response = Net::HTTP.new(uri.host, uri.port)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    request = Net::HTTP::Post.new(uri.path, initheader = {'Authorization'=> 'Bearer' + ' ' + session["github_access_token"]})
+    request.body = data.to_json
+
+    http.request(request)
+    response = http.request(request)
+    return response.body.to_s
+  end
+
+  def parse_github_data(github_data)
+    github_data = ActiveSupport::JSON.decode(github_data)
+    total_additions = github_data["data"]["repository"]["pullRequest"]["additions"]
+    total_deletions = github_data["data"]["repository"]["pullRequest"]["deletions"]
+    total_files_changed = github_data["data"]["repository"]["pullRequest"]["changedFiles"]
+
+    commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
+    authors = {}
+    dates = {}
+    parsed_data = {}
+
+
+    commit_objects.each do |commit_object|
+      author_name = commit_object["node"]["commit"]["author"]["name"];
+      commit_date = commit_object["node"]["commit"]["committedDate"].to_s;
+      commit_date = commit_date[0,10]
+
+      unless authors.key?(author_name)
+        authors[author_name] = 1
+      end
+
+      unless dates.key?(commit_date)
+        dates[commit_date] = 1
+      end
+
+      unless parsed_data[author_name]
+        parsed_data[author_name] = {}
+      end
+
+      unless parsed_data[author_name][commit_date]
+        parsed_data[author_name][commit_date] = 1
+      else
+        parsed_data[author_name][commit_date] = parsed_data[author_name][commit_date] + 1
+      end
+    end
+
+    dates.each do |k,v|
+      parsed_data.each do |k1,v1|
+        unless v1[k]
+          v1[k] = 0
+        end
+      end
+    end
+
+    parsed_data.each {|k1, v1| parsed_data[k1] = Hash[v1.sort_by {|k, v| k}]}
+    authors = authors.keys
+    dates = dates.keys
+
+    return parsed_data,authors,dates
+  end
+
+
 
   private
 

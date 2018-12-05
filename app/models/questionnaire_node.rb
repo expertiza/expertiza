@@ -6,7 +6,7 @@ class QuestionnaireNode < Node
     "questionnaires"
   end
 
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = {})
     conditions = if show
                    if User.find(user_id).role.name != "Teaching Assistant"
                      'questionnaires.instructor_id = ?'
@@ -32,11 +32,44 @@ class QuestionnaireNode < Node
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
+
+    # name = _search[:name].to_s.strip
+    # course = _search[:course].to_s.strip
+    # assignment = _search[:assignment].to_s.strip
+    # creation_date=_search[:creation_date].to_s.strip
+    # updation_date=_search[:updation_date].to_s.strip
+
+    course_name = 'BIT 115 2011 Spring'
+    course = Course.where('name LIKE ?', "%#{course_name}%").first
+    if course.present?
+      instructor_id = course.instructor_id
+      conditions+=" and questionnaires.instructor_id = \"#{instructor_id}\""
+    end
+
+    name="BIT 115 Peer"
+    conditions+=" and questionnaires.name LIKE \"%#{name}%\""
+
+    #
+    # puts "----------------------------------"
+    # assignment_name="BIT 115 First"
+    # matching_assignments = Assignment.where('name LIKE ?', "%#{assignment_name}%")
+    # puts "matching assignmnets are "+matching_assignments.to_s
+    # matching_questionnaire = AssignmentQuestionnaire.where("assignment_id in ?",matching_assignments.ids)
+    # puts "matching questionnaires are "+matching_questionnaire.to_s
+    # puts matching_questionnaire.attribute_names
+    # conditions+="and questionnaires.id = #{matching_questionnaire.questionnaire.questionnaire_id}"
+    # puts "printing conditpons"+conditions+"--------------------------------------"
+
+
+
+
+
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
     if Questionnaire.column_names.include? sortvar and %w[ASC DESC asc desc].include? sortorder
       self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}")
     end
+
   end
 
   def get_name

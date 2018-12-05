@@ -1,44 +1,11 @@
 <html>
   <head>
-    <%= content_tag :div, class: "assignment_information", data: {assignment: @assignment} do %>
-    <% end %>
     <%= content_tag :div, class: "chartdata_information", data: {chartdata: @chartdata} do %>
-    <% end %>
-    <%= content_tag :div, class: "scores_information", data: {scores: @scores} do %>
-    <% end %>
-    <%= content_tag :div, class: "scoreviews_information", data: {scoreviews: @scoreviews} do %>
-    <% end %>
-    <%= content_tag :div, class: "questions_information", data: {questions: @questions} do %>
-    <% end %>
-    <%= content_tag :div, class: "rounds_information", data: {rounds: @rounds} do %>
-    <% end %>
-    <%= content_tag :div, class: "questionnaires_information", data: {questionnaires: @questionnaires} do %>
-    <% end %>
-    <%= content_tag :div, class: "questionnaire_information", data: {questionnaire: @questionnaire} do %>
-    <% end %>
-    <%= content_tag :div, class: "questionnaireids_information", data: {questionnaireids: @questionnaireids} do %>
-    <% end %>
-    <%= content_tag :div, class: "teams_information", data: {teams: @teams} do %>
-    <% end %>
-    <%= content_tag :div, class: "team_information", data: {team: @team} do %>
-    <% end %>
-    <%= content_tag :div, class: "teamids_information", data: {teamids: @teamids} do %>
-    <% end %>
-    <%= content_tag :div, class: "participants_information", data: {participants: @participants} do %>
-    <% end %>
-    <%= content_tag :div, class: "participant_information", data: {participant: @participant} do %>
-    <% end %>
-    <%= content_tag :div, class: "maps_information", data: {maps: @maps} do %>
-    <% end %>
-    <%= content_tag :div, class: "result_information", data: {result: @result} do %>
-    <% end %>
-    <%= content_tag :div, class: "responseids_information", data: {responseids: @responseids} do %>
     <% end %>
     <%= content_tag :div, class: "text_information", data: {text: @text} do %>
     <% end %>
     <%= content_tag :div, class: "minmax_information", data: {minmax: @minmax} do %>
     <% end %>
-
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -55,29 +22,35 @@
 
       //Display Options
       var showLabels = true;
+      var barColors = [ // Other colors generated from the expertiza base red
+          '#A90201',    // using paletton.com
+          '#018701',
+          '#016565',
+          '#A94D01'
+      ];
 
-      function getData(){
+      function getData(){ //Loads all chart data from the page
         chartData = $('.chartdata_information').data('chartdata');
         chartText = $('.text_information').data('text');
         chartRange = $('.minmax_information').data('minmax');
-        for (var i = 0; i < chartData.length; i++){
+        for (var i = 0; i < chartData.length; i++){ //Set all the criteriaSelected to true
           var criteria = [];
           for (var j = 0; j < chartData[i].length; j++){
             criteria.push(true);
           }
           criteriaSelected.push(criteria);
         }
-        }
+      }
 
       function generateData() {	//Generates random data for testing
         var rounds = 3;
         for(var i = 0; i < rounds; i++) {
-          var criteriaNum = Math.floor(Math.random() * 5 + 5);
+          var criteriaNum = Math.floor(Math.random() * 5 + 5);  //Random number of criteria
           var round = [];
           var criteria = [];
           for(var j = 0; j < criteriaNum; j++) {
-            round.push(Math.floor(Math.random() * 101));
-            criteria.push(true);
+            round.push(Math.floor(Math.random() * 101));  //Random score for each criterion
+            criteria.push(true);  //Everything starts out true
           }
           chartData.push(round);
           criteriaSelected.push(criteria);
@@ -89,7 +62,7 @@
         chartOptions = {		//Render options for the chart
           title: 'Class Average on Criteria',
           titleTextStyle: {
-            fontName: 'arial',	//Fonts to be changed to Helvetica when implemented
+            fontName: 'arial',
             fontSize: 18,
             italic: false,
             bold: true
@@ -130,12 +103,12 @@
         chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
         var checkBox = document.getElementById("labelCheck");
         checkBox.checked = true;
+        checkBox.style.display = "inline";
         updateChart(currentRound);
         loadRounds();
-
       }
 
-      function updateChart(roundNum) {	//Updates the chart with a new round number
+      function updateChart(roundNum) {	//Updates the chart with a new round number and renders
         currentRound = roundNum;
         renderChart();
         loadCriteria();
@@ -150,18 +123,13 @@
 
       function renderChart() {	//Renders the chart if changes have been made
           var data = loadData();
-          if (chartRange[currentRound]) {
+          chartOptions.vAxis.viewWindow.max = 5;
+          chartOptions.vAxis.viewWindow.min = 0;
+          if (chartRange[currentRound]) { //Set axis ranges if they exist
               if (chartRange[currentRound][1])
                   chartOptions.vAxis.viewWindow.max = chartRange[currentRound][1];
-              else
-                  chartOptions.vAxis.viewWindow.max = 5;
               if (chartRange[currentRound][0])
                   chartOptions.vAxis.viewWindow.min = chartRange[currentRound][0];
-              else
-                  chartOptions.vAxis.viewWindow.min = 0;
-          } else {
-              chartOptions.vAxis.viewWindow.max = 5;
-              chartOptions.vAxis.viewWindow.min = 0;
           }
           chart.draw(data, chartOptions);
       }
@@ -177,9 +145,9 @@
 
           chartOptions.hAxis.ticks = [];
           var rowCount = 1;
-          for(var i = 0; i < chartData[currentRound].length; i++) {
+          for(var i = 0; i < chartData[currentRound].length; i++) { //Add a chart row for each criterion if not null
               if (criteriaSelected[currentRound][i] && chartData[currentRound][i]) {
-                  data.addRow([rowCount, chartData[currentRound][i], '#a90201', (showLabels) ? chartData[currentRound][i].toFixed(1).toString() : ""]);
+                  data.addRow([rowCount, chartData[currentRound][i], barColors[0], (showLabels) ? chartData[currentRound][i].toFixed(1).toString() : ""]);
                   chartOptions.hAxis.ticks.push({v: rowCount++, f: (i+1).toString()});
               }
           }
@@ -192,7 +160,7 @@
           var data = new google.visualization.DataTable();
           data.addColumn('number', 'Criterion');
           var i;
-          for(i = 0; i < roundNum; i++) {
+          for(i = 0; i < roundNum; i++) { //Add all columns for the data
               data.addColumn('number', 'Round ' + (i+1).toString());
               data.addColumn({type: 'string', role: 'style'});	//column for specifying the bar color
               data.addColumn({type: 'string', role: 'annotation'});
@@ -208,16 +176,16 @@
               var newRow = [];
               var elementsAdded = false;
               newRow.push(rowCount);
-              for(var j = 0; j < roundNum; j++) {
+              for(var j = 0; j < roundNum; j++) { //If the round has the criterion, add it
                   if (chartData[j][i]) {
                       newRow.push(chartData[j][i]);
                       elementsAdded = true;
                   } else {
                       newRow.push(null);
                   }
-                  newRow.push('#a90201');
+                  newRow.push(barColors[j % barColors.length]); //Add column color
                   if (chartData[j] && chartData[j][i] && showLabels)
-                      newRow.push(chartData[j][i].toFixed(1).toString());
+                      newRow.push(chartData[j][i].toFixed(1).toString()); //Add column annotations
                   else
                       newRow.push("");
               }
@@ -249,15 +217,15 @@
 
       function loadCriteria() {	//Creates the criteria check boxes
           var form = document.getElementById("chartCriteria");
-          while (form.firstChild)
+          while (form.firstChild) //Clear out the old check boxes
               form.removeChild(form.firstChild);
-          if (currentRound == -1)
+          if (currentRound == -1) //Don't show criteria for 'all rounds'
               return;
           chartData[currentRound].forEach(function(dat, i) {
               var checkbox = document.createElement('input');
               checkbox.type = "checkbox";
               checkbox.id = "checkboxoption" + i;
-              checkbox.onclick = function() {
+              checkbox.onclick = function() { //Register callback to toggle the criterion
                   checkboxUpdate(i);
               }
               var label = document.createElement('label')
@@ -285,7 +253,7 @@
     <form id="chartOptions" name="chartOptions">
       <select id="chartRounds" name="rounds" onChange="updateChart(document.chartOptions.chartRounds.options[document.chartOptions.chartRounds.options.selectedIndex].value)" style = "display: none">
       </select>
-      <input type="checkbox" id = "labelCheck" checked="checked" onclick="showLabels = !showLabels; renderChart();">Show Labels
+      <label><input type="checkbox" id = "labelCheck" checked="checked" style="display: none" onclick="showLabels = !showLabels; renderChart();">Show Labels</label>
     </form>
     <div id="chartCriteria" name="chartCriteria">
     </div>

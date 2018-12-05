@@ -483,4 +483,16 @@ FactoryBot.define do
     controller_action_id nil
     content_page_id nil
   end
+
+  factory :revision_questionnaire, class: RevisionReviewQuestionnaire do
+    name 'Test questionnaire'
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
+    private 0
+    min_question_score 0
+    max_question_score 5
+    type 'RevisionReviewQuestionnaire'
+    display_type 'Review'
+    instruction_loc nil
+    submission_record_id 1
+  end
 end

@@ -39,8 +39,8 @@
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
             <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %>
-              <br>
-            <%= link_to 'GitHub Metrics', { controller: 'grades', action: 'authorize_github', id: participants.first.id }, target: '_blank' %></td>
+            <br>
+            <%= link_to 'GitHub Metrics', { controller: 'grades', action: 'view_github_metrics', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
         <% end %>
 

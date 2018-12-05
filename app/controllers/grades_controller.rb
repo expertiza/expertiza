@@ -9,11 +9,11 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-      [ 'Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator',
-        'Student'].include? current_role_name and
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
         are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
         check_self_review_status
       when 'view_team'
@@ -24,10 +24,10 @@ class GradesController < ApplicationController
           true
         end
       else
-        [ 'Instructor',
-          'Teaching Assistant',
-          'Administrator',
-          'Super-Administrator'].include? current_role_name
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -68,7 +68,7 @@ class GradesController < ApplicationController
       question = @questions[('review' + round.to_s).to_sym]
       @text[round - 1] = []
       next if question.nil?
-      (0..(question.length-1)).to_a.each do |q|
+      (0..(question.length - 1)).to_a.each do |q|
         @text[round - 1][q] = question[q].txt
       end
     end
@@ -79,21 +79,20 @@ class GradesController < ApplicationController
   def assign_minmax(questionnaires)
     @minmax = []
     questionnaires.each do |questionnaire|
-      if questionnaire.symbol == :review
-        round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
-        next if round.nil?
-          @minmax[round - 1] = []
-          @minmax[round - 1][0] = if !questionnaire.min_question_score.nil? and questionnaire.min_question_score < 0
+      next if questionnaire.symbol != :review
+      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
+      next if round.nil?
+        @minmax[round - 1] = []
+        @minmax[round - 1][0] = if !questionnaire.min_question_score.nil? and questionnaire.min_question_score < 0
                                   questionnaire.min_question_score
                                 else
                                   0
                                 end
-          @minmax[round - 1][1] = if !questionnaire.max_question_score.nil?
+        @minmax[round - 1][1] = if !questionnaire.max_question_score.nil?
                                   questionnaire.max_question_score
                                 else
                                   5
                                 end
-      end
     end
   end
 
@@ -103,7 +102,7 @@ class GradesController < ApplicationController
     @rounds = @assignment.num_review_rounds
     @chartdata = []
     (1..@rounds).to_a.each do |round|
-      @teams = AssignmentTeam.where(parent_id:@assignment.id)
+      @teams = AssignmentTeam.where(parent_id: @assignment.id)
       @teamids = []
       @result = []
       @responseids = []
@@ -114,10 +113,10 @@ class GradesController < ApplicationController
           WHERE type = 'ReviewResponseMap' AND reviewee_id = ?", @teamids[t]]
         @responseids[t] = []
         @scoreviews[t] = []
-        (0..(@result[t].length-1)).to_a.each do |r|
+        (0..(@result[t].length - 1)).to_a.each do |r|
           @responseids[t][r] = Response.find_by_sql ["SELECT id FROM responses
-            WHERE round = ? AND map_id = ?",round, @result[t][r]]
-          @scoreviews[t][r] = Answer.where(response_id: @responseids[t][r][0]) if !@responseids[t][r].empty?
+            WHERE round = ? AND map_id = ?", round, @result[t][r]]
+          @scoreviews[t][r] = Answer.where(response_id: @responseids[t][r][0]) unless @responseids[t][r].empty?
         end
       end
       @chartdata[round - 1] = []
@@ -125,10 +124,8 @@ class GradesController < ApplicationController
       # iterate until a non-nil value is found or move to next round
       t = 0
       r = 0
-      while !@scoreviews[t].nil?
-        t += 1
-      end
-      while t < @scoreviews.length and !@scoreviews[t][r].nil?
+      t += 1 while @scoreviews[t].nil?
+      while t < @scoreviews.length and @scoreviews[t][r].nil?
         if r < @scoreviews[t].length - 1
           r += 1
         else
@@ -137,7 +134,6 @@ class GradesController < ApplicationController
         end
       end
       next if t >= @scoreviews.length
-
       (0..(@scoreviews[t][r].length - 1)).to_a.each do |q|
         sum = 0
         counter = 0
@@ -160,10 +156,10 @@ class GradesController < ApplicationController
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
       questionnaire_symbol = if !round.nil?
-        (questionnaire.symbol.to_s + round.to_s).to_sym
-      else
-        questionnaire.symbol
-      end
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             else
+                               questionnaire.symbol
+                             end
       @questions[questionnaire_symbol] = questionnaire.questions
     end
   end
@@ -270,10 +266,10 @@ class GradesController < ApplicationController
     if format("%.2f", total_score) != params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
-        "The computed score will be used for " + participant.user.name + "."
-      else
-        "A score of " + params[:participant][:grade] + "% has been saved for " + participant.user.name + "."
-      end
+                  "The computed score will be used for " + participant.user.name + "."
+                else
+                  "A score of " + params[:participant][:grade] + "% has been saved for " + participant.user.name + "."
+                end
     end
     flash[:note] = message
     redirect_to action: 'edit', id: params[:id]

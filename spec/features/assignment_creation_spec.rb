@@ -729,4 +729,27 @@ describe "assignment function" do
       course_id: course_id
     )
   end
+
+  it "allow doing subsequent review without first round" do
+    #user =User.find_by(name:"instructor6")
+    #stub_current_user(user, user.role.name, user.role)
+    login_as("instructor6")
+    assignment1 = double('assignment', id: 6666, rounds_of_reviews: 1)
+    visit '/assignments/6666/edit'
+    find_link('ReviewStrategy').click
+    check 'allow_doing_subsequent_review_without_first_round'
+    expect(page.find("allow_doing_subsequent_review_without_first_round")).not_to be_checked
+
+    assignment2 = double('assignment', id: 6667, rounds_of_reviews: 2)
+    visit '/assignments/6667/edit'
+    find_link('ReviewStrategy').click
+    check 'allow_doing_subsequent_review_without_first_round'
+    expect(page.find("allow_doing_subsequent_review_without_first_round")).to be_checked
+
+    
+    # select "Instructor-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
+    
+  end
+
+
 end

@@ -63,10 +63,6 @@ describe Assessment360Controller do
       it 'makes final grades not empty' do
         expect(assigns(:final_grades)).to_not be_empty
       end
-
-      it 'makes final peer review scores not empty' do
-        expect(assigns(:final_peer_review_scores)).to_not be_empty
-      end
     end
   end
 end

@@ -43,8 +43,7 @@
         <th><b>Peer Score</b></th>
         <th><b>Instructor Grade</b></th>
     <% end %>
-      <th class="sorter-true"><b>Final Average Peer Score</b></th>
-      <th class="sorter-true"><b>Final Average Instructor Grade</b></th>
+      <th class="sorter-true"><b>Total Instructor Grade</b></th>
     </tr>
   </thead>
 
@@ -56,11 +55,10 @@
               <td title="<%= topic %>" class="topic topic-tooltip">
                 <%= topic %>
               </td>
-              <td><%= @peer_review_scores[cp.id][assignment.id] %></td>
-              <td><%= @assignment_grades[cp.id][assignment.id] %> </td>
+              <td><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+              <td><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
           <% end %>
 
-          <td><%= @final_peer_review_scores[cp.id] %></td>
           <td><%= @final_grades[cp.id] %></td>
       </tr>
   <% end %>

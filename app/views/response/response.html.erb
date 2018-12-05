@@ -1,6 +1,5 @@
 <!-- <script type="text/javascript" src="/assets/response.js" ></script> -->
 <!--including tinymce javascript-->
-<h1>My edit</h1>
 <%= tinymce_assets %>
 <%= tinymce %>
 <script>
@@ -246,66 +245,76 @@
     /// end auto reload
 
     //attach event handler to all tinymce editors
-//    tinyMCE.on('AddEditor', function(e) {
-//      e.editor.on('blur', function (e) {
-//        ed = e.target;
-//        if (ed.id.includes("comments")){
-//          json_review = JSON.stringify({ "review": ed.getContent({format : 'text'}) })
-//
-//          $.ajax({
-//            url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
-//            type: "POST",
-//            crossDomain: true,
-//            contentType: "application/json",
-//            data: json_review,
-//            dataType: "html",
-//            success: function (response) {
-//              var toneAnalysisResult = '<div class="panel panel-default">' +
-//                                          '<div class="panel-heading">Tone analysis</div>' +
-//                                          '<div class="panel-body">' + response + '</div>' +
-//                                        '</div>'
-//              if(ed.id.includes("responses"))
-//                  $('#' + ed.id.replace("responses", "analysis")).html(toneAnalysisResult);
-//              else if(ed.id.includes('review_comments'))
-//                  $('#review_comments_analysis').html(toneAnalysisResult);
-//            },
-//            error: function (xhr, status) {
-//              $('#save_progress').html('Unable to reach tone analysis service at the moment')
-//            }
-//          });
-//        }
-//      });
-//    });
-      tinyMCE.on('AddEditor', function(e) {
+    //tone analysis call
+    tinyMCE.on('AddEditor', function(e) {
       e.editor.on('blur', function (e) {
         ed = e.target;
         if (ed.id.includes("comments")){
-          json_review = JSON.stringify({ "text": ed.getContent({format : 'text'}) })
-          console.log(json_review);
+          json_review = JSON.stringify({ "review": ed.getContent({format : 'text'}) })
 
           $.ajax({
-            url: "https://peer-reviews-nlp.herokuapp.com/suggestions",
+            url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
             type: "POST",
             crossDomain: true,
-            contentHeader: "application/javascript",
             contentType: "application/json",
             data: json_review,
-            dataType: "jsonp",
+            dataType: "html",
             success: function (response) {
-	      console.log("success");
               var toneAnalysisResult = '<div class="panel panel-default">' +
-                                          '<div class="panel-heading"> Suggestion Detection </div>' +
+                                          '<div class="panel-heading">Tone analysis</div>' +
                                           '<div class="panel-body">' + response + '</div>' +
                                         '</div>'
-              console.log(response);
               if(ed.id.includes("responses"))
                   $('#' + ed.id.replace("responses", "analysis")).html(toneAnalysisResult);
               else if(ed.id.includes('review_comments'))
                   $('#review_comments_analysis').html(toneAnalysisResult);
             },
             error: function (xhr, status) {
-		console.log(status)
-              $('#save_progress').html('Unable to reach suggestion detection service at the moment')
+              $('#save_progress').html('Unable to reach tone analysis service at the moment')
+            }
+          });
+        }
+      });
+    });
+      //Suggestion detection API call
+      tinyMCE.on('AddEditor', function(e) {
+      e.editor.on('blur', function (e) {
+        ed = e.target;
+        if (ed.id.includes("comments")){
+          json_review = JSON.stringify({ "text": ed.getContent({format : 'text'}) })
+          
+          $.ajax({
+            url: "https://peer-reviews-nlp.herokuapp.com/all",
+            type: "POST",
+            crossDomain: true,
+            contentHeader: "application/javascript",
+            contentType: "application/json",
+            data: json_review,
+            dataType: "json",
+            success: function (response) {
+		          var APIresultbox ="";
+		          var colors = {  "Negative": ":</b> <font style=\"color:red;\">",
+				                      "Positive": ":</b> <font style=\"color:green;\">",
+				                      "Neutral": ":</b> <font style=\"color:saddlebrown;\">",
+				                      "Mixed": ":</b> <font style=\"color:saddlebrown;\">"};
+		          APIresultbox += "<table border='1'>"
+        	    for (x in response) {
+			          if (x == "sentiment_tone"){
+				          APIresultbox += "<tr><td><b> " + x + colors[response[x]] + response[x] + "</font></td></tr>";
+			          }
+			          else
+           			  APIresultbox += "<tr><td><b> " + x + ":</b> " +response[x] + "</td></tr>";
+		
+              }
+	            //API result box
+              APIresultbox += "</table>"
+              if(ed.id.includes("responses"))
+                  $('#' + ed.id.replace("responses", "analysis")).html(APIresultbox);
+              else if(ed.id.includes('review_comments'))
+                 $('#review_comments_analysis').html(APIresultbox);
+            },
+            error: function (xhr, status) {
+              $('#save_progress').html('Unable to reach suggestion detection service at this moment')
             }
           });
         }

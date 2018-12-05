@@ -16,11 +16,28 @@
       <td><%= @assignment.sign_up_topics[i].topic_name %></td>
       <% for review_round in 1..review_rounds %>
         <% topic_id = @assignment.sign_up_topics[i].id %>
-        <td><%= text_field :due_date, (topic_id.to_s + '_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round) %></td>
-        <td><%= text_field :due_date, (topic_id.to_s + '_review_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_review_due_dates, topic_id, 2, review_round) %></td>
+        <td><%= text_field :due_date, (topic_id.to_s + '_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round), class: 'datetimepicker' %></td>
+        <td><%= text_field :due_date, (topic_id.to_s + '_review_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_review_due_dates, topic_id, 2, review_round), class: 'datetimepicker' %></td>
       <%end%>
     </tr>
   <% end %>
 </table>
 <br/>
 <%= submit_tag "Save start/due dates" %>
+
+<script type="text/javascript"> 
+jQuery('.datetimepicker').datetimepicker({
+    dateFormat: 'yy/mm/dd',
+    timeFormat: 'HH:mm:ss z',
+    controlType: 'select',
+    date: jQuery(this).value(),
+    timezoneList: [
+      { value: -000, label: 'GMT'},
+      { value: -300, label: 'Eastern'},
+      { value: -360, label: 'Central' },
+      { value: -420, label: 'Mountain' },
+      { value: -480, label: 'Pacific' }
+    ]
+});
+
+</script>

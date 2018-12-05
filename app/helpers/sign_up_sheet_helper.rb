@@ -3,7 +3,7 @@ module SignUpSheetHelper
   # otherwise, it should display the topic due date.
   def check_topic_due_date_value(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
     due_date = get_topic_deadline(assignment_due_dates, topic_id, deadline_type_id, review_round)
-    DateTime.parse(due_date.to_s).strftime("%Y-%m-%d %H:%M").in_time_zone
+    due_date ? DateTime.parse(due_date.to_s).strftime("%Y-%m-%d %H:%M:%S") : nil
   end
 
   def get_topic_deadline(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
@@ -12,8 +12,8 @@ module SignUpSheetHelper
                                         round: review_round).first rescue nil
     if !topic_due_date.nil?
       topic_due_date.due_at
-    else
-      assignment_due_dates[review_round - 1].due_at.to_s
+    # else
+    #   assignment_due_dates[review_round - 1].due_at.to_s
     end
   end
 
@@ -74,5 +74,19 @@ module SignUpSheetHelper
       html += 'No choosers.' unless chooser_present
     end
     html.html_safe
+  end
+#  student7535 student7553 teaching_assistant7517
+  def display_instructor_signup?()
+    participant = AssignmentParticipant.find(params[:id].to_i)
+    assignment_data = participant.assignment
+    assignment = Assignment.find(assignment_data.id)
+    puts @assignment.id
+    puts TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id)
+    (%w[Super-Administrator Administrator ].include? session[:user].role.name) ||
+        (assignment.instructor_id == current_user.try(:id)) ||
+        TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
+        (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
+
+
   end
 end

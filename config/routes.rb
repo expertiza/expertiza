@@ -263,6 +263,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :new_feedback
       get :view
+      get :conflict_view
       get :remove_hyperlink
       get :saving
       get :redirection

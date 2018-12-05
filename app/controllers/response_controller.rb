@@ -37,42 +37,6 @@ class ResponseController < ApplicationController
     end
   end
 
-  def get_response_details(input_id)
-    details = Response.find(input_id)
-    return details
-  end
-
-  def get_conflicting_response_details()
-<<<<<<< HEAD
-    @response = Response.find(params[:id])
-    p '@@@@@@@@@@@@@@@@'
-    p @response
-    p '@@@@@@@@@@@@@@@@'
-    conflicting_ids=@response.significant_difference?
-    p '%%%%%%%%%%%%%%%%%%%%%%%%%%%'
-    p conflicting_ids
-    p '%%%%%%%%%%%%%%%%%%%%%%%%%%%'
-    @conflicting_responses = []
-    conflicting_ids.each do |id|
-      p 'in conflictingids'
-      @response = Response.find(id)
-      p @response
-      p 'in loop'
-      @map = @response.map
-      set_content
-      #@conflicting_responses << get_response_details(id)
-    end
-    p 'out'
-  end
-
-=======
-    conflicting_ids=@response.significant_difference?
-    @conflicting_responses = []
-    conflicting_ids.each do |id|
-      @conflicting_responses << get_response_details(id)
-    end
-  end
->>>>>>> 3f29ced9760bc7c5046be4143c38f296f547f5df
   # GET /response/json?response_id=xx
   def json
     response_id = params[:response_id] if params.key?(:response_id)
@@ -180,10 +144,15 @@ class ResponseController < ApplicationController
   # view response
   def view
     @response = Response.find(params[:id])
-    #@response = self.get_conflicting_response_details()
     @map = @response.map
     set_content
-    #self.get_conflicting_response_details()
+  end
+
+  def conflict_view
+    @response = Response.find(params[:id])
+    @map = @response.map
+    set_content
+    @conflicting_ids=@response.significant_difference?
   end
 
   def create
@@ -334,6 +303,7 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
+  helper_method :set_content
 
   def set_questionnaire_for_new_response
     case @map.type

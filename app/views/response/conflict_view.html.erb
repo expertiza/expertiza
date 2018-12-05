@@ -18,7 +18,19 @@
 <% end %>
   <!--Check whether there is a UploadFile question1.-->
 <% file_url = nil %>
+Latest response:
 <%= @response.display_as_html(nil, nil, file_url) %>
+  <br/>
+Old responses:
+  <br/>
+  <% @conflicting_ids.each do |id| %>
+      <% @conflicting_response = Response.find(id) %>
+      <% @map = @conflicting_response.map %>
+      <% set_content %>
+      <% file_url = nil %>
+      <%= @conflicting_response.display_as_html %>
+      <br />
+  <% end %>
 <br/>
 
 <!--Check whether there is a UploadFile question.-->

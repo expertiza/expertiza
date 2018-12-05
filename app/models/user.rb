@@ -57,7 +57,18 @@ class User < ActiveRecord::Base
     return true if self.recursively_parent_of(user)
     false
   end
+  # This method is used to identify if the user (not student) can signup a team/student for an assignment
+  def  can_signup_someone_for?(id)
+    puts "in user rb"
+    assignment = Assignment.find(AssignmentParticipant.find(id.to_i).assignment.id)
+    instructor = User.find(assignment.instructor_id)
+   (%w[Super-Administrator ].include? self.role.name) ||
+        self.can_impersonate?(instructor) ||
+        (assignment.instructor_id == self.id)||
+       (instructor.can_impersonate?(self) && self.role.name != 'Student') ||
+        (assignment.course_id && Course.find(assignment.course_id).instructor_id == self.id)
 
+  end
   def recursively_parent_of(user)
     p = user.parent
     return false if p.nil?

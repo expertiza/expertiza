@@ -12,8 +12,6 @@ module SignUpSheetHelper
                                         round: review_round).first rescue nil
     if !topic_due_date.nil?
       topic_due_date.due_at
-    # else
-    #   assignment_due_dates[review_round - 1].due_at.to_s
     end
   end
 
@@ -75,5 +73,4 @@ module SignUpSheetHelper
     end
     html.html_safe
   end
-
 end

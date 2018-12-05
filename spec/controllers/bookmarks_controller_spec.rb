@@ -1,5 +1,3 @@
-require 'spec_helper'
-require 'rails_helper'
 
 describe BookmarksController do
   render_views
@@ -20,8 +18,6 @@ describe BookmarksController do
   let(:bookmarkrating) { build(:bookmarkrating) }
   let(:participant) { build(:participant) }
   let(:participant_review) { build(:participant_review) }
-
-
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
@@ -34,9 +30,7 @@ describe BookmarksController do
 
   describe '#action_allowed?' do
     context 'when params action is list, new, create for student' do
-
       context 'when the role name of current user is student' do
-
         it 'allows certain action list ' do
           controller.params = {action: 'list'}
           expect(controller.send(:action_allowed?)).to be true
@@ -51,11 +45,8 @@ describe BookmarksController do
         end
       end
     end
-
     context 'when params action is list, new, create for role other than student' do
-
       context 'when the role name of current user is not student' do
-
         it 'do not allow  action list ' do
           controller.params = {action: 'list'}
           stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -74,71 +65,42 @@ describe BookmarksController do
       end
     end
     context 'when params action is edit, update, destroy for role student' do
-
       context 'when the bookmark was added by the same student' do
         before(:each) do
           allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
           @request.session[:user] = student
         end
         it 'allows action edit ' do
-          controller.params  = {id: '1', action:'edit'}
+          controller.params = {id: '1', action: 'edit'}
           expect(controller.send(:action_allowed?)).to be true
-
         end
         it 'allows action update ' do
-          controller.params  = {id: '1', action: 'update'}
+          controller.params = {id: '1', action: 'update'}
           expect(controller.send(:action_allowed?)).to be true
-
         end
         it 'allows action destroy' do
-          controller.params  = {id: '1',  action:'destroy'}
+          controller.params = {id: '1', action: 'destroy'}
           expect(controller.send(:action_allowed?)).to be true
-
         end
-
-        end
+      end
     end
-
   end
-
-
   context "#create" do
     before(:each) do
       allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
     end
     it 'when bookmark is saved successfully' do
-
       session = {user: student}
-      params = {
-          url: 'https://google.com',
-          title: 'Google Test',
-          description: 'Use Google',
-          user_id: student.id,
-          topic_id: bookmark.topic_id
-
-      }
+      params = {url: 'https://google.com', title: 'Google Test', description: 'Use Google', user_id: student.id, topic_id: bookmark.topic_id}
       post :create, params, session
-      #allow_any_instance_of(Bookmark).to receive(:undo_link).with('The user "chenzy@gmail.com" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "Your bookmark has been successfully created!"
-      expect(response).to redirect_to('http://test.host/bookmarks/list?id='+params[:topic_id].to_s)
+      expect(response).to redirect_to('http://test.host/bookmarks/list?id=' + params[:topic_id].to_s)
     end
-
-
-
     it 'when bookmark is not saved successfully' do
-
       session = {user: student}
-      params = {
-          url: 'https://google.com',
-          title: 'Google Test',
-          description: 'Use Google',
-          user_id: student.id,
-          topic_id: bookmark.topic_id
-
-      }
-
+      params = {url: 'https://google.com', title: 'Google Test', description: 'Use Google', user_id: student.id, topic_id: bookmark.topic_id}
       post :create, params, session
-      expect(lambda{ expect_any_instance_of(Bookmark).to receive(:create).and_return( raise StandardError )}).to redirect_to('http://test.host/bookmarks/list?id='+params[:topic_id].to_s)
+      expect(lambda { expect_any_instance_of(Bookmark).to receive(:create).and_return(raise StandardError) }).to redirect_to('http://test.host/bookmarks/list?id=' + params[:topic_id].to_s)
     end
   end
 
@@ -146,39 +108,17 @@ describe BookmarksController do
     before(:each) do
       allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
     end
-
     it 'when bookmark is updated successfully' do
-      params = {
-         bookmark: { url: 'https://google.com',
-          title: 'Google Test',
-          description: 'Use Google',
-          user_id: student.id,
-          topic_id: bookmark.topic_id
-         },
-         id: 1
-
-
-      }
-
-      post :update, params,session
+      params = {bookmark: {url: 'https://google.com', title: 'Google Test', description: 'Use Google', user_id: student.id, topic_id: bookmark.topic_id}, id: 1}
+      post :update, params, session
       expect(flash[:success]).to eq 'Your bookmark has been successfully updated!'
-      expect(response).to redirect_to('http://test.host/bookmarks/list?id='+bookmark.topic_id.to_s)
+      expect(response).to redirect_to('http://test.host/bookmarks/list?id=' + bookmark.topic_id.to_s)
     end
     it 'when bookmark is not updated successfully' do
-        params = {
-          bookmark: {
-                      title: 'Google Test',
-                      description: 'Use Google',
-                      user_id: student.id,
-                      topic_id: bookmark.topic_id
-          },
-          id: 1
-
-
-      }
+      params = {bookmark: {title: 'Google Test', description: 'Use Google', user_id: student.id, topic_id: bookmark.topic_id}, id: 1}
       post :update, params, session
       expect(flash[:success]).not_to eq 'Your bookmark has been successfully updated!'
-      expect(response).to redirect_to('http://test.host/bookmarks/list?id='+bookmark.topic_id.to_s)
+      expect(response).to redirect_to('http://test.host/bookmarks/list?id=' + bookmark.topic_id.to_s)
     end
   end
 
@@ -188,7 +128,7 @@ describe BookmarksController do
       @params = {id: 1}
       get :destroy, @params, session
       expect(flash[:success]).not_to be_nil
-      expect(response).to redirect_to('http://test.host/bookmarks/list?id='+bookmark.topic_id.to_s)
+      expect(response).to redirect_to('http://test.host/bookmarks/list?id=' + bookmark.topic_id.to_s)
     end
   end
 
@@ -196,24 +136,18 @@ describe BookmarksController do
     it 'when bookmark Rating is updated successfully' do
       allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
       allow(BookmarkRating).to receive(:where).and_return([bookmarkrating])
-      @params = {id:1,rating: 5}
+      @params = {id: 1, rating: 5}
       get :save_bookmark_rating_score, @params, session
-      expect(response).to redirect_to('http://test.host/bookmarks/list?id='+bookmark.topic_id.to_s)
+      expect(response).to redirect_to('http://test.host/bookmarks/list?id=' + bookmark.topic_id.to_s)
     end
   end
- context '#new_bookmark_review' do
+  context '#new_bookmark_review' do
     it 'when Bookmark Rating is updated successfully' do
-         allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
-
-     allow(AssignmentParticipant).to receive(:find_by).with({:user_id=>42}).and_return(participant_review)
-
-      @params = {id:1}
+      allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
+      allow(AssignmentParticipant).to receive(:find_by).with(user_id: 42).and_return(participant_review)
+      @params = {id: 1}
       get :new_bookmark_review, @params, session
-      expect(response).to redirect_to('http://test.host/response/new?id='+@params[:id].to_s+'&return=bookmark')
-
+      expect(response).to redirect_to('http://test.host/response/new?id=' + @params[:id].to_s + '&return=bookmark')
     end
   end
-
-
-
 end

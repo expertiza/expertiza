@@ -1,45 +1,32 @@
 <h1>Bookmarks list for <%= @topic.topic_name %></h1>
 
 <div class = "exp">
-  <table>
-    <tr>
-      <th class="head">Title</th>
-      <th class="head">Description</th>
-      <th class="head">Avg. rating</th>
-      <th class="head">Your rating</th>
-      <% if !Bookmark.where(user_id: session[:user].id).blank? %>
-        <th class="head" colspan='2'>Action</th>
-      <% end %>
-    </tr>
-    <% @bookmark_ids = Array.new %>
-    <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
-    <% @bookmarks.each do |bookmark| %>
-      <tr>
-        <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.title %></td>
-        <!--Set maximum length of bookmark description and keep description in one line.-->
-        <td><%=truncate(bookmark.description, length: 100) %></td>
-        <!--Average rating score-->
-        <% @bookmark_ratings = BookmarkRating.where(bookmark_id: bookmark.id) %>
-        <!--Self rated bookmark should not be counted in average rating.-->
-        <% @bookmark_ratings.to_a.reject! {|bookmark_rating| bookmark_rating.user_id == Bookmark.find(bookmark_rating.bookmark_id).user_id} %>
-        <% sum = 0 %>
-        <% @bookmark_ratings.each do |bookmark_rating| %>
-          <% sum += bookmark_rating.rating %>
-        <% end %>
-        <td>
-          <% if @has_dropdown %>
-            <% if @bookmark_ratings.size > 0 %>
-              <%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
-            <% else %>
-              <%= '-' %>
-            <% end %>
-          <% else %>
-            <!-- Compute average rating based on rubrics -->
-            <% avg = bookmark.average_based_on_rubric %>
-            <%= avg == 0 ? '-' : avg %>
-          <% end %>
-        </td>
-        <td>
+	<table>
+	  <tr>
+	    <th class="head">Title</th>
+	    <th class="head">Description</th>
+	    <th class="head">Avg. rating</th>
+	    <th class="head">Your rating</th>
+	    <% if !Bookmark.where(user_id: session[:user].id).blank? %>
+	    	<th class="head" colspan='2'>Action</th>
+	    <% end %>
+	  </tr>
+	  <% @bookmark_ids = Array.new %>
+	  <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
+	  <% @bookmarks.each do |bookmark| %>
+	    <tr>
+	      <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.title %></td>
+	      <!--Set maximum length of bookmark description and keep description in one line.-->
+	      <td><%=truncate(bookmark.description, length: 100) %></td>
+	      <!--Average rating score-->
+	  	  <% @bookmark_ratings = BookmarkRating.where(bookmark_id: bookmark.id) %>
+	  	  <!--Self rated bookmark should not be counted in average rating.-->
+	  	  <% @bookmark_ratings.to_a.reject! {|bookmark_rating| bookmark_rating.user_id == Bookmark.find(bookmark_rating.bookmark_id).user_id} %>
+	  	  <% sum = 0 %>
+	  	  <% @bookmark_ratings.each do |bookmark_rating| %>
+	  	  	<% sum += bookmark_rating.rating %>
+	  	  <% end %>
+	  	  <td>
           <!-- Only allow to rate a bookmark which is not uploaded by the current user -->
           <% if bookmark.user_id != current_user.id %>
             <% if @has_dropdown %>
@@ -78,22 +65,20 @@
               <% end %>
             <% end %>
           <% end %>
-      </td>
-        <% if bookmark.user_id == session[:user].id %>
-          <td><%= link_to 'Edit', :action => 'edit', :id => bookmark.id %></td>
-          <td><%= link_to 'Destroy', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
-        <% end %>
-      </tr>
-    <% end %>
-  </table>
+	    </td>
+	      <% if bookmark.user_id == session[:user].id %>
+	      	<td><%= link_to 'Edit', :action => 'edit', :id => bookmark.id %></td>
+	        <td><%= link_to 'Destroy', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
+	      <% end %>
+	    </tr>
+	  <% end %>
+	</table>
 </div>
 
 <br />
 
 <%= link_to 'New bookmark', :action => 'new', :id => @topic.id %> |
-<%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list',
-    :id => current_user.assignment_participants.find_by(parent_id: @topic.assignment.id,
-                                                        user_id: current_user.id).id %>
+<%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :assignment_id => @topic.assignment_id %>
 
 <script>
   var bookmark_ids = <%=@bookmark_ids%>;

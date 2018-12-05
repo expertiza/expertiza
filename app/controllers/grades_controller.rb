@@ -16,18 +16,18 @@ class GradesController < ApplicationController
        'Student'].include? current_role_name and
         are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
         check_self_review_status
-      when 'view_team'
-        if ['Student'].include? current_role_name # students can only see the head map for their own team
-          participant = AssignmentParticipant.find(params[:id])
-          session[:user].id == participant.user_id
-        else
-          true
-        end
+    when 'view_team'
+      if ['Student'].include? current_role_name # students can only see the head map for their own team
+        participant = AssignmentParticipant.find(params[:id])
+        session[:user].id == participant.user_id
       else
-        ['Instructor',
-         'Teaching Assistant',
-         'Administrator',
-         'Super-Administrator'].include? current_role_name
+        true
+      end
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -82,17 +82,17 @@ class GradesController < ApplicationController
       next if questionnaire.symbol != :review
       round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
       next if round.nil?
-        @minmax[round - 1] = []
-        @minmax[round - 1][0] = if !questionnaire.min_question_score.nil? and questionnaire.min_question_score < 0
-                                  questionnaire.min_question_score
-                                else
-                                  0
-                                end
-        @minmax[round - 1][1] = if !questionnaire.max_question_score.nil?
-                                  questionnaire.max_question_score
-                                else
-                                  5
-                                end
+      @minmax[round - 1] = []
+      @minmax[round - 1][0] = if !questionnaire.min_question_score.nil? and questionnaire.min_question_score < 0
+                                questionnaire.min_question_score
+                              else
+                                0
+                              end
+      @minmax[round - 1][1] = if !questionnaire.max_question_score.nil?
+                                questionnaire.max_question_score
+                              else
+                                5
+                              end
     end
   end
 

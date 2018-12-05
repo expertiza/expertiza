@@ -30,8 +30,8 @@ Expertiza::Application.configure do
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
   # Print development logs
-  config.log_level = :error
-
+  config.log_level = :debug
+  ActiveRecord::Base.logger=Logger.new(STDOUT)
   config.log_tags = [ :remote_ip, :uuid ]
 
   config.log_formatter = proc do |s, ts, pg, msg|

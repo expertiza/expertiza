@@ -57,7 +57,7 @@ module OnTheFlyCalc
       # Rubrics are varying.
       rounds = self.rounds_of_reviews
       (1..rounds).each do |round|
-        author_feedback_questionnaire_id = feedback_questionnaire_id(round) # FIXME: get proper id
+        author_feedback_questionnaire_id = feedback_questionnaire_id(round)
         @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
         @response_maps.each do |response_map|
 

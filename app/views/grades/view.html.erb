@@ -111,17 +111,13 @@
                                 // Forbidden. Most likely excedded rate limit or wrong creds.
                                 $(e.delegateTarget).siblings(".tmr_tab_content").find("div.github").html("<p>GitHub rate limit exceeded.</p>");
                         }
-                        if(httpObject.status === 401) {
-
-                        }
                     }
                 });
-
             });
         });
     })();
 </script>
-<h1>Summary report for <%= @assignment.name %></h1>
+<h1>Summary report for <%= @assignment.name %></h1>`
 
 <BR/>
 <% if @scores[:teams] %>

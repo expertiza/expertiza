@@ -136,6 +136,23 @@
     githubAPICall(pullRequestHyperlink)
 </script>
 
+<br></br>
+<br><%= image_tag(@github_metrics_chart = Gchart.bar(
+        :data => [[2,2,3,2],[4,1,2,3],[1,3,3,3],[3,4,4,2]],
+        :bar_colors => ['FFE5CC','FFB266','FF9933','FF8000'],
+        :orientation => 'vertical',
+        :bar_width_and_spacing => '40,30',
+        :size => '800x350',
+        :title => 'No. of Commits per day',
+        :max_value => 20,
+        :min_value => 0,
+        :axis_with_labels => [['x'],['y']],
+        :axis_labels => [["11/14/18 | 11/15/18 | 11/16/18 | 11/17/18"]],
+        :legend => ['TeamMember1','TeamMember2','TeamMember3','TeamMember4'],
+         )
+)%></br>
+<br></br>
+
 
 <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
 <% if ['Student'].include? current_user.role.name %>

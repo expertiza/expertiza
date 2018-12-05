@@ -89,7 +89,7 @@ module OnTheFlyCalc
           end 
         end
 
-        
+
       end
 
     else
@@ -117,6 +117,7 @@ module OnTheFlyCalc
         end 
       end
     end
+    @author_feedback_scores
   end
 end
 

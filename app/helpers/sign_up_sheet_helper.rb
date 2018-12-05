@@ -73,15 +73,4 @@ module SignUpSheetHelper
     end
     html.html_safe
   end
-  
-#  student7535 student7553 teaching_assistant7517
-  def display_instructor_signup?()
-    participant = AssignmentParticipant.find(params[:id].to_i)
-    assignment_data = participant.assignment
-    assignment = Assignment.find(assignment_data.id)
-    (%w[Super-Administrator Administrator ].include? session[:user].role.name) ||
-        (assignment.instructor_id == current_user.try(:id)) ||
-        TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
-        (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
-  end
 end

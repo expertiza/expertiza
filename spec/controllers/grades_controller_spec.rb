@@ -91,14 +91,14 @@ describe GradesController do
     end
   end
 
-  xdescribe '#view_team' do
-    it 'renders grades#view_team page' do
-      allow(participant).to receive(:team).and_return(team)
-      params = {id: 1}
-      get :view_team, params
-      expect(response).to render_template(:view_team)
-    end
-  end
+  # describe '#view_team' do
+  #   it 'renders grades#view_team page' do
+  #     allow(participant).to receive(:team).and_return(team)
+  #     params = {id: 1}
+  #     get :view_team, params
+  #     expect(response).to render_template(:view_team)
+  #   end
+  # end
 
   describe '#edit' do
     it 'renders grades#edit page' do
@@ -191,6 +191,29 @@ describe GradesController do
       post :save_grade_and_comment_for_submission, params
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/assignments/list_submissions?id=8')
+    end
+  end
+
+  describe '#setup_revision_review_questionnaire' do
+    let(:question) { build(:question) }
+    let(:revision_qs) { [question] }
+    it "fetches the submission records and 
+        adds revision review questions to grade controller's questions" do
+      record = double('record')
+      allow(record).to receive_messages(:content => 'key')
+      records = [record]
+      allow(SubmissionRecord).to receive_messages(:where => records)
+      allow(RevisionReviewQuestionnaire).to receive_messages(:where => revision_qs)
+    end
+  end
+
+  describe '#revision_review_questions' do
+    let(:record) { build(:submission_record) }
+    let(:records) { [record] }
+    it 'returns the revision questions for a given round' do
+      records = [record]
+      allow(SubmissionRecord).to receive_messages(:where => records)
+      allow(RevisionReviewQuestionnaire).to receive(:where)
     end
   end
 end

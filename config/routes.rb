@@ -233,6 +233,7 @@ resources :institution, except: [:destroy] do
       post :update_quiz
       post :add_new_questions
       post :save_all_questions
+      post :create_supplementary_review_questionnaire
     end
   end
 

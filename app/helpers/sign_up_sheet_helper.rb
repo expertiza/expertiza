@@ -80,13 +80,9 @@ module SignUpSheetHelper
     participant = AssignmentParticipant.find(params[:id].to_i)
     assignment_data = participant.assignment
     assignment = Assignment.find(assignment_data.id)
-    puts @assignment.id
-    puts TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id)
     (%w[Super-Administrator Administrator ].include? session[:user].role.name) ||
         (assignment.instructor_id == current_user.try(:id)) ||
         TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
         (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
-
-
   end
 end

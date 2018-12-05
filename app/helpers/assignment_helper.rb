@@ -136,7 +136,6 @@ module AssignmentHelper
     topic = SignedUpTeam.where(team_id: team.id).first.try :topic
     topic_identifier = topic.try :topic_identifier
     topic_name = topic.try :topic_name
-    topic_due_date = DueDate.where(parent_id: topic ? topic.id : @assignment.id).order(due_at: :desc).first
     users_for_curr_team = []
     participants = []
     teams_users.each do |teams_user|
@@ -144,16 +143,14 @@ module AssignmentHelper
       users_for_curr_team << user
       participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first
     end
-    [topic_identifier ||= "", topic_name ||= "", topic_due_date ||= "", users_for_curr_team, participants]
+    [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
   end
 
-  def get_team_name_color_in_list_submission(team, topic_due_date)
+  def get_team_name_color_in_list_submission(team)
     if team.try(:grade_for_submission) && team.try(:comment_for_submission)
-      'brown' # brown. submission grade has been assigned.
-    elsif Time.now > topic_due_date.due_at
-      'blue' # BLUE GRADE CAN BE ASSIGNED , REVIEW DEADLINE IS OVER
+      '#cd6133' # brown. submission grade has been assigned.
     else
-      'red' # RED GRADE CAN NOT BE ASSIGNED.
+      '#0984e3' # submission grade is not assigned yet.
     end
   end
 end

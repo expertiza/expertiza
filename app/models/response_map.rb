@@ -86,4 +86,8 @@ class ResponseMap < ActiveRecord::Base
   def survey?
     false
   end
+
+  def change
+    add_column :course_staff
+  end
 end

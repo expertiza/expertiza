@@ -19,10 +19,18 @@ class Answer < ActiveRecord::Base
 number_of_instructor_reviews = 0
       assessments.each do |assessment|
 curr_score = 0
-
+#if(current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
+#participant = Participant.find_by(ResponseMap.find(Response.find(assessment).map_id).course_staff)
+#else
 participant = Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id)
-course = participant.assignment.course
-if course.is_ta_or_instructor?(participant.user_id)
+#end
+#puts(participant.assignment.course)
+#puts("***************************")
+#course = participant.assignment.course
+
+#if course.is_ta_or_instructor?(participant.user_id)
+user = User.find(participant.user_id)
+if(user.role_id == 2 or user.role_id == 6)
 number_of_instructor_reviews = number_of_instructor_reviews + 1
 else
 curr_score = get_total_score(response: [assessment], questions: questions)

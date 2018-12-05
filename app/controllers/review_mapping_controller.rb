@@ -25,9 +25,22 @@ class ReviewMappingController < ApplicationController
     if participant.nil?
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
     end
-    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
-    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
+    #map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
+    #map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
+    #redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
+#
+if(current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
+
+    map = ReviewResponseMap.where(reviewed_object_id: params[:id], course_staff: true , reviewee_id: params[:team_id], calibrate_to: 	    	true).first rescue nil
+    map = ReviewResponseMap.create(reviewed_object_id: params[:id], course_staff: true , reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
+    puts("Line 37")
+else
+    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: 	true).first rescue nil
+    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: 	 true) if map.nil?
+    redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
+end
+
   end
 
   def select_reviewer
@@ -64,7 +77,12 @@ class ReviewMappingController < ApplicationController
         # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
         # to treat all assignments as team assignments
         if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
+	if (current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
+          ReviewResponseMap.create(reviewee_id: params[:contributor_id], course_staff: true, reviewed_object_id: assignment.id)
+	  puts("Line82")
+	else
           ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+	end
         else
           raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
         end
@@ -125,11 +143,14 @@ if reviewer.nil?
 reviewer = AssignmentParticipant.create(parent_id: assignment_team.parent_id, user_id: session[:user].id, can_submit: false, can_review: true,
 can_take_quiz: false, handle: 'handle')
 end
-@review_map_id=ReviewResponseMap.where(reviewee_id: assignment_team.id, reviewer_id: reviewer.id,
+#puts(params[:reviewer_id]) 
+#puts(session[:user].id)
+@review_map_id=ReviewResponseMap.where(reviewee_id: assignment_team.id, course_staff: 1,
 reviewed_object_id: params[:assignment_id]).first
 @review_map_id=assignment_team.assign_reviewer(reviewer) if @review_map_id.nil?
+#puts(@review_map_id.map_id)
 redirect_to controller: 'response', action: 'new', id: @review_map_id.map_id
-  end
+end
 
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically

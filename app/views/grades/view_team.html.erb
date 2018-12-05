@@ -104,8 +104,10 @@
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                       <% if @assignment.course.is_ta_or_instructor?(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id) %>
-<th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Instructor review " %></a><%=image_tag("Instructor.jpg", title:"Instructor/TA")%> </th>
+                       <% user = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id)%>
+ <!--<%= user.id  %>-->
+<% if user.role_id == 2 or user.role_id == 6 %>
+<th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"></a><%=image_tag("Instructor.jpg", title:"Instructor/TA")%> </th>
 <% j += 1 %>
 <% else %>
 <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a> </th>

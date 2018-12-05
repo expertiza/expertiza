@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181028231141) do
+ActiveRecord::Schema.define(version: 20181202014743) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -469,6 +469,7 @@ ActiveRecord::Schema.define(version: 20181028231141) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "calibrate_to",                   default: false
+    t.boolean  "course_staff"
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree

@@ -520,5 +520,4 @@ FactoryBot.define do
     duty nil
     can_take_quiz true
   end
-
 end

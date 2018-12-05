@@ -1,4 +1,3 @@
-
 describe BookmarksController do
   render_views
 
@@ -30,40 +29,42 @@ describe BookmarksController do
 
   describe '#action_allowed?' do
     context 'when params action is list, new, create for student' do
-      context 'when the role name of current user is student' do
-        it 'allows certain action list ' do
-          controller.params = {action: 'list'}
-          expect(controller.send(:action_allowed?)).to be true
-        end
-        it 'allows certain action new ' do
-          controller.params = {action: 'new'}
-          expect(controller.send(:action_allowed?)).to be true
-        end
-        it 'allows certain action create ' do
-          controller.params = {action: 'create'}
-          expect(controller.send(:action_allowed?)).to be true
-        end
+      it 'allows certain action list ' do
+        controller.params = {action: 'list'}
+        expect(controller.send(:action_allowed?)).to be true
+      end
+      it 'allows certain action new ' do
+        controller.params = {action: 'new'}
+        expect(controller.send(:action_allowed?)).to be true
+      end
+      it 'allows certain action create ' do
+        controller.params = {action: 'create'}
+        expect(controller.send(:action_allowed?)).to be true
       end
     end
+  end
+
+  describe '#action_allowed?' do
     context 'when params action is list, new, create for role other than student' do
-      context 'when the role name of current user is not student' do
-        it 'do not allow  action list ' do
-          controller.params = {action: 'list'}
-          stub_current_user(instructor, instructor.role.name, instructor.role)
-          expect(controller.send(:action_allowed?)).to be false
-        end
-        it 'do not allow  action new ' do
-          controller.params = {action: 'new'}
-          stub_current_user(ta, ta.role.name, ta.role)
-          expect(controller.send(:action_allowed?)).to be false
-        end
-        it 'do not allow action create ' do
-          controller.params = {action: 'create'}
-          stub_current_user(admin, admin.role.name, admin.role)
-          expect(controller.send(:action_allowed?)).to be false
-        end
+      it 'do not allow  action list ' do
+        controller.params = {action: 'list'}
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        expect(controller.send(:action_allowed?)).to be false
+      end
+      it 'do not allow  action new ' do
+        controller.params = {action: 'new'}
+        stub_current_user(ta, ta.role.name, ta.role)
+        expect(controller.send(:action_allowed?)).to be false
+      end
+      it 'do not allow action create ' do
+        controller.params = {action: 'create'}
+        stub_current_user(admin, admin.role.name, admin.role)
+        expect(controller.send(:action_allowed?)).to be false
       end
     end
+  end
+
+  describe '#action_allowed?' do
     context 'when params action is edit, update, destroy for role student' do
       context 'when the bookmark was added by the same student' do
         before(:each) do
@@ -85,6 +86,7 @@ describe BookmarksController do
       end
     end
   end
+
   context "#create" do
     before(:each) do
       allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
@@ -100,7 +102,9 @@ describe BookmarksController do
       session = {user: student}
       params = {url: 'https://google.com', title: 'Google Test', description: 'Use Google', user_id: student.id, topic_id: bookmark.topic_id}
       post :create, params, session
-      expect(lambda { expect_any_instance_of(Bookmark).to receive(:create).and_return(raise StandardError) }).to redirect_to('http://test.host/bookmarks/list?id=' + params[:topic_id].to_s)
+      expect(lambda {
+        expect_any_instance_of(Bookmark).to receive(:create).and_return(raise(StandardError))
+      }).to redirect_to("http://test.host/bookmarks/list?id=#{params[:topic_id]}")
     end
   end
 
@@ -141,6 +145,7 @@ describe BookmarksController do
       expect(response).to redirect_to('http://test.host/bookmarks/list?id=' + bookmark.topic_id.to_s)
     end
   end
+
   context '#new_bookmark_review' do
     it 'when Bookmark Rating is updated successfully' do
       allow(Bookmark).to receive(:find).with(1).and_return(bookmark)

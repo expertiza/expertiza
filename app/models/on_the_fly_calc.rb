@@ -75,7 +75,7 @@ module OnTheFlyCalc
             # The score of the author feedback review
             calc_review_score 
             # Compute the sum of the author feedbacks for this review. 
-            @respective_scores[response_map.reviewee_id] = 0 if @respective_scores[response_map.reviewee_id] 
+            @respective_scores[response_map.reviewee_id] = 0 unless @respective_scores[response_map.reviewee_id].nil?
             @respective_scores[response_map.reviewee_id] += @this_review_score
             reviewer = {} if reviewer.nil?
             reviewer[round] = {} if reviewer[round].nil?
@@ -106,7 +106,8 @@ module OnTheFlyCalc
           @respective_scores = {}
           @respective_scores = reviewer unless reviewer.nil?
           calc_review_score
-          @respective_scores[response_map.reviewee_id] = @this_review_score
+          @respective_scores[response_map.reviewee_id] = 0 unless @respective_scores[response_map.reviewee_id].nil? 
+          @respective_scores[response_map.reviewee_id] += @this_review_score
           @review_scores[response_map.reviewer_id] = @respective_scores
         end 
 

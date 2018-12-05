@@ -36,9 +36,11 @@ class GradesController < ApplicationController
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
   def view
-    @github_code = params[:code].presence
-    @github_access_token = session["github_access_token"]
-    session["id"] = params[:id]
+    if session["github_access_token"].nil?
+      session["assignment_id"] = params[:id]
+      session["github_view_type"] = "view_scores"
+      return redirect_to authorize_github_grades_path
+    end
     @assignment = Assignment.find(params[:id])
     @questions = {}
     questionnaires = @assignment.questionnaires
@@ -55,6 +57,7 @@ class GradesController < ApplicationController
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
+
 
     @show_reputation = false
   end
@@ -206,8 +209,7 @@ class GradesController < ApplicationController
   end
 
   def authorize_github
-    session["participant_id"] = params[:id]
-    redirect_to "https://github.com/login/oauth/authorize?client_id=b3a9bd07e0e8710e7813"
+    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
   end
 
   private

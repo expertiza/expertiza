@@ -1,24 +1,28 @@
 <script>
-    accessToken = '<%= @github_access_token %>'
-    $(document).ready(function () {
-        $("#tmr tr ul").on("click", "li.tmr_tab", function (e, s) {
-            pull_links = $(e.delegateTarget).siblings(".tmr_tab_content").find("table.participants tr div#url a[href*='/pull/']")
-            pull_request_url = ""
-            if(pull_links.length) {
-                pull_request_url = $(pull_links[0]).attr("href")
-            }
-            if(!pull_request_url) {
-                // Show that info in div
-                return;
-            }
-            var dataArray = pull_request_url.split('/');
-            var pullRequestNumber = dataArray.pop();
-            dataArray.pop();
-            var repositoryName = dataArray.pop();
-            var ownerName = dataArray.pop();
+    function getPullRequestDetails(pullLinks) {
+        var pull_request_url = "";
 
-            debugger;
-            if (accessToken){
+    }
+    (function(){
+        // Create a closure and invoke it immediately to store token.
+        var accessToken = '<%= session["github_access_token"] %>'
+        $(document).ready(function () {
+            $("#tmr tr ul").on("click", "li.tmr_tab", function (e, s) {
+                pullLinks = $(e.delegateTarget).siblings(".tmr_tab_content").find("table.participants tr div#url a[href*='/pull/']");
+
+                if(pullLinks.length) {
+                    pull_request_url = $(pullLinks[0]).attr("href")
+                }
+                if(!pull_request_url) {
+                    // Show that info in div
+                    return;
+                }
+                var dataArray = pull_request_url.split('/');
+                var pullRequestNumber = dataArray.pop();
+                dataArray.pop();
+                var repositoryName = dataArray.pop();
+                var ownerName = dataArray.pop();
+
                 $.ajax({
                     type: "POST",
                     url: "https://api.github.com/graphql",
@@ -83,7 +87,8 @@
                         for(var author in userData) {
                             if (userData.hasOwnProperty(author)) {
                                 var authorData = userData[author];
-                                content += `<tr><td>${author}(${userData[author].email})</td><td>${authorData.additions}</td><td>${authorData.deletions}</td><td>${authorData.totalCommits}</td></tr>`
+                                var name = (authorData.user && authorData.user.name) || `${author}(${authorData.email})`;
+                                content += `<tr><td>${name}</td><td>${authorData.additions}</td><td>${authorData.deletions}</td><td>${authorData.totalCommits}</td></tr>`
                             }
                         }
                         content += "</tbody></table>"
@@ -92,19 +97,29 @@
 
                     },
                     error: function (httpObject, textStatus) {
+                        switch(httpObject.status){
+                            case 401:
+                                // If token has expired, get a new one.
+                                // status 401: unauthorized
+                                //window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/grades/authorize_github"
+                                });
+                                break;
+                            case 403:
+                                // Forbidden. Most likely excedded rate limit or wrong creds.
+                                $(e.delegateTarget).siblings(".tmr_tab_content").find("div.github").html("<p>GitHub rate limit exceeded.</p>");
+                        }
                         if(httpObject.status === 401) {
-                            // If token has expired, get a new one.
-                            // status 401: unauthorized
-                            window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
+
                         }
                     }
                 });
-            } else {
-                window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
-            }
 
+            });
         });
-    });
+    })();
 </script>
 <h1>Summary report for <%= @assignment.name %></h1>
 

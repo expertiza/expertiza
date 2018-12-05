@@ -39,11 +39,22 @@ class AuthController < ApplicationController
   end
 
   def oauth_login
-    session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
-    if session["github_view_type"] = "view_submissions"
-      redirect_to controller:'grades', action: 'view_github_metrics', id: session["participant_id"]
+    case params[:provider]
+    when "github"
+      github_login
+    when "google_oauth2"
+      google_login
     else
-      redirect_to view_grades_path(id: session["id"], github_code: params[:code])
+      ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, "Invalid OAuth Provider", "")
+    end
+  end
+
+  def github_login
+    session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
+    if session["github_view_type"] == "view_submissions"
+      redirect_to controller:'grades', action: 'view_github_metrics', id: session["participant_id"]
+    elsif session["github_view_type"] == "view_scores"
+      redirect_to view_grades_path(id: session["assignment_id"])
     end
   end
 

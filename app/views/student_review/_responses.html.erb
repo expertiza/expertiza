@@ -53,7 +53,7 @@
                     <% current_round = @assignment.number_of_current_round(topic_id) %>
 
                     <td>
-                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                        <%= link_to t('.view'), {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
                     </td>
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
@@ -62,17 +62,17 @@
                       <% if (last_response_round == current_round)%>
                         <td>
                           <% if (!@latest_response.is_submitted) %>
-                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+                              <%= link_to t('.edit'), {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
                           <%end%>
                         </td>
                       <% else %>
-                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                        <td><%= link_to t('.update'), {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                       <% end %>
                     <% end %>
                     <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
           <%end%>
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) %>
-                <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td><%= link_to t('.begin'), {:controller => 'response', :action => 'new', :id => map.id} %></td>
                 <td>&nbsp;&nbsp;</td>
             <% else %>
                 <td>Begin</td>
@@ -85,7 +85,7 @@
             <% calibration_response_map = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ? and calibrate_to = ?", @assignment.id, map.reviewee_id, 1]).first rescue nil %>
             <% if @assignment.is_calibrated and calibration_response_map and calibration_response_map.response and map.response.any? %>
               <td>&nbsp;&nbsp;</td>
-              <td><%= link_to "Show calibration results", {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id} %></td>
+              <td><%= link_to t('.show_calibration_results'), {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id} %></td>
             <% end %>
           </tr>
       <% end %>
@@ -102,7 +102,7 @@
            <% end %>
          <% else %>
            <tr>
-             <td> <font color="gray" style="font-style: italic;">No previous versions available</font></td>
+             <td> <font color="gray" style="font-style: italic;"><%=t ".no_previous_available"%></font></td>
            </tr>
          <% end %>
          </table>

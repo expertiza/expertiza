@@ -102,12 +102,12 @@ ActiveRecord::Schema.define(version: 20180427030840) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
+    t.integer  "simicheck",                  limit: 4,     default: -1
     t.boolean  "is_anonymous",                             default: true
     t.integer  "num_reviews_required",       limit: 4,     default: 3
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
-    t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
@@ -738,26 +738,26 @@ ActiveRecord::Schema.define(version: 20180427030840) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,      default: "",    null: false
-    t.string  "crypted_password",          limit: 40,       default: "",    null: false
-    t.integer "role_id",                   limit: 4,        default: 0,     null: false
+    t.string  "name",                      limit: 255,   default: "",    null: false
+    t.string  "crypted_password",          limit: 40,    default: "",    null: false
+    t.integer "role_id",                   limit: 4,     default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                         default: false
+    t.boolean "private_by_default",                      default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                                default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,        default: 0
+    t.boolean "is_new_user",                             default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 16777215
+    t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 16777215
-    t.boolean "copy_of_emails",                             default: false
+    t.text    "public_key",                limit: 65535
+    t.boolean "copy_of_emails",                          default: false
     t.integer "institution_id",            limit: 4
   end
 
@@ -774,6 +774,15 @@ ActiveRecord::Schema.define(version: 20180427030840) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
+  add_foreign_key "answer_tags", "answers"
+  add_foreign_key "answer_tags", "tag_prompt_deployments"
+  add_foreign_key "answer_tags", "users"
+  add_foreign_key "answers", "questions", name: "fk_score_questions"
+  add_foreign_key "answers", "responses", name: "fk_score_response"
+  add_foreign_key "assignment_badges", "assignments"
+  add_foreign_key "assignment_badges", "badges"
+  add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
+  add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"

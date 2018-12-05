@@ -280,6 +280,91 @@ en:
       submit_file: "Submit a file:"
       or: "or"
 
+  student_review:
+    list:
+      reviews_for: "Reviews for"
+      num_reviews_allowed: "Number of reviews allowed:"
+      required_to_do: "You are required to do"
+      reviews: "reviews"
+      note1: "Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another."
+      note2_1: "Note: You can't do more than"
+      note2_2: "reviews according to assignment policy."
+      reviews_cannot: "Reviews cannot be performed at this time"
+      metareviews_for: "Metareviews for"
+      metareviews_allowed: "Number of Meta-Reviews Allowed:"
+      metareviews: "meta-reviews"
+
+    responses:
+      view: "View"
+      edit: "Edit"
+      update: "Update"
+      latest_update_at: "  -- latest update at"
+      begin: "Begin"
+      show_calibration_results: "Show calibration results"
+      review_done_at: "Review done at --"
+      no_previous_available: "No previous versions available"
+
+    set_dynamic_review:
+      i_don't_care: "I don't care which topic I review."
+      select_topic: "Select a topic below to begin a new review:"
+      request_new_submission: "Request a new submission to review"
+
+    set_dynamic_metareview:
+      request_new_metareview: "Request a new metareview to perform"
+
+  grades:
+    view_my_scores:
+      score_for: "Score for"
+      reputation: "Reputation"
+      back: "Back"
+
+    view_team:
+      summary_report: "Summary Report for assignment:"
+      team: "Team:"
+      topic: "Topic:"
+      average_peer_review: "Average peer review score:"
+      show_submission: "Show Submission"
+      no_submission: "No Submission"
+      question: "Question"
+      toggle_question_list: "toggle question list"
+      hide_tags: "hide tags"
+      color_legend: "color legend"
+      interaction_legend: "interaction legend"
+      criterion: "Criterion"
+      metric1: "metric-1"
+      review: "Review"
+      score: "Score"
+      comment: "Comment"
+      additional_comments: "Additional Comments"
+      no_review_of: "NO REVIEW OF"
+      type_exists: "TYPE EXISTS"
+      grade_and_comment: "Grade and comment for submission"
+      grade: "Grade:"
+      comment2: "Comment:"
+
+  participants:
+    change_handle:
+      create_or_change: "Create or Change Handle for Current Assignment"
+      your: "Your"
+      handle: "handle"
+      is_the_way: "is the way you will be known to your reviewers."
+      for_example: "For example, if you are writing on a wiki, you might not want to use your Expertiza user-ID to show up on the wiki, because then your reviewers would know who they are reviewing. So, you are allowed to set up a handle instead. If you have a handle, then your wiki account is named after your handle, and your reviewers see your handle, but not your user-ID."
+      if_you_do_not: "If you do not have a handle, your user-ID will be used instead."
+      two_ways: "You can set up a handle in two ways:"
+      handle_for: "You can set up a handle for"
+      only_this_assignment: "only this assignment"
+      by_entering: "by entering a handle below."
+      you_can_set_up_default: "You can set up a \"default\" handle by editing your"
+      note_that: "Note that if you change your handle by editing your"
+      your_new_handle: "your new handle will be used for all"
+      future: "future"
+      assignments_if: "assignments; if you want the change to apply to this assignment too, you must also change it below."
+      change_handle: "Change handle"
+      for_current: "for current assignment"
+      warning: "Warning:"
+      you_must: "You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff."
+
+
 # end of Student Views
 
 

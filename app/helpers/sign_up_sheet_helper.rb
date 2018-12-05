@@ -12,8 +12,6 @@ module SignUpSheetHelper
                                         round: review_round).first rescue nil
     if !topic_due_date.nil?
       topic_due_date.due_at
-    # else
-    #   assignment_due_dates[review_round - 1].due_at.to_s
     end
   end
 
@@ -75,6 +73,7 @@ module SignUpSheetHelper
     end
     html.html_safe
   end
+  
 #  student7535 student7553 teaching_assistant7517
   def display_instructor_signup?()
     participant = AssignmentParticipant.find(params[:id].to_i)

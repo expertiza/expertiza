@@ -44,6 +44,8 @@ describe GradesController do
     context 'when current assignment does not vary rubric by round' do
       it 'calculates scores and renders grades#view page' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
+        # added AssignmentQuestionnaire 'allow' below to handle chart functionality added in E1859
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
         params = {id: 1}
         get :view, params

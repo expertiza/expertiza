@@ -16,7 +16,8 @@
       <td><%= @assignment.sign_up_topics[i].topic_name %></td>
       <% for review_round in 1..review_rounds %>
         <% topic_id = @assignment.sign_up_topics[i].id %>
-        <td><%= text_field :due_date, (topic_id.to_s + '_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round), class: 'datetimepicker' %></td>
+        <td><%= text_field :due_date, (topic_id.to_s + '_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round), class: 'datetimepicker', onfocusout: "javascript:populateDates(#{topic_id}, #{review_rounds})" %></td>
+
         <td><%= text_field :due_date, (topic_id.to_s + '_review_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_review_due_dates, topic_id, 2, review_round), class: 'datetimepicker' %></td>
       <%end%>
     </tr>
@@ -25,19 +26,48 @@
 <br/>
 <%= submit_tag "Save start/due dates" %>
 
-<script type="text/javascript"> 
-jQuery('.datetimepicker').datetimepicker({
+<script type="text/javascript">
+    $('.datetimepicker').datetimepicker({
     dateFormat: 'yy/mm/dd',
-    timeFormat: 'HH:mm:ss z',
-    controlType: 'select',
-    date: jQuery(this).value(),
-    timezoneList: [
-      { value: -000, label: 'GMT'},
-      { value: -300, label: 'Eastern'},
-      { value: -360, label: 'Central' },
-      { value: -420, label: 'Mountain' },
-      { value: -480, label: 'Pacific' }
-    ]
+    timeFormat: 'HH:mm:ss'
 });
 
+function populateDates(topic_id, review_rounds) {
+    elementsArray = [];
+    $('[id^="due_date_<%= @assignment.sign_up_topics[0].id %>"]').each( function(i, e) {
+        /* you can use e.id instead of $(e).attr('id') */
+        elementsArray.push($(e).attr('value'));
+    });
+
+    var offsetArray = [];
+    for (var i = 1; i < elementsArray.length; i++) {
+        offsetArray.push(dateDiffInDays(new Date(elementsArray[i-1]), new Date(elementsArray[i])));
+    }
+
+    var ids = [];
+    for (i = 1; i <= review_rounds; i++) {
+        ids.push('due_date_' + topic_id + '_submission_' + i + '_due_date');
+        ids.push('due_date_' + topic_id + '_review_' + i + '_due_date');
+    }
+    var initialDate = jQuery("#" + ids[0]).val();
+    console.log(initialDate);
+
+    for (i = 1; i < ids.length; i++) {
+        jQuery("#" + ids[i]).val(addDays(new Date(initialDate), offsetArray[i-1]));
+    }
+
+}
+
+function addDays(initialDate, days) {
+    var utc = Date.UTC(initialDate.getFullYear(), initialDate.getMonth(), initialDate.getDate());
+    utc += days;
+    return new Date(utc);
+}
+
+function dateDiffInDays(a, b) {
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return utc2 - utc1;
+}
 </script>

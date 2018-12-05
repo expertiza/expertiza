@@ -9,7 +9,7 @@
 <% end %>
 
 <% if display_instructor_signup?() &&  (@signup_topic_deadline.nil? || (Time.now < @signup_topic_deadline.due_at)) &&
-    (!@assignment.staggered_deadline? || (Time.now < get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id))) %>
+    (!@assignment.staggered_deadline? || get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id).nil? || (Time.now < get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id))) %>
 
 <%= link_to image_tag('signup.png', :border => 0, :title => 'Sign Up Student', :align => 'middle'), signup_as_instructor_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
 <% end  %>

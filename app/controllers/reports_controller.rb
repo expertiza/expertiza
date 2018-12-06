@@ -23,7 +23,7 @@ class ReportsController < ApplicationController
     # to treat all assignments as team assignments
     @type = params.key?(:report) ? params[:report][:type] : 'basic'
     # From the ReportFormatterHelper module
-    send(@type.underscore, params, session) unless @type.nil?
+    send(@type.underscore, params, session)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 end

@@ -3,7 +3,7 @@ describe ReportsController do
   let(:assignment) { double('Assignment', id: 1) }
   let(:review_response_map) do
     double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-           reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+                                reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
@@ -23,14 +23,16 @@ describe ReportsController do
       stub_const('WEBSERVICE_CONFIG', 'summary_webservice_url' => 'expertiza.ncsu.edu')
     end
 
-    describe 'summary_by_reviewee_and_criteria'  do
+    describe 'summary_by_reviewee_and_criteria' do
       context 'when type is SummaryByRevieweeAndCriteria' do
         it 'renders response_report page with corresponding data' do
           allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
             .with(no_args).with(assignment, 'expertiza.ncsu.edu')
             .and_return(double('Summary', summary: 'awesome!',
-                               reviewers: [participant, participant1],
-                               avg_scores_by_reviewee: 95, avg_scores_by_round: 92, avg_scores_by_criterion: 94))
+                                          reviewers: [participant, participant1],
+                                          avg_scores_by_reviewee: 95,
+                                          avg_scores_by_round: 92,
+                                          avg_scores_by_criterion: 94))
           params = {
             id: 1,
             report: {type: 'SummaryByRevieweeAndCriteria'}
@@ -47,10 +49,10 @@ describe ReportsController do
           allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_criterion)
             .with(no_args).with(assignment, 'expertiza.ncsu.edu')
             .and_return(double('Summary', summary: 'awesome!',
-                               reviewers: [participant, participant1],
-                               avg_scores_by_reviewee: 95,
-                               avg_scores_by_round: 92,
-                               avg_scores_by_criterion: 94))
+                                          reviewers: [participant, participant1],
+                                          avg_scores_by_reviewee: 95,
+                                          avg_scores_by_round: 92,
+                                          avg_scores_by_criterion: 94))
           params = {
             id: 1,
             report: {type: 'SummaryByCriteria'}
@@ -169,8 +171,8 @@ describe ReportsController do
             .with(assignment_id: '1').with(:id)
             .and_return([double('PlagiarismCheckerAssignmentSubmission', id: 1)])
           allow(PlagiarismCheckerAssignmentSubmission).to receive(:where)
-            with(plagiarism_checker_assignment_submission_id: 1)
-            and_return([double('PlagiarismCheckerAssignmentSubmission')])
+            .with(plagiarism_checker_assignment_submission_id: 1)
+            .and_return([double('PlagiarismCheckerAssignmentSubmission')])
           params = {
             id: 1,
             report: {type: 'PlagiarismCheckerReport'}

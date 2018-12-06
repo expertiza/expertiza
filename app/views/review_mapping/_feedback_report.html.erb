@@ -1,3 +1,4 @@
+<!--modified by E1877-->
 <%= create_report_table_header("Rejoinder" => "16%",
                                "# author feedbacks done" => "14%",
                                "Review responded to" => "20%",
@@ -143,21 +144,22 @@
             <% end %>
           <% end %>
       <% end %>
-    </tr>
+    </tr> <!--E1877: unclosed tag added-->
     <% end %>
   </table>
 </div>
 
-
+<!--E1877: custom parser added to sort the metric data-->
 <script>
     $(function () {
-        /*Function for sorting the table */
+        /*E1877: Function for sorting the table */
         $("table").tablesorter({
             textSorter : {
                 1: function (a, b) {
                     if (a === b) {
                         return 0;
                     }
+                    //E1877: values split by "/", to get the digits before and after it.
                     var res1 = a.split("/");
                     var res2 = b.split("/");
                     res1[1] = res1[1].split(" ")[0];

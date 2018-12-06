@@ -1,17 +1,22 @@
+<!--E1877-->
+
+<!--E1877: Script added to sort the table-->
 <script>
    $(function () {
      /*Function for sorting the table */
      $("#teammateReviewTable").tablesorter({
 
-        dateFormat : "mmddyyyy", // set the default date format
-       sortList: [[0,0]] //sort First Column by default when page loads
+        dateFormat : "mmddyyyy", //E1877: set the default date format
+       sortList: [[0,0]] // E1877: sort First Column by default when page loads
      });
    });
  </script>
 
+<!--E1877: table teammateReviewTable modified-->
 <div class = 'reviewreport'>
 <table id= "teammateReviewTable" cellspacing='0' cellpadding='2' border=0 class="table table-striped">
 <thead>
+<!--E1877: "sorter-true" included to sort the table using each attribute-->
  <tr bgcolor='#CCCCCC'>
  <th class="sorter-true" >Reviewer</th>
  <th class="sorter-true" ># teammate reviews done</th>
@@ -85,6 +90,7 @@
               </td>
               <!--Last reviewed at-->
               <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td>
+              <!--E1877: unnecessary tr tags removed-->
             <% end %>
           <% end %>
           </tr>

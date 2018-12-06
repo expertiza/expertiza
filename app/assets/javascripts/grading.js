@@ -1,4 +1,5 @@
-  function toggleAll(numteams){    
+//modified by E1877
+function toggleAll(numteams){
     var maintag = document.getElementById('teamAll');
     hidden = maintag.innerHTML == 'Show all teams';    
     if (hidden) {maintag.innerHTML = 'Hide all teams';}
@@ -69,6 +70,7 @@
   	  }
   	  else {
   	    obj.style.display = '';
+  	    //E1877: changes made to adjust width of expandables
           var offsets = obj.getBoundingClientRect();
           obj.style.width="calc(100vw - 103px)";
   	  	atag.innerHTML = '<img src="/assets/collapse.png">';

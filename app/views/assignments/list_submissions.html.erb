@@ -1,8 +1,9 @@
+<!--E1877 script added to sort the table-->
 <script>
   $(function () {
-    /*Function for sorting the table */
+    /*E1877: Function for sorting the table */
     $("#submissionsTable").tablesorter({
-      sortList: [[0,0]] //sort First Column by default when page loads
+      sortList: [[0,0]] //E1877: sort First Column by default when page loads
     });
   });
 </script>
@@ -15,9 +16,10 @@
   <% headers["Participant name"] = "18%" %>
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
+<!--E1877: table id changed -->
 <table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
     <thead>
-      <tr>
+      <tr> <!--E1877: class="sorter-true" added to sort all attributes-->
         <% if @assignment.topics? %>
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Topic name</th>
         <% end %>

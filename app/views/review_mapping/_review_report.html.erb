@@ -1,8 +1,9 @@
+<!--modifications by E1877-->
 <% @l = -1 %>
 <!-- the table creation is changed top accomodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
-
+<!---->
   <script type='text/javascript'>
       $(window).load(function () {
           $("#reviewReportTable tbody").sortable().disableSelection();
@@ -144,6 +145,7 @@
 <!--Partial for text macro form-->
 <%= render :partial => '/user_pastebins/save_text_macros' %>
 
+<!--E1877: custom parser added to sort (ascending & descending) metrics in the table"-->
 <script>
     $(function () {
         /*Function for sorting the table */

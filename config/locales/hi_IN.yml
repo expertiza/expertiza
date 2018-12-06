@@ -1,6 +1,8 @@
 hi_IN:
 
 #  hello: "Hello world"
+
+# This section of keys are for the pages related to Courses
   course:
     edit:
       course_title: "एडिट कोर्स"
@@ -157,6 +159,8 @@ hi_IN:
         action: "एक्शन"
         submitted_item: "सबमिट की गई वस्तुएं "
         submit_calibration: "अंशांकन के लिए समीक्षा सबमिट करें"
+
+# end of Courses view
 
 # keys for pages Student Views
   student_task:

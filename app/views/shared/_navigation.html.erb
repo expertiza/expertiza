@@ -20,6 +20,7 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
+
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Select language<b class="caret"></b></a>
           <ul class="dropdown-menu">
@@ -27,6 +28,7 @@
             <li><%=link_to_unless_current "Hindi", locale: "hi_IN" %></li>
           </ul>
         </li>
+
         <% if current_user %>
             <li class="impersonate-box">
               <span id="impersonate-user-info">User: <%= current_user.name(session[:ip]) %></span>

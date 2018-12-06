@@ -32,6 +32,7 @@
         <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
         <th width = "14%" class="sorter-false">Author feedback <span></span></th>
       <% else %>-->
+
         <th width="24%" class="sorter-true">Team reviewed <span></span></th>
         <!--
       <% end %>-->
@@ -81,7 +82,7 @@
                 </div>
 
                 <!--Author feedback-->
-                <!--Dr.Kidd required to add a "autor feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
+                <!--Dr.Kidd required to add a "author feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
                 <!--Dr.Kidd's course-->
                 <!--
                 <% if @assignment.instructor_id == 2026 %>
@@ -107,6 +108,7 @@
           </td>
           <!--Metrics-->
           <td align='left'>
+
             <%= display_volume_metric(r.overall_avg_vol, r.avg_vol_in_round_1, r.avg_vol_in_round_2, r.avg_vol_in_round_3) %>
             <p>
               <%= link_to "tone analysis chart", {:controller => 'popup', :action => 'tone_analysis_chart_popup', :reviewer_id => r.id, :assignment_id => @id}, target: :_blank %>
@@ -130,6 +132,7 @@
                   </td>
                 </tr>
                 </tbody>
+
               </table>
             <% end %>
           </td>
@@ -137,6 +140,7 @@
       </tr>
     <% end %>
     </table>
+
 
   <p> **In "Team reviewed" column, text in <i style="color:red">red</i> indicates that the review is not yet completed;
     text in <i style="color:blue">blue</i> indicates that the review grade is not assigned or updated; text in
@@ -149,6 +153,7 @@
 <script>
     $(function () {
         /*Function for sorting the table */
+
         $("#reviewReportTable").tablesorter({
             sortList: [[0, 0]], //sort First Column by default when page loads
             textSorter: {
@@ -193,6 +198,7 @@
                     }
                 }
             },
+
             headers: {
                 4: {
                     sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser

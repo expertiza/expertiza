@@ -15,7 +15,7 @@ class CourseController < ApplicationController
 
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where role_id=6") if search.present?
+    @users = User.where(role_id: 6) if search.present?
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
@@ -33,7 +33,7 @@ class CourseController < ApplicationController
 
   def update
     @course = Course.find(params[:id])
-    if params[:course][:directory_path] and @course.directory_path != params[:course][:directory_path]
+    if params[:course][:directory_path] && @course.directory_path != params[:course][:directory_path]
       begin
         FileHelper.delete_directory(@course)
       rescue StandardError
@@ -50,6 +50,7 @@ class CourseController < ApplicationController
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
+    @course.private = params[:course][:private].nil? ? false : params[:course][:private]
     @course.save
     undo_link("The course \"#{@course.name}\" has been updated successfully.")
     redirect_to controller: 'tree_display', action: 'list'
@@ -91,16 +92,7 @@ class CourseController < ApplicationController
     @course.instructor_id = session[:user].id
     begin
       @course.save!
-      parent_id = CourseNode.get_parent_id
-      if parent_id
-        @course_node = CourseNode.new
-        @course_node.node_object_id = @course.id
-        @course_node.parent_id = parent_id
-      else
-        @course_node = CourseNode.new
-        @course_node.node_object_id = @course.id
-      end
-      @course_node.save
+      create_course_node(@course)
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'
@@ -120,19 +112,6 @@ class CourseController < ApplicationController
     end
     @course.destroy
     undo_link("The course \"#{@course.name}\" has been successfully deleted.")
-    redirect_to controller: 'tree_display', action: 'list'
-  end
-
-  def toggle_access
-    @course = Course.find(params[:id])
-    @course.private = !@course.private
-    begin
-      @course.save!
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
-    end
-    @access = @course.private == true ? "private" : "public"
-    undo_link("The course \"#{@course.name}\" has been successfully made #{@access}.")
     redirect_to controller: 'tree_display', action: 'list'
   end
 
@@ -175,5 +154,13 @@ class CourseController < ApplicationController
     undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
 
     render action: 'remove_ta.js.erb', layout: false
+  end
+
+  def create_course_node(course)
+    parent_id = CourseNode.get_parent_id
+    @course_node = CourseNode.new
+    @course_node.node_object_id = course.id
+    @course_node.parent_id = parent_id if parent_id
+    @course_node.save
   end
 end

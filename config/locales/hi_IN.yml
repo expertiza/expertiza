@@ -13,7 +13,150 @@ hi_IN:
       course_info: "कोर्स संबंधी जानकारी"
       language: "भाषा चुनिए"
       assignment_name: "De-Assignment Name"
+    
+    view_teaching_assistants:
+      teaching_assistants: "शिक्षण सहायक"
+      course: "कोर्स"
+      teaching_assistant_name: "शिक्षण सहायक का नाम"
 
+    add_individual:
+      enter_user_login: "उपयोगकर्ता का लॉगिन दर्ज करें:"
+      add_ta: "शिक्षण सहायक को शामिल करना"
+
+  participant:
+    list:
+      participants: "हिस्सा लेनेवाला"
+
+  shared_scripts:
+    user_list:
+      email: "ईमेल ..."
+      permissions: "इजाज़त ..."
+      name: "नाम"
+      full_name: "पूरा नाम"
+      email_address: " ईमेल  एड्रेस"
+      role: "भूमिका "
+      parent: "पेअरॅन्ट"
+      badges: "पदक"
+      review: "समीक्षा"
+      submissions: "सबमिशन"
+      metareview: "मेटारिव्यु"
+      submit: "सबमिट"
+      take_quiz: "प्रश्नोत्तरी लेना"
+      handle: "संभालना "
+      action: "एक्शन"
+
+    add_individual:
+      enter_login: "उपयोगकर्ता का लॉगिन दर्ज करें:"
+      add: "शामिल करना"
+      participant: "हिस्सा लेनेवाला"
+      reader: "पाठक"
+      reviewer: "समीक्षक"
+      submitter: "जमाकर्ता का नाम"
+
+  teams:
+    list:
+      teams_for: "टीम्स फॉर"
+      teams: "टीम्स"
+      students_without_team: "टीमों के बिना छात्र"
+      name: "नाम"
+      show_members: "सभी टीम नंबर दिखाएं"
+
+    new:
+      create_teams_for: "टीम्स बनाना फॉर"
+      automatically: "खुद ब खुद"
+      uses_insofar: "जब असाइनमेंट बनाया गया था, निर्दिष्ट किए गए सदस्यों की संख्या का उपयोग करता है."
+      team_size: "टीम का परिमाण:"
+      create_teams: "टीम्स बनाना"
+      manually: "मैन्युअल रूप से"
+      specify_team_them: "टीम का नाम निर्दिष्ट करें और टीम में सदस्यों को एक एक करके चुने."
+      inherit_teams: "पाठ्यक्रम से निहित टीमों "
+      use_the_teams: "वर्तमान में पाठ्यक्रम के लिए परिभाषित टीमों का प्रयोग करें."
+      team_name: "टीम का नाम"
+
+  assignment:
+    new:
+      create_new: "नया बनाओ"
+      public: "सार्वजनिक"
+      private: "प्राइवेट"
+      assignment: "असाइनमेंट"
+      general: "सामान्य"
+      rubrics: "रुब्रिकों"
+      review_strategy: "समीक्षा रणनीति"
+      due_date: "अंतिम तारीख"
+      create_button: "बनाना"
+
+    edit:
+      general:
+        assignment_name: "असाइनमेंट का नाम:"
+        course: "कोर्स"
+        submission_directory: "सबमिशन निर्देशिका "
+        mandatory_field: "(आवश्यक स्थान. कोई स्थान या विशेष पात्रों की अनुमति नहीं है.)"
+        description_url: "यूआरएल विवरण"
+        calibration: "अंशांकन "
+        has_team: "क्या आपके पास एक टीम है?"
+        has_quiz: "क्या आपके पास प्रश्नोत्तरी है?"
+        has_badge: "क्या आपके पास बैज है?"
+        staggered_deadline: "क्या यह एक चौंकाने वाली समयसीमा असाइनमेंट है?"
+        mico_task: "क्या यह एक माइक्रो टास्क असाइनमेंट है?"
+        review_reviewers: "समीक्षा अन्य समीक्षकों के लिए उपलब्ध हैं?"
+        calibrate_training: "प्रशिक्षण के लिए यह अंशांकन है?"
+        reputation_algorithm: "क्या यह एक प्रतिष्ठा एल्गोरिदम है?"
+        use_simicheck: "क्या आप सिमिचेक उपयोग करना चाहते हैं?"
+        allow_feedback: "क्या उपयोगकर्ता द्वारा टैग की गई प्रतिक्रिया टिप्पणियों की अनुमति होनी चाहिए ?"
+        available: "क्या यह छात्रों के लिए उपलब्ध है?"
+
+      rubrics:
+        review_varies: "क्या समीक्षा दौर से भिन्न होती है?"
+        questionaire: "प्रश्नावली"
+        use_dropdown: "ड्रॉप डाउन का उपयोग करें"
+        instead: " इसके बजाय क्या ?"
+        scored_question: "रन बनाए-सवाल"
+        display_style: "प्रदर्शन शैली"
+        weight: "वजन"
+        notification_limit: "विज्ञापन का हद"
+        author_feedback: "लेखक से प्रतिक्रिया"
+        review: "समीक्षा"
+
+      review_strategy:
+        review_strategy: "समीक्षा रणनीति: "
+        review_topic: " समीक्षा विषय सीमा (के):"
+        max_num_reviews: "प्रति समीक्षाकर्ता की समीक्षा की अधिकतम संख्या :"
+        max_review_limit: "क्या समीक्षा की अधिकतम सीमा है?"
+        set_num_reviews: "प्रति समीक्षाकर्ता समीक्षा की संख्या निर्धारित करें"
+        set req_reviews: "प्रति समीक्षाकर्ता समीक्षा की आवश्यक संख्या निर्धारित करें"
+        meta_review: "क्या मेटा समीक्षा की सीमा है?"
+        set_num_meta: "प्रति समीक्षाकर्ता मेटारिव्यु की संख्या निर्धारित करें"
+        set_req_meta: "प्रति समीक्षाकर्ता मेटारिव्यु की आवश्यक संख्या निर्धारित करें"
+        anon_review: "क्या यह एक अनाम समीक्षा है?"
+        self_review: "क्या आत्म समीक्षा की अनुमति है?"
+
+      due_dates:
+        num_review_rounds: "समीक्षा दौर की संख्या :"
+        timezone: "समय क्षेत्र: "
+        meta_deadline: "मेटारिव्यु की अंतिम तिथि का उपयोग करें "
+        show_hide: "दिनांक अद्यतनकर्ता को दिखाएं / छुपाएं "
+        deadline_type: "अंतिम तिथि प्रकार"
+        date_time: "दिनांक और समय"
+        use_updater: "तारीख अद्यतनकर्ता का उपयोग करें "
+        submission_allowed: "सबमिशन की अनुमति है"
+        review_allowed: "समीक्षा की अनुमति है"
+        teammate_review: "टीममाइट समीक्षा की अनुमति है"
+        meta_allowed: "मेटारिव्यु की अनुमति है"
+        has_quiz: "आपके पास प्रश्नोत्तरी है"
+        reminder: "शेष-भाग (घंटे)"
+        due_date_names: "अंतिम तारीख का नाम"
+        description_url: "यूआरएल विवरण"
+        round: "संख्या"
+
+      late_policy:
+        apply_penalty: "पेनल्टी पालिसी लागू करें:"
+        late_policty: "नई देरी पालिसी"
+
+      calibration:
+        particpant_name: "हिस्सा लेनेवाला का नाम"
+        action: "एक्शन"
+        submitted_item: "सबमिट की गई वस्तुएं "
+        submit_calibration: "अंशांकन के लिए समीक्षा सबमिट करें"
 
 # keys for pages Student Views
   student_task:

@@ -35,6 +35,16 @@ describe UsersController do
       expect(controller.instance_variable_get(:@users)).to equal(student1)
       expect(response).to render_template(:list)
     end
+
+    it 'renders list if user is instructor with search name' do
+      allow(instructor).to receive(:get_user_list).and_return(student1)
+      @params = {:search_name=>"lily"}
+      session = {user: instructor}
+      get :index, @params, session
+      expect(controller.instance_variable_get(:@users)).to equal(student1)
+      expect(response).to render_template(:list)
+    end
+
   end
 
   context '#set_anonymized_view' do

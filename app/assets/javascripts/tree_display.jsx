@@ -1015,8 +1015,7 @@ jQuery(document).ready(function () {
   var QuestionnairesSearchBar = React.createClass({
     getInitialState: () => {
       return {
-        // advancedSearchVisible: false,
-        advancedSearchVisible: true,
+        advancedSearchVisible: false,
       }
     },
     toggleAdvancedSearch() {
@@ -1129,8 +1128,7 @@ jQuery(document).ready(function () {
   var AssignmentSearchBar = React.createClass({
     getInitialState: () => {
       return {
-        // advancedSearchVisible: false,
-        advancedSearchVisible: true,
+        advancedSearchVisible: false,
       }
     },
     toggleAdvancedSearch() {

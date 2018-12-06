@@ -64,7 +64,6 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
             return false;
         },
         format: function (stringValue) {
-            console.log(stringValue);
             var stringNumericPart = stringValue.split("%");         //E1877: split the data by %
             var numericValue = parseFloat(stringNumericPart[0], 10);   //E1877: extract the numeric data
             return numericValue;

@@ -105,7 +105,7 @@ class AssignmentTeam < Team
   # Import csv file to form teams directly
   def self.import(row, assignment_id, options)
     unless Assignment.find_by(id: assignment_id)
-      raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError, "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
     @assignment_team = prototype
     Team.import(row, assignment_id, options, @assignment_team)
@@ -130,7 +130,9 @@ class AssignmentTeam < Team
   # Add Participants to the current Assignment Team
   def add_participant(assignment_id, user)
     return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
-    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
+    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id)
+    #return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
+    #AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
   end
 
   # return a hash of scores that the team has received for the questions

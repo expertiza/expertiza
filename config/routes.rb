@@ -355,6 +355,8 @@ resources :institution, except: [:destroy] do
   resources :student_review, only: [] do
     collection do
       get :list
+      get :sign_up_list
+      post :set_priority
     end
   end
 
@@ -482,5 +484,6 @@ resources :institution, except: [:destroy] do
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
+  get '/review_bid/run_intelligent_assignment(/:id)', to: 'review_bids#run_intelligent_assignment'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180926160031) do
+ActiveRecord::Schema.define(version: 20181203171337) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -491,6 +491,14 @@ ActiveRecord::Schema.define(version: 20180926160031) do
   end
 
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
+
+  create_table "review_bids", force: :cascade do |t|
+    t.integer  "topic_id",       limit: 4
+    t.integer  "participant_id", limit: 4
+    t.integer  "priority",       limit: 4, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
 
   create_table "review_comment_paste_bins", force: :cascade do |t|
     t.integer  "review_grade_id", limit: 4

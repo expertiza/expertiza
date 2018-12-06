@@ -1,38 +1,42 @@
-<h1>Manage users</h1>
 <script>
-  $(document).ready(function () {
-      var isAdvancedSearchVisible = true; // todo false
-      const $toggleButton = $('#search_toggle_button');
-      const $advancedSearchForm = $('#advance_search_form');
-      $toggleButton.click(function () {
-          isAdvancedSearchVisible = !isAdvancedSearchVisible;
-          if (isAdvancedSearchVisible) {
-              $advancedSearchForm.show();
-          } else {
-              $advancedSearchForm.hide();
-          }
-      });
+  $(document).ready(() => {
+    const $toggleButton = $('#search_toggle_button');
+    const $advancedSearchForm = $('#advance_search_form');
+    var isAdvancedSearchVisible = false;
+    toggleAdvancedSearch(isAdvancedSearchVisible);
+    $toggleButton.click(() => {
+      isAdvancedSearchVisible = !isAdvancedSearchVisible;
+      toggleAdvancedSearch(isAdvancedSearchVisible);
+    });
+    function toggleAdvancedSearch(isAdvancedSearchVisible) {
+      if (isAdvancedSearchVisible) {
+        $advancedSearchForm.show();
+      } else {
+        $advancedSearchForm.hide();
+      }
+    }
   });
-
 </script>
+
+<h1>Manage users</h1>
 
 <br/>
 <%= form_tag :action => 'show_selection' do %>
   View user - enter exact login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
 <input type='submit' value='Edit'/>
 <% end %>
-<a id="search_toggle_button">Toggle Advanced Search</a>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
-    <%= label_tag :search_name, 'Search users by name : ' %><%= text_field_tag(:search_name,params[:search_name]) %>
-  <%= submit_tag("Search") %>
-  <div id="advance_search_form">
+  <div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
+    <%= label_tag :search_name, 'Username:' %><%= text_field_tag(:search_name,params[:search_name]) %>
+    <%= submit_tag("Search") %>
+    <a id="search_toggle_button">Toggle Advanced Search</a>
+  </div>
 
-    <%= label_tag :search_full_name, 'Search users by full name: ' %><%= text_field_tag(:search_fname,params[:search_fname]) %>
-    <%= label_tag :search_email, 'Search users by email: ' %><%= text_field_tag(:search_email,params[:search_email]) %>
-</div>
-
-
+  <div id="advance_search_form" style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(4, auto) 1fr; grid-gap: 8px; align-items: center">
+    <%= label_tag :search_full_name, 'Name: ' %><%= text_field_tag(:search_fname,params[:search_fname]) %>
+    <%= label_tag :search_email, 'Email: ' %><%= text_field_tag(:search_email,params[:search_email]) %>
+  </div>
 <% end %>
 
 

@@ -61,7 +61,7 @@ module OnTheFlyCalc
         author_feedback_questionnaire_id = feedback_questionnaire_id(round)
         @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
         @response_maps.each do |response_map|
-
+        # puts "Assignment = #{self.id}, Questionaire id = #{author_feedback_questionnaire_id}"
           # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
           reviewer = @author_feedback_scores[response_map.reviewer_id] if !@author_feedback_scores[response_map.reviewer_id].nil?
 
@@ -72,10 +72,11 @@ module OnTheFlyCalc
 
           # The author feedback response maps for the teammates reviewing the reviewer.
           author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, "FeedbackResponseMap")
-         
+         # puts "Author feedback response #{author_feedback_response_maps.inspect}"
           author_feedback_response_maps.each do |author_feedback_response_map| 
-            @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+            @corresponding_response = Response.where('id = ?', author_feedback_response_map.id)
             @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
+            # puts "Corres res #{@corresponding_response.inspect}"
             @respective_scores = {}
             @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
            
@@ -116,7 +117,7 @@ module OnTheFlyCalc
         author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, "FeedbackResponseMap")
         author_feedback_response_maps.each do |author_feedback_response_map| 
         
-          @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+          @corresponding_response = Response.where('id = ?', author_feedback_response_map.id)
           @respective_scores = {}
           @respective_scores = reviewer unless reviewer.nil?
           calc_review_score

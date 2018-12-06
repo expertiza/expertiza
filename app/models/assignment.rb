@@ -435,7 +435,7 @@ class Assignment < ActiveRecord::Base
                 end
     if feedback_q_ids.empty?
       AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        feedback_q_ids << aq if aq.questionnaire.type == "AuthorFeedbackQuestionnaire"
+        feedback_q_ids << aq if aq.questionnaire.type == 'AuthorFeedbackQuestionnaire'
       end
     end
     feedback_questionnaire_id = nil

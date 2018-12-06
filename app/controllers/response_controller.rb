@@ -12,18 +12,18 @@ class ResponseController < ApplicationController
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      if(!current_user.is_student?)
+      if(!current_user.is_student?) # If the current logged in user is not student, will be able to edit all reviews 
       return true
       end
       return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      if(!current_user.is_student?)
+      if(!current_user.is_student?) # # If the current logged in user is not student, will be able to delete and update all reviews
       return true
       end
       return current_user_id?(user_id)
     when 'view'
-      if(!current_user.is_student?)
+      if(!current_user.is_student?) # # If the current logged in user is not student, will be able to view all reviews
       return true
       end
       return edit_allowed?(response.map, user_id)
@@ -234,11 +234,11 @@ class ResponseController < ApplicationController
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
     else
-      	if @map.response_map.assignment.course.is_ta_or_instructor?(current_user.id)
-	redirect_to controller: 'assignments', action: 'list_submissions', id:@map.response_map.assignment.id
-	else
-	redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
-	end
+      if @map.response_map.assignment.course.is_ta_or_instructor?(current_user.id)
+	     redirect_to controller: 'assignments', action: 'list_submissions', id:@map.response_map.assignment.id
+	    else
+	     redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+	    end
     end
   end
 
@@ -315,11 +315,11 @@ class ResponseController < ApplicationController
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
        if @assignment.course.is_ta_or_instructor?(current_user.id)
-@current_round = @assignment.number_of_current_round_for_instructor(reviewees_topic)
-else
-@current_round = @assignment.number_of_current_round(reviewees_topic)
-end
-@questionnaire = @map.questionnaire(@current_round)
+        @current_round = @assignment.number_of_current_round_for_instructor(reviewees_topic)
+       else
+        @current_round = @assignment.number_of_current_round(reviewees_topic)
+       end
+    @questionnaire = @map.questionnaire(@current_round)
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",

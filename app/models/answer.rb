@@ -16,26 +16,18 @@ class Answer < ActiveRecord::Base
       scores[:min] = 999_999_999
       total_score = 0
       length_of_assessments = assessments.length.to_f
-number_of_instructor_reviews = 0
+      number_of_instructor_reviews = 0
       assessments.each do |assessment|
-curr_score = 0
-#if(current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
-#participant = Participant.find_by(ResponseMap.find(Response.find(assessment).map_id).course_staff)
-#else
-participant = Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id)
-#end
-#puts(participant.assignment.course)
-#puts("***************************")
-#course = participant.assignment.course
+      curr_score = 0
+      participant = Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id)
 
-#if course.is_ta_or_instructor?(participant.user_id)
-user = User.find(participant.user_id)
-if(user.role_id == 2 or user.role_id == 6)
-number_of_instructor_reviews = number_of_instructor_reviews + 1
-else
-curr_score = get_total_score(response: [assessment], questions: questions)
-end        
-scores[:max] = curr_score if curr_score > scores[:max]
+      user = User.find(participant.user_id)
+      if(!current_user.is_student?) # if the review does not belog to student, increment count of staff review. Will be helpful while displaying in grades tab
+        number_of_instructor_reviews = number_of_instructor_reviews + 1
+      else
+        curr_score = get_total_score(response: [assessment], questions: questions)
+      end        
+        scores[:max] = curr_score if curr_score > scores[:max]
         scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
 
         # Check if the review is invalid. If is not valid do not include in score calculation
@@ -45,14 +37,14 @@ scores[:max] = curr_score if curr_score > scores[:max]
         end
         total_score += curr_score
       end
-student_review_count = length_of_assessments - number_of_instructor_reviews.to_f
+      student_review_count = length_of_assessments - number_of_instructor_reviews.to_f
       scores[:avg] = if length_of_assessments != 0
                        total_score.to_f / length_of_assessments
                      else
                        0
                      end
     else
-scores[:student_review_count] = student_review_count
+      scores[:student_review_count] = student_review_count
       scores[:max] = nil
       scores[:min] = nil
       scores[:avg] = nil

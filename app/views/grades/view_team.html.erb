@@ -100,19 +100,21 @@
               <th class="sorter-true">Criterion<span></span></th>
             
               <% i = 1 %>
-	      <% j = 1 %>
+	      	  <% j = 1 %>
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                        <% user = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id)%>
- <!--<%= user.id  %>-->
-<% if !user.is_student? %>
-<th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"></a><%=image_tag("Instructor.jpg", title:"Instructor/TA")%> </th>
-<% j += 1 %>
-<% else %>
-<th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a> </th>
-<% i += 1 %>
-<% end %>
+ 				
+ 				<!-- If current review is from instructor, apply appropriate styling -->	
+				<% if !user.is_student? %>
+				<th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"></a><%=image_tag("Instructor.jpg", title:"Instructor/TA")%> </th>
+				<% j += 1 %>
+
+				<% else %>
+				<th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a> </th>
+				<% i += 1 %>
+				<% end %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
                       <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
@@ -142,23 +144,23 @@
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <!-- Highlight cell if instructor's review-->
-<% if score.is_instructor_review%>
-<!-- Check if this is the last row-->
-<% if index == vm.list_of_rows.size - 1 %>
-<td class="<%= score.color_code %> instructor-review-last-row" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-<span class="<%= underlined?(score) %>"><%= score.score_value.to_s %></span>
-</td>
-<% else %>
-<td class="<%= score.color_code %> instructor-review-row" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-<span class="<%= underlined?(score) %>"><%= score.score_value.to_s %></span>
-</td>
-<% end %>
-<% else %>
-<td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
-<span class="<%= underlined?(score) %>"><%= score.score_value.to_s %></span>
-</td>
-<% end %>
+             <!-- Show Instructor icon if instructor's review-->
+				<% if score.is_instructor_review%>
+				<!-- Check if this is the last row-->
+				<% if index == vm.list_of_rows.size - 1 %>
+				<td class="<%= score.color_code %> instructor-review-last-row" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+				<span class="<%= underlined?(score) %>"><%= score.score_value.to_s %></span>
+				</td>
+				<% else %>
+				<td class="<%= score.color_code %> instructor-review-row" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+				<span class="<%= underlined?(score) %>"><%= score.score_value.to_s %></span>
+				</td>
+				<% end %>
+				<% else %>
+				<td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+				<span class="<%= underlined?(score) %>"><%= score.score_value.to_s %></span>
+				</td>
+				<% end %>
                   <% end %>
 
 

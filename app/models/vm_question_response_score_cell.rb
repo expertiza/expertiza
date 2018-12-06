@@ -5,7 +5,7 @@ class VmQuestionResponseScoreCell
     @color_code = color_code
     @comment = comments
     @vm_prompts = vmprompts
-@is_instructor_review = is_instructor_review
+    @is_instructor_review = is_instructor_review
   end
 
   attr_reader :score_value

@@ -82,6 +82,7 @@ module ReportFormatterHelper
   def basic(params, _session = nil)
     assign_basics(params)
   end
+
   private
 
   def assign_basics(params)

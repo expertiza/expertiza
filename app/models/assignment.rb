@@ -418,36 +418,11 @@ class Assignment < ActiveRecord::Base
     end
     review_questionnaire_id
   end
-  def feedback_questionnaire_id(round = nil)
-    # Get the round it's in from the next duedates
-    if round.nil?
-      next_due_date = DueDate.get_next_due_date(self.id)
-      round = next_due_date.try(:round)
-    end
-    # for program 1 like assignment, if same rubric is used in both rounds,
-    # the 'used_in_round' field in 'assignment_questionnaires' will be null,
-    # since one field can only store one integer
-    # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
-    feedback_q_ids = if round.nil?
-                  AssignmentQuestionnaire.where(assignment_id: self.id)
-                else
-                  AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
-                end
-    if feedback_q_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        feedback_q_ids << aq if aq.questionnaire.type == 'AuthorFeedbackQuestionnaire'
-      end
-    end
-    feedback_questionnaire_id = nil
-    feedback_q_ids.each do |fqid|
-      next if fqid.questionnaire_id.nil?
-      ftype = Questionnaire.find(fqid.questionnaire_id).type
-      if ftype == 'AuthorFeedbackQuestionnaire'
-        feedback_questionnaire_id = fqid.questionnaire_id
-        break
-      end
-    end
-    feedback_questionnaire_id
+  def feedback_questionnaire_id(feedback_response_map, round)
+    feedbackAnswer = Answer.where(response_id: feedback_response_map.id).first
+    puts "feedbackAnswer "+ feedbackAnswer.inspect
+    questionnaire_id = Question.find(feedbackAnswer.question_id)
+    puts "questionnaire_id "+ questionnaire_id.inspect
   end
 
   def self.export_details(csv, parent_id, detail_options)

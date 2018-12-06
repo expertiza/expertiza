@@ -41,6 +41,7 @@ class StudentReviewController < ApplicationController
     end
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
+    sign_up_list
   end
 
 # the method remove_nullteam_topics remove the topics that are not signed up by any teams
@@ -75,7 +76,7 @@ class StudentReviewController < ApplicationController
       topics.each do |topic|
         teams = SignedUpTeam.where(topic_id: topic.id)
         teams.each do |team|
-          selections[team.team_id] = {topic_name: topic.topic_name}
+          selections[team.team_id] = {topic_name: topic.topic_name, topic_identifier: topic.topic_identifier}
         end
       end
       # If the participant hasn't change the bidding order yet.
@@ -86,7 +87,8 @@ class StudentReviewController < ApplicationController
           next if !@assignment.is_selfreview_enabled && my_teams.include?(team_id)
           @biditems << {
             team_id: team_id, 
-            topic_name: info[:topic_name], 
+            topic_name: info[:topic_name],
+            topic_identifier: info[:topic_identifier],
             team_name: assignment_teams[team_id]
           }
         end
@@ -94,7 +96,8 @@ class StudentReviewController < ApplicationController
         reviewbids.each do |bid|
           @biditems << {
             team_id: bid.team_id, 
-            topic_name: selections[bid.team_id], 
+            topic_name: selections[bid.team_id][:topic_name],
+            topic_identifier: selections[bid.team_id][:topic_identifier],
             team_name: assignment_teams[bid.team_id]
           }
         end

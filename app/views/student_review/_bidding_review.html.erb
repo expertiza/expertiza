@@ -12,7 +12,6 @@
 <h1>Sign-up sheet for bidding</h1>
 <div style="display:block">
   <h3 style="width: 40%; float: left">Review Topics</h3>
-  <h3 style="width: 40%; float:right">Selections</h3>
 </div>
 
 <div style="display:block">
@@ -22,27 +21,12 @@
       <tr><%= render :partial => 'table_header' %></tr>
       <br/><br/>
       <% i=1 %>
-      <tbody id="topics"  class="connectedSortable">
+      <tbody id="selections" data-update-url=<%= "/student_review/set_priority?participant_id=#{participant.id}" %> class="connectedSortable">
       <tr class="sort-disabled"><td></td><td></td></tr>
-      <% for topic in @topics %>
-        <%= get_intelligent_topic_row(topic, @selectedtopics, @max_team_size) %>
-        <% is_suggested_topic = false %>
-        <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
-        </tr>
-        <% i=i+1 %>
-      <% end %>
-      </tbody>
-    </table>
-
-    <!--Selections table-->
-    <table style="width: 48%; display:block" class="general" align="right">
-      <% i=1 %>
-      <tr><%= render :partial => 'table_header' %></tr>
-      <tbody id="selections" data-update-url=<%= "/student_review/set_priority?participant_id=#{@participant.id}" %> class="connectedSortable">
-      <tr class="sort-disabled"><td></td><td></td></tr>
-      <% for topic in @reviewbids %>
-        <tr style= "background-color:<%= get_topic_bg_color(topic, @max_team_size) %>" id="topic_<%= topic.id %>">
-          <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+      <% for biditem in @biditems %>
+        <%#= get_intelligent_review_row(biditem) %>
+        <tr style="background-color:rgb(47,352,0)" id="topic_<%= biditem[:topic_identifier] %>>">
+        <%= render :partial => 'table_line', :locals => {:i=>i, :biditem=>biditem} %>
         </tr>
         <% i=i+1 %>
       <% end %>

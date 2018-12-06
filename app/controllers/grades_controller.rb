@@ -206,6 +206,10 @@ class GradesController < ApplicationController
       redirect_to authorize_github_grades_path
       return
     end
+
+    @parsed_data = {}
+    @authors = []
+    @dates = []
     @token = session["github_access_token"]
 
     @participant = AssignmentParticipant.find(params[:id])
@@ -217,19 +221,19 @@ class GradesController < ApplicationController
     @participant.team.hyperlinks.each do |hyperlink|
       if hyperlink.match(/pull/)
         submission_hyperlink = hyperlink
+        submission_hyperlink_tokens = submission_hyperlink.split('/')
+        hyperlink_data = {}
+        hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
+        submission_hyperlink_tokens.pop
+        hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
+        hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
+        github_data = get_github_data(hyperlink_data)
+        @authors_temp, @dates_temp = parse_github_data(github_data)
+        @authors = (@authors_temp + @authors).uniq
+        @dates   = (@dates_temp + @dates).uniq
+
       end
     end
-
-    submission_hyperlink_tokens = submission_hyperlink.split('/')
-    hyperlink_data = {}
-    hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
-    submission_hyperlink_tokens.pop
-    hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
-    hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-
-    github_data = get_github_data(hyperlink_data)
-    @parsed_data, @authors, @dates = parse_github_data(github_data)
-
   end
 
   def authorize_github
@@ -291,7 +295,6 @@ class GradesController < ApplicationController
     commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
     authors = {}
     dates = {}
-    parsed_data = {}
 
 
     commit_objects.each do |commit_object|
@@ -307,30 +310,29 @@ class GradesController < ApplicationController
         dates[commit_date] = 1
       end
 
-      unless parsed_data[author_name]
-        parsed_data[author_name] = {}
+      unless @parsed_data[author_name]
+        @parsed_data[author_name] = {}
       end
 
-      unless parsed_data[author_name][commit_date]
-        parsed_data[author_name][commit_date] = 1
+      unless @parsed_data[author_name][commit_date]
+        @parsed_data[author_name][commit_date] = 1
       else
-        parsed_data[author_name][commit_date] = parsed_data[author_name][commit_date] + 1
+        @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
       end
     end
 
     dates.each do |k,v|
-      parsed_data.each do |k1,v1|
+      @parsed_data.each do |k1,v1|
         unless v1[k]
           v1[k] = 0
         end
       end
     end
 
-    parsed_data.each {|k1, v1| parsed_data[k1] = Hash[v1.sort_by {|k, v| k}]}
+    @parsed_data.each {|k1, v1| @parsed_data[k1] = Hash[v1.sort_by {|k, v| k}]}
     authors = authors.keys
     dates = dates.keys
-
-    return parsed_data,authors,dates
+    return authors,dates
   end
 
 

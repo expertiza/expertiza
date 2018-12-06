@@ -88,6 +88,8 @@ module OnTheFlyCalc
           if !author_feedback_response_maps.empty?
             reviewer[round][response_map.id] /= author_feedback_response_maps.count
           end 
+
+          @author_feedback_scores[response_map.reviewer_id] = reviewer
         end
 
 

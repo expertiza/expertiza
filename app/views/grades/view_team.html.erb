@@ -28,6 +28,7 @@
 <% end %>
 <!--Obtain only review scores-->
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
+<%= %>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
@@ -124,7 +125,11 @@
 
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                      <% if review_type == 'SelfReviewResponseMap' %>
+                        <th class="sorter-false", bgcolor="aqua"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                      <%else %>
+                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                      <%end%>
                   <% end %>
                   <% i += 1 %>
               <% end %>
@@ -175,7 +180,11 @@
                     <%= row.countofcomments.to_s %>
                   </td>
                   <td  class = 'cf' align="center">
-                    <%= row.composite_score_for_row.to_s %>
+                    <%if @assignment.is_selfreview_enabled and @current_role_name.eql? "Student"%>
+                      <%= row.composite_score_for_row.to_s %>
+                    <%else %>
+                      <%= "Not applicable" %>
+                    <%end %>
                   </td>
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->

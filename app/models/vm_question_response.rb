@@ -42,7 +42,7 @@ class VmQuestionResponse
     end
   end
 
-  def add_reviews(participant, team, vary)
+  def add_reviews(participant, team, vary, current_role_name)
     if @questionnaire_type == "ReviewQuestionnaire"
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
@@ -55,6 +55,9 @@ class VmQuestionResponse
       self_reviews.each do |review|
         self_review_mapping = SelfReviewResponseMap.find(review.map_id) #New addition
         if self_review_mapping && self_review_mapping.present?
+          if current_role_name != "Student"
+            @list_of_reviewers << participant
+          end
           if participant.id == self_review_mapping.reviewer_id#New addition
             participant = Participant.find(self_review_mapping.reviewer_id) #New addition
             @list_of_reviewers << participant #New addition
@@ -62,6 +65,7 @@ class VmQuestionResponse
           end
         end
       end
+
 
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
@@ -71,8 +75,10 @@ class VmQuestionResponse
         end
       end
 
-      unless @store_needed_self_review.nil?
+      if @store_needed_self_review != nil and current_role_name.eql? "Student"
         @list_of_reviews = reviews + [@store_needed_self_review]
+      elsif @store_needed_self_review != nil
+        @list_of_reviews = reviews + self_reviews
       else
         @list_of_reviews = reviews
       end
@@ -114,7 +120,12 @@ class VmQuestionResponse
       end
     end
     #New Addition
-    unless @store_needed_self_review == nil
+    if current_role_name != "Student" and @store_needed_self_review != nil
+      answers = Answer.where(response_id: self_reviews.each {|self_review| self_review.response_id})
+      answers.each do |answer|
+        add_answer(answer)
+      end
+    elsif @store_needed_self_review != nil
       answers = Answer.where(response_id: @store_needed_self_review.response_id)
       answers.each do |answer|
         add_answer(answer)

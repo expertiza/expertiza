@@ -89,12 +89,10 @@ describe ReportsController do
         context 'when assignment has varying_rubrics_by_round feature' do
           it 'renders response_report page with corresponding data' do
             allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-            allow(FeedbackResponseMap).to receive(:feedback_response_report)
-              .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2], [3, 4], [])
+            allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2], [3, 4], [])
             params = {
               id: 1,
-              report: {type: 'FeedbackResponseMap'}
-            }
+              report: {type: 'FeedbackResponseMap'}}
             get :response_report, params
             expect(response).to render_template(:response_report)
           end
@@ -103,12 +101,10 @@ describe ReportsController do
         context 'when assignment does not have varying_rubrics_by_round feature' do
           it 'renders response_report page with corresponding data' do
             allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
-            allow(FeedbackResponseMap).to receive(:feedback_response_report)
-              .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2, 3, 4])
+            allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2, 3, 4])
             params = {
               id: 1,
-              report: {type: 'FeedbackResponseMap'}
-            }
+              report: {type: 'FeedbackResponseMap'}}
             get :response_report, params
             expect(response).to render_template(:response_report)
           end

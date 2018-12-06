@@ -2,13 +2,13 @@ require 'rails_helper'
 describe ReportsController do
   let(:assignment) { double('Assignment', id: 1) }
   let(:review_response_map) do
-    double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+    double('ReviewResponseMap', id: 2, map_id: 2, assignment: assignment,
+                                reviewer: double('Participant', id: 2, name: 'reviewer'), reviewee: double('Participant', id: 3, name: 'reviewee'))
   end
-  let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
-  let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
-  let(:user) { double('User', id: 3) }
-  let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
+  let(:participant) { double('AssignmentParticipant', id: 4, can_review: false, user: double('User', id: 4)) }
+  let(:participant1) { double('AssignmentParticipant', id: 5, can_review: true, user: double('User', id: 5)) }
+  let(:user) { double('User', id: 6) }
+  let(:participant2) { double('AssignmentParticipant', id: 6, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
 

@@ -4,7 +4,7 @@ class ReportsController < ApplicationController
   helper :submitted_content
   include ReportFormatterHelper
 
-  #reports are allowed to be viewed by  only by TA, instructor and administrator
+  # reports are allowed to be viewed by  only by TA, instructor and administrator
   def action_allowed?
     ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
   end

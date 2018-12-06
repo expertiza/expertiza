@@ -990,16 +990,19 @@ jQuery(document).ready(function () {
       return (
         <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px' }}>
           <input
+            data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
             ref="words"
             type="text"
             className="form-control"
-            placeholder="Words" />
+            placeholder="Text" />
           <input
+            data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
             ref="course"
             type="text"
             className="form-control"
             placeholder="Course" />
           <input
+            data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
             ref="assignment"
             type="text"
             className="form-control"
@@ -1030,8 +1033,9 @@ jQuery(document).ready(function () {
     render: function () {
       return (
         <div>
-          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'end' }}>
+          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
             <input
+              data-toggle="tooltip" title="The name of the questionnaire"
               ref="nameInput"
               type="text"
               className="form-control"
@@ -1082,37 +1086,41 @@ jQuery(document).ready(function () {
       return (
         <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
           <input
-            data-toggle="tooltip" title="User ID of the person who participated in the assignment"
+            data-toggle="tooltip" title="The username of the person who participated in the assignment"
             ref="participantName"
             type="text"
             className="form-control"
-            placeholder="Assignee (User ID)" />
+            placeholder="Assignee (Username)" />
           <input
-            data-toggle="tooltip" title="Full name of the person who participated in the assignment"
+            data-toggle="tooltip" title="The name of the person who participated in the assignment"
             ref="participantFullname"
             type="text"
             className="form-control"
-            placeholder="Assignee (Full name)" />
+            placeholder="Assignee (Name)" />
           <input
+            data-toggle="tooltip" title="Search for assignments that are due on or after given date"
             ref="dueSince"
             type="text"
             className="form-control datepick"
-            placeholder="Due Date Since" />
+            placeholder="Due Date After" />
           <input
+            data-toggle="tooltip" title="Search for assignments that are due on or before given date"
             ref="dueUntil"
             type="text"
             className="form-control datepick"
-            placeholder="Due Date Until" />
+            placeholder="Due Date Before" />
           <input
+            data-toggle="tooltip" title="Search for assignments that were created on or after given date"
             ref="createdSince"
             type="text"
             className="form-control datepick"
-            placeholder="Created Since" />
+            placeholder="Created After" />
           <input
+            data-toggle="tooltip" title="Search for assignments that were created on or before given date"
             ref="createdUntil"
             type="text"
             className="form-control datepick"
-            placeholder="Created Until" />
+            placeholder="Created Before" />
         </div>
       );
     }
@@ -1139,8 +1147,9 @@ jQuery(document).ready(function () {
     render: function () {
       return (
         <div>
-          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'end' }}>
+          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
             <input
+              data-toggle="tooltip" title="The name of the assignment"
               ref="nameInput"
               type="text"
               className="form-control"

@@ -1,3 +1,3 @@
 class SimilarAssignment < ActiveRecord::Base
-  has_many :assignments
+  has_many :assignments, dependent: :destroy
 end

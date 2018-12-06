@@ -312,5 +312,5 @@ More migrates for default 0 and null false
 TA:
 
 After submitting review, should we allow to edit consent??
-	- If not, can we improve the language in submit warning to talk about consent?
+	He/she should be able to edit.
 */

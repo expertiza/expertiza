@@ -2,7 +2,9 @@ class SimilarAssignmentsController < ApplicationController
   include SimilarAssignmentsHelper
   include ResponseConstants
   include SimilarAssignmentsConstants
+  before_action :validate_user, only: [:get, :update]
   skip_before_action :authorize, only: [:get, :update]
+
 
   # GET /similar_assignments/:id
   def get
@@ -13,14 +15,9 @@ class SimilarAssignmentsController < ApplicationController
       return
     end
     begin
-      if current_user.role.id == Role.student.id
-        throw Exception.new
-      end
       @similar_assignments = SimilarAssignment.where(:assignment_id => @assignment_id).where.not(:is_similar_for=>@assignment_id).order("created_at DESC").pluck(:is_similar_for)
     rescue ActiveRecord::RecordNotFound => e
       render json: {"success" => false, "error" => "Resource not found"}
-    rescue Exception
-      render json: {"success" => false, "error" => "Unauthorized"}
     else
       @res = get_asssignments_set(@similar_assignments)
       render json: {"success" => true, "values" => @res}
@@ -64,6 +61,14 @@ class SimilarAssignmentsController < ApplicationController
       render json: {"success" => false, "error" => "An error occurred."}
     else
       render json: {"success" => true}
+    end
+  end
+
+  def validate_user
+    if Role.student.id == current_user.role.id
+      respond_to do |format|
+          format.html {redirect_to list_student_task_index_path}
+      end
     end
   end
 end

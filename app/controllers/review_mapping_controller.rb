@@ -1,5 +1,4 @@
 class ReviewMappingController < ApplicationController
-  # include GC4R
   autocomplete :user, :name
   # use_google_charts
   require 'gchart'
@@ -114,7 +113,7 @@ class ReviewMappingController < ApplicationController
         end
 
       end
-      end
+    end
     # rescue Exception => e
     #   flash[:error] = (e.nil?) ? $! : e
     # end
@@ -136,7 +135,7 @@ class ReviewMappingController < ApplicationController
         @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save
       end
-    rescue Exception => e
+    rescue StandardError => e
       flash[:alert] = e.nil? ? $ERROR_INFO : e
     end
     redirect_to student_quizzes_path(id: reviewer.id)
@@ -203,9 +202,7 @@ class ReviewMappingController < ApplicationController
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
-
     num_unsuccessful_deletes = 0
-
     mmappings.each do |mmapping|
       begin
         mmapping.delete(params[:force])
@@ -303,8 +300,7 @@ class ReviewMappingController < ApplicationController
     submission_review_num = params[:num_reviews_per_submission].to_i
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
-
-    if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
+    if calibrated_artifacts_num.zero? and uncalibrated_artifacts_num.zero?
       # check for exit paths first
       if student_review_num == 0 and submission_review_num == 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
@@ -388,7 +384,7 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first
     begin
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       if SelfReviewResponseMap.where(reviewee_id: team.id, reviewer_id: params[:reviewer_id]).first.nil?
         SelfReviewResponseMap.create(reviewee_id: team.id,
@@ -427,7 +423,7 @@ class ReviewMappingController < ApplicationController
       teams_hash = unsorted_teams_hash.sort_by {|_, v| v }.to_h
 
       participants_with_insufficient_review_num.each do |participant_id|
-        teams_hash.each do |team_id, _num_review_received|
+        teams_hash.each_key do |team_id, _num_review_received|
           next if TeamsUser.exists?(team_id: team_id,
                                     user_id: Participant.find(participant_id).user_id)
 
@@ -467,7 +463,7 @@ class ReviewMappingController < ApplicationController
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number
-          if iterator == 0
+          if iterator.zero?
             rand_num = rand(0..num_participants - 1)
           else
             min_value = participants_hash.values.min

@@ -183,6 +183,10 @@ en:
       stage_deadline: "Stage Deadline"
       publishing_rights: "Publishing Rights"
 
+    publishing_rights:
+      select_assignment: "Select an assignment from the list or set"
+      for_work: "for your work."
+
     view:
       submit_review: "Submit or Review work for"
       next_click: "Next: Click the activity you wish to perform on the assignment titled:"

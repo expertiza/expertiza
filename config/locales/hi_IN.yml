@@ -14,7 +14,6 @@ hi_IN:
       directory_warning: "(आवश्यक स्थान। कोई जगह या विशेष वर्ण नहीं।)"
       course_info: "कोर्स संबंधी जानकारी"
       language: "भाषा चुनिए"
-      assignment_name: "De-Assignment Name"
     
     view_teaching_assistants:
       teaching_assistants: "शिक्षण सहायक"
@@ -175,9 +174,13 @@ hi_IN:
       topic: "विषय"
       current_stage: "वर्तमान स्थिति"
       review_grade: "ग्रेड की समीक्षा करें"
-      badges: "Badges"
+      badges: "बैज"
       stage_deadline: "चरण की अंतिम तिथि"
       publishing_rights: "प्रकाशन अधिकार"
+
+    publishing_rights:
+      select_assignment: "सूची या सेट से असाइनमेंट का चयन करें"
+      for_work: "आपके काम के लिए"
 
     view:
       submit_review: "सबमिट करें या काम की समीक्षा करें"

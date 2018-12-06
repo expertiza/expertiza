@@ -21,9 +21,9 @@ class ReportsController < ApplicationController
   def response_report
     # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
-    @type = params.key?(:report) ? params[:report][:type] : "nil"
+    @type = params.key?(:report) ? params[:report][:type] : 'basic'
     # From the ReportFormatterHelper module
-    render_report(@type, params, session)
+    send(@type.underscore, params, session) unless @type.nil?
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 end

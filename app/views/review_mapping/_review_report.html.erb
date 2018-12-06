@@ -44,7 +44,7 @@
     <tbody>
 
     <% sort_reviewer_by_review_volume_desc.each do |r| %>
-      <% @response_maps, @bgcolor, @rspan, @l = get_data_for_review_report(@id, r.id, @type, @l) %>
+      <% @response_maps, @rspan = get_data_for_review_report(@id, r.id, @type) %>
       <tr>
         <% if r.id != -1 %>
           <% user = Participant.find(r.id).user %>

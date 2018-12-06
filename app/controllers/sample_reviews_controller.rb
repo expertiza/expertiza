@@ -9,6 +9,10 @@ class SampleReviewsController < ApplicationController
 	def show
 		redirect_anonymous_user
 		response_id = params[:id]
+		if Response.find(response_id).visibility != 2
+			redirect_to '/sample_reviews'
+			return
+		end
 		q_and_a_data = Answer.joins("INNER JOIN questions ON question_id = questions.id WHERE answers.response_id=#{response_id.to_s}")
 		
 		questions_query_result = Question.find(q_and_a_data.pluck(:question_id))
@@ -42,10 +46,6 @@ class SampleReviewsController < ApplicationController
 		@response_ids = []
 		similar_assignment_ids.each do |id|
 			_offset = page_number * @page_size
-			puts "querying : "
-			puts "INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+id.to_s+
-			" ORDER BY responses.created_at DESC LIMIT "+@page_size.to_s+" OFFSET "+_offset.to_s
-
 			ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+id.to_s+
 			" ORDER BY responses.created_at LIMIT "+@page_size.to_s+" OFFSET "+_offset.to_s ).ids
 			@response_ids += ids

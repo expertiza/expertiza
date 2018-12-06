@@ -80,7 +80,7 @@ class PopupController < ApplicationController
       instance_variable_set('@assignment_id',@assignment.id)
     end
     instance_variable_set('@marked',approved_as_sample)
-    instance_variable_set('@popup_show',get_similar_assignment_ids(@assignment.id).size > 0)
+    instance_variable_set('@popup_show',(get_similar_assignment_ids(@assignment.id).size > 0 ? "" : "hide"))
     @page_size = popup_page_size
   end
 

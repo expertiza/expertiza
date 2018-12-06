@@ -16,7 +16,8 @@ module SimilarAssignmentsHelper
       else
         hash2 = {:title => assignment.name, :course_name => courses[course_id], :checked => false, :id => assignment.id}
         assignment_array.push(hash2)
-      end}
+      end
+    }
     return assignment_array
   end
 
@@ -33,15 +34,12 @@ module SimilarAssignmentsHelper
         course_ids = TaMapping.where(:ta_id => current_user.id).pluck(:course_id)
         @all_assignments = Assignment.where(:course_id => course_ids).where.not(:id=>assignment_id).limit(popup_page_size).offset(_offset).order("created_at DESC")
       when Role.instructor.id
+        course_ids = Course.where(:instructor_id => current_user.id).pluck(:id)
         @all_assignments = Assignment.where(:course_id => course_ids).where.not(:id=>assignment_id).limit(popup_page_size).offset(_offset).order("created_at DESC")
-      when Role.administrator.id
-        #todo
-      when Role.superadministrator.id
-        #todo
       else
         @all_assignments = []
     end
-    return @all_assignments
+    @all_assignments
   end
 
   def get_courses_based_on_role()

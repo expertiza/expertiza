@@ -7,6 +7,11 @@ class SimilarAssignmentsController < ApplicationController
   # GET /similar_assignments/:id
   def get
     @assignment_id = params[:id]
+    ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+@assignment_id.to_s).ids
+    if ids.empty?
+      render json: {"success"=>false, "error"=>"Please mark atleast one review as sample"}
+      return
+    end
     begin
       if current_user.role.id == Role.student.id
         throw Exception.new
@@ -29,14 +34,19 @@ class SimilarAssignmentsController < ApplicationController
       @assignment_id = params[:id].to_i
       checked_list = @check_lists["checked"]
       unchecked_list = @check_lists["unchecked"]
-      if !checked_list.nil?
-        checked_list.each do |child|
+      ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+@assignment_id.to_s).ids
+      if ids.empty?
+        render json: {"success"=>false, "error"=>"Please mark atleast one review as sample"}
+        return
+      end
+      if !checked_list.nil?        
+          checked_list.each do |child|
           id = SimilarAssignment.where(:is_similar_for => child.to_i, :association_intent => intent_review,
                                        :assignment_id => @assignment_id).ids
           if id.empty?
             SimilarAssignment.create({:is_similar_for => child.to_i, :association_intent => intent_review,
-                                      :assignment_id => @assignment_id})
-          end
+                                        :assignment_id => @assignment_id})
+            end
         end
       end
 
@@ -44,7 +54,6 @@ class SimilarAssignmentsController < ApplicationController
         unchecked_list.each do |child|
           id = SimilarAssignment.where(:is_similar_for => child.to_i, :association_intent => intent_review,
                                        :assignment_id => @assignment_id).ids
-          puts id
           if !(id.empty?)
             SimilarAssignment.where({:is_similar_for => child.to_i, :association_intent => intent_review,
                                      :assignment_id => @assignment_id}).destroy_all

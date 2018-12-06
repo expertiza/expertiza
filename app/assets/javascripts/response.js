@@ -258,6 +258,7 @@
 				var responseId = _d.attr("data-response-id");
 				var markUnmarkFailMessage = jQuery("mark_unmark_fail_"+round);
 				var markUnmarkSuccessMessage = jQuery("mark_unmark_success_"+round);
+				var linkAssignmentsText = jQuery("#link_assignments");
 				var markUnmarkFail = function(){
 					toggleMarkUnmarkResultMessage(round,true,"Something went wrong!");
 				};
@@ -276,6 +277,7 @@
 					"success":function(result){
 						if(result.success){
 							toggleMarkUnmark(round,updatingToMark,false,resultMessage);
+							linkAssignmentsText.removeClass("hide");
 						}else{
 							toggleMarkUnmarkResultMessage(round,true,result.error);
 						}
@@ -311,18 +313,4 @@ TA:
 
 After submitting review, should we allow to edit consent??
 	- If not, can we improve the language in submit warning to talk about consent?
-
-For instructor to view samples, point of entry = assignment all options icons +1 more
-
-URLs redirect to home page if not logged in: Reqd???
-
-View all samples: http://localhost:3000/sample_reviews/index/30791
-   -Should we disallow access for unrelated user?? (other instructor and non-TA)
-
-Admin Todos ?? all courses, all assignments - similar_assignments_helper????
-
-inform as "null" course name in some cases
-
-Page sizes how much? Popup, similar reviews show page
-
 */

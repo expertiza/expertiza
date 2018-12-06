@@ -3,19 +3,9 @@ class ReportsController < ApplicationController
   require 'gchart'
   helper :submitted_content
   include ReportFormatterHelper
-
-  # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
+  
   def action_allowed?
-    case params[:action]
-    when 'add_dynamic_reviewer',
-          'show_available_submissions',
-          'assign_reviewer_dynamically',
-          'assign_metareviewer_dynamically',
-          'assign_quiz_dynamically',
-          'start_self_review'
-      true
-    else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
-    end
+    ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
   end
 
   def response_report

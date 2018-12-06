@@ -41,13 +41,9 @@ class AssignmentTeam < Team
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)
     raise "The assignment cannot be found." if assignment.nil?
-    puts(reviewer.user_id)
     user=User.find(reviewer.user_id)
-    puts(user.role_id)
-    if(user.role_id == 2 or user.role_id == 6)
+    if(!user.is_student?)
     user=ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id, course_staff: 1)
-    puts(user.valid?)
-    puts("assignmentline 46")
     else
     ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     end

@@ -106,7 +106,7 @@
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                        <% user = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id)%>
  <!--<%= user.id  %>-->
-<% if user.role_id == 2 or user.role_id == 6 %>
+<% if !user.is_student? %>
 <th class="sorter-false instructor-review-header"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"></a><%=image_tag("Instructor.jpg", title:"Instructor/TA")%> </th>
 <% j += 1 %>
 <% else %>

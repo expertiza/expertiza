@@ -12,18 +12,18 @@ class ResponseController < ApplicationController
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      if(current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
+      if(!current_user.is_student?)
       return true
       end
       return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      if(current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
+      if(!current_user.is_student?)
       return true
       end
       return current_user_id?(user_id)
     when 'view'
-      if(current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
+      if(!current_user.is_student?)
       return true
       end
       return edit_allowed?(response.map, user_id)
@@ -65,16 +65,10 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    puts("INside edit 59")
     @header = "Edit"
     @next_action = "update"
     @return = params[:return]
     @response = Response.find(params[:id])
-    #if(current_user.role.name == "Instructor" or current_user.role.name == "Teaching Assistant")
-    #@response = Response.find_by(map_id: ResponseMap.find_by(course_staff: 1).id)
-    #puts(ResponseMap.find_by(course_staff: 1).id)
-    #puts(Response.find_by(map_id: ResponseMap.find_by(course_staff: 1).id))
-    #end
     @map = @response.map
     @contributor = @map.contributor
     set_all_responses
@@ -128,7 +122,6 @@ class ResponseController < ApplicationController
     @return = params[:return]
     @modified_object = @map.id
     set_content(true)
-    #puts(@participant.user_id)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
     # The response must be created when the review begin.
@@ -308,7 +301,6 @@ class ResponseController < ApplicationController
     else
       @assignment = @map.assignment
     end
-    puts(@map.reviewer)
     @participant = @map.reviewer
     @contributor = @map.contributor
     new_response ? set_questionnaire_for_new_response : set_questionnaire
@@ -323,9 +315,6 @@ class ResponseController < ApplicationController
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
        if @assignment.course.is_ta_or_instructor?(current_user.id)
-        puts("inside qn")
-      puts(reviewees_topic)
-      
 @current_round = @assignment.number_of_current_round_for_instructor(reviewees_topic)
 else
 @current_round = @assignment.number_of_current_round(reviewees_topic)

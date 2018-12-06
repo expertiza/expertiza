@@ -288,6 +288,10 @@ class User < ActiveRecord::Base
     return true if self.role.ta?
   end
 
+  def is_student? # New method to check if the current user is a student
+    return true if self.role.student?
+  end
+
   def self.search_users(role, user_id, letter, search_by)
     key_word = {'1' => 'name', '2' => 'fullname', '3' => 'email'}
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"

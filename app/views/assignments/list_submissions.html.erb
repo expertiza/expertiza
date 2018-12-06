@@ -40,7 +40,7 @@
           <% unless participants.empty? %>
             <% @assignment_team = AssignmentTeam.find(team.id) %>
 <% @reviewer = AssignmentParticipant.where(user_id: session[:user].id , parent_id: @assignment_team.parent_id).first unless @assignment_team.nil? %>
-<% if session[:user].role.name == "Instructor" || session[:user].role.name == "Teaching Assistant" %>
+<% if session[:user].is_student? %> 
 <% @map =ReviewResponseMap.where(reviewee_id: @assignment_team.id, course_staff: 1).last unless @reviewer.nil? %>
 <% else %>
 <% @map =ReviewResponseMap.where(reviewee_id: @assignment_team.id, reviewer_id: @reviewer.id).last unless @reviewer.nil? %>

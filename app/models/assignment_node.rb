@@ -63,22 +63,22 @@ class AssignmentNode < Node
     end
 
     if due_since.present?
-      due_since = due_since.to_time.utc
+      due_since = due_since.to_time.utc.change(hour: 0, min: 0)
       query = query.where('due_dates.due_at >= ?', due_since)
     end
 
     if due_until.present?
-      due_until = due_until.to_time.utc
+      due_until = due_until.to_time.utc.change(hour: 23, min: 59)
       query = query.where('due_dates.due_at <= ?', due_until)
     end
 
     if created_since.present?
-      created_since = created_since.to_time.utc
+      created_since = created_since.to_time.utc.change(hour: 0, min: 0)
       query = query.where('created_at >= ?', created_since)
     end
 
     if created_until.present?
-      created_until = created_until.to_time.utc
+      created_until = created_until.to_time.utc.change(hour: 23, min: 59)
       query = query.where('created_at <= ?', created_until)
     end
 

@@ -65,7 +65,7 @@ module OnTheFlyCalc
           author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response_map.id, "FeedbackResponseMap")
         
           author_feedback_response_maps.each do |author_feedback_response_map| 
-            @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+            @corresponding_response = Response.where('id = ?', author_feedback_response_map.id)
             @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
             @respective_scores = {}
             @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
@@ -103,7 +103,7 @@ module OnTheFlyCalc
         author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response_map.id, "FeedbackResponseMap")
         author_feedback_response_maps.each do |author_feedback_response_map| 
         
-          @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+          @corresponding_response = Response.where('id = ?', author_feedback_response_map.id)
           @respective_scores = {}
           @respective_scores = reviewer unless reviewer.nil?
           calc_review_score

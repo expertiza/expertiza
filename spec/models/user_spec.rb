@@ -432,4 +432,63 @@ describe User do
       expect(User.search_users(role, @user_id, '', search_by)).to eq user
     end
   end
+
+  describe '#can_signup_someone_for?' do
+    let(:admin) { build(:admin, id: 3) }
+    let(:super_admin) {build (:superadmin)}
+    let(:instructor) { build(:instructor, id: 6) }
+    let(:student1) { build(:student, id: 6, name: :lily) }
+    let(:assignment) { build(:assignment, id: 1, instructor_id: 6) }
+    let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
+
+    before(:each) do
+      @params = {id: 1}
+      allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      allow(Participant).to receive(:find_by).with('1').and_return(participant)
+      allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 8).and_return(participant)
+      allow(User).to receive(:find).with(6).and_return(instructor)
+
+    end
+
+    it 'can signup target user if current user is super admin' do
+      allow(user).to receive_message_chain(:role, :name).and_return("Super-Administrator")
+      expect(user.can_signup_someone_for?(@params[:id])).to be true
+    end
+
+    it 'can signup target user if current user is the instructor of the course' do
+      allow(user).to receive_message_chain(:role, :name).and_return("Instructor")
+      allow(user).to receive(:can_impersonate?).with(instructor).and_return(false)
+      allow(user).to receive_message_chain(:id).and_return(6)
+      allow(assignment).to receive_message_chain(:instructor_id).and_return(6)
+      expect(user.can_signup_someone_for?(@params[:id])).to be true
+    end
+
+    it 'can signup target user if current user is the TA of the course' do
+      allow(user).to receive_message_chain(:role, :name).and_return("Teaching Assistant")
+      allow(user).to receive_message_chain(:role, :super_admin?).and_return(false)
+      allow(user).to receive_message_chain(:role, :ta?).and_return(true)
+      allow(instructor).to receive(:teaching_assistant_for?).with(user).and_return(true)
+      allow(instructor).to receive(:recursively_parent_of).with(user).and_return(false)
+      allow(instructor).to receive(:parent).and_return(nil)
+      allow(instructor).to receive(:can_impersonate?).with(user).and_return(true)
+      expect(user.can_signup_someone_for?(@params[:id])).to be true
+    end
+
+
+    it 'can signup target user if current user is the admin of the course' do
+      allow(user).to receive_message_chain(:role, :name).and_return("Administrator")
+      allow(user).to receive(:can_impersonate?).with(instructor).and_return(true)
+      expect(user.can_signup_someone_for?(@params[:id])).to be true
+    end
+
+    it 'cannot signup target user if current user does not satisfy any of the requirements' do
+       allow(user).to receive_message_chain(:role, :name).and_return("Teaching Assistant")
+       allow(user).to receive(:can_impersonate?).with(instructor).and_return(false)
+       expect(user.can_signup_someone_for?(@params[:id])).to be false
+    end
+  end
 end

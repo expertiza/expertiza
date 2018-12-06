@@ -60,17 +60,20 @@ module OnTheFlyCalc
         @response_maps.each do |response_map|
 
           # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
-          reviewer = @author_feedback_scores[response_map.reviewer_id]
+          reviewer = @author_feedback_scores[response_map.reviewer_id] if !@author_feedback_scores[response_map.reviewer_id].nil?
+          response = Response.where('map_id = ?', response_map.id)
+          response = response.select {|response| response.round == round }
+          next if response.empty?
           # The author feedback response maps for the teammates reviewing the reviewer.
-          author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response_map.id, "FeedbackResponseMap")
+          author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, "FeedbackResponseMap")
         
           author_feedback_response_maps.each do |author_feedback_response_map| 
             @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
-            @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
+            # @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
             @respective_scores = {}
             @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
 
-            author_feedback_questionnaire_id = feedback_questionnaire_id(author_feedback_response_map, round) # FIXME: get proper id
+            author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response, round) # FIXME: get proper id
             @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
            
             # The score of the author feedback review
@@ -100,9 +103,13 @@ module OnTheFlyCalc
       author_feeback_questionnaire_id = feedback_questionnaire_id()
       @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
       @response_maps.each do |response_map|
-        reviewer = @author_feedback_scores[response_map.reviewer_id]
+        # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
+        reviewer = @author_feedback_scores[response_map.reviewer_id] if !@author_feedback_scores[response_map.reviewer_id].nil?
+        response = Response.where('map_id = ?', response_map.id)
+        # response = response.select {|response| response.round == round }
+        next if response.empty?
 
-        author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response_map.id, "FeedbackResponseMap")
+        author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, "FeedbackResponseMap")
         author_feedback_response_maps.each do |author_feedback_response_map| 
         
           @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
@@ -118,7 +125,8 @@ module OnTheFlyCalc
         # average.
         if !author_feedback_response_maps.empty?
           reviewer[round][response_map.id] /= author_feedback_response_maps.count
-        end 
+        end
+        @author_feedback_scores[response_map.reviewer_id] = reviewer
       end
     end
     @author_feedback_scores

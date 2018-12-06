@@ -418,11 +418,12 @@ class Assignment < ActiveRecord::Base
     end
     review_questionnaire_id
   end
-  def feedback_questionnaire_id(feedback_response_map, round)
-    feedbackAnswer = Answer.where(response_id: feedback_response_map.id).first
-    puts "feedbackAnswer "+ feedbackAnswer.inspect
-    questionnaire_id = Question.find(feedbackAnswer.question_id)
-    puts "questionnaire_id "+ questionnaire_id.inspect
+  def feedback_questionnaire_id(feedback_response, round)
+    # puts "Feedback object #{feedback_response.inspect}"
+    feedbackAnswer = Answer.where(response_id: feedback_response.first.id)
+    # puts "feedbackAnswer "+ feedbackAnswer.inspect
+    questionnaire_id = Question.find(feedbackAnswer.first.question_id)
+    # puts "questionnaire_id "+ questionnaire_id.inspect
   end
 
   def self.export_details(csv, parent_id, detail_options)

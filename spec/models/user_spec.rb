@@ -163,6 +163,66 @@ describe User do
         expect(user.get_user_list).to eq([user1, user2])
       end
     end
+
+
+    context 'when current user is super admin and search by user name' do
+      it 'fetches all users with abc' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "abc", "", "", "").to eq([user1, user2])
+      end
+    end
+
+
+    context 'when current user is super admin and search by user name is empty' do
+      it 'fetches all users with abc' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "xyz", "", "", "").to eq([])
+      end
+    end
+
+    context 'when current user is super admin and search by user email' do
+      it 'fetches all users with email abcbbe@gmail.com' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "", "", "", "abcbbe@gmail.com").to eq([user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user email is empty' do
+      it 'fetches all users with email xyz@gmail.com' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "", "", "", "xyz@gmail.com").to eq([])
+      end
+    end
+
+    context 'when current user is super admin and search by user email by substring' do
+      it 'fetches all users with email *b*' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "", "", "", "b").to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user full name' do
+      it 'fetches all users with bbc' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "", "", "bbc", "").to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user full name is empty' do
+      it 'fetches all users with xyz' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "", "", "xyz", "").to eq([])
+      end
+    end
+
+    context 'when current user is super admin and search by user name and email' do
+      it 'fetches all users with xyz' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list "abc", "", "", "abcbbe@gmail.com").to eq([user2])
+      end
+    end
+    
+
   end
 
   describe '#super_admin?' do

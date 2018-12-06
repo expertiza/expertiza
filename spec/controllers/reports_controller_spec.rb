@@ -2,13 +2,13 @@ require 'rails_helper'
 describe ReportsController do
   let(:assignment) { double('Assignment', id: 1) }
   let(:review_response_map) do
-    double('ReviewResponseMap', id: 2, map_id: 2, assignment: assignment,
-                                reviewer: double('Participant', id: 2, name: 'reviewer'), reviewee: double('Participant', id: 3, name: 'reviewee'))
+    double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,
+                                reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
-  let(:participant) { double('AssignmentParticipant', id: 4, can_review: false, user: double('User', id: 4)) }
-  let(:participant1) { double('AssignmentParticipant', id: 5, can_review: true, user: double('User', id: 5)) }
-  let(:user) { double('User', id: 6) }
-  let(:participant2) { double('AssignmentParticipant', id: 6, can_review: true, user: user) }
+  let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
+  let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
+  let(:user) { double('User', id: 3) }
+  let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
 
@@ -16,25 +16,25 @@ describe ReportsController do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     instructor = build(:instructor)
     stub_current_user(instructor, instructor.role.name, instructor.role)
-
-    shared_examples_for "summary_report" do
-      it 'renders response_report page with corresponding data' do
-        allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
-                                             .with(no_args).with(assignment, 'expertiza.ncsu.edu')
-                                             .and_return(double('Summary', summary: 'awesome!',
-                                                                reviewers: [participant, participant1],
-                                                                avg_scores_by_reviewee: 95,
-                                                                avg_scores_by_round: 92,
-                                                                avg_scores_by_criterion: 94))
-        params = {
-            id: 1,
-            report: {type: 'SummaryByRevieweeAndCriteria'}
-        }
-        get :response_report, params
-        expect(response).to render_template(:response_report)
-      end
-    end
   end
+
+  shared_examples_for "summary_report" do
+    it 'renders response_report page with corresponding data' do
+      allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
+        .with(no_args).with(assignment, 'expertiza.ncsu.edu')
+        .and_return(double('Summary', summary: 'awesome!',
+                                      reviewers: [participant, participant1],
+                                      avg_scores_by_reviewee: 95,
+                                      avg_scores_by_round: 92,
+                                      avg_scores_by_criterion: 94))
+      params = {
+        id: 1,
+        report: {type: 'SummaryByRevieweeAndCriteria'}
+      }
+      get :response_report, params
+      expect(response).to render_template(:response_report)
+    end
+    end
 
   describe 'response_report' do
     before(:each) do
@@ -44,43 +44,12 @@ describe ReportsController do
     describe 'summary_by_reviewee_and_criteria' do
       context 'when type is SummaryByRevieweeAndCriteria' do
         it_should_behave_like "summary_report"
-#          it 'renders response_report page with corresponding data' do
-#          allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
-#            .with(no_args).with(assignment, 'expertiza.ncsu.edu')
-#            .and_return(double('Summary', summary: 'awesome!',
-#                                          reviewers: [participant, participant1],
-#                                          avg_scores_by_reviewee: 95,
-#                                          avg_scores_by_round: 92,
-#                                          avg_scores_by_criterion: 94))
-#          params = {
-#            id: 1,
-#            report: {type: 'SummaryByRevieweeAndCriteria'}
-#          }
-#          get :response_report, params
-#          expect(response).to render_template(:response_report)
-#          end
-#          =end
       end
     end
 
     describe 'summary_by_criteria' do
       context 'when type is SummaryByCriteria' do
         it_should_behave_like "summary_report"
-#        it 'renders response_report page with corresponding data' do
-#          allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_criterion)
-#            .with(no_args).with(assignment, 'expertiza.ncsu.edu')
-#            .and_return(double('Summary', summary: 'awesome!',
-#                                          reviewers: [participant, participant1],
-#                                          avg_scores_by_reviewee: 95,
-#                                          avg_scores_by_round: 92,
-#                                          avg_scores_by_criterion: 94))
-#         params = {
-#            id: 1,
-#            report: {type: 'SummaryByCriteria'}
-#          }
-#          get :response_report, params
-#          expect(response).to render_template(:response_report)
-#        end
       end
     end
 

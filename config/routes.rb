@@ -2,9 +2,6 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
-  
-
-
   resources :admin, only: [] do
     collection do
       get :list_super_administrators
@@ -264,9 +261,6 @@ resources :institution, except: [:destroy] do
 
   resources :response, only: %i[new create edit update] do
     collection do
-      post :sample_review
-     # get :sample_review #debug
-      post :checkbox_form 
       get :new_feedback
       get :view
       get :remove_hyperlink

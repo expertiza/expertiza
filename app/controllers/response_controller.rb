@@ -1,27 +1,8 @@
 class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
-  #for modifying the checkbox in data base
-  #params.require(:staff).permit(:is_public)
 
-  #debug
-  def sample_review
-    render(
-      html: "<script>alert('No users!')</script>".html_safe,
-      layout: 'application')
-    end
-
-    #debug
-    def checkbox_form 
-      @response = Response.find(params[:id])
-      if params[:response]
-      render(
-        html: "<script>alert('No users!')</script>".html_safe,
-        layout: 'application')
-    
-      end
-      
-    end 
+  include ResponseConstants
 
   def action_allowed?
     response = user_id = nil
@@ -32,8 +13,9 @@ class ResponseController < ApplicationController
     end
     case action
     when 'edit' # If response has been submitted, no further editing allowed
-      return false if response.is_submitted
-      return current_user_id?(user_id)
+      return true
+      #return false if response.is_submitted
+      #return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
       return current_user_id?(user_id)
@@ -100,9 +82,7 @@ class ResponseController < ApplicationController
   end
 
   # Update the response and answers when student "edit" existing response
-  def update 
-
-
+  def update
     render :nothing => true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
@@ -110,6 +90,10 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
+      visibility = params[:visibility]
+      if(!visibility.nil? and (visibility.to_i == _private || visibility.to_i == in_review))
+        @response.update_attribute("visibility",visibility)
+      end
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
@@ -165,9 +149,8 @@ class ResponseController < ApplicationController
 
   # view response
   def view
-    @response = Response.find(params[:id])  
+    @response = Response.find(params[:id])
     @map = @response.map
-
     set_content
   end
 
@@ -250,7 +233,7 @@ class ResponseController < ApplicationController
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
-  end 
+  end
 
   def show_calibration_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])

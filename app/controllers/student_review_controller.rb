@@ -65,54 +65,70 @@ class StudentReviewController < ApplicationController
       # The assignment that should be reviewed is here
       @assignment = @participant.assignment
       # get the original topics that are under the assignment.
-      @rawtopics = SignUpTopic.where(assignment_id: @assignment.id)
-      @topics = remove_nullteam_topics(@rawtopics)
-      # Here are the selected topics that are sorted by priority
-      @reviewbids = @participant.id.nil? ? [] : ReviewBid.where(participant_id: @participant.id).order(:priority)
-      # extract topic ids from the @reviewbids
-      selected_topicids = []
-      for i in (0..(@reviewbids.length-1)) do
-        selected_topicids[i] = @reviewbids[i].topic_id
+      topics = SignUpTopic.where(assignment_id: @assignment.id)
+      my_teams = TeamsUser.where(user_id: @participant.user_id)
+      assignment_teams = {}
+      Team.where(parent_id: @assignment.id).each do |team|
+        assignment_teams[team.id] = team.name
       end
-
-      @selectedtopics= []
-      @unselectedtopics = []
-      # according to the topic id list, create the topic list of selected topics.
-      # those that are not selected from the @topics list are unselected topics
-      for j in (0..(@topics.length-1)) do
-        if selected_topicids.include?(@topics[j].id) then
-          @selectedtopics.insert(-1, @topics[j])
-        else
-          @unselectedtopics.insert(-1, @topics[j])
+      selections = {}
+      topics.each do |topic|
+        teams = SignedUpTeam.where(topic_id: topic.id)
+        teams.each do |team|
+          selections[team.team_id] = {topic_name: topic.topic_name}
         end
       end
+      # If the participant hasn't change the bidding order yet.
+      reviewbids = ReviewBid.where(participant_id: @participant.id).order(:priority)
+      @biditems = []
+      if reviewbids.empty?
+        selections.each do |team_id, info|
+          next if !@assignment.is_selfreview_enabled && my_teams.include?(team_id)
+          @biditems << {
+            team_id: team_id, 
+            topic_name: info[:topic_name], 
+            team_name: assignment_teams[team_id]
+          }
+        end
+      else
+        reviewbids.each do |bid|
+          @biditems << {
+            team_id: bid.team_id, 
+            topic_name: selections[bid.team_id], 
+            team_name: assignment_teams[bid.team_id]
+          }
+        end
+      end
+      #render :json => @biditems.to_json
+      # extract topic ids from the @reviewbids
   end
 
   # set the priority of review
   def set_priority
-    participant = AssignmentParticipant.find_by(id: params[:participant_id])
-    if params[:topic].nil?
+    @participant = AssignmentParticipant.find(params[:participant_id])
+    @assignment = @participant.assignment
+    #params[:team] = params[:topic] #debug
+    if params[:team].nil?
       # All topics are deselected by current participant
-      ReviewBid.where(participant_id: participant.id).destroy_all
+      ReviewBid.where(participant_id: @participant.id).destroy_all
     else
-      assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-      @bids = ReviewBid.where(participant_id: participant.id)
-      signed_up_topics = ReviewBid.where(participant_id: participant.id).map(&:topic_id)
+      assignment_id = @assignment.id
+      bidding_teams = ReviewBid.where(participant_id: @participant.id).map(&:team_id)
       # Remove topics from bids table if the student moves data from Selection table to Topics table
       # This step is necessary to avoid duplicate priorities in Bids table
-      signed_up_topics -= params[:topic].map(&:to_i)
-      signed_up_topics.each do |topic|
-        ReviewBid.where(topic_id: topic, participant_id: participant.id).destroy_all
+      bidding_teams -= params[:team].map(&:to_i)
+      bidding_teams.each do |team|
+        ReviewBid.where(team_id: team, participant_id: @participant.id).destroy_all
       end
-      params[:topic].each_with_index do |topic_id, index|
-        bid_existence = ReviewBid.where(topic_id: topic_id, participant_id: participant.id)
+      params[:team].each_with_index do |team_id, index|
+        bid_existence = ReviewBid.where(team_id: team_id, participant_id: @participant.id)
         if bid_existence.empty?
-          ReviewBid.create(topic_id: topic_id, participant_id: participant.id, priority: index + 1)
+          ReviewBid.create(team_id: team_id, participant_id: @participant.id, priority: index + 1)
         else
-          ReviewBid.where(topic_id: topic_id, participant_id: participant.id).update_all(priority: index + 1)
+          ReviewBid.where(team_id: team_id, participant_id: @participant.id).update_all(priority: index + 1)
         end
       end
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    redirect_to action: 'sign_up_list', assignment_id: params[:assignment_id]
   end
 end

@@ -90,8 +90,7 @@ describe ReportsController do
           it 'renders response_report page with corresponding data' do
             allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
             allow(FeedbackResponseMap).to receive(:feedback_response_report)
-              .with('1', 'FeedbackResponseMap')
-              .and_return([participant, participant1], [1, 2], [3, 4], [])
+              .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2], [3, 4], [])
             params = {
               id: 1,
               report: {type: 'FeedbackResponseMap'}
@@ -105,8 +104,7 @@ describe ReportsController do
           it 'renders response_report page with corresponding data' do
             allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
             allow(FeedbackResponseMap).to receive(:feedback_response_report)
-              .with('1', 'FeedbackResponseMap')
-              .and_return([participant, participant1], [1, 2, 3, 4])
+              .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2, 3, 4])
             params = {
               id: 1,
               report: {type: 'FeedbackResponseMap'}
@@ -136,8 +134,7 @@ describe ReportsController do
     describe 'calibration' do
       context 'when type is Calibration and participant variable is nil' do
         it 'renders response_report page with corresponding data' do
-          allow(AssignmentParticipant).to receive(:where)
-            .with(parent_id: '1', user_id: 3).and_return([nil])
+          allow(AssignmentParticipant).to receive(:where).with(parent_id: '1', user_id: 3).and_return([nil])
           allow(AssignmentParticipant).to receive(:create)
             .with(parent_id: '1', user_id: 3, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
             .and_return(participant)
@@ -147,12 +144,11 @@ describe ReportsController do
             .with('1').and_return([assignment_questionnaire])
           allow(assignment_questionnaire).to receive_message_chain(:questionnaire, :questions)
             .and_return([double('Question', type: 'Criterion')])
-          allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
+          allow(ReviewResponseMap).to receive(:where)
+            .with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
           allow(ReviewResponseMap).to receive_message_chain(:select, :where)
-            .with('id').with(reviewed_object_id: '1', calibrate_to: 0)
-            .and_return([1, 2])
-          allow(Response).to receive(:where)
-            .with(map_id: [1, 2]).and_return([double('response')])
+            .with('id').with(reviewed_object_id: '1', calibrate_to: 0).and_return([1, 2])
+          allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
           params = {
             id: 1,
             report: {type: 'Calibration'}

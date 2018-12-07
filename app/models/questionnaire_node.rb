@@ -35,57 +35,35 @@ class QuestionnaireNode < Node
 
     name = _search[:name].to_s.strip
     course_name = _search[:course].to_s.strip
-    assignment = _search[:assignment].to_s.strip
+    assignment_name = _search[:assignment].to_s.strip
     question_text=_search[:question_text].to_s.strip
-
 
     if course_name.present?
       course = Course.where('name LIKE ?', "%#{course_name}%").first
       instructor_id = course.instructor_id
-      conditions+=" and questionnaires.instructor_id = \"#{instructor_id}\""
-      end
+      conditions += " and questionnaires.instructor_id = \"#{instructor_id}\""
     end
 
     if name.present?
-      conditions+=" and questionnaires.name LIKE \"%#{name}%\""
-
-    if question_text.present?
-      matching_questionnaires=Question.where('txt LIKE ?',"%#{question_text}%")
-      ids=matching_questionnaires.map{|r| r.questionnaire_id}
-      conditions+=" and questionnaires.id in (#{ids.join(',')})"
-      puts conditions
+      conditions += " and questionnaires.name LIKE \"%#{name}%\""
     end
 
+    if question_text.present?
+      matching_questionnaires = Question.where('txt LIKE ?',"%#{question_text}%")
+      ids = matching_questionnaires.map{|r| r.questionnaire_id}
+      conditions += " and questionnaires.id in (#{ids.join(',')})"
+    end
 
-
-
-
-
-    #
-    # puts "----------------------------------"
-    # assignment_name="BIT 115 First"
-    # matching_assignments = Assignment.where('name LIKE ?', "%#{assignment_name}%")
-    # puts "matching assignmnets are "+matching_assignments.to_s
-    # matching_questionnaires = AssignmentQuestionnaire.where("assignment_id in ?",matching_assignments.ids)
-    # puts "matching questionnaires are "+matching_questionnaires.to_s
-    # puts matching_questionnaires.first.questionnaire_id
-    # puts "-------about to get error"
-    #
-    # ids=matching_questionnaires.map{|r| r.questionnaire_id}
-    # puts "----------printing ids as string "+"and questionnaires.id in (#{ids.join(',')})"
-    # conditions+="and questionnaires.id in (#{ids.join(',')})"
-    # puts "printing conditpons"+conditions+"--------------------------------------"
-
-
-
-
+    matching_assignments = Assignment.where('name LIKE ?', "%#{assignment_name}%")
+    matching_questionnaires = AssignmentQuestionnaire.where('assignment_id in (?)', matching_assignments.ids)
+    questionnaire_ids = matching_questionnaires.map{|r| r.questionnaire_id}
+    conditions += " and questionnaires.id in (#{questionnaire_ids.join(',')})"
 
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
     if Questionnaire.column_names.include? sortvar and %w[ASC DESC asc desc].include? sortorder
       self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}")
     end
-
   end
 
   def get_name

@@ -301,8 +301,9 @@ class TreeDisplayController < ApplicationController
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new
+    search = params[:reactParams2][:search] || {}
     initialize_fnode_2(fnode, child_nodes)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, search)
     res_node_for_child_2(ch_nodes)
   end
 

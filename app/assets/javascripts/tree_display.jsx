@@ -711,7 +711,10 @@ jQuery(document).ready(function () {
           _this = this;
           jQuery.post('/tree_display/children_node_2_ng',
             {
-              reactParams2: newParams
+              reactParams2: {
+                ...newParams,
+                search: this.props.search,
+              },
             },
             function (data) {
               _this.props.data[id.split("_")[2]]['children'] = data;
@@ -981,7 +984,7 @@ jQuery(document).ready(function () {
     },
     getInputValues: function () {
       return {
-        words: this.refs.words.getDOMNode().value,
+        question_text: this.refs.question_text.getDOMNode().value,
         course: this.refs.course.getDOMNode().value,
         assignment: this.refs.assignment.getDOMNode().value,
       };
@@ -991,7 +994,7 @@ jQuery(document).ready(function () {
         <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px' }}>
           <input
             data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
-            ref="words"
+            ref="question_text"
             type="text"
             className="form-control"
             placeholder="Text" />
@@ -1270,6 +1273,7 @@ jQuery(document).ready(function () {
             onUserClick={this.handleUserClick}
             dataType={this.props.dataType}
             showPublic={this.state.publicCheckbox}
+            search={this.props.search}
           />
         </div>
       )
@@ -1375,21 +1379,24 @@ jQuery(document).ready(function () {
               key="table1"
               dataType='course'
               onSearchClick={this.loadTableData}
-              data={this.state.tableContent.Courses} />
+              data={this.state.tableContent.Courses}
+              search={this.state.search} />
           </ReactSimpleTabs.Panel>
           <ReactSimpleTabs.Panel title="Assignments">
             <FilterableTable
               key="table2"
               dataType='assignment'
               onSearchClick={this.loadTableData}
-              data={this.state.tableContent.Assignments} />
+              data={this.state.tableContent.Assignments}
+              search={this.state.search} />
           </ReactSimpleTabs.Panel>
           <ReactSimpleTabs.Panel title="Questionnaires">
             <FilterableTable
               key="table2"
               dataType='questionnaire'
               onSearchClick={this.loadTableData}
-              data={this.state.tableContent.Questionnaires} />
+              data={this.state.tableContent.Questionnaires}
+              search={this.state.search} />
           </ReactSimpleTabs.Panel>
         </ReactSimpleTabs>
       )

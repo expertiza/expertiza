@@ -8,6 +8,8 @@ describe OnTheFlyCalc do
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
   let(:contributor) { build(:assignment_team, id: 1) }
+  let(:reviewed_team) { build(:assignment_team, id: 2) }
+  
 
   describe '#compute_total_score' do
     context 'when avg score is nil' do
@@ -73,22 +75,23 @@ describe OnTheFlyCalc do
   end
 
   describe '#compute_author_feedback_score' do
+    let(:reviewer) { build(:participant, id: 1) }
+    let(:feedback) { Answer.new(answer: 2, response_id: 1, comments: 'Feedback Text', question_id: 2) }
+    let(:feedback_question) { build(:question, questionnaire: questionnaire2, weight: 1, id: 2) }
+    let(:questionnaire2) { build(:questionnaire, name: "feedback", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
+    let(:reviewer1) { build(:participant, id: 2) }
+    score = {}
+    let(:team_user) { build(:team_user, team: 2, user: 2) } 
+    let(:feedback_response) { build(:response, id: 2, map_id: 2, scores: [feedback]) }
+    let(:feedback_response_map) { build(:response_map, id: 2, reviewed_object_id: 1, reviewer_id: 2, reviewee_id: 1) }
+
     before(:each) do
-      #score = {min: 50.0, max: 50.0, avg: 50.0}
-      let(:reviewer) { build(:participant, id: 1) }
-      let(:feedback) { Answer.new(answer: 2, response_id: 1, comments: 'Feedback Text', question_id: 2) }
-      let(:feedback_question) { build(:question, questionnaire: questionnaire2, weight: 1, id: 2) }
-      let(:questionnaire2) { build(:questionnaire, name: "feedback", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
-      let(:feedback_response) { build(:response, id: 2, map_id: 2, scores: [feedback]) }
-      let(:feedback_response_map) { build(:response_map, id: 2, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
+      allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
+      allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
     end
     context 'verifies feedback score' do
       it 'computes feedback score based on reviews' do
-        allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
-        allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
-        expect(on_the_fly_calc.calc_avg_feedback_score).to eq(:calc_feedback_scores_sum).and_return(1)
-        expect(on_the_fly_calc.calc_feedback_scores_sum).to eq(:calc_avg_feedback_score).and_return(1)
-        expect(on_the_fly_calc.compute_author_feedback_scores).to eq(:compute_author_feedback_scores).and_return(1)
+        expect(assignment.compute_author_feedback_scores).to eq(score)
       end
     end
   end

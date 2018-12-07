@@ -64,25 +64,14 @@ class UsersController < ApplicationController
     search_fname = ".*"
     search_id = ".*"
     search_email = ".*"
-    if params[:search_name].present?
 
-      search_name = ".*" + params[:search_name].strip + ".*"
-    end
+    search_name = ".*" + params[:search_name].strip + ".*" if params[:search_name].present?
 
-    if params[:search_id].present?
+    search_id = ".*" + params[:search_id].strip + ".*" if params[:search_id].present?
 
-      search_id = ".*" + params[:search_id].strip + ".*"
-    end
+    search_fname = ".*" + params[:search_fname].strip + ".*" if params[:search_fname].present?
 
-    if params[:search_fname].present?
-
-      search_fname = ".*" + params[:search_fname].strip + ".*"
-    end
-
-    if params[:search_email].present?
-
-      search_email = ".*" + params[:search_email].strip + ".*"
-    end
+    search_email = ".*" + params[:search_email].strip + ".*" if params[:search_email].present?
 
     @users = user.get_user_list search_name, search_id, search_fname, search_email
   end

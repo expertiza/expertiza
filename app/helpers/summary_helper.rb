@@ -109,9 +109,7 @@ module SummaryHelper
       text = search[:text].to_s.strip
 
       query = Team
-      if team_filter.present?
-        query = query.where('name LIKE ?', "%#{team_filter}%")
-      end
+      query = query.where('name LIKE ?', "%#{team_filter}%") if team_filter.present?
       teams = query.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
@@ -156,9 +154,8 @@ module SummaryHelper
             cur_threads << Thread.new do
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
-            if search[:text].present?
-              includes_keywords |= comments.any? {|c| c.include? text}
-            end
+
+            includes_keywords |= comments.any? {|c| c.include? text} if search[:text].present?
           end
           self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_questions_used)
         end
@@ -166,15 +163,9 @@ module SummaryHelper
 
         avg_score = self.avg_scores_by_reviewee[reviewee.name]
 
-        if min_score.present?
-          is_valid &= avg_score >= min_score.to_i
-        end
-        if max_score.present?
-          is_valid &= avg_score <= max_score.to_i
-        end
-        if text.present?
-          is_valid &= includes_keywords
-        end
+        is_valid &= avg_score >= min_score.to_i if min_score.present?
+        is_valid &= avg_score <= max_score.to_i if max_score.present?
+        is_valid &= includes_keywords if text.present?
 
         if is_valid
           threads.concat cur_threads

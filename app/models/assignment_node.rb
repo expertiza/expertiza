@@ -51,15 +51,11 @@ class AssignmentNode < Node
 
     associations = {assignment: [:due_dates]}
 
-    if participant_name.present? || participant_fullname.present?
-      associations[:assignment] << {participants: :user}
-    end
+    associations[:assignment] << {participants: :user} if participant_name.present? || participant_fullname.present?
 
     query = self.includes(associations).where(find_conditions)
 
-    if name.present?
-      query = query.where('name LIKE ?', "%#{name}%")
-    end
+    query = query.where('name LIKE ?', "%#{name}%") if name.present?
 
     if due_since.present?
       due_since = due_since.to_time.utc.change(hour: 0, min: 0)
@@ -85,9 +81,7 @@ class AssignmentNode < Node
       participant_names = User.where('name LIKE ?', "%#{participant_name}%")
                               .select {|user| me.can_impersonate? user}
                               .map(&:name)
-      if participant_names.empty?
-        return []
-      end
+      return [] if participant_names.empty?
       query = query.where(users: {name: participant_names})
     end
 
@@ -95,9 +89,7 @@ class AssignmentNode < Node
       participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
                               .select {|user| me.can_impersonate? user}
                               .map(&:name)
-      if participant_names.empty?
-        return []
-      end
+      return [] if participant_names.empty?
       query = query.where(users: {name: participant_names})
     end
 

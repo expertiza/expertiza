@@ -44,9 +44,7 @@ class QuestionnaireNode < Node
       conditions += " and questionnaires.instructor_id = \"#{instructor_id}\""
     end
 
-    if name.present?
-      conditions += " and questionnaires.name LIKE \"%#{name}%\""
-    end
+    conditions += " and questionnaires.name LIKE \"%#{name}%\"" if name.present?
 
     if question_text.present?
       matching_questionnaires = Question.where('txt LIKE ?', "%#{question_text}%")

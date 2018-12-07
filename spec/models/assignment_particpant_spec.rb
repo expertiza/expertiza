@@ -315,7 +315,8 @@ describe AssignmentParticipant do
     it 'exports all participants in current assignment' do
       allow(AssignmentParticipant).to receive_message_chain(:where, :find_each).with(parent_id: 1).with(no_args).and_yield(participant)
       allow(participant).to receive(:user).and_return(build(:student, name: 'student2065', fullname: '2065, student'))
-      expect(AssignmentParticipant.export([], 1, nil)).to eq(
+      options = {'personal_details' => 'true', 'role' => 'true', 'handle' => 'true', 'parent' => 'true', 'email_options' => 'true'}
+      expect(AssignmentParticipant.export([], 1, options)).to eq(
         [["student2065",
           "2065, student",
           "expertiza@mailinator.com",

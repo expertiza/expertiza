@@ -1,5 +1,5 @@
 class Assessment360Controller < ApplicationController
-  # Added the @instructor to display the instrucor name in the home page of the 360 degree assessment
+  # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
 
   def action_allowed?
     ['Super-Administrator',

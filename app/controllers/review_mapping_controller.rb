@@ -110,7 +110,7 @@ class ReviewMappingController < ApplicationController
         end
 
       end
-      end
+    end
     # rescue Exception => e
     #   flash[:error] = (e.nil?) ? $! : e
     # end
@@ -132,7 +132,7 @@ class ReviewMappingController < ApplicationController
         @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
         @map.save
       end
-    rescue Exception => e
+    rescue StandardError => e
       flash[:alert] = e.nil? ? $ERROR_INFO : e
     end
     redirect_to student_quizzes_path(id: reviewer.id)
@@ -200,11 +200,11 @@ class ReviewMappingController < ApplicationController
     mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
 
-    failedCount = ResponseMap.delete_mappings(mmappings, params[:force])
-    if failedCount > 0
+    failed_count = ResponseMap.delete_mappings(mmappings, params[:force])
+    if failed_count > 0
       url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
       url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{failedCount} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
+      flash[:error] = "A delete action failed:<br/>#{failed_count} metareviews exist for these mappings. Delete these mappings anyway?&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><BR/>"
     else
       flash[:note] = "All metareview mappings for contributor \"" + mapping.reviewee.name + "\" and reviewer \"" + mapping.reviewer.name + "\" have been deleted."
     end
@@ -289,10 +289,10 @@ class ReviewMappingController < ApplicationController
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
 
-    if calibrated_artifacts_num == 0 and uncalibrated_artifacts_num == 0
-      if student_review_num == 0 and submission_review_num == 0
+    if calibrated_artifacts_num.zero? and uncalibrated_artifacts_num.zero?
+      if student_review_num.zero? and submission_review_num.zero?
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif (student_review_num != 0 and submission_review_num == 0) or (student_review_num == 0 and submission_review_num != 0)
+      elsif (student_review_num != 0 and submission_review_num.zero?) or (student_review_num.zero? and submission_review_num != 0)
         # REVIEW: mapping strategy
         automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
       else
@@ -326,6 +326,8 @@ class ReviewMappingController < ApplicationController
       num_reviews_per_team = (participants.size * student_review_num * 1.0 / teams.size).round
       student_review_num = student_review_num
       exact_num_of_review_needed = participants.size * student_review_num
+
+    # The number of submissions per document should be within max submissions per document
     elsif student_review_num == 0 and submission_review_num != 0
       num_reviews_per_team = submission_review_num
       student_review_num = (teams.size * submission_review_num * 1.0 / participants.size).round
@@ -419,7 +421,7 @@ class ReviewMappingController < ApplicationController
       @user_tagging_report = {}
       tag_prompt_deployments.each do |tag_dep|
         @questionnaire_tagging_report[tag_dep] = tag_dep.assignment_tagging_progress
-        #generate a summary report per user
+        # generate a summary report per user
         @questionnaire_tagging_report[tag_dep].each do |line|
           if @user_tagging_report[line.user.name].nil?
             @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
@@ -465,7 +467,7 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     team_id = TeamsUser.find_by_sql(["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", assignment.id, params[:reviewer_userid]])
     begin
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
       # to treat all assignments as team assignments
       if SelfReviewResponseMap.where(reviewee_id: team_id[0].t_id, reviewer_id: params[:reviewer_id]).first.nil?
         SelfReviewResponseMap.create(reviewee_id: team_id[0].t_id,
@@ -505,7 +507,7 @@ class ReviewMappingController < ApplicationController
       teams_hash = unsorted_teams_hash.sort_by {|_, v| v }.to_h
 
       participants_with_insufficient_review_num.each do |participant_id|
-        teams_hash.each do |team_id, _num_review_received|
+        teams_hash.each_key do |team_id, _num_review_received|
           next if TeamsUser.exists?(team_id: team_id,
                                     user_id: Participant.find(participant_id).user_id)
 
@@ -557,7 +559,7 @@ class ReviewMappingController < ApplicationController
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number
-          if iterator == 0
+          if iterator.zero?
             rand_num = rand(0..num_participants - 1)
           else
             min_value = participants_hash.values.min

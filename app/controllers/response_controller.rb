@@ -32,7 +32,7 @@ class ResponseController < ApplicationController
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
         (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
-      return current_user_id?(user_id)
+      current_user_id?(user_id)
     end
   end
 
@@ -40,7 +40,7 @@ class ResponseController < ApplicationController
   def json
     response_id = params[:response_id] if params.key?(:response_id)
     response = Response.find(response_id)
-    render :json => response
+    render json: response
   end
 
   def delete
@@ -48,7 +48,7 @@ class ResponseController < ApplicationController
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
     @response.delete
-    redirect_to action: 'redirection', id: map_id, return: params[:return], msg: "The response was deleted."
+    redirect_to action: 'redirect', id: map_id, return: params[:return], msg: "The response was deleted."
   end
 
   # Determining the current phase and check if a review is already existing for this stage.
@@ -56,15 +56,10 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    @header = "Edit"
-    @next_action = "update"
-    @return = params[:return]
-    @response = Response.find(params[:id])
-    @map = @response.map
-    @contributor = @map.contributor
-    set_all_responses
+    assign_instance_vars
+    get_all_responses
     if @prev.present?
-      @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i and m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
+      @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i && m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
     @modified_object = @response.response_id
@@ -78,9 +73,11 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
+
+
   # Update the response and answers when student "edit" existing response
   def update
-    render :nothing => true unless action_allowed?
+    render nothing: true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
@@ -90,28 +87,18 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      if params['isSubmit'] && params['isSubmit'] == 'Yes'
-        @response.update_attribute('is_submitted', true)
-      else
-        # this won't work, since the auto update click edit in the background and override the submit. Don't think this is necessary anyway
-        # @response.update_attribute('is_submitted', false)
-      end
+      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id,
-      return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
   def new
-    @header = "New"
-    @next_action = "create"
-    @feedback = params[:feedback]
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @modified_object = @map.id
+    assign_instance_vars
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
@@ -126,7 +113,7 @@ class ResponseController < ApplicationController
   end
 
   def new_feedback
-    review = Response.find(params[:id]) if !params[:id].nil?
+    review = Response.find(params[:id]) unless params[:id].nil?
     if review
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: review.map.assignment.id).first
       map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: reviewer.id).first
@@ -149,9 +136,9 @@ class ResponseController < ApplicationController
 
   def create
     map_id = params[:id]
-    map_id = params[:map_id] if !params[:map_id].nil?# pass map_id as a hidden field in the review form
+    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
-    set_all_responses
+    get_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
@@ -163,14 +150,14 @@ class ResponseController < ApplicationController
     @response = Response.where(map_id: @map.id, round: @round.to_i).first
     if @response.nil?
       @response = Response.create(
-          map_id: @map.id,
-          additional_comment: params[:review][:comments],
-          round: @round.to_i,
-          is_submitted: is_submitted
+        map_id: @map.id,
+        additional_comment: params[:review][:comments],
+        round: @round.to_i,
+        is_submitted: is_submitted
       )
     end
     was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted ) # ignore if autoupdate try to save when the response object is not yet created.
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
@@ -183,11 +170,11 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
       @response.email
     end
-    redirect_to controller: 'response', action: 'saving', id: @map.map_id,
-      return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+    redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
-  def saving
+  def save
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
@@ -204,10 +191,10 @@ class ResponseController < ApplicationController
       end
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
-    redirect_to action: 'redirection', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def redirection
+  def redirect
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by(map_id: params[:id])
@@ -296,6 +283,25 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
+  # assigning the instance variables for Edit and New actions
+  def assign_instance_vars
+    case params[:action]
+    when 'edit'
+      @header = 'Edit'
+      @next_action = 'update'
+      @response = Response.find(params[:id])
+      @map = @response.map
+      @contributor = @map.contributor
+    when 'new'
+      @header = 'New'
+      @next_action = 'create'
+      @feedback = params[:feedback]
+      @map = ResponseMap.find(params[:id])
+      @modified_object = @map.id
+    end
+    @return = params[:return]
+  end
+
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
@@ -334,7 +340,7 @@ class ResponseController < ApplicationController
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
                                           .first.try(:dropdown)
-    @dropdown_or_scale = (use_dropdown == true ? 'dropdown' : 'scale')
+    @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
   def sort_questions(questions)
@@ -359,7 +365,7 @@ class ResponseController < ApplicationController
     end
   end
 
-  def set_all_responses
+  def get_all_responses
     # get all previous versions of responses for the response map.
     # I guess if we're in the middle of creating a new response, this would be
     # all 'previous' responses to this new one (which is not yet saved)?

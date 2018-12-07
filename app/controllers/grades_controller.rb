@@ -210,6 +210,12 @@ class GradesController < ApplicationController
     @parsed_data = {}
     @authors = []
     @dates = []
+    @total_additions = 0
+    @total_deletions = 0
+    @total_commits = 0
+    @total_files_changed = 0
+    @merge_status = {}
+
     @token = session["github_access_token"]
 
     @participant = AssignmentParticipant.find(params[:id])
@@ -224,6 +230,7 @@ class GradesController < ApplicationController
         submission_hyperlink_tokens = submission_hyperlink.split('/')
         hyperlink_data = {}
         hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
+        @merge_status[hyperlink_data["pull_request_number"].to_i] = nil
         submission_hyperlink_tokens.pop
         hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
         hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
@@ -246,9 +253,12 @@ class GradesController < ApplicationController
         query: "query {
                           repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
                             pullRequest(number: "+ hyperlink_data["pull_request_number"] +") {
+                              number
                               additions
                               deletions
                               changedFiles
+                              mergeable
+                              merged
                               commits(first:200){
                                 totalCount
                                 edges{
@@ -288,9 +298,17 @@ class GradesController < ApplicationController
 
   def parse_github_data(github_data)
     github_data = ActiveSupport::JSON.decode(github_data)
-    total_additions = github_data["data"]["repository"]["pullRequest"]["additions"]
-    total_deletions = github_data["data"]["repository"]["pullRequest"]["deletions"]
-    total_files_changed = github_data["data"]["repository"]["pullRequest"]["changedFiles"]
+    @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
+    @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
+    @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
+    @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
+    pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
+
+    if github_data["data"]["repository"]["pullRequest"]["merged"]
+      @merge_status[pull_request_number] = "MERGED"
+    else
+      @merge_status[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["mergeable"]
+    end
 
     commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
     authors = {}

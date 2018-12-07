@@ -64,7 +64,7 @@ class ResponseController < ApplicationController
     end
     @modified_object = @response.response_id
     # set more handy variables for the view
-    set_content
+    set_content(new_response = true)
     @review_scores = []
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first

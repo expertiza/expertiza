@@ -41,7 +41,6 @@
 <% if stage != "Finished" and controller.controller_name == 'submitted_content' and @can_submit %>
   <h2>Add Supplementary Review Questions:</h2>
     <% if @assignment.supplementary_review_questionnaire? %>
-     
       <%= button_to "Create Supplementary Rubric", {:controller => "questionnaires", :action => "create_supplementary_review_questionnaire", :id => participant.id } %>
     <% else %>
       The instructor hasn't enabled this feature for this assignment

@@ -378,15 +378,9 @@ class QuestionnairesController < ApplicationController
     @team = Team.find(@participant.team.id)
     #Add supplementary review questionnaire to Team table 
     if @team.supplementary_review_questionnaire_id.nil? then
-      @questionnaire = Questionnaire.new
-      @questionnaire.private = false
-      @questionnaire.name = "supplementary_review_questionnaire_" + @team.id.to_s
-      @questionnaire.instructor_id = @team.id
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 5
-      @questionnaire.type = "Questionnaire"
-      @questionnaire.display_type = "Review"
-      @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+      @questionnaire = Questionnaire.create(privete: false, name: "supplementary_review_questionnaire_" + @team.id.to_s, 
+        instructor_id: @team_id, min_question_score: 0, max_question_score: 5, type: "Questionnaire", display_type: "Review", 
+        instruction_loc: Questionnaire::DEFAULT_QUESTIONNAIRE_URL)
       if @questionnaire.save
         @team.supplementary_review_questionnaire_id = @questionnaire.id
         @team.save

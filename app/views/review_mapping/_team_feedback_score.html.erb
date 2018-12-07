@@ -1,7 +1,7 @@
 <% if !@assignment.varying_rubrics_by_round? %>
     <!--Average author feedback score for this review-->
     <div>
-    <% if @author_feedback_scores[reviewer] && @author_feedback_scores[reviewer_id][team_id] && @author_feedback_scores[reviewer_id][team_id] != -1%>
+    <% if @author_feedback_scores[reviewer_id] && @author_feedback_scores[reviewer_id][team_id] && @author_feedback_scores[reviewer_id][team_id] != -1%>
         <%= @author_feedback_scores[reviewer_id][team_id].inspect %>%
     <% else %>
         --

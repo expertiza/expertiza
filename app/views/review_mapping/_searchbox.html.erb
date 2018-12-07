@@ -51,28 +51,28 @@
       <input
         data-toggle="tooltip" title="Search for reviews for the given team"
         type="text"
-        value="<%=@search[:team]%>"
+        value="<%=params.try(:[], :report).try(:[], :search).try(:[], :team)%>"
         name="report[search][team]"
         class="form-control"
         placeholder="Team" />
       <input
         data-toggle="tooltip" title="Search for reviews that contain a comment with given text"
         type="text"
-        value="<%=@search[:text]%>"
+        value="<%=params.try(:[], :report).try(:[], :search).try(:[], :text)%>"
         name="report[search][text]"
         class="form-control"
         placeholder="Text" />
       <input
         data-toggle="tooltip" title="Search for reviews that have an average score greater than or equal to the given value"
         type="number"
-        value="<%=@search[:min_score]%>"
+        value="<%=params.try(:[], :report).try(:[], :search).try(:[], :min_score)%>"
         name="report[search][min_score]"
         class="form-control"
         placeholder="Min Avg Score" />
       <input
         data-toggle="tooltip" title="Search for reviews that have an average score less that or equal to the given value"
         type="number"
-        value="<%=@search[:max_score]%>"
+        value="<%=params.try(:[], :report).try(:[], :search).try(:[], :max_score)%>"
         name="report[search][max_score]"
         class="form-control"
         placeholder="Max Avg Score" />

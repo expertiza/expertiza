@@ -164,14 +164,12 @@ describe User do
       end
     end
 
-
     context 'when current user is super admin and search by user name' do
       it 'fetches all users with abc' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
         expect(user.get_user_list "abc", "", "", "").to eq([user1, user2])
       end
     end
-
 
     context 'when current user is super admin and search by user name is empty' do
       it 'fetches all users with abc' do
@@ -221,7 +219,6 @@ describe User do
         expect(user.get_user_list "abc", "", "", "abcbbe@gmail.com").to eq([user2])
       end
     end
-
   end
 
   describe '#super_admin?' do

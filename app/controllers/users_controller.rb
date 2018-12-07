@@ -84,7 +84,6 @@ class UsersController < ApplicationController
       search_email = ".*" + params[:search_email].strip + ".*"
     end
 
-
     @users = user.get_user_list search_name, search_id, search_fname, search_email
   end
 

@@ -375,7 +375,6 @@ class ReviewMappingController < ApplicationController
       @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
       @avg_scores_by_round = sum.avg_scores_by_round
       @avg_scores_by_criterion = sum.avg_scores_by_criterion
-      @search = sum.search
       # this summarizes all reviews by each rubric criterion
     when "SummaryByCriteria"
       sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, summary_ws_url)

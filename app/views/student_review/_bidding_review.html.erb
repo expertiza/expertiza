@@ -21,11 +21,11 @@
       <tr><%= render :partial => 'table_header' %></tr>
       <br/><br/>
       <% i=1 %>
-      <tbody id="selections" data-update-url=<%= "/student_review/set_priority?participant_id=#{participant.id}" %> class="connectedSortable">
+      <tbody id="reviews" data-update-url=<%= "/student_review/set_priority?participant_id=#{participant.id}" %> class="connectedSortable">
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for biditem in @biditems %>
         <%#= get_intelligent_review_row(biditem) %>
-        <tr style="background-color:rgb(47,352,0)" id="topic_<%= biditem[:topic_identifier] %>>">
+        <tr style="background-color:rgb(47,352,0)" id="topic_<%= biditem[:team_id] %>">
         <%= render :partial => 'table_line', :locals => {:i=>i, :biditem=>biditem} %>
         </tr>
         <% i=i+1 %>

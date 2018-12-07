@@ -1,7 +1,8 @@
 module StudentReviewHelper
   # Render topic row for bidding topic review
   def get_intelligent_review_row(biditem)
-    row_html = '<tr id="topic_' + biditem[:topic_identifier].to_s + '" style="background-color:rbg(47, 352, 0)">'
+    row_html = '<tr id="topic_' + biditem[:team_id].to_s + '" style="background-color:rbg(47, 352, 0)">'
+
     row_html.html_safe
   end
 

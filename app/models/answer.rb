@@ -18,24 +18,24 @@ class Answer < ActiveRecord::Base
       length_of_assessments = assessments.length.to_f
       number_of_instructor_reviews = 0
       assessments.each do |assessment|
-      curr_score = 0
-      participant = Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id)
+        curr_score = 0
+        participant = Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id)
 
       user = User.find(participant.user_id)
-      if(!current_user.is_student?) # if the review does not belog to student, increment count of staff review. Will be helpful while displaying in grades tab
+      unless current_user.is_student? # if the review does not belog to student, increment count of staff review. Will be helpful while displaying in grades tab
         number_of_instructor_reviews = number_of_instructor_reviews + 1
       else
         curr_score = get_total_score(response: [assessment], questions: questions)
       end        
-        scores[:max] = curr_score if curr_score > scores[:max]
-        scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
+      scores[:max] = curr_score if curr_score > scores[:max]
+      scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
 
         # Check if the review is invalid. If is not valid do not include in score calculation
-        if @invalid == 1 or curr_score == -1
-          length_of_assessments -= 1
-          curr_score = 0
-        end
-        total_score += curr_score
+      if @invalid == 1 or curr_score == -1
+        length_of_assessments -= 1
+        curr_score = 0
+      end
+      total_score += curr_score
       end
       student_review_count = length_of_assessments - number_of_instructor_reviews.to_f
       scores[:avg] = if length_of_assessments != 0

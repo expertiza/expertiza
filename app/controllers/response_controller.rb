@@ -12,19 +12,19 @@ class ResponseController < ApplicationController
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      if(!current_user.is_student?) # If the current logged in user is not student, will be able to edit all reviews 
-      return true
+      unless current_user.is_student?# If the current logged in user is not student, will be able to edit all reviews 
+        return true
       end
       return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      if(!current_user.is_student?) # # If the current logged in user is not student, will be able to delete and update all reviews
-      return true
+      unless current_user.is_student? # # If the current logged in user is not student, will be able to delete and update all reviews
+        return true
       end
       return current_user_id?(user_id)
     when 'view'
-      if(!current_user.is_student?) # # If the current logged in user is not student, will be able to view all reviews
-      return true
+      unless current_user.is_student? # # If the current logged in user is not student, will be able to view all reviews
+        return true
       end
       return edit_allowed?(response.map, user_id)
     else
@@ -129,7 +129,6 @@ class ResponseController < ApplicationController
     # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
     @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
-    
     questions = sort_questions(@questionnaire.questions)
     init_answers(questions)
     render action: 'response'
@@ -233,13 +232,11 @@ class ResponseController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
-    else
-      if @map.response_map.assignment.course.is_ta_or_instructor?(current_user.id)
-	     redirect_to controller: 'assignments', action: 'list_submissions', id:@map.response_map.assignment.id
-	    else
-	     redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
-	    end
-    end
+    elsif @map.response_map.assignment.course.is_ta_or_instructor?(current_user.id)
+	    redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
+	  else
+	    redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+	  end
   end
 
   def show_calibration_results_for_student
@@ -314,11 +311,11 @@ class ResponseController < ApplicationController
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
-       if @assignment.course.is_ta_or_instructor?(current_user.id)
+      if @assignment.course.is_ta_or_instructor?(current_user.id)
         @current_round = @assignment.number_of_current_round_for_instructor(reviewees_topic)
-       else
+      else
         @current_round = @assignment.number_of_current_round(reviewees_topic)
-       end
+      end
     @questionnaire = @map.questionnaire(@current_round)
     when
       "MetareviewResponseMap",

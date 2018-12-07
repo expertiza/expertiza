@@ -9,11 +9,8 @@ class VmQuestionResponseScoreCell
   end
 
   attr_reader :score_value
-
   attr_reader :comment
-
   attr_reader :color_code
-
   attr_reader :vm_prompts
- attr_reader :is_instructor_review
+  attr_reader :is_instructor_review
 end

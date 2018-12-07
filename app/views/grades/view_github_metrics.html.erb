@@ -63,23 +63,27 @@
     </ul>
   </li>
   <li>
-    <div>Check Statuses:</div>
-    <ul>
-      <% @check_statuses.each do |pull_number, check_status| %>
-        <li>
-          <div>Pull request: <%= pull_number %></div>
-          <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>
-          <div>Results:</div>
-          <ul>
-            <% check_status["statuses"].each do |status| %>
-              <li><strong><%= status["context"] %></strong>
-                <div>Check status: <span class=<%= status_classes[status["state"]] %>><%= status["state"] %></span></div>
-                <div>Check description: <%= status["description"] %></div>
-              </li>
-            <% end %>
-          </ul>
-        </li>
-      <% end %>
-    </ul>
+    <span>Check Statuses:</span>
+    <% if @check_statuses.empty? %>
+        <span>NA</span>
+    <% else %>
+      <ul>
+        <% @check_statuses.each do |pull_number, check_status| %>
+          <li>
+            <div>Pull request: <%= pull_number %></div>
+            <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>
+            <div>Results:</div>
+            <ul>
+              <% check_status["statuses"].each do |status| %>
+                <li><strong><%= status["context"] %></strong>
+                  <div>Check status: <span class=<%= status_classes[status["state"]] %>><%= status["state"] %></span></div>
+                  <div>Check description: <%= status["description"] %></div>
+                </li>
+              <% end %>
+            </ul>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
   </li>
 </ul>

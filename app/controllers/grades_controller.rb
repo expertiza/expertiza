@@ -212,6 +212,7 @@ class GradesController < ApplicationController
       return
     end
 
+    @headRefs = {}
     @parsed_data = {}
     @authors = []
     @dates = []
@@ -303,7 +304,6 @@ class GradesController < ApplicationController
   end
 
   def parse_github_data(github_data)
-    @headRefs = {}
     github_data = ActiveSupport::JSON.decode(github_data)
     @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
     @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]

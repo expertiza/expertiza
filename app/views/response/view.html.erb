@@ -43,3 +43,26 @@
 <a href="javascript:window.history.back()">Back</a>
 
 
+<script>
+  $(document).on("ready",function(e){
+    $("#sample_cbx").prop("checked",<%= !@response.visibility.nil? && @response.visibility > 0 %>);
+    $("#sample_cbx").on("change",function(e){
+      var _d = $(this);
+      var visibility = _d.is(":checked")?1:0;
+      var message = visibility?"Your review may now ":"Your review may no longer ";
+      message += "be available for other students to view. Are you sure?";
+      if(!confirm(message)){
+        _d.prop("checked",!visibility);
+      }else{
+        $.ajax({
+        "url":"/sample_reviews/mark_unmark/"+"<%= @response.id %>",
+        "type":"POST",
+        "data":{
+          "visibility":visibility
+        },
+        "dataType":"json"
+      });
+      }
+    });
+  });
+</script>

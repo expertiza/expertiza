@@ -1,11 +1,10 @@
-
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
     table_header = "<div class = 'reviewreport'>\
                     <table width='100% cellspacing='0' cellpadding='2' border='0' class='table table-striped'>\
                     <thead><tr bgcolor='#CCCCCC'>"
     # E1877: class sorter added to make the table sortable
-    # E1877: thead included iun the table structure
+    # E1877: thead included in the table structure
     headers.each do |header, percentage|
       table_header += if percentage
                         "<th class='sorter-true' width = #{percentage}>\

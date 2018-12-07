@@ -280,7 +280,7 @@
       var _d = $(this);
       var visibility = $("#sample_cbx").is(":checked")?1:0;
       $.ajax({
-        "url":"/sample_reviews/mark_unmark/"+location.search.split("=")[1],
+        "url":"/sample_reviews/mark_unmark/"+"<%= @response.id %>",
         "type":"POST",
         "data":{
           "visibility":visibility
@@ -288,6 +288,19 @@
         "dataType":"json"
       });
     });
+
+    $("#sample_cbx").prop("checked",<%= !@response.visibility.nil? && @response.visibility > 0 %>);
+    
+    $("#sample_cbx").on("change",function(e){
+      var _d = $(this);
+      var visibility = _d.is(":checked")?1:0;
+      var message = visibility?"Your review may now ":"Your review may no longer ";
+      message += "be available for other students to view. Are you sure?";
+      if(!confirm(message)){
+        _d.prop("checked",!visibility);
+      }
+    });
+    
 
   });
 </script>
@@ -352,12 +365,8 @@
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
-    <% if (@response.visibility == 0) %>
-        <input type="checkbox" id="sample_cbx" value="0">
-    <% else %>
-        <input type="checkbox" id="sample_cbx" value="1" checked="checked">
-    <% end %>
-    <label id="sample_cbx_lbl">I agree to make my review available as sample for others</label>
+    <input type="checkbox" id="sample_cbx"/>
+    <label id="sample_cbx_lbl" for="sample_cbx">I agree to make my review available as sample for others</label>
     <table width="100%">
       <% i = 0 %>
       <% @questions.each do |question| %>

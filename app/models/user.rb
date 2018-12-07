@@ -66,7 +66,7 @@ class User < ActiveRecord::Base
     self.recursively_parent_of(p)
   end
 
-  def get_user_list(search_name="", search_id="", search_fname="", search_email="")
+  def get_user_list(search_name = '', search_id = '', search_fname = '', search_email = '')
     user_list = []
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if self.role.super_admin?
@@ -87,15 +87,16 @@ class User < ActiveRecord::Base
     end
 
     reg_name = Regexp.new(search_name)
-    reg_id = Regexp.new(search_id)
+    # reg_id = Regexp.new(search_id)
     reg_fname = Regexp.new(search_fname)
     reg_email = Regexp.new(search_email)
 
-    s = user_list.select{|item| reg_name.match(item.name) \
-        and reg_fname.match(item.fullname) \
-        and reg_email.match(item.email)}
+    s = user_list.select do |item| reg_name.match(item.name) \
+      and reg_fname.match(item.fullname) \
+      and reg_email.match(item.email)
+    end
 
-    #and reg_id.match(item.id) \
+    # and reg_id.match(item.id)
     s.uniq
   end
 
@@ -299,7 +300,7 @@ class User < ActiveRecord::Base
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    #some change here
+    # some change here
     key_word = {'1' => 'name', '2' => 'fullname', '3' => 'email'}
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by

@@ -221,7 +221,6 @@ describe User do
         expect(user.get_user_list "abc", "", "", "abcbbe@gmail.com").to eq([user2])
       end
     end
-    
 
   end
 

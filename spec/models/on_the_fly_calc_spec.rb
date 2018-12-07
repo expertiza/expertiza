@@ -2,7 +2,7 @@ describe OnTheFlyCalc do
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
-  let(:response) {build(:response, id: 1, map_id: 1, scores: [answer]) }
+  let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:team) { build(:assignment_team) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
@@ -74,13 +74,13 @@ describe OnTheFlyCalc do
 
   describe '#compute_author_feedback_score' do
     before(:each) do
-      score = {min: 50.0, max: 50.0, avg: 50.0}
-      let(:reviewer) {build(:participant, id: 1)}
-      let(:feedback) {Answer.new(answer: 2, response_id: 1, comments: 'Feedback Text', question_id: 2)}
-      let(:feedback_question) {build(:question, questionnaire: questionnaire2, weight: 1, id: 2)}
+      #score = {min: 50.0, max: 50.0, avg: 50.0}
+      let(:reviewer) { build(:participant, id: 1) }
+      let(:feedback) { Answer.new(answer: 2, response_id: 1, comments: 'Feedback Text', question_id: 2) }
+      let(:feedback_question) { build(:question, questionnaire: questionnaire2, weight: 1, id: 2) }
       let(:questionnaire2) { build(:questionnaire, name: "feedback", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
-      let(:feedback_response) {build(:response, id: 2, map_id: 2, scores: [feedback])}
-      let(:feedback_response_map) {build(:response_map, id: 2, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1)}
+      let(:feedback_response) { build(:response, id: 2, map_id: 2, scores: [feedback]) }
+      let(:feedback_response_map) { build(:response_map, id: 2, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
     end
     context 'verifies feedback score' do
       it 'computes feedback score based on reviews' do

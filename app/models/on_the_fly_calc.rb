@@ -116,8 +116,8 @@ module OnTheFlyCalc
 
         # Divide the sum of the author feedback scores for this review by their number to get the
         # average.
-        if (reviewer != nil && reviewer[round] != nil && response_map != nil && response_map.reviewee_id != nil && reviewer[round][response_map.reviewee_id] != nil)
-          reviewer[round][response_map.reviewee_id] /= author_feedback_response_maps.count
+        if (reviewer != nil && response_map != nil && response_map.reviewee_id != nil && reviewer[response_map.reviewee_id] != nil)
+          reviewer[response_map.reviewee_id] /= author_feedback_response_maps.count
         end
         @author_feedback_scores[response_map.reviewer_id] = reviewer
       end

@@ -6,8 +6,10 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   def action_allowed?
-    if action_name == "edit" || action_name == "delete"
+    if action_name == "edit"
       edit_action_allowed?
+    elsif action_name == "delete"
+      delete_action_allowed?
     else
       ['Super-Administrator',
        'Administrator',
@@ -509,6 +511,16 @@ class QuestionnairesController < ApplicationController
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.nil? || @questionnaire.submission_record.nil?
       admin? || instructor_for_questionnaire?(@questionnaire)
+    else
+      questionnaire_by_user?(@questionnaire)
+    end
+  end
+
+  # determines if "delete" action is allowed
+  def delete_action_allowed?
+    @questionnaire = Questionnaire.find(params[:id])
+    if @questionnaire.nil? || @questionnaire.submission_record.nil?
+      true
     else
       questionnaire_by_user?(@questionnaire)
     end

@@ -262,6 +262,7 @@ describe QuestionnairesController do
         questionnaire1 = double('Questionnaire', name: 'test questionnaire',
                                                  assignments: [double('Assignment', name: 'test assignment')])
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
+        allow(questionnaire1).to receive(:submission_record).with(no_args).and_return(nil)
         params = {id: 1}
         get :delete, params
         expect(flash[:error]).to eq('The assignment <b>test assignment</b> uses this questionnaire. Are sure you want to delete the assignment?')
@@ -274,6 +275,7 @@ describe QuestionnairesController do
         questionnaire1 = double('Questionnaire', name: 'test questionnaire', assignments: [],
                                                  questions: [double('Question', answers: [double('Answer')])])
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
+        allow(questionnaire1).to receive(:submission_record).with(no_args).and_return(nil)
         params = {id: 1}
         get :delete, params
         expect(flash[:error]).to eq('There are responses based on this rubric, we suggest you do not delete it.')
@@ -293,6 +295,7 @@ describe QuestionnairesController do
         allow(question).to receive(:delete).and_return(true)
         allow(questionnaire_node).to receive(:delete).and_return(true)
         allow(questionnaire1).to receive(:delete).and_return(true)
+        allow(questionnaire1).to receive(:submission_record).with(no_args).and_return(nil)
         allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return(true)
         params = {id: 1}
         get :delete, params

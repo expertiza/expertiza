@@ -71,7 +71,7 @@ module OnTheFlyCalc
             # @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
             @respective_scores = {}
             @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
-            author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response, round)
+            author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response)
             @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
             # The score of the author feedback review
             calc_review_score 

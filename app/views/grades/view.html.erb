@@ -1,27 +1,183 @@
 <script>
-    function getPullRequestDetails(pullLinks) {
-        var pull_request_url = "";
-
+    function getQueryForSinglePullRequest(pull_request_url) {
+        var dataArray = pull_request_url.split('/');
+        var pullRequestNumber = dataArray.pop();
+        dataArray.pop();
+        var repositoryName = dataArray.pop();
+        var ownerName = dataArray.pop();
+        return `pull${pullRequestNumber}: repository(owner: "${ownerName}", name: "${repositoryName}") {
+                    pullRequest(number: ${pullRequestNumber}) {
+                      id
+                      number
+                      title
+                      commits(first:100) {
+                        edges {
+                          node {
+                            id
+                            commit{
+                              author{
+                                name
+                                email
+                                user {
+                                  name
+                                }
+                              }
+                              additions
+                              deletions
+                              committedDate
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }`;
     }
+
+    function getQueryForSingleRepo(repoURL) {
+        var dataArray = repoURL.split('/');
+        var repositoryName = dataArray[4];
+        var ownerName = dataArray[3];
+        // Check for Mozilla and Expertiza projects.
+        if(repositoryName === "expertiza" || repositoryName === "servo") return "";
+
+        return `${repositoryName.replace(/\W/g, '_')} :repository(owner: "${ownerName}", name: "${repositoryName}") {
+                defaultBranchRef{
+                    target{
+                      ... on Commit {
+                        history{
+                          totalCount
+                          nodes{
+                            author{
+                              name
+                              email
+                              user {
+                                name
+                              }
+                            }
+                            additions
+                            deletions
+                            committedDate
+                          }
+                        }
+                      }
+                    }
+                  }
+                }`;
+    }
+
+    function getAllQueries(links, mode) {
+        var queryFunction = mode === "PULL_REQUEST" ? getQueryForSinglePullRequest: getQueryForSingleRepo;
+        return links.reduce(function(accumulator, link){
+            accumulator += queryFunction($(link).attr("href"));
+            return accumulator;
+        }, "");
+    }
+
+    function getAccumulatorObject(accumulator, commit) {
+        var author = commit.author;
+        var authorName = author.name;
+        var accumulatorObject;
+        if (accumulator.hasOwnProperty(authorName)) {
+            accumulatorObject = {
+                additions: accumulator[authorName].additions + commit.additions,
+                deletions: accumulator[authorName].deletions + commit.deletions,
+                totalCommits: accumulator[authorName].totalCommits + 1,
+                email: author.email,
+                displayName: (author.user && author.user.name) || `${authorName}(${author.email})`
+            };
+        } else {
+            accumulatorObject = {
+                additions: commit.additions,
+                deletions: commit.deletions,
+                totalCommits: 1,
+                email: author.email,
+                displayName: (author.user && author.user.name) || `${authorName}(${author.email})`
+            }
+        }
+
+        return accumulatorObject;
+    }
+
+    function getPullRequestResults(response) {
+        var processedResults = [];
+        for(result in response.data) {
+            var edges = response.data[result].pullRequest.commits.edges;
+            if (!edges.length) {
+                continue;
+            }
+            processedResults.push(edges.reduce(function (accumulator, edge) {
+                var commit = edge.node.commit;
+                var authorName = commit.author.name;
+                accumulator[authorName] = getAccumulatorObject(accumulator, commit);
+                return accumulator;
+            }, {}));
+        }
+        return processedResults;
+    }
+
+    function getRepoResults(response) {
+        var processedResults = [];
+        for(result in response.data) {
+            var nodes = response.data[result].defaultBranchRef.target.history.nodes;
+            processedResults.push(nodes.reduce(function(accumulator, commit){
+                var authorName = commit.author.name;
+                accumulator[authorName] = getAccumulatorObject(accumulator, commit);
+                return accumulator;
+            }, {}));
+        }
+        return processedResults;
+    }
+
+    function getResultsForRender(response, mode) {
+        return mode === "PULL_REQUEST" ? getPullRequestResults(response) : getRepoResults(response);
+    }
+
+    function getRenderHTML(processedResults) {
+        return processedResults.reduce(function(accumulator, result, index) {
+            accumulator += "<table id='myTable" + index + "' class='table table-bordered tablesorter'>" +
+                "<caption>GitHub Metrics</caption>" +
+                "<colgroup><col><col class='c5'><col class='c1'><col class='c5'></colgroup>" +
+                "<thead><th>Student</th><th>Lines of Code added</th><th>Lines of code deleted</th><th>Total Commits</th></thead>" +
+                "<tbody>";
+            for (author in result) {
+                if (result.hasOwnProperty(author)) {
+                    var authorData = result[author];
+                    accumulator += `<tr><td>${authorData.displayName}</td><td>${authorData.additions}</td><td>${authorData.deletions}</td><td>${authorData.totalCommits}</td></tr>`
+                }
+            }
+            accumulator += "</tbody></table>";
+            return accumulator;
+        }, "");
+    }
+
     (function(){
         // Create a closure and invoke it immediately to store token.
-        var accessToken = '<%= session["github_access_token"] %>'
+        var accessToken = '<%= session["github_access_token"] %>';
+
         $(document).ready(function () {
             $("#tmr tr ul").on("click", "li.tmr_tab", function (e, s) {
-                pullLinks = $(e.delegateTarget).siblings(".tmr_tab_content").find("table.participants tr div#url a[href*='/pull/']");
+                var currentTab = $(e.delegateTarget).siblings(".tmr_tab_content");
+                currentTab.find("div.github").html("");
 
+                var links;
+                var mode = "";
+                var pullLinks = currentTab.find("table.participants tr div#url a[href*='/pull/']");
+
+                // If pull links were submitted, get query strings for all of them.
                 if(pullLinks.length) {
-                    pull_request_url = $(pullLinks[0]).attr("href")
+                    mode = "PULL_REQUEST";
+                    links = pullLinks;
+                } else {
+                    mode = "REPO";
+                    // If no Pull request links were submitted, check for GitHub links
+                    links = currentTab.find("table.participants tr div#url a[href^='https://github']");
                 }
-                if(!pull_request_url) {
-                    // Show that info in div
+
+                var queries = getAllQueries(links.toArray(), mode);
+
+                if(!queries) {
                     return;
                 }
-                var dataArray = pull_request_url.split('/');
-                var pullRequestNumber = dataArray.pop();
-                dataArray.pop();
-                var repositoryName = dataArray.pop();
-                var ownerName = dataArray.pop();
 
                 $.ajax({
                     type: "POST",
@@ -30,71 +186,17 @@
                         'Authorization': 'Bearer' + ' ' + accessToken
                     },
                     data: JSON.stringify({
-                        query: `query {
-                          repository(owner: ${ownerName}, name: ${repositoryName}) {
-                            pullRequest(number: ${pullRequestNumber}) {
-                              id
-                              number
-                              title
-                              commits(first:10) {
-                                edges {
-                                  node {
-                                    id
-                                    commit{
-                                      author{
-                                        name
-                                        email
-                                        user {
-                                          name
-                                        }
-                                      }
-                                      additions
-                                      deletions
-                                      committedDate
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }`
+                        query: `query {${queries}}`
                     }),
                     success: function (response) {
-                        if(!response.data.repository.pullRequest.commits.edges.length) {
-                            $(e.delegateTarget).siblings(".tmr_tab_content").find("div.github").html("");
-                            return;
+                        try {
+                            currentTab.find("div.github").html(getRenderHTML(getResultsForRender(response, mode)));
+                            currentTab.find("div.github table").each(function (index, element) {
+                                $(element).tablesorter().trigger("update")
+                            });
+                        } catch (e) {
+                          console.error(e);
                         }
-                        var userData = response.data.repository.pullRequest.commits.edges.reduce(function(accumulator, edge) {
-
-                            var commit  = edge.node.commit;
-                            var author = commit.author.name;
-                            if (accumulator.hasOwnProperty(author)){
-                                accumulator[author].additions += commit.additions;
-                                accumulator[author].deletions += commit.deletions;
-                                accumulator[author].totalCommits += 1;
-                            }
-                            else {
-                                accumulator[author] = {
-                                    additions: commit.additions,
-                                    deletions: commit.deletions,
-                                    totalCommits: 1,
-                                    email: commit.author.email
-                                }
-                            }
-                            return accumulator;
-                        }, {});
-                        var content = "<table id='myTable' class='table table-bordered tablesorter'><caption>GitHub Metrics</caption><colgroup><col><col class='c5'><col class='c1'><col class='c5'></colgroup><thead><th>Student</th><th>Lines of Code added</th><th>Lines of code deleted</th><th>Total Commits</th></thead><tbody>";
-                        for(var author in userData) {
-                            if (userData.hasOwnProperty(author)) {
-                                var authorData = userData[author];
-                                var name = (authorData.user && authorData.user.name) || `${author}(${authorData.email})`;
-                                content += `<tr><td>${name}</td><td>${authorData.additions}</td><td>${authorData.deletions}</td><td>${authorData.totalCommits}</td></tr>`
-                            }
-                        }
-                        content += "</tbody></table>"
-                        $(e.delegateTarget).siblings(".tmr_tab_content").find("div.github").html(content);
-                        $("#myTable").tablesorter().trigger("update");
-
                     },
                     error: function (httpObject, textStatus) {
                         switch(httpObject.status){
@@ -109,7 +211,7 @@
                                 break;
                             case 403:
                                 // Forbidden. Most likely excedded rate limit or wrong creds.
-                                $(e.delegateTarget).siblings(".tmr_tab_content").find("div.github").html("<p>GitHub rate limit exceeded.</p>");
+                                currentTab.find("div.github").html("<p>GitHub rate limit exceeded.</p>");
                         }
                     }
                 });
@@ -117,7 +219,7 @@
         });
     })();
 </script>
-<h1>Summary report for <%= @assignment.name %></h1>`
+<h1>Summary report for <%= @assignment.name %></h1>
 
 <BR/>
 <% if @scores[:teams] %>

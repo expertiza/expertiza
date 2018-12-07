@@ -108,15 +108,19 @@ module GradesHelper
   def display_github_metrics(parsed_data, authors, dates)
 
     dataArray = []
-    color = 255
+    color = ["red","yellow","blue","gray","green","magenta"]
+    i = 0
     authors.each do |author|
       dataobject = {}
       dataobject['label'] = author
       dataobject['data'] = parsed_data[author].values
-      dataobject['backgroundColor'] = "rgba("+ color.to_s + ",99,175,0.8)"
+      dataobject['backgroundColor'] = color[i]
       dataobject['borderWidth'] = 1
       dataArray.push(dataobject)
-      color = color - 90
+      i+=1
+      if i>5
+        i = 0
+      end
     end
 
     data = {
@@ -134,7 +138,6 @@ module GradesHelper
                         ticks: {
                             beginAtZero: true
                         },
-                        barThickness: 30
                     }],
             xAxes: [{
                         stacked: true,

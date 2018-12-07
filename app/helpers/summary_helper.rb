@@ -153,10 +153,9 @@ module SummaryHelper
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
 
-            if text.present?
-              includes_keywords |= comments.any? do |comment|
-                comment.include? text
-              end
+            next unless text.present?
+            includes_keywords |= comments.any? do |comment|
+              comment.include? text
             end
           end
           self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_questions_used)

@@ -1323,16 +1323,11 @@ jQuery(document).ready(function () {
     loadTableData: function (search) {
       jQuery.get("/tree_display/folder_node_ng_getter", (data) => {
         jQuery.post("/tree_display/children_node_ng",
-          {
-            reactParams: { child_nodes: data, nodeType: 'FolderNode', search }
-          }, (data2, status) => {
+          { reactParams: { child_nodes: data, nodeType: 'FolderNode', search } }, (data2) => {
             jQuery.each(data2, function (nodeType, outerNode) {
               jQuery.each(outerNode, function (i, node) {
-                var newParams = {
-                  key: node.name + "|" + node.directory,
-                  nodeType,
-                  child_nodes: node.nodeinfo
-                }
+                var key = `${node.name}|${node.directory}`;
+                var newParams = { key, nodeType, child_nodes: node.nodeinfo }
                 if (nodeType === 'Assignments') {
                   node["children"] = null;
                   node[newParams] = newParams;

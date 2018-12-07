@@ -1,3 +1,4 @@
+
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
     table_header = "<div class = 'reviewreport'>\

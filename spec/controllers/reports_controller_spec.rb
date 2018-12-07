@@ -34,7 +34,7 @@ describe ReportsController do
       get :response_report, params
       expect(response).to render_template(:response_report)
     end
-    end
+  end
 
   describe 'response_report' do
     before(:each) do

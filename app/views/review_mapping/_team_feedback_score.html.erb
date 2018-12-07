@@ -1,17 +1,11 @@
 <% if !@assignment.varying_rubrics_by_round? %>
-    <!--Score awarded / Avg. score-->
+    <!--Average author feedback score for this review-->
     <div>
-    <% if @author_feedback_scores[reviewer_id][team_id] != -1%>
+    <% if @author_feedback_scores[reviewer] && @author_feedback_scores[reviewer_id][team_id] && @author_feedback_scores[reviewer_id][team_id] != -1%>
         <%= @author_feedback_scores[reviewer_id][team_id].inspect %>%
     <% else %>
         --
     <% end %>
-    <!--/-->
-    <!--<%if @avg_and_ranges[team_id] && !@avg_and_ranges[team_id][:avg].nil? && @avg_and_ranges[team_id][:avg] != -1.0 %>-->
-        <%= @avg_and_ranges[team_id][:avg].round(0) %>%
-    <!--<%else%>-->
-        <!--&#45;&#45;-->
-    <!--<%end%>-->
     </div>
 <%else%>
     <!--Assignments have vary_rubric_by_rounds-->

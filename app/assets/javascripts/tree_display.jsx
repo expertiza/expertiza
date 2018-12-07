@@ -1364,7 +1364,6 @@ jQuery(document).ready(function () {
       jQuery.get("/tree_display/set_session_last_open_tab?tab=" + tabIndex.toString())
     },
     render: function () {
-      console.log('render state.search', this.state.search)
       return (
         <ReactSimpleTabs
           className="tab-system"

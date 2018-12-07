@@ -25,7 +25,6 @@ class TreeDisplayController < ApplicationController
 
   # direct access to review rubrics
   def goto_review_rubrics
-    puts "entered here--------------------------------"
     goto_controller('Review')
   end
 

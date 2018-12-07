@@ -18,7 +18,7 @@ class AssignmentNode < Node
   #   parent_id: course_id if subset
 
   # returns: list of AssignmentNodes based on query
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
     if show
       conditions = if User.find(user_id).role.name != "Teaching Assistant"
                      'assignments.instructor_id = ?'
@@ -41,18 +41,18 @@ class AssignmentNode < Node
 
     me = User.find(user_id)
 
-    name = _search[:name].to_s.strip
-    participant_name = _search[:participant_name].to_s.strip
-    participant_fullname = _search[:participant_fullname].to_s.strip
-    due_since = _search[:due_since].to_s.strip
-    due_until = _search[:due_until].to_s.strip
-    created_since = _search[:created_since].to_s.strip
-    created_until = _search[:created_until].to_s.strip
+    name = search[:name].to_s.strip
+    participant_name = search[:participant_name].to_s.strip
+    participant_fullname = search[:participant_fullname].to_s.strip
+    due_since = search[:due_since].to_s.strip
+    due_until = search[:due_until].to_s.strip
+    created_since = search[:created_since].to_s.strip
+    created_until = search[:created_until].to_s.strip
 
-    associations = { assignment: [:due_dates] }
+    associations = {assignment: [:due_dates]}
 
     if participant_name.present? || participant_fullname.present?
-      associations[:assignment] << { participants: :user }
+      associations[:assignment] << {participants: :user}
     end
 
     query = self.includes(associations).where(find_conditions)
@@ -83,22 +83,22 @@ class AssignmentNode < Node
 
     if participant_name.present?
       participant_names = User.where('name LIKE ?', "%#{participant_name}%")
-                              .select { |user| me.can_impersonate? user }
+                              .select {|user| me.can_impersonate? user}
                               .map(&:name)
       if participant_names.empty?
         return []
       end
-      query = query.where(users: { name: participant_names })
+      query = query.where(users: {name: participant_names})
     end
 
     if participant_fullname.present?
       participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
-                              .select { |user| me.can_impersonate? user }
+                              .select {|user| me.can_impersonate? user}
                               .map(&:name)
       if participant_names.empty?
         return []
       end
-      query = query.where(users: { name: participant_names })
+      query = query.where(users: {name: participant_names})
     end
 
     query.order("assignments.#{sortvar} #{sortorder}")

@@ -66,14 +66,14 @@ class StudentReviewController < ApplicationController
       @assignment = @participant.assignment
       # get the original topics that are under the assignment.
       topics = SignUpTopic.where(assignment_id: @assignment.id)
-      my_teams = TeamsUser.where(user_id: @participant.user_id)
+      my_teams = TeamsUser.where(user_id: @participant.user_id).map(&:team_id)
       assignment_teams = {}
       Team.where(parent_id: @assignment.id).each do |team|
         assignment_teams[team.id] = team.name
       end
       selections = {}
       topics.each do |topic|
-        teams = SignedUpTeam.where(topic_id: topic.id)
+        teams = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
         teams.each do |team|
           selections[team.team_id] = {topic_name: topic.topic_name}
         end

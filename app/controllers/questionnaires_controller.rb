@@ -5,12 +5,13 @@ class QuestionnairesController < ApplicationController
   # Generally a questionnaire is associated with an assignment (Assignment)
 
   before_action :authorize
-  
+
   def action_allowed?
     if action_name == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
-       'Administrator', 'Student'
+       'Administrator', 
+       'Student'
        ].include? current_role_name)  ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
 
@@ -19,7 +20,7 @@ class QuestionnairesController < ApplicationController
          'Administrator',
          'Instructor',
          'Teaching Assistant', 'Student'].include? current_role_name
-   end
+  end
  end
 
   # Create a clone of the given questionnaire, copying all associated
@@ -376,7 +377,7 @@ class QuestionnairesController < ApplicationController
   def create_supplementary_review_questionnaire
     @participant = AssignmentParticipant.find(params[:id])
     @team = Team.find(@participant.team.id)
-    #Add supplementary review questionnaire to Team table 
+    #Add supplementary review questionnaire to Team table
     if @team.supplementary_review_questionnaire_id.nil? then
       @questionnaire = Questionnaire.create(privete: false, name: "supplementary_review_questionnaire_" + @team.id.to_s, 
         instructor_id: @team_id, min_question_score: 0, max_question_score: 5, type: "Questionnaire", display_type: "Review", 
@@ -386,7 +387,7 @@ class QuestionnairesController < ApplicationController
         @team.save
         flash[:success] = 'You have successfully created a rubric!'
       else 
-       flash[:error] = $ERROR_INFO
+        flash[:error] = $ERROR_INFO
       end
     else
       @questionnaire = Questionnaire.find(@team.supplementary_review_questionnaire_id)
@@ -592,5 +593,4 @@ class QuestionnairesController < ApplicationController
       Ta.get_my_instructor(session[:user].id)
     end
   end
-
 end

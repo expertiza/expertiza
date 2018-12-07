@@ -18,7 +18,7 @@ class AssignmentNode < Node
   #   parent_id: course_id if subset
 
   # returns: list of AssignmentNodes based on query
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = {})
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
     if show
       conditions = if User.find(user_id).role.name != "Teaching Assistant"
                      'assignments.instructor_id = ?'
@@ -38,7 +38,6 @@ class AssignmentNode < Node
     sortvar ||= 'created_at'
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
-
 
     me = User.find(user_id)
 
@@ -84,8 +83,8 @@ class AssignmentNode < Node
 
     if participant_name.present?
       participant_names = User.where('name LIKE ?', "%#{participant_name}%")
-        .select { |user| me.can_impersonate? user }
-        .map(&:name)
+                              .select { |user| me.can_impersonate? user }
+                              .map(&:name)
       if participant_names.empty?
         return []
       end
@@ -94,8 +93,8 @@ class AssignmentNode < Node
 
     if participant_fullname.present?
       participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
-        .select { |user| me.can_impersonate? user }
-        .map(&:name)
+                              .select { |user| me.can_impersonate? user }
+                              .map(&:name)
       if participant_names.empty?
         return []
       end

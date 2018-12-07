@@ -625,7 +625,7 @@ DEPENDENCIES
   launchy
   lingua
   mutant-rspec
-  mysql2 (~> 0.4.10)
+  mysql2 (= 0.4.10)
   nokogiri
   omniauth-google-oauth2
   open-uri-cached
@@ -671,4 +671,4 @@ DEPENDENCIES
   zip-zip
 
 BUNDLED WITH
-   1.16.6
+   1.17.1

@@ -505,7 +505,7 @@ describe ReviewMappingController do
     context 'when type is SummaryByRevieweeAndCriteria' do
       it 'renders response_report page with corresponding data' do
         allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
-          .with(no_args).with(assignment, 'expertiza.ncsu.edu')
+          .with(no_args).with(assignment, 'expertiza.ncsu.edu').with(assignment, 'expertiza.ncsu.edu', {})
           .and_return(double('Summary', summary: 'awesome!', reviewers: [participant, participant1],
                                         avg_scores_by_reviewee: 95, avg_scores_by_round: 92, avg_scores_by_criterion: 94))
         params = {

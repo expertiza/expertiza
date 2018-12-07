@@ -30,3 +30,11 @@ th.sorter-true.tablesorter-headerUnSorted{
   padding-right: 15px;
 
 }
+
+tbody tr.odd td {
+  background-color:#DDDDBB;
+}
+
+tbody tr.even td {
+  background-color:#FFFFFF;
+}

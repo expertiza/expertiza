@@ -2,7 +2,9 @@
 
 <%= form_for @course do %>
   <%= render :partial => 'course' %>
-  <%= submit_tag "Update" %>
+    <p><%= check_box_tag('course[private]', 'true',  @course.private?) %>
+    <%= label_tag('toggle_access_setting', 'Private course') %></p>
+    <%= submit_tag "Update" %>
 <% end %>
 
 <br/>

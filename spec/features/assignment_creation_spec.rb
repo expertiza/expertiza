@@ -240,7 +240,6 @@ describe "assignment function" do
       find_link('Due date').click
       expect(page).to have_content("Deadline type")
     end
-    
     it "set the deadline for an assignment review" do
       login_as("instructor6")
       visit '/assignments/new?private=0'
@@ -260,14 +259,14 @@ describe "assignment function" do
       submission_due_date = DueDate.find(1)
       review_due_date = DueDate.find(2)
       expect(submission_due_date).to have_attributes(
-                                         deadline_type_id: submission_type_id,
-                                         type: 'AssignmentDueDate'
-                                     )
+        deadline_type_id: submission_type_id,
+        type: 'AssignmentDueDate'
+      )
 
       expect(review_due_date).to have_attributes(
-                                     deadline_type_id: review_type_id,
-                                     type: 'AssignmentDueDate'
-                                 )
+        deadline_type_id: review_type_id,
+        type: 'AssignmentDueDate'
+      )
     end
 
     it "is able show tab rubrics" do
@@ -307,10 +306,10 @@ describe "assignment function" do
       click_button 'Create'
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                review_assignment_strategy: 'Auto-Selected',
-                                review_topic_threshold: 3,
-                                max_reviews_per_submission: 10
-                            )
+        review_assignment_strategy: 'Auto-Selected',
+        review_topic_threshold: 3,
+        max_reviews_per_submission: 10
+      )
     end
   end
   
@@ -324,10 +323,9 @@ describe "assignment function" do
     end
     # instructor can set deadline for review and taking quiz
     it "set the deadline for an assignment review" do
-     sleep 3 
-     fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
+      sleep 3
+      fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
       page.find("#set_rounds").click
-     
       fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
       fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
       click_button 'submit_btn'

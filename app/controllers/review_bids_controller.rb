@@ -16,7 +16,6 @@ class ReviewBidsController < LotteryController
       assign_size: assignment.num_reviews_required,
     }
     url = WEBSERVICE_CONFIG["review_bidding_webservice_url"]
-    url = 'http://127.0.0.1:5000/assign_reviews'
     begin
       response = RestClient.post url, data.to_json, content_type: :json, accept: :json
       bid_result = JSON.parse(response)["info"]

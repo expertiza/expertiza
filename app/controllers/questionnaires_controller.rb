@@ -10,18 +10,17 @@ class QuestionnairesController < ApplicationController
     if action_name == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
-       'Administrator', 
-       'Student'
-       ].include? current_role_name)  ||
-          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
+       'Administrator',
+       'Student'].include? current_role_name)  ||
+      ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
 
     else
-        ['Super-Administrator',
-         'Administrator',
-         'Instructor',
-         'Teaching Assistant', 'Student'].include? current_role_name
+      ['Super-Administrator',
+      'Administrator',
+      'Instructor',
+      'Teaching Assistant', 'Student'].include? current_role_name
+    end
   end
- end
 
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
@@ -377,16 +376,15 @@ class QuestionnairesController < ApplicationController
   def create_supplementary_review_questionnaire
     @participant = AssignmentParticipant.find(params[:id])
     @team = Team.find(@participant.team.id)
-    #Add supplementary review questionnaire to Team table
-    if @team.supplementary_review_questionnaire_id.nil? then
-      @questionnaire = Questionnaire.create(privete: false, name: "supplementary_review_questionnaire_" + @team.id.to_s, 
-        instructor_id: @team_id, min_question_score: 0, max_question_score: 5, type: "Questionnaire", display_type: "Review", 
+    if @team.supplementary_review_questionnaire_id.nil?
+      @questionnaire = Questionnaire.create(privete: false, name: "supplementary_review_questionnaire_" + @team.id.to_s,
+        instructor_id: @team_id, min_question_score: 0, max_question_score: 5, type: "Questionnaire", display_type: "Review"
         instruction_loc: Questionnaire::DEFAULT_QUESTIONNAIRE_URL)
       if @questionnaire.save
         @team.supplementary_review_questionnaire_id = @questionnaire.id
         @team.save
         flash[:success] = 'You have successfully created a rubric!'
-      else 
+      else
         flash[:error] = $ERROR_INFO
       end
     else
@@ -468,8 +466,7 @@ class QuestionnairesController < ApplicationController
           # Update existing question.
           question = Question.find(question_key)
           Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-          end
-
+        end
       end
     end
   end
@@ -594,3 +591,4 @@ class QuestionnairesController < ApplicationController
     end
   end
 end
+  

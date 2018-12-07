@@ -238,20 +238,20 @@ jQuery(document).ready(function () {
               </span>
                         )
 
+                        if (this.props.has_topic) {
+                            moreContent.push(
+                                <a title="Intelligent Review"
+                                   href={"/review_bid/run_intelligent_assignment/" + (parseInt(this.props.id) / 2).toString()}>
+                                    <img src="/assets/tree_view/run-review-lottery.png"/>
+                                </a>
+                            )
+                        }
+
                         if (this.props.is_intelligent) {
                             moreContent.push(
                                 <a title="Intelligent Assignment"
                                    href={"/lottery/run_intelligent_assignment/" + (parseInt(this.props.id) / 2).toString()}>
                                     <img src="/assets/tree_view/run-lottery.png"/>
-                                </a>
-                            )
-                        }
-
-                        if (this.props.bidding_review) {
-                            moreContent.push(
-                                <a title="Intelligent Review"
-                                   href={"/review_bid/run_intelligent_assignment/" + (parseInt(this.props.id) / 2).toString()}>
-                                    <img src="/assets/tree_view/run-review-lottery.png"/>
                                 </a>
                             )
                         }

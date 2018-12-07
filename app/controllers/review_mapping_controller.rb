@@ -387,8 +387,6 @@ class ReviewMappingController < ApplicationController
       @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
       @review_scores = @assignment.compute_reviews_hash
       @author_feedback_scores = @assignment.compute_author_feedback_scores
-      # puts "review score is #{@review_scores}"
-      # puts "author feedback response is #{@author_feedback_scores}"
       @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
     when "FeedbackResponseMap"
       # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model

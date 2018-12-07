@@ -58,7 +58,6 @@ module OnTheFlyCalc
       rounds = self.rounds_of_reviews
       (1..rounds).each do |round|
         @response_maps.each do |response_map|
-
           # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
           reviewer = @author_feedback_scores[response_map.reviewer_id] if !@author_feedback_scores[response_map.reviewer_id].nil?
           response = Response.where('map_id = ?', response_map.id)
@@ -66,48 +65,35 @@ module OnTheFlyCalc
           next if response.empty?
           # The author feedback response maps for the teammates reviewing the reviewer.
           author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, "FeedbackResponseMap")
-        
-          author_feedback_response_maps.each do |author_feedback_response_map| 
+          author_feedback_response_maps.each do |author_feedback_response_map|
             @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
             next if @corresponding_response.empty?
-            puts "Corresponding response #{@corresponding_response.inspect}"
             # @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
             @respective_scores = {}
             @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
-
             author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response, round)
             @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
-            puts "Question are #{@questions.inspect}"
             # The score of the author feedback review
             calc_review_score 
             # Compute the sum of the author feedbacks for this review. 
             @respective_scores[response_map.reviewee_id] = 0 if @respective_scores[response_map.reviewee_id].nil?
             @respective_scores[response_map.reviewee_id] += @this_review_score
-            puts "Respective #{@respective_scores.inspect}"
-            puts "review score = #{@this_review_score}"
             reviewer = {} if reviewer.nil?
             reviewer[round] = {} if reviewer[round].nil?
             reviewer[round] = @respective_scores
           end 
-
           # Divide the sum of the author feedback scores for this review by their number to get the
           # average.
-
           if (reviewer != nil && reviewer[round] != nil && response_map != nil && response_map.reviewee_id != nil && reviewer[round][response_map.reviewee_id] != nil)
-	    reviewer[round][response_map.reviewee_id] /= author_feedback_response_maps.count
-	  end
-
+	          reviewer[round][response_map.reviewee_id] /= author_feedback_response_maps.count
+          end
           @author_feedback_scores[response_map.reviewer_id] = reviewer
         end
-
-
       end
-
     else
       # Rubrics are not varying.
       author_feeback_questionnaire_id = feedback_questionnaire_id()
       @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
-      puts "Question for rubrics not varying #{@questions.inspect}"
       @response_maps.each do |response_map|
         # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
         reviewer = @author_feedback_scores[response_map.reviewer_id] if !@author_feedback_scores[response_map.reviewer_id].nil?
@@ -120,7 +106,6 @@ module OnTheFlyCalc
         
           @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
           next if @corresponding_response.empty?
-          puts "Corresponding response #{@corresponding_response.inspect}"
           @respective_scores = {}
           @respective_scores = reviewer unless reviewer.nil?
           calc_review_score
@@ -131,7 +116,7 @@ module OnTheFlyCalc
 
         # Divide the sum of the author feedback scores for this review by their number to get the
         # average.
-        if !author_feedback_response_maps.empty?
+        if (reviewer != nil && reviewer[round] != nil && response_map != nil && response_map.reviewee_id != nil && reviewer[round][response_map.reviewee_id] != nil)
           reviewer[round][response_map.reviewee_id] /= author_feedback_response_maps.count
         end
         @author_feedback_scores[response_map.reviewer_id] = reviewer

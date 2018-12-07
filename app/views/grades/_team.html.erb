@@ -1,4 +1,5 @@
 <tr id="<%= prefix %>_header" style="background-color: white">
+  <!--E1877: table structure modified-->
   <td WIDTH="9" style="max-width:30px;">
     <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%= image_tag("expand.png") %></a>
     <%= render :partial => 'tabbing', :locals => {:prefix => prefix, :tscore => tscore} %>

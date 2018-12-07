@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181027001119) do
+ActiveRecord::Schema.define(version: 20180926160031) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -721,8 +721,8 @@ ActiveRecord::Schema.define(version: 20181027001119) do
     t.datetime "updated_at",                null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -754,10 +754,10 @@ ActiveRecord::Schema.define(version: 20181027001119) do
     t.boolean "is_new_user",                             default: true,  null: false
     t.integer "master_permission_granted", limit: 1,     default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 65535
+    t.text    "digital_certificate",       limit: 16777215
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 65535
+    t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                          default: false
     t.integer "institution_id",            limit: 4
   end
@@ -816,6 +816,4 @@ ActiveRecord::Schema.define(version: 20181027001119) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

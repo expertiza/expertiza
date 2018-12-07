@@ -1,4 +1,3 @@
-<!-- modified by E1877-->
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
 <% if @scores[:teams] %>
@@ -7,6 +6,7 @@
 <% end %>
 <!-- If there are 1-member teams, the Teammate Review column should not appear in the score report.
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
+
 <!-- E1877: charts implemented before table-->
 <% if !@avg_of_avg.nan? %>
   <%= render :partial => 'team_charts', :locals => {:prefix => nil} %>
@@ -51,21 +51,24 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
             },
             headers: {
                 2: {
-                    sorter: 'averageParser' //E1877: custom Parser to parse Metrics data for the custom parser
+                    //E1877: custom Parser to parse Metrics data for the custom parser
+                    sorter: 'averageParser'
                 }
             }
         });
     });
 
-
+    //E1877: customParser for sorting by average
     $.tablesorter.addParser({
-        id: "averageParser",                                       //E1877: customParser for sorting by average
+        id: "averageParser",
         is: function (stringValue) {
             return false;
         },
         format: function (stringValue) {
-            var stringNumericPart = stringValue.split("%");         //E1877: split the data by %
-            var numericValue = parseFloat(stringNumericPart[0], 10);   //E1877: extract the numeric data
+            //E1877: split the data by %
+            var stringNumericPart = stringValue.split("%");
+            //E1877: extract the numeric data
+            var numericValue = parseFloat(stringNumericPart[0], 10);
             return numericValue;
         },
         type: 'numeric'

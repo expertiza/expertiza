@@ -345,7 +345,9 @@ class AssignmentForm
         questionnaire_id: aq.questionnaire_id,
         user_id: user.id,
         notification_limit: aq.notification_limit,
-        questionnaire_weight: aq.questionnaire_weight
+        questionnaire_weight: aq.questionnaire_weight,
+        used_in_round: aq.used_in_round,
+        dropdown: aq.dropdown
       )
     end
   end

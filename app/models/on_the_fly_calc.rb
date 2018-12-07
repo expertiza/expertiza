@@ -77,8 +77,8 @@ def calc_avg_feedback_score(response)
   # Retrieve the author feedback response maps for the teammates reviewing the review of their work.
   author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
   author_feedback_response_maps.each do |author_feedback_response_map|
-    @author_feedback_response = Response.where('map_id = ?', author_feedback_response_map.id)
-    next if @author_feedback_response.empty?
+    @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
+    next if @corresponding_response.empty?
     calc_feedback_scores_sum
   end 
   # Divide the sum of the author feedback scores for this review by their number to get the
@@ -99,7 +99,7 @@ def calc_feedback_scores_sum
   if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@round].nil?
     @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@round]     
   end 
-  author_feedback_questionnaire_id = feedback_questionnaire_id(@author_feedback_response)
+  author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response)
   @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
   # Calculate the score of the author feedback review.
   calc_review_score 
@@ -114,7 +114,7 @@ end
 
 def calc_review_score
   if !@corresponding_response.empty?
-    @this_review_score_raw = Answer.get_total_score(response: @author_feedback_response, questions: @questions)
+    @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
     if @this_review_score_raw
       @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
     end

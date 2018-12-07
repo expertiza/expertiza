@@ -13,7 +13,7 @@ class ReviewBidsController < LotteryController
     data = {
       users: participant_ranks, 
       item_size: assignment.max_reviews_per_submission,
-      assign_size: assignment.num_reviews_required,
+      user_size: assignment.num_reviews_required,
     }
     url = WEBSERVICE_CONFIG["review_bidding_webservice_url"]
     begin
@@ -48,6 +48,8 @@ class ReviewBidsController < LotteryController
   	  	participant_count[participant_bid["pid"]] += 1
   	  end
   	end
+  	# if after the bidding, there are some participants who do not have enough available reviews
+  	# assign them with some random teams
   	participants.each do |participant|
   	  while participant_count[participant.id] < assignment.num_reviews_required
   	  	team = teams[rand(teams.count)]

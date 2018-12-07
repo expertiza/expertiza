@@ -105,7 +105,7 @@ class TreeDisplayController < ApplicationController
       "course_id" => node.get_course_id,
       "max_team_size" => node.get_max_team_size,
       "is_intelligent" => node.get_is_intelligent,
-      "bidding_review" => node.get_is_bidding_review,
+      "bidding_review" => node.bidding_review?,
       "require_quiz" => node.get_require_quiz,
       "allow_suggestions" => node.get_allow_suggestions,
       "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false

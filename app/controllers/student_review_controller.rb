@@ -77,7 +77,7 @@ class StudentReviewController < ApplicationController
       topics.each do |topic|
         teams = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
         teams.each do |team|
-          selections[team.team_id] = {topic_name: topic.topic_name}
+          selections[team.team_id] = {topic_name: topic.topic_name, topic_identifier: topic.topic_identifier}
       end
     end
     # If the participant hasn't change the bidding order yet.

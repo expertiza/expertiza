@@ -247,7 +247,7 @@ jQuery(document).ready(function () {
                             )
                         }
 
-                        if (true) {
+                        if (this.props.bidding_review) {
                             moreContent.push(
                                 <a title="Intelligent Review"
                                    href={"/review_bid/run_intelligent_assignment/" + (parseInt(this.props.id) / 2).toString()}>

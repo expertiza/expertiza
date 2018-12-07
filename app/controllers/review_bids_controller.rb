@@ -25,6 +25,8 @@ class ReviewBidsController < LotteryController
       flash[:error] = err.message
     end
     #render :json => response_mappings.to_json
+		assignment.review_assignment_strategy = RS_AUTO_SELECTED
+		flash[:success] = 'The intelligent review assignment was successfully completed for ' + assignment.name + '.'
     redirect_to controller: 'tree_display', action: 'list'
   end
   # 

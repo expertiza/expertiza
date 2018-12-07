@@ -961,22 +961,6 @@ jQuery(document).ready(function () {
   })
 
   var QuestionnairesAdvancedSearchBar = React.createClass({
-    componentDidMount() {
-      $('.datepick').each(function () {
-        $(this).datetimepicker({
-          dateFormat: 'yy/mm/dd',
-          timeFormat: 'HH:mm:ss z',
-          controlType: 'select',
-          timezoneList: [
-            { value: -000, label: 'GMT' },
-            { value: -300, label: 'Eastern' },
-            { value: -360, label: 'Central' },
-            { value: -420, label: 'Mountain' },
-            { value: -480, label: 'Pacific' }
-          ]
-        });
-      });
-    },
     getInputValues: function () {
       return {
         question_text: this.refs.question_text.getDOMNode().value,

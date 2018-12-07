@@ -55,7 +55,7 @@ class AssignmentNode < Node
 
     query = self.includes(associations).where(find_conditions)
 
-    query = query.where('name LIKE ?', "%#{name}%") if name.present?
+    query = query.where('assignments.name LIKE ?', "%#{name}%") if name.present?
 
     if due_since.present?
       due_since = due_since.to_time.utc.change(hour: 0, min: 0)

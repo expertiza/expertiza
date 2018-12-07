@@ -153,7 +153,7 @@ module SummaryHelper
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
 
-            next unless text.present?
+            next if text.blank?
             includes_keywords |= comments.any? do |comment|
               comment.include? text
             end

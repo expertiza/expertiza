@@ -10,7 +10,8 @@ class QuestionnairesController < ApplicationController
     if action_name == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
-       'Administrator', 'Student'
+       'Administrator', 
+       'Student'
        ].include? current_role_name)  ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
 
@@ -386,7 +387,7 @@ class QuestionnairesController < ApplicationController
         @team.save
         flash[:success] = 'You have successfully created a rubric!'
       else 
-       flash[:error] = $ERROR_INFO
+        flash[:error] = $ERROR_INFO
       end
     else
       @questionnaire = Questionnaire.find(@team.supplementary_review_questionnaire_id)

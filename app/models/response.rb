@@ -234,6 +234,7 @@ class Response < ActiveRecord::Base
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
     code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
+    team_id = 
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score

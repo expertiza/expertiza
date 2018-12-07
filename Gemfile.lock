@@ -124,6 +124,8 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (~> 1.2)
       xpath (~> 3.2)
+    chartjs-ror (3.6.2)
+      rails (>= 3.1)
     childprocess (0.9.0)
       ffi (~> 1.0, >= 1.0.11)
     claide (1.0.2)
@@ -315,7 +317,7 @@ GEM
     mutant-rspec (0.8.22)
       mutant (~> 0.8.22)
       rspec-core (>= 3.4.0, < 4.0.0)
-    mysql2 (0.3.21)
+    mysql2 (0.4.10)
     nap (1.1.0)
     nenv (0.3.0)
     net-scp (1.2.1)
@@ -592,6 +594,7 @@ DEPENDENCIES
   capistrano-rails
   capistrano-rvm
   capybara
+  chartjs-ror
   coffee-rails
   coveralls
   daemons
@@ -622,7 +625,7 @@ DEPENDENCIES
   launchy
   lingua
   mutant-rspec
-  mysql2 (~> 0.3.18)
+  mysql2 (= 0.4.10)
   nokogiri
   omniauth-google-oauth2
   open-uri-cached
@@ -668,4 +671,4 @@ DEPENDENCIES
   zip-zip
 
 BUNDLED WITH
-   1.16.6
+   1.17.1

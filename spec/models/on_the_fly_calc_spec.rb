@@ -2,15 +2,11 @@ describe OnTheFlyCalc do
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
-
   let(:response) {build(:response, id: 1, map_id: 1, scores: [answer]) }
-
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
-
   let(:team) { build(:assignment_team) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
-
   let(:contributor) { build(:assignment_team, id: 1) }
 
   describe '#compute_total_score' do
@@ -85,14 +81,15 @@ describe OnTheFlyCalc do
       let(:questionnaire2) { build(:questionnaire, name: "feedback", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
       let(:feedback_response) {build(:response, id: 2, map_id: 2, scores: [feedback])}
       let(:feedback_response_map) {build(:response_map, id: 2, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1)}
-      #allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(true)
-      allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
-      allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
-      expect(on_the_fly_calc.calc_avg_feedback_score).to eq(:calc_feedback_scores_sum).and_return(1)
-      expect(on_the_fly_calc.calc_feedback_scores_sum).to eq(:calc_avg_feedback_score).and_return(1)
-      expect(on_the_fly_calc.compute_author_feedback_scores).to eq(:compute_author_feedback_scores).and_return(1)
-
-
+    end
+    context 'verifies feedback score' do
+      it 'computes feedback score based on reviews' do
+        allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
+        allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
+        expect(on_the_fly_calc.calc_avg_feedback_score).to eq(:calc_feedback_scores_sum).and_return(1)
+        expect(on_the_fly_calc.calc_feedback_scores_sum).to eq(:calc_avg_feedback_score).and_return(1)
+        expect(on_the_fly_calc.compute_author_feedback_scores).to eq(:compute_author_feedback_scores).and_return(1)
       end
     end
   end
+end

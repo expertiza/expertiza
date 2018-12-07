@@ -20,6 +20,7 @@
         }
     }
 </script>
+<% status_classes = {"failure" => "failed", "success" => "passed"} %>
 <h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>
 <h4>Team: <%= @team.name %></h4>
 
@@ -40,24 +41,45 @@
 </div><br><br>
 
 
-<br>
+<h3>Code frequency</h3>
 <div class="chart-container" style="width: 1000px; height:600px;">
   <%= display_github_metrics(@parsed_data, @authors, @dates) %>
 </div>
 <br>
 
 <br>
-<h3 style="font-weight:bold;display:inline-block;">Team Statistics</h3><br/>
-
-Total number of commits:<%= @total_commits %>
-<br>
-Total number of lines added: <%= @total_additions %>
-<br>
-Total number of lines removed: <%= @total_deletions %>
-<br>
-Total number of files changed: <%= @total_files_changed %>
-<br>
-Merge status:<br>
-<% @merge_status.each do |k, v| %>
-  Pull Request Number <%= k %> has status: <%= v %> <br>
-<% end %>
+<h3>Team Statistics</h3>
+<ul>
+  <li>Total number of commits:<%= @total_commits %></li>
+  <li>Total number of lines added: <%= @total_additions %></li>
+  <li>Total number of lines removed: <%= @total_deletions %></li>
+  <li>Total number of files changed: <%= @total_files_changed %></li>
+  <li>
+    <div>Merge statuses:</div>
+    <ul>
+      <% @merge_status.each do |k, v| %>
+        <li>Pull Request Number <%= k %> has status: <%= v %> </li>
+      <% end %>
+    </ul>
+  </li>
+  <li>
+    <div>Check Statuses:</div>
+    <ul>
+      <% @check_statuses.each do |pull_number, check_status| %>
+        <li>
+          <div>Pull request: <%= pull_number %></div>
+          <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>
+          <div>Results:</div>
+          <ul>
+            <% check_status["statuses"].each do |status| %>
+              <li><strong><%= status["context"] %></strong>
+                <div>Check status: <span class=<%= status_classes[status["state"]] %>><%= status["state"] %></span></div>
+                <div>Check description: <%= status["description"] %></div>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+    </ul>
+  </li>
+</ul>

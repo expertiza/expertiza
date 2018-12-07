@@ -199,6 +199,11 @@ class GradesController < ApplicationController
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
   end
 
+  def get_statuses_for_pull_request(ref)
+    url = "https://api.github.com/repos/expertiza/expertiza/commits/" + ref + "/status"
+    ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
+  end
+
   def view_github_metrics
     if session["github_access_token"].nil?
       session["participant_id"] = params[:id]
@@ -215,6 +220,7 @@ class GradesController < ApplicationController
     @total_commits = 0
     @total_files_changed = 0
     @merge_status = {}
+    @check_statuses = {}
 
     @token = session["github_access_token"]
 
@@ -222,7 +228,6 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-
     submission_hyperlink = nil
     @participant.team.hyperlinks.each do |hyperlink|
       if hyperlink.match(/pull/)
@@ -234,12 +239,14 @@ class GradesController < ApplicationController
         submission_hyperlink_tokens.pop
         hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
         hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-        github_data = get_github_data(hyperlink_data)
+        github_data = get_pull_request_details(hyperlink_data)
         @authors_temp, @dates_temp = parse_github_data(github_data)
         @authors = (@authors_temp + @authors).uniq
         @dates   = (@dates_temp + @dates).uniq
-
       end
+    end
+    @headRefs.each do |pull_number, ref|
+      @check_statuses[pull_number] = get_statuses_for_pull_request(ref)
     end
   end
 
@@ -247,8 +254,7 @@ class GradesController < ApplicationController
     redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
   end
 
-  def get_github_data(hyperlink_data)
-    header = {'Authorization': 'Bearer' + ' ' + session["github_access_token"]}
+  def get_pull_request_details(hyperlink_data)
     data = {
         query: "query {
                           repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
@@ -259,6 +265,7 @@ class GradesController < ApplicationController
                               changedFiles
                               mergeable
                               merged
+                              headRefOid
                               commits(first:200){
                                 totalCount
                                 edges{
@@ -283,7 +290,6 @@ class GradesController < ApplicationController
     url = "https://api.github.com/graphql"
     uri = URI.parse(url)
 
-    response = Net::HTTP.new(uri.host, uri.port)
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -297,13 +303,14 @@ class GradesController < ApplicationController
   end
 
   def parse_github_data(github_data)
+    @headRefs = {}
     github_data = ActiveSupport::JSON.decode(github_data)
     @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
     @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
     @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
     @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
-
+    @headRefs[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["headRefOid"]
     if github_data["data"]["repository"]["pullRequest"]["merged"]
       @merge_status[pull_request_number] = "MERGED"
     else
@@ -350,10 +357,8 @@ class GradesController < ApplicationController
     @parsed_data.each {|k1, v1| @parsed_data[k1] = Hash[v1.sort_by {|k, v| k}]}
     authors = authors.keys
     dates = dates.keys
-    return authors,dates
+    return authors, dates
   end
-
-
 
   private
 

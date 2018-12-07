@@ -418,9 +418,10 @@ class Assignment < ActiveRecord::Base
     end
     review_questionnaire_id
   end
+
   def feedback_questionnaire_id(feedback_response)
-    feedbackAnswer = Answer.where(response_id: feedback_response.first.id)
-    question = Question.find(feedbackAnswer.first.question_id)
+    feedback_answer = Answer.where(response_id: feedback_response.first.id)
+    question = Question.find(feedback_answer.first.question_id)
     question.questionnaire_id
   end
 

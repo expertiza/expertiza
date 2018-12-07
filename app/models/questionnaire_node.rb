@@ -33,31 +33,47 @@ class QuestionnaireNode < Node
       conditions += " and questionnaires.type = \"#{name}\""
     end
 
-    # name = _search[:name].to_s.strip
-    # course = _search[:course].to_s.strip
-    # assignment = _search[:assignment].to_s.strip
-    # creation_date=_search[:creation_date].to_s.strip
-    # updation_date=_search[:updation_date].to_s.strip
+    name = _search[:name].to_s.strip
+    course_name = _search[:course].to_s.strip
+    assignment = _search[:assignment].to_s.strip
+    question_text=_search[:question_text].to_s.strip
 
-    course_name = 'BIT 115 2011 Spring'
-    course = Course.where('name LIKE ?', "%#{course_name}%").first
-    if course.present?
+
+    if course_name.present?
+      course = Course.where('name LIKE ?', "%#{course_name}%").first
       instructor_id = course.instructor_id
       conditions+=" and questionnaires.instructor_id = \"#{instructor_id}\""
+      end
     end
 
-    name="BIT 115 Peer"
-    conditions+=" and questionnaires.name LIKE \"%#{name}%\""
+    if name.present?
+      conditions+=" and questionnaires.name LIKE \"%#{name}%\""
+
+    if question_text.present?
+      matching_questionnaires=Question.where('txt LIKE ?',"%#{question_text}%")
+      ids=matching_questionnaires.map{|r| r.questionnaire_id}
+      conditions+=" and questionnaires.id in (#{ids.join(',')})"
+      puts conditions
+    end
+
+
+
+
+
 
     #
     # puts "----------------------------------"
     # assignment_name="BIT 115 First"
     # matching_assignments = Assignment.where('name LIKE ?', "%#{assignment_name}%")
     # puts "matching assignmnets are "+matching_assignments.to_s
-    # matching_questionnaire = AssignmentQuestionnaire.where("assignment_id in ?",matching_assignments.ids)
-    # puts "matching questionnaires are "+matching_questionnaire.to_s
-    # puts matching_questionnaire.attribute_names
-    # conditions+="and questionnaires.id = #{matching_questionnaire.questionnaire.questionnaire_id}"
+    # matching_questionnaires = AssignmentQuestionnaire.where("assignment_id in ?",matching_assignments.ids)
+    # puts "matching questionnaires are "+matching_questionnaires.to_s
+    # puts matching_questionnaires.first.questionnaire_id
+    # puts "-------about to get error"
+    #
+    # ids=matching_questionnaires.map{|r| r.questionnaire_id}
+    # puts "----------printing ids as string "+"and questionnaires.id in (#{ids.join(',')})"
+    # conditions+="and questionnaires.id in (#{ids.join(',')})"
     # puts "printing conditpons"+conditions+"--------------------------------------"
 
 

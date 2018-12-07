@@ -43,7 +43,11 @@
 
 <h3>Code frequency</h3>
 <div class="chart-container" style="width: 1000px; height:600px;">
-  <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+  <% if(@parsed_data != nil && @authors != nil && @dates!= nil)%>
+    <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+  <% else%>
+    <h3 style="font-weight:bold;display:inline-block;">No github data to show</h3><br/>
+  <%end%>
 </div>
 <br>
 

@@ -214,8 +214,8 @@ class GradesController < ApplicationController
 
     @headRefs = {}
     @parsed_data = {}
-    @authors = []
-    @dates = []
+    @authors = {}
+    @dates = {}
     @total_additions = 0
     @total_deletions = 0
     @total_commits = 0
@@ -231,7 +231,7 @@ class GradesController < ApplicationController
     @team_id = @team.id
     submission_hyperlink = nil
     @participant.team.hyperlinks.each do |hyperlink|
-      if hyperlink.match(/pull/)
+      if hyperlink.match(/pull/) && hyperlink.match(/github.com/)
         submission_hyperlink = hyperlink
         submission_hyperlink_tokens = submission_hyperlink.split('/')
         hyperlink_data = {}
@@ -240,12 +240,23 @@ class GradesController < ApplicationController
         submission_hyperlink_tokens.pop
         hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
         hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-        github_data = get_pull_request_details(hyperlink_data)
-        @authors_temp, @dates_temp = parse_github_data(github_data)
-        @authors = (@authors_temp + @authors).uniq
-        @dates   = (@dates_temp + @dates).uniq
+        github_data = get_pull_request_details_pull(hyperlink_data)
+        parse_github_data_pull(github_data)
+
+      elsif hyperlink.match(/github.com/) && !hyperlink.match(/expertiza/)
+        submission_hyperlink = hyperlink
+        submission_hyperlink_tokens = submission_hyperlink.split('/')
+        hyperlink_data = {}
+        hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
+        hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
+        github_data = get_github_data_repo_repo(hyperlink_data)
+        parse_github_data_repo(github_data)
       end
+
     end
+    @authors=@authors.keys
+    @dates=@dates.keys.sort
+
     @headRefs.each do |pull_number, ref|
       @check_statuses[pull_number] = get_statuses_for_pull_request(ref)
     end
@@ -255,7 +266,51 @@ class GradesController < ApplicationController
     redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
   end
 
-  def get_pull_request_details(hyperlink_data)
+
+  def get_github_data_repo(hyperlink_data)
+    data = {
+        query: "query {
+                        repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
+                        ref(qualifiedName: "+"master"+") {
+        target {
+          ... on Commit {
+            id
+            history(first: 100) {
+              edges {
+                node {
+                  id
+                  author {
+                    name
+                    email
+                    date
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }"}
+
+    url = "https://api.github.com/graphql"
+    uri = URI.parse(url)
+
+    response = Net::HTTP.new(uri.host, uri.port)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    request = Net::HTTP::Post.new(uri.path, initheader = {'Authorization'=> 'Bearer' + ' ' + session["github_access_token"]})
+    request.body = data.to_json
+
+    http.request(request)
+    response = http.request(request)
+    return response.body.to_s
+  end
+
+
+  def get_pull_request_details_pull(hyperlink_data)
     data = {
         query: "query {
                           repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
@@ -303,7 +358,7 @@ class GradesController < ApplicationController
     return response.body.to_s
   end
 
-  def parse_github_data(github_data)
+  def parse_github_data_pull(github_data)
     github_data = ActiveSupport::JSON.decode(github_data)
     @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
     @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
@@ -318,8 +373,7 @@ class GradesController < ApplicationController
     end
 
     commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
-    authors = {}
-    dates = {}
+
 
 
     commit_objects.each do |commit_object|
@@ -327,12 +381,12 @@ class GradesController < ApplicationController
       commit_date = commit_object["node"]["commit"]["committedDate"].to_s;
       commit_date = commit_date[0,10]
 
-      unless authors.key?(author_name)
-        authors[author_name] = 1
+      unless @authors.key?(author_name)
+        @authors[author_name] = 1
       end
 
-      unless dates.key?(commit_date)
-        dates[commit_date] = 1
+      unless @dates.key?(commit_date)
+        @dates[commit_date] = 1
       end
 
       unless @parsed_data[author_name]
@@ -346,7 +400,7 @@ class GradesController < ApplicationController
       end
     end
 
-    dates.each do |k,v|
+    @dates.each do |k,v|
       @parsed_data.each do |k1,v1|
         unless v1[k]
           v1[k] = 0
@@ -355,9 +409,46 @@ class GradesController < ApplicationController
     end
 
     @parsed_data.each {|k1, v1| @parsed_data[k1] = Hash[v1.sort_by {|k, v| k}]}
-    authors = authors.keys
-    dates = dates.keys
-    return authors, dates
+  end
+
+  def parse_github_data_repo(github_data)
+    github_data = ActiveSupport::JSON.decode(github_data)
+    commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
+
+    commit_objects.each do |commit_object|
+      author_name = commit_object["node"]["author"]["name"];
+      commit_date = commit_object["node"]["author"]["date"].to_s;
+      commit_date = commit_date[0,10]
+
+      unless @authors.key?(author_name)
+        @authors[author_name] = 1
+      end
+
+      unless @dates.key?(commit_date)
+        @dates[commit_date] = 1
+      end
+
+      unless @parsed_data[author_name]
+        @parsed_data[author_name] = {}
+      end
+
+      unless @parsed_data[author_name][commit_date]
+        @parsed_data[author_name][commit_date] = 1
+      else
+        @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
+      end
+    end
+
+    @dates.each do |k,v|
+      @parsed_data.each do |k1,v1|
+        unless v1[k]
+          v1[k] = 0
+        end
+      end
+    end
+
+    @parsed_data.each {|k1, v1| @parsed_data[k1] = Hash[v1.sort_by {|k, v| k}]}
+
   end
 
   private

@@ -86,15 +86,6 @@ describe AssignmentsController do
     end
   end
 
-  describe '#toggle_access' do
-    it 'changes access permissions of one assignment from public to private or vice versa and redirects to tree_display#list page' do
-      allow(assignment).to receive(:save).and_return(true)
-      params = {id: 1}
-      get :toggle_access, params
-      expect(response).to redirect_to('/tree_display/list')
-    end
-  end
-
   describe '#new' do
     it 'creates a new AssignmentForm object and renders assignment#new page' do
       get :new
@@ -109,9 +100,9 @@ describe AssignmentsController do
         button: '',
         assignment_form: {
           assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
-                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
-          due_date: [{"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"1", "due_at"=>"2017/12/05 00:00", "submission_allowed_id"=>"3", "review_allowed_id"=>"1", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}, 
-                    {"id"=>"", "parent_id"=>"", "round"=>"1", "deadline_type_id"=>"2", "due_at"=>"2017/12/02 00:00", "submission_allowed_id"=>"1", "review_allowed_id"=>"3", "teammate_review_allowed_id"=>"3", "review_of_review_allowed_id"=>"1", "threshold"=>"1"}], 
+                                      "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+          due_date: [{"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "1", "due_at" => "2017/12/05 00:00", "submission_allowed_id" => "3", "review_allowed_id" => "1", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"},
+                     {"id" => "", "parent_id" => "", "round" => "1", "deadline_type_id" => "2", "due_at" => "2017/12/02 00:00", "submission_allowed_id" => "1", "review_allowed_id" => "3", "teammate_review_allowed_id" => "3", "review_of_review_allowed_id" => "1", "threshold" => "1"}],
           assignment: {
             instructor_id: 2,
             course_id: 1,
@@ -120,6 +111,7 @@ describe AssignmentsController do
             name: 'test assignment',
             directory_path: '/test',
             spec_location: '',
+            private: false,
             show_teammate_reviews: false,
             require_quiz: false,
             num_quiz_questions: 0,
@@ -136,7 +128,7 @@ describe AssignmentsController do
       }
     end
     context 'when assignment_form is saved successfully' do
-      it 'redirets to assignment#edit page' do
+      it 'redirects to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
@@ -164,7 +156,7 @@ describe AssignmentsController do
       it 'shows an error flash message and renders edit page' do
         allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([double('SignUpTopic'), double('SignUpTopic')])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1')
-                                                         .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
+          .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
         allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
         allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
@@ -223,7 +215,7 @@ describe AssignmentsController do
           id: 1,
           course_id: 1,
           set_pressed: {
-              bool: 'true'
+            bool: 'true'
           },
           assignment_form: {
             assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",

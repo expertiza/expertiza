@@ -13,6 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20181205211058) do
 
+
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
     t.integer  "tag_prompt_deployment_id", limit: 4

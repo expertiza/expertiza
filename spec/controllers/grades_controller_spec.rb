@@ -197,13 +197,13 @@ describe GradesController do
   describe '#setup_revision_review_questionnaire' do
     let(:question) { build(:question) }
     let(:revision_qs) { [question] }
-    it "fetches the submission records and 
+    it "fetches the submission records and
         adds revision review questions to grade controller's questions" do
       record = double('record')
-      allow(record).to receive_messages(:content => 'key')
+      allow(record).to receive_messages(content: 'key')
       records = [record]
-      allow(SubmissionRecord).to receive_messages(:where => records)
-      allow(RevisionReviewQuestionnaire).to receive_messages(:where => revision_qs)
+      allow(SubmissionRecord).to receive_messages(where: records)
+      allow(RevisionReviewQuestionnaire).to receive_messages(where: revision_qs)
     end
   end
 
@@ -212,7 +212,7 @@ describe GradesController do
     let(:records) { [record] }
     it 'returns the revision questions for a given round' do
       records = [record]
-      allow(SubmissionRecord).to receive_messages(:where => records)
+      allow(SubmissionRecord).to receive_messages(where: records)
       allow(RevisionReviewQuestionnaire).to receive(:where)
     end
   end

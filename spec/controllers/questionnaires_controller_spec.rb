@@ -204,9 +204,9 @@ describe QuestionnairesController do
 
     context 'when @user is a student on the project team' do
       it 'renders the questionnaires#edit page' do
-      	stub_current_user(student, student.role.name, student.role)
-      	participant = double('student', user_id: 7)
-      	submission_record = double('submission_record', team_id: 3, participants: [participant])
+        stub_current_user(student, student.role.name, student.role)
+        participant = double('student', user_id: 7)
+        submission_record = double('submission_record', team_id: 3, participants: [participant])
         questionnaire = double('Questionnaire', submission_record: submission_record)
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(AssignmentTeam).to receive(:find).with(anything).and_return(submission_record)

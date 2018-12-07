@@ -51,7 +51,7 @@ module OnTheFlyCalc
 
   # Build a hash for the author feedback scores
   #
-  # author_feedback_scores[reviewer.id][round][reviewee.id] returns the average author feedback 
+  # author_feedback_scores[reviewer.id][round][reviewee.id] returns the average author feedback
   # score for AssignmentParticipant reviewer's review of the AssignmentTeam reviewee.
   def compute_author_feedback_scores
     @author_feedback_scores = {}
@@ -80,13 +80,13 @@ def calc_avg_feedback_score(response)
     @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
     next if @corresponding_response.empty?
     calc_feedback_scores_sum
-  end 
+  end
   # Divide the sum of the author feedback scores for this review by their number to get the
   # average.
-  if (@author_feedback_scores[@response_map.reviewer_id] != nil && 
-      @author_feedback_scores[@response_map.reviewer_id][@round] != nil && 
-      @response_map != nil && @response_map.reviewee_id != nil && 
-      @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] != nil && 
+  if (@author_feedback_scores[@response_map.reviewer_id] != nil &&
+      @author_feedback_scores[@response_map.reviewer_id][@round] != nil &&
+      @response_map != nil && @response_map.reviewee_id != nil &&
+      @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] != nil &&
       !author_feedback_response_maps.empty?)
     @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count
   end
@@ -97,12 +97,12 @@ end
 def calc_feedback_scores_sum
   @respective_scores = {}
   if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@round].nil?
-    @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@round]     
-  end 
+    @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@round]
+  end
   author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response)
   @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
   # Calculate the score of the author feedback review.
-  calc_review_score 
+  calc_review_score
   # Compute the sum of the author feedback scores for this review. 
   @respective_scores[@response_map.reviewee_id] = 0 if @respective_scores[@response_map.reviewee_id].nil?
   @respective_scores[@response_map.reviewee_id] += @this_review_score

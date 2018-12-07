@@ -75,9 +75,8 @@ private
 # Fill the author_feedback_scores hash for this response (review).
 def calc_avg_feedback_score(response)
   # Retrieve the author feedback response maps for the teammates reviewing the review of their work.
-  # author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
-  fetch_author_feedback_response_maps(response)
-  @author_feedback_response_maps.each do |author_feedback_response_map|
+  author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
+  author_feedback_response_maps.each do |author_feedback_response_map|
     @corresponding_response = Response.where('map_id = ?', author_feedback_response_map.id)
     next if @corresponding_response.empty?
     calc_feedback_scores_sum
@@ -88,13 +87,9 @@ def calc_avg_feedback_score(response)
   if !@author_feedback_scores[@response_map.reviewer_id].nil? &&
       !@author_feedback_scores[@response_map.reviewer_id][@round].nil? &&
       !@author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id].nil? &&
-      !@author_feedback_response_maps.empty?
-    @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= @author_feedback_response_maps.count
+      !author_feedback_response_maps.empty?
+    @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count
   end
-end
-
-def fetch_author_feedback_response_maps(response)
-  @author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
 end
 
 # Add the score of the feedback attached to this feedback response (review) to the sum of feedback scores

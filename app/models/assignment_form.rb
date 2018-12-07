@@ -66,22 +66,38 @@ class AssignmentForm
   # code to save assignment questionnaires
   def update_assignment_questionnaires(attributes)
     return false unless attributes
-    existing_aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-    existing_aqs.each(&:delete)
-    attributes.each do |assignment_questionnaire|
-      if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
-        aq = AssignmentQuestionnaire.new(assignment_questionnaire)
-        unless aq.save
-          @errors = @assignment.errors.to_s
-          @has_errors = true
-        end
-      else
-        aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
-        unless aq.update_attributes(assignment_questionnaire)
-          @errors = @assignment.errors.to_s
-          @has_errors = true
+    validate_assignment_questionnaires_weights(attributes)
+    @errors = @assignment.errors
+    unless @has_errors
+      existing_aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
+      existing_aqs.each(&:delete)
+      attributes.each do |assignment_questionnaire|
+        if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
+          aq = AssignmentQuestionnaire.new(assignment_questionnaire)
+          unless aq.save
+            @errors = @assignment.errors.to_s
+            @has_errors = true
+          end
+        else
+          aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
+          unless aq.update_attributes(assignment_questionnaire)
+            @errors = @assignment.errors.to_s
+            @has_errors = true
+          end
         end
       end
+    end
+  end
+
+  # checks to see if the sum of weights of all rubrics add up to either 0 or 100%
+  def validate_assignment_questionnaires_weights(attributes)
+    total_weight=0
+    attributes.each do |assignment_questionnaire|
+      total_weight+=assignment_questionnaire[:questionnaire_weight].to_i
+    end
+    if total_weight != 0 and total_weight != 100
+      @assignment.errors.add(:message,'Total weight of rubrics should add up to either 0 or 100%')
+      @has_errors = true
     end
   end
 

@@ -310,8 +310,10 @@ class AssignmentsController < ApplicationController
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
-      flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      if flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
+        flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
+            " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      end
     end
   end
 

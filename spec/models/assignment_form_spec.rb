@@ -69,7 +69,9 @@ describe AssignmentForm do
       let(:attributes) { [assignment_questionnaire, assignment_questionnaire2] }
       before(:each) do
         allow(assignment_questionnaire).to receive(:[]).with(:id).and_return(nil)
+        allow(assignment_questionnaire).to receive(:[]).with(:questionnaire_weight).and_return(0)
         allow(assignment_questionnaire2).to receive(:[]).with(:id).and_return(1)
+        allow(assignment_questionnaire2).to receive(:[]).with(:questionnaire_weight).and_return(100)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
         allow(AssignmentQuestionnaire).to receive(:new).with(assignment_questionnaire).and_return(assignment_questionnaire)
         allow(AssignmentQuestionnaire).to receive(:find).with(1).and_return(assignment_questionnaire2)
@@ -90,6 +92,16 @@ describe AssignmentForm do
           allow(assignment_questionnaire2).to receive(:update_attributes).with(assignment_questionnaire2).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+      end
+
+      context 'when both save and update_attributes method do not work with wrong rubrics weights' do
+        it 'changes @has_errors value to true and returns nil' do
+          allow(assignment_questionnaire).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(assignment_questionnaire2).and_return(true)
+          allow(assignment_questionnaire2).to receive(:[]).with(:questionnaire_weight).and_return(12)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(nil)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
         end
       end
     end

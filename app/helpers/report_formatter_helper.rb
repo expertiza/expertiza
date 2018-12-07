@@ -110,6 +110,6 @@ module ReportFormatterHelper
     number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
     number_taggable = @user_tagging_report[line.user.name].no_tagable
     formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
-    @user_tagging_report[line.user.name].no_tagable.zero ? '-' : formatted_percentage
+    @user_tagging_report[line.user.name].no_tagable.zero? ? '-' : formatted_percentage
   end
 end

@@ -79,7 +79,9 @@ class AssignmentNode < Node
 
     if participant_name.present?
       participant_names = User.where('name LIKE ?', "%#{participant_name}%")
-                              .select {|user| me.can_impersonate? user}
+                              .select do |user|
+                                me.can_impersonate? user
+                              end
                               .map(&:name)
       return [] if participant_names.empty?
       query = query.where(users: {name: participant_names})
@@ -87,7 +89,7 @@ class AssignmentNode < Node
 
     if participant_fullname.present?
       participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
-                              .select {|user| me.can_impersonate? user}
+                              .select { |user| me.can_impersonate? user }
                               .map(&:name)
       return [] if participant_names.empty?
       query = query.where(users: {name: participant_names})

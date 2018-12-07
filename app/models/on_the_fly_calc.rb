@@ -92,8 +92,6 @@ module OnTheFlyCalc
       end
     else
       # Rubrics are not varying.
-      author_feeback_questionnaire_id = feedback_questionnaire_id()
-      @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
       @response_maps.each do |response_map|
         # The reviewer is the metareviewee whose review the authors or teammates are reviewing.
         reviewer = @author_feedback_scores[response_map.reviewer_id] if !@author_feedback_scores[response_map.reviewer_id].nil?
@@ -108,6 +106,8 @@ module OnTheFlyCalc
           next if @corresponding_response.empty?
           @respective_scores = {}
           @respective_scores = reviewer unless reviewer.nil?
+          author_feeback_questionnaire_id = feedback_questionnaire_id(@corresponding_response)
+          @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
           calc_review_score
           @respective_scores[response_map.reviewee_id] = 0 if @respective_scores[response_map.reviewee_id].nil?
           @respective_scores[response_map.reviewee_id] += @this_review_score

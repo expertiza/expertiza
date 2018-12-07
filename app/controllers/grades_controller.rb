@@ -120,6 +120,14 @@ class GradesController < ApplicationController
         end
       end
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+      supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@team_id)
+      unless supplementary_review_questionnaire_id.nil?
+        supplementary_review_questionnaire = Questionnaire.find(supplementary_review_questionnaire_id)
+        unless supplementary_review_questionnaire.nil?
+          supplementary_review_questions = supplementary_review_questionnaire.questions
+          questionnaire.questions += supplementary_review_questions
+        end
+      end
       vmquestions = questionnaire.questions
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)

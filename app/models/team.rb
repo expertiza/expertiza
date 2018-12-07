@@ -252,5 +252,15 @@ class Team < ActiveRecord::Base
     team
   end
 
+  # Get the supplementary review questionnaire id from team
+  def self.get_supplementary_review_questionnaire_id_of_team(team_id)
+    team = Team.find(team_id)
+    if team.blank?
+      nil
+    else
+      team.supplementary_review_questionnaire_id
+    end
+  end
+
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 end

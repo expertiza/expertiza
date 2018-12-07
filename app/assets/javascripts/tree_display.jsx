@@ -711,10 +711,7 @@ jQuery(document).ready(function () {
           _this = this;
           jQuery.post('/tree_display/children_node_2_ng',
             {
-              reactParams2: {
-                ...newParams,
-                search: this.props.search,
-              },
+              reactParams2: { ...newParams, search: this.props.search },
             },
             function (data) {
               _this.props.data[id.split("_")[2]]['children'] = data;
@@ -726,9 +723,7 @@ jQuery(document).ready(function () {
         if (index > -1) {
           var list = this.state.expandedRow;
           list.splice(index, 1);
-          this.setState({
-            expandedRow: list
-          })
+          this.setState({ expandedRow: list })
         }
       }
     },
@@ -1329,17 +1324,13 @@ jQuery(document).ready(function () {
       jQuery.get("/tree_display/folder_node_ng_getter", (data) => {
         jQuery.post("/tree_display/children_node_ng",
           {
-            reactParams: {
-              child_nodes: data,
-              nodeType: 'FolderNode',
-              search,
-            }
+            reactParams: { child_nodes: data, nodeType: 'FolderNode', search }
           }, (data2, status) => {
             jQuery.each(data2, function (nodeType, outerNode) {
               jQuery.each(outerNode, function (i, node) {
                 var newParams = {
                   key: node.name + "|" + node.directory,
-                  nodeType: nodeType,
+                  nodeType,
                   child_nodes: node.nodeinfo
                 }
                 if (nodeType === 'Assignments') {
@@ -1355,10 +1346,7 @@ jQuery(document).ready(function () {
               })
             })
             if (data2) {
-              this.setState({
-                tableContent: data2,
-                search,
-              })
+              this.setState({ tableContent: data2, search })
             }
           },
           'json')

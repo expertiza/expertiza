@@ -1,10 +1,245 @@
+<script type="text/javascript">
+    function addQuestionnaireTableRow1(questionnaire_type,round_no,topic_no,questionnaire, assignment_questionnaire, questionnaire_options) {
+        var table_name = "#topic_questionnaire_table"+topic_no+">tbody>tr";
+        var questionnaire_table1 = jQuery(table_name);
+        var row_id = 'topic_questionnaire_table_' + topic_no+"_"+ questionnaire_type;
+        var i = 0;
+        var html;
+        var t_id = "ti_id" + topic_no
+
+        html += '<tr id="' + row_id + '">' +
+            '<input name="assignment_form[topic_questionnaire][][sign_up_topic_id]" type="hidden" value="';
+        html += '<%= topic.id %>';
+        html += '">';
+
+        //html += '<tr>';
+        //Rubric name
+        if (round_no ==null) {
+            html += '<td><label for=t_id>' + questionnaire.display_type + ':</label></td>';
+        }
+        else {
+            html += '<td><label for=t_id>' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>';
+        }
+        //html+='<td>'+row_id+'</td>';
+        //Rubric options
+        html +=     '<td align="center">' +
+            '<select id=t_id name="assignment_form[topic_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
+            '<option value="">--Default--</option>';
+        for (i = 0; i < questionnaire_options.length; i++) {
+            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
+        }
+        html += '</select></td>';
+
+        if (round_no ==null) {
+            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
+        }
+        else{
+            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+        }
+
+        //i++;
+        questionnaire_table1.last().after(html);
+        jQuery('#t_id').val(questionnaire.id).attr('id', '');
+    }
+
+    function addQuestionnaireTableRow2(questionnaire_type,round_no,topic_no, sign_up_topic_id, questionnaire, assignment_questionnaire, questionnaire_options) {
+        //var sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id])
+        var table_name = "#topic_questionnaire_table"+topic_no+">tbody>tr";
+        var questionnaire_table2 = jQuery(table_name);
+        var row_id = 'topic_questionnaire_table_' + topic_no+"_"+questionnaire_type;
+        var i = 0;
+        var html;
+        //var topic_name = $(this).parent("tr")
+        //var topic_id = sign_up_topics[topic_no][id];
+
+
+            html += '<tr id="' + row_id + '">' +
+                '<input name="assignment_form[topic_questionnaire][][sign_up_topic_id]" type="hidden" value="';
+            html += sign_up_topic_id;
+            html += '">';
+
+            //html += '<tr>';
+            //Rubric name
+            if (round_no == null) {
+                html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
+            }
+            else {
+                html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ' Round ' + round_no + ':</label></td>';
+            }
+            //html+='<td>'+sign_up_topic_id+'</td>';
+            //Rubric options
+            html += '<td align="center">' +
+                '<select id="questionnaire_id" name="assignment_form[topic_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
+                '<option value="">--Default--</option>';
+            for (i = 0; i < questionnaire_options.length; i++) {
+                html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
+            }
+            html += '</select></td>';
+
+            if (round_no ==null) {
+              html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
+            }
+            else{
+              html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+            }
+
+            //i++;
+            questionnaire_table2.last().after(html);
+            jQuery('#questionnaire_id').val(questionnaire.id).attr('id', '');
+
+    }
+
+    function getTopicRows(){
+        var tab = document.getElementById("topics_table") ;
+        var rows = tab.rows.length ;
+        return rows;
+    }
+
+
+    function removeQuestionnaireTableRow1(questionnaire_type) {
+        var rows = getTopicRows();
+        for(var t=1; t<rows+1; t++) {
+            var row_id = 'topic_questionnaire_table_'+t+'_' + questionnaire_type;
+            jQuery('#' + row_id).remove();
+        }
+
+    }
+
+    function handleCheckReviewVary1(checkvalue) {
+        var state = checkvalue.checked;
+        var round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
+        var rows = getTopicRows();
+        var topic_id;
+        //var rwo_id;
+        //var html;
+
+
+            if (state == true && round_count > 1) {
+                //for(var j=0; j<rows; j++) {
+                    //Make it display by rounds
+                    //Make it display by rounds
+                    ['ReviewQuestionnaire',
+                        'MetareviewQuestionnaire',
+                        'AuthorFeedbackQuestionnaire',
+                        'TeammateReviewQuestionnaire'].forEach(function (item) {
+                        removeQuestionnaireTableRow1(item);
+                        //row_id = 'topic_questionnaire_table_' + item;
+
+                    });
+            //}
+
+                for(t=1; t<rows; t++) {
+                    p=(round_count+2)*t-(round_count+1);
+                    topic_id = $("#topics_table").find("tr").eq(p).find("input").val();
+
+                    for (j = 1; j <= round_count; j++) {
+                        addQuestionnaireTableRow2(
+                                'ReviewQuestionnaire',
+                                j,
+                                t,
+                                topic_id,
+                                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
+                                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
+                                <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
+                            );
+                    }
+                }
+            }
+
+            if (state == false && round_count > 1) {
+                //Make it display as usual
+                //for (var t = 0; t < rows; t++) {
+                    ['ReviewQuestionnaire',
+                        'MetareviewQuestionnaire',
+                        'AuthorFeedbackQuestionnaire',
+                        'TeammateReviewQuestionnaire'].forEach(function (item) {
+                        if (item === 'ReviewQuestionnaire')
+                            for (j = 1; j <= round_count + 1; j++) {
+                                removeQuestionnaireTableRow1(item);
+                            } else
+                            removeQuestionnaireTableRow1(item);
+                        //row_id = 'topic_questionnaire_table_' + item;
+                    });
+                //}
+
+                for (var y = 1; y < rows+1; y++) {
+                    topic_id1 = $("#topics_table").find("tr").eq(3*y-2).find("input").val();
+                    addQuestionnaireTableRow2(
+                        'ReviewQuestionnaire',
+                        null,
+                        y,
+                        topic_id1,
+                        <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
+                    )
+
+
+                }
+
+        }
+
+    }
+
+    /*function getTopicId(p){
+        var topic_id = $("#topics_table").find("tr").eq(p).find("td").eq(0).text();
+        return  s;
+    }*/
+
+</script>
+
+<input name="hidden_topic_id" type="hidden" value=<%=topic.id %> >
 <td><%= topic.topic_identifier %></td>
+
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>
   <% if @assignment.microtask? %>
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
+    <% table_id = "topic_questionnaire_table"+i.to_s %>
+  <td>
+  <!--<table id="topic_questionnaire_table">-->
+    <table id = <%=table_id %>>
+    <tr>
+    <script>
+
+
+            //page_name = "./assignment/edit.html.erb";
+
+            <% if @assignment_form.review_by_rounds %>
+              <% for t in 1..@assignment_form.assignment.rounds_of_reviews %>
+              addQuestionnaireTableRow1(
+                  'ReviewQuestionnaire',
+                  <%=t%>,
+                  <%=i%>,
+                  <%= questionnaire_for_topic(topic, 'ReviewQuestionnaire',t).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',t).to_json.html_safe %>,
+                  <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',t).to_json.html_safe %>
+              );
+              <% end %>
+            <% else %>
+                addQuestionnaireTableRow1(
+                    'ReviewQuestionnaire',
+                    null,
+                    <%=i%>,
+                    <%= questionnaire_for_topic(topic, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
+                    <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
+                );
+            <% end %>
+
+    </script>
+    </tr>
+
+  </table>
+
+
+
+  </td>
+
+
+
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
@@ -18,3 +253,5 @@
   <% end %>
   </td>
 <% end %>
+
+

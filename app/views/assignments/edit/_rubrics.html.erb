@@ -306,7 +306,7 @@
 
 <!--Add a review varies by round checkbox. -->
 <input name="assignment_questionnaire[used_in_round]" type="hidden" value="false" />
-<%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @reviewvarycheck,:onclick=>"handleCheckReviewVary(this)" ) %>
+<%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @reviewvarycheck,:onclick=>"handleCheckReviewVary(this), handleCheckReviewVary1(this)", :id=>"more_round_box") %>
 <%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
 <div>
 <table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>

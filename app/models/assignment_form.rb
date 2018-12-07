@@ -1,7 +1,7 @@
 
 require 'active_support/time_with_zone'
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :topic_questionnaires, :review_by_rounds
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -16,6 +16,8 @@ class AssignmentForm
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
+    @topic_questionnaires = Array(args[:topic_questionnaires])
+    @review_by_rounds = check_review_by_rounds
   end
 
   # create a form object for this assignment_id
@@ -26,6 +28,7 @@ class AssignmentForm
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
+    assignment_form.topic_questionnaires = TopicQuestionnaire.where(sign_up_topic_id: SignUpTopic.where(assignment_id: assignment_id))
     assignment_form
   end
 
@@ -39,6 +42,7 @@ class AssignmentForm
     end
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
+    update_topic_questionnaires(attributes[:topic_questionnaire]) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -83,6 +87,29 @@ class AssignmentForm
         end
       end
     end
+  end
+
+  def update_topic_questionnaires(attributes)
+    return false unless attributes
+    existing_tqs = TopicQuestionnaire.where(sign_up_topic_id: SignUpTopic.where(assignment_id: @assignment.id))
+    existing_tqs.each(&:delete)
+
+    attributes.each do |topic_questionnaire|
+      if topic_questionnaire[:id].nil? or topic_questionnaire[:id].blank?
+        tq = TopicQuestionnaire.new(topic_questionnaire)
+        unless tq.save
+          @errors = @assignment.errors.to_s
+          @has_errors = true
+        end
+      else
+        tq = TopicQuestionnaire.find(topic_questionnaire[:id])
+        unless tq.update_attributes(topic_questionnaire)
+          @errors = @assignment.errors.to_s
+          @has_errors = true
+        end
+      end
+   # end
+      end
   end
 
   # s required by answer tagging
@@ -331,6 +358,15 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight
       )
+    end
+  end
+end
+
+def check_review_by_rounds
+  @assignment_questionnaires.each do |aq|
+    unless aq.used_in_round.nil?
+      @review_by_rounds = true
+      break
     end
   end
 end

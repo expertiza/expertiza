@@ -39,7 +39,7 @@ class AssignmentTeam < Team
 
   # Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
-    assignment = Assignment.find(self.parent_id)
+    assignment = Assignment.find_by(id: parent_id)
     raise "The assignment cannot be found." if assignment.nil?
     ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
   end
@@ -105,7 +105,7 @@ class AssignmentTeam < Team
   # Import csv file to form teams directly
   def self.import(row, assignment_id, options)
     unless Assignment.find_by(id: assignment_id)
-      raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError, "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
     @assignment_team = prototype
     Team.import(row, assignment_id, options, @assignment_team)

@@ -133,6 +133,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
+
   def delete
     begin
       @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -263,6 +264,7 @@ class AssignmentsController < ApplicationController
     @user = current_user
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @topic_questionnaires = TopicQuestionnaire.where(sign_up_topic_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @reviewvarycheck = false
     @due_date_nameurl_notempty = false
@@ -353,6 +355,10 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.instructor ||= current_user
     params[:assignment_form][:assignment_questionnaire].reject! do |q|
       q[:questionnaire_id].empty?
+    end
+
+    params[:assignment_form][:topic_questionnaire].reject! do |t|
+      t[:questionnaire_id].empty?
     end
 
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni

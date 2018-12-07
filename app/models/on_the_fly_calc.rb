@@ -77,24 +77,24 @@ def calc_avg_feedback_score(response)
   # Retrieve the author feedback response maps for the teammates reviewing the review of their work.
   author_feedback_response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', response.first.id, 'FeedbackResponseMap')
   author_feedback_response_maps.each do |author_feedback_response_map|
-    calc_feedback_scores_sum(author_feedback_response_map)
+    @author_feedback_response = Response.where('map_id = ?', author_feedback_response_map.id)
+    next if @author_feedback_response.empty?
+    calc_feedback_scores_sum
   end 
   # Divide the sum of the author feedback scores for this review by their number to get the
   # average.
   if (@author_feedback_scores[@response_map.reviewer_id] != nil && 
       @author_feedback_scores[@response_map.reviewer_id][@round] != nil && 
       @response_map != nil && @response_map.reviewee_id != nil && 
-      @author_feedback_scores[response_map.reviewer_id][@round][@response_map.reviewee_id] != nil && 
+      @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] != nil && 
       !author_feedback_response_maps.empty?)
-    @author_feedback_scores[response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count
+    @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count
   end
 end
 
-# Add the score of the feedback attached to this feedback response map to the sum of feedback scores
-# for the review reviewed by one of the authors.
-def calc_feedback_scores_sum(author_feedback_response_map)
-  @author_feedback_response = Response.where('map_id = ?', author_feedback_response_map.id)
-  next if @author_feedback_response.empty?
+# Add the score of the feedback attached to this feedback response (review) to the sum of feedback scores
+# for the response (review) reviewed by one of the authors.
+def calc_feedback_scores_sum
   @respective_scores = {}
   if !@author_feedback_scores[@response_map.reviewer_id].nil? && !@author_feedback_scores[@response_map.reviewer_id][@round].nil?
     @respective_scores = @author_feedback_scores[@response_map.reviewer_id][@round]     

@@ -69,6 +69,11 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
+
+    @supplementary_review_questions.each do |question|
+      @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
+    end
+
     @questionnaire = set_questionnaire
     render action: 'response'
   end
@@ -80,13 +85,26 @@ class ResponseController < ApplicationController
     render nothing: true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
+
+    map = @response.map
+    team_id = map.reviewee_id
+
     msg = ""
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = set_questionnaire
+      set_questionnaire
       questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+
+
+      supplementary_review_questions = sort_questions(@supplementary_review_questionnaire.questions)
+      unless @supplementary_review_questionnaire.nil?
+        questions += supplementary_review_questions
+      end
+      create_answers(params, questions) unless params[:responses].nil?
+
+
+
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -138,10 +156,19 @@ class ResponseController < ApplicationController
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
+
+    @team_id = @map.reviewee_id
+
     get_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
+
+      @supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@team_id)
+      unless @supplementary_review_questionnaire_id.nil?
+        @supplementary_review_questionnaire = Questionnaire.find(@supplementary_review_questionnaire_id)
+      end
+
     else
       @round = nil
     end
@@ -162,6 +189,12 @@ class ResponseController < ApplicationController
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
+
+    unless @supplementary_review_questionnaire.nil?
+      supplementary_review_questions = sort_questions(@supplementary_review_questionnaire.questions)
+      questions += supplementary_review_questions
+    end
+
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
@@ -279,6 +312,11 @@ class ResponseController < ApplicationController
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
+
+    unless @supplementary_review_questionnaire.nil?
+      @supplementary_review_questions = sort_questions(@supplementary_review_questionnaire.questions)
+    end
+
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
@@ -308,6 +346,12 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
+
+      @supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@contributor.id)
+      unless @supplementary_review_questionnaire_id.nil?
+        @supplementary_review_questionnaire = Questionnaire.find(@supplementary_review_questionnaire_id)
+      end
+
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
@@ -334,6 +378,10 @@ class ResponseController < ApplicationController
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
     @questionnaire = @response.questionnaire_by_answer(answer)
+
+    supplementary_review_answer = @response.scores.last
+    @supplementary_review_questionnaire = @response.questionnaire_by_answer(supplementary_review_answer)
+
   end
 
   def set_dropdown_or_scale

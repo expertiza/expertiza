@@ -138,13 +138,19 @@ class AssignmentsController < ApplicationController
       @assignment_form = AssignmentForm.create_form_object(params[:id])
       @user = session[:user]
       id = @user.get_instructor
-      if id != @assignment_form.assignment.instructor_id
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "You are not authorized to delete this assignment.", request)
-        raise "You are not authorized to delete this assignment."
-      else
+      # Issue 101 - allow instructor to delete assignment created by TA.
+      # FixA : TA can only assignment created by itself.
+      # FixB : Instrucor will be able to delete any assignment from the list of assignments in the courses.
+      
+      if @user.role.name == "Instructor" or (@user.role.name == "Teaching Assistant" and id == @assignment_form.assignment.instructor_id)
+        # allow delete
         @assignment_form.delete(params[:force])
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{@assignment_form.assignment.id} was deleted.", request)
         flash[:success] = "The assignment was successfully deleted."
+      else
+        # throw error
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "You are not authorized to delete this assignment.", request)
+        raise "You are not authorized to delete this assignment."
       end
     rescue StandardError => e
       flash[:error] = e.message

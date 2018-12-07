@@ -19,23 +19,15 @@ $(window).load(function(){
   <%end %>
 });
 
-function trial()
-{
-    alert("time spent = 10 mins!")
-}
-
 
 function showHideReviewTime(studentId){
 
     var id = "myDiv_"+studentId;
-   /* alert(id.toString());*/
-    /*var show = element.innerHTML == 'Hide all team members'; */
     if (document.getElementById(id).style.display == "none"){
         document.getElementById(id).style.display="block";
     }else{
         document.getElementById(id).style.display = "none";
     }
-    //toggleTeamMembersInTeamsListPage();
 }
 
 </script>
@@ -175,7 +167,7 @@ function showHideReviewTime(studentId){
                   <div>
                     <table>
                       <tr>
-                        <th align="right">Reviewee id </th>
+                        <th align="right">Team Reviewed </th>
                         <th align="right">Total Time (mins)</th>
                         <th align="right">Round </th>
                         <th align="right">Links</th>
@@ -184,17 +176,13 @@ function showHideReviewTime(studentId){
                       </tr>
 
                       <% @reviewers = Participant.where(user_id:user.id) %>
-                      <!%= "user is:"+user.id.to_s%>
                       <% @reviewers.each do |reviewer| %> <!-- for reviewer-->
-                          <!%="Reviewer id is : "+reviewer.id.to_s %>
                           <% @response_maps = ResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: @id)  %>
                           <% @number_of_rounds = Assignment.find(@id).rounds_of_reviews %>
-                          <!%= "no. of rounds: "+ @number_of_rounds.to_s %>
                           <% reviewee_count = 0 %>
                           <% @response_maps.each do |map| %>  <!-- for reviewee-->
-                              <!%= "map id: "+map.id.to_s %>
-                              <% map_total_time = 0 %>
                               <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
+                                  <% map_total_time = 0 %>
                                   <% @per_round_time = Array.new %>
                                   <% @responsetime_match = ResponseTime.where(map_id: map.id, round:each_round)%>
                                   <% @reviewed_object_id = map.reviewed_object_id %>
@@ -210,7 +198,7 @@ function showHideReviewTime(studentId){
                                           <tr>
                                             <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
                                                 <td><%= Team.where(id:@reviewee_id).first.name.to_s %></td>
-                                                <td id="<%= reviewee_count.to_s %>"></td>
+                                                <td id="<%= map.id.to_s+""+each_round.to_s %>"></td>
                                                 <td><%= responsetime_entry.round %></td>
                                             <% else %>        <!--- Else print dummy-->
                                                 <td><%= @dummy %></td>
@@ -229,31 +217,23 @@ function showHideReviewTime(studentId){
                                       <% end %>
                                       <% @count=@count+1 %>
                                   <%end %>   <!-- end for link-->
+
                                   <% timeHash[(@reviewee_id.to_s).concat(each_round.to_s)] = @per_round_time %>
+                                  <script type="text/javascript">
+                                      function calculateTotalTime() {
+                                          var totalTime = <%= map_total_time.round(2) %>;
+                                          document.getElementById(<%= map.id.to_s+""+each_round.to_s %>).innerHTML = totalTime;
+                                      }
+                                      calculateTotalTime();
+                                  </script>
                               <% end%>    <!-- end for round-->
                               <% reviewee_list << @reviewee_id %>
                               <% total_time_list << map_total_time.round(2) %>
+
                               <% reviewee_count = reviewee_count+1%>
                           <% end %>  <!-- end for reviewee-->
                       <% end %>  <!-- end for reviewer-->
-                      <!--- Script to update the total time column after the page load-->
-                      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/canvasjs.js"> </script>     <!-- Canvas JS CDN -->
-                      <script type="text/javascript">
-                          var timeReportHash;
-                          var showDetailsEnabled = false;
-                          $(document).ready(function () {
-                              console.log("i'm working");
-                              timeReportHash = <%= timeHash.to_json.to_s.html_safe %>;
-                              totalTimeList = <%= total_time_list%>
-                              for(each=0;each<totalTimeList.length;each++){
-                                  // var eachId = each.toString();
-                                  if(document.getElementById(each.toString())!=null && totalTimeList[each]!=null)
-                                      document.getElementById(each.toString()).innerHTML = totalTimeList[each];
-                                  console.log("id:"+each+"totalTime:"+totalTimeList[each]);
-                                  // $("#responsetime table #"+each).html(totalTimeList[each]);
-                              }
-                          });
-                      </script>
+
                     </table>
                   </div>
                 </div>

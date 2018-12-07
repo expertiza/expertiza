@@ -86,7 +86,6 @@ def calc_avg_feedback_score(response)
 
   if !@author_feedback_scores[@response_map.reviewer_id].nil? &&
       !@author_feedback_scores[@response_map.reviewer_id][@round].nil? &&
-      !@response_map.nil? && !@response_map.reviewee_id.nil? &&
       !@author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id].nil? &&
       !author_feedback_response_maps.empty?
     @author_feedback_scores[@response_map.reviewer_id][@round][@response_map.reviewee_id] /= author_feedback_response_maps.count

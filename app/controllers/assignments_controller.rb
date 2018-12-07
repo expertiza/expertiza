@@ -141,7 +141,6 @@ class AssignmentsController < ApplicationController
       # Issue 101 - allow instructor to delete assignment created by TA.
       # FixA : TA can only assignment created by itself.
       # FixB : Instrucor will be able to delete any assignment from the list of assignments in the courses.
-      
       if @user.role.name == "Instructor" or (@user.role.name == "Teaching Assistant" and id == @assignment_form.assignment.instructor_id)
         # allow delete
         @assignment_form.delete(params[:force])

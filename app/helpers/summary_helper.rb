@@ -97,8 +97,6 @@ module SummaryHelper
       self.reviewers = ({})
       threads = []
 
-      self.search = search
-
       # get all criteria used in each round
       rubric = get_questions_by_assignment(assignment)
 

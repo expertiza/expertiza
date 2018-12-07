@@ -1,4 +1,3 @@
-<!-- modified by E1877-->
 <% col_outer_th_span_value = 0 %>
 <% col_avg_th_span_value = 0 %>
 <% col_range_th_span_value = 0 %>
@@ -32,6 +31,7 @@
 	 :col_avg_th_span_value => col_avg_th_span_value,
 	 :col_range_th_span_value => col_range_th_span_value}  %>
 </thead>
+<!--E1877: tbody tag added to the table structure-->
 <tbody>
 <% for index in 0 .. @scores[:teams].length - 1 %>   
      <%= render :partial => 'grades/team',

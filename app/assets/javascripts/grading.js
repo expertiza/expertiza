@@ -1,4 +1,3 @@
-//modified by E1877
 function toggleAll(numteams){
     var maintag = document.getElementById('teamAll');
     hidden = maintag.innerHTML == 'Show all teams';    

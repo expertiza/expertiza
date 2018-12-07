@@ -4,7 +4,7 @@ describe QuestionnairesController do
   let(:review_questionnaire) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:question) { build(:question, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:student) {build(:student, id: 7)}
+  let(:student) { build(:student, id: 7) }
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end

@@ -4,3 +4,5 @@ class SupplementaryReviewQuestionnaire < Questionnaire
   # Make me better.
   attr_accessible
 end
+
+

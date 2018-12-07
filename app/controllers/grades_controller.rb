@@ -230,6 +230,7 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
     submission_hyperlink = nil
+
     @participant.team.hyperlinks.each do |hyperlink|
       if hyperlink.match(/pull/) && hyperlink.match(/github.com/)
         submission_hyperlink = hyperlink
@@ -242,14 +243,13 @@ class GradesController < ApplicationController
         hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
         github_data = get_pull_request_details_pull(hyperlink_data)
         parse_github_data_pull(github_data)
-
-      elsif hyperlink.match(/github.com/) && !hyperlink.match(/expertiza/)
+      elsif hyperlink.match(/github.com/) && !hyperlink.match(/expertiza/)# && !is_pull_request
         submission_hyperlink = hyperlink
         submission_hyperlink_tokens = submission_hyperlink.split('/')
         hyperlink_data = {}
         hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
         hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-        github_data = get_github_data_repo_repo(hyperlink_data)
+        github_data = get_github_data_repo(hyperlink_data)
         parse_github_data_repo(github_data)
       end
 
@@ -270,43 +270,31 @@ class GradesController < ApplicationController
   def get_github_data_repo(hyperlink_data)
     data = {
         query: "query {
-                        repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
-                        ref(qualifiedName: "+"master"+") {
-        target {
-          ... on Commit {
-            id
-            history(first: 100) {
-              edges {
-                node {
-                  id
-                  author {
-                    name
-                    email
-                    date
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }"}
+                        repository(owner: \""+ hyperlink_data["owner_name"] +"\", name: \""+ hyperlink_data["repository_name"] +"\") {
+                          ref(qualifiedName: master) {
+                            target {
+                              ... on Commit {
 
-    url = "https://api.github.com/graphql"
-    uri = URI.parse(url)
-
-    response = Net::HTTP.new(uri.host, uri.port)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-    request = Net::HTTP::Post.new(uri.path, initheader = {'Authorization'=> 'Bearer' + ' ' + session["github_access_token"]})
-    request.body = data.to_json
-
-    http.request(request)
-    response = http.request(request)
-    return response.body.to_s
+                                id
+                                history(first: 100) {
+                                  edges {
+                                    node {
+                                      id
+                                      author {
+                                        name
+                                        email
+                                        date
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }"}
+    response_data = make_github_api_request(data)
+    return response_data
   end
 
 
@@ -314,7 +302,7 @@ class GradesController < ApplicationController
     data = {
         query: "query {
                           repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
-                            pullRequest(number: "+ hyperlink_data["pull_request_number"] +") {
+                            pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
                               number
                               additions
                               deletions
@@ -322,8 +310,13 @@ class GradesController < ApplicationController
                               mergeable
                               merged
                               headRefOid
-                              commits(first:200){
+                              commits(first:100){
                                 totalCount
+                                pageInfo{
+                                  hasNextPage
+                                  startCursor
+                                  endCursor
+                                }
                                 edges{
                                   node{
                                     id
@@ -343,29 +336,65 @@ class GradesController < ApplicationController
                           }
                         }"}
 
-    url = "https://api.github.com/graphql"
-    uri = URI.parse(url)
+    response_data = make_github_api_request(data)
 
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    @has_next_page = response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["hasNextPage"]
+    @end_cursor = response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["endCursor"]
 
-    request = Net::HTTP::Post.new(uri.path, initheader = {'Authorization'=> 'Bearer' + ' ' + session["github_access_token"]})
-    request.body = data.to_json
+    while @has_next_page
+      data = {
+          query: "query {
+                          repository(owner: " + hyperlink_data["owner_name"] + ", name: " + hyperlink_data["repository_name"] + ") {
+                            pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
+                              number
+                              additions
+                              deletions
+                              changedFiles
+                              mergeable
+                              merged
+                              headRefOid
+                              commits(first:100, after:" + @end_cursor + "){
+                                totalCount
+                                pageInfo{
+                                  hasNextPage
+                                  startCursor
+                                  endCursor
+                                }
+                                edges{
+                                  node{
+                                    id
+                                    commit{
+                                      author{
+                                        name
+                                      }
+                                      additions
+                                      deletions
+                                      changedFiles
+                                      committedDate
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }"}
+      new_response_data = make_github_api_request(data)
+      response_data["data"]["repository"]["pullRequest"]["commits"]["edges"].push(*new_response_data["data"]["repository"]["pullRequest"]["commits"]["edges"])
+      @has_next_page = new_response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["hasNextPage"]
+      @end_cursor = new_response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["endCursor"]
+    end
 
-    http.request(request)
-    response = http.request(request)
-    return response.body.to_s
+    return response_data
   end
 
   def parse_github_data_pull(github_data)
-    github_data = ActiveSupport::JSON.decode(github_data)
     @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
     @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
     @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
     @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
     @headRefs[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["headRefOid"]
+
     if github_data["data"]["repository"]["pullRequest"]["merged"]
       @merge_status[pull_request_number] = "MERGED"
     else
@@ -373,8 +402,6 @@ class GradesController < ApplicationController
     end
 
     commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
-
-
 
     commit_objects.each do |commit_object|
       author_name = commit_object["node"]["commit"]["author"]["name"];
@@ -412,7 +439,6 @@ class GradesController < ApplicationController
   end
 
   def parse_github_data_repo(github_data)
-    github_data = ActiveSupport::JSON.decode(github_data)
     commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
 
     commit_objects.each do |commit_object|
@@ -449,6 +475,20 @@ class GradesController < ApplicationController
 
     @parsed_data.each {|k1, v1| @parsed_data[k1] = Hash[v1.sort_by {|k, v| k}]}
 
+  end
+
+  def make_github_api_request(data)
+    url = "https://api.github.com/graphql"
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    request = Net::HTTP::Post.new(uri.path, initheader = {'Authorization'=> 'Bearer' + ' ' + session["github_access_token"]})
+    request.body = data.to_json
+    http.request(request)
+    response = http.request(request)
+    response_body = ActiveSupport::JSON.decode(response.body.to_s)
+    return response_body
   end
 
   private

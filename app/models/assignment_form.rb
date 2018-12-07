@@ -108,8 +108,7 @@ class AssignmentForm
           @has_errors = true
         end
       end
-   # end
-      end
+    end
   end
 
   # s required by answer tagging

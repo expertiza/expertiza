@@ -90,7 +90,7 @@ module AssignmentHelper
     questionnaire
   end
 
-  #E1873
+  # E1873
   def questionnaire_for_topic(topic, type, round_number)
     if round_number.nil?
       questionnaire = topic.questionnaires.find_by(type: type)

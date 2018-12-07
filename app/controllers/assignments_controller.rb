@@ -133,7 +133,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-
   def delete
     begin
       @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -150,7 +149,6 @@ class AssignmentsController < ApplicationController
     rescue StandardError => e
       flash[:error] = e.message
     end
-
     redirect_to list_tree_display_index_path
   end
 

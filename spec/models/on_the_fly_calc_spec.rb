@@ -9,7 +9,6 @@ describe OnTheFlyCalc do
   let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
   let(:contributor) { build(:assignment_team, id: 1) }
   let(:reviewed_team) { build(:assignment_team, id: 2) }
-  
 
   describe '#compute_total_score' do
     context 'when avg score is nil' do
@@ -80,8 +79,8 @@ describe OnTheFlyCalc do
     let(:feedback_question) { build(:question, questionnaire: questionnaire2, weight: 1, id: 2) }
     let(:questionnaire2) { build(:questionnaire, name: "feedback", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
     let(:reviewer1) { build(:participant, id: 2) }
-    score = {}
-    let(:team_user) { build(:team_user, team: 2, user: 2) } 
+    let score = {}
+    let(:team_user) { build(:team_user, team: 2, user: 2) }
     let(:feedback_response) { build(:response, id: 2, map_id: 2, scores: [feedback]) }
     let(:feedback_response_map) { build(:response_map, id: 2, reviewed_object_id: 1, reviewer_id: 2, reviewee_id: 1) }
 

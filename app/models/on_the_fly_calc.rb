@@ -106,7 +106,7 @@ module OnTheFlyCalc
           next if @corresponding_response.empty?
           @respective_scores = {}
           @respective_scores = reviewer unless reviewer.nil?
-          author_feeback_questionnaire_id = feedback_questionnaire_id(@corresponding_response)
+          author_feedback_questionnaire_id = feedback_questionnaire_id(@corresponding_response)
           @questions = Question.where('questionnaire_id = ?', author_feedback_questionnaire_id)
           calc_review_score
           @respective_scores[response_map.reviewee_id] = 0 if @respective_scores[response_map.reviewee_id].nil?

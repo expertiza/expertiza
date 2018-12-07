@@ -62,21 +62,22 @@ class StudentReviewController < ApplicationController
 # @unselectedtopics, topics that remains at the left of the view, that are not yet chosen by the reviewer.
   def sign_up_list
     # get the participant that's the reviewer for the assignment
-    @participant = AssignmentParticipant.find(params[:id])
-    # The assignment that should be reviewed is here
-    @assignment = @participant.assignment
-    # get the original topics that are under the assignment.
-    topics = SignUpTopic.where(assignment_id: @assignment.id)
-    my_teams = TeamsUser.where(user_id: @participant.user_id)
-    assignment_teams = {}
-    Team.where(parent_id: @assignment.id).each do |team|
-      assignment_teams[team.id] = team.name
-    end
-    selections = {}
-    topics.each do |topic|
-      teams = SignedUpTeam.where(topic_id: topic.id)
-      teams.each do |team|
-        selections[team.team_id] = {topic_name: topic.topic_name, topic_identifier: topic.topic_identifier}
+
+      @participant = AssignmentParticipant.find(params[:id])
+      # The assignment that should be reviewed is here
+      @assignment = @participant.assignment
+      # get the original topics that are under the assignment.
+      topics = SignUpTopic.where(assignment_id: @assignment.id)
+      my_teams = TeamsUser.where(user_id: @participant.user_id).map(&:team_id)
+      assignment_teams = {}
+      Team.where(parent_id: @assignment.id).each do |team|
+        assignment_teams[team.id] = team.name
+      end
+      selections = {}
+      topics.each do |topic|
+        teams = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
+        teams.each do |team|
+          selections[team.team_id] = {topic_name: topic.topic_name}
       end
     end
     # If the participant hasn't change the bidding order yet.

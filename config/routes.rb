@@ -245,7 +245,8 @@ resources :institution, except: [:destroy] do
   resources :assignment_survey_questionnaires, controller: :questionnaires
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_survey_questionnaires, controller: :questionnaires
-  resources :bookmark_rating_questionnaires, controller: :questionnaires
+  resources :bookmarkrating_questionnaires, controller: :questionnaires
+  resources :supplementary_review_questionnaire, controller: :questionnaires
 
   resources :questions do
     collection do
@@ -265,8 +266,8 @@ resources :institution, except: [:destroy] do
       get :new_feedback
       get :view
       get :remove_hyperlink
-      get :save
-      get :redirect
+      get :saving
+      get :redirection
       get :show_calibration_results_for_student
       post :custom_create
       get :pending_surveys

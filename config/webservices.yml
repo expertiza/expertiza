@@ -5,7 +5,7 @@ development:
   topic_bidding_webservice_url: 'http://peerlogic.csc.ncsu.edu/intelligent_assignment/merge_teams'
   heatmap_webservice_url: 'http://peerlogic.csc.ncsu.edu/reviewsentiment/configure'
   sentiment_webservice_url: 'http://peerlogic.csc.ncsu.edu/sentiment/'
-  review_bidding_webservice_url: 'http://127.0.0.1:5000/assign_reviews'
+  review_bidding_webservice_url: 'http://peerlogic.csc.ncsu.edu/assign_reviews'
 
 test:
   metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
@@ -14,7 +14,7 @@ test:
   topic_bidding_webservice_url: 'http://peerlogic.csc.ncsu.edu/intelligent_assignment/merge_teams'
   heatmap_webservice_url: 'http://peerlogic.csc.ncsu.edu/reviewsentiment/configure'
   sentiment_webservice_url: 'http://peerlogic.csc.ncsu.edu/sentiment/'
-  review_bidding_webservice_url: 'http://127.0.0.1:5000/assign_reviews'
+  review_bidding_webservice_url: 'http://peerlogic.csc.ncsu.edu/assign_reviews'
 
 
 

@@ -435,7 +435,7 @@ describe User do
 
   describe '#can_signup_someone_for?' do
     let(:admin) { build(:admin, id: 3) }
-    let(:super_admin) {build (:superadmin)}
+    let(:super_admin) { build(:superadmin) }
     let(:instructor) { build(:instructor, id: 6) }
     let(:student1) { build(:student, id: 6, name: :lily) }
     let(:assignment) { build(:assignment, id: 1, instructor_id: 6) }
@@ -477,7 +477,6 @@ describe User do
       expect(user.can_signup_someone_for?(1)).to be true
     end
 
-
     it 'can signup target user if current user is the admin of the course' do
       allow(user).to receive_message_chain(:role, :name).and_return("Administrator")
       allow(user).to receive(:can_impersonate?).with(instructor).and_return(true)
@@ -485,9 +484,9 @@ describe User do
     end
 
     it 'cannot signup target user if current user does not satisfy any of the requirements' do
-       allow(user).to receive_message_chain(:role, :name).and_return("Teaching Assistant")
-       allow(user).to receive(:can_impersonate?).with(instructor).and_return(false)
-       expect(user.can_signup_someone_for?(1)).to be false
+      allow(user).to receive_message_chain(:role, :name).and_return("Teaching Assistant")
+      allow(user).to receive(:can_impersonate?).with(instructor).and_return(false)
+      expect(user.can_signup_someone_for?(1)).to be false
     end
   end
 end

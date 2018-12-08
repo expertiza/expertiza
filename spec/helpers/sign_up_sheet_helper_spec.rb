@@ -14,7 +14,7 @@ describe "SignUpSheetHelper" do
     end
     it "The check_topic_due_date_value method should fail" do
       expect { helper.get_topic_deadline(@assignment_due_date, @topic.id, 1, 1) }.
-        to be nil
+        to eq(nil)
     end
 
     it "The check_topic_due_date_value method should not return the assignment due date" do

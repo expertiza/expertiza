@@ -60,18 +60,13 @@ class User < ActiveRecord::Base
 
   # This method is used to identify if the user (not student) can signup a team/student for an assignment
   def can_signup_someone_for?(id)
-    participant=AssignmentParticipant.find(id.to_i)
-    unless participant.nil?
-      assignment_data = participant.assignment
-      unless assignment_data.nil?
-        assignment = Assignment.find(assignment_data.id)
-        instructor = User.find(assignment.instructor_id)
-        self.role.name != 'Student' && ((%w[Super-Administrator ].include? self.role.name) ||
-            self.can_impersonate?(instructor) || (assignment.instructor_id == self.id) ||
-            (instructor.can_impersonate?(self) && self.role.name != 'Student') ||
-            (assignment.course_id && Course.find(assignment.course_id).instructor_id == self.id))
-      end
-    end
+    assignment = Assignment.find(AssignmentParticipant.find(id.to_i).assignment.id)
+    instructor = User.find(assignment.instructor_id)
+    self.role.name != 'Student' && ((%w[Super-Administrator ].include? self.role.name) ||
+        self.can_impersonate?(instructor) ||
+        (assignment.instructor_id == self.id) ||
+       (instructor.can_impersonate?(self) && self.role.name != 'Student') ||
+        (assignment.course_id && Course.find(assignment.course_id).instructor_id == self.id))
   end
 
   def recursively_parent_of(user)

@@ -240,6 +240,7 @@ FactoryBot.define do
     submitted_hyperlinks "---
 - https://www.expertiza.ncsu.edu"
     directory_num 0
+    supplementary_review_questionnaire_id 3
   end
 
   factory :team_user, class: TeamsUser do

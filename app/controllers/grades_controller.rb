@@ -314,42 +314,40 @@ class GradesController < ApplicationController
   end
 
   def get_pull_request_details(hyperlink_data)
-    is_initial_page = true
-    data = get_query(is_initial_page, hyperlink_data)
-    response_data = make_github_api_request(data)
+    response_data = make_github_api_request(get_query(true, hyperlink_data))
 
     @has_next_page = response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["hasNextPage"]
-    if @has_next_page
-      is_initial_page = false
-    end
     @end_cursor = response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["endCursor"]
 
     while @has_next_page
-      data = get_query(is_initial_page, hyperlink_data)
-      new_response_data = make_github_api_request(data)
+      new_response_data = make_github_api_request(get_query(false, hyperlink_data))
       response_data["data"]["repository"]["pullRequest"]["commits"]["edges"].push(*new_response_data["data"]["repository"]["pullRequest"]["commits"]["edges"])
       @has_next_page = new_response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["hasNextPage"]
       @end_cursor = new_response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["endCursor"]
     end
 
-    return response_data
+    response_data
+  end
+
+  def process_github_authors_and_dates(author_name, commit_date)
+    @authors[author_name] ||= 1
+    @dates[commit_date] ||= 1
+    @parsed_data[author_name] ||= {}
+    if @parsed_data[author_name][commit_date]
+      @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
+    else
+      @parsed_data[author_name][commit_date] = 1
+    end
   end
 
   def parse_github_data_pull(github_data)
     set_team_statistics(github_data)
     commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
     commit_objects.each do |commit_object|
-      author_name = commit_object["node"]["commit"]["author"]["name"]
-      commit_date = commit_object["node"]["commit"]["committedDate"].to_s
-      commit_date = commit_date[0, 10]
-      @authors[author_name] ||= 1
-      @dates[commit_date] ||= 1
-      @parsed_data[author_name] ||= {}
-      if @parsed_data[author_name][commit_date]
-        @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
-      else
-        @parsed_data[author_name][commit_date] = 1
-      end
+      commit = commit_object["node"]["commit"]
+      author_name = commit["author"]["name"]
+      commit_date = commit["committedDate"].to_s
+      process_github_authors_and_dates(author_name, commit_date[0, 10])
     end
     organize_commit_dates
   end
@@ -357,24 +355,16 @@ class GradesController < ApplicationController
   def parse_github_data_repo(github_data)
     commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
     commit_objects.each do |commit_object|
-      author_name = commit_object["node"]["author"]["name"]
-      commit_date = commit_object["node"]["author"]["date"].to_s
-      commit_date = commit_date[0, 10]
-      @authors[author_name] ||= 1
-      @dates[commit_date] ||= 1
-      @parsed_data[author_name] ||= {}
-      if @parsed_data[author_name][commit_date]
-        @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
-      else
-        @parsed_data[author_name][commit_date] = 1
-      end
+      commit_author = commit_object["node"]["author"]
+      author_name = commit_author["name"]
+      commit_date = commit_author["date"].to_s
+      process_github_authors_and_dates(author_name, commit_date[0, 10])
     end
     organize_commit_dates
   end
 
   def make_github_api_request(data)
-    url = "https://api.github.com/graphql"
-    uri = URI.parse(url)
+    uri = URI.parse("https://api.github.com/graphql")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -382,16 +372,13 @@ class GradesController < ApplicationController
     request.body = data.to_json
     http.request(request)
     response = http.request(request)
-    response_body = ActiveSupport::JSON.decode(response.body.to_s)
-    return response_body
+    ActiveSupport::JSON.decode(response.body.to_s)
   end
 
   def organize_commit_dates
     @dates.each do |date, commit_count|
       @parsed_data.each do |author, commits|
-        unless commits[date]
-          commits[date] = 0
-        end
+          commits[date] ||= 0
       end
     end
     @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, commit_count| date}]}

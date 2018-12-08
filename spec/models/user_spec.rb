@@ -451,12 +451,11 @@ describe User do
       allow(Participant).to receive(:find_by).with('1').and_return(participant)
       allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 8).and_return(participant)
       allow(User).to receive(:find).with(6).and_return(instructor)
-
     end
 
     it 'can signup target user if current user is super admin' do
       allow(user).to receive_message_chain(:role, :name).and_return("Super-Administrator")
-      expect(user.can_signup_someone_for?(@params[:id])).to be true
+      expect(user.can_signup_someone_for?(1)).to be true
     end
 
     it 'can signup target user if current user is the instructor of the course' do
@@ -464,7 +463,7 @@ describe User do
       allow(user).to receive(:can_impersonate?).with(instructor).and_return(false)
       allow(user).to receive_message_chain(:id).and_return(6)
       allow(assignment).to receive_message_chain(:instructor_id).and_return(6)
-      expect(user.can_signup_someone_for?(@params[:id])).to be true
+      expect(user.can_signup_someone_for?(1)).to be true
     end
 
     it 'can signup target user if current user is the TA of the course' do
@@ -475,20 +474,20 @@ describe User do
       allow(instructor).to receive(:recursively_parent_of).with(user).and_return(false)
       allow(instructor).to receive(:parent).and_return(nil)
       allow(instructor).to receive(:can_impersonate?).with(user).and_return(true)
-      expect(user.can_signup_someone_for?(@params[:id])).to be true
+      expect(user.can_signup_someone_for?(1)).to be true
     end
 
 
     it 'can signup target user if current user is the admin of the course' do
       allow(user).to receive_message_chain(:role, :name).and_return("Administrator")
       allow(user).to receive(:can_impersonate?).with(instructor).and_return(true)
-      expect(user.can_signup_someone_for?(@params[:id])).to be true
+      expect(user.can_signup_someone_for?(1)).to be true
     end
 
     it 'cannot signup target user if current user does not satisfy any of the requirements' do
        allow(user).to receive_message_chain(:role, :name).and_return("Teaching Assistant")
        allow(user).to receive(:can_impersonate?).with(instructor).and_return(false)
-       expect(user.can_signup_someone_for?(@params[:id])).to be false
+       expect(user.can_signup_someone_for?(1)).to be false
     end
   end
 end

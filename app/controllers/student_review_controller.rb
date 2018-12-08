@@ -44,7 +44,7 @@ class StudentReviewController < ApplicationController
     sign_up_list
   end
 
-# the method remove_nullteam_topics remove the topics that are not signed up by any teams
+  # the method remove_nullteam_topics remove the topics that are not signed up by any teams
   def remove_nullteam_topics(old_array)
     new_array = []
     for j in (0..(old_array.length - 1)) do
@@ -57,69 +57,44 @@ class StudentReviewController < ApplicationController
     return new_array
   end
 
-# this method gives the following global variables: @topics, that are the topics that are unchosen for the reviewer;
-# @selectedtopics, topics that are selected by the reviewer that he wants to review;
-# @unselectedtopics, topics that remains at the left of the view, that are not yet chosen by the reviewer.
+  # this method gives the following global variables: @topics, that are the topics that are unchosen for the reviewer;
+  # @selectedtopics, topics that are selected by the reviewer that he wants to review;
+  # @unselectedtopics, topics that remains at the left of the view, that are not yet chosen by the reviewer.
   def sign_up_list
     # get the participant that's the reviewer for the assignment
-
-      @participant = AssignmentParticipant.find(params[:id])
-      # The assignment that should be reviewed is here
-      @assignment = @participant.assignment
-      # get the original topics that are under the assignment.
-      topics = SignUpTopic.where(assignment_id: @assignment.id)
-      my_teams = TeamsUser.where(user_id: @participant.user_id).map(&:team_id)
-      assignment_teams = {}
-      Team.where(parent_id: @assignment.id).each do |team|
-        assignment_teams[team.id] = team.name
-      end
-      selections = {}
-      topics.each do |topic|
-        teams = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
-        teams.each do |team|
-          selections[team.team_id] = {topic_name: topic.topic_name, topic_identifier: topic.topic_identifier}
+    @participant = AssignmentParticipant.find(params[:id])
+    # The assignment that should be reviewed is here
+    @assignment = @participant.assignment
+    # get the original topics that are under the assignment.
+    topics = SignUpTopic.where(assignment_id: @assignment.id)
+    signed_up_teams = []
+    topics.each do |topic|
+      teams = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
+      teams.each do |team|
+        signed_up_teams << team
       end
     end
-    # If the participant hasn't change the bidding order yet.
-    reviewbids = ReviewBid.where(participant_id: @participant.id).order(:priority)
-    @biditems = []
-    if reviewbids.empty?
-      selections.each do |team_id, info|
-        next if !@assignment.is_selfreview_enabled && my_teams.include?(team_id)
-        @biditems << {
-            team_id: team_id,
-            topic_name: info[:topic_name],
-            topic_identifier: info[:topic_identifier],
-            team_name: assignment_teams[team_id]
-        }
+    my_bids = ReviewBid.get_bids_by_participant(@participant, topics, signed_up_teams)
+    @bids = []
+    #render :json => @bids
+    my_teams = TeamsUser.where(user_id: @participant.user_id).map(&:team_id)
+    # if self-review is not allowed
+    if !@assignment.is_selfreview_enabled
+      my_bids.each do |bid|
+        next if my_teams.include?(bid.team_id)
+        @bids << bid
       end
     else
-      reviewbids.each do |bid|
-        @biditems << {
-            team_id: bid.team_id,
-            topic_name: selections[bid.team_id][:topic_name],
-            topic_identifier: selections[bid.team_id][:topic_identifier],
-            team_name: assignment_teams[bid.team_id]
-        }
-      end
+      @bids = my_bids
     end
-    #render :json => @biditems.to_json
-    # extract topic ids from the @reviewbids
   end
 
-# set the priority of review
+  # set the priority of review
   def set_priority
     @participant = AssignmentParticipant.find(params[:participant_id])
     @assignment = @participant.assignment
-    #params[:team] = params[:topic] #debug
-    # if params[:team].nil?
-    #   # All topics are deselected by current participant
-    #   ReviewBid.where(participant_id: @participant.id).destroy_all
-    # else
     assignment_id = @assignment.id
     bidding_teams = ReviewBid.where(participant_id: @participant.id).map(&:team_id)
-    # Remove topics from ReviewBid table
-    # bidding_teams -= params[:team].map(&:to_i)
     bidding_teams.each do |team|
       ReviewBid.where(team_id: team, participant_id: @participant.id).destroy_all
     end
@@ -132,7 +107,6 @@ class StudentReviewController < ApplicationController
         ReviewBid.where(team_id: team_id, participant_id: @participant.id).update_all(priority: index + 1)
       end
     end
-    # end
-    redirect_to action: 'sign_up_list', assignment_id: params[:assignment_id]
+    redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 end

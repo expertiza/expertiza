@@ -6,7 +6,7 @@ class ReviewBidsController < LotteryController
     participants = AssignmentParticipant.where(parent_id: params[:id])
     participant_ranks = []
     participants.each do |participant|
-      ranks = ReviewBid.get_rank(assignment, teams, participant)
+      ranks = ReviewBid.get_rank(teams, participant)
       participant_ranks << {pid: participant.id, ranks: ranks}
     end
     #we have the availability of topics and ranks of users' choices towards submission now. 

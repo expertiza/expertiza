@@ -642,8 +642,7 @@ describe ReviewMappingController do
                                                      grading_type: 'Review',
                                                      grade_receiver_id: 2,
                                                      grade: '90',
-                                                     comment: 'keke',
-                                                     graded_at: anything)
+                                                     comment: 'keke')
 
       params = {
         participant_id: 1,

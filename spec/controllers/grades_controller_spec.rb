@@ -190,8 +190,7 @@ describe GradesController do
                                                      grading_type: "Submission",
                                                      grade_receiver_id: team.id,
                                                      grade: 100,
-                                                     comment: 'comment',
-                                                     graded_at: anything)
+                                                     comment: 'comment')
       params = {
         participant_id: 1,
         grade_for_submission: 100,

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181127234620) do
+ActiveRecord::Schema.define(version: 20181208025542) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -283,7 +283,6 @@ ActiveRecord::Schema.define(version: 20181127234620) do
     t.integer  "grade_receiver_id", limit: 4
     t.integer  "grade",             limit: 4
     t.text     "comment",           limit: 65535
-    t.datetime "graded_at"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
   end

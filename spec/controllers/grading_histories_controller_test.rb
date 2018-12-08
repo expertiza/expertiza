@@ -10,4 +10,3 @@ describe GradingHistoriesController do
 		end
 	end
 end
-

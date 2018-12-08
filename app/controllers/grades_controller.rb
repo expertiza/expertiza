@@ -192,8 +192,7 @@ class GradesController < ApplicationController
                             grading_type: "Submission",
                             grade_receiver_id: @team.id,
                             grade: @team.grade_for_submission,
-                            comment: @team.comment_for_submission,
-                            graded_at: Time.now)
+                            comment: @team.comment_for_submission)
       @team.save
     rescue StandardError
       flash[:error] = $ERROR_INFO

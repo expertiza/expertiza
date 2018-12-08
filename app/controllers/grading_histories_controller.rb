@@ -1,8 +1,8 @@
 class GradingHistoriesController < ApplicationController
-  before_action :set_grading_history, only: %i[show edit update destroy]
+  before_action :set_grading_history, only: %i[show]
 
   def action_allowed?
-    return true if ['Instructor','Teaching Assistant','Super-Administrator', 'Administrator'].include? current_role_name
+    return true if ['Instructor', 'Teaching Assistant', 'Super-Administrator', 'Administrator'].include? current_role_name
   end
 
   # GET /grading_histories

@@ -85,25 +85,18 @@ class ResponseController < ApplicationController
     render nothing: true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
-
-    map = @response.map
-    team_id = map.reviewee_id
-
     msg = ""
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
+
       set_questionnaire
       questions = sort_questions(@questionnaire.questions)
-
-
       supplementary_review_questions = sort_questions(@supplementary_review_questionnaire.questions)
       unless @supplementary_review_questionnaire.nil?
         questions += supplementary_review_questions
       end
       create_answers(params, questions) unless params[:responses].nil?
-
-
 
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
@@ -156,19 +149,16 @@ class ResponseController < ApplicationController
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
-
     @team_id = @map.reviewee_id
 
     get_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
-
       @supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@team_id)
       unless @supplementary_review_questionnaire_id.nil?
         @supplementary_review_questionnaire = Questionnaire.find(@supplementary_review_questionnaire_id)
       end
-
     else
       @round = nil
     end

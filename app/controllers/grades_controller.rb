@@ -57,8 +57,6 @@ class GradesController < ApplicationController
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
-
-
     @show_reputation = false
   end
 
@@ -234,7 +232,7 @@ class GradesController < ApplicationController
     pull_links = team_links.select do |link|
       link.match(/pull/) && link.match(/github.com/)
     end
-    if pull_links.length > 0
+    if !pull_links.empty?
       retrieve_pull_request_data(pull_links)
     else
       repo_links = team_links.select do |link|
@@ -279,9 +277,8 @@ class GradesController < ApplicationController
     retrieve_github_data
     retrieve_check_run_statuses
 
-    @authors=@authors.keys
-    @dates=@dates.keys.sort
-
+    @authors = @authors.keys
+    @dates = @dates.keys.sort
   end
 
   def authorize_github
@@ -290,26 +287,26 @@ class GradesController < ApplicationController
 
   def get_github_data_repo(hyperlink_data)
     data = {
-        query: "query {
-                        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
-                          ref(qualifiedName: \"master\") {
-                            target {
-                              ... on Commit {
-                                id
-                                history(first: 100) {
-                                  edges {
-                                    node {
-                                      id author {
-                                          name email date
-                                        }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
+      query: "query {
+        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
+          ref(qualifiedName: \"master\") {
+            target {
+              ... on Commit {
+                id
+                  history(first: 100) {
+                    edges {
+                      node {
+                        id author {
+                          name email date
                         }
-                      }"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }"}
     return make_github_api_request(data)
   end
 
@@ -341,8 +338,9 @@ class GradesController < ApplicationController
   end
 
   def parse_github_data_pull(github_data)
-    set_team_statistics(github_data)
-    commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
+    team_statistics(github_data)
+    pull_request_object = github_data["data"]["repository"]["pullRequest"]
+    commit_objects = pull_request_object["commits"]["edges"]
     commit_objects.each do |commit_object|
       commit = commit_object["node"]["commit"]
       author_name = commit["author"]["name"]
@@ -353,7 +351,8 @@ class GradesController < ApplicationController
   end
 
   def parse_github_data_repo(github_data)
-    commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
+    commit_history = github_data["data"]["repository"]["ref"]["target"]["history"]
+    commit_objects = commit_history["edges"]
     commit_objects.each do |commit_object|
       commit_author = commit_object["node"]["author"]
       author_name = commit_author["name"]
@@ -368,7 +367,7 @@ class GradesController < ApplicationController
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    request = Net::HTTP::Post.new(uri.path, initheader = {'Authorization' => 'Bearer' + ' ' + session["github_access_token"]})
+    request = Net::HTTP::Post.new(uri.path, {'Authorization' => 'Bearer' + ' ' + session["github_access_token"]})
     request.body = data.to_json
     http.request(request)
     response = http.request(request)
@@ -376,15 +375,15 @@ class GradesController < ApplicationController
   end
 
   def organize_commit_dates
-    @dates.each do |date, commit_count|
-      @parsed_data.each do |author, commits|
-          commits[date] ||= 0
+    @dates.each_key do |date|
+      @parsed_data.each_value do |commits|
+        commits[date] ||= 0
       end
     end
-    @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, commit_count| date}]}
+    @parsed_data.each { |author, commits| @parsed_data[author] = Hash[commits.sort_by { |date, _commit_count| date }] }
   end
 
-  def set_team_statistics(github_data)
+  def team_statistics(github_data)
     @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
     @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
     @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
@@ -400,37 +399,27 @@ class GradesController < ApplicationController
   end
 
   def get_query(is_initial_page, hyperlink_data)
-
-    if is_initial_page
-      commit_query_line = "commits(first:10){"
-    else
-      commit_query_line = "commits(first:10, after:" + @end_cursor + "){"
-    end
-
-    data = {query: "query {
-                            repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
-                              pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
-                                number additions deletions changedFiles mergeable merged headRefOid
-                                " + commit_query_line + "
-                                  totalCount
-                                  pageInfo{
-                                    hasNextPage startCursor endCursor
-                                  }
-                                  edges{
-                                    node{
-                                      id
-                                      commit{
-                                        author{
-                                          name
-                                        }
-                                        additions deletions changedFiles committedDate
-                                      }
-                                    }
-                                  }
-                                }
-                              }
+    is_initial_page ? commit_query_line = "commits(first:100){" : commit_query_line = "commits(first:100, after:" + @end_cursor + "){"
+    data = {
+      query: "query {
+        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
+          pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
+            number additions deletions changedFiles mergeable merged headRefOid
+              " + commit_query_line + "
+                totalCount
+                  pageInfo{
+                    hasNextPage startCursor endCursor
+                    }
+                      edges{
+                        node{
+                          id
+                          commit{
+                            author{
+                              name
                             }
-                          }"}
+                          additions deletions changedFiles committedDate
+                        }}}}}}}"
+            }
     return data
   end
 

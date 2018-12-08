@@ -28,29 +28,51 @@ describe GradesController do
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       allow(assignment).to receive(:late_policy_id).and_return(false)
       allow(assignment).to receive(:calculate_penalty).and_return(false)
+      session["github_access_token"] = "QWERTY"
     end
 
-    context 'when current assignment varys rubric by round' do
-      it 'retrieves questions, calculates scores and renders grades#view page' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-        params = {id: 1}
-        get :view, params
-        expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
-        expect(response).to render_template(:view)
+    context 'when user hasn\'t logged in to GitHub' do
+      before(:each) do
+        @params = {id: 900}
+        session["github_access_token"] = nil
+      end
+
+      it 'stores the current assignment id and the view action' do
+        get :view, @params
+        expect(session["assignment_id"]).to eq("900")
+        expect(session["github_view_type"]).to eq("view_scores")
+      end
+
+      it 'redirects user to GitHub authorization page' do
+        get :view, @params
+        expect(response).to redirect_to(authorize_github_grades_path)
       end
     end
 
-    context 'when current assignment does not vary rubric by round' do
-      it 'calculates scores and renders grades#view page' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
-        params = {id: 1}
-        get :view, params
-        expect(controller.instance_variable_get(:@questions)[:review].size).to eq(1)
-        expect(response).to render_template(:view)
+    context "when user has logged into to GitHub" do
+      context 'when current assignment varies rubric by round' do
+        it 'retrieves questions, calculates scores and renders grades#view page' do
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
+          params = {id: 1}
+          get :view, params
+          expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
+          expect(response).to render_template(:view)
+        end
+      end
+
+      context 'when current assignment does not vary rubric by round' do
+        it 'calculates scores and renders grades#view page' do
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
+          allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
+          params = {id: 1}
+          get :view, params
+          expect(controller.instance_variable_get(:@questions)[:review].size).to eq(1)
+          expect(response).to render_template(:view)
+        end
       end
     end
+
   end
 
   describe '#view_my_scores' do
@@ -191,6 +213,36 @@ describe GradesController do
       post :save_grade_and_comment_for_submission, params
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/assignments/list_submissions?id=8')
+    end
+  end
+
+  describe "#get_statuses_for_pull_request" do
+    before(:each) do
+      allow(Net::HTTP).to receive(:get) {"{\"team\":\"rails\",\"players\":\"36\"}"}
+    end
+
+    it 'makes a call to the GitHub API to get status of the head commit passed' do
+      expect(controller.get_statuses_for_pull_request('qwerty123')).to eq({"team" => "rails", "players" => "36"})
+    end
+  end
+
+  describe '#view_github_metrics' do
+    context 'when user hasn\'t logged in to GitHub' do
+      before(:each) do
+        @params = {id: 900}
+        session["github_access_token"] = nil
+      end
+
+      it 'stores the current participant id and the view action' do
+        get :view_github_metrics, @params
+        expect(session["participant_id"]).to eq("900")
+        expect(session["github_view_type"]).to eq("view_submissions")
+      end
+
+      it 'redirects user to GitHub authorization page' do
+        get :view_github_metrics, @params
+        expect(response).to redirect_to(authorize_github_grades_path)
+      end
     end
   end
 end

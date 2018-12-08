@@ -236,11 +236,5 @@ describe "Staggered deadline test" do
     expect(page).to have_content 'Reviews for "Assignment1665"'
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
   end
-
-  it "When Creating new topic, it should take the offsets from the first topic of the assignment" def 
-    create(:topic, topic_name: "Topic_3")
-    click_link 'Hide start/due date'  
-    fill_in "field[due_date_3_submission_1_due_date]", :with => Time.now
-    expect(find_field('due_date_3_review_1_due_date').value).to eq Time.now
-  end
 end
+

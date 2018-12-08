@@ -10,8 +10,6 @@ if [ $DEPLOY_ENV = "green" ]
 then
   # Production deploy
   git checkout beta
-else
-  # Beta deploy
 fi
 
 docker build --force-rm --tag "${IMAGE_NAME}:${DEPLOY_ENV}" .

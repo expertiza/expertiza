@@ -10,5 +10,4 @@
 
 - name: Install Forever (to run node.js app)
   become: True
-  npm: name=forever global=yes 
-  state: present
+  npm: name=forever global=yes state=latest

@@ -453,7 +453,7 @@ class ReviewMappingController < ApplicationController
                             grade_receiver_id: Participant.find(params[:participant_id]).user_id,
                             grade: params[:grade_for_reviewer],
                             comment: params[:comment_for_reviewer],
-                            graded_at: Time.zone.now)
+                            graded_at: Time.now)
       review_grade.save!
     rescue StandardError
       flash[:error] = $ERROR_INFO

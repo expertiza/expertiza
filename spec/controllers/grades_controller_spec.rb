@@ -183,12 +183,22 @@ describe GradesController do
     it 'saves grade and comment for submission and redirects to assignments#list_submissions page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
       allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
+      session = {user: instructor} 
+      team = participant.team
+      
+      allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
+                            assignment_id: participant.assignment.id,
+                            grading_type: "Submission",
+                            grade_receiver_id: team.id,
+                            grade: 100,
+                            comment: 'comment',
+			    graded_at: anything)
       params = {
         participant_id: 1,
         grade_for_submission: 100,
         comment_for_submission: 'comment'
       }
-      post :save_grade_and_comment_for_submission, params
+      post :save_grade_and_comment_for_submission, params, session
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/assignments/list_submissions?id=8')
     end

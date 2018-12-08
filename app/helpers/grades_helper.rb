@@ -138,13 +138,22 @@ module GradesHelper
                         ticks: {
                             beginAtZero: true
                         },
+                        barThickness: 30,
+                        scaleLabel:  {
+                        display: true,
+                        labelString: 'Submission timeline'
+                        }
                     }],
             xAxes: [{
                         stacked: true,
                         ticks: {
                             beginAtZero: true
                         },
-                        barThickness: 30
+                        barThickness: 30,
+                        scaleLabel:  {
+                        display: true,
+                        labelString: '# of Commits'
+                        }
                     }]
 
         }

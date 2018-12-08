@@ -213,7 +213,7 @@ class GradesController < ApplicationController
       submission_hyperlink_tokens.pop
       hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
       hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-      github_data = get_pull_request_details_pull(hyperlink_data)
+      github_data = get_pull_request_details(hyperlink_data)
       parse_github_data_pull(github_data)
     end
   end

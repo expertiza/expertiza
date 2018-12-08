@@ -49,24 +49,28 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
-
+      #variable to store self review
       @store_needed_self_review = nil
-      self_reviews = SelfReviewResponseMap.get_assessments_for(team) #New Addition
+
+      #find and selected self reviewers based on current user role
+      self_reviews = SelfReviewResponseMap.get_assessments_for(team) # Get all Self Reviews for the team
       self_reviews.each do |review|
-        self_review_mapping = SelfReviewResponseMap.find(review.map_id) #New addition
+        self_review_mapping = SelfReviewResponseMap.find(review.map_id) # Find respons maps baed on map id
         if self_review_mapping && self_review_mapping.present?
+          # if the current role is not student fetch all self reviewers i.e instructor view
           if current_role_name != "Student"
             @list_of_reviewers << participant
           end
-          if participant.id == self_review_mapping.reviewer_id#New addition
-            participant = Participant.find(self_review_mapping.reviewer_id) #New addition
-            @list_of_reviewers << participant #New addition
-            @store_needed_self_review = review #New addition
+          # if it is a student view show only that particular students self review
+          if participant.id == self_review_mapping.reviewer_id
+            participant = Participant.find(self_review_mapping.reviewer_id)
+            @list_of_reviewers << participant
+            @store_needed_self_review = review
           end
         end
       end
 
-
+      #find and add all peer reviewers
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping && review_mapping.present?  #new addition
@@ -75,6 +79,7 @@ class VmQuestionResponse
         end
       end
 
+      #add all reviews i.e self  + peer , based on the role and type of assignment
       if @store_needed_self_review != nil and current_role_name.eql? "Student"
         @list_of_reviews = reviews + [@store_needed_self_review]
       elsif @store_needed_self_review != nil
@@ -82,8 +87,6 @@ class VmQuestionResponse
       else
         @list_of_reviews = reviews
       end
-
-
 
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
@@ -119,7 +122,7 @@ class VmQuestionResponse
         add_answer(answer)
       end
     end
-    #New Addition
+    # Find all answers based on user role
     if current_role_name != "Student" and @store_needed_self_review != nil
       answers = Answer.where(response_id: self_reviews.each {|self_review| self_review.response_id})
       answers.each do |answer|

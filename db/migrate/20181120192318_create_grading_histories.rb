@@ -7,7 +7,6 @@ class CreateGradingHistories < ActiveRecord::Migration
       t.integer :grade_receiver_id
       t.integer :grade
       t.text :comment
-      t.timestamp :graded_at
       t.timestamps null: false
     end
   end

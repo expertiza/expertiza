@@ -307,7 +307,7 @@ class GradesController < ApplicationController
             }
           }
         }"
-    }
+           }
     make_github_api_request(data)
   end
 
@@ -368,7 +368,7 @@ class GradesController < ApplicationController
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    request = Net::HTTP::Post.new(uri.path, {'Authorization' => 'Bearer' + ' ' + session["github_access_token"]})
+    request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"])
     request.body = data.to_json
     http.request(request)
     response = http.request(request)
@@ -392,11 +392,11 @@ class GradesController < ApplicationController
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
     @head_refs[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["headRefOid"]
 
-    if github_data["data"]["repository"]["pullRequest"]["merged"]
-      @merge_status[pull_request_number] = "MERGED"
-    else
-      @merge_status[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["mergeable"]
-    end
+    @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
+                                           "MERGED"
+                                         else
+                                           github_data["data"]["repository"]["pullRequest"]["mergeable"]
+                                         end
   end
 
   def get_query(is_initial_page, hyperlink_data)
@@ -425,7 +425,7 @@ class GradesController < ApplicationController
                           additions deletions changedFiles committedDate
                         }}}}}}}"
             }
-    #return data
+    return data
   end
 
   private

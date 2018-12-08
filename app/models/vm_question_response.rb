@@ -49,9 +49,9 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
-      #variable to store self review
+      # variable to store self review
       @store_needed_self_review = nil
-      #find and selected self reviewers based on current user role
+      # find and selected self reviewers based on current user role
       self_reviews = SelfReviewResponseMap.get_assessments_for(team) # Get all Self Reviews for the team
       self_reviews.each do |review|
         self_review_mapping = SelfReviewResponseMap.find(review.map_id) # Find respons maps baed on map id
@@ -68,7 +68,7 @@ class VmQuestionResponse
           end
         end
       end
-      #find and add all peer reviewers
+      # Find and add all peer reviewers
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping && review_mapping.present?
@@ -76,10 +76,10 @@ class VmQuestionResponse
           @list_of_reviewers << participant
         end
       end
-      #add all reviews i.e self  + peer , based on the role and type of assignment
-      if @store_needed_self_review != nil and current_role_name.eql? "Student"
+      # Add all reviews i.e self  + peer , based on the role and type of assignment
+      if !@store_needed_self_review.nil? and current_role_name.eql? "Student"
         @list_of_reviews = reviews + [@store_needed_self_review]
-      elsif @store_needed_self_review != nil
+      elsif !@store_needed_self_review.nil?
         @list_of_reviews = reviews + self_reviews
       else
         @list_of_reviews = reviews
@@ -119,12 +119,12 @@ class VmQuestionResponse
       end
     end
     # Find all answers based on user role
-    if current_role_name != "Student" and @store_needed_self_review != nil
+    if current_role_name != "Student" and !@store_needed_self_review.nil?
       answers = Answer.where(response_id: self_reviews.each {|self_review| self_review.response_id})
       answers.each do |answer|
         add_answer(answer)
       end
-    elsif @store_needed_self_review != nil
+    elsif !@store_needed_self_review.nil?
       answers = Answer.where(response_id: @store_needed_self_review.response_id)
       answers.each do |answer|
         add_answer(answer)

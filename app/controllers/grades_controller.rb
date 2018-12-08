@@ -308,7 +308,7 @@ class GradesController < ApplicationController
           }
         }"
     }
-    return make_github_api_request(data)
+    make_github_api_request(data)
   end
 
   def get_pull_request_details(hyperlink_data)
@@ -381,7 +381,7 @@ class GradesController < ApplicationController
         commits[date] ||= 0
       end
     end
-    @parsed_data.each { |author, commits| @parsed_data[author] = Hash[commits.sort_by { |date, _commit_count| date }] }
+    @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
   end
 
   def team_statistics(github_data)
@@ -425,7 +425,7 @@ class GradesController < ApplicationController
                           additions deletions changedFiles committedDate
                         }}}}}}}"
             }
-    return data
+    #return data
   end
 
   private

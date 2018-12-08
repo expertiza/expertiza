@@ -1,6 +1,6 @@
 describe SimilarAssignmentsController do
   describe "perform user validation" do
-    it "should redirect to assignments page when a student tries to get similar assignments" do
+    it "should redirect to assignments page when a student tries to fetch similar assignments" do
       params = {id: 1}
       user = build(:student)
       stub_current_user(user, user.role.name, user.role)
@@ -14,7 +14,7 @@ describe SimilarAssignmentsController do
       expect(response).to redirect_to('/student_task/list')
     end
   end
-  describe "perform basic html vlidation" do
+  describe "perform basic html validation" do
     it "should give content-type as text/html" do
       params = {id: 1}
       user = build(:student)

@@ -10,12 +10,12 @@
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
-    <% if @assignment.number_of_current_round(@topic_id) == 1 or (@assignment.number_of_current_round(@topic_id) >= 2 and @assignment.allow_doing_subsequent_review_without_first_round) %>  
+    <% if @assignment.number_of_current_round(@topic_id) == 1 or (@assignment.number_of_current_round(@topic_id) >= 2 and @assignment.allow_doing_subsequent_review_without_first_round) %>   
       <% if @assignment.dynamic_reviewer_assignment? %>
           <% if @num_reviews_in_progress >= Assignment.max_outstanding_reviews %>
               <br><br>
               <span>Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another.</span>
-          <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_reviews_total > @assignment.num_reviews%>
+          <% elsif @assignment.num_reviews && @assignment.num_reviews >= 0 && @num_reviews_total >= @assignment.num_reviews%>
               <br><br>
               <span>Note: You can't do more than <%=@assignment.num_reviews%> reviews according to assignment policy.</span>
           <%else %>

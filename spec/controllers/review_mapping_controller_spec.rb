@@ -32,7 +32,7 @@ describe ReviewMappingController do
         allow(AssignmentParticipant).to receive_message_chain(:where, :first)
           .with(parent_id: '1', user_id: 1).with(no_args).and_return(participant)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
-          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
+          .with(reviewed_object_id: '1', reviewer_id: 1, course_staff: true, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
         params = {id: 1, team_id: 1}
         session = {user: build(:instructor, id: 1)}
         get :add_calibration, params, session
@@ -49,7 +49,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create)
-          .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
+          .with(reviewed_object_id: '1', course_staff: true, reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
         params = {id: 1, team_id: 1}
         session = {user: build(:instructor, id: 1)}
         get :add_calibration, params, session
@@ -87,7 +87,7 @@ describe ReviewMappingController do
                                                        .and_return([double('AssignmentParticipant', id: 1, name: 'no one')])
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
-        allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
+        allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', course_staff: true, reviewed_object_id: 1).and_return(nil)
         post :add_reviewer, @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
@@ -398,7 +398,7 @@ describe ReviewMappingController do
       it 'add instructor as a reviwer and assigns the team a reviwer' do
         params = { team_id: 1, reviewer_id: 1, assignment_id: 1}
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
-        allow(ReviewResponseMap).to receive_message_chain(:where, :first).with(reviewee_id: 1, reviewer_id: 1, reviewed_object_id: '1').with(no_args).and_return(nil)
+        allow(ReviewResponseMap).to receive_message_chain(:where, :first).with(reviewee_id: 1, course_staff: true, reviewed_object_id: '1').with(no_args).and_return(nil)
         allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(user_id: '1', parent_id: 1).with(no_args).and_return(nil)
         session = {user: build(:instructor, id: 1)}
         allow(AssignmentParticipant).to receive(:create).with(parent_id: 1, user_id: 1, can_submit:false, can_review: true, can_take_quiz: false, handle: 'handle').and_return(reviewer)
@@ -415,7 +415,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive_message_chain(:where, :first).with(reviewee_id: 1, reviewer_id: 1, reviewed_object_id: '1').with(no_args).and_return(review_map)
         session = {user: build(:instructor, id: 1)}
         params = { team_id: 1, reviewer_id: 1, assignment_id: 1}
-        post :add_instructor_as_reviewer, params, sessions
+        post :add_instructor_as_reviewer, params, session
         expect(assigns(:review_map_id)).to eql(review_map)
         expect(response).to redirect_to('/response/new?id=1')
       end

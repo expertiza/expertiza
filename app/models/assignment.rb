@@ -323,8 +323,7 @@ class Assignment < ActiveRecord::Base
   def number_of_current_round(topic_id)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
     return 0 if next_due_date.nil?
-    next_due_date.round
-    #next_due_date.round ||= 0
+    next_due_date.round ||= 0
   end
 
   # For varying rubric feature

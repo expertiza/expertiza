@@ -12,6 +12,10 @@
 	<% colwidth = 15 %>
 <% end %>
 
+<%if @cscore %>
+  <% colwidth = 10 %>
+<%end%>
+
 <tr <% if prefix %>id='<%= prefix %>_1' style="background-color: #f9f9f9;"<% end %>>
 <th style="text-align:center;" WIDTH="<%= namecolwidth %>%">&nbsp;</th>
 <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</th>
@@ -22,7 +26,8 @@
 <% if has_team_and_metareview?[:has_team] %>
   <th style="text-align:center;" COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</th>
 <% end %>
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;</th></tr>           
+<th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;</th></tr>
+<th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;</th></tr>
 
 <tr <% if prefix %>id='<%= prefix %>_2' style="display:none; background-color: #f9f9f9;"<% end %>>
 <th style="text-align:left;" WIDTH="<%= namecolwidth %>%" ALIGN="LEFT">Contributor</th>
@@ -39,5 +44,9 @@
 	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
 	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
 <% end %>   
-<th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Score</th></tr>    
-    
+<th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Score</th>
+
+<%if @cscore%>
+  <th style="text-align:center;"  WIDTH="<%= colwidth %>%">Final Self Review Score</th>
+<%end%>
+</tr>

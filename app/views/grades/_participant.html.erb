@@ -8,6 +8,7 @@
 <% 
     participant = pscore[:participant]
     rscore_review = Rscore.new(pscore,:review) if pscore[:review]
+    cscore_review = Rscore.new(@cscore,:review) if @cscore[:review]
     rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview]
     rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback]
     rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate]
@@ -142,6 +143,9 @@
       <% end %>
       </TD>
     <% end %>
+  <TD align="center">
+    <%= cscore_review.my_avg.is_a?(Float)?sprintf("%.2f",cscore_review.my_avg):cscore_review.my_avg %><%= score_postfix %>
+  </TD>
 </TR>
 
 <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>

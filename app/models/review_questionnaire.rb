@@ -8,8 +8,8 @@ class ReviewQuestionnaire < Questionnaire
     "review".to_sym
   end
 
-  def get_assessments_for(participant)
-    participant.reviews
+  def get_assessments_for(participant, composite = false)
+    participant.reviews(composite)
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang

@@ -80,6 +80,9 @@ class GradesController < ApplicationController
     retrieve_questions questionnaires
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
+    if @assignment.is_selfreview_enabled?
+      @cscore = @participant.scores(@questions, true)
+    end
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
@@ -102,6 +105,10 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     retrieve_questions questionnaires
     @pscore = @participant.scores(@questions)
+    # To calculate self review average
+    if @assignment.is_selfreview_enabled?
+      @cscore = @participant.scores(@questions, true)
+    end
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary

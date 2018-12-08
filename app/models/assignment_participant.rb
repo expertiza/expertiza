@@ -50,10 +50,10 @@ class AssignmentParticipant < Participant
 
   # Return scores that this participant has been given
   # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
-  def scores(questions)
+  def scores(questions, composite = false)
     scores = {}
     scores[:participant] = self
-    compute_assignment_score(questions, scores)
+    compute_assignment_score(questions, scores, composite)
     scores[:total_score] = self.assignment.compute_total_score(scores)
     # merge scores[review#] (for each round) to score[review]  -Yang
     merge_scores(scores) if self.assignment.varying_rubrics_by_round?
@@ -76,7 +76,7 @@ class AssignmentParticipant < Participant
     calculate_scores(scores)
   end
 
-  def compute_assignment_score(questions, scores)
+  def compute_assignment_score(questions, scores, composite = false)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
       # create symbol for "varying rubrics" feature -Yang
@@ -89,7 +89,7 @@ class AssignmentParticipant < Participant
       scores[questionnaire_symbol] = {}
 
       scores[questionnaire_symbol][:assessments] = if round.nil?
-                                                     questionnaire.get_assessments_for(self)
+                                                     questionnaire.get_assessments_for(self, composite)
                                                    else
                                                      questionnaire.get_assessments_round_for(self, round)
                                                    end
@@ -149,10 +149,18 @@ class AssignmentParticipant < Participant
     FeedbackResponseMap.get_assessments_for(self)
   end
 
-  def reviews
+  def reviews(composite = false)
     # ACS Always get assessments for a team
-    # removed check to see if it is a team assignment
-    ReviewResponseMap.get_assessments_for(self.team)
+    # If self review enabled it pass self responses to calculate
+    puts composite
+    if composite
+      assignment_check = Assignment.find(self.team.parent_id)
+      if assignment_check.is_selfreview_enabled?
+        ResponseMap.get_assessments_for(self.team, self.id)
+      end
+    else
+      ReviewResponseMap.get_assessments_for(self.team)
+    end
   end
 
   def reviews_by_reviewer(reviewer)

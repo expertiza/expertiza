@@ -30,6 +30,12 @@
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
 <%= %>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<%if @current_role_name.eql? "Student"%>
+  <% rscore_review = Rscore.new(@cscore,:review) if @pscore[:review] %>
+  <%= %>
+  <h4>Average Self review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<%end %>
+
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">

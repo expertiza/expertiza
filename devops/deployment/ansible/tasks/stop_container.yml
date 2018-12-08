@@ -1,0 +1,15 @@
+- name: "Stop the container for Production(Blue)"
+  become: True
+  docker_container:
+    name: blue
+    state: stopped
+  when: deploy_env == "blue"
+  ignore_errors: True
+
+- name: "Stop the container for Beta(Green)"
+  become: True
+  docker_container:
+    name: green
+    state: stopped
+  when: deploy_env == "green"
+  ignore_errors: True

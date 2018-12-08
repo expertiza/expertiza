@@ -1,0 +1,19 @@
+- name: Enable UFW
+  become: true
+  shell: ufw enable
+
+- name: Open Ports
+  become: true
+  shell: ufw allow {{ item }}/tcp
+  loop:
+    - 4000
+
+- name: Reload UFW
+  become: true
+  shell: ufw reload
+
+- name: Add rule to IPTABLE
+  become: true
+  shell: iptables -I INPUT -p tcp -s 0.0.0.0/0 --dport {{ item }} -j ACCEPT
+  loop:
+    - 4000

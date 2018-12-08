@@ -51,11 +51,9 @@ class VmQuestionResponseRow
     @total_avg_score = average_score_for_row
     @peer_total = (@total_avg_score * @no_of_columns) - @self_review_score_of_row
     @peer_avg = @peer_total / (@no_of_columns - 1)
-
-    unless @peer_avg.nan?
-      #apply your formula here
-      #composite_score = (@self_review_score_of_row + @peer_avg)/ 100
-      composite_score = (100 - (@self_review_score_of_row - @peer_avg).abs) * (@peer_avg/100)
+    if !@peer_avg.nan?
+      # Apply your formula here
+      composite_score = (100 - (@self_review_score_of_row - @peer_avg).abs) * (@peer_avg / 100)
       composite_score.round(2)
     else
       composite_score = "Not applicable"

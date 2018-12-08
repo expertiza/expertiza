@@ -57,7 +57,7 @@ class VmQuestionResponse
         self_review_mapping = SelfReviewResponseMap.find(review.map_id) # Find respons maps baed on map id
         if self_review_mapping && self_review_mapping.present?
           # if the current role is not student fetch all self reviewers i.e instructor view
-          if current_role_name != "Student"
+          if !current_role_name.eql? "Student"
             @list_of_reviewers << participant
           end
           # if it is a student view show only that particular students self review

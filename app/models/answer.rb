@@ -22,7 +22,7 @@ class Answer < ActiveRecord::Base
         participant = Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id)
 
       user = User.find(participant.user_id)
-      unless current_user.is_student? # if the review does not belog to student, increment count of staff review. Will be helpful while displaying in grades tab
+      unless user.is_student? # if the review does not belog to student, increment count of staff review. Will be helpful while displaying in grades tab
         number_of_instructor_reviews = number_of_instructor_reviews + 1
       else
         curr_score = get_total_score(response: [assessment], questions: questions)

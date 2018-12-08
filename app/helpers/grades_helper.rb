@@ -127,37 +127,6 @@ module GradesHelper
         labels: dates,
         datasets: dataArray
     }
-    options = {
-        responsive:true,
-        maintainAspectRatio: false,
-        width: 100,
-        height:100,
-        scales: {
-            yAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: true
-                        },
-                        barThickness: 30,
-                        scaleLabel:  {
-                        display: true,
-                        labelString: 'Submission timeline'
-                        }
-                    }],
-            xAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: true
-                        },
-                        barThickness: 30,
-                        scaleLabel:  {
-                        display: true,
-                        labelString: '# of Commits'
-                        }
-                    }]
-
-        }
-    }
     horizontal_bar_chart data, get_chart_options
   end
 

@@ -51,7 +51,6 @@ class VmQuestionResponse
                 end
       #variable to store self review
       @store_needed_self_review = nil
-
       #find and selected self reviewers based on current user role
       self_reviews = SelfReviewResponseMap.get_assessments_for(team) # Get all Self Reviews for the team
       self_reviews.each do |review|
@@ -69,16 +68,14 @@ class VmQuestionResponse
           end
         end
       end
-
       #find and add all peer reviewers
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
-        if review_mapping && review_mapping.present?  #new addition
+        if review_mapping && review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
           @list_of_reviewers << participant
         end
       end
-
       #add all reviews i.e self  + peer , based on the role and type of assignment
       if @store_needed_self_review != nil and current_role_name.eql? "Student"
         @list_of_reviews = reviews + [@store_needed_self_review]
@@ -87,7 +84,6 @@ class VmQuestionResponse
       else
         @list_of_reviews = reviews
       end
-
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|

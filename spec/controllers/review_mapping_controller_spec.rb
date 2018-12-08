@@ -538,6 +538,7 @@ describe ReviewMappingController do
                                                                     .and_return([participant, participant1])
         allow(assignment).to receive(:compute_reviews_hash).and_return('1' => 'good')
         allow(assignment).to receive(:compute_avg_and_ranges_hash).and_return(avg: 94, range: [90, 99])
+        allow(assignment).to receive(:compute_author_feedback_scores).with(no_args)
         params = {
           id: 1,
           report: {type: 'ReviewResponseMap'},

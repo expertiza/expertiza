@@ -2,10 +2,10 @@ describe OnTheFlyCalc do
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
-  let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
+  let(:response) { build(:response, id: 1, map_id: 1, scores: [answer], round: 1) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:team) { build(:assignment_team) }
-  let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
+  let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 1) }
   let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
   let(:contributor) { build(:assignment_team, id: 1) }
   let(:reviewed_team) { build(:assignment_team, id: 2) }
@@ -79,18 +79,18 @@ describe OnTheFlyCalc do
     let(:feedback_question) { build(:question, questionnaire: questionnaire2, weight: 1, id: 2) }
     let(:questionnaire2) { build(:questionnaire, name: "feedback", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
     let(:reviewer1) { build(:participant, id: 2) }
-    let score = {}
     let(:team_user) { build(:team_user, team: 2, user: 2) }
     let(:feedback_response) { build(:response, id: 2, map_id: 2, scores: [feedback]) }
     let(:feedback_response_map) { build(:response_map, id: 2, reviewed_object_id: 1, reviewer_id: 2, reviewee_id: 1) }
+    let(:response_map) { build(:review_response_map, id: 1, reviewer_id: 1) }
 
-    before(:each) do
-      allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
-      allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
-    end
     context 'verifies feedback score' do
       it 'computes feedback score based on reviews' do
-        expect(assignment.compute_author_feedback_scores).to eq(score)
+        allow(ResponseMap).to receive(:where).and_return([response_map])
+        allow(Response).to receive(:where).and_return([response])
+        allow(assignment).to receive(:calc_avg_feedback_score).with(response)
+        expect(assignment).to receive(:calc_avg_feedback_score).with([response])
+        expect(assignment.compute_author_feedback_scores).to eq({})
       end
     end
   end

@@ -10,9 +10,7 @@ module SignUpSheetHelper
     topic_due_date = TopicDueDate.where(parent_id: topic_id,
                                         deadline_type_id: deadline_type_id,
                                         round: review_round).first rescue nil
-    if !topic_due_date.nil?
-      topic_due_date.due_at
-    end
+    topic_due_date.nil? ? topic_due_date : topic_due_date.due_at
   end
 
   # Retrieve topics suggested by signed in user for

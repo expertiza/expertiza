@@ -1,8 +1,7 @@
 describe "Staggered deadline test" do
   before(:each) do
     # assignment and topic
-    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true,
-           max_team_size: 1, is_anonymous: true)
+    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true, max_team_size: 1)
     create_list(:participant, 3)
     create(:topic, topic_name: "Topic_1")
     create(:topic, topic_name: "Topic_2")
@@ -11,7 +10,6 @@ describe "Staggered deadline test" do
     # rubric
     create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
-    #create(:questionnaire, name: "AuthorFeedbackQuestionnaire", type: 'AuthorFeedbackQuestionnaire')
     create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, type: "Criterion")
     create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Criterion")
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
@@ -249,8 +247,8 @@ describe "Staggered deadline test" do
     expect(page).to have_content 'Show start/due date'
     click_link 'Show start/due date'
     expect(page).to have_content 'Hide start/due date'
-    current_time = DateTime.now
-    fill_in 'due_date_3_submission_1_due_date', :with => current_time
+    current_time = DateTime.current
+    fill_in 'due_date_3_submission_1_due_date', with: current_time
     expect(find_field("due_date_3_submission_1_due_date").value).to_not eq(nil)
     find(:xpath, ".//input[@id='due_date_3_review_1_due_date']").click
     expect(find_field("due_date_3_review_1_due_date").value).to_not eq(nil)

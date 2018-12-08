@@ -209,7 +209,6 @@ class GradesController < ApplicationController
       submission_hyperlink_tokens = hyperlink.split('/')
       hyperlink_data = {}
       hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
-      @merge_status[hyperlink_data["pull_request_number"].to_i] = nil
       submission_hyperlink_tokens.pop
       hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
       hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
@@ -230,7 +229,8 @@ class GradesController < ApplicationController
     end
   end
 
-  def retrieve_github_data(team_links)
+  def retrieve_github_data
+    team_links = @team.hyperlinks
     pull_links = team_links.select do |link|
       link.match(/pull/) && link.match(/github.com/)
     end
@@ -241,6 +241,12 @@ class GradesController < ApplicationController
         link.match(/github.com/)
       end
       retrieve_repository_data(repo_links)
+    end
+  end
+
+  def retrieve_check_run_statuses
+    @headRefs.each do |pull_number, ref|
+      @check_statuses[pull_number] = get_statuses_for_pull_request(ref)
     end
   end
 
@@ -270,14 +276,12 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
 
-    retrieve_github_data(@team.hyperlinks)
+    retrieve_github_data
+    retrieve_check_run_statuses
 
     @authors=@authors.keys
     @dates=@dates.keys.sort
 
-    @headRefs.each do |pull_number, ref|
-      @check_statuses[pull_number] = get_statuses_for_pull_request(ref)
-    end
   end
 
   def authorize_github
@@ -335,8 +339,8 @@ class GradesController < ApplicationController
     set_team_statistics(github_data)
     commit_objects = github_data["data"]["repository"]["pullRequest"]["commits"]["edges"]
     commit_objects.each do |commit_object|
-      author_name = commit_object["node"]["commit"]["author"]["name"];
-      commit_date = commit_object["node"]["commit"]["committedDate"].to_s;
+      author_name = commit_object["node"]["commit"]["author"]["name"]
+      commit_date = commit_object["node"]["commit"]["committedDate"].to_s
       commit_date = commit_date[0, 10]
       @authors[author_name] ||= 1
       @dates[commit_date] ||= 1
@@ -353,8 +357,8 @@ class GradesController < ApplicationController
   def parse_github_data_repo(github_data)
     commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
     commit_objects.each do |commit_object|
-      author_name = commit_object["node"]["author"]["name"];
-      commit_date = commit_object["node"]["author"]["date"].to_s;
+      author_name = commit_object["node"]["author"]["name"]
+      commit_date = commit_object["node"]["author"]["date"].to_s
       commit_date = commit_date[0, 10]
       @authors[author_name] ||= 1
       @dates[commit_date] ||= 1

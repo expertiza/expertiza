@@ -216,13 +216,115 @@ describe GradesController do
     end
   end
 
-  describe "#get_statuses_for_pull_request" do
+  describe '#get_statuses_for_pull_request' do
     before(:each) do
       allow(Net::HTTP).to receive(:get) {"{\"team\":\"rails\",\"players\":\"36\"}"}
     end
 
     it 'makes a call to the GitHub API to get status of the head commit passed' do
       expect(controller.get_statuses_for_pull_request('qwerty123')).to eq({"team" => "rails", "players" => "36"})
+    end
+  end
+
+  describe '#retrieve_pull_request_data' do
+    before(:each) do
+      allow(controller).to receive(:get_pull_request_details).and_return({"pr" => "details"})
+      allow(controller).to receive(:parse_github_data_pull)
+    end
+
+    it 'gets pull request details for each PR link submitted' do
+      expect(controller).to receive(:get_pull_request_details).with(
+          {
+              "pull_request_number" => "1261",
+              "repository_name" => "expertiza",
+              "owner_name" => "expertiza"
+          })
+      expect(controller).to receive(:get_pull_request_details).with(
+          {
+              "pull_request_number" => "1293",
+              "repository_name" => "mamaMiya",
+              "owner_name" => "Shantanu"
+          })
+      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261", "https://github.com/Shantanu/mamaMiya/pull/1293"])
+    end
+
+    it 'calls parse_github_data_pull on each of the PR details' do
+      expect(controller).to receive(:parse_github_data_pull).with({"pr" => "details"}).twice
+      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261", "https://github.com/Shantanu/mamaMiya/pull/1293"])
+    end
+  end
+
+  describe '#retrieve_repository_data' do
+    before(:each) do
+      allow(controller).to receive(:get_github_data_repo).and_return({"pr" => "details"})
+      allow(controller).to receive(:parse_github_data_repo)
+    end
+
+    it 'gets details for each repo link submitted, excluding those for expertiza and servo' do
+      expect(controller).to receive(:get_github_data_repo).with(
+          {
+              "repository_name" => "website",
+              "owner_name" => "Shantanu"
+          })
+      expect(controller).to receive(:get_github_data_repo).with(
+          {
+              "repository_name" => "OODD",
+              "owner_name" => "Edward"
+          })
+      controller.retrieve_repository_data(["https://github.com/Shantanu/website", "https://github.com/Edward/OODD", "https://github.com/expertiza/expertiza", "https://github.com/Shantanu/expertiza]"])
+    end
+
+    it 'calls parse_github_data_repo on each of the PR details' do
+      expect(controller).to receive(:parse_github_data_repo).with({"pr" => "details"}).twice
+      controller.retrieve_repository_data(["https://github.com/Shantanu/website", "https://github.com/Edward/OODD"])
+    end
+  end
+
+  describe '#retrieve_github_data' do
+    before(:each) do
+      allow(controller).to receive(:retrieve_pull_request_data)
+      allow(controller).to receive(:retrieve_repository_data)
+    end
+
+    context 'when pull request links have been submitted' do
+      before(:each) do
+        teams_mock = double
+        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website", "https://github.com/Shantanu/website/pull/1123"])
+        controller.instance_variable_set(:@team, teams_mock)
+      end
+
+      it 'retrieves PR data only' do
+        expect(controller).to receive(:retrieve_pull_request_data).with(["https://github.com/Shantanu/website/pull/1123"])
+        controller.retrieve_github_data
+      end
+    end
+
+    context 'when pull request links have not been submitted' do
+      before(:each) do
+        teams_mock = double
+        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website", "https://github.com/expertiza/expertiza"])
+        controller.instance_variable_set(:@team, teams_mock)
+      end
+
+      it 'retrieves repo details ' do
+        expect(controller).to receive(:retrieve_repository_data).with(["https://github.com/Shantanu/website", "https://github.com/expertiza/expertiza"])
+        controller.retrieve_github_data
+      end
+    end
+  end
+
+  describe '#retrieve_check_run_statuses' do
+    before(:each) do
+      allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
+      controller.instance_variable_set(:@headRefs, {"1234" => "qwerty", "5678" => "asdfg"})
+      controller.instance_variable_set(:@check_statuses, {})
+    end
+
+    it 'gets and stores the statuses associated with head commits of PRs' do
+      expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
+      expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
+      controller.retrieve_check_run_statuses
+      expect(controller.instance_variable_get(:@check_statuses)).to eq({"1234" => "check_status", "5678" => "check_status"})
     end
   end
 
@@ -249,10 +351,23 @@ describe GradesController do
       before(:each) do
         session["github_access_token"] = "qwerty"
         allow(controller).to receive(:get_statuses_for_pull_request).and_return("status")
+        allow(controller).to receive(:retrieve_github_data)
+        allow(controller).to receive(:retrieve_check_run_statuses)
       end
 
       it 'stores the GitHub access token for later use' do
+        get :view_github_metrics, {id: '1'}
+        expect(controller.instance_variable_get(:@token)).to eq("qwerty")
+      end
 
+      it 'calls retrieve_github_data to retrieve data from GitHub' do
+        expect(controller).to receive(:retrieve_github_data)
+        get :view_github_metrics, {id: '1'}
+      end
+
+      it 'calls retrieve_check_run_statuses to retrieve check runs data' do
+        expect(controller).to receive(:retrieve_check_run_statuses)
+        get :view_github_metrics, {id: '1'}
       end
     end
   end

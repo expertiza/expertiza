@@ -229,7 +229,7 @@ describe GradesController do
   describe '#retrieve_pull_request_data' do
     before(:each) do
       allow(controller).to receive(:get_pull_request_details).and_return({"pr" => "details"})
-      allow(controller).to receive(:parse_github_data_pull)
+      allow(controller).to receive(:parse_github_pull_request_data)
     end
 
     it 'gets pull request details for each PR link submitted' do
@@ -249,24 +249,24 @@ describe GradesController do
     end
 
     it 'calls parse_github_data_pull on each of the PR details' do
-      expect(controller).to receive(:parse_github_data_pull).with({"pr" => "details"}).twice
+      expect(controller).to receive(:parse_github_pull_request_data).with({"pr" => "details"}).twice
       controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261", "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
   end
 
   describe '#retrieve_repository_data' do
     before(:each) do
-      allow(controller).to receive(:get_github_data_repo).and_return({"pr" => "details"})
-      allow(controller).to receive(:parse_github_data_repo)
+      allow(controller).to receive(:get_github_repository_details).and_return({"pr" => "details"})
+      allow(controller).to receive(:parse_github_repository_data)
     end
 
     it 'gets details for each repo link submitted, excluding those for expertiza and servo' do
-      expect(controller).to receive(:get_github_data_repo).with(
+      expect(controller).to receive(:get_github_repository_details).with(
           {
               "repository_name" => "website",
               "owner_name" => "Shantanu"
           })
-      expect(controller).to receive(:get_github_data_repo).with(
+      expect(controller).to receive(:get_github_repository_details).with(
           {
               "repository_name" => "OODD",
               "owner_name" => "Edward"
@@ -275,7 +275,7 @@ describe GradesController do
     end
 
     it 'calls parse_github_data_repo on each of the PR details' do
-      expect(controller).to receive(:parse_github_data_repo).with({"pr" => "details"}).twice
+      expect(controller).to receive(:parse_github_repository_data).with({"pr" => "details"}).twice
       controller.retrieve_repository_data(["https://github.com/Shantanu/website", "https://github.com/Edward/OODD"])
     end
   end
@@ -316,7 +316,7 @@ describe GradesController do
   describe '#retrieve_check_run_statuses' do
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
-      controller.instance_variable_set(:@headRefs, {"1234" => "qwerty", "5678" => "asdfg"})
+      controller.instance_variable_set(:@head_refs, {"1234" => "qwerty", "5678" => "asdfg"})
       controller.instance_variable_set(:@check_statuses, {})
     end
 
@@ -369,6 +369,205 @@ describe GradesController do
         expect(controller).to receive(:retrieve_check_run_statuses)
         get :view_github_metrics, {id: '1'}
       end
+    end
+  end
+
+  describe '#authorize_github' do
+    it 'redirects the user to GitHub authorization page' do
+      get :authorize_github
+      expect(response).to redirect_to("https://github.com/login/oauth/authorize?client_id=qwerty12345")
+    end
+  end
+
+  describe '#get_github_repository_details' do
+    before(:each) do
+      allow(controller).to receive(:make_github_graphql_request).and_return({"github": "github"})
+    end
+
+    it 'gets  make_github_graphql_request with query for repository' do
+      hyperlink_data = {
+          "owner_name" => "Shantanu",
+          "repository_name" => "expertiza"
+      }
+
+      expect(controller).to receive(:make_github_graphql_request).with(
+          {
+              query: "query {
+        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
+          ref(qualifiedName: \"master\") {
+            target {
+              ... on Commit {
+                id
+                  history(first: 100) {
+                    edges {
+                      node {
+                        id author {
+                          name email date
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }"
+          })
+      details = controller.get_github_repository_details(hyperlink_data)
+      expect(details).to eq({"github": "github"})
+    end
+  end
+
+  describe '#get_pull_request_details' do
+    before(:each) do
+      allow(controller).to receive(:get_query)
+      allow(controller).to receive(:make_github_graphql_request).and_return(
+          {
+            "data" => {
+                "repository" => {
+                    "pullRequest" => {
+                        "commits" => {
+                            "edges" => [],
+                            "pageInfo" => {
+                                "hasNextPage" => false,
+                                "endCursor" => "qwerty"
+                            }
+                        }
+                    }
+                }
+            }
+          })
+    end
+
+    it 'gets pull request data for link passed' do
+      data = controller.get_pull_request_details("https://github.com/expertiza/expertiza")
+      expect(data).to eq({
+        "data" => {
+           "repository" => {
+               "pullRequest" => {
+                   "commits" => {
+                       "edges" => [],
+                       "pageInfo" => {
+                           "hasNextPage" => false,
+                           "endCursor" => "qwerty"
+                       }
+                   }
+               }
+           }
+        }
+        })
+    end
+  end
+
+  describe '#process_github_authors_and_dates' do
+    before(:each) do
+      controller.instance_variable_set(:@authors, {})
+      controller.instance_variable_set(:@dates, {})
+      controller.instance_variable_set(:@parsed_data, {})
+    end
+    it 'sets authors and data for GitHub data' do
+      controller.process_github_authors_and_dates("author", "date")
+      expect(controller.instance_variable_get(:@authors)).to eq({"author" => 1})
+      expect(controller.instance_variable_get(:@dates)).to eq({"date" => 1})
+      expect(controller.instance_variable_get(:@parsed_data)).to eq({"author" => { "date" => 1 }})
+
+      controller.process_github_authors_and_dates("author", "date")
+      expect(controller.instance_variable_get(:@parsed_data)).to eq({"author" => { "date" => 2 }})
+    end
+  end
+
+  describe '#parse_github_pull_request_data' do
+    before(:each) do
+      allow(controller).to receive(:process_github_authors_and_dates)
+      allow(controller).to receive(:team_statistics)
+      allow(controller).to receive(:organize_commit_dates)
+      @github_data = {
+          "data" => {
+              "repository" => {
+                  "pullRequest" => {
+                      "commits" => {
+                          "edges" => [
+                              {
+                                  "node" => {
+                                      "commit" => {
+                                        "author" => {
+                                            "name" => "Shantanu",
+                                        },
+                                        "committedDate" => "2018-12-1013:45"
+                                      }
+                                  }
+                              }
+                          ]
+                      }
+                  }
+              }
+          }
+      }
+    end
+
+    it 'calls team_statistics' do
+      expect(controller).to receive(:team_statistics).with(@github_data)
+      controller.parse_github_pull_request_data(@github_data)
+    end
+
+    it 'calls process_github_authors_and_dates for each commit object of GitHub data passed in' do
+      expect(controller).to receive(:process_github_authors_and_dates).with("Shantanu", "2018-12-10")
+      controller.parse_github_pull_request_data(@github_data)
+    end
+
+    it 'calls organize_commit_dates' do
+      expect(controller).to receive(:organize_commit_dates)
+      controller.parse_github_pull_request_data(@github_data)
+    end
+  end
+
+  describe '#parse_github_repository_data' do
+    before(:each) do
+      allow(controller).to receive(:process_github_authors_and_dates)
+      allow(controller).to receive(:organize_commit_dates)
+      @github_data = {
+          "data" => {
+              "repository" => {
+                  "ref" => {
+                      "target" => {
+                          "history" => {
+                              "edges" => [
+                                  {
+                                      "node" => {
+                                          "author" => {
+                                              "name" => "Shantanu",
+                                              "date" => "2018-12-1013:45"
+                                          }
+                                      }
+                                  }
+                              ]
+                          }
+                      }
+                  }
+              }
+          }
+      }
+    end
+
+    it 'calls process_github_authors_and_dates for each commit object of GitHub data passed in' do
+      expect(controller).to receive(:process_github_authors_and_dates).with("Shantanu", "2018-12-10")
+      controller.parse_github_repository_data(@github_data)
+    end
+
+    it 'calls organize_commit_dates' do
+      expect(controller).to receive(:organize_commit_dates)
+      controller.parse_github_repository_data(@github_data)
+    end
+  end
+
+  describe '#make_github_graphql_request' do
+    before(:each) do
+      session['github_access_token'] = "qwerty"
+    end
+
+    it 'gets data from GitHub api v4(graphql)' do
+      response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
+      expect(response).to eq({"message"=>"Bad credentials", "documentation_url"=>"https://developer.github.com/v4"})
     end
   end
 end

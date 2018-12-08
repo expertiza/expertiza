@@ -211,7 +211,7 @@ class GradesController < ApplicationController
       hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
       hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
       github_data = get_pull_request_details(hyperlink_data)
-      parse_github_data_pull(github_data)
+      parse_github_pull_request_data(github_data)
     end
   end
 
@@ -222,8 +222,8 @@ class GradesController < ApplicationController
       hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
       next if hyperlink_data["repository_name"] == "servo" || hyperlink_data["repository_name"] == "expertiza"
       hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
-      github_data = get_github_data_repo(hyperlink_data)
-      parse_github_data_repo(github_data)
+      github_data = get_github_repository_details(hyperlink_data)
+      parse_github_repository_data(github_data)
     end
   end
 
@@ -285,7 +285,7 @@ class GradesController < ApplicationController
     redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
   end
 
-  def get_github_data_repo(hyperlink_data)
+  def get_github_repository_details(hyperlink_data)
     data = {
       query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
@@ -308,22 +308,24 @@ class GradesController < ApplicationController
           }
         }"
     }
-    make_github_api_request(data)
+    make_github_graphql_request(data)
   end
 
   def get_pull_request_details(hyperlink_data)
-    response_data = make_github_api_request(get_query(true, hyperlink_data))
-
-    @has_next_page = response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["hasNextPage"]
-    @end_cursor = response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["endCursor"]
-
+    @has_next_page = true
+    @end_cursor = ""
+    all_edges = []
+    response_data = {}
     while @has_next_page
-      new_response_data = make_github_api_request(get_query(false, hyperlink_data))
-      response_data["data"]["repository"]["pullRequest"]["commits"]["edges"].push(*new_response_data["data"]["repository"]["pullRequest"]["commits"]["edges"])
-      @has_next_page = new_response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["hasNextPage"]
-      @end_cursor = new_response_data["data"]["repository"]["pullRequest"]["commits"]["pageInfo"]["endCursor"]
+      response_data = make_github_graphql_request(get_query(hyperlink_data))
+      current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
+      current_page_info = current_commits["pageInfo"]
+      all_edges.push(*current_commits["edges"])
+      @has_next_page = current_page_info["hasNextPage"]
+      @end_cursor =current_page_info["endCursor"]
     end
 
+    response_data["data"]["repository"]["pullRequest"]["commits"]["edges"] = all_edges
     response_data
   end
 
@@ -338,7 +340,7 @@ class GradesController < ApplicationController
                                              end
   end
 
-  def parse_github_data_pull(github_data)
+  def parse_github_pull_request_data(github_data)
     team_statistics(github_data)
     pull_request_object = github_data["data"]["repository"]["pullRequest"]
     commit_objects = pull_request_object["commits"]["edges"]
@@ -351,7 +353,7 @@ class GradesController < ApplicationController
     organize_commit_dates
   end
 
-  def parse_github_data_repo(github_data)
+  def parse_github_repository_data(github_data)
     commit_history = github_data["data"]["repository"]["ref"]["target"]["history"]
     commit_objects = commit_history["edges"]
     commit_objects.each do |commit_object|
@@ -363,7 +365,7 @@ class GradesController < ApplicationController
     organize_commit_dates
   end
 
-  def make_github_api_request(data)
+  def make_github_graphql_request(data)
     uri = URI.parse("https://api.github.com/graphql")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -399,18 +401,13 @@ class GradesController < ApplicationController
                                          end
   end
 
-  def get_query(is_initial_page, hyperlink_data)
-    commit_query_line = if is_initial_page
-                          "commits(first:100){"
-                        else
-                          "commits(first:100, after:" + @end_cursor + "){"
-                        end
-    {
+  def get_query(hyperlink_data)
+    return {
       query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
           pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
             number additions deletions changedFiles mergeable merged headRefOid
-              " + commit_query_line + "
+              commits(first:100, after:" + @end_cursor + "){
                 totalCount
                   pageInfo{
                     hasNextPage startCursor endCursor

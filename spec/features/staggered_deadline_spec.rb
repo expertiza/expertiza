@@ -247,7 +247,6 @@ describe "Staggered deadline test" do
 =end
     login_as("instructor6")
     assignment = Assignment.find_by(name: 'Assignment1665')
-    puts assignment.id
     visit '/assignments/1/edit'
     click_link 'Topics'
     expect(page).to have_content 'Show start/due date'

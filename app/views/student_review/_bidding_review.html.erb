@@ -1,0 +1,44 @@
+<SCRIPT LANGUAGE="JavaScript">
+    function toggleVis(value, id) {
+        var elem = document.getElementById(id);
+        if (value) {
+            elem.style.display = 'none';
+        } else {
+            elem.style.display = '';
+        }
+    }
+</SCRIPT>
+
+<h1>Sign-up sheet for bidding</h1>
+<div style="display:block">
+  <h3 style="width: 40%; float: left">Review Topics</h3>
+</div>
+
+<div style="display:block">
+  <div style="display:inline-block" >
+    <!--Topics table-->
+    <table style="width: 48%; float: left" class="general">
+      <tr><%= render :partial => 'table_header' %></tr>
+      <br/><br/>
+      <% i=1 %>
+      <tbody id="reviews" data-update-url=<%= "/student_review/set_priority?participant_id=#{participant.id}" %> class="connectedSortable">
+      <tr class="sort-disabled"><td></td><td></td></tr>
+      <% for biditem in @biditems %>
+        <%#= get_intelligent_review_row(biditem) %>
+        <tr style="background-color:rgb(47,352,0)" id="topic_<%= biditem[:team_id] %>">
+        <%= render :partial => 'table_line', :locals => {:i=>i, :biditem=>biditem} %>
+        </tr>
+        <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <% session[:return_to] = request.url %>
+    <br/>
+    <br/>
+    <a href="javascript:history.back()">Back</a>
+    <br/>
+  </div>
+</div>

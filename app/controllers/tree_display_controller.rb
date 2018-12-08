@@ -92,7 +92,7 @@ class TreeDisplayController < ApplicationController
 
   # finding out child_nodes from params
   def child_nodes_from_params(child_nodes)
-    if child_nodes.is_a? String
+    if child_nodes.is_a? String and !child_nodes.empty?
       JSON.parse(child_nodes)
     else
       child_nodes
@@ -105,9 +105,10 @@ class TreeDisplayController < ApplicationController
       "course_id" => node.get_course_id,
       "max_team_size" => node.get_max_team_size,
       "is_intelligent" => node.get_is_intelligent,
+      "has_topic" => node.bidding_review?,
       "require_quiz" => node.get_require_quiz,
-      "allow_suggestions" => node.get_allow_suggestions,
-      "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+      "allow_suggestions" => node.get_allow_suggestions
+      # "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
     )
   end
 

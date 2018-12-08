@@ -1,20 +1,31 @@
 version: '3'
 
 services:
-  expertiza:
-    image: winbobob/expertiza:test
+  expertiza_blue:
+    image: expertiza:blue
     ports:
       - '3000:3000'
-    volumes:
-      - '.:/root/expertiza'
     depends_on:
       - scrubbed_db
       - redis
     links:
       - scrubbed_db
       - redis
-    working_dir: /root/expertiza
     command: bundle exec thin start -p 3000
+    environment:
+      REDIS_HOST: redis
+
+  expertiza_green:
+    image: expertiza:green
+    ports:
+      - '3001:3001'
+    depends_on:
+      - scrubbed_db
+      - redis
+    links:
+      - scrubbed_db
+      - redis
+    command: bundle exec thin start -p 3001
     environment:
       REDIS_HOST: redis
 

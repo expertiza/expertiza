@@ -183,7 +183,7 @@ describe QuestionnairesController do
         allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6))
         session = {user: instructor}
         params = {id: 1}
-        get :edit, params
+        get :edit, params, session
         expect(response).to render_template(:edit)
       end
     end
@@ -193,7 +193,7 @@ describe QuestionnairesController do
         allow(Questionnaire).to receive(:find).with('666').and_return(nil)
         session = {user: instructor}
         params = {id: 666}
-        get :edit, params
+        get :edit, params, session
         expect(response).to redirect_to('/')
       end
     end
@@ -280,18 +280,6 @@ describe QuestionnairesController do
         expect(flash[:error]).to eq nil
         expect(response).to redirect_to('/tree_display/list')
       end
-    end
-  end
-
-  describe '#toggle_access' do
-    it 'redirects to tree_display#list page' do
-      allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-      allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return(true)
-      params = {id: 1}
-      get :toggle_access, params
-      expect(response).to redirect_to('/tree_display/list')
-      expect(controller.instance_variable_get(:@questionnaire).private).to eq true
-      expect(controller.instance_variable_get(:@access)).to eq('private')
     end
   end
 

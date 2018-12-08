@@ -106,53 +106,53 @@ module GradesHelper
   end
 
   def display_github_metrics(parsed_data, authors, dates)
-    dataArray = []
-    color = %w(red yellow blue gray green magenta)
+    data_array = []
+    color = ["red", "yellow", "blue", "gray", "green", "magenta"]
     i = 0
     authors.each do |author|
-      dataobject = {}
-      dataobject['label'] = author
-      dataobject['data'] = parsed_data[author].values
-      dataobject['backgroundColor'] = color[i]
-      dataobject['borderWidth'] = 1
-      dataArray.push(dataobject)
+      data_object = {}
+      data_object['label'] = author
+      data_object['data'] = parsed_data[author].values
+      data_object['backgroundColor'] = color[i]
+      data_object['borderWidth'] = 1
+      data_array.push(data_object)
       i += 1
-      if i > 5
-        i = 0
-      end
+      i = 0 if i > 5
     end
 
     data = {
-        labels: dates,
-        datasets: dataArray
+      labels: dates,
+      datasets: data_array
     }
-    horizontal_bar_chart data, get_chart_options
+    horizontal_bar_chart data, chart_options
   end
 
-  def get_chart_options
+  def chart_options
     options = {
-      responsive: true, maintainAspectRatio: false, width: 100, height:100,
-        scales: {
-          yAxes: [{
-            stacked: true,
-            ticks: {
-              beginAtZero: true
-            }, barThickness: 30,
-            scaleLabel:  {
-              display: true, labelString: 'Submission timeline'
-            }
-          }],
-          xAxes: [{
-            stacked: true,
-              ticks: {
-                beginAtZero: true
-              }, barThickness: 30,
-            scaleLabel:  {
-              display: true, labelString: '# of Commits'
-            }
-          }]
-        }
-      }
+                responsive: true, maintainAspectRatio: false, width: 100, height: 100,
+                  scales: {
+                    yAxes: [{
+                      stacked: true,
+                      ticks: {
+                        beginAtZero: true
+                      },
+                      barThickness: 30,
+                      scaleLabel:  {
+                        display: true, labelString: 'Submission timeline'
+                      }
+                    }],
+                    xAxes: [{
+                      stacked: true,
+                        ticks: {
+                          beginAtZero: true
+                        },
+                      barThickness: 30,
+                      scaleLabel:  {
+                        display: true, labelString: '# of Commits'
+                      }
+                    }]
+                  }
+              }
     return options
   end
 end

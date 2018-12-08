@@ -121,38 +121,47 @@ module GradesHelper
     end
 
     data = {
-      labels: dates,
-      datasets: data_array
-    }
+              labels: dates,
+              datasets: data_array
+           }
     horizontal_bar_chart data, chart_options
   end
 
   def chart_options
     options = {
-                responsive: true, maintainAspectRatio: false, width: 100, height: 100,
-                  scales: {
-                    yAxes: [{
-                      stacked: true,
-                      ticks: {
-                        beginAtZero: true
-                      },
-                      barThickness: 30,
-                      scaleLabel:  {
-                        display: true, labelString: 'Submission timeline'
-                      }
-                    }],
-                    xAxes: [{
-                      stacked: true,
-                        ticks: {
-                          beginAtZero: true
-                        },
-                      barThickness: 30,
-                      scaleLabel:  {
-                        display: true, labelString: '# of Commits'
-                      }
-                    }]
-                  }
+                 responsive: true,
+                 maintainAspectRatio: false,
+                 width: 100,
+                 height: 100,
+                 scales: graph_scales
               }
     return options
+  end
+
+  def graph_scales
+    scales = {
+                yAxes: [{
+                           stacked: true,
+                           ticks: {
+                                     beginAtZero: true
+                                  },
+                           barThickness: 30,
+                           scaleLabel:  {
+                                           display: true,
+                                           labelString: 'Submission timeline'
+                                        }
+                         }],
+                xAxes: [{
+                           stacked: true,
+                           ticks: {
+                                     beginAtZero: true
+                                  },
+                           barThickness: 30,
+                           scaleLabel:  {
+                                           display: true,
+                                           labelString: '# of Commits'
+                                        }
+                        }]
+              }
   end
 end

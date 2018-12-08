@@ -638,12 +638,12 @@ describe ReviewMappingController do
       session = {user: double('User', id: 1)}
 
       allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
-                                                                    assignment_id: '1',
-                                                                    grading_type: 'Review',
-                                                                    grade_receiver_id: 2,
-                                                                    grade: '90',
-                                                                    comment: 'keke',
-                                                                    graded_at: anything)
+                                                     assignment_id: '1',
+                                                     grading_type: 'Review',
+                                                     grade_receiver_id: 2,
+                                                     grade: '90',
+                                                     comment: 'keke',
+                                                     graded_at: anything)
 
       params = {
         participant_id: 1,

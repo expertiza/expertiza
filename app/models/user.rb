@@ -60,10 +60,9 @@ class User < ActiveRecord::Base
 
   # This method is used to identify if the user (not student) can signup a team/student for an assignment
   def can_signup_someone_for?(id)
-   # assignment = Assignment.find(AssignmentParticipant.find(id.to_i).assignment.id)
     assignment = Assignment.find(id.to_i)
     instructor = User.find(assignment.instructor_id)
-    self.role.name != 'Student' && ((%w[Super-Administrator ].include? self.role.name) ||
+    self.role.name != 'Student' && ((%w[Super-Administrator].include? self.role.name) ||
         self.can_impersonate?(instructor) ||
         (assignment.instructor_id == self.id) ||
        (instructor.can_impersonate?(self) && self.role.name != 'Student') ||

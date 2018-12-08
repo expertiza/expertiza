@@ -6,7 +6,7 @@ module SignUpSheetHelper
     due_date ? DateTime.parse(due_date.to_s).strftime("%Y-%m-%d %H:%M:%S") : nil
   end
 
-  def get_topic_deadline(assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
+  def get_topic_deadline(_assignment_due_dates, topic_id, deadline_type_id = 1, review_round = 1)
     topic_due_date = TopicDueDate.where(parent_id: topic_id,
                                         deadline_type_id: deadline_type_id,
                                         round: review_round).first rescue nil

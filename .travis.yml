@@ -18,14 +18,10 @@ install:
 
 deploy:
   - provider: script
-    script: bash devops/deployment/deploy.sh blue
-    on:
-      branchs: 
-        only: 
-          - master
-  - provider: script
     script: bash devops/deployment/deploy.sh green
     on:
-      branchs: 
-        only:
-          - beta
+      branch: beta
+  - provider: script
+    script: bash devops/deployment/deploy.sh blue
+    on:
+      branch: master

@@ -61,12 +61,11 @@ class User < ActiveRecord::Base
   def  can_signup_someone_for?(id)
     assignment = Assignment.find(AssignmentParticipant.find(id.to_i).assignment.id)
     instructor = User.find(assignment.instructor_id)
-   (%w[Super-Administrator ].include? self.role.name) ||
+    self.role.name != 'Student' && (
         self.can_impersonate?(instructor) ||
-        (assignment.instructor_id == self.id)||
-       (instructor.can_impersonate?(self) && self.role.name != 'Student') ||
-        (assignment.course_id && Course.find(assignment.course_id).instructor_id == self.id)
-
+        assignment.instructor_id == self.id||
+       instructor.can_impersonate?(self)  ||
+        (assignment.course_id && Course.find(assignment.course_id).instructor_id == self.id))
   end
   def recursively_parent_of(user)
     p = user.parent

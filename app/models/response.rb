@@ -235,7 +235,7 @@ class Response < ActiveRecord::Base
     code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     team_id = response_map.reviewee_id
-    supplementary_review_questionnaire_id= Team.get_supplementary_review_questionnaire_id_of_team(team_id)
+    supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(team_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
 

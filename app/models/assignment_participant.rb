@@ -152,7 +152,6 @@ class AssignmentParticipant < Participant
   def reviews(composite = false)
     # ACS Always get assessments for a team
     # If self review enabled it pass self responses to calculate
-    puts composite
     if composite
       assignment_check = Assignment.find(self.team.parent_id)
       if assignment_check.is_selfreview_enabled?

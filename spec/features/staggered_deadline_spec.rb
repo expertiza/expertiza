@@ -238,6 +238,10 @@ describe "Staggered deadline test" do
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
   end
 
+  # the test will test the Java script which is embedded into the sign up sheet. The java script will
+  # computer the offset in dates for the deadlines using the first topic and as soon as we input the date
+  # in the first field of a new topic , the other deadlines corresponding to the topic will be populated
+  # automatically using the offsets that were calculated from the first topic.
   it "test4:When creating a new topic when already a topic exists for assignment , it should take the offset from the first topic for setting the due dates.",
      js: true do
     login_as("instructor6")

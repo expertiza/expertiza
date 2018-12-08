@@ -254,8 +254,12 @@ describe "Staggered deadline test" do
     click_link 'Show start/due date'
     #find(:xpath, ".//a[@href='#due_date']").click
     expect(page).to have_content 'Hide start/due date'
-    fill_in 'due_date_3_submission_1_due_date', :with => DateTime.now
-    expect(find_field("due_date_3_review_1_due_date").value).to eq(DateTime.now +10)
+    current_time = DateTime.now
+    fill_in 'due_date_3_submission_1_due_date', :with => current_time
+    expect(find_field("due_date_3_submission_1_due_date").value).to eq(current_time)
+    expected_review_time = current_time + 10
+    find(:xpath, ".//input[@id='due_date_3_review_1_due_date']").click
+    expect(find_field("due_date_3_review_1_due_date").value).to eq(expected_review_time)
   end
 end
 

@@ -243,7 +243,7 @@ class GradesController < ApplicationController
   end
 
   def retrieve_check_run_statuses
-    @headRefs.each do |pull_number, ref|
+    @head_refs.each do |pull_number, ref|
       @check_statuses[pull_number] = get_statuses_for_pull_request(ref)
     end
   end
@@ -256,7 +256,7 @@ class GradesController < ApplicationController
       return
     end
 
-    @headRefs = {}
+    @head_refs = {}
     @parsed_data = {}
     @authors = {}
     @dates = {}
@@ -306,7 +306,8 @@ class GradesController < ApplicationController
               }
             }
           }
-        }"}
+        }"
+    }
     return make_github_api_request(data)
   end
 
@@ -330,11 +331,11 @@ class GradesController < ApplicationController
     @authors[author_name] ||= 1
     @dates[commit_date] ||= 1
     @parsed_data[author_name] ||= {}
-    if @parsed_data[author_name][commit_date]
-      @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
-    else
-      @parsed_data[author_name][commit_date] = 1
-    end
+    @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
+                                               @parsed_data[author_name][commit_date] + 1
+                                             else
+                                               1
+                                             end
   end
 
   def parse_github_data_pull(github_data)
@@ -389,7 +390,7 @@ class GradesController < ApplicationController
     @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
     @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
-    @headRefs[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["headRefOid"]
+    @head_refs[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["headRefOid"]
 
     if github_data["data"]["repository"]["pullRequest"]["merged"]
       @merge_status[pull_request_number] = "MERGED"
@@ -399,7 +400,11 @@ class GradesController < ApplicationController
   end
 
   def get_query(is_initial_page, hyperlink_data)
-    is_initial_page ? commit_query_line = "commits(first:100){" : commit_query_line = "commits(first:100, after:" + @end_cursor + "){"
+    commit_query_line = if is_initial_page
+                          "commits(first:100){"
+                        else
+                          "commits(first:100, after:" + @end_cursor + "){"
+                        end
     data = {
       query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {

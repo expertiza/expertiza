@@ -1,14 +1,17 @@
 describe "Staggered deadline test" do
   before(:each) do
     # assignment and topic
-    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true)
+    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true,
+           max_team_size: 1, is_anonymous: true)
     create_list(:participant, 3)
     create(:topic, topic_name: "Topic_1")
     create(:topic, topic_name: "Topic_2")
+    create(:topic, topic_name: "Topic_3")
 
     # rubric
     create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
+    #create(:questionnaire, name: "AuthorFeedbackQuestionnaire", type: 'AuthorFeedbackQuestionnaire')
     create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, type: "Criterion")
     create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Criterion")
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
@@ -235,6 +238,25 @@ describe "Staggered deadline test" do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
+  end
+
+  it "test4:When creating a new topic when already a topic exists for assignment , it should take the offset from the first topic for setting the due dates.",js: true do
+=begin
+    user = User.find_by(name: 'instructor6')
+    stub_current_user(user, user.role.name, user.role)
+=end
+    login_as("instructor6")
+    assignment = Assignment.find_by(name: 'Assignment1665')
+    puts assignment.id
+    visit '/assignments/1/edit'
+    click_link 'Topics'
+    expect(page).to have_content 'Show start/due date'
+    #find("a[href='#due_date']").click
+    click_link 'Show start/due date'
+    #find(:xpath, ".//a[@href='#due_date']").click
+    expect(page).to have_content 'Hide start/due date'
+    fill_in 'due_date_3_submission_1_due_date', :with => DateTime.now
+    expect(find_field("due_date_3_review_1_due_date").value).to eq(DateTime.now +10)
   end
 end
 

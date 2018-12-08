@@ -43,7 +43,7 @@ describe GradesController do
 
     context 'when current assignment does not vary rubric by round' do
       it 'calculates scores and renders grades#view page' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
+        allow(Asrspec specsignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
         params = {id: 1}
         get :view, params
@@ -105,7 +105,7 @@ describe GradesController do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
       assignment_questionnaire.used_in_round = nil
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
-      allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([review_response])
+      allow(review_questionnaire).to receive(:get_assessments_for).with(participant, false).and_return([review_response])
       allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
       params = {id: 1}

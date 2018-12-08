@@ -14,12 +14,10 @@ class ResponseMap < ActiveRecord::Base
       @array_sort = []
       @sort_to = []
       # find maps based on self review and peer reviews
-      puts pid
       if pid.nil?
         maps = where(reviewee_id: team.id)
       else
         maps = where(reviewee_id: team.id, reviewer_id: pid)
-        puts where(reviewee_id: team.id, reviewer_id: pid).to_sql
       end
       maps.each do |map|
         next if map.response.empty?

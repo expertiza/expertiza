@@ -68,8 +68,8 @@ class User < ActiveRecord::Base
         instructor = User.find(assignment.instructor_id)
         self.role.name != 'Student' && ((%w[Super-Administrator ].include? self.role.name) ||
             self.can_impersonate?(instructor) || (assignment.instructor_id == self.id) ||
-            (instructor.can_impersonate?(self) && self.role.name != 'Student') || (assignment.course_id && Course.find(assignment.course_id).instructor_id == self.id))
-
+            (instructor.can_impersonate?(self) && self.role.name != 'Student') ||
+            (assignment.course_id && Course.find(assignment.course_id).instructor_id == self.id))
       end
     end
   end

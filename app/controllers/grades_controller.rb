@@ -307,7 +307,7 @@ class GradesController < ApplicationController
             }
           }
         }"
-           }
+    }
     make_github_api_request(data)
   end
 
@@ -367,7 +367,7 @@ class GradesController < ApplicationController
     uri = URI.parse("https://api.github.com/graphql")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
     request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"])
     request.body = data.to_json
     http.request(request)
@@ -405,7 +405,7 @@ class GradesController < ApplicationController
                         else
                           "commits(first:100, after:" + @end_cursor + "){"
                         end
-    data = {
+    {
       query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
           pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
@@ -417,15 +417,13 @@ class GradesController < ApplicationController
                     }
                       edges{
                         node{
-                          id
-                          commit{
-                            author{
-                              name
-                            }
-                          additions deletions changedFiles committedDate
+                          id  commit{
+                                author{
+                                  name
+                                }
+                               additions deletions changedFiles committedDate
                         }}}}}}}"
-            }
-    return data
+    }
   end
 
   private

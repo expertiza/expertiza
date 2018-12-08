@@ -338,15 +338,9 @@ class GradesController < ApplicationController
       author_name = commit_object["node"]["commit"]["author"]["name"];
       commit_date = commit_object["node"]["commit"]["committedDate"].to_s;
       commit_date = commit_date[0, 10]
-      unless @authors.key?(author_name)
-        @authors[author_name] = 1
-      end
-      unless @dates.key?(commit_date)
-        @dates[commit_date] = 1
-      end
-      unless @parsed_data[author_name]
-        @parsed_data[author_name] = {}
-      end
+      @authors[author_name] ||= 1
+      @dates[commit_date] ||= 1
+      @parsed_data[author_name] ||= {}
       if @parsed_data[author_name][commit_date]
         @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
       else
@@ -362,15 +356,9 @@ class GradesController < ApplicationController
       author_name = commit_object["node"]["author"]["name"];
       commit_date = commit_object["node"]["author"]["date"].to_s;
       commit_date = commit_date[0, 10]
-      unless @authors.key?(author_name)
-        @authors[author_name] = 1
-      end
-      unless @dates.key?(commit_date)
-        @dates[commit_date] = 1
-      end
-      unless @parsed_data[author_name]
-        @parsed_data[author_name] = {}
-      end
+      @authors[author_name] ||= 1
+      @dates[commit_date] ||= 1
+      @parsed_data[author_name] ||= {}
       if @parsed_data[author_name][commit_date]
         @parsed_data[author_name][commit_date] = @parsed_data[author_name][commit_date] + 1
       else

@@ -106,9 +106,8 @@ module GradesHelper
   end
 
   def display_github_metrics(parsed_data, authors, dates)
-
     dataArray = []
-    color = ["red","yellow","blue","gray","green","magenta"]
+    color = %w(red yellow blue gray green magenta)
     i = 0
     authors.each do |author|
       dataobject = {}
@@ -117,8 +116,8 @@ module GradesHelper
       dataobject['backgroundColor'] = color[i]
       dataobject['borderWidth'] = 1
       dataArray.push(dataobject)
-      i+=1
-      if i>5
+      i += 1
+      if i > 5
         i = 0
       end
     end
@@ -131,37 +130,29 @@ module GradesHelper
   end
 
   def get_chart_options
-  options = {
-        responsive:true,
-        maintainAspectRatio: false,
-        width: 100,
-        height:100,
+    options = {
+      responsive: true, maintainAspectRatio: false, width: 100, height:100,
         scales: {
-            yAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: true
-                        },
-                        barThickness: 30,
-                        scaleLabel:  {
-                        display: true,
-                        labelString: 'Submission timeline'
-                        }
-                    }],
-            xAxes: [{
-                        stacked: true,
-                        ticks: {
-                            beginAtZero: true
-                        },
-                        barThickness: 30,
-                        scaleLabel:  {
-                        display: true,
-                        labelString: '# of Commits'
-                        }
-                    }]
-
+          yAxes: [{
+            stacked: true,
+            ticks: {
+              beginAtZero: true
+            }, barThickness: 30,
+            scaleLabel:  {
+              display: true, labelString: 'Submission timeline'
+            }
+          }],
+          xAxes: [{
+            stacked: true,
+              ticks: {
+                beginAtZero: true
+              }, barThickness: 30,
+            scaleLabel:  {
+              display: true, labelString: '# of Commits'
+            }
+          }]
         }
-    }
-  return options
+      }
+    return options
   end
 end

@@ -41,53 +41,52 @@
 </div><br><br>
 
 
-<h3>Code frequency</h3>
-<div class="chart-container" style="width: 1000px; height:600px;">
-  <% if(@parsed_data != nil && @authors != nil && @dates!= nil)%>
+<% if @parsed_data && @authors.present? && @dates %>
+  <h3>Code frequency</h3>
+  <div class="chart-container" style="width: 1000px; height:600px;">
     <%= display_github_metrics(@parsed_data, @authors, @dates) %>
-  <% else%>
-    <h3 style="font-weight:bold;display:inline-block;">No github data to show</h3><br/>
-  <%end%>
-</div>
-<br>
-
-<br>
-<h3>Team Statistics</h3>
-<ul>
-  <li>Total number of commits:<%= @total_commits %></li>
-  <li>Total number of lines added: <%= @total_additions %></li>
-  <li>Total number of lines removed: <%= @total_deletions %></li>
-  <li>Total number of files changed: <%= @total_files_changed %></li>
-  <li>
-    <div>Merge statuses:</div>
-    <ul>
-      <% @merge_status.each do |k, v| %>
-        <li>Pull Request Number <%= k %> has status: <%= v %> </li>
-      <% end %>
-    </ul>
-  </li>
-  <li>
-    <span>Check Statuses:</span>
-    <% if @check_statuses.empty? %>
-        <span>NA</span>
-    <% else %>
+  </div>
+  <h3>Team Statistics</h3>
+  <ul>
+    <li>Total number of commits:<%= @total_commits %></li>
+    <li>Total number of lines added: <%= @total_additions %></li>
+    <li>Total number of lines removed: <%= @total_deletions %></li>
+    <li>Total number of files changed: <%= @total_files_changed %></li>
+    <li>
+      <div>Merge statuses:</div>
       <ul>
-        <% @check_statuses.each do |pull_number, check_status| %>
-          <li>
-            <div>Pull request: <%= pull_number %></div>
-            <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>
-            <div>Results:</div>
-            <ul>
-              <% check_status["statuses"].each do |status| %>
-                <li><strong><%= status["context"] %></strong>
-                  <div>Check status: <span class=<%= status_classes[status["state"]] %>><%= status["state"] %></span></div>
-                  <div>Check description: <%= status["description"] %></div>
-                </li>
-              <% end %>
-            </ul>
-          </li>
+        <% @merge_status.each do |k, v| %>
+          <li>Pull Request Number <%= k %> has status: <%= v %> </li>
         <% end %>
       </ul>
-    <% end %>
-  </li>
-</ul>
+    </li>
+    <li>
+      <span>Check Statuses:</span>
+      <% if @check_statuses.empty? %>
+          <span>NA</span>
+      <% else %>
+        <ul>
+          <% @check_statuses.each do |pull_number, check_status| %>
+            <li>
+              <div>Pull request: <%= pull_number %></div>
+              <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>
+              <% if check_status["statuses"].present? %>
+                <div>Results:</div>
+                <ul>
+                  <% check_status["statuses"].each do |status| %>
+                    <li><strong><%= status["context"] %></strong>
+                      <div>Check status: <span class=<%= status_classes[status["state"]] %>><%= status["state"] %></span></div>
+                      <div>Check description: <%= status["description"] || "NA" %></div>
+                    </li>
+                  <% end %>
+                </ul>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </li>
+  </ul>
+<% else %>
+  <h4 style="font-weight:bold;display:inline-block;">No github data to show</h4>
+<% end %>

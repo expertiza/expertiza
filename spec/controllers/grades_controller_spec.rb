@@ -244,5 +244,16 @@ describe GradesController do
         expect(response).to redirect_to(authorize_github_grades_path)
       end
     end
+
+    context 'when user has logged in to GitHub' do
+      before(:each) do
+        session["github_access_token"] = "qwerty"
+        allow(controller).to receive(:get_statuses_for_pull_request).and_return("status")
+      end
+
+      it 'stores the GitHub access token for later use' do
+
+      end
+    end
   end
 end

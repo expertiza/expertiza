@@ -204,6 +204,46 @@ class GradesController < ApplicationController
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
   end
 
+  def retrieve_pull_request_data(pull_links)
+    pull_links.each do |hyperlink|
+      submission_hyperlink_tokens = hyperlink.split('/')
+      hyperlink_data = {}
+      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
+      @merge_status[hyperlink_data["pull_request_number"].to_i] = nil
+      submission_hyperlink_tokens.pop
+      hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
+      hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
+      github_data = get_pull_request_details_pull(hyperlink_data)
+      parse_github_data_pull(github_data)
+    end
+  end
+
+  def retrieve_repository_data(repo_links)
+    repo_links.each do |hyperlink|
+      submission_hyperlink_tokens = hyperlink.split('/')
+      hyperlink_data = {}
+      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
+      next if hyperlink_data["repository_name"] == "servo" || hyperlink_data["repository_name"] == "expertiza"
+      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
+      github_data = get_github_data_repo(hyperlink_data)
+      parse_github_data_repo(github_data)
+    end
+  end
+
+  def retrieve_github_data(team_links)
+    pull_links = team_links.select do |link|
+      link.match(/pull/) && link.match(/github.com/)
+    end
+    if pull_links.length > 0
+      retrieve_pull_request_data(pull_links)
+    else
+      repo_links = team_links.select do |link|
+        link.match(/github.com/)
+      end
+      retrieve_repository_data(repo_links)
+    end
+  end
+
   def view_github_metrics
     if session["github_access_token"].nil?
       session["participant_id"] = params[:id]
@@ -229,33 +269,11 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    submission_hyperlink = nil
 
-    @participant.team.hyperlinks.each do |hyperlink|
-      if hyperlink.match(/pull/) && hyperlink.match(/github.com/)
-        submission_hyperlink = hyperlink
-        submission_hyperlink_tokens = submission_hyperlink.split('/')
-        hyperlink_data = {}
-        hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
-        @merge_status[hyperlink_data["pull_request_number"].to_i] = nil
-        submission_hyperlink_tokens.pop
-        hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
-        hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-        github_data = get_pull_request_details(hyperlink_data)
-        parse_github_data_pull(github_data)
-      elsif hyperlink.match(/github.com/) && !hyperlink.match(/expertiza/)
-        submission_hyperlink = hyperlink
-        submission_hyperlink_tokens = submission_hyperlink.split('/')
-        hyperlink_data = {}
-        hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
-        hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-        github_data = get_github_data_repo(hyperlink_data)
-        parse_github_data_repo(github_data)
-      end
+    retrieve_github_data(@team.hyperlinks)
 
-    end
-    @authors = @authors.keys
-    @dates = @dates.keys.sort
+    @authors=@authors.keys
+    @dates=@dates.keys.sort
 
     @headRefs.each do |pull_number, ref|
       @check_statuses[pull_number] = get_statuses_for_pull_request(ref)

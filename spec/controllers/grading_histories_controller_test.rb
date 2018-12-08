@@ -18,7 +18,8 @@ class GradingHistoriesControllerTest < ActionController::TestCase
 
   test "should create grading_history" do
     assert_difference('GradingHistory.count') do
-      post :create, grading_history: { assignment_id: @grading_history.assignment_id, comment: @grading_history.comment, grade: @grading_history.grade, grade_type: @grading_history.grade_type, instructor_id: @grading_history.instructor_id, student_id: @grading_history.student_id, timestamp: @grading_history.timestamp }
+      post :create, grading_history: {assignment_id: @grading_history.assignment_id, comment: @grading_history.comment,
+                                      grade: @grading_history.grade, grade_type: @grading_history.grade_type, instructor_id: @grading_history.instructor_id, student_id: @grading_history.student_id, timestamp: @grading_history.timestamp}
     end
 
     assert_redirected_to grading_history_path(assigns(:grading_history))
@@ -35,7 +36,8 @@ class GradingHistoriesControllerTest < ActionController::TestCase
   end
 
   test "should update grading_history" do
-    patch :update, id: @grading_history, grading_history: { assignment_id: @grading_history.assignment_id, comment: @grading_history.comment, grade: @grading_history.grade, grade_type: @grading_history.grade_type, instructor_id: @grading_history.instructor_id, student_id: @grading_history.student_id, timestamp: @grading_history.timestamp }
+    patch :update, id: @grading_history, grading_history: {assignment_id: @grading_history.assignment_id, comment: @grading_history.comment,
+                                                           grade: @grading_history.grade, grade_type: @grading_history.grade_type, instructor_id: @grading_history.instructor_id, student_id: @grading_history.student_id, timestamp: @grading_history.timestamp}
     assert_redirected_to grading_history_path(assigns(:grading_history))
   end
 

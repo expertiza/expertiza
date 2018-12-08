@@ -638,20 +638,20 @@ describe ReviewMappingController do
       session = {user: double('User', id: 1)}
 
       allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
-                            assignment_id: '1',
-                            grading_type: 'Review',
-                            grade_receiver_id: 2,
-                            grade: '90',
-                            comment: 'keke',
-                            graded_at: anything)
+                                                                    assignment_id: '1',
+                                                                    grading_type: 'Review',
+                                                                    grade_receiver_id: 2,
+                                                                    grade: '90',
+                                                                    comment: 'keke',
+                                                                    graded_at: anything)
 
       params = {
         participant_id: 1,
         grade_for_reviewer: 90,
         comment_for_reviewer: 'keke',
-	assignment_id: 1 
+	      assignment_id: 1
       }
-      #session = {user: double('User', id: 1)}
+      # session = {user: double('User', id: 1)}
       post :save_grade_and_comment_for_reviewer, params, session
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/review_mapping/response_report?id=1')

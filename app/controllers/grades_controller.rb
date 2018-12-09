@@ -322,7 +322,7 @@ class GradesController < ApplicationController
       current_page_info = current_commits["pageInfo"]
       all_edges.push(*current_commits["edges"])
       @has_next_page = current_page_info["hasNextPage"]
-      @end_cursor =current_page_info["endCursor"]
+      @end_cursor = current_page_info["endCursor"]
     end
 
     response_data["data"]["repository"]["pullRequest"]["commits"]["edges"] = all_edges
@@ -402,7 +402,7 @@ class GradesController < ApplicationController
   end
 
   def get_query(hyperlink_data)
-    return {
+    {
       query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
           pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {

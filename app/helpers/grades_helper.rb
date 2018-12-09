@@ -128,18 +128,17 @@ module GradesHelper
   end
 
   def chart_options
-    options = {
+    {
       responsive: true,
       maintainAspectRatio: false,
       width: 100,
       height: 100,
       scales: graph_scales
     }
-    return options
   end
 
   def graph_scales
-    scales = {
+    {
       yAxes: [{
         stacked: true,
         ticks: {

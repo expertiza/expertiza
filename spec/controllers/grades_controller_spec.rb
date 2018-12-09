@@ -416,16 +416,14 @@ describe GradesController do
     before(:each) do
       allow(controller).to receive(:get_query)
       allow(controller).to receive(:make_github_graphql_request).and_return(
-        {
-          "data" => {
-            "repository" => {
-              "pullRequest" => {
-                "commits" => {
-                  "edges" => [],
-                  "pageInfo" => {
-                    "hasNextPage" => false,
-                    "endCursor" => "qwerty"
-                  }
+        "data" => {
+          "repository" => {
+            "pullRequest" => {
+              "commits" => {
+                "edges" => [],
+                "pageInfo" => {
+                  "hasNextPage" => false,
+                  "endCursor" => "qwerty"
                 }
               }
             }
@@ -487,7 +485,7 @@ describe GradesController do
                       "commit" => {
                         "author" => {
                           "name" => "Shantanu"
-                          },
+                        },
                         "committedDate" => "2018-12-1013:45"
                       }
                     }
@@ -601,13 +599,13 @@ describe GradesController do
 
   describe '#team_statistics' do
     before(:each) do
-     controller.instance_variable_set(:@total_additions, 0)
-     controller.instance_variable_set(:@total_deletions, 0)
-     controller.instance_variable_set(:@total_files_changed, 0)
-     controller.instance_variable_set(:@total_commits, 0)
-     controller.instance_variable_set(:@head_refs, [])
-     controller.instance_variable_set(:@merge_status, [])
-   end
+      controller.instance_variable_set(:@total_additions, 0)
+      controller.instance_variable_set(:@total_deletions, 0)
+      controller.instance_variable_set(:@total_files_changed, 0)
+      controller.instance_variable_set(:@total_commits, 0)
+      controller.instance_variable_set(:@head_refs, [])
+      controller.instance_variable_set(:@merge_status, [])
+    end
 
     it 'parses data from github data for pull Request' do
       controller.team_statistics(
@@ -639,8 +637,8 @@ describe GradesController do
 
   describe '#organize_commit_dates' do
     before(:each) do
-     controller.instance_variable_set(:@dates, "2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1)
-     controller.instance_variable_set(:@parsed_data, "abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2})
+      endcontroller.instance_variable_set(:@dates, "2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1)
+      controller.instance_variable_set(:@parsed_data, "abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2})
     end
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do

@@ -570,4 +570,37 @@ describe GradesController do
       expect(response).to eq({"message"=>"Bad credentials", "documentation_url"=>"https://developer.github.com/v4"})
     end
   end
+
+  describe 'get_query' do
+    before(:each) do
+      controller.instance_variable_set(:@end_cursor,"")
+    end
+    it 'constructs the graphql query' do
+      query = {
+          query: "query {
+        repository(owner: \"expertiza\", name:\"expertiza\") {
+          pullRequest(number: 1228) {
+            number additions deletions changedFiles mergeable merged headRefOid
+              commits(first:100, after:){
+                totalCount
+                  pageInfo{
+                    hasNextPage startCursor endCursor
+                    }
+                      edges{
+                        node{
+                          id  commit{
+                                author{
+                                  name
+                                }
+                               additions deletions changedFiles committedDate
+                        }}}}}}}"
+      }
+      hyperlink_data = {}
+      hyperlink_data["owner_name"] = "expertiza"
+      hyperlink_data["repository_name"] = "expertiza"
+      hyperlink_data["pull_request_number"] = "1228"
+      response = controller.get_query(hyperlink_data)
+      expect(response).to eq(query)
+    end
+  end
 end

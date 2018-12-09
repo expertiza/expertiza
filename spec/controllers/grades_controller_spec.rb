@@ -591,4 +591,58 @@ describe GradesController do
       expect(response).to eq(query)
     end
   end
+
+  describe '#team_statistics' do
+    before(:each) do
+
+     controller.instance_variable_set(:@total_additions, 0)
+     controller.instance_variable_set(:@total_deletions, 0)
+     controller.instance_variable_set(:@total_files_changed, 0)
+     controller.instance_variable_set(:@total_commits, 0)
+     controller.instance_variable_set(:@head_refs, [])
+     controller.instance_variable_set(:@merge_status, [])
+   end
+
+    it 'parses data from github data for pull Request' do
+           controller.team_statistics({"data"=>
+                                              {"repository"=>
+                                                            {
+                                                            "pullRequest"=>
+                                                                          {
+                                                                          "number"=>8,
+                                                                          "additions"=>2,
+                                                                          "deletions"=>1,
+                                                                          "changedFiles"=>3,
+                                                                          "mergeable"=>"UNKNOWN",
+                                                                          "merged"=>true,
+                                                                          "headRefOid"=>"123abc",
+                                                                          "commits"=>
+                                                                                    {
+                                                                                    "totalCount"=>16,
+                                                                                    "pageInfo"=>{},
+                                                                                    "edges"=>[]
+                                                                                    }
+                                                                          }
+                                                            }
+                                               }
+                                      })
+            expect(controller.instance_variable_get(:@total_additions)).to eq(2)
+            expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
+            expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
+            expect(controller.instance_variable_get(:@total_commits)).to eq(16)
+     end
+  end
+
+  describe '#organize_commit_dates' do
+    before(:each) do
+     controller.instance_variable_set(:@dates, {"2017-04-05"=>1, "2017-04-13"=>1, "2017-04-14"=>1})
+     controller.instance_variable_set(:@parsed_data, {"abc"=>{"2017-04-14"=>2, "2017-04-13"=>2, "2017-04-05"=>2}})
+    end
+
+    it 'calls organize_commit_dates to sort parsed commits by dates' do
+     controller.organize_commit_dates
+     expect(controller.instance_variable_get(:@parsed_data)).to eq({"abc"=>{"2017-04-05"=>2, "2017-04-13"=>2, "2017-04-14"=>2}})
+    end
+  end
+
 end

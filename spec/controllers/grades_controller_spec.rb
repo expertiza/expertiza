@@ -217,7 +217,7 @@ describe GradesController do
 
   describe '#get_statuses_for_pull_request' do
     before(:each) do
-      allow(Net::HTTP).to receive(:get) {"{\"team\":\"rails\",\"players\":\"36\"}"}
+      allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
     end
 
     it 'makes a call to the GitHub API to get status of the head commit passed' do
@@ -318,8 +318,8 @@ describe GradesController do
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
       controller.retrieve_check_run_statuses
-      expect(controller.instance_variable_get(:@check_statuses)).to eq({"1234" => "check_status",
-                                                                        "5678" => "check_status"})
+      expect(controller.instance_variable_get(:@check_statuses)).to eq("1234" => "check_status",
+                                                                       "5678" => "check_status")
     end
   end
 
@@ -381,13 +381,12 @@ describe GradesController do
 
     it 'gets  make_github_graphql_request with query for repository' do
       hyperlink_data = {
-          "owner_name" => "Shantanu",
-          "repository_name" => "expertiza"
+        "owner_name" => "Shantanu",
+        "repository_name" => "expertiza"
       }
 
       expect(controller).to receive(:make_github_graphql_request).with(
-          {
-              query: "query {
+        query:       "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
           ref(qualifiedName: \"master\") {
             target {
@@ -407,9 +406,9 @@ describe GradesController do
             }
           }
         }"
-          })
+      )
       details = controller.get_github_repository_details(hyperlink_data)
-      expect(details).to eq({"github": "github"})
+      expect(details).to eq("github": "github")
     end
   end
 
@@ -635,19 +634,19 @@ describe GradesController do
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
       expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
       expect(controller.instance_variable_get(:@total_commits)).to eq(16)
-     end
+    end
   end
 
   describe '#organize_commit_dates' do
     before(:each) do
-     controller.instance_variable_set(:@dates, "2017-04-05" =>1 , "2017-04-13" => 1, "2017-04-14" => 1)
+     controller.instance_variable_set(:@dates, "2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1)
      controller.instance_variable_set(:@parsed_data, "abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2})
     end
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do
-     controller.organize_commit_dates
-     expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2, "2017-04-14" => 2})
+      controller.organize_commit_dates
+      expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
+                                                                              "2017-04-14" => 2})
     end
   end
-
 end

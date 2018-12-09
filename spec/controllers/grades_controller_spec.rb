@@ -72,7 +72,6 @@ describe GradesController do
         end
       end
     end
-
   end
 
   describe '#view_my_scores' do
@@ -228,7 +227,7 @@ describe GradesController do
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
-      allow(controller).to receive(:get_pull_request_details).and_return({"pr" => "details"})
+      allow(controller).to receive(:get_pull_request_details).and_return("pr" => "details")
       allow(controller).to receive(:parse_github_pull_request_data)
     end
 
@@ -239,12 +238,14 @@ describe GradesController do
       expect(controller).to receive(:get_pull_request_details).with("pull_request_number" => "1293",
                                                                     "repository_name" => "mamaMiya",
                                                                     "owner_name" => "Shantanu")
-      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261", "https://github.com/Shantanu/mamaMiya/pull/1293"])
+      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261",
+                                             "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
 
     it 'calls parse_github_data_pull on each of the PR details' do
       expect(controller).to receive(:parse_github_pull_request_data).with("pr" => "details").twice
-      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261", "https://github.com/Shantanu/mamaMiya/pull/1293"])
+      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261",
+                                             "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
   end
 
@@ -259,11 +260,13 @@ describe GradesController do
                                                                          "owner_name" => "Shantanu")
       expect(controller).to receive(:get_github_repository_details).with("repository_name" => "OODD",
                                                                          "owner_name" => "Edward")
-      controller.retrieve_repository_data(["https://github.com/Shantanu/website", "https://github.com/Edward/OODD", "https://github.com/expertiza/expertiza", "https://github.com/Shantanu/expertiza]"])
+      controller.retrieve_repository_data(["https://github.com/Shantanu/website", "https://github.com/Edward/OODD",
+                                           "https://github.com/expertiza/expertiza",
+                                           "https://github.com/Shantanu/expertiza]"])
     end
 
     it 'calls parse_github_data_repo on each of the PR details' do
-      expect(controller).to receive(:parse_github_repository_data).with({"pr" => "details"}).twice
+      expect(controller).to receive(:parse_github_repository_data).with("pr" => "details").twice
       controller.retrieve_repository_data(["https://github.com/Shantanu/website", "https://github.com/Edward/OODD"])
     end
   end
@@ -277,7 +280,8 @@ describe GradesController do
     context 'when pull request links have been submitted' do
       before(:each) do
         teams_mock = double
-        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website", "https://github.com/Shantanu/website/pull/1123"])
+        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website",
+                                                              "https://github.com/Shantanu/website/pull/1123"])
         controller.instance_variable_set(:@team, teams_mock)
       end
 
@@ -290,12 +294,14 @@ describe GradesController do
     context 'when pull request links have not been submitted' do
       before(:each) do
         teams_mock = double
-        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website", "https://github.com/expertiza/expertiza"])
+        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website",
+                                                              "https://github.com/expertiza/expertiza"])
         controller.instance_variable_set(:@team, teams_mock)
       end
 
       it 'retrieves repo details ' do
-        expect(controller).to receive(:retrieve_repository_data).with(["https://github.com/Shantanu/website", "https://github.com/expertiza/expertiza"])
+        expect(controller).to receive(:retrieve_repository_data).with(["https://github.com/Shantanu/website",
+                                                                       "https://github.com/expertiza/expertiza"])
         controller.retrieve_github_data
       end
     end
@@ -304,7 +310,7 @@ describe GradesController do
   describe '#retrieve_check_run_statuses' do
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
-      controller.instance_variable_set(:@head_refs, {"1234" => "qwerty", "5678" => "asdfg"})
+      controller.instance_variable_set(:@head_refs, "1234" => "qwerty", "5678" => "asdfg")
       controller.instance_variable_set(:@check_statuses, {})
     end
 
@@ -312,7 +318,8 @@ describe GradesController do
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
       controller.retrieve_check_run_statuses
-      expect(controller.instance_variable_get(:@check_statuses)).to eq({"1234" => "check_status", "5678" => "check_status"})
+      expect(controller.instance_variable_get(:@check_statuses)).to eq({"1234" => "check_status",
+                                                                        "5678" => "check_status"})
     end
   end
 
@@ -355,7 +362,7 @@ describe GradesController do
 
       it 'calls retrieve_check_run_statuses to retrieve check runs data' do
         expect(controller).to receive(:retrieve_check_run_statuses)
-        get :view_github_metrics, {id: '1'}
+        get :view_github_metrics, id: '1'
       end
     end
   end
@@ -369,7 +376,7 @@ describe GradesController do
 
   describe '#get_github_repository_details' do
     before(:each) do
-      allow(controller).to receive(:make_github_graphql_request).and_return({"github": "github"})
+      allow(controller).to receive(:make_github_graphql_request).and_return("github": "github")
     end
 
     it 'gets  make_github_graphql_request with query for repository' do
@@ -410,26 +417,27 @@ describe GradesController do
     before(:each) do
       allow(controller).to receive(:get_query)
       allow(controller).to receive(:make_github_graphql_request).and_return(
-          {
-            "data" => {
-              "repository" => {
-                "pullRequest" => {
-                  "commits" => {
-                    "edges" => [],
-                    "pageInfo" => {
-                      "hasNextPage" => false,
-                      "endCursor" => "qwerty"
-                    }
+        {
+          "data" => {
+            "repository" => {
+              "pullRequest" => {
+                "commits" => {
+                  "edges" => [],
+                  "pageInfo" => {
+                    "hasNextPage" => false,
+                    "endCursor" => "qwerty"
                   }
                 }
               }
             }
-          })
+          }
+        }
+      )
     end
 
     it 'gets pull request data for link passed' do
       data = controller.get_pull_request_details("https://github.com/expertiza/expertiza")
-      expect(data).to eq({
+      expect(data).to eq(
         "data" => {
           "repository" => {
             "pullRequest" => {
@@ -443,7 +451,7 @@ describe GradesController do
             }
           }
         }
-      })
+      )
     end
   end
 
@@ -470,26 +478,26 @@ describe GradesController do
       allow(controller).to receive(:team_statistics)
       allow(controller).to receive(:organize_commit_dates)
       @github_data = {
-          "data" => {
-              "repository" => {
-                  "pullRequest" => {
-                      "commits" => {
-                          "edges" => [
-                              {
-                                  "node" => {
-                                      "commit" => {
-                                        "author" => {
-                                            "name" => "Shantanu",
-                                        },
-                                        "committedDate" => "2018-12-1013:45"
-                                      }
-                                  }
-                              }
-                          ]
+        "data" => {
+          "repository" => {
+            "pullRequest" => {
+              "commits" => {
+                "edges" => [
+                  {
+                    "node" => {
+                      "commit" => {
+                        "author" => {
+                          "name" => "Shantanu"
+                          },
+                        "committedDate" => "2018-12-1013:45"
                       }
+                    }
                   }
+                ]
               }
+            }
           }
+        }
       }
     end
 
@@ -555,13 +563,13 @@ describe GradesController do
 
     it 'gets data from GitHub api v4(graphql)' do
       response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
-      expect(response).to eq({"message" => "Bad credentials", "documentation_url" => "https://developer.github.com/v4"})
+      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://developer.github.com/v4")
     end
   end
 
   describe 'get_query' do
     before(:each) do
-      controller.instance_variable_set(:@end_cursor,"")
+      controller.instance_variable_set(:@end_cursor, "")
     end
     it 'constructs the graphql query' do
       query = {

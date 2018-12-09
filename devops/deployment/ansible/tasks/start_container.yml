@@ -31,3 +31,9 @@
     state: present
   when: deploy_env == "green"
   ignore_errors: True
+
+- name: "Make sure blue branch is up"
+  command: "curl -ksSfI  https://localhost:3000 &"
+
+- name: "Make sure green branch is up"
+  command: "curl -ksSfI  https://localhost:3001 &"

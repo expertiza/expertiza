@@ -552,7 +552,7 @@ describe "assignment function" do
         end
         click_button 'Save'
         sleep 1
-        questionnaire = get_questionnaire("ReviewQuestionnaire2").first
+        questionnaire = get_questionnaire("ReviewQuestionnaire1").first
         expect(questionnaire).to have_attributes(
           questionnaire_weight: 100,
           notification_limit: 50

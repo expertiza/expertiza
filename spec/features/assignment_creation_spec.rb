@@ -544,17 +544,17 @@ describe "assignment function" do
     describe "Edit review rubric" do
       it "updates review questionnaire" do
         within(:css, "tr#questionnaire_table_ReviewQuestionnaire") do
-          select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
+          select "ReviewQuestionnaire1", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
+          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '100'
           fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
         end
         click_button 'Save'
         sleep 1
         questionnaire = get_questionnaire("ReviewQuestionnaire2").first
         expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
+          questionnaire_weight: 100,
           notification_limit: 50
         )
       end

@@ -91,12 +91,12 @@ class AssignmentForm
 
   # checks to see if the sum of weights of all rubrics add up to either 0 or 100%
   def validate_assignment_questionnaires_weights(attributes)
-    total_weight=0
+    total_weight = 0
     attributes.each do |assignment_questionnaire|
-      total_weight+=assignment_questionnaire[:questionnaire_weight].to_i
+      total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
     if total_weight != 0 and total_weight != 100
-      @assignment.errors.add(:message,'Total weight of rubrics should add up to either 0 or 100%')
+      @assignment.errors.add(:message, 'Total weight of rubrics should add up to either 0 or 100%')
       @has_errors = true
     end
   end

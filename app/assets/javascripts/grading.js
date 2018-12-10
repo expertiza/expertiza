@@ -1,4 +1,4 @@
-function toggleAll(numteams){
+  function toggleAll(numteams){    
     var maintag = document.getElementById('teamAll');
     hidden = maintag.innerHTML == 'Show all teams';    
     if (hidden) {maintag.innerHTML = 'Hide all teams';}
@@ -61,6 +61,7 @@ function toggleAll(numteams){
         var header = document.getElementById(elementId+'_header');
 	
   	while (obj != null){
+		
       header.style.backgroundColor = 'white';
       header.style.color = "#000000";
   	  var bExpand = obj.style.display.length == 0;	  	   	  

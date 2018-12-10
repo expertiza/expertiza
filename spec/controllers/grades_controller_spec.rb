@@ -370,7 +370,7 @@ describe GradesController do
   describe '#authorize_github' do
     it 'redirects the user to GitHub authorization page' do
       get :authorize_github
-      expect(response).to redirect_to("https://github.com/login/oauth/authorize?client_id=qwerty12345")
+      expect(response).to redirect_to("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a")
     end
   end
 

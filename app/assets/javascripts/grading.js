@@ -60,8 +60,8 @@
 	var atag = document.getElementById(elementId+'Link');	
         var header = document.getElementById(elementId+'_header');
 	
-  	while (obj != null){
-		
+  	while (obj != null){ 
+
       header.style.backgroundColor = 'white';
       header.style.color = "#000000";
   	  var bExpand = obj.style.display.length == 0;	  	   	  

@@ -12,13 +12,13 @@ module AccessHelper
                         "An #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
                       else
                         "An #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
-                      end
+                                      end
                     else
                       if params[:action] == 'new'
                         "A #{current_role_name.try(:downcase)} is not allowed to create this/these #{params[:controller]}"
                       else
                         "A #{current_role_name.try(:downcase)} is not allowed to #{params[:action]} this/these #{params[:controller]}"
-                      end
+                                      end
                     end
   end
 

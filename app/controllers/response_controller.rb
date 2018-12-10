@@ -109,8 +109,7 @@ class ResponseController < ApplicationController
     # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
     @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
-    # questions = sort_questions(@questionnaire.questions)
-    # @questions is initialized inside `set_content` method
+    # questions = sort_questions(@questionnaire.questions)     # @questions is initialized inside `set_content` method
     init_answers(@questions)
     render action: 'response'
   end

@@ -21,22 +21,22 @@
 </table>
 
 <script type="text/javascript">
-    var myCircle = Circles.create({
-        id: 'average-score',
-        radius: 50,
-        value: <%= @avg_of_avg.to_i %>,
-        maxValue: 100,
-        width: 15,
-        text: '<%=@avg_of_avg.to_i%>',
-        colors: ['#FFEB99', '#FFCC00'],
-        duration: 700,
-        textClass: 'circles-final'
-    });
+var myCircle = Circles.create({
+        id:           'average-score',
+        radius:       50,
+        value:        <%= @avg_of_avg.to_i %>,
+        maxValue:     100,
+        width:        15,
+        text:         '<%=@avg_of_avg.to_i%>',
+        colors:       ['#FFEB99', '#FFCC00'],
+        duration:     700,
+        textClass:     'circles-final'
+  });
 
 </script>
 
-<style>
-  .circles-final {
-    font-size: 16px !important;
+<style> 
+ .circles-final{
+    font-size: 16px !important;    
   }
 </style> 

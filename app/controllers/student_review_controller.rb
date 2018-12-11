@@ -56,9 +56,8 @@ class StudentReviewController < ApplicationController
     return new_array
   end
 
-  # this method gives the following global variables: @topics, that are the topics that are unchosen for the reviewer;
-  # @selectedtopics, topics that are selected by the reviewer that he wants to review;
-  # @unselectedtopics, topics that remains at the left of the view, that are not yet chosen by the reviewer.
+  # this method is used to show a submission list for students to bid when 
+  # the review strategy is "bidding"
   def sign_up_list
     # get the participant that's the reviewer for the assignment
     @participant = AssignmentParticipant.find(params[:id])

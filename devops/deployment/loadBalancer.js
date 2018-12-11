@@ -9,8 +9,8 @@ var http = require('https');
 var httpProxy = require('http-proxy')
 var proxy = httpProxy.createProxyServer({secure: false});
 var options = {
-        key: fs.readFileSync('key.pem'),
-        cert: fs.readFileSync('cert.pem')
+        key: fs.readFileSync('/home/expertiza/key.pem'),
+        cert: fs.readFileSync('/home/expertiza/cert.pem')
 };
 //var credentials = crypto.createCredentials({key: privateKey, cert: certificate});
 var server=http.createServer(options, function (req, res){

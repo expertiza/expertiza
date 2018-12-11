@@ -51,7 +51,6 @@ class StudentReviewController < ApplicationController
       @signupteam = SignedUpTeam.where(topic_id = old_array[j].id).first
       if (@signupteam != [] and @signupteam.team_id != 0) then
         new_array.insert(-1, old_array[j])
-      else
       end
     end
     return new_array

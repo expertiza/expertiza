@@ -4,6 +4,13 @@ Expertiza::Application.routes.draw do
   ###
   namespace :api do 
     namespace :v1 do
+
+      resources :review_mapping, only: [] do
+        collection do
+          post :assign_reviewer_dynamically
+        end
+      end
+
     resources :sessions, only: [:create, :index, :destroy]
     resources :profile
     resources :institution

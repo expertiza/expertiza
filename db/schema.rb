@@ -102,12 +102,12 @@ ActiveRecord::Schema.define(version: 20180926160031) do
     t.boolean  "is_calibrated",                            default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",       limit: 255,   default: "Lauw"
-    t.integer  "simicheck",                  limit: 4,     default: -1
     t.boolean  "is_anonymous",                             default: true
     t.integer  "num_reviews_required",       limit: 4,     default: 3
     t.integer  "num_metareviews_required",   limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",    limit: 4,     default: 3
     t.integer  "num_reviews_allowed",        limit: 4,     default: 3
+    t.integer  "simicheck",                  limit: 4,     default: -1
     t.integer  "simicheck_threshold",        limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
@@ -629,7 +629,6 @@ ActiveRecord::Schema.define(version: 20180926160031) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-    t.string  "feedback",          limit: 255
   end
 
   create_table "survey_deployments", force: :cascade do |t|
@@ -715,10 +714,10 @@ ActiveRecord::Schema.define(version: 20180926160031) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
-    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",
+    t.datetime "updated_at"
+    t.integer  "notification_id", limit: 4, null: false
   end
 
   add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
@@ -739,26 +738,26 @@ ActiveRecord::Schema.define(version: 20180926160031) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,   default: "",    null: false
-    t.string  "crypted_password",          limit: 40,    default: "",    null: false
-    t.integer "role_id",                   limit: 4,     default: 0,     null: false
+    t.string  "name",                      limit: 255,      default: "",    null: false
+    t.string  "crypted_password",          limit: 40,       default: "",    null: false
+    t.integer "role_id",                   limit: 4,        default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                      default: false
+    t.boolean "private_by_default",                         default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                             default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,     default: 0
+    t.boolean "is_new_user",                                default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,        default: 0
     t.string  "handle",                    limit: 255
     t.text    "digital_certificate",       limit: 16777215
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
     t.text    "public_key",                limit: 16777215
-    t.boolean "copy_of_emails",                          default: false
+    t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
   end
 

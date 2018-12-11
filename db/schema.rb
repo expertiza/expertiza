@@ -715,7 +715,7 @@ ActiveRecord::Schema.define(version: 20180926160031) do
 
   create_table "track_notifications", force: :cascade do |t|
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",
+    t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "notification_id", limit: 4, null: false
   end

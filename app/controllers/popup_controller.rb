@@ -73,8 +73,8 @@ class PopupController < ApplicationController
         else
           mark_as_sample = ""
         end
-        instance_variable_set('@mark_as_sample_'+review_round,mark_as_sample)
-        instance_variable_set('@remove_as_sample_'+review_round,remove_as_sample)
+        instance_variable_set('@mark_as_sample_' + review_round,mark_as_sample)
+        instance_variable_set('@remove_as_sample_' + review_round, remove_as_sample)
         # E-1867 changes end here
       end
       instance_variable_set('@assignment_id',@assignment.id)

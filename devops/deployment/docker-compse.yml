@@ -39,7 +39,7 @@ services:
     env_file:
       - ~/production.env
     ports:
-      - '3001:3000'
+      - '3002:3000'
     depends_on:
       - redis
     links:

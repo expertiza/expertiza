@@ -29,20 +29,20 @@ var server=http.createServer(options, function (req, res){
         if(random<=0.8) {
 
                 /* 
-                Redirect to port 3000. If an error occus then redirect to port 3001.
+                Redirect to port 3000. If an error occus then redirect to port 3002.
                 */
 
                 proxy.web(req, res, {target: "https://localhost:3000"}, function (e){
-                        proxy.web(req, res, {target: "https://localhost:3001"});
+                        proxy.web(req, res, {target: "https://localhost:3002"});
                 });
         }
         else {
 
                 /* 
-                Redirect to port 3001. If an error occus then redirect to port 3000.
+                Redirect to port 3002. If an error occus then redirect to port 3000.
                 */
 
-                proxy.web(req, res, {target: "https://localhost:3001"}, function (e){
+                proxy.web(req, res, {target: "https://localhost:3002"}, function (e){
                     proxy.web(req, res, {target: "https://localhost:3000"});
                 });
         }

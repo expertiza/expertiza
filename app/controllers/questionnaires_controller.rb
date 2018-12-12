@@ -505,8 +505,10 @@ class QuestionnairesController < ApplicationController
                                      :alternatives, :break_before, :max_label, :min_label)
   end
 
-  # action_allowed? helper methods
-  # determines if "edit" action is allowed
+  # determines if "edit" action is allowed.
+  # If the Questionnaire with the provided `id` has a SubmissionRecord then check if the
+  # questionnaire is uploaded by the current user using the `questionnaire_by_user?` method.
+  # Otherwise, allow the user to edit if he/she is an admin or an instructor for the provided questionnaire's assignment
   def edit_action_allowed?
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.nil? || @questionnaire.submission_record.nil?
@@ -516,7 +518,10 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # determines if "delete" action is allowed
+  # determines if "delete" action is allowed.
+  # If the Questionnaire with the provided `id` has a SubmissionRecord then check if the
+  # questionnaire is uploaded by the current user using the `questionnaire_by_user?` method.
+  # Otherwise, allow the user to perform the action
   def delete_action_allowed?
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.nil? || @questionnaire.submission_record.nil?

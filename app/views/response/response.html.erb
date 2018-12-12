@@ -292,29 +292,37 @@
             data: json_review,
             dataType: "json",
             success: function (response) {
-		          var APIresultbox ="";
-		          var colors = {  "Negative": ":</b> <font style=\"color:red;\">",
-				                      "Positive": ":</b> <font style=\"color:green;\">",
-				                      "Neutral": ":</b> <font style=\"color:saddlebrown;\">",
-				                      "Mixed": ":</b> <font style=\"color:saddlebrown;\">"};
-		          APIresultbox += "<table border='1'>"
-        	    for (x in response) {
-			          if (x == "sentiment_tone"){
-				          APIresultbox += "<tr><td><b> " + x + colors[response[x]] + response[x] + "</font></td></tr>";
-			          }
-			          else
-           			  APIresultbox += "<tr><td><b> " + x + ":</b> " +response[x] + "</td></tr>";
+	    	console.log("success");
+		var APIresultbox ="";
+		var colors = {"Negative": ":</b> <font style=\"color:red;\">", 
+				"Positive": ":</b> <font style=\"color:green;\">", 
+				"Neutral": ":</b> <font style=\"color:saddlebrown;\">", 
+				"Mixed": ":</b> <font style=\"color:saddlebrown;\">"};
+		APIresultbox += "<table border='1'>"
+        	for (x in response) { 
+			if (x == "text"){
+				continue;
+			}
+			if (x == "sentiment_tone"){
+				APIresultbox += "<tr><td><b> " + x + colors[response[x]] + response[x] + "</font></td></tr>";
+			}
+			else
+           			APIresultbox += "<tr><td><b> " + x + ":</b> " +response[x] + "</td></tr>";
 		
-              }
-	            //API result box
-              APIresultbox += "</table>"
-              if(ed.id.includes("responses"))
+       		}
+		
+	//API result box
+        APIresultbox += "</table>"
+	console.log(APIresultbox);
+              console.log(response);
+             if(ed.id.includes("responses"))
                   $('#' + ed.id.replace("responses", "analysis")).html(APIresultbox);
               else if(ed.id.includes('review_comments'))
                  $('#review_comments_analysis').html(APIresultbox);
             },
             error: function (xhr, status) {
-              $('#save_progress').html('Unable to reach suggestion detection service at this moment')
+		console.log(status)
+              $('#save_progress').html('Unable to reach suggestion detection service at the moment')
             }
           });
         }

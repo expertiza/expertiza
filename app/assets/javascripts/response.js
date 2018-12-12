@@ -303,14 +303,3 @@
 	}
 })();
 
-/*
-Todos: 
-Move Consent checkbox into form and check why not submitting
-TESTS!!
-DOCUMENT!
-More migrates for default 0 and null false
-TA:
-
-After submitting review, should we allow to edit consent??
-	He/she should be able to edit.
-*/

@@ -33,7 +33,7 @@ class SimilarAssignmentsController < ApplicationController
       unchecked_list = @check_lists["unchecked"]
       ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+@assignment_id.to_s).ids
       if ids.empty?
-        render json: {"success"=>false, "error"=>"Please mark atleast one review as sample"}
+        render json: {"success" => false, "error" => "Please mark atleast one review as sample"}
         return
       end
       if !checked_list.nil?        

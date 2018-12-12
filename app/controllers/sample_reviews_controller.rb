@@ -7,10 +7,12 @@ class SampleReviewsController < ApplicationController
 	include SampleReviewsHelper
 	
 	def show
-		redirect_anonymous_user
+		if redirect_anonymous_user?
+			redirect_to '/' and return
+		end
 		response_id = params[:id]
 		if Response.find(response_id).visibility != 2
-			redirect_to '/sample_reviews'
+			redirect_to '/'
 			return
 		end
 		q_and_a_data = Answer.joins("INNER JOIN questions ON question_id = questions.id WHERE answers.response_id=#{response_id.to_s}")
@@ -35,7 +37,9 @@ class SampleReviewsController < ApplicationController
 	end
 
 	def index
-		redirect_anonymous_user
+		if redirect_anonymous_user?
+			redirect_to '/' and return
+		end
 		@assignment_id = params[:id].to_i
 		page_number = params[:page].to_i
 		if page_number.nil?

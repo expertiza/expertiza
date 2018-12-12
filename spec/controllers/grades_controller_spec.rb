@@ -221,13 +221,23 @@ describe GradesController do
     end
 
     it 'makes a call to the GitHub API to get status of the head commit passed' do
-      expect(controller.get_statuses_for_pull_request('qwerty123')).to eq("team" => "rails", "players" => "36")
+      expect(controller.get_statuses_for_pull_request({
+          owner: 'expertiza',
+          repository: 'expertiza',
+          head_commit: 'qwerty123'})).to eq("team" => "rails", "players" => "36")
     end
   end
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
-      allow(controller).to receive(:get_pull_request_details).and_return("pr" => "details")
+      controller.instance_variable_set(:@head_refs, {})
+      allow(controller).to receive(:get_pull_request_details).and_return({"data" => {
+          "repository" => {
+              "pullRequest" => {
+                  "headRefOid" => "qwerty123"
+              }
+          }
+      }})
       allow(controller).to receive(:parse_github_pull_request_data)
     end
 
@@ -243,7 +253,13 @@ describe GradesController do
     end
 
     it 'calls parse_github_data_pull on each of the PR details' do
-      expect(controller).to receive(:parse_github_pull_request_data).with("pr" => "details").twice
+      expect(controller).to receive(:parse_github_pull_request_data).with({"data" => {
+          "repository" => {
+              "pullRequest" => {
+                  "headRefOid" => "qwerty123"
+              }
+          }
+      }}).twice
       controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261",
                                              "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
@@ -370,7 +386,7 @@ describe GradesController do
   describe '#authorize_github' do
     it 'redirects the user to GitHub authorization page' do
       get :authorize_github
-      expect(response).to redirect_to("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a")
+      expect(response).to redirect_to("https://github.com/login/oauth/authorize?client_id=qwerty12345")
     end
   end
 
@@ -607,7 +623,7 @@ describe GradesController do
       controller.instance_variable_set(:@merge_status, [])
     end
 
-    it 'parses data from github data for pull Request' do
+    it 'parses team data from github data for merged pull Request' do
       controller.team_statistics(
         "data" => {
           "repository" => {
@@ -632,6 +648,35 @@ describe GradesController do
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
       expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
       expect(controller.instance_variable_get(:@total_commits)).to eq(16)
+      expect(controller.instance_variable_get(:@merge_status)[8]).to eq("MERGED")
+    end
+
+    it 'parses team data from github data for non-merged pull Request' do
+      controller.team_statistics(
+          "data" => {
+              "repository" => {
+                  "pullRequest" => {
+                      "number" => 8,
+                      "additions" => 2,
+                      "deletions" => 1,
+                      "changedFiles" => 3,
+                      "mergeable" => true,
+                      "merged" => false,
+                      "headRefOid" => "123abc",
+                      "commits" => {
+                          "totalCount" => 16,
+                          "pageInfo" => {},
+                          "edges" => []
+                      }
+                  }
+              }
+          }
+      )
+      expect(controller.instance_variable_get(:@total_additions)).to eq(2)
+      expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
+      expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
+      expect(controller.instance_variable_get(:@total_commits)).to eq(16)
+      expect(controller.instance_variable_get(:@merge_status)[8]).to eq(true)
     end
   end
 

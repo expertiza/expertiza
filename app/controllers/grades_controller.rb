@@ -197,11 +197,6 @@ class GradesController < ApplicationController
     redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
   end
 
-  def get_statuses_for_pull_request(ref)
-    url = "https://api.github.com/repos/expertiza/expertiza/commits/" + ref + "/status"
-    ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
-  end
-
   def retrieve_pull_request_data(pull_links)
     pull_links.each do |hyperlink|
       submission_hyperlink_tokens = hyperlink.split('/')
@@ -211,6 +206,11 @@ class GradesController < ApplicationController
       hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
       hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
       github_data = get_pull_request_details(hyperlink_data)
+      @head_refs[hyperlink_data["pull_request_number"]] = {
+          head_commit: github_data["data"]["repository"]["pullRequest"]["headRefOid"],
+          owner: hyperlink_data["owner_name"],
+          repository: hyperlink_data["repository_name"]
+      }
       parse_github_pull_request_data(github_data)
     end
   end
@@ -242,9 +242,14 @@ class GradesController < ApplicationController
     end
   end
 
+  def get_statuses_for_pull_request(pr_object)
+    url = "https://api.github.com/repos/" + pr_object[:owner] + "/" + pr_object[:repository] + "/commits/" + pr_object[:head_commit] + "/status"
+    ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
+  end
+
   def retrieve_check_run_statuses
-    @head_refs.each do |pull_number, ref|
-      @check_statuses[pull_number] = get_statuses_for_pull_request(ref)
+    @head_refs.each do |pull_number, pr_object|
+      @check_statuses[pull_number] = get_statuses_for_pull_request(pr_object)
     end
   end
 
@@ -392,7 +397,6 @@ class GradesController < ApplicationController
     @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
     @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
-    @head_refs[pull_request_number] = github_data["data"]["repository"]["pullRequest"]["headRefOid"]
 
     @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
                                            "MERGED"

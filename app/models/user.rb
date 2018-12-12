@@ -59,7 +59,7 @@ class User < ActiveRecord::Base
   end
 
   # This method is used to identify if the user (not student) can signup a team/student for an assignment
-  def can_signup_someone_for?(id)
+  def can_sign_someone_up_for?(id)
     assignment = Assignment.find(id.to_i)
     instructor = User.find(assignment.instructor_id)
     self.role.name != 'Student' && ((%w[Super-Administrator].include? self.role.name) ||

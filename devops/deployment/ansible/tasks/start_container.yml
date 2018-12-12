@@ -46,6 +46,6 @@
 
 
 - name: "Make sure green branch is up"
-  command: "curl -ksSfI  https://localhost:3001 &"
+  command: "curl -ksSfI  https://localhost:3002 &"
   ignore_errors: True
 

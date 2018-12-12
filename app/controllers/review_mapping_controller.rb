@@ -390,7 +390,7 @@ class ReviewMappingController < ApplicationController
             rubric[:criteria][row.question_id] = {max_score: row.question_max_score, raw_data: [], title: row.question_text}
           end
           label = team.trunc_name
-          rubric[:criteria][row.question_id][:raw_data] << { label: label, scores: row.score_row.map(&:score_value) }
+          rubric[:criteria][row.question_id][:raw_data] << {label: label, scores: row.score_row.map(&:score_value)}
         end
       end
       @boxplot_info << rubric

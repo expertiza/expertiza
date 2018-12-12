@@ -142,7 +142,7 @@ class GradesController < ApplicationController
           end
           label = "Your Team"
           label = "" unless team.id == @team_id
-          rubric[:criteria][row.question_id][:raw_data] << { label: label, scores: row.score_row.map(&:score_value) }
+          rubric[:criteria][row.question_id][:raw_data] << {label: label, scores: row.score_row.map(&:score_value)}
         end
       end
       @boxplot_info << rubric

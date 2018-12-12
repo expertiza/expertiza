@@ -30,9 +30,8 @@ class AssignmentTeam < Team
   def trunc_name
     name_len = Assignment.find(self.parent_id).name.length
     trunced_name = self.name
-    if trunced_name[0, name_len-1] == Assignment.find(self.parent_id).name
-      trunced_name = trunced_name[name_len + 1, self.name.length - 1]
-    end
+    trunced_name = trunced_name[name_len + 1, self.name.length - 1] if trunced_name[0, name_len - 1] == Assignment.find(self.parent_id).name
+
     trunced_name[0, [self.name.length, 7].min]
   end
 

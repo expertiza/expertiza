@@ -1,3 +1,8 @@
+- name: Copy Load Balancer js
+  copy: 
+     src: loadBalancer.js
+     dest: /home/expertiza/loadBalancer.js
+     
 - name: Check to see if Load Balancer is running
   command: forever list
   register: forever_list

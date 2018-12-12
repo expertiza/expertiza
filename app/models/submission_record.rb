@@ -5,5 +5,5 @@ class SubmissionRecord < ActiveRecord::Base
   validates :user, presence: true
   validates :assignment_id, presence: true
 
-  belongs_to :questionnaire
+  has_one :questionnaire, dependent: :destroy
 end

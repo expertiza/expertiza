@@ -1,6 +1,8 @@
-/* 
+/*
 A load balancer and blue-green deployment implementation of Expertiza which are running on two port, 3000 and 3001.
 Handle all incoming requests on port 8080.
+Also load balancer and blue-green deployment implementation of Expertiza ReactJS front-end which are running on two port, 5000 and 5001.
+Handle all incoming requests on port 4000.
 The ansible script runs this file.
 */
 
@@ -15,20 +17,20 @@ var options = {
 //var credentials = crypto.createCredentials({key: privateKey, cert: certificate});
 var server=http.createServer(options, function (req, res){
 
-        /* 
-        Math.random() is used to randomly generate a new number since we 
+        /*
+        Math.random() is used to randomly generate a new number since we
         only want 20% of all requests to be redirected to the green channel on port 3001.
         */
 
         var random = Math.random()
 
-        /* 
+        /*
         The 0.8 figure is used to route 20% of all requests to be redirected to the green channel on port 3001.
         */
 
         if(random<=0.8) {
 
-                /* 
+                /*
                 Redirect to port 3000. If an error occus then redirect to port 3002.
                 */
 
@@ -38,7 +40,7 @@ var server=http.createServer(options, function (req, res){
         }
         else {
 
-                /* 
+                /*
                 Redirect to port 3002. If an error occus then redirect to port 3000.
                 */
 
@@ -48,8 +50,49 @@ var server=http.createServer(options, function (req, res){
         }
 });
 
-/* 
+/*
 Serve all incoming requests on port 8080.
 */
 
 server.listen(8080);
+
+var react_server=http.createServer(options, function (req, res){
+
+        /*
+        Math.random() is used to randomly generate a new number since we
+        only want 20% of all requests to be redirected to the green channel on port 5001.
+        */
+
+        var random = Math.random()
+
+        /*
+        The 0.8 figure is used to route 20% of all requests to be redirected to the green channel on port 3001.
+        */
+
+        if(random<=0.8) {
+
+                /*
+                Redirect to port 5000. If an error occus then redirect to port 5001.
+                */
+
+                proxy.web(req, res, {target: "https://localhost:5000"}, function (e){
+                        proxy.web(req, res, {target: "https://localhost:5001"});
+                });
+        }
+        else {
+
+                /*
+                Redirect to port 5001. If an error occus then redirect to port 5000.
+                */
+
+                proxy.web(req, res, {target: "https://localhost:5001"}, function (e){
+                    proxy.web(req, res, {target: "https://localhost:5000"});
+                });
+        }
+});
+
+/*
+Serve all incoming requests on port 4000.
+*/
+
+react_server.listen(4000);

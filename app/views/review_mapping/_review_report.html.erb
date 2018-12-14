@@ -127,7 +127,7 @@
                 </tr>
               </table>
             <% end %>
-            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first) %>
+            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
           </td>
         <%end %>  
         </tr>

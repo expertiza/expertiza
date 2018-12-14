@@ -47,8 +47,7 @@
             <!--reviewer-->
             <td>
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)<br/>
-              <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first) %>
+              (<%= user.fullname(session[:ip]) %>)
             </td>
             <!--# reviews done-->
             <td align = 'left'>
@@ -128,6 +127,7 @@
                 </tr>
               </table>
             <% end %>
+            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first) %>
           </td>
         <%end %>  
         </tr>

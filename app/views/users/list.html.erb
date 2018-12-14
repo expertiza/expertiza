@@ -11,8 +11,10 @@
     function toggleAdvancedSearch(isAdvancedSearchVisible) {
       if (isAdvancedSearchVisible) {
         $advancedSearchForm.show();
+        $toggleButton.text('Hide Advanced Search');
       } else {
         $advancedSearchForm.hide();
+        $toggleButton.text('Advanced Search');
       }
     }
   });
@@ -30,7 +32,7 @@
   <div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
     <%= label_tag :search_name, 'Username:' %><%= text_field_tag(:search_name,params[:search_name]) %>
     <%= submit_tag("Search") %>
-    <a id="search_toggle_button">Toggle Advanced Search</a>
+    <a id="search_toggle_button"></a>
   </div>
 
   <div id="advance_search_form" style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(4, auto) 1fr; grid-gap: 8px; align-items: center">

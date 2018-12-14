@@ -78,7 +78,7 @@ FactoryBot.define do
   end
 
   factory :student, class: User do
-    # Zhewei: In order to keep students the same names (2064, 2065, 2066) before each example.
+    # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
     sequence(:name) {|n| n = n % 3; "student206#{n + 4}" }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password "password"
@@ -195,46 +195,21 @@ FactoryBot.define do
     has_badge false
   end
 
-  factory :assignment_mapping, class: Assignment do
-    sequence(:name) {|n| "final#{n + 100}" }
-    directory_path "final_test"
-    submitter_count 0
-    course { Course.first || association(:course) }
-    instructor { Instructor.first || association(:instructor) }
-    private false
-    num_reviews 1
-    num_review_of_reviews 1
-    num_review_of_reviewers 1
-    reviews_visible_to_all false
-    num_reviewers 1
-    spec_location "https://expertiza.ncsu.edu/"
-    max_team_size 3
-    staggered_deadline false
-    allow_suggestions false
-    review_assignment_strategy "Auto-Selected"
-    max_reviews_per_submission 2
-    review_topic_threshold 0
-    copy_flag false
-    rounds_of_reviews 1
-    microtask false
-    require_quiz false
-    num_quiz_questions 0
-    is_coding_assignment false
-    is_intelligent false
-    calculate_penalty false
-    late_policy_id nil
-    is_penalty_calculated false
-    show_teammate_reviews true
-    availability_flag true
-    use_bookmark false
-    can_review_same_topic true
-    can_choose_topic_to_review true
-  end
-
   factory :assignment_team, class: AssignmentTeam do
     sequence(:name) {|n| "team#{n}" }
     assignment { Assignment.first || association(:assignment) }
     type 'AssignmentTeam'
+    comments_for_advertisement nil
+    advertise_for_partner nil
+    submitted_hyperlinks "---
+- https://www.expertiza.ncsu.edu"
+    directory_num 0
+  end
+
+  factory :course_team, class: CourseTeam do
+    sequence(:name) {|n| "team#{n}" }
+    course { Course.first || association(:course) }
+    type 'CourseTeam'
     comments_for_advertisement nil
     advertise_for_partner nil
     submitted_hyperlinks "---
@@ -249,17 +224,6 @@ FactoryBot.define do
 
   factory :invitation, class: Invitation do
     reply_status 'W'
-  end
-
-  factory :course_team, class: CourseTeam do
-    sequence(:name) {|n| "team#{n}" }
-    course { Course.first || association(:course) }
-    type 'CourseTeam'
-    comments_for_advertisement nil
-    advertise_for_partner nil
-    submitted_hyperlinks "---
-- https://www.expertiza.ncsu.edu"
-    directory_num 0
   end
 
   factory :topic, class: SignUpTopic do

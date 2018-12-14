@@ -35,7 +35,6 @@
       <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
       <th width="13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
-      <th width = "10%" >Grading History <span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -48,7 +47,8 @@
             <!--reviewer-->
             <td>
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)
+              (<%= user.fullname(session[:ip]) %>)<br/>
+              <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first) %>
             </td>
             <!--# reviews done-->
             <td align = 'left'>
@@ -114,7 +114,7 @@
               <%= hidden_field_tag :assignment_id, @id %>
               <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
               <br/>
-              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
+              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1", :style => 'width: 80%' %>
               <table class="inline-transparent">
                 <tr>
                   <td>
@@ -128,9 +128,6 @@
                 </tr>
               </table>
             <% end %>
-          </td>
-          <td align = 'left'>
-            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first) %>
           </td>
         <%end %>  
         </tr>

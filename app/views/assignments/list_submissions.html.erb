@@ -20,7 +20,7 @@
         <td style="font-weight: bold; font-size: 15px;">Participant name</td>
       <% end %>  
       <td style="font-weight: bold; font-size: 15px;">Links</td> 
-      <td style="font-weight: bold; font-size: 15px;"></td>                    
+      <td style="font-weight: bold; font-size: 15px;">History</td>
     </thead>
     <% @l = -1 %>
     <% @teams.each do |team| %>
@@ -69,11 +69,8 @@
         </td>
         <td width="10%">
 
-          <%= link_to "Submission History", submission_records_path(team_id: team.id) %>
-
-        </td>
-        <td width="10%">
-
+          <%= link_to "Submission History", submission_records_path(team_id: team.id) %> <br/>
+          <br/>
           <%= link_to "Grading History", grading_histories_path(grade_receiver_id: team.id) %>
 
         </td>

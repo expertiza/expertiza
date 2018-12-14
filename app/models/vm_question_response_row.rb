@@ -1,6 +1,7 @@
 # represents each row of a heatgrid-table, which is represented by the vm_question_response class.
 class VmQuestionResponseRow
-  attr_reader :countofcomments, :question_seq, :countofcomments, :question_text, :question_id, :score_row, :weight
+  attr_reader :question_seq, :question_text, :question_id, :score_row, :weight
+  attr_accessor :countofcomments
 
   def initialize(question_text, question_id, weight, question_max_score, seq)
     @question_text = question_text

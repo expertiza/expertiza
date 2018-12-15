@@ -1,19 +1,9 @@
 
 describe Node do
   let(:node) { Menu::Node.new }
-
-  let(:content_page) do
-    double('ContentPage', id: 1, name: 'name')
-  end
-
-  let(:controller_action) do
-    double('ControllerAction', id: 99, name: 'name', url_to_use: 'url', controller: nil)
-  end
-
-  let(:controller) do
-    double('Controller', id: 3, name: 'name')
-  end
-
+  let(:content_page) { double('ContentPage', id: 1, name: 'name') }
+  let(:controller_action) { double('ControllerAction', id: 99, name: 'name', url_to_use: 'url', controller: nil) }
+  let(:controller) { double('Controller', id: 3, name: 'name') }
   let(:menu_item) do
     build :menu_item,
           parent_id: 1,
@@ -23,10 +13,7 @@ describe Node do
           controller_action: controller_action,
           content_page: content_page
   end
-
-  before(:each) do
-    node.setup(menu_item)
-  end
+  before(:each) { node.setup(menu_item) }
 
   describe '#setup' do
     it 'sets up attributes: parent_id, name, id, label' do
@@ -165,8 +152,7 @@ describe Menu do
   before(:each) do
     allow(ControllerAction).to receive(:find_by).and_return(controller_action)
     allow(ContentPage).to receive(:find_by)
-    allow(MenuItem).to receive(:items_for_permissions)
-      .with(permission_ids).and_return(menu_items)
+    allow(MenuItem).to receive(:items_for_permissions).with(permission_ids).and_return(menu_items)
   end
 
   let(:menu) { Menu.new(role) }

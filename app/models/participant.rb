@@ -72,7 +72,7 @@ class Participant < ActiveRecord::Base
 
   def email(pw, home_page)
     user = User.find_by(id: self.user_id)
-    assignment = Assignment.find_by(id: self.assignment_id)
+    assignment = Assignment.find_by(id: self.assignment.id)
 
     Mailer.sync_message(
       recipients: user.email,
@@ -88,23 +88,8 @@ class Participant < ActiveRecord::Base
   end
 
   # Return scores that this participant for the given questions
-  def scores(questions)
-    scores = {}
-    scores[:participant] = self
-    self.assignment.questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
-      questionnaire_symbol = if round
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             else
-                               questionnaire.symbol
-                             end
-      scores[questionnaire_symbol] = {}
-      scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
-    end
-    scores[:total_score] = assignment.compute_total_score(scores)
-    scores
-  end
+  # Implemented in assignment_participant.rb
+  def scores(questions); end
 
   # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
   # Permissions are can_submit, can_review, can_take_quiz.

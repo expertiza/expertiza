@@ -1,5 +1,4 @@
 describe Participant do
-
   let(:team) { build(:assignment_team, id: 1, name: 'myTeam') }
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
   let(:team_user) { build(:team_user, id: 1, user: user, team: team) }

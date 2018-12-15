@@ -6,6 +6,7 @@ class SampleReviewsController < ApplicationController
 	include SimilarAssignmentsHelper
 	include SampleReviewsHelper
 	
+	#Displays review details in Question and Answer format.
 	def show
 		if redirect_anonymous_user?
 			redirect_to '/' and return
@@ -36,6 +37,7 @@ class SampleReviewsController < ApplicationController
 		@course_assignment_name = get_course_assignment_name(assignment_id)
 	end
 
+	#Displays list of sample reviews.
 	def index
 		if redirect_anonymous_user?
 			redirect_to '/' and return
@@ -62,6 +64,7 @@ class SampleReviewsController < ApplicationController
 		end
 	end
 
+	#Updats the visibility status in Response table.
 	def update_visibility
 		begin
 			visibility = params[:visibility] #response object consists of visibility in string format
@@ -115,6 +118,7 @@ class SampleReviewsController < ApplicationController
 	end
 
 	private
+	#Updates SimilarAssignment table.
 	def update_similar_assignment(assignment_id, visibility)
 		if visibility == approved_as_sample
 			ids = SimilarAssignment.where(:is_similar_for => assignment_id, :association_intent => intent_review, 
@@ -133,6 +137,7 @@ class SampleReviewsController < ApplicationController
 		end
 	end
 
+	#Used to generate links for the sample reviews.
 	def generate_links(response_ids)
 		links = []
 		response_ids.each do |id|
@@ -141,6 +146,7 @@ class SampleReviewsController < ApplicationController
 		links
 	end
 
+	#Returns concatenation of Course name and Assignment name.
 	def get_course_assignment_name(assignment_id)
 		assignment_name = Assignment.find(assignment_id).name
 		course_id = Assignment.find(assignment_id).course_id

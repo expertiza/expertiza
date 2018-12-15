@@ -10,6 +10,8 @@ module OnTheFlyCalc
   def compute_reviews_hash
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
+    # FIXME: Non-varying rubrics still have rounds. Just use the scores_varying_rubrics method for
+    # both  cases.
     if self.varying_rubrics_by_round?
       @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
       scores_varying_rubrics
@@ -129,6 +131,8 @@ def scores_varying_rubrics
     review_questionnaire_id = review_questionnaire_id(round)
     @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
     @response_maps.each do |response_map|
+      # FIXME: reviewer should be assigned back to @review_scores[response_map.reviewer_id] after this
+      # loop. Right now it will always be null for this assignment (=).
       reviewer = @review_scores[response_map.reviewer_id]
       @corresponding_response = Response.where('map_id = ?', response_map.id)
       @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?

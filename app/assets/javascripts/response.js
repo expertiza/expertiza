@@ -6,13 +6,22 @@
 	if(typeof jQuery == "function"){
 		// identify the buttons
 		jQuery(document).on("ready",function(){
+			// From an HTML element, get the integer value that represents "approve as sample".
+			// Store the value in a local variable and remove the element from the page source.
 			var markedAsSample = jQuery("#sampleReviewHold").attr("data-marked");
 			jQuery("#sampleReviewHold").remove();
+			
+			// From an HTML element, get the size of each pagination request by reading its content.
+			// Store the value in a local variable and remove the element from the page source.
 			var pageSize = parseInt(jQuery("#pageSizeHold").html());
 			jQuery("#pageSizeHold").remove();
+			
 			var assignmentId = jQuery("#similar_assignments_popup").attr("data-assignment-id");
 			var buttons = jQuery(".mark-delete-sample").find("div").find("button");
 
+			// A function that takes integer, boolean, boolean, string as parameters...
+			// ..and toggles the button text and success/error message
+			// ..for "mark as sample" or "remove as sample" buttons.
 			var toggleMarkUnmark = function(round,marked,hasError,message){
 				var markButton = jQuery(jQuery(".mark-delete-sample.round"+round).find("div").find("button")[0]);
 				var unmarkButton = jQuery(jQuery(".mark-delete-sample.round"+round).find("div").find("button")[1]);
@@ -26,6 +35,8 @@
 				toggleMarkUnmarkResultMessage(round,hasError,message);
 			};
 
+			// A function that updates the success/error message below mark/remove as sample buttons..
+			// ...on every click of the button
 			var toggleMarkUnmarkResultMessage = function(round,hasError,message){
 				if(hasError){
 					jQuery("#mark_unmark_fail_"+round).removeClass("hide").html(message);
@@ -36,12 +47,15 @@
 				}
 			};
 
+			// A function that hides the success/error message below mark/remove as sample buttons
 			var hideMarkUnmarkResultMessage = function(round){
 				jQuery("#mark_unmark_fail_"+round).addClass("hide");
 				jQuery("#mark_unmark_success_"+round).addClass("hide");
 			}
 
+			// An object representing the similar assignments popup
 			var AssignmentsPopup = {
+				// initialize data for the popup HTML and object
 				init:function(){
 					this._target = jQuery("#similar_assignments_popup");
 					this.opener = jQuery("#link_assignments");
@@ -64,6 +78,7 @@
 						}
 					});
 				},
+				// add an assignment to HTML list of assignments
 				addToList:function(assignment){
 					var assignmentId = assignment.id;
 					var title = assignment.title;
@@ -78,7 +93,7 @@
 					this.list.append(newRow.removeAttr("id"));
 				},
 				open:function(assignmentsMap){
-					// using map template, build the HTML
+					// using map template, build the HTML list of assignments fetched
 					var self = this;
 					for(var i in assignmentsMap){
 						this.addToList(assignmentsMap[i]);
@@ -87,6 +102,7 @@
 						this._target.parent().removeClass("hide");
 					}
 				},
+				// function for success or error messages to be shown after fetching similar assignments
 				showError:function(message){
 					this.errorMessageSpan.html(message).removeClass("hide");
 				},
@@ -99,6 +115,7 @@
 				hideSuccess:function(){
 					this.successMessageSpan.html("").addClass("hide");
 				},
+				// function to fetch similar assignments, given an assignment id
 				fetchAssignments:function(){
 					var self = this;
 					var ajaxUrl = "/similar_assignments/"+assignmentId;
@@ -130,6 +147,9 @@
 						"error":self.onFetchFail
 					});
 				},
+
+				// on successful fetch of similar assigments, popuplate the HTML for the popup ...
+				// .. and build the current popup object's data
 				onFetchSuccess:function(assignmentsMap){
 					AssignmentsPopup.assignmentsMap = AssignmentsPopup.assignmentsMap.concat(assignmentsMap);
 					AssignmentsPopup.hideSuccess();
@@ -141,12 +161,16 @@
 						this.morePages = false;
 					}
 				},
+				// function to show error message when similar assignments could not be fetched
 				onFetchFail:function(message){
 					message = (typeof message != "undefined" && message.length)?message:"An error occurred";
 					AssignmentsPopup.assignmentsMap = [];
 					AssignmentsPopup.showError(message);
 					AssignmentsPopup.hideSuccess();
 				},
+				// close the popup.
+				// Closing is defined as clearing popup's data, HTML, resetting error messages, ..
+				// .. and resetting pagination counter
 				close:function(){
 					this.assignmentsMap = [];
 					this.hideSuccess();
@@ -161,6 +185,8 @@
 						self.fetchAssignments();
 					}).html("More +");
 				},
+				// function that closes the popup on submit..
+				// takes success/failure boolean result status of submission as param
 				closeAfterSubmit:function(success,message){
 					this.close();
 					if(success){
@@ -171,12 +197,15 @@
 						this.hideSuccess();
 					}
 				},
+				// clear the list of assignments from the popup
 				resetList:function(){
 					this.list.html("").append(this.template);
 				},
+				// find out what rows have changed while selecting and unselecting similar assignments
 				findDelta:function(){
 					var existingChecked = [], existingUnchecked = [];
-					// Current
+					// From the initial data of the popup...
+					// construct lists for 'linked' and 'not linked' assignments
 					for(var i in this.assignmentsMap){
 						var assignment = this.assignmentsMap[i];
 						if(assignment.checked){
@@ -187,7 +216,9 @@
 					}
 					var existingCheckedSet = new Set(existingChecked);
 					var existingUncheckedSet = new Set(existingUnchecked);
-					// Changed
+					
+					// From the current data of the popup...
+					// construct lists for 'linked' and 'not linked' assignments
 					var newChecked = [];
 					var newUnchecked = [];
 					var formLi = this.list.find("li").not("#popup_list_template");
@@ -204,6 +235,7 @@
 					});
 					var newCheckedSet = new Set(newChecked);
 					var newUncheckedSet = new Set(newUnchecked);
+					// find and return the difference between the two sets
 					var differenceCheckedSet = new Set([...newCheckedSet].filter(setElement => !existingCheckedSet.has(setElement)));
 					var differenceUncheckedSet = new Set([...newUncheckedSet].filter(setElement => !existingUncheckedSet.has(setElement)));
 					var differenceChecked = Array.from(differenceCheckedSet);
@@ -213,12 +245,11 @@
 						"unchecked":differenceUnchecked
 					};
 				},
+				// Function to submit linked and unlinked similar assignments and handle success or failure result
 				submit:function(){
-					// on submit:
-					// function to find delta from fetch result
-					var delta = this.findDelta();
+					var delta = this.findDelta(); // find out what rows have changed
 					if(!delta.checked.length && !delta.unchecked.length){
-						this.close();
+						this.close(); // if no overall change, simply close the popup
 					}else{
 						// make Ajax call
 						var self = this;
@@ -242,6 +273,7 @@
 						});
 					}
 				},
+				// function to handle failure of linking or unlinking assignments
 				onSubmitFail:function(message){
 					message = (typeof message != "udefined" && message.length)?message:"An error occurred";
 					this.closeAfterSubmit(false,message);
@@ -249,8 +281,10 @@
 
 			};
 
+			// Initialize the popup container
 			AssignmentsPopup.init();
 			
+			// Event handler for click of Mark as Sample or Remove as Sample..
 			buttons.on("click",function(e){
 				var _d = jQuery(this);
 				var round = _d.attr("data-round");
@@ -265,6 +299,8 @@
 
 				var updatingToMark = (updatedVisibility == markedAsSample);
 				var resultMessage = (updatingToMark)?"Marked as sample!":"No more a sample!"
+				
+				// make the HTTP request to mark or unmark as sample
 				jQuery.ajax({
 					"url":"/sample_reviews/mark_unmark/"+responseId,
 					"type":"POST",
@@ -287,14 +323,17 @@
 				});
 			});
 
+			// Assign an opener element to the popup
 			AssignmentsPopup.opener.on("click",function(event){
 				AssignmentsPopup.fetchAssignments();
 			});
 
+			// Assign a closer to the popup
 			AssignmentsPopup.closer.on("click",function(event){
 				AssignmentsPopup.close();
 			});
 
+			// Assign the popup submitter
 			AssignmentsPopup.submitter.on("click",function(event){
 				AssignmentsPopup.submit();
 			});

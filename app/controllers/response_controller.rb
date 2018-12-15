@@ -90,6 +90,8 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
+      # if the request passes a param for visibility (consent for review to be used as sample)...
+      # ... with a valid value, update the @response object
       visibility = params[:visibility]
       if(!visibility.nil? and (visibility.to_i == _private || visibility.to_i == in_review))
         @response.update_attribute("visibility",visibility)

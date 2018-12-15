@@ -12,19 +12,23 @@ class SampleReviewsController < ApplicationController
 			redirect_to '/' and return
 		end
 		response_id = params[:id]
+		# redirect to home page if Response is not an approved sample review
 		if Response.find(response_id).visibility != 2
 			redirect_to '/'
 			return
 		end
+		
+		# get all questions and answers associated with this sample review
 		q_and_a_data = Answer.joins("INNER JOIN questions ON question_id = questions.id WHERE answers.response_id=#{response_id.to_s}")
 		
 		questions_query_result = Question.find(q_and_a_data.pluck(:question_id))
-		questions_map = {}
+		questions_map = {} # map to store question text (value) against question id (key)
 		questions_query_result.each do |question|
 			if !questions_map.key?(question.id)
 				questions_map[question.id] = question.txt
 			end
 		end
+		# construct @qa_table to get a list of key-value tuples, each representing question and answer
 		@qa_table = []
 		q_and_a_data.each do |answer|
 			question_text = questions_map[answer.question_id]
@@ -33,6 +37,7 @@ class SampleReviewsController < ApplicationController
 				@qa_table.push({:question=>question_text,:answer=>answer_text})
 			end
 		end
+		# construct the heading of the page
 		assignment_id = ResponseMap.find(Response.find(response_id).map_id).reviewed_object_id
 		@course_assignment_name = get_course_assignment_name(assignment_id)
 	end
@@ -43,13 +48,17 @@ class SampleReviewsController < ApplicationController
 			redirect_to '/' and return
 		end
 		@assignment_id = params[:id].to_i
+		# page_number variable is used for limit and offset in query
 		page_number = params[:page].to_i
 		if page_number.nil?
 			page_number = 0
 		end
 		@page_size = 8
+		# get all assignment ids that are similar
 		similar_assignment_ids = get_similar_assignment_ids(@assignment_id)
+		
 		@response_ids = []
+		# get all Responses that are samples from this colletion of assignments
 		similar_assignment_ids.each do |id|
 			_offset = page_number * @page_size
 			ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+id.to_s+
@@ -57,6 +66,7 @@ class SampleReviewsController < ApplicationController
 			@response_ids += ids
 		end
 		@links = generate_links(@response_ids)
+		# respond with HTML if initial request, or JSON if pagination request
 		if page_number == 0
 			@course_assignment_name = get_course_assignment_name(@assignment_id)
 		else
@@ -68,6 +78,7 @@ class SampleReviewsController < ApplicationController
 	def update_visibility
 		begin
 			visibility = params[:visibility] #response object consists of visibility in string format
+			# validate the request
 			if(visibility.nil?)
 				raise StandardError.new("Missing parameter 'visibility'")
 			end
@@ -146,7 +157,7 @@ class SampleReviewsController < ApplicationController
 		links
 	end
 
-	#Returns concatenation of Course name and Assignment name.
+	#Returns concatenation of Course name and Assignment name, given assignment id
 	def get_course_assignment_name(assignment_id)
 		assignment_name = Assignment.find(assignment_id).name
 		course_id = Assignment.find(assignment_id).course_id

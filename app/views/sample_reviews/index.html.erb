@@ -1,16 +1,16 @@
 <span class="hide" id="pageSizeSpan"><%= @page_size %></span>
 <% if !@links.empty? %>
 	<h3>Below are the Sample Reviews for <%= @course_assignment_name %></h3>
-	<ul class="list-group samples" data-id="<%= @assignment_id %>">
-		<li class="hide list-group-item" id="li_template">
+	<ul style="list-style-type: none;" class="list-group samples" data-id="<%= @assignment_id %>">
+		<li class="hide" id="li_template">
 			<a></a>
 		</li>
 		<%@links.each_with_index do |link, index|%>
-	  		<li class="list-group-item"><%=link_to("Sample Review " + (index+1).to_s, link)%></li>
+	  		<li><%=link_to("Sample Review " + (index+1).to_s, link)%></li>
 	  	<%end%>
 	</ul>
 	<% if @links.size == @page_size %>
-		<h5 style="cursor:pointer;text-align: center;" id="more_button">More +</h5>
+		<h5 style="cursor:pointer;" id="more_button">More +</h5>
 	<% end %>
 <% else %>
 	<h3>There are no sample reviews available for this assignment</h3>

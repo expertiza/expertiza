@@ -2,6 +2,8 @@
 # represents each table in the view_team view.
 # the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
+  attr_reader :name, :rounds, :round, :questionnaire_type, :questionnaire_display_type, :list_of_reviews, :list_of_rows, :list_of_reviewers, :max_score
+
   @questionnaire = nil
   @assignment = nil
 
@@ -26,13 +28,11 @@ class VmQuestionResponse
     @name  = questionnaire.name
   end
 
-  attr_reader :name
-
   def add_questions(questions)
     questions.each do |question|
       # Get the maximum score for this question. For some unknown, godforsaken reason, the max
       # score for the question is stored not on the question, but on the questionnaire. Neat.
-      corresponding_questionnaire = Questionnaire.find_by(id: question.questionnaire.id)
+      corresponding_questionnaire = question.questionnaire
       question_max_score = corresponding_questionnaire.max_question_score
       # if this question is a header (table header, section header, column header), ignore this question
       unless question.is_a? QuestionnaireHeader
@@ -60,7 +60,7 @@ class VmQuestionResponse
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
-        review_mapping = FeedbackResponseMap.where(id: review.map_id).first
+        review_mapping = FeedbackResponseMap.find_by(id: review.map_id)
         participant = Participant.find(review_mapping.reviewer_id)
         @list_of_reviewers << participant
         @list_of_reviews << review
@@ -68,7 +68,7 @@ class VmQuestionResponse
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"
       reviews = participant.teammate_reviews
       reviews.each do |review|
-        review_mapping = TeammateReviewResponseMap.where(id: review.map_id).first
+        review_mapping = TeammateReviewResponseMap.find_by(id: review.map_id)
         participant = Participant.find(review_mapping.reviewer_id)
         # commenting out teamreviews. I just realized that teammate reviews are hidden during the current semester,
         # and I don't know how to implement the logic, so I'm being safe.
@@ -78,7 +78,7 @@ class VmQuestionResponse
     elsif @questionnaire_type == "MetareviewQuestionnaire"
       reviews = participant.metareviews
       reviews.each do |review|
-        review_mapping = MetareviewResponseMap.where(id: review.map_id).first
+        review_mapping = MetareviewResponseMap.find_by(id: review.map_id)
         participant = Participant.find(review_mapping.reviewer_id)
         @list_of_reviewers << participant
         @list_of_reviews << review
@@ -110,33 +110,9 @@ class VmQuestionResponse
     @list_of_team_participants = team.participants
   end
 
-  def listofteamparticipants
-    @list_of_team_participants
-  end
-
-  attr_reader :max_score
-
   def max_score_for_questionnaire
     @max_score * @list_of_rows.length
   end
-
-  def max_score_for_questionnaire
-    @max_score * @list_of_rows.length
-  end
-
-  attr_reader :rounds
-
-  attr_reader :round
-
-  attr_reader :questionnaire_type
-
-  attr_reader :questionnaire_display_type
-
-  attr_reader :list_of_reviews
-
-  attr_reader :list_of_rows
-
-  attr_reader :list_of_reviewers
 
   def add_answer(answer)
     # We want to add each response score from this review (answer) to its corresponding
@@ -153,7 +129,7 @@ class VmQuestionResponse
       if answer.answer.is_a? Numeric
         color_code_number = ((answer.answer.to_f / question_max_score.to_f) * 5.0).ceil
         # Color code c0 is reserved for null spaces in the table which will be gray.
-        color_code_number = 1 if color_code_number == 0
+        color_code_number = 1 if color_code_number.zero?
       end
 
       # Find out the tag prompts assosiated with the question
@@ -177,9 +153,7 @@ class VmQuestionResponse
     end
   end
 
-  def get_number_of_comments_greater_than_10_words
-    first_time = true
-
+  def number_of_comments_greater_than_10_words
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|

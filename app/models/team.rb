@@ -122,7 +122,7 @@ class Team < ActiveRecord::Base
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
     for i in (1..num_of_teams).to_a
-      team = Object.const_get(team_type + 'Team').create(name: "Team" + i.to_s, parent_id: parent.id)
+      team = Object.const_get(team_type + 'Team').create(name: 'Team_' + i.to_s, parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: team.id)
       min_team_size.times do
         break if next_team_member_index >= users.length
@@ -148,10 +148,10 @@ class Team < ActiveRecord::Base
   end
 
   # Generate the team name
-  def self.generate_team_name(team_name_prefix)
+  def self.generate_team_name(team_name_prefix = '')
     counter = 1
     loop do
-      team_name = team_name_prefix + "_Team#{counter}"
+      team_name = "Team_#{counter}"
       return team_name unless Team.find_by(name: team_name)
       counter += 1
     end

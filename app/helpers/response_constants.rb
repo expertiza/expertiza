@@ -1,4 +1,4 @@
-
+# constants used to maintain the visibility status of reviews(response objects)
 module ResponseConstants
 	def _private
 		0

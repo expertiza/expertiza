@@ -1,5 +1,8 @@
 module SimilarAssignmentsHelper
   include SimilarAssignmentsConstants
+  # get all the assignemts in two different sets
+  # one with all the assignments that are already marked as similar to the given assignment
+  # another with all the remaining assignments that are not marked as similar yet
   def get_asssignments_set(selected)
     all_assignments = get_assignments_based_on_role
     assignment_array = []
@@ -20,6 +23,8 @@ module SimilarAssignmentsHelper
     assignment_array
   end
 
+  # get all the assignments for the requested user
+  # poupulate assignments list based on the role
   def get_assignments_based_on_role
     role = current_user.role.id
     page = params[:page]
@@ -41,6 +46,8 @@ module SimilarAssignmentsHelper
     @all_assignments
   end
 
+  # get all the courses for the requested user
+  # poupulate courses list based on the role
   def get_courses_based_on_role
     role = current_user.role.id
     case role
@@ -60,6 +67,7 @@ module SimilarAssignmentsHelper
     courses_hash
   end
 
+  # fetch all the similar assignments for the given assignment
   def get_similar_assignment_ids(assignment_id)
     SimilarAssignment.where(:assignment_id => assignment_id).pluck(:is_similar_for)
   end

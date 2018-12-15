@@ -1,3 +1,4 @@
+# constants used in similar_assignments controller
 module SimilarAssignmentsConstants
 	def intent_review
 		"Review"

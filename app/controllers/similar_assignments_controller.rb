@@ -7,6 +7,9 @@ class SimilarAssignmentsController < ApplicationController
 
 
   # GET /similar_assignments/:id
+  # get the assignments set in two groups
+  # one with all the assignments that are already marked as similar to the given assignment
+  # another with all the remaining assignments that are not marked as similar yet
   def get
     @assignment_id = params[:id]
     ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+@assignment_id.to_s).ids
@@ -25,6 +28,7 @@ class SimilarAssignmentsController < ApplicationController
   end
 
   # POST /similar_assigments/:id
+  # update similar_assignments table based on the check list entries passed with update request(fetched from params[:similar])
   def update
     begin
       @check_lists = params[:similar].to_hash
@@ -64,6 +68,7 @@ class SimilarAssignmentsController < ApplicationController
     end
   end
 
+  # block students from making any requests to this controller
   def validate_user
     if Role.student.id == current_user.role.id
       respond_to do |format|

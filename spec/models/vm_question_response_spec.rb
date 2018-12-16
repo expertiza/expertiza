@@ -115,6 +115,7 @@ describe VmQuestionResponse do
     it 'displays the members of the team' do
       allow(team).to receive(:participants).and_return([participant])
       response.add_team_members(team)
+      allow(participant).to receive(:fullname).and_return('2065, student')
       expect(response.display_team_members).to eq('Team members: (2065, student) ')
     end
   end

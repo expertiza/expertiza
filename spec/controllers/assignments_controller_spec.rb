@@ -1,6 +1,6 @@
 describe AssignmentsController do
   let(:assignment) do
-    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'path',
+    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
   let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
@@ -276,31 +276,26 @@ describe AssignmentsController do
   end
 
   describe '#copy' do
-    let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'path') }
+    let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'different path') }
+    let(:new_assignment2) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'same path') }
 
     context 'when new assignment id fetches successfully' do
       it 'redirects to assignments#edit page' do
+        allow(assignment).to receive(:dup).and_return(new_assignment)
+        allow(new_assignment).to receive(:save).and_return(true)
         allow(Assignment).to receive(:find).with(2).and_return(new_assignment)
         params = {id: 1}
         get :copy, params
-        expect(flash[:error]).to be nil
+        expect(flash[:note]).to be_nil
+        expect(flash[:error]).to be_nil
         expect(response).to redirect_to('/assignments/2/edit')
-      end
-    end
-
-    context 'when new assignment id does not fetch successfully' do
-      it 'shows an error flash message and redirects to assignments#edit page' do
-        params = {id: 1}
-        get :copy, params
-        expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
-        expect(response).to redirect_to('/tree_display/list')
       end
     end
 
     context 'when new assignment directory is same as old' do
       it 'should show an error and redirect to assignments#edit page' do
         allow(AssignmentForm).to receive(:copy).with('1', instructor).and_return(2)
-        allow(Assignment).to receive(:find).with(2).and_return(new_assignment)
+        allow(Assignment).to receive(:find).with(2).and_return(new_assignment2)
         params = {id: 1}
         session = {user: instructor}
         get :copy, params, session
@@ -309,7 +304,18 @@ describe AssignmentsController do
           "If you do not want this to happen, change the submission directory in the new copy of the assignment.")
         expect(flash[:error]).to be_nil
         expect(response).to redirect_to('/assignments/2/edit')
+      end
+    end
 
+    context 'when new assignment id does not fetch successfully' do
+      it 'shows an error flash message and redirects to assignments#edit page' do
+        allow(assignment).to receive(:dup).and_return(new_assignment)
+        allow(new_assignment).to receive(:save).and_return(false)
+        params = {id: 1}
+        get :copy, params
+        expect(flash[:note]).to be_nil
+        expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
+        expect(response).to redirect_to('/tree_display/list')
       end
     end
   end

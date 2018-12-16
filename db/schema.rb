@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180926160031) do
+ActiveRecord::Schema.define(version: 20181102231238) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -764,11 +764,11 @@ ActiveRecord::Schema.define(version: 20180926160031) do
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
 
   create_table "versions", force: :cascade do |t|
-    t.string   "item_type",  limit: 255,   null: false
-    t.integer  "item_id",    limit: 4,     null: false
-    t.string   "event",      limit: 255,   null: false
+    t.string   "item_type",  limit: 255,      null: false
+    t.integer  "item_id",    limit: 4,        null: false
+    t.string   "event",      limit: 255,      null: false
     t.string   "whodunnit",  limit: 255
-    t.text     "object",     limit: 65535
+    t.text     "object",     limit: 16777215
     t.datetime "created_at"
   end
 

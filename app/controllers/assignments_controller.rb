@@ -147,12 +147,6 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
-  def index
-    set_up_display_options("ASSIGNMENT")
-    @assignments = super(Assignment)
-    # @assignment_pages, @assignments = paginate :assignments, :per_page => 10
-  end
-
   def delayed_mailer
     @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])

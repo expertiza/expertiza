@@ -222,8 +222,6 @@ resources :institution, except: [:destroy] do
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :list
-      post :list_questionnaires
       get :new_quiz
       get :select_questionnaire_type
       post :select_questionnaire_type

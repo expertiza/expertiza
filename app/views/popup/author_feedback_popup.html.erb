@@ -31,7 +31,7 @@
         <%else%>
           <td align = 'center'> <%= s.answer %></td>
         <%end%>
-        <td align = 'left'> <%= s.comments.html_safe unless s.comments.nil? %> </td>
+        <td align = 'left'> <%= sanitize s.comments.html_safe unless s.comments.nil? %> </td>
       </tr>
     <%end%>
     <tr>
@@ -48,7 +48,7 @@
         <%if @response.additional_comment.nil? %>
           <td> No Comments </td>
         <%else%>
-          <td> <%= @response.additional_comment.html_safe unless @response.additional_comment.html_safe.nil? %> </td>
+          <td> <%= sanitize @response.additional_comment.html_safe unless @response.additional_comment.html_safe.nil? %> </td>
         <%end%>
       </tr>
     </table>

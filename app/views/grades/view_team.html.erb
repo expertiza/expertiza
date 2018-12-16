@@ -134,7 +134,7 @@
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%=score.comment%>">
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
@@ -158,7 +158,7 @@
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->
                 <tr class="tablesorter-childRow">
                   <td colspan="<%= (i+1).to_s %>" class="hiddenRow" ><div id="hid<%= row.question_id.to_s + vm.round.to_s %>" class="accordion-body collapse" style="margin-left:10px;">
-                    <div style="padding-top: 10px; padding-bottom: 10px;"><%= row.question_text %></div>
+                    <div style="padding-top: 10px; padding-bottom: 10px;"><%=  sanitize row.question_text %></div>
                     <div>
                       <table class="table tbl_questlist">
                         <thead>

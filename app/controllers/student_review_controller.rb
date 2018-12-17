@@ -41,7 +41,7 @@ class StudentReviewController < ApplicationController
     end
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
-    sign_up_list
+    topic_list
   end
 
   # the method remove_nullteam_topics remove the topics that are not signed up by any teams
@@ -58,23 +58,11 @@ class StudentReviewController < ApplicationController
 
   # this method is used to show a submission list for students to bid when 
   # the review strategy is "bidding"
-  def sign_up_list
+  def topic_list
     # get the participant that's the reviewer for the assignment
     @participant = AssignmentParticipant.find(params[:id])
-    # The assignment that should be reviewed is here
-    @assignment = @participant.assignment
-    # get the original topics that are under the assignment.
-    topics = SignUpTopic.where(assignment_id: @assignment.id)
-    signed_up_teams = []
-    topics.each do |topic|
-      teams = SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
-      teams.each do |team|
-        signed_up_teams << team
-      end
-    end
-    my_bids = ReviewBid.get_bids_by_participant(@participant, topics, signed_up_teams)
+    my_bids = ReviewBid.get_bids_by_participant(@participant)
     @bids = []
-    #render :json => @bids
     my_teams = TeamsUser.where(user_id: @participant.user_id).map(&:team_id)
     # if self-review is not allowed
     if !@assignment.is_selfreview_enabled
@@ -85,6 +73,7 @@ class StudentReviewController < ApplicationController
     else
       @bids = my_bids
     end
+    #render :json => my_bids
   end
 
   # set the priority of review

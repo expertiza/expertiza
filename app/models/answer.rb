@@ -23,14 +23,14 @@ class Answer < ActiveRecord::Base
 
       user = User.find(participant.user_id)
       unless user.is_student? # if the review does not belog to student, increment count of staff review. Will be helpful while displaying in grades tab
-        number_of_instructor_reviews = number_of_instructor_reviews + 1
+        number_of_instructor_reviews += 1
       else
         curr_score = get_total_score(response: [assessment], questions: questions)
-      end        
+      end
       scores[:max] = curr_score if curr_score > scores[:max]
       scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
 
-        # Check if the review is invalid. If is not valid do not include in score calculation
+      # Check if the review is invalid. If is not valid do not include in score calculation
       if @invalid == 1 or curr_score == -1
         length_of_assessments -= 1
         curr_score = 0

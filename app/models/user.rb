@@ -288,7 +288,8 @@ class User < ActiveRecord::Base
     return true if self.role.ta?
   end
 
-  def is_student? # New method to check if the current user is a student
+  # New method to check if the current user is a student
+  def is_student?
     return true if self.role.student?
   end
 

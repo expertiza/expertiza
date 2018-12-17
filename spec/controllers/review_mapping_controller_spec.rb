@@ -2,22 +2,20 @@ require 'rails_helper'
 describe ReviewMappingController do
   let(:assignment) { double('Assignment', id: 1) }
   let(:review_response_map) do
-    double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-          reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+    double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:metareview_response_map) do
-    double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-          reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+    double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:map) { double('ResponseMap', id: 1)}
 
-  let(:reviewer) { double('AssignmentParticipant', user_id: 1, parent_id: 1, reviewer_id: 1, id: 1)}
-  let(:review_map) { double('ReviewResponseMap', reviewee_id: 1, reviewer_id: 1, map_id: 1)}
+  let(:reviewer) { double('AssignmentParticipant', user_id: 1, parent_id: 1, reviewer_id: 1, id: 1) }
+  let(:review_map) { double('ReviewResponseMap', reviewee_id: 1, reviewer_id: 1, map_id: 1) }
   let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
   let(:user) { double('User', id: 3) }
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
-  let(:team) { double('AssignmentTeam', name: 'no one', id: 1, parent_id: 1, id: 1) }
+  let(:team) { double('AssignmentTeam', name: 'no one', id: 1, parent_id: 1) }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
 
   before(:each) do
@@ -378,7 +376,7 @@ describe ReviewMappingController do
   describe '#select_reviewer' do
     it 'sets the contributor in session variable' do
       allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
-      params = { contributor_id: 1 }
+      params = {contributor_id: 1}
       post :select_reviewer, params
       expect(session[:contributor]).to eql(team)
     end
@@ -396,12 +394,12 @@ describe ReviewMappingController do
   describe '#add_instructor_as_reviewer' do
     context 'when there is no response map and no reviewer' do
       it 'add instructor as a reviwer and assigns the team a reviwer' do
-        params = { team_id: 1, reviewer_id: 1, assignment_id: 1}
+        params = {team_id: 1, reviewer_id: 1, assignment_id: 1}
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first).with(reviewee_id: 1, course_staff: true, reviewed_object_id: '1').with(no_args).and_return(nil)
         allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(user_id: '1', parent_id: 1).with(no_args).and_return(nil)
         session = {user: build(:instructor, id: 1)}
-        allow(AssignmentParticipant).to receive(:create).with(parent_id: 1, user_id: 1, can_submit:false, can_review: true, can_take_quiz: false, handle: 'handle').and_return(reviewer)
+        allow(AssignmentParticipant).to receive(:create).with(parent_id: 1, user_id: 1, can_submit: false, can_review: true, can_take_quiz: false, handle: 'handle').and_return(reviewer)
         allow(team).to receive(:assign_reviewer).with(reviewer).and_return(review_map)
         post :add_instructor_as_reviewer, params, session
         expect(assigns(:review_map_id)).to eql(review_map)
@@ -411,16 +409,16 @@ describe ReviewMappingController do
     context 'when there is a reviewer' do
       it 'maps the response and team' do
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
-        allow(AssignmentParticipant).to receive_message_chain(:where,:first).with(user_id: '1', parent_id: 1).with(no_args).and_return(reviewer)
+        allow(AssignmentParticipant).to receive_message_chain(:where, :first).with(user_id: '1', parent_id: 1).with(no_args).and_return(reviewer)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first).with(reviewee_id: 1, reviewer_id: 1, reviewed_object_id: '1').with(no_args).and_return(review_map)
         session = {user: build(:instructor, id: 1)}
-        params = { team_id: 1, reviewer_id: 1, assignment_id: 1}
+        params = {team_id: 1, reviewer_id: 1, assignment_id: 1}
         post :add_instructor_as_reviewer, params, session
         expect(assigns(:review_map_id)).to eql(review_map)
         expect(response).to redirect_to('/response/new?id=1')
       end
     end
- end
+  end
 
   describe '#delete_metareview' do
     it 'redirects to review_mapping#list_mappings page after deletion' do

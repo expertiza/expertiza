@@ -88,7 +88,7 @@ class VmQuestionResponse
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
-      add_answer(answer, review.response_id)
+        add_answer(answer, review.response_id)
       end
     end
   end
@@ -173,11 +173,10 @@ class VmQuestionResponse
 
       # Now construct the color code based on scores and user type!
       color_code = "c#{color_code_number}"
-      participant= Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewer_id)
+      participant = Participant.find(ResponseMap.find(Response.find(response_id).map_id).reviewer_id)
       user_id = participant.user_id
       course = Course.find(@assignment.course_id)
-      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments,
-      course.is_ta_or_instructor?(user_id), vm_tag_prompts))
+      row.score_row.push(VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments,course.is_ta_or_instructor?(user_id), vm_tag_prompts))
     end
   end
 

@@ -41,8 +41,8 @@ class AssignmentTeam < Team
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)
     raise "The assignment cannot be found." if assignment.nil?
-    user=User.find(reviewer.user_id)
-    if (!user.is_student?) # if current reviewer is not a student, set course staff = true while creating record in Review and ResponseMap
+    user = User.find(reviewer.user_id)
+    if !user.is_student? # if current reviewer is not a student, set course staff = true while creating record in Review and ResponseMap
       ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id, course_staff: true)
     else
       ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)

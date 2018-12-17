@@ -12,7 +12,7 @@ class ResponseController < ApplicationController
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      unless current_user.is_student?# If the current logged in user is not student, will be able to edit all reviews 
+      unless current_user.is_student? # If the current logged in user is not student, will be able to edit all reviews
         return true
       end
       return current_user_id?(user_id)
@@ -233,10 +233,10 @@ class ResponseController < ApplicationController
     elsif params[:return] == "survey"
       redirect_to controller: 'response', action: 'pending_surveys'
     elsif @map.response_map.assignment.course.is_ta_or_instructor?(current_user.id)
-	    redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
-	  else
-	    redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
-	  end
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
+    else
+      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+    end
   end
 
   def show_calibration_results_for_student
@@ -316,7 +316,7 @@ class ResponseController < ApplicationController
       else
         @current_round = @assignment.number_of_current_round(reviewees_topic)
       end
-    @questionnaire = @map.questionnaire(@current_round)
+      @questionnaire = @map.questionnaire(@current_round)
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",

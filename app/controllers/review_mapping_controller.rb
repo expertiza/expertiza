@@ -25,12 +25,12 @@ class ReviewMappingController < ApplicationController
     if participant.nil?
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
     end
-    if (!current_user.is_student?)#If the current logged in user is not student, set coursestaff = true in review response map
+    if !current_user.is_student? # If the current logged in user is not student, set coursestaff = true in review response map
       map = ReviewResponseMap.where(reviewed_object_id: params[:id], course_staff: true, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
       map = ReviewResponseMap.create(reviewed_object_id: params[:id], course_staff: true, reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
     else
-      map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: 	true).first rescue nil
-      map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: 	 true) if map.nil?
+      map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
+      map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
     end
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
@@ -67,13 +67,13 @@ class ReviewMappingController < ApplicationController
         reviewer = get_reviewer(user, assignment, regurl)
         # it treats all assignments as team assignments
         if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-	         if (!current_user.is_student?) # If Reviewer is part of course staff, we set the boolean variable to true while creating the Map.
-              ReviewResponseMap.create(reviewee_id: params[:contributor_id], course_staff: true, reviewed_object_id: assignment.id)
-	         else
-              ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-	         end
+          if !current_user.is_student? # If Reviewer is part of course staff, we set the boolean variable to true while creating the Map.
+            ReviewResponseMap.create(reviewee_id: params[:contributor_id], course_staff: true, reviewed_object_id: assignment.id)
+          else
+            ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+          end
         else
-            raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
+          raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
         end
       rescue StandardError => e
         msg = e.message
@@ -117,9 +117,10 @@ class ReviewMappingController < ApplicationController
       end
       end
     redirect_to controller: 'student_review', action: 'list', id: reviewer.id
-end
-# Adds an instructor as a participant in a team so that he/she can add a review.
-# We need to add Instructor and TA as reviewer because to review the user must be part of that assignment.
+  end
+  
+  # Adds an instructor as a participant in a team so that he/she can add a review.
+  # We need to add Instructor and TA as reviewer because to review the user must be part of that assignment.
   def add_instructor_as_reviewer
     assignment_team = AssignmentTeam.find(params[:team_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment_team.parent_id).first
@@ -127,8 +128,7 @@ end
       reviewer = AssignmentParticipant.create(parent_id: assignment_team.parent_id, user_id: session[:user].id, can_submit: false, can_review: true,
                                               can_take_quiz: false, handle: 'handle')
     end
-    @review_map_id = ReviewResponseMap.where(reviewee_id: assignment_team.id, course_staff: 1,
-                   reviewed_object_id: params[:assignment_id]).first
+    @review_map_id = ReviewResponseMap.where(reviewee_id: assignment_team.id, course_staff: 1,reviewed_object_id: params[:assignment_id]).first
     @review_map_id = assignment_team.assign_reviewer(reviewer) if @review_map_id.nil?
     redirect_to controller: 'response', action: 'new', id: @review_map_id.map_id
   end

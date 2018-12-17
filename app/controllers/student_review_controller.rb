@@ -1,5 +1,4 @@
 class StudentReviewController < ApplicationController
-
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -21,7 +20,7 @@ class StudentReviewController < ApplicationController
 
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     # if it is an calibrated assignment, change the response_map order in a certain way
-    @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5} if @assignment.is_calibrated == true
+    @review_mappings = @review_mappings.sort_by { |mapping| mapping.id % 5 } if @assignment.is_calibrated == true
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
 
@@ -56,7 +55,7 @@ class StudentReviewController < ApplicationController
     return new_array
   end
 
-  # this method is used to show a submission list for students to bid when 
+  # this method is used to show a submission list for students to bid when
   # the review strategy is "bidding"
   def topic_list
     # get the participant that's the reviewer for the assignment
@@ -73,7 +72,6 @@ class StudentReviewController < ApplicationController
     else
       @bids = my_bids
     end
-    #render :json => my_bids
   end
 
   # set the priority of review
@@ -94,6 +92,6 @@ class StudentReviewController < ApplicationController
         ReviewBid.where(team_id: team_id, participant_id: @participant.id).update_all(priority: index + 1)
       end
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    redirect_to action: 'list', assignment_id: assignment_id
   end
 end

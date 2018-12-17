@@ -29,6 +29,7 @@ class ReviewBidsController < LotteryController
     flash[:success] = 'The intelligent review assignment was successfully completed for ' + assignment.name + '.'
     redirect_to controller: 'tree_display', action: 'list'
   end
+
   # if some participants don't get assigned reviews from peerlogic,
   # randomly assign availables reviews to them
   def run_intelligent_bid(assignment, teams, participants, bid_result)
@@ -64,6 +65,8 @@ class ReviewBidsController < LotteryController
     end
     return response_mappings
   end
+
+  # create response_mapping data with the result from intelligent assignment
   def create_response_mappings(assignment, response_mappings)
     response_mappings.each do |map|
       ReviewResponseMap.create(

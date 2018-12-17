@@ -341,6 +341,11 @@
     <%end%>
     <table width="100%">
       <% i = 0 %>
+      <tr>
+        <td>
+          <h2>Regular Review Questions</h2>
+        </td>
+      </tr>
       <% @questions.each do |question| %>
           <tr>
             <td>
@@ -364,20 +369,33 @@
 
       <br>
       <% unless @supplementary_review_questions.nil? %>
-        Supplementary Review Questions
+      <tr>
+        <td>
+          <h2>Supplementary Review Questions</h2>
+        </td>
+      </tr>
         <% @supplementary_review_questions.each do |question| %>
-          <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil? %>
-          <% if question.instance_of? Criterion %>
-            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-            <%= tinymce %>
-          <% elsif question.instance_of? Scale %>
-            <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
-            <%= tinymce %>
-          <% elsif question.instance_of? UploadFile %>
-          <% else %>
-            <%= question.complete(i, answer) %>
-          <% end %>
-          <% i += 1 %>
+        <tr>
+          <td>
+            <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil? %>
+            <% if question.instance_of? Criterion %>
+              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
+              <%= tinymce %>
+            <% elsif question.instance_of? Scale %>
+              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
+              <%= tinymce %>
+            <% elsif question.instance_of? UploadFile %>
+            <% else %>
+              <%= question.complete(i, answer) %>
+            <% end %>
+          </td>
+          <td width="25%">
+            <% if [Criterion, TextArea].include? question.class %>
+                <div id="analysis_<%= i.to_s %>_comments"></div>
+            <% end %>
+          </td>
+        </tr>
+        <% i += 1 %>
         <% end %>
       <% end %>
 

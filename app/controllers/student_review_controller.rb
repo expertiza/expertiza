@@ -73,7 +73,6 @@ class StudentReviewController < ApplicationController
       @bids = my_bids
     end
   end
-
   # set the priority of review
   def set_priority
     @participant = AssignmentParticipant.find(params[:participant_id])

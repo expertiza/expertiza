@@ -89,6 +89,7 @@ class AssignmentForm
     end
   end
 
+  # code to save topic questionnaires
   def update_topic_questionnaires(attributes)
     return false unless attributes
     existing_tqs = TopicQuestionnaire.where(sign_up_topic_id: SignUpTopic.where(assignment_id: @assignment.id))
@@ -361,6 +362,7 @@ class AssignmentForm
   end
 end
 
+#check review by rounds, save the check box statue in @review_by_rounds
 def check_review_by_rounds
   @assignment_questionnaires.each do |aq|
     unless aq.used_in_round.nil?

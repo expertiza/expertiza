@@ -16,7 +16,7 @@ describe 'ReviewBid' do
       it "return bid item ordered by priority" do
         bid1 = build(:review_bid, team_id: 1, participant_id: 1, priority: 2)
         bid2 = build(:review_bid, team_id: 2, participant_id: 1, priority: 1)
-        allow(ReviewBid).to receive_message_chain(:where, :order).and_return([bid2, bid1]) 
+        allow(ReviewBid).to receive_message_chain(:where, :order).and_return([bid2, bid1])
         expect(ReviewBid.get_rank_by_participant(par, [1, 2])).to eq([2, 1])
       end
       it "with different priority" do
@@ -56,5 +56,5 @@ describe 'ReviewBid' do
         expect(bid_info[0].bid_team_name).to eq("team 2")
       end
     end
-   end
+  end
 end

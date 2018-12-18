@@ -1,6 +1,6 @@
 class ReviewBid < ActiveRecord::Base
   attr_accessor :bid_topic_name, :bid_topic_identifier, :bid_team_name
-  # this method is called when the bidding is run, 
+  # this method is called when the bidding is run,
   # get the ranking of teams ordered by the participant from the bids
   def self.get_rank_by_participant(participant, assignment_teams)
     bids = ReviewBid.where(participant_id: participant.id).order(:priority)
@@ -11,6 +11,7 @@ class ReviewBid < ActiveRecord::Base
       return bids.map(&:team_id)
     end
   end
+
   # get the bidding list of the participant
   def self.get_bids_by_participant(participant)
     assignment = participant.assignment
@@ -18,7 +19,7 @@ class ReviewBid < ActiveRecord::Base
     signed_up_teams = []
     topics = SignUpTopic.where(assignment_id: assignment.id)
     topics.each do |topic|
-      signed_up_teams = signed_up_teams + SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
+      signed_up_teams += SignedUpTeam.where(topic_id: topic.id, is_waitlisted: 0)
     end
     bids = ReviewBid.where(participant_id: participant.id).order(:priority)
     default = false
@@ -36,14 +37,15 @@ class ReviewBid < ActiveRecord::Base
     if default
       bids.order(:bid_topic_identifier)
     end
-    return bids
+    bids
   end
-  # for the bid list to show includes topic name, topic identifier and the team name, 
+
+  # for the bid list to show includes topic name, topic identifier and the team name,
   # this method is used to wrap up all the information for bid item.
   def self.match_bid_with_team_topic(bid, signed_up_teams, assignment_teams, topics)
     signed_up_teams.each do |team|
       topics.each do |topic|
-        if bid.team_id == team.team_id && topic.id == team.topic_id 
+        if bid.team_id == team.team_id && topic.id == team.topic_id
           bid.bid_topic_name = topic.topic_name
           bid.bid_topic_identifier = topic.topic_identifier
         end

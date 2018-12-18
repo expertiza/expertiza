@@ -63,7 +63,7 @@ class ReviewBidsController < LotteryController
         response_mappings << {pid: participant.id, team: team}
       end
     end
-    return response_mappings
+    response_mappings
   end
 
   # create response_mapping data with the result from intelligent assignment

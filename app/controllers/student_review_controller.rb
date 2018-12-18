@@ -20,7 +20,7 @@ class StudentReviewController < ApplicationController
 
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     # if it is an calibrated assignment, change the response_map order in a certain way
-    @review_mappings = @review_mappings.sort_by { |mapping| mapping.id % 5 } if @assignment.is_calibrated == true
+    @review_mappings = @review_mappings.sort_by {|mapping| mapping.id % 5} if @assignment.is_calibrated == true
     @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
     # Calculate the number of reviews that the user has completed so far.
 
@@ -73,6 +73,7 @@ class StudentReviewController < ApplicationController
       @bids = my_bids
     end
   end
+
   # set the priority of review
   def set_priority
     @participant = AssignmentParticipant.find(params[:participant_id])

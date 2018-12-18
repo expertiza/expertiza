@@ -31,7 +31,7 @@ class ReviewBid < ActiveRecord::Base
       end
     end
     bids.each do |bid|
-      self.match_bid_with_team_topic(bid, signed_up_teams, assignment_teams, topics) 
+      self.match_bid_with_team_topic(bid, signed_up_teams, assignment_teams, topics)
     end
     # if getting a default list, sort by topic_identifier
     if default

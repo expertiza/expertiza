@@ -1,0 +1,16 @@
+= form_for @badge_preference do |f|
+  - if @badge_preference.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@badge_preference.errors.count, "error")} prohibited this badge_preference from being saved:"
+      %ul
+        - @badge_preference.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :instructor_id
+    = f.number_field :instructor_id
+  .field
+    = f.label :preference
+    = f.check_box :preference
+  .actions
+    = f.submit 'Save'

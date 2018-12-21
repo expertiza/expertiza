@@ -1,0 +1,35 @@
+
+<%=form_tag({:controller=>'badge_preferences',:action=>'create', :id=> 'badge_preference_form'}) %>
+<div id="preference" style="display:block; position: fixed; top:0; left: 0; height:100vh; width:100vw">
+  <div style="height:100%; width:100%; background-color:rgba(0,0,0,0.7);">
+    <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        margin: auto;background-color: white; height:fit-content; width:fit-content; padding:20px 50px;" align="left">
+      <br>
+
+      Credly badges once awarded, can only be revoked using premium account.
+      <h5>Are you sure you want to continue?</h5>
+      <br>
+      <%=check_box_tag :disclaimer_preference %>
+      Don't show this message again
+      <br><br>
+
+        <%= submit_tag 'Continue', class: 'btn btn-default', onclick: 'create_preference()' %>
+      <%= link_to 'Cancel', "http://localhost:3000/course_badges/awarding?course_id=#{course_id}", class: 'btn btn-default'%>
+    </div>
+  </div>
+</div>
+
+<%= link_to 'Cancel', "http://localhost:3000/course_badges/awarding?course_id=#{course_id}"%>
+
+<script>
+    $(document).ready(function() {
+        $('#continue').on('click', function() {
+
+            $('#badge_preference_form').submit();
+            <% if :disclaimer_preference.equal?(true) %>
+            <% @badge_preferences.create(session[:user],:disclaimer_preference)%>
+            <%end%>
+        });
+    });
+
+</script>

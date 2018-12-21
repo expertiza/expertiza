@@ -1,4 +1,5 @@
 Expertiza::Application.routes.draw do
+  resources :badge_preferences
   get 'course_badges/awarding'
   post 'course_badges/awarding_submit'
 

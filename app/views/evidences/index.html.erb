@@ -1,23 +1,45 @@
-%h1 Listing evidences
+  <h4>&#8226; Submit a hyperlink:</h4>
+  <input type="text" name="submission" size=40 value="http://">
+  <input type="submit" name="upload_link" value="Upload link"/>
+  <br/><br/><br/>
+  <h5>Hyperlink Actions:</h5>
+  <button>Delete selected hyperlink</button>
+  <br/><br/><br/>
 
-%table
-  %thead
-    %tr
-      %th Awarded badge
-      %th File name
-      %th
-      %th
-      %th
+  <h4>&#8226; Submit a file:</h4>
 
-  %tbody
-    - @evidences.each do |evidence|
-      %tr
-        %td= evidence.awarded_badge_id
-        %td= evidence.file_name
-        %td= link_to 'Show', evidence
-        %td= link_to 'Edit', edit_evidence_path(evidence)
-        %td= link_to 'Destroy', evidence, method: :delete, data: { confirm: 'Are you sure?' }
+  <div class="form-group">
+    <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
+  </div>
+    <%= submit_tag 'Upload file', class: 'btn btn-default' %>
+    <br/><br/>
+  <h4>&#8226; Comments:</h4>
 
-%br
+  <textarea rows="4" cols="50">
 
-= link_to 'New Evidence', new_evidence_path
+  </textarea>
+  <br/><br/>
+  <a href="javascript:window.history.back()">Back</a>
+  <!--%h1 Listing evidences-->
+
+<!--%table-->
+  <!--%thead-->
+    <!--%tr-->
+      <!--%th Awarded badge-->
+      <!--%th File name-->
+      <!--%th-->
+      <!--%th-->
+      <!--%th-->
+
+  <!--%tbody-->
+    <!-- - @evidences.each do |evidence|-->
+      <!--%tr-->
+        <!--%td= evidence.awarded_badge_id-->
+        <!--%td= evidence.file_name-->
+        <!--%td= link_to 'Show', evidence-->
+        <!--%td= link_to 'Edit', edit_evidence_path(evidence)-->
+        <!--%td= link_to 'Destroy', evidence, method: :delete, data: { confirm: 'Are you sure?' }-->
+
+<!--%br-->
+
+<!--= link_to 'New Evidence', new_evidence_path-->

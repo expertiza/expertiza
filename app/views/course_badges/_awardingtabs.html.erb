@@ -1,0 +1,67 @@
+<script>
+    $(function(){
+        $('table').tablesorter({
+            sortReset      : true,
+            sortRestart    : true
+        });
+
+        $('.checkbox_award').click(function(data){
+            if(!this.checked) {
+                var id = "deleted_" + this.id;
+                $('#placeholder_deleted_' + this.id).html('<input type="hidden" id="' + id + '" name="' + id + '"></input>');
+            }else
+                $('#placeholder_deleted_' + this.id).html('')
+        });
+
+    });
+</script>
+<table class="tablesorter table table-striped">
+      <thead class="thead-light" align="center">
+      <tr>
+      <th colspan="2">Participant</th>
+      <% @assignments.each do |assig| %>
+        <th colspan="2" style="word-wrap: break-word;">Avg. in <%= assig.name %></th>
+        <% end %>
+      <th colspan="<%= @course_badges.count %>">Badges</th>
+      </tr>
+      <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <% @assignments.each do |assig| %>
+        <th>Score</th>
+        <th>Reviewing</th>
+        <% end %>
+                <th style="text-align: center; word-wrap: break-word;"><div><img src="<%= coursebadge.badge.image_url%>" width="25" height="25"/></div><%= coursebadge.badge.name %></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% @participants.each do |participant| %>
+        <tr>
+        <td><%= participant.user.name %></td>
+        <td><%= participant.user.fullname %></td>
+        <% @assignments.each do |assignment| %>
+          <td>
+          <a href="../grades/view_team?id=<%=@score[participant.id][assignment.id]['assignment_participant']%>" target="_blank">
+          <%= @score[participant.id][assignment.id]['avg_score'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_score']  %>
+          </a>
+          </td>
+          <td>
+          <a href="../grades/view_team?id=<%=@score[participant.id][assignment.id]['assignment_participant']%>" target="_blank">
+          <%= @score[participant.id][assignment.id]['avg_reviewing'] == {} ? "N/A" : @score[participant.id][assignment.id]['avg_reviewing']  %>
+          </a>
+          </td>
+          <% end %>
+          <% if @course_badges.count > 0 %>
+              <td style="text-align: center;" >
+                <img src="<%= coursebadge.badge.image_url%>" width="25" height="25"/>&nbsp;
+                <%= check_box_tag "award_" + participant.id.to_s + "_" + coursebadge.badge.id.to_s,
+                                  @award[participant.id][coursebadge.badge.id].eql?(true) ? "awarded" : "",
+                                  @award[participant.id][coursebadge.badge.id].eql?(true),
+                                  :class => 'checkbox_award' %>
+                <div id='<%= "placeholder_deleted_award_" + participant.id.to_s + "_" + coursebadge.badge.id.to_s %>'></div>
+              </td>
+            <% end %>
+        <% end%>
+        </tr>
+      </tbody>
+</table>

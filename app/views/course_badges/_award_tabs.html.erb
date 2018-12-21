@@ -1,0 +1,17 @@
+
+<div class= "table" id="tabs">
+  <% counter = 1 %>
+  <ul>
+    <% @course_badges.each do |course_badge| %>
+      <li><a href="#tabs-<%=counter %>" id="<%= course_badge.badge.name %>"><%= course_badge.badge.name %></a></li>
+      <% counter += 1 %>
+    <% end%>
+  </ul>
+  <% counter = 1 %>
+  <% @course_badges.each do |course_badge| %>
+    <div id="tabs-<%=counter %>">
+      <%= render 'course_badges/awardingtabs', :coursebadge => course_badge %>
+    </div>
+    <% counter += 1 %>
+  <% end %>
+</div>

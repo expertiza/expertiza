@@ -456,10 +456,9 @@ resources :institution, except: [:destroy] do
 
   resources :user_pastebins
 
-  resources :versions, only: %i[index show destroy] do
+  resources :versions, only: %i[index show] do
     collection do
       get :search
-      delete '', action: :destroy_all
     end
   end
 

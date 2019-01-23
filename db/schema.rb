@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180901222912) do
+ActiveRecord::Schema.define(version: 20181219231614) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -35,6 +35,17 @@ ActiveRecord::Schema.define(version: 20180901222912) do
 
   add_index "answers", ["question_id"], name: "fk_score_questions", using: :btree
   add_index "answers", ["response_id"], name: "fk_score_response", using: :btree
+
+  create_table "assignment_badges", force: :cascade do |t|
+    t.integer  "badge_id",      limit: 4
+    t.integer  "assignment_id", limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "auto_award",    limit: 1
+  end
+
+  add_index "assignment_badges", ["assignment_id"], name: "index_assignment_badges_on_assignment_id", using: :btree
+  add_index "assignment_badges", ["badge_id"], name: "index_assignment_badges_on_badge_id", using: :btree
 
   create_table "assignment_questionnaires", force: :cascade do |t|
     t.integer "assignment_id",        limit: 4
@@ -149,6 +160,13 @@ ActiveRecord::Schema.define(version: 20180901222912) do
   add_index "badge_awarding_rules", ["assignment_id"], name: "index_badge_awarding_rules_on_assignment_id", using: :btree
   add_index "badge_awarding_rules", ["badge_id"], name: "index_badge_awarding_rules_on_badge_id", using: :btree
   add_index "badge_awarding_rules", ["question_id"], name: "index_badge_awarding_rules_on_question_id", using: :btree
+
+  create_table "badge_preferences", force: :cascade do |t|
+    t.integer  "instructor_id", limit: 4
+    t.boolean  "preference"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
 
   create_table "badges", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -301,6 +319,9 @@ ActiveRecord::Schema.define(version: 20180901222912) do
     t.string   "file_name",        limit: 255
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.integer  "student_id",       limit: 4
+    t.string   "links",            limit: 255
+    t.string   "comments",         limit: 255
   end
 
   create_table "file_instructions", force: :cascade do |t|
@@ -833,6 +854,8 @@ ActiveRecord::Schema.define(version: 20180901222912) do
   add_foreign_key "answer_tags", "users"
   add_foreign_key "answers", "questions", name: "fk_score_questions"
   add_foreign_key "answers", "responses", name: "fk_score_response"
+  add_foreign_key "assignment_badges", "assignments"
+  add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"

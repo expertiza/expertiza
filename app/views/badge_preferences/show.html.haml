@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Instructor:
+  = @badge_preference.instructor_id
+%p
+  %b Preference:
+  = @badge_preference.preference
+
+= link_to 'Edit', edit_badge_preference_path(@badge_preference)
+\|
+= link_to 'Back', badge_preferences_path

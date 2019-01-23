@@ -15,6 +15,8 @@ class CourseBadgesController < ApplicationController
   # GET /course_badges
   def index
     @course_badges = CourseBadge.all
+    @preference = BadgePreference.find_by_instructor_id(session[:user])
+    @disclaimer = !@preference.nil? and @preference.preference
   end
 
   # GET /course_badges/1

@@ -1,0 +1,9 @@
+---
+- hosts: prod
+  vars:
+    docker_repo: "expertiza/expertiza"
+  tasks:
+    # - include: ../tasks/open_ports.yml # Uncomment only for VCL
+    - include: ../tasks/setup_python.yml
+    - include: ../tasks/docker_pull.yml
+    - include: ../tasks/start_container.yml

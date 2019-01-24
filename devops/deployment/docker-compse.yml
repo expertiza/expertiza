@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  expertiza_blue:
+    image: expertiza/expertiza:blue
+    volumes:
+      - ~/shared/expertiza_ncsu_edu_cert.cer:/app/expertiza_ncsu_edu_cert.cer
+      - ~/shared/expertiza.ncsu.edu.key:/app/expertiza.ncsu.edu.key
+      - ~/shared/private2.pem:/app/private2.pem 
+      - ~/shared/public1.pem:/app/public1.pem
+      - ~/shared/config:/app/conf
+      - ~/shared/public:/app/pub
+      - ~/shared/vendor/:/app/vend
+      - ~/shared/pg_data/:/app/pg_data
+    env_file:
+      - ~/production.env
+    ports:
+      - '3000:3000'
+    depends_on:
+      - redis
+    links:
+      - redis
+    command: /bin/bash -c "cp -r conf/* config/ && cp -r vend/* vendor/ && RAILS_ENV=production bundle exec thin start -p 3000 --ssl --ssl-key-file expertiza.ncsu.edu.key --ssl-cert-file expertiza_ncsu_edu_cert.cer"
+    environment:
+      REDIS_HOST: redis
+    network_mode: bridge
+    
+  expertiza_green:
+    image: expertiza/expertiza:green
+    volumes:
+      - ~/shared/expertiza_ncsu_edu_cert.cer:/app/expertiza_ncsu_edu_cert.cer
+      - ~/shared/expertiza.ncsu.edu.key:/app/expertiza.ncsu.edu.key
+      - ~/shared/private2.pem:/app/private2.pem 
+      - ~/shared/public1.pem:/app/public1.pem
+      - ~/shared/config:/app/conf
+      - ~/shared/public:/app/pub
+      - ~/shared/vendor/:/app/vend
+      - ~/shared/pg_data/:/app/pg_data
+    env_file:
+      - ~/production.env
+    ports:
+      - '3002:3000'
+    depends_on:
+      - redis
+    links:
+      - redis
+    command: /bin/bash -c "cp -r conf/* config/ && cp -r vend/* vendor/ && RAILS_ENV=production bundle exec thin start -p 3000 --ssl --ssl-key-file expertiza.ncsu.edu.key --ssl-cert-file expertiza_ncsu_edu_cert.cer"
+    environment:
+      REDIS_HOST: redis
+    network_mode: bridge
+    
+  redis:
+    image: redis:alpine
+    network_mode: bridge

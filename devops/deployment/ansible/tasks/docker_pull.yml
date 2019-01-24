@@ -1,0 +1,20 @@
+- name: "Pull docker image for Production (Blue)"
+  become: True
+  docker_image:
+    name: "{{ docker_repo }}"
+    tag: blue
+    force: true
+  when: deploy_env == "blue"
+
+- name: "Pull docker image for Beta (Green)"
+  become: True
+  docker_image:
+    name: "{{ docker_repo }}"
+    tag: green
+    force: true
+  when: deploy_env == "green"
+
+- name: Remove unused images
+  become: True
+  shell: docker rmi -f $(docker images -f "dangling=true" -q)
+  ignore_errors: True

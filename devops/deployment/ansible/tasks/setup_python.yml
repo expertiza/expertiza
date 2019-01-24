@@ -1,0 +1,13 @@
+- name: Install python-pip
+  become: True
+  yum:
+     name: python-pip
+
+- name: Install python dependency
+  become: True
+  pip:
+     name: docker
+
+- name: Install Forever (to run node.js app)
+  become: True
+  npm: name=forever global=yes state=latest

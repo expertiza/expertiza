@@ -285,7 +285,7 @@ class Assignment < ActiveRecord::Base
   # Check to see if assignment is a microtask
   def microtask?
     self.microtask.nil? ? false : self.microtask
-  end
+
 
   def has_badge?
     self.has_badge.nil? ? false : self.has_badge

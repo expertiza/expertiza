@@ -37,10 +37,8 @@ Expertiza::Application.routes.draw do
 
   resources :assessment360, only: [] do
     collection do
-      # get :one_course_all_assignments
+      get :course_student_grade_summary
       get :all_students_all_reviews
-      # get :one_student_all_reviews
-      # get :one_assignment_all_students
     end
   end
 
@@ -222,8 +220,6 @@ resources :institution, except: [:destroy] do
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :list
-      post :list_questionnaires
       get :new_quiz
       get :select_questionnaire_type
       post :select_questionnaire_type
@@ -460,10 +456,9 @@ resources :institution, except: [:destroy] do
 
   resources :user_pastebins
 
-  resources :versions, only: %i[index show destroy] do
+  resources :versions, only: %i[index show] do
     collection do
       get :search
-      delete '', action: :destroy_all
     end
   end
 

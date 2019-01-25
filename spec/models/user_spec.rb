@@ -18,6 +18,11 @@ describe User do
     it 'Validate that name is always unique' do
       expect(user1).to validate_uniqueness_of(:name)
     end
+    it 'Validate that the name does not contain white spaces' do
+      expect(user).to be_valid
+      user.name = 'abc def'
+      expect(user).not_to be_valid
+    end
   end
 
   describe '#fullname' do

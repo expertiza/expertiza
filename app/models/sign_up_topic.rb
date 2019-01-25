@@ -158,4 +158,10 @@ class SignUpTopic < ActiveRecord::Base
     end
     waitlisted_users.flatten
   end
+
+  def format_for_display
+    topic_display = ''
+    topic_display += self.id.to_s + ' - '
+    topic_display + self.topic_name
+  end
 end

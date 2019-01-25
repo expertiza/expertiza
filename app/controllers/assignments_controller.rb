@@ -32,18 +32,20 @@ class AssignmentsController < ApplicationController
         @assignment_form.create_assignment_node
         exist_assignment = Assignment.find_by_name(@assignment_form.assignment.name)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-        ques_params = assignment_form_params
-        ques_array = ques_params[:assignment_questionnaire]
-        due_array = ques_params[:due_date]
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+        end
+        ques_array = assignment_form_params[:assignment_questionnaire]
+        due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
           cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
         end
         due_array.each do |cur_due|
           cur_due[:parent_id] = exist_assignment.id.to_s
         end
-        ques_params[:assignment_questionnaire] = ques_array
-        ques_params[:due_date] = due_array
-        @assignment_form.update(ques_params,current_user)
+        assignment_form_params[:assignment_questionnaire] = ques_array
+        assignment_form_params[:due_date] = due_array
+        @assignment_form.update(assignment_form_params,current_user)
         aid = Assignment.find_by_name(@assignment_form.assignment.name).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
@@ -143,12 +145,6 @@ class AssignmentsController < ApplicationController
     end
 
     redirect_to list_tree_display_index_path
-  end
-
-  def index
-    set_up_display_options("ASSIGNMENT")
-    @assignments = super(Assignment)
-    # @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
 
   def delayed_mailer

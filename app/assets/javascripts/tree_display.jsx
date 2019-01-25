@@ -122,7 +122,7 @@ jQuery(document).ready(function() {
                 <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
                   <img src="/assets/tree_view/create-teams-24.png" />
                 </a>
-                <a title="360 degree assessment dashboad" href={"/assessment360/one_course_all_assignments?course_id="+(parseInt(this.props.id)/2).toString()}>
+                <a title="View grade summary by student" href={"/assessment360/course_student_grade_summary?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/360-dashboard-24.png" />
                 </a>
                 <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=CourseSurveyDeployment"}>

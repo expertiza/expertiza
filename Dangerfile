@@ -225,10 +225,10 @@ end
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.yml/).any?
   YAML_FILE_MESSAGE =
     markdown <<-MARKDOWN
-You should not change YAML (`*.yml`) or example (`*.yml.example`) files; please revert these changes.
+You changed YAML (`*.yml`) or example (`*.yml.example`) files; please double-check whether this is necessary.
     MARKDOWN
 
-  fail(YAML_FILE_MESSAGE, sticky: true)
+  warn(YAML_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------

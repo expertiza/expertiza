@@ -50,7 +50,7 @@ function microtaskChanged() {
 
 <tr><div class="form-inline">
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars.)
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
   <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
 </td></div>
 </tr>

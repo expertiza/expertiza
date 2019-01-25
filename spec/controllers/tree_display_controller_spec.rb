@@ -108,7 +108,6 @@ describe TreeDisplayController do
       @foldernode.node_object_id = 1
       @foldernode.save
       @course = create(:course)
-      create(:assignment)
       create(:assignment_node)
       create(:course_node)
       @instructor = User.where(role_id: 1).first
@@ -243,7 +242,7 @@ describe TreeDisplayController do
 
       # make ta student of that course
       # create assignment against course_2
-      @assignment1 = create(:assignment_mapping)
+      @assignment1 = create(:assignment, name: 'test1')
       @assignment1.course_id = @course2.id
       @assignment1.save
 
@@ -276,7 +275,7 @@ describe TreeDisplayController do
 
       # make ta student of the existing course he is ta of
       # create assignment against course_1
-      @assignment1 = create(:assignment_mapping)
+      @assignment1 = create(:assignment, name: 'test2')
       @assignment1.course_id = @course1.id
       @assignment1.save
 
@@ -308,7 +307,7 @@ describe TreeDisplayController do
 
       # create assignment against course_1
       # this is 2nd assignment added to course_1, other being in "before" method
-      @assignment2 = create(:assignment_mapping)
+      @assignment2 = create(:assignment, name: 'test3')
       @assignment2.course_id = @course1.id
       @assignment2.save!
 

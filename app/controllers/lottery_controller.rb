@@ -54,7 +54,7 @@ class LotteryController < ApplicationController
             current_team = team_user.team
             parent = TeamNode.find_by(parent_id: assignment.id, node_object_id: current_team.id)
             break if current_team and parent
-            current_team = AssignmentTeam.create(name: assignment.name + '_Team' + rand(10_000).to_s, parent_id: assignment.id)
+            current_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s, parent_id: assignment.id)
             parent = TeamNode.create(parent_id: assignment.id, node_object_id: current_team.id)
           end
           team_user.team_user_node.destroy

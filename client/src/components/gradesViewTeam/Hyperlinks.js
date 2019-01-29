@@ -6,13 +6,21 @@ class Hyperlinks extends Component {
         if(this.props.show)
             return (
                 <div>
-                    {this.props.team.submitted_hyperlinks.split("\n").map((element, index) =>
+                    {/* {this.props.team.submitted_hyperlinks.split("\n").map((element, index) =>
                     (index !== 0)?
                     <div style={{paddingLeft:20}}>
                         <a href={element.substring(1)}>{element.substring(1)}</a>
+                <div style={{marginTop: '10px', padding: '5px'}}>
+                    {this.props.team.submitted_hyperlinks.split("\n").map((element, index) =>
+                    (index !== 0 && element.substring(1) !== "")?
+                    <div className="radio" style={{paddingLeft:20}}>
+                        <label>
+                        <input type="radio" value={element.substring(1)} checked={false} />
+                        {element.substring(1)}
+                        </label>
                     </div>: <div> </div>
                     )
-                }
+                } */}
                 </div>
             )
         else{

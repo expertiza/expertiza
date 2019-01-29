@@ -2,7 +2,10 @@
   margin:0px auto;
   padding:0px auto;
 }
-
+.main-content {
+  padding-top: 10px;
+  padding-left: 10px;
+}
 .row-content {
   margin:0px auto;
   padding: 50px 0px 50px 0px;
@@ -86,4 +89,13 @@ table.general td {
 }
 .table_info{
   background-color:#d9edf7;
+}
+.table_summary_header{ 
+  border-right: 1px solid black;
+}
+.table_summary{
+  width: 80%
+}
+.table_topic_list{
+  margin-left: 20px;
 }

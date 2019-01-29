@@ -8,7 +8,9 @@ class Scoretable extends Component {
 
     constructor(props){
         super(props);
-        this.state={};
+        this.state={
+            vm: this.props.vm
+        };
         this.toggle = this.toggle.bind(this)
     }
     toggle(tableindex, index) {
@@ -47,7 +49,7 @@ class Scoretable extends Component {
             if((this.state.vm !== null && this.state.vm!== undefined && this.state.vm.length>0)){
                 return(
                     <div className="overflow-container">
-                                {this.state.vm.filter((q) => (q.questionnaire_type==='ReviewQuestionnaire'
+                                {this.state.vm.filter((q) => (q.questionnaire_type===this.props.type
                                                               && q.list_of_reviewers.length>0))
                                 .map((rq, tableindex)=>
                                     <div key={`tableindex${tableindex}`} className="row mt-5">
@@ -68,7 +70,7 @@ class Scoretable extends Component {
                                                     </tbody>
                                                 </table>
                                             </Collapse>
-                                            <h5 style={{display : 'inline-block'}}>Review (Round: {rq.round} of {rq.rounds})</h5>
+                                            {this.props.type ==='ReviewQuestionnaire'?<h5 style={{display : 'inline-block'}}>Review (Round: {rq.round} of {rq.rounds})</h5>:<h5></h5>}
                                             <span className="spn_qsttog" onClick={()=>this.toggleQuestions(tableindex)} title="Click to display/hide questions">toggle question list</span>
                                             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
                                             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>

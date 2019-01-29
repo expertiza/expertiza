@@ -4,6 +4,13 @@ Expertiza::Application.routes.draw do
   ###
   namespace :api do 
     namespace :v1 do
+
+      resources :review_mapping, only: [] do
+        collection do
+          post :assign_reviewer_dynamically
+        end
+      end
+
     resources :sessions, only: [:create, :index, :destroy]
     resources :profile
     resources :institution
@@ -42,6 +49,7 @@ Expertiza::Application.routes.draw do
         post :getTeamUsers
         post :getCurrentTeam
         post :getUserNameFromParticipant
+        post :update_submitted_hyperlinks
       end
     end
 
@@ -50,7 +58,7 @@ Expertiza::Application.routes.draw do
         get :view
         get :view_team
         get :view_reviewer
-        post :view_my_scores
+        get :view_my_scores
         get :instructor_review
         post :remove_hyperlink
         post :save_grade_and_comment_for_submission
@@ -106,7 +114,7 @@ Expertiza::Application.routes.draw do
 
     resources :student_review, only: [] do
       collection do
-        post :list
+        get :list
       end
     end
 

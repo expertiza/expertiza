@@ -32,9 +32,41 @@ module Api::V1
         @num_reviews_total = @review_mappings.size
         # Add the reviews which are requested and not began.
         @num_reviews_completed = 0
+        puts @participant.user_id
+        @candidate_reviews = []
         @review_mappings.each do |map|
-          @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+          @latest_response = nil
+          if !map.response.empty?
+            array_not_empty = 0
+            @sorted_responses = Array.new
+            @prev = Response.where(:map_id => map.id)
+            for element in @prev
+                    array_not_empty = 1
+                      @sorted_responses << element
+            end
+            if (array_not_empty == 1)
+                @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last
+                @latest_response = @sorted_responses.last
+            end 
+          end
+          temp = {} 
+          if map.type.to_s == "MetareviewResponseMap"
+            review_mapping = ResponseMap.find(map.reviewed_object_id)
+            candidate = AssignmentTeam.get_first_member(review_mapping.reviewee_id)
+          else
+            candidate = AssignmentTeam.get_first_member(map.reviewee_id)
+          end 
+          if candidate
+                topic_id = SignedUpTeam.topic_id(candidate.parent_id, candidate.user_id)
+                temp[:map] = map
+                if @latest_response!=nil
+                  temp[:latest_response_id] = @latest_response.id 
+                end
+                temp[:id] = SignUpTopic.find(topic_id).topic_identifier
+                temp[:name] = SignUpTopic.find(topic_id).topic_name
+                @candidate_reviews << temp
         end
+      end
 
         @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
         # Calculate the number of metareviews that the user has completed so far.
@@ -46,7 +78,20 @@ module Api::V1
         @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
         @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
         
-        render json: {status: :ok, data: "need to descide what data is needed"}
+      
+        @candidate_topics_to_review = @assignment.candidate_topics_to_review(@participant).to_a 
+        @candidate_topics_to_review.sort! { |a, b| a.id <=> b.id } 
+        @non_reviewable_topics = @assignment.sign_up_topics - @candidate_topics_to_review 
+        @non_reviewable_topics.sort! { |a, b| a.id <=> b.id }
+
+        render json: {
+                      status: :ok,
+                      candidate_reviews_started: @candidate_reviews,
+                      review_mappings: @review_mappings,
+                      candidate_topics_to_review: @candidate_topics_to_review,
+                      non_reviewable_topics: @non_reviewable_topics,
+                      num_reviews_in_progress: @num_reviews_in_progress
+                    }
       else 
         render json: {status: :ok, data: 'access denied'}
       end

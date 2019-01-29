@@ -3,12 +3,16 @@ import { connect } from 'react-redux';
 import { fetchScore } from '../../redux/actions/Grade';
 import  Scoretable  from './ScoreTable';
 import { Button } from 'react-bootstrap';
+import Summary from './Summary';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
 import Hyperlinks from './Hyperlinks';
 class GradesViewTeamComponent extends Component {
     constructor(props){
         super(props);
         this.state = {
-            showlinks: false
+            showlinks: false,
+            tabindex: 0
         }
         this.togglelinks = this.togglelinks.bind(this);
     }
@@ -30,9 +34,26 @@ class GradesViewTeamComponent extends Component {
                             <h4>Team: {this.props.team_name}</h4>
                             <h4>Average peer review score: <span className = "c5">{(this.props.total !== null && this.props.total !== undefined && this.props.total % 1 !== 0)?
                                                                                      this.props.total.toFixed(2): this.props.total} </span></h4>
-                            <Button onClick={this.togglelinks}> Show Submission </Button>
+                            <Button onClick={this.togglelinks}> Show Submission </Button>                
                             <Hyperlinks show = {this.state.showlinks} team = {this.props.team} /> 
-                            <Scoretable vm = {this.props.vm} /><br/>
+                            <br/>
+                            <Summary vm = {this.props.vm} />
+                            <Tabs selectedIndex={this.state.tabindex} onSelect={tabindex => this.setState({ tabindex})} >
+                                <TabList>
+                                    <Tab>Reviews</Tab>
+                                    <Tab>Author Feedback</Tab>
+                                    <Tab>Teammate Review</Tab>
+                                </TabList>
+                                <TabPanel>
+                                    <Scoretable vm = {this.props.vm} type='ReviewQuestionnaire'/><br/>
+                                </TabPanel>
+                                <TabPanel>
+                                    <Scoretable vm = {this.props.vm} type='AuthorFeedbackQuestionnaire'/><br/>
+                                </TabPanel>
+                                <TabPanel>
+                                    <Scoretable vm = {this.props.vm} type='TeammateReviewQuestionnaire'/><br/>
+                                </TabPanel>
+                            </Tabs>                         
                             <h4 style ={{'font-weight':'bold', 'display':'inline-block'}}> Grade and comment for submission</h4><br/>
                             <div>Grade: Grade for submission</div>
                             <div>Comment: Comment for submission</div>

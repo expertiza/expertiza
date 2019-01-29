@@ -2,11 +2,9 @@ import React,{Component} from 'react';
 import Aux from '../../../hoc/Aux/Aux'
 import {NavLink} from 'react-router-dom'
 import {connect} from 'react-redux'
-import * as actions from '../../../redux/index'
+import * as actions from '../../../redux'
 
 class invitationComponent extends Component {
-    
-    
     render () {
         let output;
         if (this.props.inv.reply_status === 'A') {
@@ -22,12 +20,14 @@ class invitationComponent extends Component {
 
         return (
             <Aux>
-                <tr>
-                    <td> {this.props.inv.to_user.name} </td>
-                    <td> {this.props.inv.to_user.fullname} </td>
-                    <td> {this.props.inv.to_user.email} </td>
-                    {output}        
-                </tr>
+             <tr> 
+                <td> {this.props.inv.to_user_name} </td>
+                <td> {this.props.inv.to_user_fullname}</td>
+                <td> {this.props.inv.to_user_email}</td>
+                  {output}
+            </tr>  
+                            
+                
             </Aux>
         )
     }

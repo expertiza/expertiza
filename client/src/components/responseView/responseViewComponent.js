@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import  Hyperlinks from '../gradesViewTeam/Hyperlinks'
 import {Loading} from '../UI/spinner/LoadingComponent';
-import * as actions from '../../redux/index'
+import * as actions from '../../redux'
 import ResponseTable from './responseTable';
 
 class  ResponseViewComponent extends Component {
@@ -43,32 +43,32 @@ class  ResponseViewComponent extends Component {
                         <div>
                             <h1> {this.props.title} for {this.props.assignment.name}</h1>
                             <div className="row" style={{paddingTop: 30}}>
-                                <div className="col">
+                                {/* <div className="col">
                                     <b>Submission Links</b>
                                     <Hyperlinks show = {true} links={this.props.contributor} />
-                                </div>
-                            </div>
-                            <ResponseTable title="Review" questions={this.props.questions} answers={this.props.answers} response={this.props.response} type="normal"/>
-                                <br/><h3 style={{float: 'left'}} > Feedback from author </h3>
-                                <a style={{float: 'left', paddingTop: '10px', paddingLeft: '10px'}} href="#!" onClick = {()=>this.toggleAuthorFeedback()}>
-                                    {this.state.toggle_button}
-                                </a><br/>
-                            {(this.state.author_feedback)?
+        //                         </div> */}
+                             </div>
+        {/* //                     <ResponseTable title="Review" questions={this.props.questions} answers={this.props.answers} response={this.props.response} type="normal"/>
+        //                         <br/><h3 style={{float: 'left'}} > Feedback from author </h3>
+        //                         <a style={{float: 'left', paddingTop: '10px', paddingLeft: '10px'}} href="#!" onClick = {()=>this.toggleAuthorFeedback()}>
+        //                             {this.state.toggle_button}
+        //                         </a><br/>
+        //                     {(this.state.author_feedback)?
 
                                 <div style={{clear: 'both'}}><ResponseTable title="Review" questions={this.props.author_questions} answers = {this.props.author_answers} 
                                 response={this.props.author_response_map[0]} type ="author"/></div>
                                 : <div></div>
-                            }
+                            } */}
 
                             <div className="row" style={{paddingTop: 20, paddingLeft: 20}}>
                                 <table width="100%">
                                     <tbody>
-                                        <tr>
+                                        {/* <tr>
                                             <td align="left" width="70%"><b>Review</b></td>
                                             <td align="left"><b>Last Reviewed:</b><span>
                                             {(this.props.response.updated_at===null)?'Not Available':
                                         new Date(this.props.response.updated_at.split('T')).toLocaleString("en-US", options)}</span></td> 
-                                        </tr>
+                                        </tr> */}
                                     </tbody>
                                 </table>
                                 <table className="table">
@@ -101,6 +101,9 @@ class  ResponseViewComponent extends Component {
                                             </tbody> 
                                         </tr>
                                     )}
+                                    <tr>
+                                        <b>Addtional Comment </b>: {this.props.response.additional_comment}
+                                    </tr>
                                 </table>
                                 </div>
                         </div>
@@ -122,7 +125,7 @@ class  ResponseViewComponent extends Component {
         }
     }
     
-}
+ }
 
 
 const mapStatetoProps = state => {

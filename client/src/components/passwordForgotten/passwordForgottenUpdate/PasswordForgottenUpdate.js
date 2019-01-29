@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import querystring from 'query-string'
 import {connect} from 'react-redux'
 import {Redirect} from 'react-router-dom'
-import * as actions from '../../../redux/index'
+import * as actions from '../../../redux'
 
 class PasswordForgottenUpdate extends Component {
     state = {

@@ -1,7 +1,7 @@
 import React from 'react'
 
 const editNameComponent = (props) => {
-    return (
+  return (
         <div className="container text-center">
           <form onSubmit={props.submitEditName}>
              <h1>Edit Team Name</h1>
@@ -11,7 +11,7 @@ const editNameComponent = (props) => {
                 type="text"
                 className="form-control"
                 placeholder="Team Name"
-                value={props.value}
+                // value={props.value}
                 onChange={props.team_name}
               />
             </div>

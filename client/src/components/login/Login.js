@@ -1,7 +1,7 @@
 import React, { Component} from 'react';
 import { connect} from 'react-redux';
 import {NavLink} from 'react-router-dom'
-import * as actions from '../../redux/index.js'
+import * as actions from '../../redux'
 import {Redirect} from 'react-router-dom'
 
 class Login extends Component {

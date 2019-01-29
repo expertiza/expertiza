@@ -55,7 +55,43 @@ module Api::V1
             break
           end
         end
+        if @send_invs && @send_invs.length > 0
+          @send_invs_array = []
+          for inv in @send_invs
+            hash = {}
+            hash['assignment_id'] = inv.assignment_id
+            hash['from_id'] = inv.from_id
+            hash['to_id'] = inv.to_id
+            hash['id'] = inv.id
+            hash['reply_status'] = inv.reply_status
+            hash['to_user_name'] = inv.to_user.name
+            hash['to_user_fullname'] = inv.to_user.fullname
+            hash['to_user_email'] = inv.to_user.email
+            @send_invs_array.push(hash)
+          end
+        end
 
+        if @received_invs && @received_invs.length > 0
+          @received_invs_array = []
+          for inv in @received_invs
+            hash = {}
+            hash['assignment_id'] = inv.assignment_id
+            hash['from_id'] = inv.from_id
+            hash['to_id'] = inv.to_id
+            hash['id'] = inv.id
+            hash['reply_status'] = inv.reply_status
+            hash['from_user_name'] = inv.from_user.name
+            teamsusers = TeamsUser.where(['user_id = ?', inv.from_id])
+            
+            for teamsuser in teamsusers
+              current_team = Team.where(['id = ? and parent_id = ?', teamsuser.team_id, @student.assignment.id]).first
+                if current_team != nil
+                  hash['team_name'] = Team.find(current_team.id).name
+                end
+            end
+            @received_invs_array.push(hash)
+          end
+        end
         current_team = @student.team
 
         @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
@@ -78,7 +114,7 @@ module Api::V1
           @join_team_requests = JoinTeamRequest.where(team_id: @team.id)
         end
         render json: {status: :ok, student: @student, current_due_date: @current_due_date, users_on_waiting_list: @users_on_waiting_list, teammate_review_allowed: @teammate_review_allowed,
-                      send_invs: @send_invs, recieved_invs: @recieved_invs, assignment: @assignment, team: @team, participants: @participants, full: full , team_topic: @team_topic,
+                      send_invs: @send_invs_array, received_invs: @received_invs_array, assignment: @assignment, team: @team, participants: @participants, full: full , team_topic: @team_topic,
                       assignment_topics: @assignment_topics, join_team_requests: @join_team_requests }
       else
         render json: {status: :ok, data: 1}

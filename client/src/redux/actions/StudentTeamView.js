@@ -1,5 +1,5 @@
 import axios from '../../axios-instance'
-import * as actions from '../index'
+import * as actions from '..'
 
 export const fetchStudentsTeamView = (student_id) => (dispatch) => {
     return axios({
@@ -27,10 +27,10 @@ export const fetchStudentsTeamViewSuccess = (studentsTeamView) => ({
     payload: studentsTeamView
 });
 
-export const updateTeamName = (student_id, team_name) => (dispatch) => {
+export const updateTeamName = (student_id, team_name, team_id) => (dispatch) => {
     return axios({
-            method: 'post',
-            url: 'student_teams',
+            method: 'put',
+            url: 'student_teams/update',
             headers: {
                 AUTHORIZATION: "Bearer " + localStorage.getItem('jwt')
             },
@@ -38,7 +38,8 @@ export const updateTeamName = (student_id, team_name) => (dispatch) => {
                 "team": {
                     "name": team_name
                 },
-                "student_id": student_id
+                "student_id": student_id,
+                "team_id": team_id
             }
         })
         .then(response => console.log(response.data))
@@ -157,7 +158,7 @@ export const declineInvitationToAssignment = (inv_id, student_id) => dispatch =>
                     if(response.data.error) {
                         dispatch(setAlert(response.data.error))
                     } else {
-                        dispatch(setAlert("invitation accepted successfully"))
+                        dispatch(setAlert("invitation declined successfully"))
                     }
                 }
         )

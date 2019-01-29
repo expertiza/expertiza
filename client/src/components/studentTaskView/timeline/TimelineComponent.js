@@ -4,8 +4,10 @@ import '../../../assets/stylesheets/timeline.css'
 
 const  TimelineComponent = (props) => {
         let output;
+
         if (props.timeline_list) {
-            output = props.timeline_list.map(tl =>  <UnitTimelineComponent tl={tl}> </UnitTimelineComponent> )
+            output = props.timeline_list.map(tl =>  <
+                UnitTimelineComponent tl={tl}> </UnitTimelineComponent> )
         } else {
             output = null
         }

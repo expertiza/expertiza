@@ -26,6 +26,16 @@ const responseReducer = (state = initialize, action) => {
                                             loading: false })
         case actions.FETCH_REVIEW_DATA_FAILURE:
             return updateObject(state, { laoding: true })  
+
+        case actions.FETCH_EDIT_DATA_SUCCESS:
+                return updateObject(state, {
+                                            review_scores: action.payload.review_scores,
+                                            questions: action.payload.questions,
+                                            questionnaire: action.payload.questionnaire,
+                                            assignment: action.payload.assignment,
+                                            loading: false
+
+                })
         default:
             return state;
     }

@@ -77,7 +77,13 @@ module Api::V1
       end
       @questionnaire = set_questionnaire
       # render action: 'response'
-      render json: {status: :ok, data: "yet to decide which data to send"}
+      render json: {status: :ok, 
+                    data: "yet to decide which data to send",
+                    review_scores: @review_scores,
+                    questions: @questions,
+                    questionnaire: @questionnaire,
+                    assignment: @assignment
+    }
     end
 
     # Update the response and answers when student "edit" existing response
@@ -153,15 +159,21 @@ module Api::V1
       curr_ans= Answer.where(question_id: question.id, response_id: @response.id).first
       @ans << curr_ans
     end
-    @feedbackmap = FeedbackResponseMap.find_by(reviewed_object_id: @response.id)
-    @author_response_map = Response.where(map_id: @feedbackmap.id)
-    @author_answers = Answer.where(response_id: @author_response_map.first.response_id)
+    # @feedbackmap = FeedbackResponseMap.find_by(reviewed_object_id: @response.id)
+    # @author_response_map = Response.where(map_id: @feedbackmap.id)
+    # @author_answers = Answer.where(response_id: @author_response_map.first.response_id)
+    responseArr = []
+    @review_versions = @map.get_all_versions()
+    if !@review_versions.empty?
+      @review_versions.each do |response|
+        responseArr.push(response)
+      end
+    end 
+    # @author_questions=[]
 
-    @author_questions=[]
-
-    @author_answers.each do | answer| 
-      @author_questions << Question.find(answer.question_id)
-    end
+    # @author_answers.each do | answer| 
+    #   @author_questions << Question.find(answer.question_id)
+    # end
     
     survey = @map.survey?
     render json: {
@@ -172,8 +184,8 @@ module Api::V1
                   questions: @questions,
                   contributor: @contributor,
                   ans: @ans,
-                  author_answers: @author_answers,
-                  author_questions: @author_questions,
+                  # author_answers: @author_answers,
+                  # author_questions: @author_questions,
                   map: @map,
                   author_response_map: @author_response_map
                 }

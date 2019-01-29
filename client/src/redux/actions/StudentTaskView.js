@@ -1,5 +1,5 @@
 import axios from '../../axios-instance'
-import * as actions from '../index'
+import * as actions from '..'
 
 export const onLoad = (id) => {
     return dispatch => {

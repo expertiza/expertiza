@@ -6,11 +6,11 @@ import Aux from "../../hoc/Aux/Aux";
 import StudentTeamMemberComponent from "./studentTeamMember/studentTeamMemberComponent";
 import JoinTeamRequestListComponent from "./joinTeamRequest/JoinTeamRequestListComponent";
 import InvitationComponent from "./invitation/InvitationComponent";
-import JoinTeamRequestListSentComponent from './joinTeamRequestListSent/JoinTeamRequestListSent'
-import RecievedInvitationComponent from "./recievedInvitation/recievedInvitationComponent";
+import JoinTeamRequestListSentComponent from './joinTeamRequestListSent/JoinTeamRequestListSent';
+import  ReceivedInvitationComponent from "./receivedInvitation/receivedInvitationComponent";
 import Modal from '../UI/Modal/Modal'
 import EditNameComponent from './editName/EditNameComponent'
-import * as actions from '../../redux/index';
+import * as actions from '../../redux';
 import { Loading } from "../UI/spinner/LoadingComponent";
 
 import "../../assets/stylesheets/goldberg.css";
@@ -38,7 +38,7 @@ class StudentTeamComponent extends Component {
   onTeamNameSubmitHandler = e => {
     e.preventDefault();
     console.log("submit pressed");
-    this.props.updateTeamName(this.props.student.id, this.state.team_name);
+    this.props.updateTeamName(this.props.student.id, this.state.team_name, this.props.team.id);
     this.setState({editNameModal: false, updateNameSuccess: true})
 
   };
@@ -69,6 +69,7 @@ class StudentTeamComponent extends Component {
   updateCommentForAdvertisement = (ad_content) => {
     this.props.updateCommentForAdvertisement(this.props.team.id,ad_content)
   }
+
 
   render() {
     let output;
@@ -132,10 +133,12 @@ class StudentTeamComponent extends Component {
               <th class="head">Team Name </th>
               <th class="head">Reply </th>
             </tr>
-            { this.props.received_invs.map ( inv => <RecievedInvitationComponent  inv={inv} 
+            { this.props.received_invs.map ( inv =>   <ReceivedInvitationComponent  inv={inv} 
                                                                                   student={this.props.student} 
                                                                                   team = {this.props.team} 
-                                                                                  assignment={this.props.assignment}/> ) }
+                                                                                  assignment={this.props.assignment}
+                                                                                  onAccept = {this.props.acceptInvitationToAssignment}
+                                                                                  onDecline = {this.props.declineInvitationToAssignment}/> ) }
           </table>
   }
   
@@ -275,14 +278,14 @@ class StudentTeamComponent extends Component {
         body = (
           <Aux>
             <b style={{ textAlign: "center" }}>Team Name: &nbsp;&nbsp;</b>
-            {this.props.team.name} &nbsp;&nbsp;&nbsp;
+            {this.state.team_name == "" ? this.props.team.name : this.state.team_name} &nbsp;&nbsp;&nbsp;
             <NavLink to ="#" onClick={this.editNameHandler}> Edit name </NavLink>
             <br />
             {this.state.editNameModal ? <Modal show = {this.state.editNameModal} back= { this.editNameHandler} > 
                   {<EditNameComponent submitEditName = {this.onTeamNameSubmitHandler} 
                                       backButton = {this.editNameHandler} 
                                       team_name = {this.onTeamNameChangeHandler}
-                                      value = {this.state.team_name}
+                                      value = {this.props.team.name}
                                       />} </Modal>: null}
             <br />
             <b>Team members</b>
@@ -364,7 +367,7 @@ const mapStateToProps = state => {
     users_on_waiting_list: state.studentTeamView.users_on_waiting_list,
     teammate_review_allowed: state.studentTeamView.teammate_review_allowed,
     send_invs: state.studentTeamView.send_invs,
-    recieved_invs: state.studentTeamView.recieved_invs,
+    received_invs: state.studentTeamView.received_invs,
     assignment: state.studentTeamView.assignment,
     assignment_topics: state.studentTeamView.assignment_topics,
     team: state.studentTeamView.team,
@@ -383,11 +386,13 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     fetchStudentsTeamView: student_id => dispatch(actions.fetchStudentsTeamView(student_id)),
-    updateTeamName: (student_id, team_name) => dispatch(actions.updateTeamName(student_id, team_name)),
+    updateTeamName: (student_id, team_name, team_id) => dispatch(actions.updateTeamName(student_id, team_name, team_id)),
     remove_participant_student_teams: (student_id, team_id) => dispatch(actions.remove_participant_student_teams(student_id, team_id)),
     invitePeopleToAssignment: (team_id, student_id, assignment_id, user_name) => dispatch(actions.invitePeopleToAssignment(team_id, student_id, assignment_id, user_name)),
     // getAdContent: team_id => dispatch(actions.getAdContent(team_id))  ,
-    updateCommentForAdvertisement: (team_id,ad_content) => dispatch(actions.updateCommentForAdvertisement(team_id, ad_content))
+    updateCommentForAdvertisement: (team_id,ad_content) => dispatch(actions.updateCommentForAdvertisement(team_id, ad_content)),
+    acceptInvitationToAssignment: (inv_id, team_id, student_id) => {dispatch(actions.acceptInvitationToAssignment(inv_id, team_id, student_id))},
+    declineInvitationToAssignment: (inv_id, student_id) => {dispatch(actions.declineInvitationToAssignment(inv_id, student_id))}
   }
   };
 

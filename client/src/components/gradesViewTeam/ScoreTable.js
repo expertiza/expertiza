@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import  { UnmountClosed as Collapse } from 'react-collapse';
 import { Table } from 'react-bootstrap';
-import { Loading } from './../UI/spinner/LoadingComponent';
+import { Loading } from '../UI/spinner/LoadingComponent';
 import { NavLink } from 'react-router-dom';
 
 class Scoretable extends Component {

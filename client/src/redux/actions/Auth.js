@@ -1,4 +1,4 @@
-import  * as actions from '../index'
+import  * as actions from '..'
 import axios from '../../axios-instance';
 
 export const forgetUsername = () => {

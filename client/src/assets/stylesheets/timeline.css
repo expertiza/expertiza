@@ -9,7 +9,8 @@
   height: 140px; }
 
 .timestamp {
-  margin-bottom: 20px; }
+  margin-bottom: 20px;
+  width: 100px; }
 
 .status {
   display: flex;

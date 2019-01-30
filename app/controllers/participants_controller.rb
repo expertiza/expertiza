@@ -46,7 +46,7 @@ class ParticipantsController < ApplicationController
       end
       user = User.find_by(name: params[:user][:name])
       @participant = curr_object.participants.find_by(user_id: user.id)
-      undo_link("The user <b>#{params[:user][:name]}</b> has successfully been added.")
+      flash.now[:note] = "The user <b>#{params[:user][:name]}</b> has successfully been added."
     rescue StandardError
       url_for controller: 'users', action: 'new'
       flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."

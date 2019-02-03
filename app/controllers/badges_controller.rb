@@ -23,6 +23,8 @@ class BadgesController < ApplicationController
       render action: 'login_credly'
     end
     @referrer = params['referrer']
+    @id = params['id']
+    @type = params["type"]
   end
 
   def redirect_to_assignment

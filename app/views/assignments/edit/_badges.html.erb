@@ -83,6 +83,8 @@
     <%= form_tag({:controller => "badges",
                 :action => "new"}, {:method => "get"}) do %>
       <%= hidden_field_tag "referrer", "/assignments/" + @assignment.id.to_s + "/edit" %>
+      <%= hidden_field_tag "id", @assignment.id %>
+      <%= hidden_field_tag "type", "assignment" %>
       <%= submit_tag "New", class: "btn btn-default"%>
       <%= button_tag "Award badges", onclick: "location.href='/course_badges/awarding?course_id=" + @assignment.course_id.to_s + "'" , type: :button, class: "btn btn-primary"%>
   <% end %>

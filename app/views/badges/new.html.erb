@@ -42,4 +42,8 @@
   <%= submit_tag "Create", class: "btn btn-default"%>
 <% end %>
 
-<%= link_to 'Back', controller: 'badges', action: 'redirect_to_assignment' %>
+<% if @type == "assignment" %>
+  <%= link_to 'Back', edit_assignment_path(@id) %>
+<% else %>
+  <%= link_to 'Back', edit_course_path(@id) %>
+<% end %>

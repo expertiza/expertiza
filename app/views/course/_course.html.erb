@@ -12,6 +12,6 @@
 <p><label for="course_info">Course Information</label><br/>
 <%= text_field 'course', 'info'  %></p>
 <p><label for="course_has_badge">Uses badge(s)?</label><br/>
-<%= check_box 'course', 'has_badge'  %></p>
+<%= check_box 'course', 'has_badge', :onclick=>"showHideDiv(this)" %></p>
 <!--[eoform:user]-->
 <br/>

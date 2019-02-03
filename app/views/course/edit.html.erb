@@ -96,23 +96,36 @@
       cell.appendChild(checkbox);
     }
   }
+
+  function showHideDiv (checkbox) {
+      var divBadges = document.getElementById("badge-table");
+      divBadges.style.display = checkbox.checked ? "block" : "none";
+      filterBadges();
+  }
 </script>
 
+<div id="badge-table" style="display: none">
 <table class="table table-striped" id="badge-info" style="width: 100%">
   Search: <input id='filter' type='text' oninput="filterBadges()">
   <div align='right'>
     <%= form_tag({:controller => "badges",
                 :action => "new"}, {:method => "get"}) do %>
       <%= hidden_field_tag "referrer", "/course/" + @course.id.to_s + "/edit" %>
+      <%= hidden_field_tag "id", @course.id%>
+      <%= hidden_field_tag "type", "course" %>
       <%= submit_tag "New", class: "btn btn-default"%>
       <%= button_tag "Award badges", onclick: "location.href='/course_badges/awarding?course_id=" + @course.id.to_s + "'" , type: :button, class: "btn btn-primary"%>
 
   <% end %>
   </div>
 </table>
+</div>
 
 <script>
-  filterBadges();
+    let checkbox = document.getElementById("course_has_badge");
+    if(checkbox.checked) {
+        showHideDiv(checkbox)
+    }
 </script>
 
 <%= render :partial => '/shared_scripts/back' %>

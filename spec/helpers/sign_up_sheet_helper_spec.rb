@@ -15,7 +15,7 @@ describe "SignUpSheetHelper" do
 
     it "The check_topic_due_date_value method should not return the assignment due date" do
       due_date = helper.get_topic_deadline([@assignment_due_date], @topic.id, 1, 1)
-      expect(due_date).to eq(nil)
+      expect(due_date).to be_nil
     end
   end
 

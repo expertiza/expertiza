@@ -1,10 +1,11 @@
 describe "Staggered deadline test" do
   before(:each) do
     # assignment and topic
-    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true)
+    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true, max_team_size: 1)
     create_list(:participant, 3)
     create(:topic, topic_name: "Topic_1")
     create(:topic, topic_name: "Topic_2")
+    create(:topic, topic_name: "Topic_3")
 
     # rubric
     create(:questionnaire, name: "TestQuestionnaire1")
@@ -236,4 +237,25 @@ describe "Staggered deadline test" do
     expect(page).to have_content 'Reviews for "Assignment1665"'
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
   end
+
+  # the test will test the Java script which is embedded into the sign up sheet. The java script will
+  # computer the offset in dates for the deadlines using the first topic and as soon as we input the date
+  # in the first field of a new topic , the other deadlines corresponding to the topic will be populated
+  # automatically using the offsets that were calculated from the first topic.
+  it "test4:When creating a new topic when already a topic exists for assignment , it should take the offset from the first topic for setting the due dates.",
+     js: true do
+    login_as("instructor6")
+    assignment = Assignment.find_by(name: 'Assignment1665')
+    visit "/assignments/#{assignment.id}/edit"
+    click_link 'Topics'
+    expect(page).to have_content 'Show start/due date'
+    click_link 'Show start/due date'
+    expect(page).to have_content 'Hide start/due date'
+    current_time = DateTime.current
+    fill_in 'due_date_3_submission_1_due_date', with: current_time
+    expect(find_field("due_date_3_submission_1_due_date").value).to_not eq(nil)
+    find(:xpath, ".//input[@id='due_date_3_review_1_due_date']").click
+    expect(find_field("due_date_3_review_1_due_date").value).to_not eq(nil)
+  end
 end
+

@@ -35,7 +35,7 @@
             <% if User.anonymized_view?(session[:ip]) %>
                 <li id="anonymized-view">
                   <%= image_tag "spy.png", height: '40'%>
-                  <span>Anonymized View</span>
+                  <span>Anonymized View <a href="/users/set_anonymized_view"><%= image_tag "close.png", height: '20'%></a></span>
                 </li>
             <% end %>
             <li id="user-label">

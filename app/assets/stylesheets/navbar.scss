@@ -34,6 +34,7 @@
 
 .right-most {
   margin-right: 20px;
+  padding-top: 7px;
 }
 
 .navbar {
@@ -47,7 +48,7 @@ ul.nav li.first-level {
 
 li.first-level > a {
   line-height: 10px;
-  padding: 0px 10px;
+  padding: 5px 10px;
 }
 
 ul.nav li.dropdown:hover > ul.dropdown-menu {
@@ -83,8 +84,8 @@ ul.navbar-right > li.right-most > a:hover {
 
 #user-label{
   color: #EEEEEE;
-  height: 13px;
-  padding: 0px 0;
+  line-height: 10px;
+  padding:27px 20px 0px 0px;
 }
 
 .navbar .impersonate-box {

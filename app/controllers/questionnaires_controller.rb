@@ -44,10 +44,10 @@ class QuestionnairesController < ApplicationController
 
   def create
     if params[:questionnaire][:name] == ''
-      flash[:error]='A rubric or survey must have a title.'
+      flash[:error] = 'A rubric or survey must have a title.'
       redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: '1'
     else
-      questionnaire_private = params[:questionnaire][:private] == "true"
+      questionnaire_private = params[:questionnaire][:private] == 'true'
       display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
         @questionnaire = Object.const_get(params[:questionnaire][:type]).new
@@ -64,16 +64,16 @@ class QuestionnairesController < ApplicationController
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
         case display_type
-          when 'AuthorFeedback'
-            display_type = 'Author%Feedback'
-          when 'CourseSurvey'
-            display_type = 'Course%Survey'
-          when 'TeammateReview'
-            display_type = 'Teammate%Review'
-          when 'GlobalSurvey'
-            display_type = 'Global%Survey'
-          when 'AssignmentSurvey'
-            display_type = 'Assignment%Survey'
+        when 'AuthorFeedback'
+          display_type = 'Author%Feedback'
+        when 'CourseSurvey'
+          display_type = 'Course%Survey'
+        when 'TeammateReview'
+          display_type = 'Teammate%Review'
+        when 'GlobalSurvey'
+          display_type = 'Global%Survey'
+        when 'AssignmentSurvey'
+          display_type = 'Assignment%Survey'
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL

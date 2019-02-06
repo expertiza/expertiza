@@ -220,7 +220,7 @@ if github.pr_diff.include? "puts " or
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not modifying *.yml or *.yml.example file.
+# The PR should not modify *.yml or *.yml.example file.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.yml/).any?
   YAML_FILE_MESSAGE =
@@ -232,7 +232,7 @@ You changed YAML (`*.yml`) or example (`*.yml.example`) files; please double-che
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not modifying rails_helper.rb or spec_helper.rb file.
+# The PR should not modify rails_helper.rb or spec_helper.rb file.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and
   (MODIFIED_FILES.grep(/rails_helper\.rb/).any? or MODIFIED_FILES.grep(/spec_helper\.rb/).any?)
@@ -245,7 +245,7 @@ You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert 
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not modifying Gemfile, Gemfile.lock.
+# The PR should not modify Gemfile, Gemfile.lock.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and
   (MODIFIED_FILES.include? "Gemfile" or MODIFIED_FILES.include? "Gemfile.lock")
@@ -386,7 +386,7 @@ fail("You changed config.ru; please double-check whether this is necessary.", st
 fail("You changed setup.sh; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/setup\.sh/).any?
 
 # ------------------------------------------------------------------------------
-# The PR should not modifying vendor folder.
+# The PR should not modify vendor folder.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/vendor/).any?
   VENDOR_MESSAGE =
@@ -398,7 +398,7 @@ You modified `vendor` folder, please double-check whether it is necessary.
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not modifying /spec/factories/ folder.
+# The PR should not modify /spec/factories/ folder.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/spec\/factories/).any?
   FIXTURE_FILE_MESSAGE =

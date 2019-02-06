@@ -96,7 +96,7 @@
           <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
           <tr>
             <td> <%= team.name %> </td>
-            <td colspan="2"> <%= Response.find(response_id).additional_comment %> </td>
+            <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
           </tr>
       <% end %>
     </table>

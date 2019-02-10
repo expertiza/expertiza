@@ -68,20 +68,9 @@ set :keep_releases, 10
 # set :ssh_options, verify_host_key: :secure
 
 set :passenger_in_gemfile, true
-set :passenger_restart_with_touch, false
+set :passenger_restart_with_touch, true
 
 namespace :deploy do
-
-  desc 'Restart application'
-  task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
-      execute :mkdir, '-p', "#{ release_path }/tmp"
-      execute :touch, release_path.join('tmp/restart.txt')
-    end
-  end
-
-  after :publishing, :restart
-
   after :restart, :clear_cache do
     on roles(:web), in: :groups, limit: 3, wait: 10 do
       # Here we can do anything such as:

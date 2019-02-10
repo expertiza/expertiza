@@ -55,7 +55,8 @@ set :linked_dirs, %w{log pg_data vendor/assets/components}
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 set :default_env, { 
-  "PASSENGER_INSTANCE_REGISTRY_DIR" => "/var/run/passenger-instreg"
+  "PASSENGER_INSTANCE_REGISTRY_DIR" => "/var/run/passenger-instreg",
+  "JAVA_HOME" => "/usr/lib/jvm/java-1.8.0-openjdk.x86_64"
 }
 
 # Default value for local_user is ENV['USER']

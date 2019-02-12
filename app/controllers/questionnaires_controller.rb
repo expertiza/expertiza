@@ -3,14 +3,17 @@ class QuestionnairesController < ApplicationController
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)
+
   before_action :authorize
 
+  # Check role access for edit questionnaire
   def action_allowed?
-    if action_name == "edit"
+    if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
-          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
+          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
+          ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
 
     else
       ['Super-Administrator',
@@ -36,7 +39,7 @@ class QuestionnairesController < ApplicationController
 
   def new
     begin
-      @questionnaire = Object.const_get(params[:model].split.join).new
+      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -46,7 +49,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_private = params[:questionnaire][:private] == "true"
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     begin
-      @questionnaire = Object.const_get(params[:questionnaire][:type]).new
+      @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -161,6 +164,16 @@ class QuestionnairesController < ApplicationController
     redirect_to action: 'list', controller: 'tree_display'
   end
 
+  # Toggle the access permission for this assignment from public to private, or vice versa
+  def toggle_access
+    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire.private = !@questionnaire.private
+    @questionnaire.save
+    @access = @questionnaire.private == true ? "private" : "public"
+    undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
+    redirect_to controller: 'tree_display', action: 'list'
+  end
+
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
@@ -250,7 +263,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    if valid_request
+    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = Object.const_get(params[:model]).new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0

@@ -37,7 +37,29 @@
   <br/><br/>
 <% end %>
 
-<h2>Export Details</h2>
+<% if @model == 'Question' %>
+  <h2>Export Advices</h2>
+  <%= form_tag({:controller => 'export_file', :action => 'export_advices'}, {:method => 'post', :multipart => true, :name => 'export_advices'}) do %>
+    <table>
+      <tr>
+        <td valign='Top'>Delimiter:</td>
+        <td>
+          <%= radio_button_tag 'delim_type', 'comma', true %> Comma<br/>
+          <%= radio_button_tag 'delim_type', 'space' %> Space<br/>
+          <%= radio_button_tag 'delim_type', 'tab' %> Tab<br/>
+          <%= radio_button_tag 'delim_type', 'other' %> Other <%= text_field_tag 'other_char' %>
+          <br/>
+        </td>
+      </tr>
+    </table>
+    <br/>
+    <%= hidden_field_tag('model', @model) %>
+    <%= hidden_field_tag('id', @id) %>
+    <input type='submit' value='Export Advices' onclick='{export_advices.submit();}'/>
+    <br/><br/>
+  <% end %>
+<% else %>
+  <h2>Export Details</h2>
   <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>
       <tr>
@@ -58,4 +80,5 @@
     <input type='submit' value='Export Details' onclick='{export_details_form.submit();}'/>
     <br/><br/>
   <% end %>
-<a href="<%= session[:return_to] %>">Back</a>
+  <a href="<%= session[:return_to] %>">Back</a>
+<% end %>

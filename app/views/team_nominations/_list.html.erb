@@ -1,0 +1,44 @@
+<script>
+    $(function(){
+        $('table').tablesorter({
+            sortReset      : true,
+            sortRestart    : true
+        });
+
+        $('.checkbox_nomination').click(function(data){
+            if(!this.checked) {
+                var id = "deleted_" + this.id;
+                $('#placeholder_deleted_' + this.id).html('<input type="hidden" id="' + id + '" name="' + id + '"></input>');
+            }else
+                $('#placeholder_deleted_' + this.id).html('')
+        });
+
+    });
+</script>
+
+<div id="nominating">
+  <table class="tablesorter table table-striped">
+    <tbody>
+    <% if @course_badges.count > 0
+         @course_badges.each do |course_badge| %>
+        <tr>
+          <td style="width:12.5%">
+            <div>
+              <img src="<%= course_badge.badge.image_url%>" width="25" height="25"/>
+            </div>
+            <%= course_badge.badge.name %>
+          </td>
+          <td>
+            <%= check_box_tag "nomination_" + @team_id.to_s + "_" + course_badge.badge.id.to_s,
+                              @is_checked[@team_id][course_badge.badge.id].eql?(true) ? "nominated" : "",
+                              @is_checked[@team_id][course_badge.badge.id].eql?(true),
+                              :disabled => @disable_checkbox[@team_id][course_badge.badge.id].eql?(true),
+                              :class => 'checkbox_nomination' %>
+            <div id='<%= "placeholder_deleted_nomination_" + @team_id.to_s + "_" + course_badge.badge.id.to_s %>'></div>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+    </tbody>
+  </table>
+</div>

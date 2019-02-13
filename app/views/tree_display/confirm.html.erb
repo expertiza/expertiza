@@ -1,5 +1,7 @@
 <% if @node_type == 'course' %>
     <h1>Are you sure you want to delete this course?</h1>
+<% elsif @node_type == 'questionnaires'%>
+    <h1>Are you sure you want to delete this questionnaire?</h1>
 <% else %>
     <h1>Are you sure you want to delete this assignment?</h1>
 <% end %>
@@ -11,6 +13,8 @@
     <td align="center" width="120px" style="font-size: xx-large">
         <% if @node_type == 'course' %>
             <%= link_to 'YES', :controller => :course, :action => :delete, :id => @id %>
+        <% elsif @node_type == 'questionnaires'%>
+            <%= link_to 'YES', :controller => :questionnaires, :action => :delete, :id => @id %>
         <% else %>
             <%= link_to 'YES', :controller => :assignments, :action => :delete, :id => @id %>
         <% end %>

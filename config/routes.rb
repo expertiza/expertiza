@@ -1,4 +1,5 @@
 Expertiza::Application.routes.draw do
+
   resources :badge_preferences
   get 'course_badges/awarding'
   post 'course_badges/awarding_submit'
@@ -469,6 +470,13 @@ resources :institution, except: [:destroy] do
       post :bridge_to_is_available
       get :session_last_open_tab
       get :set_session_last_open_tab
+    end
+  end
+
+  resources :team_nominations, only: [] do
+    collection do
+      get :list_badges
+      post :nominate
     end
   end
 

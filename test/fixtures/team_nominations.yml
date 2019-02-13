@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  team_id: 1
+  badge_id: 1
+  status: MyString
+  nominator_id: 1
+
+two:
+  team_id: 1
+  badge_id: 1
+  status: MyString
+  nominator_id: 1

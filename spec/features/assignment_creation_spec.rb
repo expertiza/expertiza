@@ -650,10 +650,10 @@ describe "assignment function" do
       assignment_id = Assignment.where(name: 'participants Assignment').first.id
       visit "/participants/list?id=#{assignment_id}&model=Assignment"
 
-      fill_in 'user_name', with: student.name
-      choose 'user_role_participant'
+      fill_in 'user_name', with: student.name, match: :first
+      choose 'user_role_participant', match: :first
 
-      expect { click_button 'Add'; sleep(1) }.to change { Participant.count }.by 1
+      expect { click_button 'Add', match: :first; sleep(1) }.to change { Participant.count }.by 1
     end
 
     it "should display newly created assignment" do

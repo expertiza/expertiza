@@ -174,10 +174,11 @@ class GradesController < ApplicationController
     @team.comment_for_submission = params[:comment_for_submission]
     begin
       @team.save
+      flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
+    redirect_to controller: 'grades', action: 'view_team', id: participant.id
   end
 
   private

@@ -235,7 +235,7 @@
   Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
   Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
 <% else %>
-  <%= form_tag 'save_grade_and_comment_for_submission', remote: true do %>
+  <%= form_tag 'save_grade_and_comment_for_submission' do %>
     <%= hidden_field_tag :participant_id, params[:id] %>
     <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: 'Grade' %><br/>
     <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment', class: "form-control width-500" %><br>

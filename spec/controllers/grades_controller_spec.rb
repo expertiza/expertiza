@@ -180,7 +180,7 @@ describe GradesController do
   end
 
   describe '#save_grade_and_comment_for_submission' do
-    it 'saves grade and comment for submission and redirects to assignments#list_submissions page' do
+    it 'saves grade and comment for submission and refreshes the grades#view_team page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
       allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
       params = {
@@ -190,7 +190,7 @@ describe GradesController do
       }
       post :save_grade_and_comment_for_submission, params
       expect(flash[:error]).to be nil
-      expect(response).to redirect_to('/assignments/list_submissions?id=8')
+      expect(response).to redirect_to('/grades/view_team?id=1')
     end
   end
 end

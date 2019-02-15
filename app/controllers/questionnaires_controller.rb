@@ -46,7 +46,11 @@ class QuestionnairesController < ApplicationController
   end
 
   def create
-    questionnaire_private = params[:questionnaire][:private] == "true"
+    if params[:questionnaire][:name].blank?
+      flash[:error] = 'A rubric or survey must have a title.'
+      redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
+    end
+    questionnaire_private = params[:questionnaire][:private] == 'true'
     display_type = params[:questionnaire][:type].split('Questionnaire')[0]
     begin
       @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]

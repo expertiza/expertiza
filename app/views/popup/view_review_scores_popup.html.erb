@@ -5,7 +5,7 @@
 
     <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
     <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
-    <% roundtitle = key.to_s.insert(key.to_s.rindex('d')+1, ' ') %>
+    <% roundtitle = key.to_s %>
     <h4><%= roundtitle.titlecase %></h4>
 
     <table class="general" border="1">

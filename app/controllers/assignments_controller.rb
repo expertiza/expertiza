@@ -30,7 +30,7 @@ class AssignmentsController < ApplicationController
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by_name(@assignment_form.assignment.name)
+        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
@@ -45,8 +45,8 @@ class AssignmentsController < ApplicationController
         end
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
-        @assignment_form.update(assignment_form_params,current_user)
-        aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+        @assignment_form.update(assignment_form_params, current_user)
+        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -169,8 +169,10 @@ class AssignmentsController < ApplicationController
   end
 
   def delete_delayed_mailer
-    @delayed_job = DelayedJob.find(params[:delayed_job_id])
-    @delayed_job.delete
+    queue = Sidekiq::Queue.new("mailers")
+    queue.each do |job|
+      job.delete if job.jid == params[:delayed_job_id]
+    end
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
@@ -240,10 +242,9 @@ class AssignmentsController < ApplicationController
 
   # helper methods for edit
   def edit_params_setting
-
     @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission') == nil ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review') == nil ? 0 : @assignment.find_due_dates('review').count
+    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -349,9 +350,7 @@ class AssignmentsController < ApplicationController
 
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
-    if params[:metareviewAllowed] == "false"
-      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
-    end
+    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
   end
 
   def handle_current_user_timezonepref_nil

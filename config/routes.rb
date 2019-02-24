@@ -391,6 +391,7 @@ resources :institution, except: [:destroy] do
       post :submit_file
       post :folder_action
       post :submit_hyperlink
+      post :begin_planning
       get :submit_hyperlink
       get :view
     end

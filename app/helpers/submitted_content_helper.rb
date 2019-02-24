@@ -118,5 +118,33 @@ module SubmittedContentHelper
     end
   # rescue
   # end
-end
+  end
+
+  def revision_planning(name)
+    participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(participant.user_id)
+    questionnaire = create_revision_planning_questionnaire(name)
+    #redirect_to controller: 'questionnaires', action: 'new', model: 'RevisionReviewQuestionnaire', private: 0, pid: params[:id]
+    aq = AssignmentQuestionnaire.new
+    aq.assignment = Assignment.find(participant.parent_id)
+    aq.questionnaire = questionnaire
+    aq.user_id = participant.user_id
+    aq.save
+    # record = create_revision_review_submission_record(participant)
+    redirect_to controller: 'questionnaires', action: 'edit', id: questionnaire.id
+  end
+
+  def create_revision_planning_questionnaire(name)
+    questionnaire = Questionnaire.new
+    questionnaire.name = name
+    #questionnaire.name = params[:questionnaire][:name]
+    questionnaire.type = 'RevisionReviewQuestionnaire'
+    questionnaire.display_type = 'RevisionReview'
+    questionnaire.min_question_score = 0
+    questionnaire.max_question_score = 5
+    questionnaire.instructor_id = session[:user].id
+    questionnaire.save!
+    questionnaire
+  end
+
 end

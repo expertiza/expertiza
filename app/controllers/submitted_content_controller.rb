@@ -12,6 +12,7 @@ class SubmittedContentController < ApplicationController
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
   # so @can_submit should be true
   def edit
+    @ques = Questionnaire.new
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
@@ -20,7 +21,10 @@ class SubmittedContentController < ApplicationController
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    @stage = @assignment.get_current_stage(topic_id)
+    # Find the round of the current assignment
+    @round = @assignment.number_of_current_round(topic_id)
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false
@@ -235,5 +239,10 @@ class SubmittedContentController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @participant.parent_id)
     # check one assignment has topics or not
     (!@topics.empty? and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.empty?
+  end
+
+  def begin_planning
+    @name = params[:questionnaire][:name]
+    SubmittedContentHelper.revision_planning(@name)
   end
 end

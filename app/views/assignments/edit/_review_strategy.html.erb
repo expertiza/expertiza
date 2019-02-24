@@ -42,8 +42,6 @@
       <%= label_tag('review', 'Has Max Review Limit?') %>
       <img src="/assets/info.png" title='You can select whether the particular submission needs to have maximum limit for review or not.'>
     </td>
-    <td>
-    </td>
   </tr>
 
   <tr id="assignment_review_topic_threshold_row">
@@ -66,9 +64,6 @@
       <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has Meta-review Limit?') %>  
       <img src="/assets/info.png" title='You can set if a particular submission can have a Meta-review or not.'>
-    </td>
-    <td>
-
     </td>
   </tr>
 
@@ -93,7 +88,6 @@
         <%end%>
         </span>
     </td>
-
   </tr>
 
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
@@ -134,8 +128,6 @@
       <%= label_tag('assignment_form[assignment][is_anonymous]', 'Is Review Anonymous?') %>
       <img src="/assets/info.png" title='You can select whether the review name should be visible or not'>
     </td>
-    <td></td>
-
   </tr>
 
   <tr>
@@ -145,8 +137,19 @@
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow Self Reviews?') %>
       <img src="/assets/info.png" title='Select if you want a person to allow review their own submission'>
     </td>
-    <td></td>
   </tr>
+
+  <!--#E1870-->
+  <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
+    <tr>
+      <td id='assignment_allow_selecting_additional_reviews_after_1st_round'>
+        <input name="assignment_form[assignment][allow_selecting_additional_reviews_after_1st_round]" type="hidden" value="false"/>
+        <%= check_box_tag('assignment_form[assignment][allow_selecting_additional_reviews_after_1st_round]', 'true', @assignment_form.assignment.allow_selecting_additional_reviews_after_1st_round) %>
+        <%= label_tag('assignment_form[assignment][allow_selecting_additional_reviews_after_1st_round]', 'Allow students to join reviews late') %>
+        <img src="/assets/info.png" title='Should a student who does not do a first-round review be allowed to review this work in subsequent rounds?'>
+      </td>
+    </tr>
+  <% end %>
 
 </table>
 <script>

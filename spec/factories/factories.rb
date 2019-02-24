@@ -193,6 +193,7 @@ FactoryBot.define do
     num_metareviews_allowed 3
     is_calibrated false
     has_badge false
+    allow_selecting_additional_reviews_after_1st_round false
   end
 
   factory :assignment_team, class: AssignmentTeam do

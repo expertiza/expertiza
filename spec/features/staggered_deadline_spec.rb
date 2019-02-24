@@ -1,7 +1,13 @@
 describe "Staggered deadline test" do
   before(:each) do
     # assignment and topic
-    create(:assignment, name: "Assignment1665", directory_path: "Assignment1665", rounds_of_reviews: 2, staggered_deadline: true, max_team_size: 1)
+    create(:assignment,
+           name: "Assignment1665",
+           directory_path: "Assignment1665",
+           rounds_of_reviews: 2,
+           staggered_deadline: true,
+           max_team_size: 1,
+           allow_selecting_additional_reviews_after_1st_round: true)
     create_list(:participant, 3)
     create(:topic, topic_name: "Topic_1")
     create(:topic, topic_name: "Topic_2")
@@ -54,11 +60,11 @@ describe "Staggered deadline test" do
   end
 
   # create topic deadline
-  def topic_due(type, time, id, round, review_allowed_id = 3)
+  def topic_due(type, time, topic_id, round, review_allowed_id = 3)
     create(:topic_due_date,
            due_at: time,
            deadline_type: DeadlineType.where(name: type).first,
-           topic: SignUpTopic.where(id: id).first,
+           topic: SignUpTopic.where(id: topic_id).first,
            round: round,
            review_allowed_id: review_allowed_id)
   end
@@ -258,4 +264,3 @@ describe "Staggered deadline test" do
     expect(find_field("due_date_3_review_1_due_date").value).to_not eq(nil)
   end
 end
-

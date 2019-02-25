@@ -5,8 +5,21 @@
   <script type='text/javascript'>
       $(window).load(function () {
           $("#myTable tbody").sortable().disableSelection();
+          $("#dialog").dialog({
+            autoOpen: false,
+            modal: true,
+            show: "blind",
+            hide: "blind",
+            buttons: {
+              Ok: function() {
+                $(this).dialog("close");
+              }
+            }
+          });
       });
   </script>
+
+  <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
 
   <p> **In "Team reviewed" column text in:</p>
     <ul style="list-style-type:square">
@@ -24,14 +37,7 @@
       <!-- class value decides whether the column should be sortable or not  -->
       <th width="16%" class="sorter-true">Reviewer <span></span></th>
       <th width="10%" class="sorter-false">Reviews done<span></span></th>
-      <!--Dr.Kidd's course
-      <% if @assignment.instructor_id == 2026 %>
-        <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
-        <th width = "14%" class="sorter-false">Author feedback <span></span></th>
-      <% else %>-->
-        <th width="24%" class="sorter-false">Team reviewed <span></span></th>
-        <!--
-      <% end %>-->
+      <th width="24%" class="sorter-false">Team reviewed <span></span></th>
       <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
       <th width="13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
@@ -108,7 +114,7 @@
           </td>
           <!--Assign grade and write comments-->
           <td align='left'>
-            <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
+            <%= form_tag save_grade_and_comment_for_reviewer_review_mapping_index_path, remote: true do %>
               <%= hidden_field_tag :participant_id, r.id %>
               <%= hidden_field_tag :assignment_id, @id %>
               <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>

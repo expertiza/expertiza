@@ -4,7 +4,12 @@ class Team < ActiveRecord::Base
   has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
   has_many :signed_up_teams, dependent: :destroy
+  has_many :bids, dependent: :destroy
   has_paper_trail
+
+  scope :find_team_for_assignment_and_user, lambda {|assignment_id, user_id|
+    joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
+  }
 
   # Get the participants of the given team
   def participants

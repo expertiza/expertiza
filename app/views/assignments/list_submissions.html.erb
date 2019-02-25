@@ -1,4 +1,12 @@
-
+<!--E1877 script added to sort the table-->
+<script>
+  $(function () {
+    /*E1877: Function for sorting the table */
+    $("#submissionsTable").tablesorter({
+      sortList: [[0,0]] //E1877: sort First Column by default when page loads
+    });
+  });
+</script>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
 <% if @assignment.max_team_size > 1 %>
@@ -8,19 +16,23 @@
   <% headers["Participant name"] = "18%" %>
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
-<table class="table table-striped" style="margin-top: 50px">
+<!--E1877: table id changed -->
+<table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
     <thead>
-      <% if @assignment.topics? %>
-        <td style="font-weight: bold; font-size: 15px;">Topic name</td>
-      <% end %>
-      <% if @assignment.max_team_size > 1 %>
-        <td style="font-weight: bold; font-size: 15px;">Team name</td>
-        <td style="font-weight: bold; font-size: 15px;">Team member(s)</td>
-      <% else %>
-        <td style="font-weight: bold; font-size: 15px;">Participant name</td>
-      <% end %>  
-      <td style="font-weight: bold; font-size: 15px;">Links</td> 
-      <td style="font-weight: bold; font-size: 15px;"></td>                    
+    <!--E1877: class="sorter-true" added to sort all attributes-->
+      <tr>
+        <% if @assignment.topics? %>
+          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Topic name</th>
+        <% end %>
+        <% if @assignment.max_team_size > 1 %>
+          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team name</th>
+          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Team member(s)</th>
+        <% else %>
+          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
+        <% end %>  
+        <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
+        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
+      </tr>                    
     </thead>
     <% @l = -1 %>
     <% @teams.each do |team| %>
@@ -38,7 +50,7 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
-            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id }, target: '_blank' %></td>
+            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
           <% end %>
         <% end %>
 

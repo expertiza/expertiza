@@ -30,7 +30,7 @@ class AssignmentsController < ApplicationController
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by_name(@assignment_form.assignment.name)
+        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
@@ -45,8 +45,8 @@ class AssignmentsController < ApplicationController
         end
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
-        @assignment_form.update(assignment_form_params,current_user)
-        aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+        @assignment_form.update(assignment_form_params, current_user)
+        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -129,16 +129,18 @@ class AssignmentsController < ApplicationController
 
   def delete
     begin
-      @assignment_form = AssignmentForm.create_form_object(params[:id])
-      @user = session[:user]
-      id = @user.get_instructor
-      if id != @assignment_form.assignment.instructor_id
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "You are not authorized to delete this assignment.", request)
-        raise "You are not authorized to delete this assignment."
+      assignment_form = AssignmentForm.create_form_object(params[:id])
+      user = session[:user]
+      # Issue 1017 - allow instructor to delete assignment created by TA.
+      # FixA : TA can only delete assignment created by itself.
+      # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
+      if user.role.name == 'Instructor' or (user.role.name == 'Teaching Assistant' and user.id == assignment_form.assignment.instructor_id)
+        assignment_form.delete(params[:force])
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
+        flash[:success] = 'The assignment was successfully deleted.'
       else
-        @assignment_form.delete(params[:force])
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{@assignment_form.assignment.id} was deleted.", request)
-        flash[:success] = "The assignment was successfully deleted."
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'You are not authorized to delete this assignment.', request)
+        flash[:error] = 'You are not authorized to delete this assignment.'
       end
     rescue StandardError => e
       flash[:error] = e.message
@@ -169,8 +171,10 @@ class AssignmentsController < ApplicationController
   end
 
   def delete_delayed_mailer
-    @delayed_job = DelayedJob.find(params[:delayed_job_id])
-    @delayed_job.delete
+    queue = Sidekiq::Queue.new("mailers")
+    queue.each do |job|
+      job.delete if job.jid == params[:delayed_job_id]
+    end
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
@@ -240,10 +244,9 @@ class AssignmentsController < ApplicationController
 
   # helper methods for edit
   def edit_params_setting
-
     @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission') == nil ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review') == nil ? 0 : @assignment.find_due_dates('review').count
+    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -349,9 +352,7 @@ class AssignmentsController < ApplicationController
 
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
-    if params[:metareviewAllowed] == "false"
-      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
-    end
+    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
   end
 
   def handle_current_user_timezonepref_nil

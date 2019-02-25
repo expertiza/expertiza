@@ -2,6 +2,9 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
+
   resources :admin, only: [] do
     collection do
       get :list_super_administrators
@@ -107,6 +110,7 @@ Expertiza::Application.routes.draw do
       get :export
       post :export
       post :exportdetails
+      post :export_advices
     end
   end
 
@@ -248,6 +252,13 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :reports, only: [] do
+    collection do
+      post :response_report
+      get :response_report
+    end
+  end
+
   resources :reputation_web_service, only: [] do
     collection do
       get :client
@@ -284,8 +295,8 @@ resources :institution, except: [:destroy] do
       get :delete_reviewer
       get :distribution
       get :list_mappings
-      get :response_report
-      post :response_report
+      # post :response_report
+      # get :response_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping

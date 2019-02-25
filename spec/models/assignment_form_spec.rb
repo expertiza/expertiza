@@ -150,30 +150,36 @@ describe AssignmentForm do
     before(:each) do
       allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
       allow_any_instance_of(AssignmentForm).to receive(:find_min_from_now).with(any_args).and_return(666)
-      allow_any_instance_of(AssignmentForm).to receive(:change_item_type).with(any_args).and_return('Succeed!')
       allow(due_date).to receive(:update_attribute).with(:delayed_job_id, any_args).and_return('Succeed!')
+      Sidekiq::Testing.inline!
     end
 
     context 'when the deadline type is review' do
       it 'adds two delayed jobs and changes the # of DelayedJob by 2' do
         allow(DeadlineType).to receive(:find).with(1).and_return(double('DeadlineType', name: 'review'))
-        expect { assignment_form.add_to_delayed_queue }.to change { DelayedJob.count }.by(2)
+        Sidekiq::Testing.fake!
+        Sidekiq::RetrySet.new.clear
+        Sidekiq::ScheduledSet.new.clear
+        Sidekiq::Stats.new.reset
+        Sidekiq::DeadSet.new.clear
+        queue = Sidekiq::Queues["mailers"]
+        puts queue.size
+        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end
 
     context 'when the deadline type is team formation and current assignment is team-based assignment' do
       it 'adds a delayed job and changes the # of DelayedJob by 2' do
         allow(DeadlineType).to receive(:find).with(1).and_return(double('DeadlineType', name: 'team_formation'))
-        expect { assignment_form.add_to_delayed_queue }.to change { DelayedJob.count }.by(2)
+        Sidekiq::Testing.fake!
+        Sidekiq::RetrySet.new.clear
+        Sidekiq::ScheduledSet.new.clear
+        Sidekiq::Stats.new.reset
+        Sidekiq::DeadSet.new.clear
+        queue = Sidekiq::Queues["mailers"]
+        puts queue.size
+        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
-    end
-  end
-
-  describe '#change_item_type' do
-    it 'changes the item_type displayes in the log' do
-      allow(Version).to receive(:find_by).with(item_type: 'Delayed::Backend::ActiveRecord::Job', item_id: 1)
-                                         .and_return(Version.new(item_type: 'some type', item_id: 1, event: 'create'))
-      expect(assignment_form.change_item_type(1)).to be true
     end
   end
 

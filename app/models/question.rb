@@ -126,23 +126,17 @@ class Question < ActiveRecord::Base
     end
   end
 
-  def self.export_fields(options)
-    fields = []
-    User.columns.each do |column|
-      fields.push(column.name)
-    end
+  def self.export_fields(_options)
+    fields = ["Seq", "Question", "Type", "Weight", "text area size", "max_label", "min_label"]
     fields
   end
 
-  def self.export(csv, _parent_id, options)
-    questionnaire = Questionnaire.find_by_id(_parent_id)
-    questions = questionnaire.questions
-    for question in questions
-      tcsv = []
-      question.attributes.each_pair do |name,value|
-        tcsv.push(value)
-      end
-      csv << tcsv
+  def self.export(csv, parent_id, _options)
+    questionnaire = Questionnaire.find(parent_id)
+    questionnaire.questions.each do |question|
+      csv << [question.seq, question.txt, question.type,
+              question.weight, question.size, question.max_label,
+              question.min_label]
     end
   end
 end

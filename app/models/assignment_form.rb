@@ -1,5 +1,6 @@
 
 require 'active_support/time_with_zone'
+
 class AssignmentForm
   attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
   attr_accessor :errors
@@ -179,8 +180,8 @@ class AssignmentForm
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
       diff_btw_time_left_and_threshold, min_left = get_time_diff_btw_due_date_and_now(due_date)
       next unless diff_btw_time_left_and_threshold > 0
-      delayed_job = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
-      due_date.update_attribute(:delayed_job_id, delayed_job.id)
+      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
+      due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
       add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left) if deadline_type == "review"
       # If the deadline type is team_formation, add a delayed job to drop one member team
@@ -199,25 +200,24 @@ class AssignmentForm
   end
 
   # add DelayedJob into queue and return it
-  def add_delayed_job(assignment, deadline_type, due_date, min_left)
-    delayed_job = DelayedJob.enqueue(DelayedMailer.new(assignment.id, deadline_type, due_date.due_at.to_s(:db)),
-                                     1, min_left.minutes.from_now)
-    change_item_type(delayed_job.id)
-    delayed_job
+  def add_delayed_job(_assignment, deadline_type, due_date, min_left)
+    delayed_job_id = MailWorker.perform_in(min_left * 60, due_date.parent_id, deadline_type, due_date.due_at)
+    delayed_job_id
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
   def delete_from_delayed_queue
-    djobs = Delayed::Job.where(['handler LIKE "%assignment_id: ?%"', @assignment.id])
-    for dj in djobs
-      dj.delete if !dj.nil? && !dj.id.nil?
+    queue = Sidekiq::Queue.new("mailers")
+    queue.each do |job|
+      assignmentId = job.args.first
+      job.delete if @assignment.id == assignmentId
     end
-  end
 
-  # Change the item_type displayed in the log
-  def change_item_type(delayed_job_id)
-    log = Version.find_by(item_type: "Delayed::Backend::ActiveRecord::Job", item_id: delayed_job_id)
-    log.update_attribute(:item_type, "DelayedMailer") # Change the item type in the log
+    queue = Sidekiq::ScheduledSet.new
+    queue.each do |job|
+      assignmentId = job.args.first
+      job.delete if @assignment.id == assignmentId
+    end
   end
 
   def delete(force = nil)
@@ -253,7 +253,7 @@ class AssignmentForm
 
     submissions = @assignment.find_due_dates('submission')
     reviews = @assignment.find_due_dates('review')
-    
+
     @assignment.directory_path = nil if @assignment.directory_path.empty?
   end
 
@@ -300,14 +300,13 @@ class AssignmentForm
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|
         next if DeadlineType.find(due_date.deadline_type_id).name != "submission"
-        change_item_type(enqueue_simicheck_task(due_date, simicheck_delay).id)
+        enqueue_simicheck_task(due_date, simicheck_delay)
       end
     end
   end
 
   def enqueue_simicheck_task(due_date, simicheck_delay)
-    DelayedJob.enqueue(DelayedMailer.new(@assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db)),
-                       1, find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now)
+    MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

@@ -3,14 +3,17 @@ class QuestionnairesController < ApplicationController
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
   # Generally a questionnaire is associated with an assignment (Assignment)
+
   before_action :authorize
 
+  # Check role access for edit questionnaire
   def action_allowed?
-    if action_name == "edit"
+    if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
-          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id)))
+          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
+          ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
 
     else
       ['Super-Administrator',
@@ -36,53 +39,58 @@ class QuestionnairesController < ApplicationController
 
   def new
     begin
-      @questionnaire = Object.const_get(params[:model].split.join).new
+      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
   end
 
   def create
-    questionnaire_private = params[:questionnaire][:private] == "true"
-    display_type = params[:questionnaire][:type].split('Questionnaire')[0]
-    begin
-      @questionnaire = Object.const_get(params[:questionnaire][:type]).new
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
-    end
-    begin
-      @questionnaire.private = questionnaire_private
-      @questionnaire.name = params[:questionnaire][:name]
-      @questionnaire.instructor_id = session[:user].id
-      @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-      @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-      @questionnaire.type = params[:questionnaire][:type]
-      # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-      # In the future, we need to write migration files to make them consistency.
-      case display_type
-      when 'AuthorFeedback'
-        display_type = 'Author%Feedback'
-      when 'CourseSurvey'
-        display_type = 'Course%Survey'
-      when 'TeammateReview'
-        display_type = 'Teammate%Review'
-      when 'GlobalSurvey'
-        display_type = 'Global%Survey'
-      when 'AssignmentSurvey'
-        display_type = 'Assignment%Survey'
+    if params[:questionnaire][:name].blank?
+      flash[:error] = 'A rubric or survey must have a title.'
+      redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
+    else
+      questionnaire_private = params[:questionnaire][:private] == 'true'
+      display_type = params[:questionnaire][:type].split('Questionnaire')[0]
+      begin
+        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
       end
-      @questionnaire.display_type = display_type
-      @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-      @questionnaire.save
-      # Create node
-      tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
-      parent = FolderNode.find_by(node_object_id: tree_folder.id)
-      QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-      flash[:success] = 'You have successfully created a questionnaire!'
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
+      begin
+        @questionnaire.private = questionnaire_private
+        @questionnaire.name = params[:questionnaire][:name]
+        @questionnaire.instructor_id = session[:user].id
+        @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+        @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+        @questionnaire.type = params[:questionnaire][:type]
+        # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
+        # In the future, we need to write migration files to make them consistency.
+        case display_type
+        when 'AuthorFeedback'
+          display_type = 'Author%Feedback'
+        when 'CourseSurvey'
+          display_type = 'Course%Survey'
+        when 'TeammateReview'
+          display_type = 'Teammate%Review'
+        when 'GlobalSurvey'
+          display_type = 'Global%Survey'
+        when 'AssignmentSurvey'
+          display_type = 'Assignment%Survey'
+        end
+        @questionnaire.display_type = display_type
+        @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+        @questionnaire.save
+        # Create node
+        tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
+        parent = FolderNode.find_by(node_object_id: tree_folder.id)
+        QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
+        flash[:success] = 'You have successfully created a questionnaire!'
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+      redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
     end
-    redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
   end
 
   def create_questionnaire
@@ -159,6 +167,16 @@ class QuestionnairesController < ApplicationController
       end
     end
     redirect_to action: 'list', controller: 'tree_display'
+  end
+
+  # Toggle the access permission for this assignment from public to private, or vice versa
+  def toggle_access
+    @questionnaire = Questionnaire.find(params[:id])
+    @questionnaire.private = !@questionnaire.private
+    @questionnaire.save
+    @access = @questionnaire.private == true ? "private" : "public"
+    undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
+    redirect_to controller: 'tree_display', action: 'list'
   end
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
@@ -250,7 +268,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    if valid_request
+    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = Object.const_get(params[:model]).new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0

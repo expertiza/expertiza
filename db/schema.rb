@@ -417,20 +417,17 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
   create_table "questionnaires", force: :cascade do |t|
-    t.string   "name",                 limit: 64
-    t.integer  "instructor_id",        limit: 4,     default: 0,     null: false
-    t.boolean  "private",                            default: false, null: false
-    t.integer  "min_question_score",   limit: 4,     default: 0,     null: false
-    t.integer  "max_question_score",   limit: 4
+    t.string   "name",               limit: 64
+    t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
+    t.boolean  "private",                          default: false, null: false
+    t.integer  "min_question_score", limit: 4,     default: 0,     null: false
+    t.integer  "max_question_score", limit: 4
     t.datetime "created_at"
-    t.datetime "updated_at",                                         null: false
-    t.string   "type",                 limit: 255
-    t.string   "display_type",         limit: 255
-    t.text     "instruction_loc",      limit: 65535
-    t.integer  "submission_record_id", limit: 4
+    t.datetime "updated_at",                                       null: false
+    t.string   "type",               limit: 255
+    t.string   "display_type",       limit: 255
+    t.text     "instruction_loc",    limit: 65535
   end
-
-  add_index "questionnaires", ["submission_record_id"], name: "index_questionnaires_on_submission_record_id", using: :btree
 
   create_table "questions", force: :cascade do |t|
     t.text    "txt",              limit: 65535

@@ -52,14 +52,15 @@ class LotteryController < ApplicationController
       team_node = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
       user_ids.each do |user_id|
         # Destroy current team_user and team_user node if exists
-        team_user = TeamsUser.find_by(user_id: user_id, team_id: original_team_id)
-        unless team_user.nil?
-          team_user.team_user_node.destroy
-          team_user.destroy
+        TeamsUser.where(user_id: user_id).each do |team_user|
+          next unless team_user.team.parent_id == assignment.id
+          team_user.team_user_node.destroy rescue nil
+          team_user.destroy rescue nil
+          break
         end
         # Create new team_user and team_user node
-        TeamsUser.create(user_id: user_id, team_id: new_team.id)
-        TeamUserNode.create(parent_id: team_node.id, node_object_id: team_user.id)
+        new_team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id)
+        TeamUserNode.create(parent_id: team_node.id, node_object_id: new_team_user.id)
         # Create new bids for team based on `bidding_data` variable for each team member
         # Currently, it is possible (already proved by db records) that
         # some team has multiple 1st priority, multiply 2nd priority, ....
@@ -69,9 +70,9 @@ class LotteryController < ApplicationController
       end
     end
     # Remove empty teams
-    assignment.teams.each do |team|
+    assignment.teams.reload.each do |team|
       if team.teams_users.empty?
-        TeamNode.where(parent_id: assignment.id, node_object_id: team.id).destroy_all
+        TeamNode.where(parent_id: assignment.id, node_object_id: team.id).destroy_all rescue nil
         team.destroy
       end
     end
@@ -81,43 +82,44 @@ class LotteryController < ApplicationController
     # Select data from `priority_info` variable that only related to team members in current team and transpose it.
     # For example, below matrix shows 4 topics (key) and correponding priorities given by 3 team members (value).
     # {
-    #   1: [1, 2, 4],
-    #   2: [0, 1, 3],
+    #   1: [1, 2, 3],
+    #   2: [0, 1, 2],
     #   3: [2, 3, 1],
-    #   4: [3, 0, 2]
+    #   4: [2, 0, 1]
     # }
     bidding_matrix = {}
-    user_ids.each do |user_id|
-      priority_info.each do |info|
-        bids = info[:ranks] if info[:pid] == user_id
-        assignment.sign_up_topics.each_with_index do |topic, index|
-          bidding_matrix[topic.id.to_sym] = [] unless bidding_matrix[topic.id.to_sym]
-          bidding_matrix[topic.id.to_sym] << bids[index]
-        end
+    priority_info.each do |info|
+      next unless user_ids.include? info[:pid]
+      bids = info[:ranks]
+      assignment.sign_up_topics.each_with_index do |topic, index|
+        bidding_matrix[topic.id] = [] unless bidding_matrix[topic.id]
+        bidding_matrix[topic.id] << bids[index]
       end
     end
     # Below is the structure of matrix summary
     # The first value is the number of nonzero item, the second value is the sum of priorities, the third value of the topic_id.
     # [
-    #   [3, 7, 1],
-    #   [2, 4, 2],
+    #   [3, 6, 1],
+    #   [2, 3, 2],
     #   [3, 6, 3],
-    #   [2, 5, 4]
+    #   [2, 3, 4]
     # ]
     bidding_matrix_summary = []
     bidding_matrix.each do |topic_id, value|
+      # Exclude topics that no one bidded
       next if value.inject(:+).zero?
       bidding_matrix_summary << [value.count {|i| i != 0 }, value.inject(:+), topic_id]
     end
-    bidding_matrix_summary.sort! {|b1, b2| [b2[0], b2[1]] <=> [b1[0], b1[1]] }
-    # Result of soring first two elements descendingly
+    bidding_matrix_summary.sort! {|b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
+    # Result of soring first element descendingly and second element ascendingly.
+    # We want the topic with most people bidded and lowest sum of priorities at the top.
     # [
+    #   [3, 6, 1],
     #   [3, 6, 3],
-    #   [3, 7, 1],
-    #   [2, 4, 2],
-    #   [2, 5, 4]
+    #   [2, 3, 2],
+    #   [2, 3, 4]
     # ]
-    # Therefore the bidding priority of these 4 topics is 3 -> 1 -> 2 -> 4
+    # Therefore the bidding priority of these 4 topics is 1 -> 3 -> 2 -> 4
     bidding_matrix_summary.each_with_index do |b, index|
       Bid.create(topic_id: b[2], team_id: team_id, priority: index + 1)
     end
@@ -132,7 +134,7 @@ class LotteryController < ApplicationController
     end
     # Getting signup topics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? and max_choosers > 0', assignment.id)
-    unassigned_teams = assignment.teams.reject {|t| SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).any? || Bid.where(team_id: t.id).blank? }
+    unassigned_teams = assignment.teams.reload.select {|t| SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? and Bid.where(team_id: t.id).any? }
     # Sorting unassigned_teams by team size desc, number of bids in current team asc
     # again, we need to find a way to to merge bids that came from different previous teams
     # then sorting unassigned_teams by number of bids in current team (less is better)
@@ -142,7 +144,7 @@ class LotteryController < ApplicationController
       [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
       [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
-    # generate team bidding infomation hash based on newly-created teams
+    # Generate team bidding infomation hash based on newly-created teams
     team_bids = []
     unassigned_teams.each do |team|
       topic_bids = []
@@ -153,7 +155,7 @@ class LotteryController < ApplicationController
       topic_bids.sort! {|b| b[:priority] }
       team_bids << {team_id: team.id, bids: topic_bids}
     end
-    # if certain topic has available slot(s),
+    # If certain topic has available slot(s),
     # the team with biggest size get its first-priority topic
     # then break the loop to next team
     team_bids.each do |tb|
@@ -168,7 +170,7 @@ class LotteryController < ApplicationController
     end
 
     # Remove is_intelligent property from assignment so that it can revert to the default signup state
-    assignment.update_attributes(:is_intelligent, false)
+    assignment.update_attributes(:is_intelligent => false)
     flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
   end
   # rubocop:enable Metrics/AbcSize

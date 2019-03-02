@@ -234,4 +234,10 @@ class AssignmentTeam < Team
   def received_any_peer_review?
     ResponseMap.where(reviewee_id: self.id, reviewed_object_id: self.parent_id).any?
   end
+
+  # Returns the most recent submission of the team
+  def most_recent_submission
+    assignment = Assignment.find(self.parent_id)
+    most_recent_submission_record = SubmissionRecord.where(team_id: self.id, assignment_id:assignment.id).order(updated_at: :desc).first
+  end
 end

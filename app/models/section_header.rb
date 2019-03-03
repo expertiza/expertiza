@@ -12,7 +12,7 @@ class SectionHeader < QuestionnaireHeader
     safe_join(make_header)
   end
 
-  def private make_header
+  private def make_header
     ['<b style="color: #986633; font-size: x-large">',
      self.txt,
      '</b>']

@@ -1,6 +1,10 @@
+# Code Climate mistakenly reports
+# "Mass assignment is not restricted using attr_accessible"
+# https://github.com/presidentbeef/brakeman/issues/579
+
 class SectionHeader < QuestionnaireHeader
   :attr_accessible
-  
+
   def complete(_count, _answer = nil)
     html = '<br><br><div><b style="color: #986633; font-size: x-large">' + self.txt + '</b></div>'
     html.html_safe

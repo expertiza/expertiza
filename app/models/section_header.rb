@@ -20,4 +20,5 @@ class SectionHeader < QuestionnaireHeader
     html << '</b>'.html_safe
     html
   end
+  
 end

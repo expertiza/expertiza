@@ -101,12 +101,16 @@ class ResponseController < ApplicationController
     assign_instance_vars
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
-    # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
+    # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
-    # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
-    @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
-    @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
+    # A new response has to be created when there hasn't been any reviews done for the current round,
+    # or when there has been a submission after the most recent review in this round.
+    team = AssignmentTeam.find(@map.reviewee_id)
+    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+    if @response.nil? || team.most_recent_submission.updated_at > @response.updated_at
+      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
+    end
     questions = sort_questions(@questionnaire.questions)
     init_answers(questions)
     render action: 'response'
@@ -147,7 +151,9 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     was_submitted = false
-    @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    # There could be multiple responses per round, when re-submission is enabled for that round.
+    # Hence we need to pick the latest response.
+    @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
       @response = Response.create(
         map_id: @map.id,

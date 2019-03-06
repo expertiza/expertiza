@@ -5,8 +5,8 @@
       <%- # ACS Have metareviews done for all teams   -%>
       <%- # removed code that handles team and individual assignments differently   -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
-          <% review_mapping = ResponseMap.find(map.reviewed_object_id) %>
-          <% team = AssignmentTeam.find(review_mapping.reviewee_id) %>
+          <% review_mapping = ResponseMap.find_by(id: map.reviewed_object_id) %>
+          <% team = AssignmentTeam.find_by(id: review_mapping.reviewee_id) %>
       <% else %>
           <% team = AssignmentTeam.find(map.reviewee_id) %>
       <% end %>
@@ -65,7 +65,7 @@
                         <td>
                           <% if (!@latest_response.is_submitted) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
-                          <% elsif@latest_response.updated_at < latest_submission.updated_at %>
+                          <% elsif @latest_response.updated_at < latest_submission.updated_at %>
                               <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                           <%end%>
                         </td>

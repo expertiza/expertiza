@@ -10,6 +10,6 @@
 <%= render :partial => 'users/password', :locals => { :new_user => new_user, :request_user => request_user } %>
 <%= render :partial => 'users/prefs', :locals => { :request_user => request_user } %>
 <%= render :partial => 'users/institutions' %>
-<%= render :partial => 'users/self_introduction' %>
+<%= render :partial => 'users/self_introduction' if request_user%>
 <!--[eoform:user]-->
 <br/>

@@ -268,7 +268,7 @@ class ResponseController < ApplicationController
   # if false: we figure out which questionnaire to display base on @response object
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
-    @title = @map.get_title
+    @title = @map.title
     if @map.survey?
       @survey_parent = @map.survey_parent
     else

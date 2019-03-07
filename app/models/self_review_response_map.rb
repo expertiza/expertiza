@@ -19,8 +19,8 @@ class SelfReviewResponseMap < ResponseMap
   end
 
   # This method returns 'Title' of type of review (used to manipulate headings accordingly)
-  def get_title
-    "Self Review"
+  def title
+    'Self Review'
   end
 
   # do not send any reminder for self review received.

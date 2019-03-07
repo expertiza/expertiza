@@ -13,7 +13,7 @@ class ReviewResponseMap < ResponseMap
     Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round))
   end
 
-  def get_title
+  def title
     "Review"
   end
 

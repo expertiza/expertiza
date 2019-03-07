@@ -1,5 +1,6 @@
 class MarkupStylesController < ApplicationController
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     current_role_name.eql?("Super-Administrator")
   end
 

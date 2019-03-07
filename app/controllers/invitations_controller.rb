@@ -2,6 +2,7 @@ class InvitationsController < ApplicationController
   before_action :check_user_before_invitation, only: [:create]
   before_action :check_team_before_accept, only: [:accept]
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
 

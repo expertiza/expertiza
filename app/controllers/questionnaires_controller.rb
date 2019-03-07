@@ -10,12 +10,14 @@ class QuestionnairesController < ApplicationController
   def action_allowed?
     if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
           ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
 
     else
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Super-Administrator',
        'Administrator',
        'Instructor',
@@ -576,6 +578,7 @@ class QuestionnairesController < ApplicationController
 
   def assign_instructor_id
     # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if session[:user].role.name != "Teaching Assistant"
       session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA

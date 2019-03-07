@@ -3,6 +3,7 @@ class Assessment360Controller < ApplicationController
 
   # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     ['Super-Administrator',
      'Administrator',
      'Instructor',

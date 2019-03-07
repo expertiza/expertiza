@@ -23,6 +23,7 @@ module AccessHelper
   end
 
   def all_actions_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if current_user && current_role.super_admin?
       true
     else

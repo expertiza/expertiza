@@ -2,14 +2,17 @@ class SuggestionController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       current_role_name.eql? 'Student'
     when 'submit'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name
     else
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Instructor',
        'Teaching Assistant',
        'Administrator',

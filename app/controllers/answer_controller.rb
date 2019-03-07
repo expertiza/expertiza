@@ -5,6 +5,7 @@ class AnswerController < ApplicationController
   def action_allowed?
     case params[:action]
       when 'index'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
         ['Instructor',
          'Teaching Assistant',
          'Student',

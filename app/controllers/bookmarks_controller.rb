@@ -2,8 +2,10 @@ class BookmarksController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'list', 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       # edit, update, delete bookmarks can only be done by owner
       current_role_name.eql? 'Student' and Bookmark.find(params[:id].to_i).user_id == session[:user].id
     end

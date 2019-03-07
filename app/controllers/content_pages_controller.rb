@@ -8,6 +8,7 @@ class ContentPagesController < ApplicationController
     when 'view', 'view_default'
       true
     else
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       current_role_name.eql?('Super-Administrator')
     end
   end

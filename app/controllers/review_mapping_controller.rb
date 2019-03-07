@@ -20,6 +20,7 @@ class ReviewMappingController < ApplicationController
           'assign_quiz_dynamically',
           'start_self_review'
       true
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
   end

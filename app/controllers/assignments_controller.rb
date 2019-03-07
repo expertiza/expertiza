@@ -65,18 +65,23 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
-    assignment_form_assignment_staggered_deadline?
+    #used to be assignment_form_assignment_staggered_deadline?
+    assignment_staggered_deadline?
     @due_date_all.each do |dd|
-      check_due_date_nameurl_not_empty(dd)
+      #used to be check_due_date_nameurl_not_empty(dd)
+      check_due_date_nameurl(dd)
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
     check_assignment_questionnaires_usage
-    @due_date_all = update_nil_dd_deadline_name(@due_date_all)
-    @due_date_all = update_nil_dd_description_url(@due_date_all)
+    #used to be @due_date_all = update_nil_dd_deadline_name(@due_date_all)
+    @due_date_all = update_due_date_deadline_name(@due_date_all)
+    #used to be @due_date_all = update_nil_dd_description_url(@due_date_all)
+    @due_date_all = update_due_date_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
-    handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    #handle_assignment_directory_path_nonexist_case_and_answer_tagging refactored to be
+    nonexist_path_with_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
@@ -85,12 +90,15 @@ class AssignmentsController < ApplicationController
 
   def update
     unless params.key?(:assignment_form)
-      assignment_form_key_nonexist_case_handler
+      #used to be assignment_form_key_nonexist_case_handler
+      assignment_saving
       return
     end
     retrieve_assignment_form
-    handle_current_user_timezonepref_nil
-    update_feedback_assignment_form_attributes
+    #used to be handle_current_user_timezonepref_nil
+    nil_timezone_handler
+    #used to be update_feedback_assignment_form_attributes
+    update_feedback_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 
@@ -227,14 +235,16 @@ class AssignmentsController < ApplicationController
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
 
-  def update_nil_dd_deadline_name(due_date_all)
+  # used to be update_nil_dd_deadline_name
+  def update_due_date_deadline_name(due_date_all)
     due_date_all.each do |dd|
       dd.deadline_name ||= ''
     end
     due_date_all
   end
 
-  def update_nil_dd_description_url(due_date_all)
+  #used to be update_nil_dd_description_url
+  def update_due_date_description_url(due_date_all)
     due_date_all.each do |dd|
       dd.description_url ||= ''
     end
@@ -269,7 +279,8 @@ class AssignmentsController < ApplicationController
     @teams_count = @assignment_form.assignment.teams.size
   end
 
-  def assignment_form_assignment_staggered_deadline?
+  #used to be assignment_form_assignment_staggered_deadline?
+  def assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
@@ -278,7 +289,8 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.staggered_deadline == true
   end
 
-  def check_due_date_nameurl_not_empty(dd)
+  #used to be check_due_date_nameurl_not_empty
+  def check_due_date_nameurl(dd)
     @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
     @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
     @metareview_allowed = meta_review_allowed?(dd)
@@ -316,8 +328,8 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-
-  def handle_assignment_directory_path_nonexist_case_and_answer_tagging
+  #used to be handle_assignment_directory_path_nonexist_case_and_answer_tagging
+  def nonexist_path_with_tagging
     if @assignment_form.assignment.directory_path.blank?
       flash.now[:error] = "You did not specify your submission directory."
       ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
@@ -326,7 +338,8 @@ class AssignmentsController < ApplicationController
   end
 
   # helper methods for update
-  def assignment_form_key_nonexist_case_handler
+  # used to be assignment_form_key_nonexist_case_handler
+  def assignment_saving
     @assignment = Assignment.find(params[:id])
     @assignment.course_id = params[:course_id]
 
@@ -355,7 +368,9 @@ class AssignmentsController < ApplicationController
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
   end
 
-  def handle_current_user_timezonepref_nil
+  # used to be handle_current_user_timezonepref_nil
+  def nil_timezone_handler
+    # give an error message is instructor have not set the time zone.
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref
@@ -364,7 +379,8 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def update_feedback_assignment_form_attributes
+  #used to be update_feedback_assignment_form_attributes
+  def update_feedback_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else

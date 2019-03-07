@@ -237,6 +237,7 @@ class AssignmentsController < ApplicationController
 
   # used to be update_nil_dd_deadline_name
   def update_due_date_deadline_name(due_date_all)
+    #goes through all the due dates and sets the deadline name
     due_date_all.each do |dd|
       dd.deadline_name ||= ''
     end
@@ -245,6 +246,7 @@ class AssignmentsController < ApplicationController
 
   #used to be update_nil_dd_description_url
   def update_due_date_description_url(due_date_all)
+    #goes through all the due dates and sets the description url
     due_date_all.each do |dd|
       dd.description_url ||= ''
     end
@@ -281,16 +283,19 @@ class AssignmentsController < ApplicationController
 
   #used to be assignment_form_assignment_staggered_deadline?
   def assignment_staggered_deadline?
+    #if there is a staggered deadline then set the following variables
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
       @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end
+    #if it is not true then set it to true
     @assignment_form.assignment.staggered_deadline == true
   end
 
   #used to be check_due_date_nameurl_not_empty
   def check_due_date_nameurl(dd)
+    # remember the following variable bool values
     @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
     @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
     @metareview_allowed = meta_review_allowed?(dd)
@@ -371,6 +376,7 @@ class AssignmentsController < ApplicationController
   # used to be handle_current_user_timezonepref_nil
   def nil_timezone_handler
     # give an error message is instructor have not set the time zone.
+    # then set the time zone equal to the parent timezone if not set
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref
@@ -381,12 +387,15 @@ class AssignmentsController < ApplicationController
 
   #used to be update_feedback_assignment_form_attributes
   def update_feedback_attributes
+    #if there are reviews submitted then you cant reduce the number of review as instructor
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
+      #otherwise update the form
       if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'
       else
+        #if for some reason it didnt update
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
       end
     end

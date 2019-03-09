@@ -44,18 +44,18 @@ class CourseBadgesController < ApplicationController
   # GET /course_badges/awarding?course_id
   def awarding
     if !params['course_id'].nil?
-       course = Course.find(params['course_id'])
+       @course = Course.find(params['course_id'])
     elsif !params['assignment_id'].nil?
       @assignments = Assignment.where(id: params['assignment_id'])
-      course = @assignments.first.course
+      @course = @assignments.first.course
     end
 
-    if !course.nil?
+    if !@course.nil?
       # get avg score of each participant in different assignment in the course
-      @assignments = Assignment.where(course_id: course.id)
-      @course_badges = CourseBadge.where(course_id: course.id)
-      ta_user_ids = TaMapping.where(course: course).pluck(:id)
-      @participants = CourseParticipant.where(parent_id: course.id).where.not(user_id: ta_user_ids)
+      @assignments = Assignment.where(course_id: @course.id)
+      @course_badges = CourseBadge.where(course_id: @course.id)
+      ta_user_ids = TaMapping.where(course: @course).pluck(:id)
+      @participants = CourseParticipant.where(parent_id: @course.id).where.not(user_id: ta_user_ids)
 
       # initialize nested hash
       # From: http://www.ruby-forum.com/topic/111524, Author: Daniel Martin

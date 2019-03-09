@@ -67,6 +67,7 @@ class UsersController < ApplicationController
     @roles = Role.all
   end
 
+  #How is this different from show?
   def show_selection
     @user = User.find_by(name: params[:user][:name])
     if !@user.nil?
@@ -259,8 +260,15 @@ class UsersController < ApplicationController
 
   protected
 
+  # finds the list of roles that the current user can have
+  # used to display a dropdown selection of roles for the current user in the views
   def foreign
+    # finds what the role of the current user is.
     role = Role.find(session[:user].role_id)
+
+    # this statement finds a list of roles that the current user can have
+    # The @all_roles variable is used in the view to present the user a list of options
+    # of the roles they may select from.
     @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
   end
 
@@ -300,6 +308,7 @@ class UsersController < ApplicationController
           .merge(self_introduction: params[:requested_user][:self_introduction])
   end
 
+  #may have to be renamed to role or move this to the model.
   def get_role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)

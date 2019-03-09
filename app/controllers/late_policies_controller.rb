@@ -2,11 +2,13 @@ class LatePoliciesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'new', 'create', 'index'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Super-Administrator',
        'Administrator',
        'Instructor',
        'Teaching Assistant'].include? current_role_name
     when 'edit', 'update', 'destroy'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       [
         'Super-Administrator',
         'Administrator',

@@ -2,6 +2,7 @@ class StudentTaskController < ApplicationController
   helper :submitted_content
 
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
 

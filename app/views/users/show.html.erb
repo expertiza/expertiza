@@ -16,7 +16,7 @@
   </tr>
 
 </table>
-
+<!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
 <% unless current_user_role? == "Student" %>
   <hr/>
   <p><%= link_to 'Edit', :action => 'edit', :id => @user %> |

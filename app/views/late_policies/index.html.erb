@@ -1,7 +1,7 @@
 <h1>Listing late policies</h1>
+<!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
 <% user_role = session[:user].role.name
 is_admin = (user_role == "Administrator" || user_role == "Super-Administrator")
-
 if session[:user].role.name == "Teaching Assistant"
   instructor_id = Ta.get_my_instructor(session[:user].id)
 else

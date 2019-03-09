@@ -16,6 +16,7 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -23,6 +24,7 @@ class SignUpSheetController < ApplicationController
        'Student'].include? current_role_name and
       ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Instructor',
        'Teaching Assistant',
        'Administrator',

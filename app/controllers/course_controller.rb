@@ -10,6 +10,7 @@ class CourseController < ApplicationController
   require 'fileutils'
 
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     current_role_name.eql?("Instructor")
   end
 

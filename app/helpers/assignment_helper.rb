@@ -1,5 +1,6 @@
 module AssignmentHelper
   def course_options(instructor)
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if session[:user].role.name == 'Teaching Assistant'
       courses = []
       ta = Ta.find(session[:user].id)
@@ -8,8 +9,10 @@ module AssignmentHelper
       courses << Course.where(instructor_id: instructor.id)
       courses.flatten!
     # Administrator and Super-Administrator can see all courses
+    # # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
       courses = Course.all
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     elsif session[:user].role.name == 'Instructor'
       courses = Course.where(instructor_id: instructor.id)
       # instructor can see courses his/her TAs created

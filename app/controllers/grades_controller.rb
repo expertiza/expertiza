@@ -10,6 +10,7 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -18,6 +19,7 @@ class GradesController < ApplicationController
       are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
       check_self_review_status
     when 'view_team'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       if ['Student'].include? current_role_name # students can only see the head map for their own team
         participant = AssignmentParticipant.find(params[:id])
         session[:user].id == participant.user_id
@@ -25,6 +27,7 @@ class GradesController < ApplicationController
         true
       end
     else
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Instructor',
        'Teaching Assistant',
        'Administrator',

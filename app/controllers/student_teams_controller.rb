@@ -17,6 +17,7 @@ class StudentTeamsController < ApplicationController
   before_action :student, only: %i[view update edit create remove_participant]
 
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     # note, this code replaces the following line that cannot be called before action allowed?
     if ['Instructor',
         'Teaching Assistant',

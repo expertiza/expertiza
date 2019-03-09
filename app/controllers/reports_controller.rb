@@ -6,6 +6,7 @@ class ReportsController < ApplicationController
 
   # reports are allowed to be viewed by  only by TA, instructor and administrator
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
   end
 

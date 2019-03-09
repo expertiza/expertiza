@@ -9,6 +9,7 @@ class UsersController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Super-Administrator',
        'Administrator'].include? current_role_name
     when 'request_new'
@@ -16,8 +17,10 @@ class UsersController < ApplicationController
     when 'create_requested_user_record'
       true
     when 'keys'
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       current_role_name.eql? 'Student'
     else
+      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       ['Super-Administrator',
        'Administrator',
        'Instructor',
@@ -26,6 +29,7 @@ class UsersController < ApplicationController
   end
 
   def index
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if current_user_role? == "Student"
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
@@ -84,6 +88,7 @@ class UsersController < ApplicationController
   end
 
   def show
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
@@ -249,6 +254,7 @@ class UsersController < ApplicationController
   end
 
   def keys
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else

@@ -7,6 +7,7 @@
     <%= render :partial => 'auth/login' %><br/>
     <% if session[:user].nil? %>
     <% else %>
+        <!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
       <% if session[:user].role_id == 4 || session[:user].role_id == 3 || session[:user].role_id == 2 %>
         <%= link_to "Search log", Version %></a>
       <% end %>

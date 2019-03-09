@@ -3,6 +3,7 @@ class JoinTeamRequestsController < ApplicationController
   before_action :find_request, only: %i[show edit update destroy decline]
 
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     current_role_name.eql?("Student")
   end
 

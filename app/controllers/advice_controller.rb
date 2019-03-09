@@ -1,5 +1,6 @@
 class AdviceController < ApplicationController
   def action_allowed?
+    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     ['Administrator',
      'Instructor',
      'Teaching Assistant'].include? current_user.role.name

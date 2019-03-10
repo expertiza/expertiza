@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ..
+cd ../..
 
 DIR=`pwd`
 
@@ -8,7 +8,7 @@ DIR=`pwd`
 bash setup.sh
 
 # Go back to docker folder
-cd $DIR/docker/scrubbed_db
+cd $DIR/devops/docker/scrubbed_db
 
 # Checking the scrubbed_db
 
@@ -29,7 +29,7 @@ tar -xzf expertiza_scrubbed_db.sql.tar.gz
 cd $DIR
 
 # Get the docker-compose file
-cp ./docker/docker-compose.yml.example docker-compose.yml
+cp ./devops/docker/docker-compose.yml.example docker-compose.yml
 
 # Get the MYSQL_ROOT_PASSWORD
 read -p "Please enter your MYSQL ROOT PASSWORD: " MYSQL_ROOT_PASSWORD

@@ -83,7 +83,7 @@ class UsersController < ApplicationController
     @user = User.find_by(name: params[:user][:name])
     #make sure that the requested user exists
     if !@user.nil?
-      get_role
+      role
       # if the role is higher in the hierarchy, permission is granted
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
@@ -108,7 +108,7 @@ class UsersController < ApplicationController
     else
       #find the users information from the model.
       @user = User.find(params[:id])
-      get_role
+      role
       # obtain number of assignments participated
       @assignment_participant_num = 0
       AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
@@ -232,7 +232,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    get_role
+    role
     foreign
   end
 
@@ -327,8 +327,10 @@ class UsersController < ApplicationController
           .merge(self_introduction: params[:requested_user][:self_introduction])
   end
 
-  #may have to be renamed to role or move this to the model.
-  def get_role
+  # It was not preferred to move this method to the model because this has some selection logic and that should not be placed in the model.
+  # this follows the style guideline that anything that does not alter the data structure should not be placed in the model.
+  # This method was previously named get_role but is now renamed to role.
+  def role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
     elsif @user

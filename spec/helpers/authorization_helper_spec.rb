@@ -12,20 +12,7 @@ describe AuthorizationHelper do
   let(:admin) { build(:admin) }
   let(:superadmin) { build(:superadmin) }
 
-  # Before EACH test
-  # Clear out any dummy users from the session
-  # Set up some roles
-  #   The helper we are testing depends on roles actually existing
-  #   These are not explicitly used in the test
-  #   But they must exist in memory for the helper to work correctly
-  before(:each) do
-    session[:user] = nil
-    create(:role_of_student)
-    create(:role_of_teaching_assistant)
-    create(:role_of_instructor)
-    create(:role_of_administrator)
-    create(:role_of_superadministrator)
-  end
+  # The global before(:each) in spec/spec_helper.rb establishes roles before each test runs
 
   # TESTS
 
@@ -36,27 +23,27 @@ describe AuthorizationHelper do
     end
 
     it 'returns false for a student' do
-      session[:user] = student
+      stub_current_user(student, student.role.name, student.role)
       expect(current_user_has_ta_privileges?).to be false
     end
 
     it 'returns true for a TA' do
-      session[:user] = teaching_assistant
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
       expect(current_user_has_ta_privileges?).to be true
     end
 
     it 'returns true for an instructor' do
-      session[:user] = instructor
+      stub_current_user(instructor, instructor.role.name, instructor.role)
       expect(current_user_has_ta_privileges?).to be true
     end
 
     it 'returns true for an admin' do
-      session[:user] = admin
+      stub_current_user(admin, admin.role.name, admin.role)
       expect(current_user_has_ta_privileges?).to be true
     end
 
     it 'returns true for a super admin' do
-      session[:user] = superadmin
+      stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       expect(current_user_has_ta_privileges?).to be true
     end
 

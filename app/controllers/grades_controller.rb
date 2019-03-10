@@ -6,6 +6,7 @@ class GradesController < ApplicationController
   include StudentTaskHelper
   include AssignmentHelper
   include GradesHelper
+  include AuthorizationHelper
 
   def action_allowed?
     case params[:action]
@@ -27,11 +28,7 @@ class GradesController < ApplicationController
         true
       end
     else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 

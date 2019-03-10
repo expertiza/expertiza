@@ -1,4 +1,6 @@
 class SuggestionController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     case params[:action]
     when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
@@ -12,11 +14,7 @@ class SuggestionController < ApplicationController
        'Super-Administrator',
        'Student'].include? current_role_name
     else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 

@@ -9,6 +9,8 @@
 # to
 
 class SignUpSheetController < ApplicationController
+  include AuthorizationHelper
+
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -24,11 +26,7 @@ class SignUpSheetController < ApplicationController
        'Student'].include? current_role_name and
       ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 

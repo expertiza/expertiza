@@ -98,6 +98,21 @@ RSpec.configure do |config|
     mocks.verify_doubled_constant_names = false
   end
 
+  # Before EACH test
+  # Clear out any dummy users from the session
+  # Set up some roles
+  #   The authorization helper depends on roles actually existing
+  #   These are not explicitly used in tests
+  #   But they must exist in memory for the authorization helper to work correctly
+  config.before(:each) do
+    session[:user] = nil
+    create(:role_of_student)
+    create(:role_of_teaching_assistant)
+    create(:role_of_instructor)
+    create(:role_of_administrator)
+    create(:role_of_superadministrator)
+  end
+
   Dir["./spec/features/helpers/*.rb"].each do |filename|
     require filename.gsub(/\.rb/, "")
   end

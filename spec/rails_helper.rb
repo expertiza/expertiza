@@ -70,6 +70,8 @@ RSpec.configure do |config|
     allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
+    # Also pop this stub user into the session to support the authorization helper
+    session[:user] = current_user
   end
 
   def http_status_factory(status_code)

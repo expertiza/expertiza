@@ -1,5 +1,13 @@
 # E1600
 # A new type called SelfReviewResponseMap was created for ResponseMap to handle self-reviews independent
+##############################################################################
+# E1920
+# Fix Code Climate issues
+#
+# Code Climate mistakenly reports
+# "Mass assignment is not restricted using attr_accessible"
+# https://github.com/presidentbeef/brakeman/issues/579
+#
 class SelfReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
@@ -19,6 +27,7 @@ class SelfReviewResponseMap < ResponseMap
   end
 
   # This method returns 'Title' of type of review (used to manipulate headings accordingly)
+  # Change from get_title to title per Code Climate
   def title
     "Self Review"
   end

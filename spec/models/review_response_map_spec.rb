@@ -35,8 +35,8 @@ describe ReviewResponseMap do
     expect(review_response_map.questionnaire(1)).to eq(questionnaire)
   end
 
-  it '#get_title' do
-    expect(review_response_map.get_title).to eq("Review")
+  it '#title' do
+    expect(review_response_map.title).to eq("Review")
   end
 
   it '#delete' do

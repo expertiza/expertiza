@@ -60,39 +60,39 @@ end
 
 describe '.confirm_topic' do
   it "create SignedUpTeam" do
-    allow(SignUpTopic).to receive(:slotAvailable?) { true }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
+    allow(SignUpTopic).to receive(:slot_available?) { true }
+    expect(SignUpSheet.confirm_topic(nil, nil, nil, nil)).to be(false)
   end
 
   it "sign_up.is_waitlisted is equal to true" do
-    allow(SignUpTopic).to receive(:slotAvailable?) { false }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
+    allow(SignUpTopic).to receive(:slot_available?) { false }
+    expect(SignUpSheet.confirm_topic(nil, nil, nil, nil)).to be(false)
   end
 
   it "returns false if user_signup_topic.is_waitlisted == false" do
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = false
-    allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(false)
+    allow(SignUpSheet).to receive(:other_confirmed_topic_for_user) { [user_signup] }
+    expect(SignUpSheet.confirm_topic(nil, nil, nil, nil)).to be(false)
   end
   it "sets sign_up.is_waitlisted = true if slotAvailable is false" do
-    allow(SignUpTopic).to receive(:slotAvailable?) { false }
+    allow(SignUpTopic).to receive(:slot_available?) { false }
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
-    allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be_nil
+    allow(SignUpSheet).to receive(:other_confirmed_topic_for_user) { [user_signup] }
+    expect(SignUpSheet.confirm_topic(nil, nil, nil, nil)).to be_nil
   end
 
-  it "returns true for SignUpSheet.confirmTopic " do
-    allow(SignUpTopic).to receive(:slotAvailable?) { true }
+  it "returns true for SignUpSheet.confirm_topic " do
+    allow(SignUpTopic).to receive(:slot_available?) { true }
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
     allow(SignUpSheet).to receive(:update_attribute) { [user_signup] }
     allow(SignedUpTeam).to receive(:where) { user_signup }
     allow(user_signup).to receive(:first) { user_signup }
     allow(user_signup).to receive(:update_attribute)
-    allow(SignUpSheet).to receive(:otherConfirmedTopicforUser) { [user_signup] }
-    expect(SignUpSheet.confirmTopic(nil, nil, nil, nil)).to be(true)
+    allow(SignUpSheet).to receive(:other_confirmed_topic_for_user) { [user_signup] }
+    expect(SignUpSheet.confirm_topic(nil, nil, nil, nil)).to be(true)
   end
 end
 

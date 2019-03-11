@@ -12,11 +12,7 @@ class GradesController < ApplicationController
     case params[:action]
     when 'view_my_scores'
       # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
+      current_user_has_student_privileges? and
       are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
       check_self_review_status
     when 'view_team'

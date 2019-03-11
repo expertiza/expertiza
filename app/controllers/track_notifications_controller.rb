@@ -1,12 +1,9 @@
 class TrackNotificationsController < ApplicationController
+  include AuthorizationHelper
+
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator',
-     'Super-Administrator',
-     'Student'].include? current_role_name
+    current_user_has_student_privileges?
   end
 
   # GET /track_notifications *** Only used to add an individual exemption to showing notifications

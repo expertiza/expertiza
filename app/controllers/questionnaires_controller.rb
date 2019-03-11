@@ -1,4 +1,6 @@
 class QuestionnairesController < ApplicationController
+  include AuthorizationHelper
+
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -17,11 +19,7 @@ class QuestionnairesController < ApplicationController
           ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
 
     else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant', 'Student'].include? current_role_name
+      current_user_has_student_privileges?
     end
   end
 

@@ -21,9 +21,14 @@ module AuthorizationHelper
   end
 
   # Determine if the currently logged-in user has the privileges of a Student (or higher)
+  def current_user_has_student_privileges?
+    current_user_has_privileges_of?('Student')
+  end
+
+  # Determine if the currently logged-in user has the privileges of a Student (or higher)
   # As student is the "lowest" role, any student (or higher) has at least some privileges
   def current_user_has_any_privileges?
-    current_user_has_privileges_of?('Student')
+    current_user_has_student_privileges?
   end
 
   # Determine if the currently logged-in user is participating in an Assignment based on the passed in AssignmentTeam ID.

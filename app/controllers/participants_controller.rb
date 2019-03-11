@@ -4,12 +4,7 @@ class ParticipantsController < ApplicationController
 
   def action_allowed?
     if %w[change_handle update_duties].include? params[:action]
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name
+      current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
     end

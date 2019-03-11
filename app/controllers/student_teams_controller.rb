@@ -1,4 +1,6 @@
 class StudentTeamsController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
 
   def team
@@ -19,11 +21,7 @@ class StudentTeamsController < ApplicationController
   def action_allowed?
     # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     # note, this code replaces the following line that cannot be called before action allowed?
-    if ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator',
-        'Student'].include? current_role_name and
+    if current_user_has_student_privileges? and
        ((%w[view].include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
       # make sure the student is the owner if they are trying to create it
       return current_user_id? student.user_id if %w[create].include? action_name

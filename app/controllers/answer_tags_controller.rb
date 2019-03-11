@@ -1,15 +1,13 @@
 class AnswerTagsController < ApplicationController
+  include AuthorizationHelper
+
   protect_from_forgery with: :null_session
   skip_before_action :verify_authenticity_token
 
   def action_allowed?
     case params[:action]
     when 'index', 'create_edit'
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Instructor',
-       'Teaching Assistant',
-       'Student',
-       'Administrator'].include? current_role_name
+      current_user_has_student_privileges?
     end
   end
 

@@ -1,20 +1,13 @@
 class LatePoliciesController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     case params[:action]
     when 'new', 'create', 'index'
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     when 'edit', 'update', 'destroy'
       # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      [
-        'Super-Administrator',
-        'Administrator',
-        'Instructor',
-        'Teaching Assistant'
-      ].include?(current_role_name) &&
+      current_user_has_ta_privileges? &&
       current_user.instructor_id == instructor_id
     end
   end

@@ -1,5 +1,6 @@
 class AssignmentsController < ApplicationController
   include AssignmentHelper
+  include AuthorizationHelper
   autocomplete :user, :name
   before_action :authorize
 
@@ -12,11 +13,7 @@ class AssignmentsController < ApplicationController
       TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
       (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
     else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 

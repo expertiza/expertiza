@@ -1,10 +1,8 @@
 class PopupController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # this can be called from "response_report" by clicking student names from instructor end.

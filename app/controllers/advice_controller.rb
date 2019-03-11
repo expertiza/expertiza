@@ -1,9 +1,8 @@
 class AdviceController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    ['Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_user.role.name
+    current_user_has_ta_privileges?
   end
 
   # Modify the advice associated with a questionnaire

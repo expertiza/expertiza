@@ -1,7 +1,16 @@
 class AdvertiseForPartnerController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    current_user.role.name.eql?("Student")
+
+    # Any user with a role should be able to advertise for a partner
+    # For the create, edit, update, and remove actions the current user should also be a participant in the assignment
+    if %w[create, edit, update, remove].include? params[:action]
+      current_user_is_assignment_participant?(params[:id]) && current_user_has_any_privileges?
+    else
+      current_user_has_any_privileges?
+    end
   end
 
   def new; end

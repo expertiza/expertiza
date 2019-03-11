@@ -1,12 +1,13 @@
 class AdminController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     case params[:action]
     when 'list_instructors'
       # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       current_user.role.name['Administrator']
     else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      current_user.role.name['Super-Administrator']
+      current_user_has_super_admin_privileges?
     end
   end
 

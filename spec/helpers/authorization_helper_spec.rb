@@ -1,7 +1,6 @@
 describe AuthorizationHelper do
 
   # E1915 TODO each and every method defined in app/helpers/authorization_helper.rb should be thoroughly tested here
-  # E1915 TODO look at spec/controllers/assignments_controller_spec.rb for how to stub_current_user
 
   # Set up some dummy users
   # Inspired by spec/controllers/users_controller_spec.rb
@@ -15,6 +14,39 @@ describe AuthorizationHelper do
   # The global before(:each) in spec/spec_helper.rb establishes roles before each test runs
 
   # TESTS
+
+  describe ".current_user_has_super_admin_privileges?" do
+
+    it 'returns false if there is no current user' do
+      expect(current_user_has_super_admin_privileges?).to be false
+    end
+
+    it 'returns false for a student' do
+      stub_current_user(student, student.role.name, student.role)
+      expect(current_user_has_super_admin_privileges?).to be false
+    end
+
+    it 'returns false for a TA' do
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+      expect(current_user_has_super_admin_privileges?).to be false
+    end
+
+    it 'returns false for an instructor' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_has_super_admin_privileges?).to be false
+    end
+
+    it 'returns false for an admin' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      expect(current_user_has_super_admin_privileges?).to be false
+    end
+
+    it 'returns true for a super admin' do
+      stub_current_user(superadmin, superadmin.role.name, superadmin.role)
+      expect(current_user_has_super_admin_privileges?).to be true
+    end
+
+  end
 
   describe ".current_user_has_ta_privileges?" do
 

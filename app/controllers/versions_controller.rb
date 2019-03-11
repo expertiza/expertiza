@@ -1,4 +1,6 @@
 class VersionsController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     ['Administrator',
@@ -30,8 +32,7 @@ class VersionsController < ApplicationController
   def paginate_list
     versions = Version.page(params[:page]).order('id').per_page(25)
     versions = versions.where(id: params[:id]) if params[:id].to_i > 0
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    if current_user_role? == 'Super-Administrator'
+    if current_user_has_super_admin_privileges?
       versions = versions.where(whodunnit: params[:post][:user_id]) if params[:post][:user_id].to_i > 0
     end
     versions = versions.where(whodunnit: current_user.try(:id)) if current_user.try(:id).to_i > 0

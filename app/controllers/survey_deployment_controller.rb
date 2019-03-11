@@ -1,10 +1,9 @@
 class SurveyDeploymentController < ApplicationController
   include SurveyDeploymentHelper
+  include AuthorizationHelper
+
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   def survey_deployment_types

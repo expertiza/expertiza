@@ -1,13 +1,12 @@
 class LotteryController < ApplicationController
+  include AuthorizationHelper
+
   require 'json'
   require 'rest_client'
 
   # Give permission to run the bid to appropriate roles
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.

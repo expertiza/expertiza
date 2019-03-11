@@ -15,6 +15,10 @@ module AuthorizationHelper
     current_user_has_privileges_of?('Super-Administrator')
   end
 
+  def current_user_has_admin_privileges?
+    current_user_has_privileges_of?('Administrator')
+  end
+
   # Determine if the currently logged-in user has the privileges of a TA (or higher)
   def current_user_has_ta_privileges?
     current_user_has_privileges_of?('Teaching Assistant')

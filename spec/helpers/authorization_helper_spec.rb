@@ -81,6 +81,39 @@ describe AuthorizationHelper do
 
   end
 
+  describe ".current_user_has_instructor_privileges?" do
+
+    it 'returns false if there is no current user' do
+      expect(current_user_has_instructor_privileges?).to be false
+    end
+
+    it 'returns false for a student' do
+      stub_current_user(student, student.role.name, student.role)
+      expect(current_user_has_instructor_privileges?).to be false
+    end
+
+    it 'returns false for a TA' do
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+      expect(current_user_has_instructor_privileges?).to be false
+    end
+
+    it 'returns true for an instructor' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_has_instructor_privileges?).to be true
+    end
+
+    it 'returns true for an admin' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      expect(current_user_has_instructor_privileges?).to be true
+    end
+
+    it 'returns true for a super admin' do
+      stub_current_user(superadmin, superadmin.role.name, superadmin.role)
+      expect(current_user_has_instructor_privileges?).to be true
+    end
+
+  end
+
   describe ".current_user_has_ta_privileges?" do
 
     it 'returns false if there is no current user' do

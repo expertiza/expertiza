@@ -1,9 +1,8 @@
 class InstitutionController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor'].include? current_role_name
+    current_user_has_instructor_privileges?
   end
 
   def index

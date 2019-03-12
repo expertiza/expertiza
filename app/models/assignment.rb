@@ -26,7 +26,7 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :questionnaires, through: :assignment_questionnaires
   has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy
-  has_many :response_maps, foreign_key: 'reviewed_object_id', inverse_of: 'reviewee', dependent: :destroy
+  has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
   has_many :assignment_badges, dependent: :destroy

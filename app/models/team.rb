@@ -5,8 +5,6 @@ class Team < ActiveRecord::Base
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
   has_many :signed_up_teams, dependent: :destroy
   has_many :bids, dependent: :destroy
-  # Set up inverse relation
-  has_many :response_maps, inverse_of: 'reviewee', dependent: :destroy
   has_paper_trail
 
   scope :find_team_for_assignment_and_user, lambda {|assignment_id, user_id|

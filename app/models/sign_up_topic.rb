@@ -114,6 +114,7 @@ class SignUpTopic < ActiveRecord::Base
   # Change dropDate to drop_date per Code Climate
   # Change where().first to find_by() per Code Climate
   # Add zone to Time
+  # Decrease if nesting
   def self.reassign_topic(session_user_id, assignment_id, topic_id)
     # find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
@@ -132,21 +133,21 @@ class SignUpTopic < ActiveRecord::Base
       signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id: users_team[0].t_id)
       assignment = Assignment.find(assignment_id)
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-      unless assignment.is_intelligent?
-        if signup_record.try(:is_waitlisted) == false
-          # find the first wait listed user if exists
-          first_waitlisted_user = SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted: true)
+      # Change if statements to decrease nesting
+      # unless assignment.is_intelligent?
+      if not assignment.is_intelligent? and not signup_record.try(:is_waitlisted)
+        # find the first wait listed user if exists
+        first_waitlisted_user = SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted: true)
 
-          unless first_waitlisted_user.nil?
-            # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
-            ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
-            first_waitlisted_user.is_waitlisted = false
-            first_waitlisted_user.save
+        unless first_waitlisted_user.nil?
+          # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
+          ### Bad policy!  Should be changed! (once users are allowed to specify waitlist priorities) -efg
+          first_waitlisted_user.is_waitlisted = false
+          first_waitlisted_user.save
 
-            # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-            # to treat all assignments as team assignments
-            Waitlist.cancel_all_waitlists(first_waitlisted_user.team_id, assignment_id)
-          end
+          # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
+          # to treat all assignments as team assignments
+          Waitlist.cancel_all_waitlists(first_waitlisted_user.team_id, assignment_id)
         end
       end
       signup_record.destroy unless signup_record.nil?

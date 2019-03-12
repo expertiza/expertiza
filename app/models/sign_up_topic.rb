@@ -25,8 +25,8 @@ class SignUpTopic < ActiveRecord::Base
   # Change where().first to find_by() per Code Climate
   def self.import(row_hash, session, _id = nil)
     if row_hash.length < 3
-      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, " <<
-                                                             "Topic Category (optional), Topic Description (Optional), " <<
+      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, " \
+                                                             "Topic Category (optional), Topic Description (Optional), " \
                                                              "Topic Link (optional)."
     end
     topic = SignUpTopic.find_by(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id])
@@ -69,23 +69,26 @@ class SignUpTopic < ActiveRecord::Base
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t" \
     # "JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
     SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t " \
-                                 "JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
+                                 "JOIN signed_up_teams u ON t.id = u.topic_id " \
+                                 "WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
   end
 
   # Use multi-line string per Code Climate
   def self.find_slots_waitlisted(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t" \
     # " JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
-    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t" \
-                                 " JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
+    SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t " \
+                                 "JOIN signed_up_teams u ON t.id = u.topic_id " \
+                                 "WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
   end
 
   # Use multi-line string per Code Climate
   def self.find_waitlisted_topics(assignment_id, team_id)
     # SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u" \
     # " WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
-    SignedUpTeam.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_teams u" \
-                                  " WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s])
+    SignedUpTeam.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_teams u " \
+                                  "WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? " \
+                                                          "and u.team_id = ?", assignment_id.to_s, team_id.to_s])
   end
 
   # Rename to slot_available? per Code Climate
@@ -95,16 +98,16 @@ class SignUpTopic < ActiveRecord::Base
     no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
 
     # if !no_of_students_who_selected_the_topic.nil?
-      # if topic.max_choosers > no_of_students_who_selected_the_topic.size
-      #   return true
-      # else
-      #   return false
-      # end
+    #   if topic.max_choosers > no_of_students_who_selected_the_topic.size
+    #     return true
+    #   else
+    #     return false
+    #   end
     # else
     #   return true
     # end
-    return true if no_of_students-who_selected_the_topic.nil?
-    return topic.max_choosers > no_of_students_who_selected_the_topic.size
+    return true if no_of_students_who_selected_the_topic.nil?
+    topic.max_choosers > no_of_students_who_selected_the_topic.size
   end
 
   # Change dropDate to drop_date per Code Climate
@@ -125,7 +128,7 @@ class SignUpTopic < ActiveRecord::Base
       # to treat all assignments as team assignments
       # users_team will contain the team id of the team to which the user belongs
       users_team = SignedUpTeam.find_team_users(assignment_id, session_user_id)
-      signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id:  users_team[0].t_id)
+      signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id: users_team[0].t_id)
       assignment = Assignment.find(assignment_id)
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       unless assignment.is_intelligent?

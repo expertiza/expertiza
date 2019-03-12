@@ -56,7 +56,7 @@ class SignUpSheet < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         # check whether user is clicking on a topic which is not going to place him in the waitlist
-        result = sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id)#, user_id)
+        result = sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id)
       end
     end
 
@@ -64,14 +64,15 @@ class SignUpSheet < ActiveRecord::Base
   end
 
   # Change method name to sign_up_waitlisted
-  def self.sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id)#, user_id)
+  # Remove user_id from method signature
+  def self.sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id)
     if !slot_available?(topic_id)
       sign_up.is_waitlisted = true
       result = true if sign_up.save
       ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}")
     else
       # if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-      result = cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)#, user_id)
+      result = cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)
     end
     result
   end
@@ -81,7 +82,8 @@ class SignUpSheet < ActiveRecord::Base
   # Change where().first to find_by() per Code Climate
   # Change result=true to true
   # Comment out team_id line
-  def self.cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)#, user_id)
+  # Change method signature, remove user_id
+  def self.cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)
     Waitlist.cancel_all_waitlists(team_id, assignment_id)
     sign_up.is_waitlisted = false
     sign_up.save
@@ -121,26 +123,27 @@ class SignUpSheet < ActiveRecord::Base
 
   # Assignment Branch Condition still exists
   # Change for loop per Code Climate
+  # Change local variabel to due_date
   def self.add_signup_topic(assignment_id)
     @review_rounds = Assignment.find(assignment_id).num_review_rounds
     @topics = SignUpTopic.where(assignment_id: assignment_id)
     @duedates = {}
     return @duedates if @topics.nil?
     @topics.each_with_index do |topic, i|
-      @duedates[i] = duedate = {}
-      duedate['id'] = topic.id
-      duedate['topic_identifier'] = topic.topic_identifier
-      duedate['topic_name'] = topic.topic_name
+      @duedates[i] = due_date = {}
+      due_date['id'] = topic.id
+      due_date['topic_identifier'] = topic.topic_identifier
+      due_date['topic_name'] = topic.topic_name
 
       # for round in 1..@review_rounds
       1.upto(@review_rounds) do |r|
-        process_review_round(assignment_id, duedate, r, topic)
+        process_review_round(assignment_id, due_date, r, topic)
       end
 
       deadline_type_subm = DeadlineType.find_by(name: 'metareview').id
-      duedate_subm = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_subm).first
-      subm_string = duedate_subm.nil? ? nil : DateTime.parse(duedate_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-      duedate['submission_' + (@review_rounds + 1).to_s] = subm_string
+      due_date_subm = TopicDueDate.find_by(parent_id: topic.id, deadline_type_id: deadline_type_subm)
+      subm_string = due_date_subm.nil? ? nil : DateTime.parse(due_date_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      due_date['submission_' + (@review_rounds + 1).to_s] = subm_string
     end
     @duedates
   end
@@ -172,8 +175,8 @@ class SignUpSheet < ActiveRecord::Base
         due_date_rev, due_date_subm = find_topic_due_dates(round, topic)
       end
 
-      _due_date['submission_' + round.to_s] = DateTime.parse(due_date_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-      _due_date['review_' + round.to_s] = DateTime.parse(due_date_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      due_date['submission_' + round.to_s] = DateTime.parse(due_date_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      due_date['review_' + round.to_s] = DateTime.parse(due_date_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
     end
 
     # Change name to find_topic_due_dates

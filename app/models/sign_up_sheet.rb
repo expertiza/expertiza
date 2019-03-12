@@ -9,7 +9,6 @@
 # Rubyify code
 
 class SignUpSheet < ActiveRecord::Base
-
   # Team lazy initialization method [zhewei, 06/27/2015]
   # Comment out teamuser line per Code climate
   def self.signup_team(assignment_id, user_id, topic_id = nil)
@@ -18,7 +17,7 @@ class SignUpSheet < ActiveRecord::Base
       # if team is not yet created, create new team.
       # create Team and TeamNode
       team = AssignmentTeam.create_team_and_node(assignment_id)
-      user = User.find(user_id)
+      # user = User.find(user_id)
       # create TeamsUser and TeamUserNode
       # teamuser = ApplicationController.helpers.create_team_users(user, team.id)
       # create SignedUpTeam
@@ -57,7 +56,7 @@ class SignUpSheet < ActiveRecord::Base
       # Using a DB transaction to ensure atomic inserts
       ActiveRecord::Base.transaction do
         # check whether user is clicking on a topic which is not going to place him in the waitlist
-        result = sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id, user_id)
+        result = sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id)#, user_id)
       end
     end
 
@@ -65,14 +64,14 @@ class SignUpSheet < ActiveRecord::Base
   end
 
   # Change method name to sign_up_waitlisted
-  def self.sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id, user_id)
+  def self.sign_up_waitlisted(assignment_id, sign_up, team_id, topic_id)#, user_id)
     if !slot_available?(topic_id)
       sign_up.is_waitlisted = true
       result = true if sign_up.save
       ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}")
     else
       # if slot exist, then confirm the topic for the user and delete all the waitlist for this user
-      result = cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id, user_id)
+      result = cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)#, user_id)
     end
     result
   end
@@ -82,7 +81,7 @@ class SignUpSheet < ActiveRecord::Base
   # Change where().first to find_by() per Code Climate
   # Change result=true to true
   # Comment out team_id line
-  def self.cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id, user_id)
+  def self.cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)#, user_id)
     Waitlist.cancel_all_waitlists(team_id, assignment_id)
     sign_up.is_waitlisted = false
     sign_up.save

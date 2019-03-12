@@ -84,6 +84,7 @@ class SignUpSheet < ActiveRecord::Base
   # Change result=true to true
   # Comment out team_id line
   # Change method signature, remove user_id
+  # Change to update_attributes per Code Climate
   def self.cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)
     Waitlist.cancel_all_waitlists(team_id, assignment_id)
     sign_up.is_waitlisted = false
@@ -91,7 +92,7 @@ class SignUpSheet < ActiveRecord::Base
     # Update topic_id in signed_up_teams table with the topic_id
     # team_id = SignedUpTeam.find_team_users(assignment_id, user_id)
     signed_up_team = SignedUpTeam.find_by(topic_id: topic_id)
-    signed_up_team.update_attribute('topic_id', topic_id)
+    signed_up_team.update_attributes('topic_id', topic_id)
     true
   end
 
@@ -119,12 +120,13 @@ class SignUpSheet < ActiveRecord::Base
   # When using this method when creating fields, update race conditions by using db transactions
   # Change name to slot_available? per Code Climate
   def self.slot_available?(topic_id)
-    SignUpTopic.slot_available?(topic_id)
+    SignUpTopic.slotAvailable?(topic_id)
   end
 
   # Assignment Branch Condition still exists
   # Change for loop per Code Climate
   # Change local variabel to due_date
+  # Change DateTime.parse to Time.zone.parse
   def self.add_signup_topic(assignment_id)
     @review_rounds = Assignment.find(assignment_id).num_review_rounds
     @topics = SignUpTopic.where(assignment_id: assignment_id)
@@ -143,7 +145,7 @@ class SignUpSheet < ActiveRecord::Base
 
       deadline_type_subm = DeadlineType.find_by(name: 'metareview').id
       due_date_subm = TopicDueDate.find_by(parent_id: topic.id, deadline_type_id: deadline_type_subm)
-      subm_string = due_date_subm.nil? ? nil : DateTime.parse(due_date_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      subm_string = due_date_subm.nil? ? nil : Time.zone.parse(due_date_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
       due_date['submission_' + (@review_rounds + 1).to_s] = subm_string
     end
     @duedates
@@ -164,6 +166,7 @@ class SignUpSheet < ActiveRecord::Base
     # Assignment Branch Condition still exists
     # Change duedate* to due_date*
     # Change loop variable to d
+    # Change DateTime.parse to Time.zone.parse
     def process_review_round(assignment_id, due_date, round, topic)
       due_date_rev, due_date_subm = find_topic_due_dates(round, topic)
 
@@ -176,12 +179,13 @@ class SignUpSheet < ActiveRecord::Base
         due_date_rev, due_date_subm = find_topic_due_dates(round, topic)
       end
 
-      due_date['submission_' + round.to_s] = DateTime.parse(due_date_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
-      due_date['review_' + round.to_s] = DateTime.parse(due_date_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      due_date['submission_' + round.to_s] = Time.zone.parse(due_date_subm['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
+      due_date['review_' + round.to_s] = Time.zone.parse(due_date_rev['due_at'].to_s).strftime("%Y-%m-%d %H:%M:%S")
     end
 
     # Change name to find_topic_due_dates
     # Change variables to due_date*
+    # Change where().first to find_by()
     def find_topic_due_dates(round, topic)
       deadline_type_subm = DeadlineType.find_by(name: 'submission').id
       due_date_subm = TopicDueDate.find_by(parent_id: topic.id, deadline_type_id: deadline_type_subm, round: round)

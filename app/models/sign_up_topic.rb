@@ -135,7 +135,7 @@ class SignUpTopic < ActiveRecord::Base
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       # Change if statements to decrease nesting
       # unless assignment.is_intelligent?
-      if not assignment.is_intelligent? and not signup_record.try(:is_waitlisted)
+      if !assignment.is_intelligent? and !signup_record.try(:is_waitlisted)
         # find the first wait listed user if exists
         first_waitlisted_user = SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted: true)
 

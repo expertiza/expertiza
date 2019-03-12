@@ -3,11 +3,12 @@
 # "Mass assignment is not restricted using attr_accessible"
 # https://github.com/presidentbeef/brakeman/issues/579
 #
+# Add inverse_of relationships per Code Climate
 class SignUpTopic < ActiveRecord::Base
-  has_many :signed_up_teams, foreign_key: 'topic_id', dependent: :destroy
+  has_many :signed_up_teams, inverse_of: :sign_up_topics, foreign_key: 'topic_id', dependent: :destroy
   has_many :teams, through: :signed_up_teams # list all teams choose this topic, no matter in waitlist or not
-  has_many :due_dates, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
-  has_many :bids, foreign_key: 'topic_id', dependent: :destroy
+  has_many :due_dates, inverse_of: :sign_up_topics, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
+  has_many :bids, inverse_of: :sign_up_topics, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
   has_paper_trail

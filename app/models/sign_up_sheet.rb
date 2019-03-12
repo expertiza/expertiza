@@ -49,7 +49,8 @@ class SignUpSheet < ActiveRecord::Base
       end
     else
       # If all the topics choosen by the user are waitlisted,
-      for user_signup_topic in user_signup
+      # Chnage loop per Code Climate
+      user_signup.each do |user_signup_topic|
         return false if user_signup_topic.is_waitlisted == false
       end
 

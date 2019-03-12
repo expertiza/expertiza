@@ -9,8 +9,8 @@
 # https://github.com/presidentbeef/brakeman/issues/579
 #
 class SelfReviewResponseMap < ResponseMap
-  belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
-  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  belongs_to :reviewee, inverse_of: :response_maps, class_name: 'Team', foreign_key: 'reviewee_id'
+  belongs_to :assignment, inverse_of: :response_maps, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   # This method is used to get questionnaire for self-review to be performed by user
   def questionnaire(round)

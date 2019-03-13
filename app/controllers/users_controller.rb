@@ -24,8 +24,7 @@ class UsersController < ApplicationController
   end
 
   def index
-    # E1915 TODO: instead, use current_user_has_student_privileges? (after addressing RSpec test issue)
-    if current_user_role? == "Student"
+    if current_user_is_a? 'Student'
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       list
@@ -83,8 +82,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
+    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_id_as_string.eql? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
@@ -249,8 +247,7 @@ class UsersController < ApplicationController
   end
 
   def keys
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
+    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_id_as_string.eql? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])

@@ -46,6 +46,19 @@ module AuthorizationHelper
     participant ? true : false
   end
 
+  # Determine if the currently logged-in user IS of the given role name
+  # If there is no currently logged-in user simply return false
+  # TODO (Ginger): need to write tests
+  def current_user_is_a?(role_name)
+    session[:user] && session[:user].role ? session[:user].role.name == role_name : false
+  end
+
+  # Get the current user's ID
+  # TODO (Ginger): need to write tests
+  def current_user_id_as_string
+    session[:user].id.to_s
+  end
+
   # PRIVATE METHODS
   private
 
@@ -54,12 +67,6 @@ module AuthorizationHelper
   # If there is no currently logged-in user simply return false
   def current_user_has_privileges_of?(role_name)
     session[:user] && session[:user].role ? session[:user].role.hasAllPrivilegesOf(Role.find_by(name: role_name)) : false
-  end
-
-  # Determine if the currently logged-in user IS of the given role name
-  # If there is no currently logged-in user simply return false
-  def current_user_is_a?(role_name)
-    session[:user] && session[:user].role ? session[:user].role.name == role_name : false
   end
 
 end

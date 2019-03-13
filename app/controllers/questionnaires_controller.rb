@@ -576,7 +576,6 @@ class QuestionnairesController < ApplicationController
 
   def assign_instructor_id
     # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if session[:user].role.name != "Teaching Assistant"
       session[:user].id
     else # for TA we need to get his instructor id and by default add it to his course for which he is the TA

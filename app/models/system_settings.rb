@@ -1,14 +1,24 @@
+# E1920
+# Code Climate mistakenly reports
+# "Mass assignment is not restricted using attr_accessible"
+# https://github.com/presidentbeef/brakeman/issues/579
+#
 class SystemSettings < ActiveRecord::Base
   self.table_name = 'system_settings'
 
-  attr_accessor :public_role, :default_markup_style
-  attr_accessor :site_default_page, :not_found_page, :permission_denied_page,
-                :session_expired_page
+  # Change to attr_writer per Code Climate
+  # attr_accessor :public_role, :default_markup_style
+  # attr_accessor :site_default_page, :not_found_page, :permission_denied_page,
+  #               :session_expired_page
+  attr_writer :public_role, :default_markup_style
+  attr_writer :site_default_page, :not_found_page, :permission_denied_page,
+              :session_expired_page
 
   def public_role
     @public_role ||= Role.find(self.public_role_id)
   end
 
+  # Rubify code
   def default_markup_style
     @default_markup_style ||= if self.default_markup_style_id
                                 MarkupStyle.find(self.default_markup_style_id)
@@ -16,7 +26,6 @@ class SystemSettings < ActiveRecord::Base
                                 MarkupStyle.new(id: nil,
                                                 name: '(None)')
                               end
-    @default_markup_style
   end
 
   def site_default_page
@@ -37,18 +46,17 @@ class SystemSettings < ActiveRecord::Base
 
   # Returns an array of system page settings for a given page,
   # or nil if the page is not a system page.
+  # Rubify return statements
+  # Rubify strings using single quotes
   def system_pages(pageid)
     pages = []
 
-    pages << "Site default page" if self.site_default_page_id == pageid
-    pages << "Not found page" if self.not_found_page_id == pageid
-    pages << "Permission denied page" if self.permission_denied_page_id == pageid
-    pages << "Session expired page" if self.session_expired_page_id == pageid
+    pages << 'Site default page' if self.site_default_page_id == pageid
+    pages << 'Not found page' if self.not_found_page_id == pageid
+    pages << 'Permission denied page' if self.permission_denied_page_id == pageid
+    pages << 'Session expired page' if self.session_expired_page_id == pageid
 
-    if !pages.empty?
-      return pages
-    else
-      return nil
-    end
+    return nil if pages.empty?
+    pages
   end
 end

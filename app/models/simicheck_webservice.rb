@@ -1,6 +1,6 @@
 class SimiCheckWebService
-  @@api_key = PLAGIARISM_CHECKER_CONFIG['simicheck_api_key']
-  @@base_uri = 'https://www.simicheck.com/api'
+  @api_key = PLAGIARISM_CHECKER_CONFIG['simicheck_api_key']
+  @base_uri = 'https://www.simicheck.com/api'
   ############################################
   # Comparison Operations
   ############################################
@@ -10,11 +10,7 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response
   def self.all_comparisons
-    full_url = @@base_uri + '/comparisons'
-    RestClient::Request.execute(method: :get,
-                                url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
-                                verify_ssl: false)
+    request_execute(:get, '/comparisons', make_short_header)
   end
 
   # Creates a new comparison
@@ -24,18 +20,8 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response
   def self.new_comparison(comparison_name = '')
-    full_url = @@base_uri + '/comparison'
     json_body = {comparison_name: comparison_name}.to_json
-    RestClient::Request.execute(method: :put,
-                                url: full_url,
-                                payload: json_body,
-                                headers:
-                                    {
-                                      simicheck_api_key: @@api_key,
-                                      content_type: :json,
-                                      accept: :json
-                                    },
-                                verify_ssl: false)
+    request_execute_payload(:put, '/comparison', json_body, make_header)
   end
 
   # Deletes a comparison
@@ -44,11 +30,8 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response (NO BODY)
   def self.delete_comparison(comparison_id)
-    full_url = @@base_uri + '/comparison/' + comparison_id
-    RestClient::Request.execute(method: :delete,
-                                url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
-                                verify_ssl: false)
+    # full_url = @base_uri + '/comparison/' + comparison_id
+    request_execute(:delete, '/comparison/' + comparison_id, make_short_header)
   end
 
   # Gets the details about a comparison
@@ -57,11 +40,7 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response
   def self.get_comparison_details(comparison_id)
-    full_url = @@base_uri + '/comparison/' + comparison_id
-    RestClient::Request.execute(method: :get,
-                                url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
-                                verify_ssl: false)
+    request_execute(:get, '/comparison/' + comparison_id, make_short_header)
   end
 
   # Updates a comparison (currently only the name)
@@ -71,18 +50,8 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response (NO BODY)
   def self.update_comparison(comparison_id, new_comparison_name)
-    full_url = @@base_uri + '/comparison/' + comparison_id
     json_body = {comparison_name: new_comparison_name}.to_json
-    RestClient::Request.execute(method: :post,
-                                url: full_url,
-                                payload: json_body,
-                                headers:
-                                    {
-                                      simicheck_api_key: @@api_key,
-                                      content_type: :json,
-                                      accept: :json
-                                    },
-                                verify_ssl: false)
+    request_execute_payload(:post, '/comparison/' + comparison_id, json_body, make_header)
   end
 
   ############################################
@@ -96,19 +65,9 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response
   def self.upload_file(comparison_id, path_to_file)
-    full_url = @@base_uri + '/upload_file/' + comparison_id
     file_to_upload = File.new(path_to_file, 'rb')
     json_body = {"file" => file_to_upload} # don't use .to_json!
-    RestClient::Request.execute(method: :put,
-                                url: full_url,
-                                payload: json_body,
-                                headers:
-                                    {
-                                      simicheck_api_key: @@api_key,
-                                      content_type: 'multipart/form-data',
-                                      accept: :json
-                                    },
-                                verify_ssl: false)
+    request_execute_payload(:put, '/upload_file/' + comparison_id, json_body, make_header('multipart/form-data'))
   end
 
   # Deletes files from a comparison
@@ -118,18 +77,8 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response (NO BODY)
   def self.delete_files(comparison_id, filenames_to_delete)
-    full_url = @@base_uri + '/delete_files/' + comparison_id
     json_body = {"filenames" => filenames_to_delete}.to_json
-    RestClient::Request.execute(method: :post,
-                                url: full_url,
-                                payload: json_body,
-                                headers:
-                                    {
-                                      simicheck_api_key: @@api_key,
-                                      content_type: :json,
-                                      accept: :json
-                                    },
-                                verify_ssl: false)
+    request_execute_payload(:post, '/delete_files/' + comparison_id, json_body, make_header)
   end
 
   ############################################
@@ -142,11 +91,7 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response
   def self.get_similarity_nxn(comparison_id)
-    full_url = @@base_uri + '/similarity_nxn/' + comparison_id
-    RestClient::Request.execute(method: :get,
-                                url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
-                                verify_ssl: false)
+    request_execute(:get, '/similarity_nxn/' + comparison_id, make_short_header)
   end
 
   # Starts the computation of file similarity for a comparison
@@ -155,64 +100,35 @@ class SimiCheckWebService
   # Returns:
   #   response = RestClient::Response
   def self.post_similarity_nxn(comparison_id, callback_url = '')
-    full_url = @@base_uri + '/similarity_nxn/' + comparison_id
     json_body = callback_url.empty? ? {}.to_json : {"callback_url" => callback_url}.to_json
-    RestClient::Request.execute(method: :post,
-                                url: full_url,
-                                payload: json_body,
-                                headers:
-                                    {
-                                      simicheck_api_key: @@api_key,
-                                      content_type: :json,
-                                      accept: :json
-                                    },
-                                verify_ssl: false)
+    request_execute_payload(:post, '/similarity_nxn/' + comparison_id, json_body, make_header)
   end
 
   # # Checks where a NxN comparison has terminated - NOT WORKING?
   # def self.get_similarity_status(comparison_id)
-  #   full_url = @@base_uri + '/similarity_status/' + comparison_id
+  #   full_url = @base_uri + '/similarity_status/' + comparison_id
   #   puts full_url
   #   RestClient::Request.execute(method: :get,
   #                                          url: full_url,
   #                                          headers:
   #                                              {
-  #                                                  simicheck_api_key: @@api_key,
+  #                                                  simicheck_api_key: @api_key,
   #                                                  accept: :json
   #                                              },
   #                                          verify_ssl: false)
   # end
 
   # Gets the latest results for the similarity of one file wrt. all other files in a comparison
+  # DRY headers
   def self.get_similarity_1xn(comparison_id, filename)
-    full_url = @@base_uri + '/similarity_1xn/' + comparison_id
     json_body = {"filename" => filename}.to_json
-    RestClient::Request.execute(method: :get,
-                                url: full_url,
-                                payload: json_body,
-                                headers:
-                                    {
-                                      simicheck_api_key: @@api_key,
-                                      content_type: :json,
-                                      accept: :json
-                                    },
-                                verify_ssl: false)
+    request_execute_payload(:get, '/similarity_1xn/' + comparison_id, json_body, make_header)
   end
 
   # Finds the files in a comparison that are most similar to a given file
   def self.post_similarity_1xn(comparison_id, filename, callback_url = '')
-    full_url = @@base_uri + '/similarity_1xn/' + comparison_id
     json_body = callback_url.empty? ? {"filename" => filename}.to_json : {"filename" => filename, "callback_url" => callback_url}.to_json
-    RestClient::Request.execute(method: :post,
-                                url: full_url,
-                                payload: json_body,
-                                headers:
-                                    {
-                                      simicheck_api_key: @@api_key,
-                                      content_type: :json,
-                                      accept: :json
-                                    },
-                                verify_ssl: false)
+    request_execute_payload(:post, '/similarity_1xn/' + comparison_id, json_body, make_header)
   end
 
   ############################################
@@ -221,19 +137,40 @@ class SimiCheckWebService
 
   # Gets the results of the similarity comparison
   def self.visualize_similarity(comparison_id)
-    full_url = @@base_uri + '/visualize_similarity/' + comparison_id
-    RestClient::Request.execute(method: :get,
-                                url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
-                                verify_ssl: false)
+    request_execute(:get, '/visualize_similarity/' + comparison_id, make_short_header)
   end
 
   # Gets the results of similarity comparison
   def self.visualize_comparison(comparison_id, file_id1, file_id2)
-    full_url = @@base_uri + '/visualize_comparison/' + comparison_id + '/' + file_id1 + '/' + file_id2
-    RestClient::Request.execute(method: :get,
-                                url: full_url,
-                                headers: {simicheck_api_key: @@api_key},
+    request_execute(:get, '/visualize_comparison/' + comparison_id + '/' + file_id1 + '/' + file_id2, make_short_header)
+  end
+
+  private def full_url(dir)
+    @base_uri + dir
+  end
+
+  private def make_short_header
+    {simicheck_api_key: @api_key}
+  end
+
+  private def make_header(content_type = :json)
+    make_short_header[content_type: content_type, accept: :json]
+  end
+
+  # Call without payload
+  private def request_execute(method_sym, url, header_func)
+    RestClient::Request.execute(method: method_sym,
+                                url: full_url(url),
+                                headers: header_func,
+                                verify_ssl: false)
+  end
+
+  # Call with payload
+  private def request_execute_payload(method_sym, url, json_body, header_func)
+    RestClient::Request.execute(method: method_sym,
+                                url: full_url(url),
+                                payload: json_body,
+                                headers: header_func,
                                 verify_ssl: false)
   end
 end

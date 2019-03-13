@@ -5,11 +5,13 @@ describe AuthorizationHelper do
   # Set up some dummy users
   # Inspired by spec/controllers/users_controller_spec.rb
   # Makes use of spec/factories/factories.rb
-  let(:student) { build(:student) }
-  let(:teaching_assistant) { build(:teaching_assistant) }
-  let(:instructor) { build(:instructor) }
-  let(:admin) { build(:admin) }
-  let(:superadmin) { build(:superadmin) }
+  # Use create instead of build so that these users get IDs
+  # https://stackoverflow.com/questions/41149787/how-do-i-create-an-user-id-for-a-factorygirl-build
+  let(:student) { create(:student) }
+  let(:teaching_assistant) { create(:teaching_assistant) }
+  let(:instructor) { create(:instructor) }
+  let(:admin) { create(:admin) }
+  let(:superadmin) { create(:superadmin) }
   let(:assignment_team) {create(:assignment_team)}
 
   # The global before(:each) in spec/spec_helper.rb establishes roles before each test runs
@@ -183,6 +185,8 @@ describe AuthorizationHelper do
 
   end
 
+  # OTHER HELPER METHODS
+
   describe ".current_user_is_assignment_participant?" do
     # Makes use of existing :assignment_team and :participant factories
     # Both factories point to Assignment.first
@@ -231,6 +235,32 @@ describe AuthorizationHelper do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       create(:participant, user: session[:user])
       expect(current_user_is_assignment_participant?(assignment_team.id)).to be true
+    end
+
+  end
+
+  describe ".current_user_created_bookmark_id?" do
+
+    it 'returns false if there is no current user' do
+      create(:bookmark, user: student)
+      expect(current_user_created_bookmark_id?(Bookmark.first.id)).to be false
+    end
+
+    it 'returns false if there is no bookmark' do
+      stub_current_user(student, student.role.name, student.role)
+      expect(current_user_created_bookmark_id?(12345678)).to be false
+    end
+
+    it 'returns false if the current user did not create the bookmark' do
+      stub_current_user(student, student.role.name, student.role)
+      create(:bookmark, user: teaching_assistant)
+      expect(current_user_created_bookmark_id?(Bookmark.first.id)).to be false
+    end
+
+    it 'returns true if the current user did create the bookmark' do
+      stub_current_user(student, student.role.name, student.role)
+      create(:bookmark, user: student)
+      expect(current_user_created_bookmark_id?(Bookmark.first.id)).to be true
     end
 
   end

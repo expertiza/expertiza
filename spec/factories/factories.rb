@@ -146,7 +146,10 @@ FactoryBot.define do
 
   factory :course, class: Course do
     sequence(:name) {|n| "CSC517, test#{n}" }
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
+    # Get first instructor or create one
+    # Do not look at role_id of instructor
+    # because it is fragile to assume that role_id of instructor is 1 (or any other unchanging value)
+    instructor { Instructor.first || association(:instructor) }
     directory_path 'csc517/test'
     info 'Object-Oriented Languages and Systems'
     private true
@@ -220,6 +223,7 @@ FactoryBot.define do
 
   factory :team_user, class: TeamsUser do
     team { AssignmentTeam.first || association(:assignment_team) }
+    # Beware: it is fragile to assume that role_id of student is 2 (or any other unchanging value)
     user { User.where(role_id: 2).first || association(:student) }
   end
 
@@ -344,6 +348,7 @@ FactoryBot.define do
 
   factory :questionnaire, class: ReviewQuestionnaire do
     name 'Test questionnaire'
+    # Beware: it is fragile to assume that role_id of instructor is 1 (or any other unchanging value)
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
@@ -453,4 +458,12 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
+
+  factory :bookmark do
+    id 1
+    url "www.fake.com"
+    title "fake bookmark title"
+    description "fake bookmark description"
+  end
+
 end

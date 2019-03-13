@@ -4,7 +4,7 @@ class StudentQuizzesController < ApplicationController
   def action_allowed?
     # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     current_user_has_ta_privileges? or
-    (current_role_name.eql?("Student") and
+    (current_user_is_student? and
       ((%w[index].include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
   end
 

@@ -1,7 +1,8 @@
 class PublishingController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    current_role_name.eql?("Student")
+    current_user_is_student?
   end
 
   def view

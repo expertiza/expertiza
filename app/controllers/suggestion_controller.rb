@@ -4,8 +4,7 @@ class SuggestionController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      current_role_name.eql? 'Student'
+      current_user_is_student?
     when 'submit'
       current_user_has_student_privileges?
     else
@@ -22,7 +21,7 @@ class SuggestionController < ApplicationController
     else
       flash[:error] = "There was an error in adding your comment."
     end
-    if current_role_name.eql? 'Student'
+    if current_user_is_student?
       redirect_to action: "student_view", id: params[:id]
     else
       redirect_to action: "show", id: params[:id]

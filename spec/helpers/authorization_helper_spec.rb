@@ -15,6 +15,8 @@ describe AuthorizationHelper do
 
   # TESTS
 
+  # HAS PRIVILEGES (Super Admin --> Admin --> Instructor --> TA --> Student)
+
   describe ".current_user_has_super_admin_privileges?" do
 
     it 'returns false if there is no current user' do
@@ -176,6 +178,41 @@ describe AuthorizationHelper do
     it 'returns true for a super admin' do
       stub_current_user(superadmin, superadmin.role.name, superadmin.role)
       expect(current_user_has_student_privileges?).to be true
+    end
+
+  end
+
+  # IS A (Super Admin --> Admin --> Instructor --> TA --> Student)
+
+  describe ".current_user_is_student?" do
+
+    it 'returns false if there is no current user' do
+      expect(current_user_is_student?).to be false
+    end
+
+    it 'returns true for a student' do
+      stub_current_user(student, student.role.name, student.role)
+      expect(current_user_is_student?).to be true
+    end
+
+    it 'returns false for a TA' do
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+      expect(current_user_is_student?).to be false
+    end
+
+    it 'returns false for an instructor' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_is_student?).to be false
+    end
+
+    it 'returns false for an admin' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      expect(current_user_is_student?).to be false
+    end
+
+    it 'returns false for a super admin' do
+      stub_current_user(superadmin, superadmin.role.name, superadmin.role)
+      expect(current_user_is_student?).to be false
     end
 
   end

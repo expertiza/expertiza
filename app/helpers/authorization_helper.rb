@@ -41,6 +41,13 @@ module AuthorizationHelper
     current_user_has_student_privileges?
   end
 
+  # Determine if the currently logged-in user IS a Student
+  # There are some cases where a student role specifically is needed,
+  # And a user with a role "above" a student isn't allowed to perform the given function
+  def current_user_is_student?
+    current_user_is_a?('Student')
+  end
+
   # Determine if the currently logged-in user is participating in an Assignment based on the passed in AssignmentTeam ID.
   # Although it would be better to take the Assignment ID as a parameter, the controller that this function gets used
   # in does not get passed an Assignment ID, only an AssignmentTeam ID
@@ -58,6 +65,12 @@ module AuthorizationHelper
   # If there is no currently logged-in user simply return false
   def current_user_has_privileges_of?(role_name)
     session[:user] ? session[:user].role.hasAllPrivilegesOf(Role.find_by(name: role_name)) : false
+  end
+
+  # Determine if the currently logged-in user IS of the given role name
+  # If there is no currently logged-in user simply return false
+  def current_user_is_a?(role_name)
+    session[:user] ? session[:user].role.name == role_name : false
   end
 
 end

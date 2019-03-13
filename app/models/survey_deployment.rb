@@ -12,7 +12,7 @@ class SurveyDeployment < ActiveRecord::Base
       errors[:base] << "The End Date should be after the Start Date."
       return false
     end
-    if !end_date.nil? && end_date < Time.now
+    if !end_date.nil? && end_date < Time.zone.now
       errors[:base] << "The End Date should be in the future."
       return false
     end

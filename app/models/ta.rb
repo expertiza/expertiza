@@ -1,3 +1,10 @@
+# E1920
+# Code Climate mistakenly reports
+# "Mass assignment is not restricted using attr_accessible"
+# https://github.com/presidentbeef/brakeman/issues/579
+#
+# Changes to this model are tested in models/user_spec.rb
+
 class Ta < User
   has_many :ta_mappings, dependent: :destroy
 
@@ -36,8 +43,9 @@ class Ta < User
     end
   end
 
+  # Change where().first to find_by() per Code Climate
   def get(object_type, id, user_id)
-    object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]).first
+    object_type.find_by(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id])
   end
 
   # This method is potentially problematic: it assumes one TA only help teach one course.
@@ -80,7 +88,8 @@ class Ta < User
     ids
   end
 
-  def get_instructor
+  # Change name to instructor per Code Climate
+  def instructor
     Ta.get_my_instructor(self.id)
   end
 

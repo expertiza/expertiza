@@ -2,7 +2,7 @@ class PublishingController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
-    current_user_is_student?
+    current_user_has_student_privileges?
   end
 
   def view

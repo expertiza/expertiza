@@ -12,7 +12,7 @@ class CourseController < ApplicationController
   require 'fileutils'
 
   def action_allowed?
-    current_user_is_instructor?
+    current_user_has_instructor_privileges?
   end
 
   def auto_complete_for_user_name

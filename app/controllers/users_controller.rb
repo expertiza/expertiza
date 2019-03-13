@@ -17,7 +17,7 @@ class UsersController < ApplicationController
     when 'create_requested_user_record'
       true
     when 'keys'
-      # E1915 TODO: instead, use current_user_is_student? (after addressing RSpec test issue)
+      # E1915 TODO: instead, use current_user_has_student_privileges? (after addressing RSpec test issue)
       current_role_name.eql? 'Student'
     else
       # E1915 TODO: instead, use current_user_has_ta_privileges? (after addressing RSpec test issue)
@@ -29,7 +29,7 @@ class UsersController < ApplicationController
   end
 
   def index
-    # E1915 TODO: instead, use current_user_is_student? (after addressing RSpec test issue)
+    # E1915 TODO: instead, use current_user_has_student_privileges? (after addressing RSpec test issue)
     if current_user_role? == "Student"
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else

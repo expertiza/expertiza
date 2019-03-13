@@ -5,7 +5,7 @@ class JoinTeamRequestsController < ApplicationController
   before_action :find_request, only: %i[show edit update destroy decline]
 
   def action_allowed?
-    current_user_is_student?
+    current_user_has_student_privileges?
   end
 
   def index

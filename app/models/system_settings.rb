@@ -26,7 +26,6 @@ class SystemSettings < ActiveRecord::Base
                                 MarkupStyle.new(id: nil,
                                                 name: '(None)')
                               end
-    #@default_markup_style
   end
 
   def site_default_page

@@ -24,7 +24,7 @@ class SimiCheckWebService
   #   response = RestClient::Response
   # DRY headers
   def self.new_comparison(comparison_name = '')
-#    full_url = @base_uri + '/comparison'
+    # full_url = @base_uri + '/comparison'
     json_body = {comparison_name: comparison_name}.to_json
     RestClient::Request.execute(method: :put,
                                 url: full_url('/comparison'),
@@ -41,9 +41,9 @@ class SimiCheckWebService
     {simicheck_api_key: @api_key}
   end
 
-  private def make_header(content_type='')
-#    ret = make_short_header
-    if (content_type.nil?)
+  private def make_header(content_type = nil)
+    # ret = make_short_header
+    if content_type.nil?
       make_short_header[content_type: :json]
     else
       ret = make_short_header[content_type: content_type]

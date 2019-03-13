@@ -1,6 +1,8 @@
 require 'will_paginate/array'
 
 class UsersController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
@@ -9,22 +11,15 @@ class UsersController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
-      # E1915 TODO: instead, use current_user_has_admin_privileges? (after addressing RSpec test issue)
-      ['Super-Administrator',
-       'Administrator'].include? current_role_name
+      current_user_has_admin_privileges?
     when 'request_new'
       true
     when 'create_requested_user_record'
       true
     when 'keys'
-      # E1915 TODO: instead, use current_user_has_student_privileges? (after addressing RSpec test issue)
-      current_role_name.eql? 'Student'
+      current_user_has_student_privileges?
     else
-      # E1915 TODO: instead, use current_user_has_ta_privileges? (after addressing RSpec test issue)
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 

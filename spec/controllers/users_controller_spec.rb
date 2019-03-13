@@ -119,7 +119,6 @@ describe UsersController do
 
   context "#new" do
     it '1' do
-      allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
       params = {role: 'instructor'}
       session = {user: instructor}
       get :new, params, session
@@ -129,7 +128,6 @@ describe UsersController do
 
   context "#request new" do
     it '1' do
-      allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
       params = {role: 'instructor'}
       post :request_new, params
       expect(response).to render_template(:request_new)

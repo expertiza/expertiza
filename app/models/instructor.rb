@@ -1,3 +1,12 @@
+# E1920
+# Code Climate mistakenly reports
+# "Mass assignment is not restricted using attr_accessible"
+# https://github.com/presidentbeef/brakeman/issues/579
+#
+# Changes in superclass User may require changes to this model
+# Changes to this model are tested in models/user_spec.rb
+#                                     models/assignment_form_spec.rb
+
 class Instructor < User
   has_many :questionnaires
 

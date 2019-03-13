@@ -4,6 +4,7 @@
 # https://github.com/presidentbeef/brakeman/issues/579
 #
 # Changes to this model are tested in models/user_spec.rb
+#                                     models/assignment_form_spec.rb
 
 class Ta < User
   has_many :ta_mappings, dependent: :destroy
@@ -93,7 +94,8 @@ class Ta < User
     Ta.get_my_instructor(self.id)
   end
 
-  def set_instructor(new_assign)
+  # Change to copy_instructor per Code Climate
+  def copy_instructor(new_assign)
     new_assign.instructor_id = Ta.get_my_instructor(self.id)
     new_assign.course_id = TaMapping.get_course_id(self.id)
   end

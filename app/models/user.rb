@@ -1,3 +1,11 @@
+# E1920
+# Code Climate mistakenly reports
+# "Mass assignment is not restricted using attr_accessible"
+# https://github.com/presidentbeef/brakeman/issues/579
+#
+# Changes to this model are tested in models/user_spec.rb
+#                                     models/assignment_form_spec.rb
+
 class User < ActiveRecord::Base
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
@@ -182,11 +190,13 @@ class User < ActiveRecord::Base
     user
   end
 
-  def set_instructor(new_assignment)
+  # Change to copy_instructor per Code Climate
+  def copy_instructor(new_assignment)
     new_assignment.instructor_id = self.id
   end
 
-  def get_instructor
+  # Change to instructor per Code Climate
+  def instructor
     self.id
   end
 

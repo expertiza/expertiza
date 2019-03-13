@@ -35,18 +35,14 @@ module AuthorizationHelper
     current_user_has_privileges_of?('Student')
   end
 
-  # Determine if the currently logged-in user has the privileges of a Student (or higher)
-  # As student is the "lowest" role, any student (or higher) has at least some privileges
-  def current_user_has_any_privileges?
-    current_user_has_student_privileges?
-  end
-
   # Determine if the currently logged-in user is participating in an Assignment based on the passed in AssignmentTeam ID.
   # Although it would be better to take the Assignment ID as a parameter, the controller that this function gets used
   # in does not get passed an Assignment ID, only an AssignmentTeam ID
   def current_user_is_assignment_participant?(assignment_team_id)
     team = AssignmentTeam.find_by(id: assignment_team_id)
-    participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: session[:user].id)
+    if team && session[:user]
+      participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: session[:user].id)
+    end
     participant ? true : false
   end
 

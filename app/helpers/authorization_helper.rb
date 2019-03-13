@@ -41,7 +41,7 @@ module AuthorizationHelper
   def current_user_is_assignment_participant?(assignment_team_id)
     team = AssignmentTeam.find_by(id: assignment_team_id)
     if team && session[:user]
-      participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: session[:user].id)
+      participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: current_user_id)
     end
     participant ? true : false
   end
@@ -59,6 +59,18 @@ module AuthorizationHelper
     session[:user].id.to_s
   end
 
+  # Determine if the currently logged-in user created the bookmark with the given ID
+  # If there is no currently logged-in user (or that user has no ID) simply return false
+  # Bookmark ID can be passed as string or number
+  # If the bookmark is not found, simply return false
+  def current_user_created_bookmark_id?(bookmark_id)
+    return false unless current_user_id
+    return false unless bookmark_id
+    Bookmark.find(bookmark_id.to_i).user_id == current_user_id
+  rescue ActiveRecord::RecordNotFound
+    return false
+  end
+
   # PRIVATE METHODS
   private
 
@@ -67,6 +79,14 @@ module AuthorizationHelper
   # If there is no currently logged-in user simply return false
   def current_user_has_privileges_of?(role_name)
     session[:user] && session[:user].role ? session[:user].role.hasAllPrivilegesOf(Role.find_by(name: role_name)) : false
+  end
+
+  # Get the ID of the currently logged-in user
+  # Return -1 if there is no currently logged-in user
+  # Return -1 if the currently logged-in user has no id
+  # This is done instead of returning nil to be very explicit and avoid matching to records which have nil user ID
+  def current_user_id
+    (session[:user] && session[:user].id) ? session[:user].id : -1
   end
 
 end

@@ -185,6 +185,97 @@ describe AuthorizationHelper do
 
   end
 
+  describe ".teaching_staff_of_assignment?" do
+
+    it 'returns true if the instructor is assigned to the course of the assignment' do
+      instructor1 = build(:instructor, id: 20)
+      instructor1.save!
+
+      course = build(:course, id: 40, instructor_id: 20)
+      course.save!
+
+      assignment = build(:assignment, id: 1, course_id: 40)
+      assignment.save!
+
+      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+      expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
+    end
+
+    it 'returns false if the instructor is not assigned to the course of the assignment' do
+      instructor1 = build(:instructor, name: "Lucy", id: 27)
+      instructor1.save!
+
+      instructor2 = build(:instructor, name: "Jeb", id: 20)
+      instructor2.save!
+
+      course = build(:course, id: 41, instructor_id: 20)
+      course.save!
+
+      assignment = build(:assignment, id: 1, course_id: 41)
+      assignment.save!
+
+      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+      expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
+    end
+
+    it 'returns true if the instructor is associated with the assignment' do
+      instructor1 = build(:instructor, name: "Lucy", id: 27)
+      instructor1.save!
+
+      assignment = build(:assignment, id: 1, instructor_id: 27)
+      assignment.save!
+
+      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+      expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
+    end
+
+    it 'returns false if the instructor is not associated with the assignment' do
+      instructor1 = build(:instructor, name: "Lucy", id: 13)
+      instructor1.save!
+
+      instructor2 = build(:instructor, name: "Jeb", id: 27)
+      instructor2.save!
+
+      assignment = build(:assignment, id: 1, instructor_id: 27)
+      assignment.save!
+
+      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+      expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
+    end
+
+    it 'returns true if the teaching assistant is associated with the course of the assignment' do
+      teaching_assistant1 = build(:teaching_assistant, id: 13, name: "Lillian")
+      teaching_assistant1.save!
+
+      course = build(:course, id: 41)
+      course.save!
+
+      assignment = build(:assignment, id: 1 )
+      assignment.save!
+
+      ta_mapping = TaMapping.new(ta_id: 13, course_id: 41)
+      ta_mapping.save!
+
+      stub_current_user(teaching_assistant1, teaching_assistant1.role.name, teaching_assistant1.role)
+      expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
+    end
+
+    it 'returns false if the teaching assistant is not associated with the course of the assignment' do
+      instructor1 = build(:instructor, name: "Lucy", id: 33)
+      instructor1.save!
+
+      teaching_assistant1 = build(:teaching_assistant, id: 13, name: "Lillian")
+      teaching_assistant1.save!
+
+      assignment = build(:assignment, id: 1, instructor_id: 33)
+      assignment.save!
+
+      stub_current_user(teaching_assistant1, teaching_assistant1.role.name, teaching_assistant1.role)
+      expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
+    end
+
+  end
+
   # OTHER HELPER METHODS
 
   describe ".current_user_is_assignment_participant?" do

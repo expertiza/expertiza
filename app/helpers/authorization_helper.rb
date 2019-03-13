@@ -46,6 +46,14 @@ module AuthorizationHelper
     participant ? true : false
   end
 
+  def current_user_teaching_staff_of_assignment?(assignment_id)
+    assignment = Assignment.find(assignment_id)
+    session[:user] &&
+        (assignment.course_id && Course.find(assignment.course_id).instructor_id == session[:user].id ||
+        assignment.instructor_id == session[:user].id ||
+        TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course_id))
+  end
+
   # Determine if the currently logged-in user IS of the given role name
   # If there is no currently logged-in user simply return false
   # TODO (Ginger): need to write tests

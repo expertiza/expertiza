@@ -6,12 +6,13 @@
 
 # change access permission from public to private or vice versa
 class CourseController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
   require 'fileutils'
 
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    current_role_name.eql?("Instructor")
+    current_user_is_instructor?
   end
 
   def auto_complete_for_user_name

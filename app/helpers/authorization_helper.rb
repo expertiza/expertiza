@@ -41,6 +41,13 @@ module AuthorizationHelper
     current_user_has_student_privileges?
   end
 
+  # Determine if the currently logged-in user IS an Instructor
+  # There are some cases where an instructor role specifically is needed,
+  # And a user with a role "above" an instructor isn't allowed to perform the given function
+  def current_user_is_instructor?
+    current_user_is_a?('Instructor')
+  end
+
   # Determine if the currently logged-in user IS a Student
   # There are some cases where a student role specifically is needed,
   # And a user with a role "above" a student isn't allowed to perform the given function

@@ -25,30 +25,12 @@ class SimiCheckWebService
   # DRY headers
   def self.new_comparison(comparison_name = '')
     # full_url = @base_uri + '/comparison'
-    json_body = {comparison_name: comparison_name}.to_json
+    # json_body = {comparison_name: comparison_name}.to_json
     RestClient::Request.execute(method: :put,
                                 url: full_url('/comparison'),
-                                payload: json_body,
+                                payload: comparison_json_body(comparison_name),
                                 headers: make_header,
                                 verify_ssl: false)
-  end
-
-  private def full_url(dir)
-    @base_uri + dir
-  end
-
-  private def make_short_header
-    {simicheck_api_key: @api_key}
-  end
-
-  private def make_header(content_type = nil)
-    # ret = make_short_header
-    if content_type.nil?
-      make_short_header[content_type: :json]
-    else
-      ret = make_short_header[content_type: content_type]
-    end
-    ret[accept: :json]
   end
 
   # Deletes a comparison
@@ -86,10 +68,10 @@ class SimiCheckWebService
   # DRY headers
   def self.update_comparison(comparison_id, new_comparison_name)
     # full_url = @base_uri + '/comparison/' + comparison_id
-    json_body = {comparison_name: new_comparison_name}.to_json
+    # json_body = {comparison_name: new_comparison_name}.to_json
     RestClient::Request.execute(method: :post,
                                 url: full_url('/comparison/' + comparison_id),
-                                payload: json_body,
+                                payload: comparison_json_body(new_comparison_name),
                                 headers: make_header,
                                 verify_ssl: false)
   end
@@ -224,4 +206,27 @@ class SimiCheckWebService
                                 headers: make_short_header,
                                 verify_ssl: false)
   end
+
+  private def comparison_json_body(value)
+    {comparison_name: value}.to_json
+  end
+
+  private def full_url(dir)
+    @base_uri + dir
+  end
+
+  private def make_short_header
+    {simicheck_api_key: @api_key}
+  end
+
+  private def make_header(content_type = nil)
+    # ret = make_short_header
+    if content_type.nil?
+      ret = make_short_header[content_type: :json]
+    else
+      ret = make_short_header[content_type: content_type]
+    end
+    ret[accept: :json]
+  end
+
 end

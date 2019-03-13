@@ -59,7 +59,7 @@ module AuthorizationHelper
   # Determine if the currently logged-in user IS of the given role name
   # If there is no currently logged-in user simply return false
   def current_user_is_a?(role_name)
-    session[:user] ? session[:user].role.name == role_name : false
+    session[:user] && session[:user].role ? session[:user].role.name == role_name : false
   end
 
 end

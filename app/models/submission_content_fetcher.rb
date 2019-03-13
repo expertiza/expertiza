@@ -8,7 +8,6 @@ class SubmissionContentFetcher
 
       return GoogleDocFetcher.new(params) if GoogleDocFetcher.supports_url?(url)
       return WebsiteFetcher.new(params) if WebsiteFetcher.supports_url?(url) # leave as catch-all
-
     end
 
     def code_factory(url)

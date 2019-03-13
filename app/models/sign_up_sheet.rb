@@ -120,7 +120,7 @@ class SignUpSheet < ActiveRecord::Base
   # When using this method when creating fields, update race conditions by using db transactions
   # Change name to slot_available? per Code Climate
   def self.slot_available?(topic_id)
-    SignUpTopic.slotAvailable?(topic_id)
+    SignUpTopic.slot_available?(topic_id)
   end
 
   # Assignment Branch Condition still exists

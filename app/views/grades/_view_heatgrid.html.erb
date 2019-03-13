@@ -106,7 +106,7 @@ function toggleFunction(elementId) {
           <table id='<%="scoresTable"+@type + @participant.id.to_s%>' class="table tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
-            <tr>
+            <tr class="hide-scrollbar">
               <th class="sorter-true">Criterion<span></span></th>
               
               <% i = 1 %>

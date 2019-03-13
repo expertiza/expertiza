@@ -107,3 +107,12 @@ background-color: #d3d3d3;
 .spn_qsttog {
   padding-left:30px;cursor: pointer;text-decoration:underline;color:blue;font-size:small;
 }
+
+.hide-scrollbar {
+  overflow-y: hidden;
+  padding-top: 10px;
+}
+
+.hide-scrollbar th{
+  overflow-y: hidden;
+}

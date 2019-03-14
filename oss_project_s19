@@ -1,0 +1,7 @@
+Complete
+
+TODO
+- Get Expertiza code running
+- Start to look at modifying documentation
+- Fix Issue #98 - all topic waitlists need to be cleared when a drop-topic deadline passes (and update documentation)
+- Fix Issue #154 - same drop-topic deadlines applies to all topics of a staggered-deadline assignment (and update documentation)

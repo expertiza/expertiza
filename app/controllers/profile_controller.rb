@@ -14,7 +14,7 @@ class ProfileController < ApplicationController
 
     unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?
       aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
-      aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
+      aq.update_attributes('notification_limit', params[:assignment_questionnaire][:notification_limit])
     end
     if @user.update_attributes(params[:user])
       ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, "Your profile was successfully updated.", request)

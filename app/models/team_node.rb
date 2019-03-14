@@ -16,7 +16,7 @@ class TeamNode < Node
     Team.find(self.node_object_id).name
   end
 
-  def get_children()
+  def children
     TeamUserNode.get(self.node_object_id)
   end
 end

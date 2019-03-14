@@ -15,7 +15,7 @@ class Node < ActiveRecord::Base
   def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil); end
 
   # Retrieves the children of this node
-  def get_children() end
+  def children; end
 
   # Retrieves the action partial for this node
   def get_partial_name

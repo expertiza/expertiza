@@ -314,7 +314,7 @@ class AssignmentForm
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
-    user.set_instructor(new_assign)
+    user.copy_instructor(new_assign)
     new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)

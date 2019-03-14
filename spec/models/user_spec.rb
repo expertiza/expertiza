@@ -244,10 +244,10 @@ describe User do
     end
   end
 
-  describe '#get_instructor' do
+  describe '#instructor' do
     it 'gets the instructor id' do
       user.id = 6
-      expect(user.get_instructor).to eq 6
+      expect(user.instructor).to eq 6
     end
   end
 

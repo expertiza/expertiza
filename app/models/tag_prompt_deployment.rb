@@ -33,7 +33,7 @@ class TagPromptDeployment < ActiveRecord::Base
       teams.each do |team|
         if self.assignment.varying_rubrics_by_round?
           responses = []
-          for round in 1..self.assignment.rounds_of_reviews
+          1..self.assignment.rounds_of_reviews.each do |round|
             responses += ReviewResponseMap.get_responses_for_team_round(team, round)
           end
         else
@@ -47,7 +47,7 @@ class TagPromptDeployment < ActiveRecord::Base
         users.each do |user|
           tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id, answer_id: answers_ids)
           tagged_answers_ids = tags.map(&:answer_id)
-          percentage = answers.count == 0 ? "-" : format("%.1f", tags.count.to_f / answers.count * 100)
+          percentage = answers.count.zero? ? "-" : format("%.1f", tags.count.to_f / answers.count * 100)
           not_tagged_answers = answers.where.not(id: tagged_answers_ids)
           answer_tagging = VmUserAnswerTagging.new(user, percentage, tags.count, not_tagged_answers.count, answers.count)
           user_answer_tagging.append(answer_tagging)

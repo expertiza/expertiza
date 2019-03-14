@@ -1,5 +1,5 @@
 class TeamNode < Node
-  belongs_to :node_object, class_name: 'Team'
+  belongs_to :node_object, class_name: 'Team', inverse_of => :team_node
   attr_accessible :parent_id, :node_object_id
   def self.table
     "teams"
@@ -16,7 +16,7 @@ class TeamNode < Node
     Team.find(self.node_object_id).name
   end
 
-  def get_children(_sortvar = nil, _sortorder = nil, _user_id = nil, _parent_id = nil, _search = nil)
+  def get_children
     TeamUserNode.get(self.node_object_id)
   end
 end

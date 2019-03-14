@@ -26,7 +26,7 @@ class RolesController < ApplicationController
   end
 
   def create
-    @role = Role.new(params[:role])
+    @role = Role.new(params[:role],:without_protection => true)
     if @role.save
       Role.rebuild_cache
       flash[:notice] = 'The role was successfully created.'
